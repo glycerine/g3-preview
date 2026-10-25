@@ -138736,7 +138736,10 @@
         "pkg/smtcore/theory_str_containment.go",
         "pkg/smtcore/theory_str_containment_test.go",
         "pkg/smtcore/theory_str_containment_pairs.go",
-        "pkg/smtcore/theory_str_containment_pairs_test.go"
+        "pkg/smtcore/theory_str_containment_pairs_test.go",
+        "pkg/smtcore/theory_str_regex.go",
+        "pkg/smtcore/theory_str_regex_axioms.go",
+        "pkg/smtcore/theory_str_regex_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -138769,7 +138772,13 @@
         "TestSMTStringContainmentNonconstantSubstringAndPremiseLifetime",
         "TestSMTStringContainmentEqualClassAndReflexiveRules",
         "TestSMTStringContainmentLiteralTraversalSkipsBinders",
-        "TestSMTStringContainmentMonotonicityCoreMergeAndPop"
+        "TestSMTStringContainmentMonotonicityCoreMergeAndPop",
+        "TestSMTStringRegexTextKeysAndAutomataRegistries",
+        "TestSMTStringLegacyRegexLeafAxioms",
+        "TestSMTStringLegacyRegexNFAEqualityGuardsAndCache",
+        "TestSMTStringRegexAutomataModeAndBorrowedParameterUpdate",
+        "TestSMTStringLegacyRegexConcatUnionWitnessesAndWorklists",
+        "TestSMTStringLegacyRegexStarUnrollDefinition"
       ],
       "conditionals": [
         {
@@ -139631,6 +139640,45 @@
             "TestSMTStringContainmentLiteralTraversalSkipsBinders",
             "TestSMTStringContainmentMonotonicityCoreMergeAndPop"
           ]
+        },
+        {
+          "name": "str2RegexStr/get_std_regex_str: native text registry keys, twelve escapes, NUL omission, nonliteral to_re fallback and supported regex constructors, implemented using Go byte-string handling",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex.go",
+          "tests": [
+            "TestSMTStringRegexTextKeysAndAutomataRegistries"
+          ]
+        },
+        {
+          "name": "instantiate_axiom_RegexIn/mk_RegexIn: persistent text-key registration in both modes, automata-mode term indexes, and complete initial legacy to_re/concat/union/star/range/full-sequence/full-character axioms with recursive child worklist setup; automata final checking remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_axioms.go",
+          "tests": [
+            "TestSMTStringRegexTextKeysAndAutomataRegistries",
+            "TestSMTStringLegacyRegexLeafAxioms",
+            "TestSMTStringLegacyRegexNFAEqualityGuardsAndCache",
+            "TestSMTStringRegexAutomataModeAndBorrowedParameterUpdate",
+            "TestSMTStringLegacyRegexConcatUnionWitnessesAndWorklists",
+            "TestSMTStringLegacyRegexStarUnrollDefinition"
+          ]
+        },
+        {
+          "name": "mk_regex_rep_var/mk_unroll_bound_var/mk_unroll initial definition as reached by legacy star membership: regex-specific String witness classification, shared fresh counter, relevant integer bound and zero/empty/nonnegative constraints; later unroll processing remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_axioms.go",
+          "tests": [
+            "TestSMTStringLegacyRegexConcatUnionWitnessesAndWorklists",
+            "TestSMTStringLegacyRegexStarUnrollDefinition"
+          ]
+        },
+        {
+          "name": "check_regex_in and new_eq_check consumer hook: prospective class constant selection, sorted native-text registry traversal, cached concrete byte NFA, guarded match/refusal and live borrowed RegexAutomata gating",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex.go",
+          "tests": [
+            "TestSMTStringLegacyRegexNFAEqualityGuardsAndCache",
+            "TestSMTStringRegexAutomataModeAndBorrowedParameterUpdate"
+          ]
         }
       ],
       "ownership": [
@@ -139639,7 +139687,8 @@
         "Fresh String witnesses are retained by source m_trail before internalization; their decimal counter, variable sets and scope-membership map have native lifetime rather than being reset on scope pop. Canonical concat pairs and library deduplication keys remain valid through retained concat/axiom trees. Symbolic Contains expressions have a separate owning contains_map ref vector, released forward before m_trail. Relation axiom temporaries are pinned through final publication and close in reverse lexical order. Pair/reverse registries use concrete Go maps for membership, without iteration-dependent choices.",
         "Equality feasibility reads syntactic concat leaves and private union-find class membership without substituting arbitrary model values into unconditional axioms. Length lookup uses a reusable owned temporary str.len ref and only actual core numeral roots, returning arbitrary-precision integer copies. Length premise vectors pin each generated equality, retain guards through refusal publication, and release forward as native expr_ref_vectors do. Shared string-equality/length implication locals retain reverse lexical lifetime. Private class merging remains after the checker, including when a conflict has already been asserted, and union-find scope trails undo it.",
         "Containment premise vectors own equality, conclusion and conjunction handles through implication publication and close forward. Literal traversal uses concrete Go slices; pair/reverse maps remain membership indexes. Prospective equalities remain explicit guards rather than being assumed before private class merging.",
-        "Containment pair rules retain each explicit pending/class equality and registered containment premise through Boolean consequence publication. The nonconstant substring premise vector deliberately persists across index entries as in the source. Ordered concrete slices replace native pointer sets, sorting by stable Go handle slot/generation; maps supply membership and lookup only. Literal collection walks applications left-first and skips bound variables/quantifiers without traversing binder bodies."
+        "Containment pair rules retain each explicit pending/class equality and registered containment premise through Boolean consequence publication. The nonconstant substring premise vector deliberately persists across index entries as in the source. Ordered concrete slices replace native pointer sets, sorting by stable Go handle slot/generation; maps supply membership and lookup only. Literal collection walks applications left-first and skips bound variables/quantifiers without traversing binder bodies.",
+        "Regex memberships are retained by the Go theory trail even when automata-mode registration publishes no axiom, protecting persistent raw-handle registries after scope pop and text-key overwrites. Native NFA cache values become read-only Go-owned concrete byte NFAs keyed by retained regex ASTs. Fresh owners borrow parameters but start with empty membership/automata/witness/NFA state. Regex axiom expression temporaries remain pinned through publication and close in reverse lexical order; native clause/premise vectors keep forward release."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -139653,7 +139702,8 @@
         "The active get_len_value path requires the actual mixed arithmetic owner even for literal strings. It sums literal byte lengths and integral values at internalized str.len core numeral roots, never reading a simplex candidate or a private String class value as a length fact. Source get_arith_value has an unconditional return false before its model-query fallback; that dead fallback and never-enabled diagnostic option branches are not ported. Source length consistency guards every observed nonliteral length, keeps unknown-partial sum behavior and omits zero-valued leaf premises only in the native concat/variable case. Scope tests require the refused parent equality to become undefined after pop and a subsequent equal-length branch to remain consistent.",
         "This increment does not complete handle_equality/new_eq_check: the preceding concat-length inference call, containment/legacy-regex class consistency, tester/free-variable dispatch, concat arrangements and parent/unroll simplification still require audit/porting. FinalCheck remains GiveUp and production string-backend routing is unchanged. Native/debug integration evidence covers this partial callback increment, not a newly complete string solver.",
         "Constant-value containment checks now run after successful value/length pair checks and before private class merging. Nonconstant substring inference, relation-pair monotonicity/congruence and legacy-regex consistency remain pending; this does not complete check_contain_in_new_eq or handle_equality. FinalCheck remains GiveUp and production backend routing is unchanged. The running frozen 964bf983 full-suite checkpoint excludes this increment.",
-        "The remaining nonconstant substring and pair-rule stages of check_contain_in_new_eq are now connected after successful pre-merge value/length checks. Implications use the native not-premise/or-conclusion form. Pointer-set traversal uses stable Go handle order, preserving the native identical-node first-key early exit rather than introducing random Go-map choice. This completes the audited containment consistency methods, not handle_equality/new_eq_check or the String backend. Legacy regex class checks, preceding concat length inference, equality arrangements and full final checking remain pending; production routing is unchanged and FinalCheck remains GiveUp. Frozen 964bf983 full-suite evidence excludes both subsequent containment increments."
+        "The remaining nonconstant substring and pair-rule stages of check_contain_in_new_eq are now connected after successful pre-merge value/length checks. Implications use the native not-premise/or-conclusion form. Pointer-set traversal uses stable Go handle order, preserving the native identical-node first-key early exit rather than introducing random Go-map choice. This completes the audited containment consistency methods, not handle_equality/new_eq_check or the String backend. Legacy regex class checks, preceding concat length inference, equality arrangements and full final checking remain pending; production routing is unchanged and FinalCheck remains GiveUp. Frozen 964bf983 full-suite evidence excludes both subsequent containment increments.",
+        "RegexIn registration and initial legacy axioms now use the actual theory_str library worklist, with the cached NFA reached from pre-merge equality consistency only when RegexAutomata is disabled. Default automata mode records terms for its still-unported later final-check path. Registry keys preserve source NUL omission/text collisions and twelve-character escaping without porting C++ string internals. Legacy range axioms normalize reversed endpoints, while the separate native NFA keeps the reversed range empty; neither algorithm is silently replaced by the other. Legacy concat/union axioms retain unconditional child memberships as source requires. Star setup preserves separate inner/outer empty-literal cache accesses. This does not complete handle_equality, unroll/arrangement processing, automata final checking or String production routing; FinalCheck remains GiveUp. No new runner comparison vector is credited to this unselected owner."
       ]
     },
     {
@@ -139683,7 +139733,10 @@
         "pkg/smtcore/theory_str_containment.go",
         "pkg/smtcore/theory_str_containment_test.go",
         "pkg/smtcore/theory_str_containment_pairs.go",
-        "pkg/smtcore/theory_str_containment_pairs_test.go"
+        "pkg/smtcore/theory_str_containment_pairs_test.go",
+        "pkg/smtcore/theory_str_regex.go",
+        "pkg/smtcore/theory_str_regex_axioms.go",
+        "pkg/smtcore/theory_str_regex_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139717,7 +139770,13 @@
         "TestSMTStringContainmentNonconstantSubstringAndPremiseLifetime",
         "TestSMTStringContainmentEqualClassAndReflexiveRules",
         "TestSMTStringContainmentLiteralTraversalSkipsBinders",
-        "TestSMTStringContainmentMonotonicityCoreMergeAndPop"
+        "TestSMTStringContainmentMonotonicityCoreMergeAndPop",
+        "TestSMTStringRegexTextKeysAndAutomataRegistries",
+        "TestSMTStringLegacyRegexLeafAxioms",
+        "TestSMTStringLegacyRegexNFAEqualityGuardsAndCache",
+        "TestSMTStringRegexAutomataModeAndBorrowedParameterUpdate",
+        "TestSMTStringLegacyRegexConcatUnionWitnessesAndWorklists",
+        "TestSMTStringLegacyRegexStarUnrollDefinition"
       ],
       "conditionals": [
         {
@@ -139897,6 +139956,45 @@
             "TestSMTStringContainmentLiteralTraversalSkipsBinders",
             "TestSMTStringContainmentMonotonicityCoreMergeAndPop"
           ]
+        },
+        {
+          "name": "str2RegexStr/get_std_regex_str: native text registry keys, twelve escapes, NUL omission, nonliteral to_re fallback and supported regex constructors, implemented using Go byte-string handling",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex.go",
+          "tests": [
+            "TestSMTStringRegexTextKeysAndAutomataRegistries"
+          ]
+        },
+        {
+          "name": "instantiate_axiom_RegexIn/mk_RegexIn: persistent text-key registration in both modes, automata-mode term indexes, and complete initial legacy to_re/concat/union/star/range/full-sequence/full-character axioms with recursive child worklist setup; automata final checking remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_axioms.go",
+          "tests": [
+            "TestSMTStringRegexTextKeysAndAutomataRegistries",
+            "TestSMTStringLegacyRegexLeafAxioms",
+            "TestSMTStringLegacyRegexNFAEqualityGuardsAndCache",
+            "TestSMTStringRegexAutomataModeAndBorrowedParameterUpdate",
+            "TestSMTStringLegacyRegexConcatUnionWitnessesAndWorklists",
+            "TestSMTStringLegacyRegexStarUnrollDefinition"
+          ]
+        },
+        {
+          "name": "mk_regex_rep_var/mk_unroll_bound_var/mk_unroll initial definition as reached by legacy star membership: regex-specific String witness classification, shared fresh counter, relevant integer bound and zero/empty/nonnegative constraints; later unroll processing remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_axioms.go",
+          "tests": [
+            "TestSMTStringLegacyRegexConcatUnionWitnessesAndWorklists",
+            "TestSMTStringLegacyRegexStarUnrollDefinition"
+          ]
+        },
+        {
+          "name": "check_regex_in and new_eq_check consumer hook: prospective class constant selection, sorted native-text registry traversal, cached concrete byte NFA, guarded match/refusal and live borrowed RegexAutomata gating",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex.go",
+          "tests": [
+            "TestSMTStringLegacyRegexNFAEqualityGuardsAndCache",
+            "TestSMTStringRegexAutomataModeAndBorrowedParameterUpdate"
+          ]
         }
       ],
       "ownership": [
@@ -139906,7 +140004,8 @@
         "Fresh String witnesses are retained by source m_trail before internalization; their decimal counter, variable sets and scope-membership map have native lifetime rather than being reset on scope pop. Canonical concat pairs and library deduplication keys remain valid through retained concat/axiom trees. Symbolic Contains expressions have a separate owning contains_map ref vector, released forward before m_trail. Relation axiom temporaries are pinned through final publication and close in reverse lexical order. Pair/reverse registries use concrete Go maps for membership, without iteration-dependent choices.",
         "Equality feasibility reads syntactic concat leaves and private union-find class membership without substituting arbitrary model values into unconditional axioms. Length lookup uses a reusable owned temporary str.len ref and only actual core numeral roots, returning arbitrary-precision integer copies. Length premise vectors pin each generated equality, retain guards through refusal publication, and release forward as native expr_ref_vectors do. Shared string-equality/length implication locals retain reverse lexical lifetime. Private class merging remains after the checker, including when a conflict has already been asserted, and union-find scope trails undo it.",
         "Containment premise vectors own equality, conclusion and conjunction handles through implication publication and close forward. Literal traversal uses concrete Go slices; pair/reverse maps remain membership indexes. Prospective equalities remain explicit guards rather than being assumed before private class merging.",
-        "Containment pair rules retain each explicit pending/class equality and registered containment premise through Boolean consequence publication. The nonconstant substring premise vector deliberately persists across index entries as in the source. Ordered concrete slices replace native pointer sets, sorting by stable Go handle slot/generation; maps supply membership and lookup only. Literal collection walks applications left-first and skips bound variables/quantifiers without traversing binder bodies."
+        "Containment pair rules retain each explicit pending/class equality and registered containment premise through Boolean consequence publication. The nonconstant substring premise vector deliberately persists across index entries as in the source. Ordered concrete slices replace native pointer sets, sorting by stable Go handle slot/generation; maps supply membership and lookup only. Literal collection walks applications left-first and skips bound variables/quantifiers without traversing binder bodies.",
+        "Regex memberships are retained by the Go theory trail even when automata-mode registration publishes no axiom, protecting persistent raw-handle registries after scope pop and text-key overwrites. Native NFA cache values become read-only Go-owned concrete byte NFAs keyed by retained regex ASTs. Fresh owners borrow parameters but start with empty membership/automata/witness/NFA state. Regex axiom expression temporaries remain pinned through publication and close in reverse lexical order; native clause/premise vectors keep forward release."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -139921,7 +140020,8 @@
         "The active get_len_value path requires the actual mixed arithmetic owner even for literal strings. It sums literal byte lengths and integral values at internalized str.len core numeral roots, never reading a simplex candidate or a private String class value as a length fact. Source get_arith_value has an unconditional return false before its model-query fallback; that dead fallback and never-enabled diagnostic option branches are not ported. Source length consistency guards every observed nonliteral length, keeps unknown-partial sum behavior and omits zero-valued leaf premises only in the native concat/variable case. Scope tests require the refused parent equality to become undefined after pop and a subsequent equal-length branch to remain consistent.",
         "This increment does not complete handle_equality/new_eq_check: the preceding concat-length inference call, containment/legacy-regex class consistency, tester/free-variable dispatch, concat arrangements and parent/unroll simplification still require audit/porting. FinalCheck remains GiveUp and production string-backend routing is unchanged. Native/debug integration evidence covers this partial callback increment, not a newly complete string solver.",
         "Constant-value containment checks now run after successful value/length pair checks and before private class merging. Nonconstant substring inference, relation-pair monotonicity/congruence and legacy-regex consistency remain pending; this does not complete check_contain_in_new_eq or handle_equality. FinalCheck remains GiveUp and production backend routing is unchanged. The running frozen 964bf983 full-suite checkpoint excludes this increment.",
-        "The remaining nonconstant substring and pair-rule stages of check_contain_in_new_eq are now connected after successful pre-merge value/length checks. Implications use the native not-premise/or-conclusion form. Pointer-set traversal uses stable Go handle order, preserving the native identical-node first-key early exit rather than introducing random Go-map choice. This completes the audited containment consistency methods, not handle_equality/new_eq_check or the String backend. Legacy regex class checks, preceding concat length inference, equality arrangements and full final checking remain pending; production routing is unchanged and FinalCheck remains GiveUp. Frozen 964bf983 full-suite evidence excludes both subsequent containment increments."
+        "The remaining nonconstant substring and pair-rule stages of check_contain_in_new_eq are now connected after successful pre-merge value/length checks. Implications use the native not-premise/or-conclusion form. Pointer-set traversal uses stable Go handle order, preserving the native identical-node first-key early exit rather than introducing random Go-map choice. This completes the audited containment consistency methods, not handle_equality/new_eq_check or the String backend. Legacy regex class checks, preceding concat length inference, equality arrangements and full final checking remain pending; production routing is unchanged and FinalCheck remains GiveUp. Frozen 964bf983 full-suite evidence excludes both subsequent containment increments.",
+        "RegexIn registration and initial legacy axioms now use the actual theory_str library worklist, with the cached NFA reached from pre-merge equality consistency only when RegexAutomata is disabled. Default automata mode records terms for its still-unported later final-check path. Registry keys preserve source NUL omission/text collisions and twelve-character escaping without porting C++ string internals. Legacy range axioms normalize reversed endpoints, while the separate native NFA keeps the reversed range empty; neither algorithm is silently replaced by the other. Legacy concat/union axioms retain unconditional child memberships as source requires. Star setup preserves separate inner/outer empty-literal cache accesses. This does not complete handle_equality, unroll/arrangement processing, automata final checking or String production routing; FinalCheck remains GiveUp. No new runner comparison vector is credited to this unselected owner."
       ]
     },
     {
@@ -251031,7 +251131,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 698.669,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated commit 964bf9837cc13de67dade38297c48c05e0fa8bb1, unchanged at start/end and verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Covers all earlier sequence and distinct partial String owner increments through 964bf983, including canonical concat/relation witnesses, borrowed kernel assertion setup and pre-merge value/length consistency. The known ALL unconstrained containment sat-versus-unknown differential remains pending. Excludes subsequent constant-class containment (1d6a6689) and nonconstant substring/congruence/monotonicity (81985ff4); their separate focused/native/debug integration evidence does not complete the String backend. Production backend routing and remaining equality/final-check stages are still incomplete."
+    "scope_warning": "Independently verified exact clean isolated commit 964bf9837cc13de67dade38297c48c05e0fa8bb1, unchanged at start/end and verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Covers all earlier sequence and distinct partial String owner increments through 964bf983, including canonical concat/relation witnesses, borrowed kernel assertion setup and pre-merge value/length consistency. The known ALL unconstrained containment sat-versus-unknown differential remains pending. Excludes subsequent constant-class containment (1d6a6689) and nonconstant substring/congruence/monotonicity (81985ff4); their separate focused/native/debug integration evidence does not complete the String backend. Production backend routing and remaining equality/final-check stages are still incomplete. Also excludes the subsequent RegexIn registration, initial legacy axiom and NFA equality-consumer increment."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

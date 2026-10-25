@@ -303,6 +303,8 @@ func (t *SMTStringTheory) Propagate() error {
 					err = t.instantiateBoundaryRelation(node, op == 4)
 				case 5:
 					err = t.instantiateContains(node)
+				case 12:
+					err = t.instantiateRegexMembership(node)
 				default:
 					return fmt.Errorf("string theory library operation %d is not ported", op)
 				}

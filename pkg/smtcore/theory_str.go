@@ -13,34 +13,39 @@ import (
 // callbacks/final check must be ported before setup selects it for QF_S.
 type SMTStringTheory struct {
 	*SMTTheoryBase
-	parameterOwner    *SMTStrParams
-	find              *backtrack.UnionFind
-	findTrail         *backtrack.TrailStack
-	level             uint32
-	charset           [256]byte
-	charsetLookup     map[byte]int
-	strings           map[string]ast.ASTHandle
-	refs              []ast.ASTRef
-	cacheAccesses     uint64
-	unusedID          uint32
-	basicTodo         []*SMTEnode
-	concatTodo        []*SMTEnode
-	concatEvalTodo    []*SMTEnode
-	libraryTodo       []*SMTEnode
-	delayedSetup      []ast.ASTHandle
-	conversions       []ast.ASTHandle
-	searchStarted     bool
-	freshID           uint32
-	concatCache       map[[2]ast.ASTHandle]ast.ASTHandle
-	variableSet       map[ast.ASTHandle]struct{}
-	internalVariables map[ast.ASTHandle]struct{}
-	variableScopes    map[uint32]map[ast.ASTHandle]struct{}
-	axiomatized       map[ast.ASTHandle]struct{}
-	contains          []ast.ASTHandle
-	containsRefs      []ast.ASTRef
-	containsByPair    map[[2]ast.ASTHandle]ast.ASTHandle
-	containsIndex     map[ast.ASTHandle]map[[2]ast.ASTHandle]struct{}
-	closed            bool
+	parameterOwner     *SMTStrParams
+	find               *backtrack.UnionFind
+	findTrail          *backtrack.TrailStack
+	level              uint32
+	charset            [256]byte
+	charsetLookup      map[byte]int
+	strings            map[string]ast.ASTHandle
+	refs               []ast.ASTRef
+	cacheAccesses      uint64
+	unusedID           uint32
+	basicTodo          []*SMTEnode
+	concatTodo         []*SMTEnode
+	concatEvalTodo     []*SMTEnode
+	libraryTodo        []*SMTEnode
+	delayedSetup       []ast.ASTHandle
+	conversions        []ast.ASTHandle
+	searchStarted      bool
+	freshID            uint32
+	concatCache        map[[2]ast.ASTHandle]ast.ASTHandle
+	variableSet        map[ast.ASTHandle]struct{}
+	internalVariables  map[ast.ASTHandle]struct{}
+	variableScopes     map[uint32]map[ast.ASTHandle]struct{}
+	axiomatized        map[ast.ASTHandle]struct{}
+	contains           []ast.ASTHandle
+	containsRefs       []ast.ASTRef
+	containsByPair     map[[2]ast.ASTHandle]ast.ASTHandle
+	containsIndex      map[ast.ASTHandle]map[[2]ast.ASTHandle]struct{}
+	regexVariables     map[ast.ASTHandle]struct{}
+	regexMemberships   map[ast.ASTHandle]map[string]ast.ASTHandle
+	regexTerms         map[ast.ASTHandle]struct{}
+	regexTermsByString map[ast.ASTHandle][]ast.ASTHandle
+	regexNFACache      map[ast.ASTHandle]*smtStringNFA
+	closed             bool
 }
 
 func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStringTheory, error) {
@@ -66,6 +71,11 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	t.axiomatized = make(map[ast.ASTHandle]struct{})
 	t.containsByPair = make(map[[2]ast.ASTHandle]ast.ASTHandle)
 	t.containsIndex = make(map[ast.ASTHandle]map[[2]ast.ASTHandle]struct{})
+	t.regexVariables = make(map[ast.ASTHandle]struct{})
+	t.regexMemberships = make(map[ast.ASTHandle]map[string]ast.ASTHandle)
+	t.regexTerms = make(map[ast.ASTHandle]struct{})
+	t.regexTermsByString = make(map[ast.ASTHandle][]ast.ASTHandle)
+	t.regexNFACache = make(map[ast.ASTHandle]*smtStringNFA)
 	// Source initialize_charset's active default alphabet. The unused final
 	// slot remains zero; NUL is excluded from the 255-character search order.
 	index := 0
@@ -310,6 +320,8 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.concatCache, t.variableSet, t.internalVariables = nil, nil, nil
 	t.variableScopes, t.axiomatized = nil, nil
 	t.containsByPair, t.containsIndex = nil, nil
+	t.regexVariables, t.regexTerms, t.regexNFACache = nil, nil, nil
+	t.regexMemberships, t.regexTermsByString = nil, nil
 	t.closed = true
 	return result
 }

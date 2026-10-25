@@ -177,5 +177,19 @@ func (t *SMTStringTheory) checkNewEqualityValuesAndLengths(left, right ast.ASTHa
 			}
 		}
 	}
-	return true, t.checkContainNewEquality(left, right)
+	if err := t.checkContainNewEquality(left, right); err != nil {
+		return false, err
+	}
+	if len(t.regexMemberships) != 0 {
+		automata, err := t.regexAutomataEnabled()
+		if err != nil {
+			return false, err
+		}
+		if !automata {
+			if err := t.checkRegexNewEquality(left, right); err != nil {
+				return false, err
+			}
+		}
+	}
+	return true, nil
 }
