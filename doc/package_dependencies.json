@@ -2737,6 +2737,7 @@
         "theory_datatype_occurs.go",
         "theory_datatype_recognizers.go",
         "theory_datatype_split.go",
+        "theory_datatype_trace.go",
         "theory_dense_diff_logic.go",
         "theory_diff_logic_integer.go",
         "theory_diff_logic_real.go",

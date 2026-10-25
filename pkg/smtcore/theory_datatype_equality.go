@@ -2,6 +2,9 @@
 package smtcore
 
 import (
+	"fmt"
+	"io"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -54,6 +57,20 @@ func (t *SMTDatatypeTheory) equalityAxiom(left, right ast.ASTHandle, antecedent 
 	if lhs == nil || rhs == nil {
 		return ast.ErrASTDomain
 	}
+	if err = t.emitDatatype("datatype", "assert_eq_axiom", 100, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "adding axiom:\n")
+		if err := t.displayDatatypeExpression(out, left); err != nil {
+			return err
+		}
+		_, _ = io.WriteString(out, "\n=\n")
+		if err := t.displayDatatypeExpression(out, right); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return err
+	}
 	if antecedent == SMTNullLiteral {
 		return state.assignEquality(lhs, rhs, NewSMTEqualityAxiom())
 	}
@@ -72,8 +89,27 @@ func (t *SMTDatatypeTheory) equalityAxiom(left, right ast.ASTHandle, antecedent 
 	// Source dt_eq_justification::get_from_theory returns null: this
 	// equality must notify the datatype theory that originated it.
 	owner.returnToOwner = true
-	// Transfer before merging: a late merge error can leave an equality
-	// edge or conflict referencing this scoped owner.
+	// Transfer before publishing the queued equality: a later merge error
+	// can leave an equality edge or conflict referencing this scoped owner.
 	state.ownedJustifications = append(state.ownedJustifications, owner)
+	if err = t.emitDatatype("datatype", "assert_eq_axiom", 116, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "assigning... #")
+		leftID, err := lhs.OwnerID()
+		if err != nil {
+			return err
+		}
+		_, _ = fmt.Fprintf(out, "%d #", leftID)
+		rightID, err := rhs.OwnerID()
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "%d\nv%d v%d\n", rightID, lhs.TheoryVar(t.FamilyID()), rhs.TheoryVar(t.FamilyID()))
+		return err
+	}); err != nil {
+		return err
+	}
+	if err = t.emitDatatype("datatype_detail", "assert_eq_axiom", 118, t.Display); err != nil {
+		return err
+	}
 	return state.assignEquality(lhs, rhs, NewSMTEqualityJustification(owner))
 }

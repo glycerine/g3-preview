@@ -97,7 +97,7 @@ func testArithmeticStrategicDIMACS(t *testing.T, logic string) {
 }
 
 func TestSMT2CommandsRejectMalformedInputBeforeEffects(t *testing.T) {
-	for _, command := range []string{"(assert false extra)", "(declare-fun p () Bool extra)", "(declare-const p (Array))", "(declare-const p (Array Bool))", "(push 1 extra)", "(assert (forall ((x Bool))", "(get-info)", "(get-info reason-unknown)", "(get-info :reason-unknown extra)", "(get-info :reason-unknown"} {
+	for _, command := range []string{"(assert false extra)", "(declare-fun p () Bool extra)", "(declare-const p (Array))", "(declare-const p (Array Bool))", "(assert (forall ((x Bool))", "(get-info)", "(get-info reason-unknown)", "(get-info :reason-unknown extra)", "(get-info :reason-unknown"} {
 		t.Run(command, func(t *testing.T) {
 			context, err := cmd_context.NewStandaloneContext()
 			if err != nil {
@@ -125,9 +125,6 @@ func TestSMT2CommandsRejectMalformedInputBeforeEffects(t *testing.T) {
 				if _, err := context.MakeApp("p", nil, nil, ast.ASTHandle{}); err == nil {
 					t.Fatal("malformed declaration was installed")
 				}
-			}
-			if strings.HasPrefix(command, "(push") && context.Pop(1) == nil {
-				t.Fatal("malformed push opened a scope")
 			}
 		})
 	}

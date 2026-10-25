@@ -106,6 +106,7 @@ func (t *SMTDatatypeTheory) Close() error {
 	t.data = nil
 	t.scopes = nil
 	t.mergeError = nil
+	t.trace = nil
 	t.variables = nil
 	t.limits = nil
 	return nil

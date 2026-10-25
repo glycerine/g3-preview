@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/backtrack"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -24,6 +25,7 @@ type smtDatatypeStatistics struct {
 // publishes reconstruction and accessor equalities through the shared egraph.
 type SMTDatatypeTheory struct {
 	*SMTTheoryBase
+	trace          *diagnostic.TraceTags
 	parameterOwner *SMTDatatypeParams
 	utility        *ast.DatatypeUtil
 	find           *backtrack.UnionFind
@@ -259,31 +261,20 @@ func (t *SMTDatatypeTheory) initializeVariable(node *SMTEnode, data *smtDatatype
 }
 
 func (t *SMTDatatypeTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool, error) {
+	if err := t.traceDatatypeExpression("internalize_atom", 258, "internalizing atom:\n", expression); err != nil {
+		return false, err
+	}
 	op, own, err := t.operation(expression)
-	if err != nil || !own || op != ast.ASTDatatypeRecognizer && op != ast.ASTDatatypeIs {
+	if err != nil || !own || op < ast.ASTDatatypeConstructor || op > ast.ASTDatatypeUpdateField {
 		return false, err
-	}
-	state, _ := t.State()
-	variable, found := state.boolVar[expression]
-	if !found {
-		variable, err = state.MkBoolVar(expression)
-		if err != nil {
-			return false, err
-		}
-	}
-	data, err := state.BooleanData(variable)
-	if err != nil {
-		return false, err
-	}
-	if !data.IsTheoryAtom() {
-		if err = state.SetVariableTheory(variable, t.FamilyID()); err != nil {
-			return false, err
-		}
 	}
 	return t.InternalizeTerm(expression)
 }
 
 func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
+	if err := t.traceDatatypeExpression("internalize_term", 263, "internalizing term:\n", expression); err != nil {
+		return false, err
+	}
 	operation, own, err := t.operation(expression)
 	if err != nil || !own {
 		return false, err
@@ -324,6 +315,23 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		node, err = state.MkEnode(expression, false, boolean, true)
 		if err != nil {
 			return false, fmt.Errorf("datatype enode: %w", err)
+		}
+	}
+	if node.IsBool() {
+		// Source creates argument enodes first, then this enode, then its
+		// Boolean variable and enode flag, including in gate context.
+		variable, found := state.BoolVar(expression)
+		if !found {
+			variable, err = state.MkBoolVar(expression)
+			if err != nil {
+				return false, err
+			}
+		}
+		if err = state.SetVariableTheory(variable, t.FamilyID()); err != nil {
+			return false, err
+		}
+		if err = state.ensureBooleanEnode(expression, variable, false, true, true); err != nil {
+			return false, err
 		}
 	}
 	if operation == ast.ASTDatatypeConstructor || operation == ast.ASTDatatypeUpdateField {

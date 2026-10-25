@@ -90470,7 +90470,9 @@
         "pkg/smtcore/smt_model_checker.go",
         "pkg/smtcore/smt_model_checker_instances.go",
         "pkg/smtcore/smt_quantifier_manager.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/parsers/smt2/commands_scope_test.go",
+        "pkg/cmd/g3/test_vectors/datatype_boolean_fields_scopes.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -90516,7 +90518,10 @@
         "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
         "TestSMTRecursiveModelPublicationAllocationFrontiers",
         "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMT2OptionalScopeCountsAndNestedRollback",
+        "TestSMT2ScopeCommandsPreserveSourceMutationBeforeTrailingError",
+        "TestSMT2InvalidScopeCountsRefuseBeforeMutation"
       ],
       "assertions": [
         {
@@ -91334,7 +91339,7 @@
         {
           "name": "parse_define_fun_rec and parse_define_funs_rec: declare before body, mutual forward declarations, sorted local binder scopes, body sort/proper-term validation, count and syntax guards, retained declaration prefix after body failure",
           "status": "ported",
-        "go_target": "pkg/parsers/smt2/recursive_functions.go",
+          "go_target": "pkg/parsers/smt2/recursive_functions.go",
           "go_targets": [
             "pkg/ast/ast_recursive_definition.go",
             "pkg/ast/rewriter/rewriter_engine.go",
@@ -91367,6 +91372,23 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "parse_opt_unsigned/parse_push/parse_pop: default scope count one, explicit zero and unsigned validation, context mutation before closing-parenthesis check and success output",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands_scope_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/datatype_boolean_fields_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMT2OptionalScopeCountsAndNestedRollback",
+            "TestSMT2ScopeCommandsPreserveSourceMutationBeforeTrailingError",
+            "TestSMT2InvalidScopeCountsRefuseBeforeMutation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -91380,7 +91402,8 @@
         "The retained Array constructor now parses all supplied sort arguments, using the final sort as range and preceding sorts as domains, matching native variadic array sorts. Empty/unary constructors are rejected before installing the declaration. Two multidimensional store/read scope scripts, with proofs disabled/enabled, now run through the public parser and compare against C++; strict runner agreement is 130.",
         "The selected local lookup returns an owning ASTRef for the future parser expression stack and reuses the concrete AST var_shifter; scanner, command-context fallback, other parser branches and complete expression-stack integration remain unported.",
         "Go recursive grammar functions replace source explicit parser frame dispatch for retained branches. The current runner stops on the first command error; full C++ recovery and unsupported grammar branches remain open and fail explicitly.",
-        "Explicit quantified patterns now reach E-matching through the SMT-LIB runner. Validation warnings use the process diagnostic warning service, invalid patterns follow ignore_bad_patterns, and ignored user patterns are consumed as S-expressions. Full legacy qualified unary-pattern and constant-pattern discard variants, expression labels, unknown-attribute warning/recovery and other parser grammar branches remain partial. The runner now has 92 strict C++ comparisons plus the separately documented C++ live-relevancy model defect regression."
+        "Explicit quantified patterns now reach E-matching through the SMT-LIB runner. Validation warnings use the process diagnostic warning service, invalid patterns follow ignore_bad_patterns, and ignored user patterns are consumed as S-expressions. Full legacy qualified unary-pattern and constant-pattern discard variants, expression labels, unknown-attribute warning/recovery and other parser grammar branches remain partial. The runner now has 92 strict C++ comparisons plus the separately documented C++ live-relevancy model defect regression.",
+        "The new datatype C++ comparison exposed rejection of valid (push)/(pop). Scope counts now default to one only at a closing parenthesis. Invalid counts refuse before mutation; valid counts mutate the context before a trailing-token error, matching source control flow. Nested rollback and failed-command success suppression are tested with print-success enabled. Existing Go scanner error formatting is retained; broader parser work remains partial."
       ]
     },
     {
@@ -132433,7 +132456,11 @@
         "pkg/smtcore/smt_equality_propagation.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_context_invariant.go",
-        "pkg/smtcore/smt_core_equality_queue_test.go"
+        "pkg/smtcore/smt_core_equality_queue_test.go",
+        "pkg/smtcore/theory_datatype_trace.go",
+        "pkg/smtcore/theory_datatype_trace_test.go",
+        "pkg/smtcore/theory_datatype_boolean_order_test.go",
+        "pkg/cmd/g3/test_vectors/datatype_boolean_fields_scopes.smt2"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -132476,7 +132503,11 @@
         "TestSMTDatatypeEmptyDisplayAndClosedOwner",
         "TestSMTDatatypeDisplayBoundsConstructorArguments",
         "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
-        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting",
+        "TestSMTDatatypeBooleanTermsUseSourceArgumentOrderAndEnodeFlags",
+        "TestSMTDatatypeEqualityTraceSourceBranchesBeforeQueuedMerge",
+        "TestSMTDatatypeTraceEntryOrderAndIndependentDetailTag",
+        "TestSMTDatatypeTraceBadStreamPreservesQueuedEquality"
       ],
       "assertions": [
         {
@@ -132919,6 +132950,28 @@
             "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
             "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
           ]
+        },
+        {
+          "name": "internalize_atom delegates to argument-first internalize_term for Boolean accessors/recognizers, source Boolean creation/theory/enode flags; retained entry and assert_eq_axiom TRACE packets",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_equality.go",
+            "pkg/smtcore/theory_datatype_split.go",
+            "pkg/smtcore/theory_datatype_trace.go",
+            "pkg/smtcore/theory_datatype_trace_test.go",
+            "pkg/smtcore/theory_datatype_boolean_order_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/datatype_boolean_fields_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMTDatatypeBooleanTermsUseSourceArgumentOrderAndEnodeFlags",
+            "TestSMTDatatypeEqualityTraceSourceBranchesBeforeQueuedMerge",
+            "TestSMTDatatypeTraceEntryOrderAndIndependentDetailTag",
+            "TestSMTDatatypeTraceBadStreamPreservesQueuedEquality",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -132934,7 +132987,8 @@
         "Guarded SAT clauses and scoped egraph scans still replace portions of source var_data and recognizer arrays. Datatype roots now use the concrete source union-find port. Handled accessors require enodes without artificial result variables; sort constraints attach finite or asserted-quantifier datatype results. Invalid source assertion states return Go errors.",
         "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/assertion and broader context integration still require audit.",
         "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order.",
-        "Non-proof publication creates neither SAT encoding nor an immediate merge. Core propagation merges and then exposes theory events. Corrected earlier eager-merge test expectations to the source phase boundaries. All guard/proof branches and constructor/accessor counters remain checked; conditional owners precede queue publication. Final datatype diagnostic/context audit remains open."
+        "Non-proof publication creates neither SAT encoding nor an immediate merge. Core propagation merges and then exposes theory events. Corrected earlier eager-merge test expectations to the source phase boundaries. All guard/proof branches and constructor/accessor counters remain checked; conditional owners precede queue publication. Final datatype diagnostic/context audit remains open.",
+        "Corrected eager recognizer Boolean allocation and fallback Boolean accessor handling. Datatype Boolean variables now follow argument/accessor/recognizer source order, carry datatype notification and an enode flag in gate context, and restore across repeated scope reuse. The regression failed before correction (argument/accessor/recognizer IDs 2/3/1). Added datatype entry records at 258/263 and equality records at 100/116/118, independent datatype_detail, source operand order, native/disabled erasure and sticky ostream behavior. Remaining datatype TRACE/assertion/context sites stay open. A scoped Boolean-field SMT-LIB script is compared strictly against clean-exit prebuilt C++ with forced true/false field and recognizer values."
       ]
     },
     {
@@ -132975,7 +133029,11 @@
         "pkg/smtcore/smt_equality_propagation.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_context_invariant.go",
-        "pkg/smtcore/smt_core_equality_queue_test.go"
+        "pkg/smtcore/smt_core_equality_queue_test.go",
+        "pkg/smtcore/theory_datatype_trace.go",
+        "pkg/smtcore/theory_datatype_trace_test.go",
+        "pkg/smtcore/theory_datatype_boolean_order_test.go",
+        "pkg/cmd/g3/test_vectors/datatype_boolean_fields_scopes.smt2"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -133017,7 +133075,11 @@
         "TestSMTDatatypeEmptyDisplayAndClosedOwner",
         "TestSMTDatatypeDisplayBoundsConstructorArguments",
         "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
-        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting",
+        "TestSMTDatatypeBooleanTermsUseSourceArgumentOrderAndEnodeFlags",
+        "TestSMTDatatypeEqualityTraceSourceBranchesBeforeQueuedMerge",
+        "TestSMTDatatypeTraceEntryOrderAndIndependentDetailTag",
+        "TestSMTDatatypeTraceBadStreamPreservesQueuedEquality"
       ],
       "conditionals": [
         {
@@ -133230,6 +133292,28 @@
             "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
             "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
           ]
+        },
+        {
+          "name": "internalize_atom delegates to argument-first internalize_term for Boolean accessors/recognizers, source Boolean creation/theory/enode flags; retained entry and assert_eq_axiom TRACE packets",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_equality.go",
+            "pkg/smtcore/theory_datatype_split.go",
+            "pkg/smtcore/theory_datatype_trace.go",
+            "pkg/smtcore/theory_datatype_trace_test.go",
+            "pkg/smtcore/theory_datatype_boolean_order_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/datatype_boolean_fields_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMTDatatypeBooleanTermsUseSourceArgumentOrderAndEnodeFlags",
+            "TestSMTDatatypeEqualityTraceSourceBranchesBeforeQueuedMerge",
+            "TestSMTDatatypeTraceEntryOrderAndIndependentDetailTag",
+            "TestSMTDatatypeTraceBadStreamPreservesQueuedEquality",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -133245,7 +133329,8 @@
         "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation.",
         "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/assertion and broader context integration still require audit.",
         "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order.",
-        "Non-proof publication creates neither SAT encoding nor an immediate merge. Core propagation merges and then exposes theory events. Corrected earlier eager-merge test expectations to the source phase boundaries. All guard/proof branches and constructor/accessor counters remain checked; conditional owners precede queue publication. Final datatype diagnostic/context audit remains open."
+        "Non-proof publication creates neither SAT encoding nor an immediate merge. Core propagation merges and then exposes theory events. Corrected earlier eager-merge test expectations to the source phase boundaries. All guard/proof branches and constructor/accessor counters remain checked; conditional owners precede queue publication. Final datatype diagnostic/context audit remains open.",
+        "Corrected eager recognizer Boolean allocation and fallback Boolean accessor handling. Datatype Boolean variables now follow argument/accessor/recognizer source order, carry datatype notification and an enode flag in gate context, and restore across repeated scope reuse. The regression failed before correction (argument/accessor/recognizer IDs 2/3/1). Added datatype entry records at 258/263 and equality records at 100/116/118, independent datatype_detail, source operand order, native/disabled erasure and sticky ostream behavior. Remaining datatype TRACE/assertion/context sites stay open. A scoped Boolean-field SMT-LIB script is compared strictly against clean-exit prebuilt C++ with forced true/false field and recognizer values."
       ]
     },
     {
@@ -249426,7 +249511,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 707.47,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification. Includes PB resolution diagnostics, source aggregate/simplex counter widths and kernel no-op reset corrections through 20b421bb, with prebuilt C++ comparisons enabled. Excludes subsequent literal-network diagnostics b4169f7c, complement/term guards 45f59d59 and current conflict-continuation corrections, whose focused integration evidence is separate. Also excludes subsequent equality conflict retention 80eedc08 and the shared core equality FIFO/replay increment."
+    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification. Includes PB resolution diagnostics, source aggregate/simplex counter widths and kernel no-op reset corrections through 20b421bb, with prebuilt C++ comparisons enabled. Excludes subsequent literal-network diagnostics b4169f7c, complement/term guards 45f59d59 and current conflict-continuation corrections, whose focused integration evidence is separate. Also excludes subsequent equality conflict retention 80eedc08 and the shared core equality FIFO/replay increment. Also excludes the subsequent datatype Boolean internalization/trace and optional-scope parser corrections."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

@@ -290,12 +290,12 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 	case "push", "pop":
-		n, err := p.unsigned()
-		if err != nil {
-			return false, err
-		}
-		if err = p.requireEnd(); err != nil {
-			return false, err
+		n := uint32(1)
+		if p.token != RightParenToken {
+			n, err = p.unsigned()
+			if err != nil {
+				return false, err
+			}
 		}
 		if name == "push" {
 			err = p.context.Push(n)
@@ -303,6 +303,11 @@ func (p *commandParser) command() (bool, error) {
 			err = p.context.Pop(n)
 		}
 		if err != nil {
+			return false, err
+		}
+		// Source parse_push/parse_pop mutates the context before checking
+		// the closing parenthesis; a trailing syntax error keeps that prefix.
+		if err = p.requireEnd(); err != nil {
 			return false, err
 		}
 	case "check-sat-using":
