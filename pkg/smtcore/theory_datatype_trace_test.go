@@ -137,3 +137,45 @@ func TestSMTDatatypeTraceBadStreamPreservesQueuedEquality(t *testing.T) {
 		t.Fatal("disabled trace evaluated operands")
 	}
 }
+
+func TestSMTDatatypeOccursTraceLeafExitAndCachedSkip(t *testing.T) {
+	_, dt, x, _, _ := smtDatatypeSplitFixture(t)
+	s, err := dt.State()
+	astTestMust(t, err)
+	node := s.context.enodes[x]
+	id, err := node.OwnerID()
+	astTestMust(t, err)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("datatype")
+	dt.trace = tags
+	check := smtDatatypeOccursCheck{theory: dt, onStack: make(map[*SMTEnode]bool), cycleFree: make(map[*SMTEnode]bool), parent: make(map[*SMTEnode]*SMTEnode)}
+	cycle, err := check.run(node)
+	astTestMust(t, err)
+	if cycle || !check.cycleFree[node.root] || s.Inconsistent() {
+		t.Fatal("leaf diagnostic changed occurs-check traversal")
+	}
+	entry := smtDatatypeTraceRecord("datatype", "occurs_check", 524, fmt.Sprintf("occurs check: #%d incremental-x\n", id))
+	want := entry + smtDatatypeTraceRecord("datatype", "occurs_check", 538, fmt.Sprintf("occurs check loop: #%d incremental-x enter\n", id)) + smtDatatypeTraceRecord("datatype", "occurs_check", 538, fmt.Sprintf("occurs check loop: #%d incremental-x exit\n", id))
+	if tags.ShouldTrace("datatype") {
+		if output.String() != want {
+			t.Fatal("source leaf/exit diagnostics", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("native leaf diagnostic was not erased")
+	}
+	output.Reset()
+	cycle, err = check.run(node)
+	astTestMust(t, err)
+	if cycle || tags.ShouldTrace("datatype") && output.String() != entry {
+		t.Fatal("cycle-free skip evaluated loop diagnostic", cycle, output.String())
+	}
+	dt.trace = diagnostic.NewTraceTagsWithWriter(smtPBDisplayFailure{})
+	dt.trace.Enable("datatype")
+	check = smtDatatypeOccursCheck{theory: dt, onStack: make(map[*SMTEnode]bool), cycleFree: make(map[*SMTEnode]bool), parent: make(map[*SMTEnode]*SMTEnode)}
+	cycle, err = check.run(node)
+	astTestMust(t, err)
+	if cycle || !check.cycleFree[node.root] {
+		t.Fatal("sticky ostream failure stopped cycle-free publication")
+	}
+}

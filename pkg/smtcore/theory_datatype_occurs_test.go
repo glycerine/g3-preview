@@ -1,10 +1,13 @@
 package smtcore
 
 import (
+	"bytes"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -28,6 +31,10 @@ func TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery(t *testing.T) {
 					family, err := m.DatatypeFamilyID()
 					astTestMust(t, err)
 					dt := state.theories[family].(*SMTDatatypeTheory)
+					var trace bytes.Buffer
+					tags := diagnostic.NewTraceTagsWithWriter(&trace)
+					tags.Enable("datatype")
+					dt.trace = tags
 					sort := smtDatatypePolicySort(t, m, true)
 					ctors, err := m.DatatypeConstructors(sort)
 					astTestMust(t, err)
@@ -71,6 +78,7 @@ func TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery(t *testing.T) {
 							t.Fatal("cycle conflicted before final check")
 						}
 						splits := dt.statistics.splits
+						trace.Reset()
 						status, err := dt.FinalCheck()
 						astTestMust(t, err)
 						if status != SMTFinalCheckContinue || !state.Inconsistent() {
@@ -88,6 +96,21 @@ func TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery(t *testing.T) {
 						ext, ok := owner.(*SMTExtTheoryConflictJustification)
 						if !ok || len(ext.Literals) != 0 || len(ext.Equalities) != length {
 							t.Fatal("cycle did not retain equality-only source evidence", owner)
+						}
+						if tags.ShouldTrace("datatype") {
+							last := -1
+							for _, site := range []string{"[datatype] occurs_check src/smt/theory_datatype.cpp:524", "[datatype] occurs_check src/smt/theory_datatype.cpp:538", "[datatype] occurs_check_explain src/smt/theory_datatype.cpp:461", "[datatype] occurs_check src/smt/theory_datatype.cpp:556"} {
+								i := strings.Index(trace.String(), site)
+								if i <= last {
+									t.Fatal("missing or reordered cycle diagnostic", site, trace.String())
+								}
+								last = i
+							}
+							if strings.Count(trace.String()[last:], "eq: #") != len(ext.Equalities) {
+								t.Fatal("cycle diagnostic lost conflict equality evidence", trace.String()[last:])
+							}
+						} else if trace.Len() != 0 {
+							t.Fatal("native cycle diagnostics were not erased")
 						}
 						for _, pair := range ext.Equalities {
 							if pair.First == pair.Second || pair.First.root != pair.Second.root {

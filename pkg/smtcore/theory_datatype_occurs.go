@@ -1,7 +1,11 @@
 // Source: theory_datatype.cpp occurs_check and occurs_check_explain.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"io"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 type smtDatatypeOccursFrame struct {
 	node *SMTEnode
@@ -24,6 +28,20 @@ func (c *smtDatatypeOccursCheck) push(node *SMTEnode) {
 }
 
 func (c *smtDatatypeOccursCheck) explain(app, root *SMTEnode) error {
+	if err := c.theory.emitDatatype("datatype", "occurs_check_explain", 461, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "occurs_check_explain ")
+		if err := c.theory.displayDatatypeBounded(out, app.owner); err != nil {
+			return err
+		}
+		_, _ = io.WriteString(out, " <-> ")
+		if err := c.theory.displayDatatypeBounded(out, root.owner); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return err
+	}
 	constructor, err := c.theory.classConstructor(app)
 	if err != nil {
 		return err
@@ -80,6 +98,9 @@ func (c *smtDatatypeOccursCheck) run(node *SMTEnode) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	if err = t.traceDatatypeOccursNode("occurs_check", 524, "occurs check: #", node, ""); err != nil {
+		return false, err
+	}
 	t.statistics.occursChecks++
 	c.push(node)
 	for len(c.stack) > 0 {
@@ -89,6 +110,13 @@ func (c *smtDatatypeOccursCheck) run(node *SMTEnode) (bool, error) {
 		app := frame.node
 		if c.cycleFree[app.root] {
 			continue
+		}
+		operation := " enter"
+		if frame.exit {
+			operation = " exit"
+		}
+		if err = t.traceDatatypeOccursNode("occurs_check", 538, "occurs check loop: #", app, operation); err != nil {
+			return false, err
 		}
 		if frame.exit {
 			c.cycleFree[app.root] = true
@@ -116,7 +144,10 @@ func (c *smtDatatypeOccursCheck) run(node *SMTEnode) (bool, error) {
 				if err := c.explain(app, arg); err != nil {
 					return false, err
 				}
-				return true, t.setDatatypeConflict(nil, c.equalities)
+				if err = t.setDatatypeConflict(nil, c.equalities); err != nil {
+					return true, err
+				}
+				return true, c.traceConflict()
 			}
 			sort, err := state.manager.GetSort(arg.owner)
 			if err != nil {
