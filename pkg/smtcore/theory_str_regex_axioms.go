@@ -20,6 +20,10 @@ func (t *SMTStringTheory) freshRegexVariable() (ast.ASTHandle, error) {
 }
 
 func (t *SMTStringTheory) freshUnrollBound() (ast.ASTHandle, error) {
+	return t.freshIntegerVariable("unroll")
+}
+
+func (t *SMTStringTheory) freshIntegerVariable(prefix string) (ast.ASTHandle, error) {
 	m := t.state.manager
 	zero, err := m.ArithmeticIntegerNumeralText("0")
 	if err != nil {
@@ -29,7 +33,7 @@ func (t *SMTStringTheory) freshUnrollBound() (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	name := "unroll!tmp" + strconv.FormatUint(uint64(t.freshID), 10)
+	name := prefix + "!tmp" + strconv.FormatUint(uint64(t.freshID), 10)
 	t.freshID++
 	symbol, err := m.Symbols.Intern(name)
 	if err != nil {

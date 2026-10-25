@@ -286,12 +286,17 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 		return false, err
 	}
 	for {
+		caseSplitHead := s.propagationHead
 		consistent, err := s.Propagate()
 		if err != nil || !consistent {
 			if err != nil {
 				return consistent, fmt.Errorf("Boolean propagation: %w", err)
 			}
 			return consistent, nil
+		}
+		consistent, err = s.propagateTheoryCaseSplits(caseSplitHead)
+		if err != nil || !consistent {
+			return consistent, err
 		}
 		if err = s.propagateTheoryRelevancy(); err != nil {
 			return false, fmt.Errorf("theory relevancy: %w", err)

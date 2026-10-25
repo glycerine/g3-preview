@@ -13,32 +13,33 @@ import (
 )
 
 type smtInternalizerScope struct {
-	trueFirstLimit     int
-	booleanLimit       int
-	enodeLimit         int
-	pendingLimit       int
-	pendingHead        int
-	equalityLimit      int
-	assignmentLimit    int
-	clauseLimit        int
-	justificationLimit int
-	theoryLimit        int
-	assignedLimit      int
-	propagationHead    int
-	theoryEqLimit      int
-	theoryEqHead       int
-	theoryDiseqLimit   int
-	theoryDiseqHead    int
-	atomHead           int
-	notifyLimit        int
-	enodeFlagLimit     int
-	atomNotifiedLimit  int
-	simplifyHead       int
-	inconsistent       bool
-	conflict           SMTBooleanJustification
-	conflictLiteral    SMTLiteral
-	disequalities      map[smtEnodePairKey]struct{}
-	disequalityReasons map[smtEnodePairKey]SMTLiteral
+	trueFirstLimit       int
+	theoryCaseSplitLimit int
+	booleanLimit         int
+	enodeLimit           int
+	pendingLimit         int
+	pendingHead          int
+	equalityLimit        int
+	assignmentLimit      int
+	clauseLimit          int
+	justificationLimit   int
+	theoryLimit          int
+	assignedLimit        int
+	propagationHead      int
+	theoryEqLimit        int
+	theoryEqHead         int
+	theoryDiseqLimit     int
+	theoryDiseqHead      int
+	atomHead             int
+	notifyLimit          int
+	enodeFlagLimit       int
+	atomNotifiedLimit    int
+	simplifyHead         int
+	inconsistent         bool
+	conflict             SMTBooleanJustification
+	conflictLiteral      SMTLiteral
+	disequalities        map[smtEnodePairKey]struct{}
+	disequalityReasons   map[smtEnodePairKey]SMTLiteral
 }
 
 type smtInternalizerAssignmentTrail struct {
@@ -101,82 +102,86 @@ type smtPendingEquality struct {
 }
 
 type SMTInternalizerState struct {
-	theoryProgress           uint64
-	manager                  *ast.ASTManager
-	theoryRewriter           *rewriter.TheoryRewriter // borrowed from the kernel
-	context                  *SMTCheckerContext
-	congruence               *SMTCongruenceTable
-	quantifiers              *SMTQuantifierRegistry
-	quantifierManager        *SMTQuantifierManager
-	assertedHasQuantifiers   *bool                 // borrowed context::has_quantifiers state
-	assertedFormulas         *[]SMTKernelAssertion // borrowed context asserted-formula owner
-	relevancy                *SMTRelevancyPropagator
-	theories                 map[ast.FamilyID]SMTTheoryInternalizer
-	theoryOrder              []SMTTheoryInternalizer
-	boolVar                  map[ast.ASTHandle]int32
-	boolExpr                 []ast.ASTHandle
-	booleanData              []SMTBoolVarData
-	booleanCreation          []uint64
-	nextBooleanCreation      uint64
-	activity                 []float64
-	activityIncrement        float64
-	activityInverseDecay     float64
-	random                   z3rand.Generator
-	randomInitialActivity    uint32
-	caseSplitStrategy        uint32
-	activityCache            map[ast.ASTHandle]float64
-	assignment               []lbool.LBool
-	watches                  []SMTWatchList
-	booleanStack             []ast.ASTHandle
-	enodeStack               []*SMTEnode
-	scopes                   []smtInternalizerScope
-	cachedGeneration         map[ast.ASTHandle]uint32
-	pending                  []smtPendingEquality
-	pendingHead              int
-	equalityTrail            []smtEqualitySnapshot
-	disequalityReasons       map[smtEnodePairKey]SMTLiteral
-	dynamicAck               *smtDynAckManager
-	assignmentTrail          []smtInternalizerAssignmentTrail
-	theoryTrail              []smtInternalizerTheoryTrail
-	theoryEqualities         []SMTTheoryPropagation
-	theoryDisequalities      []SMTTheoryPropagation
-	theoryEqualityHead       int
-	theoryDisequalityHead    int
-	atomPropagationHead      int
-	notifyTrail              []smtInternalizerNotifyTrail
-	enodeFlagTrail           []int32
-	trueFirstTrail           []int32
-	atomNotified             map[int32]bool
-	atomNotifiedTrail        []int32
-	relevancyLevel           uint32
-	newCore2thEq             bool
-	clauses                  []SMTInternalizedClause
-	ownedJustifications      []SMTJustification
-	assignedLiterals         []SMTLiteral
-	propagationHead          int
-	conflict                 SMTBooleanJustification
-	conflictLiteral          SMTLiteral
-	inconsistent             bool
-	generation               uint32
-	scopeLevel               uint32
-	statistics               SMTContextStatistics
-	finalCheckIndex          int
-	incompleteTheories       []SMTTheoryInternalizer
-	theoriesSetup            bool
-	binaryClauseOptimization bool
-	clauseMaintenance        SMTClauseMaintenanceConfig
-	conflictsSinceLemmaGC    uint32
-	lemmaGCThreshold         uint32
-	simplifyHead             int
-	simplifyCounter          int
-	learnedUnits             []smtPersistentLearnedUnit
-	searchBaseLevel          uint32
-	searchUserBaseLevel      uint32
-	searchAgility            float64
-	searchAgilityFactor      float64
-	searchRestartAdaptive    bool
-	searching                bool
-	closed                   bool
+	theoryProgress             uint64
+	manager                    *ast.ASTManager
+	theoryRewriter             *rewriter.TheoryRewriter // borrowed from the kernel
+	context                    *SMTCheckerContext
+	congruence                 *SMTCongruenceTable
+	quantifiers                *SMTQuantifierRegistry
+	quantifierManager          *SMTQuantifierManager
+	assertedHasQuantifiers     *bool                 // borrowed context::has_quantifiers state
+	assertedFormulas           *[]SMTKernelAssertion // borrowed context asserted-formula owner
+	relevancy                  *SMTRelevancyPropagator
+	theories                   map[ast.FamilyID]SMTTheoryInternalizer
+	theoryOrder                []SMTTheoryInternalizer
+	boolVar                    map[ast.ASTHandle]int32
+	boolExpr                   []ast.ASTHandle
+	booleanData                []SMTBoolVarData
+	booleanCreation            []uint64
+	nextBooleanCreation        uint64
+	activity                   []float64
+	activityIncrement          float64
+	activityInverseDecay       float64
+	random                     z3rand.Generator
+	randomInitialActivity      uint32
+	caseSplitStrategy          uint32
+	theoryCaseSplit            bool
+	theoryCaseSplitSets        [][]SMTLiteral
+	allTheoryCaseSplitLiterals map[SMTLiteral]struct{}
+	literalTheoryCaseSplitSets map[SMTLiteral][][]SMTLiteral
+	activityCache              map[ast.ASTHandle]float64
+	assignment                 []lbool.LBool
+	watches                    []SMTWatchList
+	booleanStack               []ast.ASTHandle
+	enodeStack                 []*SMTEnode
+	scopes                     []smtInternalizerScope
+	cachedGeneration           map[ast.ASTHandle]uint32
+	pending                    []smtPendingEquality
+	pendingHead                int
+	equalityTrail              []smtEqualitySnapshot
+	disequalityReasons         map[smtEnodePairKey]SMTLiteral
+	dynamicAck                 *smtDynAckManager
+	assignmentTrail            []smtInternalizerAssignmentTrail
+	theoryTrail                []smtInternalizerTheoryTrail
+	theoryEqualities           []SMTTheoryPropagation
+	theoryDisequalities        []SMTTheoryPropagation
+	theoryEqualityHead         int
+	theoryDisequalityHead      int
+	atomPropagationHead        int
+	notifyTrail                []smtInternalizerNotifyTrail
+	enodeFlagTrail             []int32
+	trueFirstTrail             []int32
+	atomNotified               map[int32]bool
+	atomNotifiedTrail          []int32
+	relevancyLevel             uint32
+	newCore2thEq               bool
+	clauses                    []SMTInternalizedClause
+	ownedJustifications        []SMTJustification
+	assignedLiterals           []SMTLiteral
+	propagationHead            int
+	conflict                   SMTBooleanJustification
+	conflictLiteral            SMTLiteral
+	inconsistent               bool
+	generation                 uint32
+	scopeLevel                 uint32
+	statistics                 SMTContextStatistics
+	finalCheckIndex            int
+	incompleteTheories         []SMTTheoryInternalizer
+	theoriesSetup              bool
+	binaryClauseOptimization   bool
+	clauseMaintenance          SMTClauseMaintenanceConfig
+	conflictsSinceLemmaGC      uint32
+	lemmaGCThreshold           uint32
+	simplifyHead               int
+	simplifyCounter            int
+	learnedUnits               []smtPersistentLearnedUnit
+	searchBaseLevel            uint32
+	searchUserBaseLevel        uint32
+	searchAgility              float64
+	searchAgilityFactor        float64
+	searchRestartAdaptive      bool
+	searching                  bool
+	closed                     bool
 }
 
 func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext, quantifiers *SMTQuantifierRegistry) (*SMTInternalizerState, error) {
@@ -639,8 +644,9 @@ func (s *SMTInternalizerState) PushScope() error {
 		reasons[key] = literal
 	}
 	s.scopes = append(s.scopes, smtInternalizerScope{
-		trueFirstLimit: len(s.trueFirstTrail),
-		booleanLimit:   len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending), pendingHead: s.pendingHead,
+		trueFirstLimit:       len(s.trueFirstTrail),
+		theoryCaseSplitLimit: len(s.theoryCaseSplitSets),
+		booleanLimit:         len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending), pendingHead: s.pendingHead,
 		equalityLimit:   len(s.equalityTrail),
 		assignmentLimit: len(s.assignmentTrail), clauseLimit: len(s.clauses), justificationLimit: len(s.ownedJustifications), theoryLimit: len(s.theoryTrail), inconsistent: s.inconsistent,
 		assignedLimit: len(s.assignedLiterals), propagationHead: s.propagationHead, conflict: s.conflict,
@@ -730,6 +736,9 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 }
 
 func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
+	if err := s.undoTheoryCaseSplits(scope.theoryCaseSplitLimit); err != nil {
+		return err
+	}
 	if scope.trueFirstLimit < 0 || scope.trueFirstLimit > len(s.trueFirstTrail) {
 		return ast.ErrASTDomain
 	}

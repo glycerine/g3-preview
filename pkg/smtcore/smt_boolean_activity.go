@@ -38,6 +38,7 @@ func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState)
 	s.random.SetSeed(params.RandomSeed)
 	s.randomInitialActivity = params.RandomInitialActivity
 	s.caseSplitStrategy = params.CaseSplitStrategy
+	s.theoryCaseSplit = params.TheoryCaseSplit
 	s.activityInverseDecay = params.InvDecay
 	return nil
 }

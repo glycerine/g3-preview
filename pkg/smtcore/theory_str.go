@@ -45,6 +45,7 @@ type SMTStringTheory struct {
 	regexTerms         map[ast.ASTHandle]struct{}
 	regexTermsByString map[ast.ASTHandle][]ast.ASTHandle
 	regexNFACache      map[ast.ASTHandle]*smtStringNFA
+	concatBreakFlags   map[[2]ast.ASTHandle]ast.ASTHandle
 	closed             bool
 }
 
@@ -76,6 +77,7 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	t.regexTerms = make(map[ast.ASTHandle]struct{})
 	t.regexTermsByString = make(map[ast.ASTHandle][]ast.ASTHandle)
 	t.regexNFACache = make(map[ast.ASTHandle]*smtStringNFA)
+	t.concatBreakFlags = make(map[[2]ast.ASTHandle]ast.ASTHandle)
 	// Source initialize_charset's active default alphabet. The unused final
 	// slot remains zero; NUL is excluded from the 255-character search order.
 	index := 0
@@ -253,10 +255,16 @@ func (t *SMTStringTheory) NewEquality(left, right SMTTheoryVar) error {
 	if left < 0 || right < 0 || uint32(left) >= t.find.GetNumVars() || uint32(right) >= t.find.GetNumVars() {
 		return ast.ErrASTDomain
 	}
-	// Native handle_equality checks the classes before merging. The retained
-	// value/length pair loop is connected; other handler stages remain open.
-	if _, err := t.checkNewEqualityValuesAndLengths(t.variables[left].Owner(), t.variables[right].Owner()); err != nil {
+	// Native handle_equality runs before merging. Consistency, coherence,
+	// grouping and concat/constant stages are connected; others remain open.
+	consistent, err := t.checkNewEqualityValuesAndLengths(t.variables[left].Owner(), t.variables[right].Owner())
+	if err != nil {
 		return err
+	}
+	if consistent {
+		if err := t.handleConstantEqualityStages(t.variables[left].Owner(), t.variables[right].Owner()); err != nil {
+			return err
+		}
 	}
 	t.find.Merge(uint32(left), uint32(right))
 	return nil
@@ -322,6 +330,7 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.containsByPair, t.containsIndex = nil, nil
 	t.regexVariables, t.regexTerms, t.regexNFACache = nil, nil, nil
 	t.regexMemberships, t.regexTermsByString = nil, nil
+	t.concatBreakFlags = nil
 	t.closed = true
 	return result
 }
