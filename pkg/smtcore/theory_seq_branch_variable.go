@@ -3,46 +3,167 @@
 package smtcore
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-func (t *SMTSequenceTheory) assumeSequenceEquality(left, right ast.ASTHandle) (lbool.LBool, error) {
+// The source sequence theory owns a substitution-free th_rewriter. The
+// kernel's preprocessor also carries assertion substitutions and cannot be
+// borrowed for unconditional equality simplification here.
+type smtSequenceRewriterOwner struct {
+	context  *uparams.ParamsContext
+	catalog  *uparams.GlobalParamsCatalog
+	globals  *uparams.GlobalParamsService
+	rewriter *rewriter.TheoryRewriter
+}
+
+func (r *smtSequenceRewriterOwner) close() (result error) {
+	if r.rewriter != nil {
+		result = errors.Join(result, r.rewriter.Close())
+	}
+	if r.globals != nil {
+		result = errors.Join(result, r.globals.Close())
+	}
+	if r.catalog != nil {
+		result = errors.Join(result, r.catalog.Close())
+	}
+	if r.context != nil {
+		result = errors.Join(result, r.context.Close())
+	}
+	return result
+}
+
+func (t *SMTSequenceTheory) equalityRewriter() (_ *rewriter.TheoryRewriter, result error) {
+	if t.rewrite != nil {
+		return t.rewrite.rewriter, nil
+	}
+	state, err := t.State()
+	if err != nil {
+		return nil, err
+	}
+	m := state.manager
+	r := &smtSequenceRewriterOwner{}
+	defer func() {
+		if result != nil {
+			result = errors.Join(result, r.close())
+		}
+	}()
+	r.context, err = uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
+	if err != nil {
+		return nil, err
+	}
+	r.catalog, err = uparams.NewGlobalParamsCatalog(m.Symbols, uparams.GlobalParamsCatalogConfig{Budget: m.Budget()})
+	if err != nil {
+		return nil, err
+	}
+	r.globals, err = uparams.NewGlobalParamsService(m.Symbols, r.context, uparams.GlobalParamsConfig{Budget: m.Budget(), Catalog: r.catalog})
+	if err != nil {
+		return nil, err
+	}
+	if err = r.globals.InitializeSource(); err != nil {
+		return nil, err
+	}
+	r.rewriter, err = rewriter.NewTheoryRewriter(m, r.context, r.globals, nil)
+	if err != nil {
+		return nil, err
+	}
+	t.rewrite = r
+	return r.rewriter, nil
+}
+
+func (t *SMTSequenceTheory) assumeSequenceEquality(left, right ast.ASTHandle) (value lbool.LBool, result error) {
 	state, err := t.State()
 	if err != nil {
 		return lbool.Undef, err
 	}
-	if left == right {
-		return lbool.True, nil
+	if t.exclusions.Contains(left, right) {
+		return lbool.False, nil
 	}
 	equality, err := state.manager.MkEq(left, right)
 	if err != nil {
 		return lbool.Undef, err
 	}
-	if err = state.Internalize(equality, false); err != nil {
+	original, err := state.manager.NewRef(equality)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	defer func() { result = errors.Join(result, state.manager.DelRef(&original)) }()
+	ref, err := state.manager.NewRef(equality)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	defer func() { result = errors.Join(result, state.manager.DelRef(&ref)) }()
+	rw, err := t.equalityRewriter()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if err = rw.Rewrite(equality, ref); err != nil {
+		return lbool.Undef, err
+	}
+	rewritten, err := state.manager.RefGet(ref)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if state.manager.IsTrue(rewritten) {
+		return lbool.True, nil
+	}
+	if state.manager.IsFalse(rewritten) {
+		return lbool.False, nil
+	}
+	if err = state.Internalize(left, false); err != nil {
+		return lbool.Undef, err
+	}
+	if err = state.Internalize(right, false); err != nil {
+		return lbool.Undef, err
+	}
+	first, second := state.context.enodes[left], state.context.enodes[right]
+	if first == nil || second == nil {
+		return lbool.Undef, ast.ErrASTDomain
+	}
+	if first.Root() == second.Root() {
+		return lbool.True, nil
+	}
+	if state.context.isDisequal(first, second) {
+		return lbool.False, nil
+	}
+	if err = state.markRelevant(left); err != nil {
+		return lbool.Undef, err
+	}
+	if err = state.markRelevant(right); err != nil {
+		return lbool.Undef, err
+	}
+	// Sequence inherits the source base mk_eq_atom AST-ID order.
+	firstID, err := first.OwnerID()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	secondID, err := second.OwnerID()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if firstID > secondID {
+		first, second = second, first
+	}
+	accepted, err := state.assumeEquality(first, second)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if !accepted {
+		return lbool.False, nil
+	}
+	equality, err = state.manager.MkEq(first.Owner(), second.Owner())
+	if err != nil {
 		return lbool.Undef, err
 	}
 	literal, err := state.Literal(equality)
 	if err != nil {
 		return lbool.Undef, err
 	}
-	assignment, err := state.Assignment(literal)
-	if err != nil || assignment != lbool.Undef {
-		return assignment, err
-	}
-	if state.relevancy != nil {
-		if err = state.relevancy.MarkRelevant(equality); err != nil {
-			return lbool.Undef, err
-		}
-	} else if err = state.context.SetRelevant(equality, true); err != nil {
-		return lbool.Undef, err
-	}
-	data, err := state.BooleanData(literal.Var())
-	if err != nil {
-		return lbool.Undef, err
-	}
-	data.SetTrueFirst()
-	return lbool.Undef, nil
+	return state.Assignment(literal)
 }
 
 func (t *SMTSequenceTheory) wordHasUncoveredPart(parts []ast.ASTHandle) (bool, error) {
@@ -105,10 +226,20 @@ func (t *SMTSequenceTheory) sequenceWordsCanBeEqual(left, right []ast.ASTHandle)
 	return true, nil
 }
 
-func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
+func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (progress bool, result error) {
 	if len(left) == 0 || len(right) == 0 {
 		return false, nil
 	}
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	var candidateRefs []ast.ASTRef
+	defer func() {
+		for i := len(candidateRefs) - 1; i >= 0; i-- {
+			result = errors.Join(result, state.manager.DelRef(&candidateRefs[i]))
+		}
+	}()
 	for pass := 0; pass < 2; pass++ {
 		variable, err := t.sequenceVariable(left[0])
 		if err != nil {
@@ -117,10 +248,6 @@ func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHa
 		uncovered, err := t.wordHasUncoveredPart(right)
 		if err != nil {
 			return false, err
-		}
-		state, stateErr := t.State()
-		if stateErr != nil {
-			return false, stateErr
 		}
 		allUnits := true
 		for _, part := range right {
@@ -140,6 +267,11 @@ func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHa
 			if makeErr != nil {
 				return false, makeErr
 			}
+			emptyRef, makeErr := state.manager.NewRef(empty)
+			if makeErr != nil {
+				return false, makeErr
+			}
+			candidateRefs = append(candidateRefs, emptyRef)
 			possible, possibleErr := t.sequenceWordsCanBeEqual(left[1:], right)
 			if possibleErr != nil {
 				return false, possibleErr
@@ -169,6 +301,11 @@ func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHa
 				if prefixErr != nil {
 					return false, prefixErr
 				}
+				prefixRef, prefixErr := state.manager.NewRef(prefix)
+				if prefixErr != nil {
+					return false, prefixErr
+				}
+				candidateRefs = append(candidateRefs, prefixRef)
 				assignment, assumeErr := t.assumeSequenceEquality(left[0], prefix)
 				if assumeErr != nil {
 					return false, assumeErr

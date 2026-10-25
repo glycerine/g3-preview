@@ -26,6 +26,7 @@ type SMTSequenceTheory struct {
 	nonContains   *smtSequenceNonContainsQueue
 	relations     *smtSequenceRelationQueue
 	axioms        *smtSequenceAxiomQueue
+	rewrite       *smtSequenceRewriterOwner
 	internalTerms map[ast.ASTHandle]struct{}
 	internalLog   []ast.ASTHandle
 	internalLim   []int
@@ -1226,6 +1227,10 @@ func (t *SMTSequenceTheory) Close() (result error) {
 		return ast.ErrASTHandle
 	}
 	result = errors.Join(t.solutions.Close(), t.exclusions.Close(), t.equations.Close(), t.disequations.Close(), t.nonContains.Close(), t.relations.Close(), t.axioms.Close())
+	if t.rewrite != nil {
+		result = errors.Join(result, t.rewrite.close())
+		t.rewrite = nil
+	}
 	t.solutions = nil
 	t.exclusions = nil
 	t.equations = nil

@@ -906,7 +906,7 @@ func TestSMTSequenceTheoryBranchesVariablePrefixEqualities(t *testing.T) {
 	if !branched {
 		t.Fatal("variable did not advance to the first word prefix")
 	}
-	prefixEquality, err := m.MkEq(x, prefix)
+	prefixEquality, err := m.MkEq(prefix, x)
 	astTestMust(t, err)
 	prefixLiteral, err := state.Literal(prefixEquality)
 	astTestMust(t, err)
@@ -1282,7 +1282,7 @@ func TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound(t *testing.T) {
 	astTestMust(t, err)
 	empty, err := m.MkSequenceEmpty(sort)
 	astTestMust(t, err)
-	minimalLength, err := m.MkEq(remainder, empty)
+	minimalLength, err := m.MkEq(empty, remainder)
 	astTestMust(t, err)
 	variable, found := solver.kernel.internalizer.BoolVar(minimalLength)
 	if !found {
