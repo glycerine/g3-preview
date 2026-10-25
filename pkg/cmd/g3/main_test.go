@@ -336,6 +336,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"assertion_conflict_prefix_scopes.smt2":        "unsat\nunsat\nunsat\nsat\n",
 	"asserted_driver_inconsistency_scopes.smt2":    "unsat\nsat\nunsat\nsat\n",
 	"asserted_driver_quantifier_scopes.smt2":       "sat\nunsat\nsat\n",
 	"quant_seq_boundary_equality_core.smt2":        "unsat\n(same words)\n",
@@ -927,7 +928,14 @@ func canonicalOutput(text string) string {
 }
 
 func TestSMTLibRunnerProofScript(t *testing.T) {
-	script, err := os.ReadFile(filepath.Join("test_vectors", "proof.smt2"))
+	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2"} {
+		t.Run(name, func(t *testing.T) { testSMTLibProofScript(t, name) })
+	}
+}
+
+func testSMTLibProofScript(t *testing.T, name string) {
+	t.Helper()
+	script, err := os.ReadFile(filepath.Join("test_vectors", name))
 	if err != nil {
 		t.Fatal(err)
 	}

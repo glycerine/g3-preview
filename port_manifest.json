@@ -106558,7 +106558,8 @@
         "pkg/smtcore/smt_asserted_diagnostics.go",
         "pkg/smtcore/smt_asserted_setup.go",
         "pkg/smtcore/smt_asserted_diagnostics_test.go",
-        "pkg/smtcore/smt_kernel_test.go"
+        "pkg/smtcore/smt_kernel_test.go",
+        "pkg/smtcore/smt_assertion_conflict_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -106618,7 +106619,12 @@
         "TestSMTAssertedTraceDefinitionAllocationFrontiers",
         "TestSMTAssertedVerbosePassSequenceCPPReference",
         "TestSMTAssertedWellSortedConditionalErasure",
-        "TestSMTAssertedMacroTraceDisplaysHeadAndDefinition"
+        "TestSMTAssertedMacroTraceDisplaysHeadAndDefinition",
+        "TestSMTAssertionConflictSkipsPrefixAndPreservesProofScopes",
+        "TestSMTAssertionConflictInitialCancellationAndAxiomFallback",
+        "TestSMTAssertionCancellationCommitsOnlyCompletedPrefix",
+        "TestSMTLibRunnerProofScript",
+        "TestSMTAssertionConflictProofAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -106703,7 +106709,7 @@
         },
         {
           "name": "two-direction pending value propagation, source expression ordering, committed substitutions, and proof composition",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/smtcore/smt_asserted_propagate.go",
           "tests": [
             "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
@@ -106953,6 +106959,22 @@
           "name": "unused asserted_formulas::reset: retained kernel::reset destroys and reconstructs its context instead of calling this helper",
           "status": "reference_only",
           "tests": []
+        },
+        {
+          "name": "commit cursor and macro-forbidden-declaration portion of commit; inconsistent push_scope commits its pending cursor even when formulas were not internalized",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTAssertionConflictSkipsPrefixAndPreservesProofScopes",
+            "TestSMTAssertionConflictInitialCancellationAndAxiomFallback",
+            "TestSMTAssertionCancellationCommitsOnlyCompletedPrefix"
+          ]
+        },
+        {
+          "name": "persistent committed expression substitution and its scoped rollback across assertion-time rewriting",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
         }
       ],
       "ownership": [
@@ -106964,13 +106986,16 @@
         "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references.",
         "Each generic simplifier and NNF owns its local transformed/flattened vector until source per-row cancellation checks permit a raw swap. Unchanged generic rows preserve original justifications, including conjunctive definitions. Post-operations run on the published vector; the NNF main composed proof is pinned during theory rewriting. Four allocation-frontier campaigns cover injectivity and NNF with proofs disabled/enabled and release all charged fixture storage.",
         "Inconsistency is the explicit scoped source flag rather than a scan of published formulas: canceled local-vector transformations retain eager conflict state, while native allocation errors restore prior/published conflict state. User scope snapshots restore this flag on pop independently of the sticky has-quantifiers flag.",
-        "The diagnostic bridge borrows the selected verbose/trace services, uses a short-lived owning numeric stream for low-level output and the existing manager-owned AST printer frame, and retains no roots after completed printing. Two open/refused trace allocation campaigns release all charged fixture storage. Sticky ostream refusals still evaluate pretty-printer operands; conditional well-sorted operands are erased outside the source debug/tag/assertion gates."
+        "The diagnostic bridge borrows the selected verbose/trace services, uses a short-lived owning numeric stream for low-level output and the existing manager-owned AST printer frame, and retains no roots after completed printing. Two open/refused trace allocation campaigns release all charged fixture storage. Sticky ostream refusals still evaluate pretty-printer operands; conditional well-sorted operands are erased outside the source debug/tag/assertion gates.",
+        "A preprocessing conflict uses the existing concrete root-literal proof wrapper owned by the logical context scope, or the immediate Boolean axiom when no false-row proof exists. The kernel retains the source false proof independently until its result owner resets/closes. No pending term/quantifier/theory atom is internalized on the early-conflict branch. Scope pop releases the context wrapper; repeated internalization preserves an existing Boolean conflict.",
+        "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage."
       ],
       "deviations": [
         "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
         "Go expands stored definitions before committing later assertions independently of new-discovery and ordinary-preprocessing flags. Definitions removed from the assertion list therefore remain effective after parameter changes and when quasi_macros is enabled without macro_finder.",
         "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining per-method diagnostic hooks and retained-method audit remain unfinished, so this source unit remains partial.",
-        "IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE source profile, including smt.reducing; ordinary IF_VERBOSE labels remain live. Independent prebuilt C++ comparisons verify complete selected pass order and shared-expression totals for ground and macro assertions. The unused reset helper is not ported; the surrounding live reset lifecycle reconstructs the context."
+        "IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE source profile, including smt.reducing; ordinary IF_VERBOSE labels remain live. Independent prebuilt C++ comparisons verify complete selected pass order and shared-expression totals for ground and macro assertions. The unused reset helper is not ported; the surrounding live reset lifecycle reconstructs the context.",
+        "The audit identifies remaining source substitution lifetime work: native propagation currently reconstructs committed substitutions from the assertion prefix, whereas source commit retains a scoped substitution also consulted during subsequent assertion-time rewriting. That source behavior remains unported and is recorded explicitly; cursor/forbidden declaration completion does not claim persistent substitution completion."
       ]
     },
     {
@@ -107009,7 +107034,8 @@
         "pkg/smtcore/smt_asserted_diagnostics.go",
         "pkg/smtcore/smt_asserted_setup.go",
         "pkg/smtcore/smt_asserted_diagnostics_test.go",
-        "pkg/smtcore/smt_kernel_test.go"
+        "pkg/smtcore/smt_kernel_test.go",
+        "pkg/smtcore/smt_assertion_conflict_test.go"
       ],
       "tests": [
         "TestSMTKernelConflictLearningProvesBooleanUnsat",
@@ -107069,7 +107095,12 @@
         "TestSMTAssertedTraceDefinitionAllocationFrontiers",
         "TestSMTAssertedVerbosePassSequenceCPPReference",
         "TestSMTAssertedWellSortedConditionalErasure",
-        "TestSMTAssertedMacroTraceDisplaysHeadAndDefinition"
+        "TestSMTAssertedMacroTraceDisplaysHeadAndDefinition",
+        "TestSMTAssertionConflictSkipsPrefixAndPreservesProofScopes",
+        "TestSMTAssertionConflictInitialCancellationAndAxiomFallback",
+        "TestSMTAssertionCancellationCommitsOnlyCompletedPrefix",
+        "TestSMTLibRunnerProofScript",
+        "TestSMTAssertionConflictProofAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -107105,7 +107136,7 @@
         },
         {
           "name": "scoped pending value propagation with concrete AST substitution and proof ownership",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/smtcore/smt_asserted_propagate.go",
           "tests": [
             "TestSMTSolverPropagatesValuesAcrossPendingAndCommittedAssertions",
@@ -107352,6 +107383,22 @@
           "name": "unused asserted_formulas::reset: retained kernel::reset destroys and reconstructs its context instead of calling this helper",
           "status": "reference_only",
           "tests": []
+        },
+        {
+          "name": "commit cursor and macro-forbidden-declaration portion of commit; inconsistent push_scope commits its pending cursor even when formulas were not internalized",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTAssertionConflictSkipsPrefixAndPreservesProofScopes",
+            "TestSMTAssertionConflictInitialCancellationAndAxiomFallback",
+            "TestSMTAssertionCancellationCommitsOnlyCompletedPrefix"
+          ]
+        },
+        {
+          "name": "persistent committed expression substitution and its scoped rollback across assertion-time rewriting",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
         }
       ],
       "ownership": [
@@ -107363,12 +107410,15 @@
         "The kernel owns the maximize_bv_sharing rewriter and pushes/pops its operand cache with assertion scopes. Bit2int owns its per-pass cache until transformed formula/proof rows have acquired references.",
         "Each generic simplifier and NNF owns its local transformed/flattened vector until source per-row cancellation checks permit a raw swap. Unchanged generic rows preserve original justifications, including conjunctive definitions. Post-operations run on the published vector; the NNF main composed proof is pinned during theory rewriting. Four allocation-frontier campaigns cover injectivity and NNF with proofs disabled/enabled and release all charged fixture storage.",
         "Inconsistency is the explicit scoped source flag rather than a scan of published formulas: canceled local-vector transformations retain eager conflict state, while native allocation errors restore prior/published conflict state. User scope snapshots restore this flag on pop independently of the sticky has-quantifiers flag.",
-        "The diagnostic bridge borrows the selected verbose/trace services, uses a short-lived owning numeric stream for low-level output and the existing manager-owned AST printer frame, and retains no roots after completed printing. Two open/refused trace allocation campaigns release all charged fixture storage. Sticky ostream refusals still evaluate pretty-printer operands; conditional well-sorted operands are erased outside the source debug/tag/assertion gates."
+        "The diagnostic bridge borrows the selected verbose/trace services, uses a short-lived owning numeric stream for low-level output and the existing manager-owned AST printer frame, and retains no roots after completed printing. Two open/refused trace allocation campaigns release all charged fixture storage. Sticky ostream refusals still evaluate pretty-printer operands; conditional well-sorted operands are erased outside the source debug/tag/assertion gates.",
+        "A preprocessing conflict uses the existing concrete root-literal proof wrapper owned by the logical context scope, or the immediate Boolean axiom when no false-row proof exists. The kernel retains the source false proof independently until its result owner resets/closes. No pending term/quantifier/theory atom is internalized on the early-conflict branch. Scope pop releases the context wrapper; repeated internalization preserves an existing Boolean conflict.",
+        "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage."
       ],
       "deviations": [
         "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class.",
         "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining per-method diagnostic hooks and retained-method audit remain unfinished, so this source unit remains partial.",
-        "IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE source profile, including smt.reducing; ordinary IF_VERBOSE labels remain live. Independent prebuilt C++ comparisons verify complete selected pass order and shared-expression totals for ground and macro assertions. The unused reset helper is not ported; the surrounding live reset lifecycle reconstructs the context."
+        "IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE source profile, including smt.reducing; ordinary IF_VERBOSE labels remain live. Independent prebuilt C++ comparisons verify complete selected pass order and shared-expression totals for ground and macro assertions. The unused reset helper is not ported; the surrounding live reset lifecycle reconstructs the context.",
+        "The audit identifies remaining source substitution lifetime work: native propagation currently reconstructs committed substitutions from the assertion prefix, whereas source commit retains a scoped substitution also consulted during subsequent assertion-time rewriting. That source behavior remains unported and is recorded explicitly; cursor/forbidden declaration completion does not claim persistent substitution completion."
       ]
     },
     {
@@ -113754,7 +113804,8 @@
         "pkg/cmd/g3/test_vectors/qfaufbv_proof.smt2",
         "pkg/cmd/g3/test_vectors/qfaufbv_solver_proof.smt2",
         "pkg/smtcore/smt_preprocessor_constructor_frontier_test.go",
-        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+        "pkg/smtcore/smt_assertion_conflict_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -113822,7 +113873,12 @@
         "TestSMTBoundedWeightedDisequalitiesModel",
         "TestSMTClauseSimplificationRetainsWrappedRegionProofReason",
         "TestSMTKernelPreprocessorConstructionAllocationFrontiers",
-        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+        "TestSMTAssertionConflictSkipsPrefixAndPreservesProofScopes",
+        "TestSMTAssertionConflictInitialCancellationAndAxiomFallback",
+        "TestSMTAssertionCancellationCommitsOnlyCompletedPrefix",
+        "TestSMTLibRunnerProofScript",
+        "TestSMTAssertionConflictProofAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -115088,6 +115144,24 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "retained internalize_assertions control flow: counted initial/per-row cancellation, direct preprocessing conflict with proof-wrapper/axiom without internalizing pending formulas, and completed-prefix commit cursor",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTAssertionConflictSkipsPrefixAndPreservesProofScopes",
+            "TestSMTAssertionConflictInitialCancellationAndAxiomFallback",
+            "TestSMTAssertionCancellationCommitsOnlyCompletedPrefix",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript",
+            "TestSMTAssertionConflictProofAllocationFrontiers"
+          ],
+          "go_targets": [
+            "pkg/smtcore/smt_assertion_conflict_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
         }
       ],
       "ownership": [
@@ -115095,7 +115169,9 @@
         "The theory notification trail stores Boolean variable IDs without AST ownership. Scope rollback restores eligibility for subsequent assignments and relevance events.",
         "Search reads the quantifier manager-owned acceptedModel at the ground completion boundary. A checked candidate transfers through the existing generated-model path; an unchecked candidate cannot publish a SAT result.",
         "When replacing a satisfied auxiliary clause reason, transfer the actual record.owner into state-owned justifications even if false-tail simplification has wrapped it below the current antecedent; deletion must not release the still-borrowed proof wrapper. The direct regression reconstructs the surviving literal proof after two simplification stages.",
-        "Preprocessing publishes a returned partial TheoryRewriter into the actual kernel owner before inspecting its construction error; solver/kernel teardown therefore closes the allocated configuration on every reached reservation failure."
+        "Preprocessing publishes a returned partial TheoryRewriter into the actual kernel owner before inspecting its construction error; solver/kernel teardown therefore closes the allocated configuration on every reached reservation failure.",
+        "A preprocessing conflict uses the existing concrete root-literal proof wrapper owned by the logical context scope, or the immediate Boolean axiom when no false-row proof exists. The kernel retains the source false proof independently until its result owner resets/closes. No pending term/quantifier/theory atom is internalized on the early-conflict branch. Scope pop releases the context wrapper; repeated internalization preserves an existing Boolean conflict.",
+        "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -115112,7 +115188,8 @@
         "Go creates interpreted true/false enodes on first term use rather than during context initialization. Assigned Boolean terms merge with those truth-value classes, including when their enodes are created after assignment; conflict antecedent lookup retains the actual assigned polarity.",
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
-        "With auto_config=false and MBQI disabled, the transitive-relation runner regression now agrees with C++ on UNKNOWN, UNSAT after grounded contradictory facts, then UNKNOWN after pop. The no-preprocessing solver regression additionally verifies incomplete-quantifier failure reporting and repeated scoped E-matching refutations."
+        "With auto_config=false and MBQI disabled, the transitive-relation runner regression now agrees with C++ on UNKNOWN, UNSAT after grounded contradictory facts, then UNKNOWN after pop. The no-preprocessing solver regression additionally verifies incomplete-quantifier failure reporting and repeated scoped E-matching refutations.",
+        "This increment ports assertion internalization/conflict control flow, not the complete check/setup_and_check orchestration or its time/trace hooks. The native search wrapper still performs additional setup on known base conflicts; source check-phase short circuits remain part of the context audit."
       ]
     },
     {
@@ -115135,7 +115212,8 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_theory_relevance_test.go",
         "pkg/smtcore/theory_arith_division_test.go",
-        "pkg/smtcore/smt_checker.go"
+        "pkg/smtcore/smt_checker.go",
+        "pkg/smtcore/smt_assertion_conflict_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -115155,7 +115233,12 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
         "TestSMTArithmeticSymbolicZeroDivisorGuard",
-        "TestSMTQuantifierMatchersHonorDisabledRelevancy"
+        "TestSMTQuantifierMatchersHonorDisabledRelevancy",
+        "TestSMTAssertionConflictSkipsPrefixAndPreservesProofScopes",
+        "TestSMTAssertionConflictInitialCancellationAndAxiomFallback",
+        "TestSMTAssertionCancellationCommitsOnlyCompletedPrefix",
+        "TestSMTLibRunnerProofScript",
+        "TestSMTAssertionConflictProofAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -115434,15 +115517,36 @@
           "tests": [
             "TestSMTQuantifierMatchersHonorDisabledRelevancy"
           ]
+        },
+        {
+          "name": "retained internalize_assertions control flow: counted initial/per-row cancellation, direct preprocessing conflict with proof-wrapper/axiom without internalizing pending formulas, and completed-prefix commit cursor",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_kernel.go",
+          "tests": [
+            "TestSMTAssertionConflictSkipsPrefixAndPreservesProofScopes",
+            "TestSMTAssertionConflictInitialCancellationAndAxiomFallback",
+            "TestSMTAssertionCancellationCommitsOnlyCompletedPrefix",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript",
+            "TestSMTAssertionConflictProofAllocationFrontiers"
+          ],
+          "go_targets": [
+            "pkg/smtcore/smt_assertion_conflict_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
         }
       ],
       "ownership": [
         "SMTInternalizerState owns the concrete slices and clause objects for this context subset.",
         "The theory notification trail stores Boolean variable IDs without AST ownership. Scope rollback restores eligibility for subsequent assignments and relevance events.",
-        "The read-side checker context borrows the concrete relevancy service installed by SetRelevancy. Queries follow its current enabled flag without creating marks, callbacks, owning AST roots, or synthetic relevance trails; standalone contexts without a service retain their explicit marks."
+        "The read-side checker context borrows the concrete relevancy service installed by SetRelevancy. Queries follow its current enabled flag without creating marks, callbacks, owning AST roots, or synthetic relevance trails; standalone contexts without a service retain their explicit marks.",
+        "A preprocessing conflict uses the existing concrete root-literal proof wrapper owned by the logical context scope, or the immediate Boolean axiom when no false-row proof exists. The kernel retains the source false proof independently until its result owner resets/closes. No pending term/quantifier/theory atom is internalized on the early-conflict branch. Scope pop releases the context wrapper; repeated internalization preserves an existing Boolean conflict.",
+        "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage."
       ],
       "deviations": [
-        "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported."
+        "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
+        "This increment ports assertion internalization/conflict control flow, not the complete check/setup_and_check orchestration or its time/trace hooks. The native search wrapper still performs additional setup on known base conflicts; source check-phase short circuits remain part of the context audit."
       ]
     },
     {

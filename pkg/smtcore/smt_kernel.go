@@ -666,20 +666,61 @@ func (k *SMTKernel) Assertions() []SMTKernelAssertion {
 }
 
 func (k *SMTKernel) internalizePending() error {
+	// context::get_cancel_flag is a counted reslimit::inc, including when
+	// the asserted manager is already inconsistent or has no pending rows.
+	if canceled, err := k.manager.Canceled(); canceled || err != nil {
+		return err
+	}
 	ready, err := k.reduceAssertedPending()
 	if err != nil || !ready {
 		return err
 	}
-	for k.assertedHead < len(k.assertions) {
-		assertion := k.assertions[k.assertedHead]
-		if err := k.internalizer.Assert(assertion.Formula, assertion.Proof, 0); err != nil {
+	if k.assertedFormulasInconsistent() {
+		if k.internalizer.Inconsistent() {
+			return nil
+		}
+		proof, err := k.AssertionInconsistencyProof()
+		if err != nil {
 			return err
 		}
-		if err := k.assertedMacros.MarkForbidden([]ast.ASTHandle{assertion.Formula}); err != nil {
+		// Set the Boolean conflict directly: pending expressions must never
+		// enter theory/quantifier internalization on this source branch.
+		if err := k.internalizer.assignRootLiteral(SMTFalseLiteral, proof); err != nil {
 			return err
 		}
-		k.assertedHead++
+		if !proof.IsNull() {
+			return k.manager.SetRef(k.unsatProof, proof)
+		}
+		return nil
 	}
+	head := k.assertedHead
+	for head < len(k.assertions) {
+		if canceled, err := k.manager.Canceled(); canceled || err != nil {
+			return errors.Join(err, k.commitAssertedTo(head))
+		}
+		assertion := k.assertions[head]
+		if err := k.internalizer.Assert(assertion.Formula, assertion.Proof, 0); err != nil {
+			return errors.Join(err, k.commitAssertedTo(head))
+		}
+		head++
+	}
+	return k.commitAssertedTo(head)
+}
+
+// The native propagation pass reconstructs committed substitutions from this
+// prefix. Source commit also forbids its declarations for later macro finding.
+func (k *SMTKernel) commitAssertedTo(head int) error {
+	if head < k.assertedHead || head > len(k.assertions) {
+		return ast.ErrASTDomain
+	}
+	rows := make([]ast.ASTHandle, 0, head-k.assertedHead)
+	for _, row := range k.assertions[k.assertedHead:head] {
+		rows = append(rows, row.Formula)
+	}
+	if err := k.assertedMacros.MarkForbidden(rows); err != nil {
+		return err
+	}
+	k.assertedHead = head
 	return nil
 }
 
@@ -728,6 +769,10 @@ func (k *SMTKernel) Push() error {
 	}
 	if err := k.internalizer.PushScope(); err != nil {
 		return errors.Join(err, k.bvSharing.PopScope(1), k.definedNames.Pop(1), k.assertedMacros.PopScope(1))
+	}
+	// asserted_formulas::push_scope commits even an inconsistent manager.
+	if err := k.commitAssertedTo(len(k.assertions)); err != nil {
+		return errors.Join(err, k.internalizer.PopScopes(1), k.bvSharing.PopScope(1), k.definedNames.Pop(1), k.assertedMacros.PopScope(1))
 	}
 	k.scopes = append(k.scopes, len(k.assertions))
 	k.assertedScopeConflicts = append(k.assertedScopeConflicts, k.assertedInconsistent)
@@ -1020,9 +1065,9 @@ func (k *SMTKernel) SetProgressCallback(callback solver.ProgressCallback) error 
 	return nil
 }
 
-// Proof returns the kernel-owned proof from the latest unsatisfiable check.
-// It is null when proof generation is disabled or the latest check did not
-// establish unsatisfiability.
+// Proof returns the retained proof established by assertion internalization or
+// search. It is null when proof generation is disabled or no unsatisfiable
+// result has been retained since the most recent result reset.
 func (k *SMTKernel) Proof() (ast.ASTHandle, error) {
 	if err := k.open(); err != nil {
 		return ast.ASTHandle{}, err
