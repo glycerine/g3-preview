@@ -661,7 +661,10 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 	if model == nil || model.Core() == nil {
 		return false, ast.ErrASTHandle
 	}
-	if len(quantifiers) == 0 {
+	// The supplied list is filtered by relevance, assignment and MBQI ID.
+	// Source skips the whole lifecycle only when the registry itself is empty.
+	// Standalone callers may supply quantifiers without registering them.
+	if c.registry.Empty() && len(quantifiers) == 0 {
 		return true, nil
 	}
 	if c.iteration >= c.maxIterations {

@@ -7,10 +7,58 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestSMTModelCheckerValidatesGroundModelWithNoActiveQuantifiers(t *testing.T) {
+	m, cfg := smtModelGeneratorFixture(t)
+	s, err := NewSMTSolver(m, nil, "AUFLIA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	state := s.kernel.internalizer
+	checker := state.quantifierManager.modelChecker
+	a := smtRelevancyBool(t, m, "inactive-quantifier-invalid-model")
+	astTestMust(t, state.Assert(a, ast.ASTHandle{}, 0))
+	astTestMust(t, state.context.SetRelevant(a, true))
+	proto, err := protomodel.NewProtoModel(m, cfg)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, proto.Close()) })
+	decl, err := m.GetDecl(a)
+	astTestMust(t, err)
+	no, err := m.MkFalse()
+	astTestMust(t, err)
+	astTestMust(t, proto.Core().RegisterConstant(decl, no))
+	// No registered quantifiers: preserve the source fast path.
+	accepted, err := checker.Check(proto, nil)
+	astTestMust(t, err)
+	if !accepted {
+		t.Fatal("empty registry did not use source fast path")
+	}
+	q, _ := smtRecursiveTestDefinition(t, m, "inactive-definition")
+	astTestMust(t, state.Internalize(q, true))
+	astTestMust(t, state.context.SetAssignment(q, lbool.Undef))
+	active, err := state.quantifierManager.activeQuantifiers()
+	astTestMust(t, err)
+	if len(active) != 0 || checker.registry.Empty() {
+		t.Fatal("expected filtered-empty nonempty registry")
+	}
+	initial := checker.maxCexs
+	accepted, err = checker.Check(proto, active)
+	astTestMust(t, err)
+	if accepted || checker.iteration != 0 || checker.maxCexs != initial+checker.initialMaxCexs {
+		t.Fatal("inactive registry bypassed ground validation or changed iteration", accepted, checker.iteration, checker.maxCexs)
+	}
+	// The same filtered-empty registry still observes the source iteration cap.
+	astTestMust(t, checker.ConfigureLifecycle(1, 0))
+	accepted, err = checker.Check(proto, active)
+	astTestMust(t, err)
+	if accepted || !checker.Exhausted() {
+		t.Fatal("filtered-empty registry bypassed iteration cap")
+	}
+}
 
 func TestSMTModelCheckerFindsFiniteBooleanCounterexample(t *testing.T) {
 	m, state, registry, manager := smtQuantifierManagerFixture(t, 10, 20, SMTQuantifierManagerConfig{})

@@ -119335,7 +119335,8 @@
         "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
         "TestSMTRecursiveModelPublicationAllocationFrontiers",
         "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTModelCheckerValidatesGroundModelWithNoActiveQuantifiers"
       ],
       "assertions": [
         {
@@ -119607,6 +119608,21 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "check empty-registry boundary: filtered-empty active list still observes iteration cap, candidate compression, counterexample allowance growth, ground validation and successful cleanup; iteration advances only for relevant checked quantifiers",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_test.go",
+            "pkg/smtcore/smt_model_checker_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTModelCheckerValidatesGroundModelWithNoActiveQuantifiers",
+            "TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup",
+            "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate"
+          ]
         }
       ],
       "ownership": [
@@ -119615,7 +119631,8 @@
         "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close."
       ],
       "deviations": [
-        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in a fresh solver using the parent logic and parameter services. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; new instance expressions are pinned until restart, then surviving quantifiers and reinternalized bindings enter the ordinary registry queue; duplicate filtering occurs at that source publication boundary. Recursive-function checking now consumes the reserved marker emitted by the command context; the remaining class/diagnostic audit is separate."
+        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in a fresh solver using the parent logic and parameter services. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; new instance expressions are pinned until restart, then surviving quantifiers and reinternalized bindings enter the ordinary registry queue; duplicate filtering occurs at that source publication boundary. Recursive-function checking now consumes the reserved marker emitted by the command context; the remaining class/diagnostic audit is separate.",
+        "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded."
       ]
     },
     {
@@ -119649,7 +119666,8 @@
         "pkg/smtcore/smt_recursive_functions.go",
         "pkg/smtcore/smt_recursive_functions_test.go",
         "pkg/smtcore/smt_candidate_validation.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_model_checker_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -119678,7 +119696,10 @@
         "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
         "TestSMTRecursiveModelPublicationAllocationFrontiers",
         "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTModelCheckerValidatesGroundModelWithNoActiveQuantifiers",
+        "TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup",
+        "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate"
       ],
       "conditionals": [
         {
@@ -119789,13 +119810,30 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "check empty-registry boundary: filtered-empty active list still observes iteration cap, candidate compression, counterexample allowance growth, ground validation and successful cleanup; iteration advances only for relevant checked quantifiers",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_test.go",
+            "pkg/smtcore/smt_model_checker_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTModelCheckerValidatesGroundModelWithNoActiveQuantifiers",
+            "TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup",
+            "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate"
+          ]
         }
       ],
       "ownership": [
         "The Go checker has explicit borrowed state and registry pointers and no region-allocated flexible-array instances; ordinary slices carry pinned expression bindings; enodes are recovered only at restart.",
         "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close."
       ],
-      "deviations": []
+      "deviations": [
+        "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded."
+      ]
     },
     {
       "path": "src/smt/smt_model_finder.cpp",

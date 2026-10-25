@@ -10,7 +10,7 @@ import (
 )
 
 func TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup(t *testing.T) {
-	for _, scenario := range []string{"accepted", "rejected", "no-quantifiers", "iteration-limit"} {
+	for _, scenario := range []string{"accepted", "rejected", "no-quantifiers", "filtered-empty", "iteration-limit"} {
 		t.Run(scenario, func(t *testing.T) {
 			m, config := smtModelGeneratorFixture(t)
 			solver, err := NewSMTSolver(m, nil, "AUFLIA", SMTSolverConfig{Params: config.Context, ModelEvaluator: config})
@@ -30,7 +30,9 @@ func TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup(t *testing.T) {
 			q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolean}, Names: []symbol.Symbol{astTestSymbol(t, m, "lifecycle-x")}, Body: body})
 			astTestMust(t, err)
 			state := solver.kernel.internalizer
-			astTestMust(t, state.Internalize(q, true))
+			if scenario != "no-quantifiers" {
+				astTestMust(t, state.Internalize(q, true))
+			}
 			proto, err := protomodel.NewProtoModel(m, config)
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, proto.Close()) })
@@ -65,7 +67,7 @@ func TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup(t *testing.T) {
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, checker.Close()) })
 			quantifiers := []ast.ASTHandle{q}
-			if scenario == "no-quantifiers" {
+			if scenario == "no-quantifiers" || scenario == "filtered-empty" {
 				quantifiers = nil
 			}
 			if scenario == "iteration-limit" {
@@ -73,7 +75,7 @@ func TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup(t *testing.T) {
 			}
 			accepted, err := checker.Check(proto, quantifiers)
 			astTestMust(t, err)
-			if accepted != (scenario == "accepted" || scenario == "no-quantifiers") {
+			if accepted != (scenario == "accepted" || scenario == "no-quantifiers" || scenario == "filtered-empty") {
 				t.Fatal("unexpected model check result", accepted)
 			}
 			expectedEntries := uint32(0)
@@ -89,7 +91,7 @@ func TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup(t *testing.T) {
 			astTestMust(t, err)
 			fallback, err := lateFI.Else()
 			astTestMust(t, err)
-			if scenario == "accepted" {
+			if scenario == "accepted" || scenario == "filtered-empty" {
 				if remaining != nil || value.IsNull() || value != fallback || !m.IsFalse(fallback) {
 					t.Fatal("successful candidate was not cleaned", remaining, value, fallback)
 				}
