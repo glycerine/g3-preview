@@ -2800,6 +2800,7 @@
         "theory_str_arrangements.go",
         "theory_str_assumptions.go",
         "theory_str_automaton_bounds.go",
+        "theory_str_automaton_paths.go",
         "theory_str_axioms.go",
         "theory_str_backpropagation.go",
         "theory_str_concat_classes.go",
