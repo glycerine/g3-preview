@@ -136,5 +136,10 @@ func (t *SMTDatatypeTheory) Close() error {
 		}
 		t.utility = nil
 	}
+	if err := t.findTrail.Reset(); err != nil {
+		return err
+	}
+	t.variables = nil
+	t.limits = nil
 	return nil
 }

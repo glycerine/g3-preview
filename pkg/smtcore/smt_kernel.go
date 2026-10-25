@@ -153,6 +153,7 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 			RestartAdaptive: true, AgilityFactor: 0.9999, RestartAgilityThreshold: 0.18, SimplifyClauses: true,
 		},
 	}
+	internalizer.assertedHasQuantifiers = &kernel.assertedHasQuantifiers
 	kernel.assertedSubstitution, err = manager.NewExprSubstitution()
 	if err != nil {
 		return nil, errors.Join(err, kernel.Close())

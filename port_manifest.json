@@ -16373,7 +16373,8 @@
         "pkg/ast/ast_datatype_plugin.go",
         "pkg/ast/ast_datatype_plugin_source_test.go",
         "pkg/ast/ast_datatype_util.go",
-        "pkg/ast/ast_datatype_util_test.go"
+        "pkg/ast/ast_datatype_util_test.go",
+        "pkg/ast/ast_datatype_util_reset_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16387,7 +16388,8 @@
         "TestASTDatatypeValueAndSomeValueCallbacks",
         "TestASTTranslationInheritsDatatypeDefinitions",
         "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
-        "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
+        "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
+        "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference"
       ],
       "assertions": [
         {
@@ -16592,11 +16594,24 @@
             "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
             "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
           ]
+        },
+        {
+          "name": "datatype::util::reset: release cached preference AST pins and clear the per-instance cache, increment the unsigned constructor-selection counter, retain the utility owner, reject copied/closed owners",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_util.go",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_util_reset_test.go"
+          ],
+          "tests": [
+            "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference"
+          ]
         }
       ],
       "ownership": [
         "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Translation snapshots definitions without retaining source pointers, then destination definitions acquire their own translated sort references. Declaration and description query results remain borrowed manager nodes.",
-        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in reverse order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache."
+        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in reverse order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache.",
+        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
       ],
       "deviations": [
         "Private utility memoization maps are omitted because concrete Go queries reconstruct hash-consed declarations and compute recursion/enum properties directly. The unused plugin remove entry point and undeclared get_datatype_size declaration are not ported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed."
@@ -16621,7 +16636,8 @@
         "pkg/ast/rewriter/datatype_rewriter_test.go",
         "pkg/ast/ast_datatype_plugin.go",
         "pkg/ast/ast_datatype_util.go",
-        "pkg/ast/ast_datatype_util_test.go"
+        "pkg/ast/ast_datatype_util_test.go",
+        "pkg/ast/ast_datatype_util_reset_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16634,7 +16650,8 @@
         "TestASTDatatypeValueAndSomeValueCallbacks",
         "TestASTTranslationInheritsDatatypeDefinitions",
         "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
-        "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
+        "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
+        "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference"
       ],
       "conditionals": [
         {
@@ -16731,11 +16748,24 @@
             "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
             "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
           ]
+        },
+        {
+          "name": "datatype::util::reset: release cached preference AST pins and clear the per-instance cache, increment the unsigned constructor-selection counter, retain the utility owner, reject copied/closed owners",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_util.go",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_util_reset_test.go"
+          ],
+          "tests": [
+            "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference"
+          ]
         }
       ],
       "ownership": [
         "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager. Exported definition descriptions contain borrowed handles and copied native slices.",
-        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in reverse order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache."
+        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in reverse order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache.",
+        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
       ],
       "deviations": [
         "Private utility caches, the unused plugin remove entry point, and the undeclared get_datatype_size implementation are omitted under the retained-consumer rule. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes."
@@ -131670,7 +131700,14 @@
         "pkg/smtcore/theory_datatype_split.go",
         "pkg/smtcore/theory_datatype_split_test.go",
         "pkg/smtcore/theory_datatype_conflicts.go",
-        "pkg/smtcore/theory_datatype_conflicts_test.go"
+        "pkg/smtcore/theory_datatype_conflicts_test.go",
+        "pkg/smtcore/theory_datatype_occurs.go",
+        "pkg/smtcore/theory_datatype_occurs_test.go",
+        "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/ast/ast_datatype_util.go",
+        "pkg/ast/ast_datatype_util_reset_test.go",
+        "pkg/smtcore/theory_datatype_restart_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131694,7 +131731,12 @@
         "TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck",
         "TestSMTDatatypeDisjointConstructorsConflictDuringMerge",
         "TestSMTDatatypeKnownConstructorPositiveRecognizerNeedsNoReconstruction",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery",
+        "TestSMTDatatypeAccessorVariableContract",
+        "TestSMTDatatypeAccessorResultSortConstraints",
+        "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
+        "TestSMTDatatypeRestartAdvancesIndependentUtility"
       ],
       "assertions": [
         {
@@ -131978,7 +132020,7 @@
           ]
         },
         {
-          "name": "remaining source merge/recognizer-array lifecycle and complete final-check/model audit",
+          "name": "Remaining constructor/recognizer metadata merge lifecycle, theory reset and complete model audit",
           "status": "partial",
           "tests": []
         },
@@ -132023,16 +132065,51 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "final_check_eh and occurs_check: scoped datatype union-find root order; iterative ENTER/EXIT traversal before each lazy split; shared per-call marks; all-root split scheduling; actual equality-only cycle conflicts and proofs; accessor enode-only handled contract; sticky asserted-quantifier sort constraints; forwarded-root model variable acceptance",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_occurs.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_occurs.go",
+            "pkg/smtcore/theory_datatype_occurs_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery",
+            "TestSMTDatatypeAccessorVariableContract",
+            "TestSMTDatatypeAccessorResultSortConstraints",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
+        },
+        {
+          "name": "restart_eh: reset the independent datatype utility and advance constructor preference even before its first query; preserve theory variables, statistics and other utility owners",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_datatype_lifecycle.go",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_util_reset_test.go",
+            "pkg/smtcore/smt_datatype_lifecycle.go",
+            "pkg/smtcore/theory_datatype_restart_test.go"
+          ],
+          "tests": [
+            "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
+            "TestSMTDatatypeRestartAdvancesIndependentUtility"
+          ]
         }
       ],
       "ownership": [
         "Concrete Go maps and slices own initialized-value, recognizer, reconstruction and case-split trails. AST handles and enodes remain borrowed from the manager and SMT context; the model generator owns registered datatype values.",
         "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed.",
-        "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten."
+        "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten.",
+        "Owns concrete backtrack.UnionFind and undo trail synchronized with base variables and scoped rollback. Traversal stacks, marks, parents and equalities belong to one final-check invocation. Context owns extended conflicts. Internalizer borrows kernel sticky asserted-quantifier state.",
+        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
       ],
       "deviations": [
-        "Guarded SAT clauses and shared egraph roots replace source var_data, union-find, region justifications and recognizer arrays. Accessor result enodes receive attach-only theory variables to satisfy the Go handled-term contract without eager recursive case expansion. Invalid source assertion states return Go errors.",
-        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the broader merge/lifecycle/final-check/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts."
+        "Guarded SAT clauses and scoped egraph scans still replace portions of source var_data and recognizer arrays. Datatype roots now use the concrete source union-find port. Handled accessors require enodes without artificial result variables; sort constraints attach finite or asserted-quantifier datatype results. Invalid source assertion states return Go errors.",
+        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the remaining metadata merge/lifecycle/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts."
       ]
     },
     {
@@ -132054,7 +132131,14 @@
         "pkg/smtcore/theory_datatype_split_test.go",
         "pkg/smtcore/smt_singleton_datatype_test.go",
         "pkg/smtcore/theory_datatype_conflicts.go",
-        "pkg/smtcore/theory_datatype_conflicts_test.go"
+        "pkg/smtcore/theory_datatype_conflicts_test.go",
+        "pkg/smtcore/theory_datatype_occurs.go",
+        "pkg/smtcore/theory_datatype_occurs_test.go",
+        "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/ast/ast_datatype_util.go",
+        "pkg/ast/ast_datatype_util_reset_test.go",
+        "pkg/smtcore/theory_datatype_restart_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -132077,7 +132161,12 @@
         "TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck",
         "TestSMTDatatypeDisjointConstructorsConflictDuringMerge",
         "TestSMTDatatypeKnownConstructorPositiveRecognizerNeedsNoReconstruction",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery",
+        "TestSMTDatatypeAccessorVariableContract",
+        "TestSMTDatatypeAccessorResultSortConstraints",
+        "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
+        "TestSMTDatatypeRestartAdvancesIndependentUtility"
       ],
       "conditionals": [
         {
@@ -132131,7 +132220,7 @@
           ]
         },
         {
-          "name": "remaining source merge/recognizer-array lifecycle and complete final-check/model audit",
+          "name": "Remaining constructor/recognizer metadata merge lifecycle, theory reset and complete model audit",
           "status": "partial",
           "tests": []
         },
@@ -132176,16 +132265,51 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "final_check_eh and occurs_check: scoped datatype union-find root order; iterative ENTER/EXIT traversal before each lazy split; shared per-call marks; all-root split scheduling; actual equality-only cycle conflicts and proofs; accessor enode-only handled contract; sticky asserted-quantifier sort constraints; forwarded-root model variable acceptance",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_occurs.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_occurs.go",
+            "pkg/smtcore/theory_datatype_occurs_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery",
+            "TestSMTDatatypeAccessorVariableContract",
+            "TestSMTDatatypeAccessorResultSortConstraints",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
+        },
+        {
+          "name": "restart_eh: reset the independent datatype utility and advance constructor preference even before its first query; preserve theory variables, statistics and other utility owners",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_datatype_lifecycle.go",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_util_reset_test.go",
+            "pkg/smtcore/smt_datatype_lifecycle.go",
+            "pkg/smtcore/theory_datatype_restart_test.go"
+          ],
+          "tests": [
+            "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
+            "TestSMTDatatypeRestartAdvancesIndependentUtility"
+          ]
         }
       ],
       "ownership": [
         "SMTDatatypeTheory owns concrete Go metadata and scope trails while borrowing manager-owned AST handles and context-owned enodes.",
         "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed.",
-        "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten."
+        "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten.",
+        "Owns concrete backtrack.UnionFind and undo trail synchronized with base variables and scoped rollback. Traversal stacks, marks, parents and equalities belong to one final-check invocation. Context owns extended conflicts. Internalizer borrows kernel sticky asserted-quantifier state.",
+        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
       ],
       "deviations": [
         "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation.",
-        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the broader merge/lifecycle/final-check/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts."
+        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the remaining metadata merge/lifecycle/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts."
       ]
     },
     {
@@ -247283,14 +247407,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "4c50fd642a352725dbb60ed5cc065fe8fcb5fd4a",
+    "commit": "94a0c940a2c430a09953fa794826a2d9615995ff",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25 02:43:26.926543 UTC",
-    "completed_utc": "2026-10-25 02:57:11.156125 UTC",
+    "started_utc": "2026-10-25 03:46:29.163256 UTC",
+    "completed_utc": "2026-10-25 04:00:11.478244 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-4c50fd64.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-4c50fd64.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-4c50fd64.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-94a0c940.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-94a0c940.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-94a0c940.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -247306,9 +247430,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 718.772,
+    "lp_seconds": 714.405,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout with C++ runner comparisons enabled; includes eager/lazy multipattern matching, recursive definitions, optional core validation, filtered-empty MBQI validation and cached auxiliary-context lifecycle, plus earlier increments. Excludes the subsequent datatype policy/recognizer, datatype plugin-copy and command builtin registration changes, whose focused integration evidence is recorded separately."
+    "scope_warning": "Clean isolated exact-HEAD checkout with C++ comparisons enabled; includes prior datatype policy, plugin-copy, incremental splitting and immediate conflict/proof-printing changes. Excludes subsequent legacy string printing and current datatype occurs/root lifecycle changes, whose integration evidence is recorded separately."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

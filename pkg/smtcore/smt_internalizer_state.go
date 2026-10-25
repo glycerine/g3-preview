@@ -101,6 +101,7 @@ type SMTInternalizerState struct {
 	congruence               *SMTCongruenceTable
 	quantifiers              *SMTQuantifierRegistry
 	quantifierManager        *SMTQuantifierManager
+	assertedHasQuantifiers   *bool // borrowed context::has_quantifiers state
 	relevancy                *SMTRelevancyPropagator
 	theories                 map[ast.FamilyID]SMTTheoryInternalizer
 	theoryOrder              []SMTTheoryInternalizer

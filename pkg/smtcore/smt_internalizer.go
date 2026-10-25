@@ -927,7 +927,7 @@ func (s *SMTInternalizerState) internalizeTerm(expression ast.ASTHandle) error {
 			if err != nil {
 				return err
 			}
-			if handled && !theory.IsAttachedToVariable(node) {
+			if handled && s.context.enodes[expression] == nil {
 				return ast.ErrASTDomain
 			}
 		}
@@ -951,7 +951,7 @@ func (s *SMTInternalizerState) internalizeTerm(expression ast.ASTHandle) error {
 		}
 		if handled {
 			node := s.context.enodes[expression]
-			if node == nil || !theory.IsAttachedToVariable(node) {
+			if node == nil {
 				return ast.ErrASTDomain
 			}
 			return s.applySortConstraint(expression, node)

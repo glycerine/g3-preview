@@ -3,6 +3,22 @@ package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 
+// Source theory_datatype::restart_eh resets its utility even when no
+// constructor preference has yet been requested.
+func (t *SMTDatatypeTheory) Restart() error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	if t.utility == nil {
+		t.utility, err = ast.NewDatatypeUtil(state.manager)
+		if err != nil {
+			return err
+		}
+	}
+	return t.utility.Reset()
+}
+
 func (k *SMTKernel) copyDatatypePlugin(source *SMTKernel) error {
 	if !source.preprocessingSetupDone {
 		return nil

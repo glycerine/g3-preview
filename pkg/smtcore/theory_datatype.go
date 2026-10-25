@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/backtrack"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -25,6 +26,8 @@ type SMTDatatypeTheory struct {
 	*SMTTheoryBase
 	parameterOwner     *SMTDatatypeParams
 	utility            *ast.DatatypeUtil
+	find               *backtrack.UnionFind
+	findTrail          *backtrack.TrailStack
 	initialized        map[ast.ASTHandle]bool
 	initializedTrail   []ast.ASTHandle
 	reconstructed      map[ast.ASTHandle]bool
@@ -46,8 +49,14 @@ func NewSMTDatatypeTheory(family ast.FamilyID) (*SMTDatatypeTheory, error) {
 	if err != nil {
 		return nil, err
 	}
+	context := backtrack.NewUnionFindDefaultContext()
+	find, err := backtrack.NewUnionFind(context)
+	if err != nil {
+		return nil, err
+	}
 	return &SMTDatatypeTheory{
 		SMTTheoryBase: base,
+		find:          find, findTrail: context.GetTrailStack(),
 		initialized:   make(map[ast.ASTHandle]bool),
 		reconstructed: make(map[ast.ASTHandle]bool),
 	}, nil
@@ -217,8 +226,14 @@ func (t *SMTDatatypeTheory) attachVariable(node *SMTEnode) error {
 	if t.IsAttachedToVariable(node) {
 		return nil
 	}
-	_, err := t.CreateVariable(node)
-	return err
+	variable, err := t.CreateVariable(node)
+	if err != nil {
+		return err
+	}
+	if t.find.MkVar() != uint32(variable) {
+		return ast.ErrASTDomain
+	}
+	return nil
 }
 
 func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
@@ -349,11 +364,6 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		if err = t.ensureVariable(node.arguments[0]); err != nil {
 			return false, err
 		}
-		if operation == ast.ASTDatatypeAccessor {
-			if err = t.attachVariable(node); err != nil {
-				return false, err
-			}
-		}
 	}
 	return true, nil
 }
@@ -370,14 +380,22 @@ func (t *SMTDatatypeTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHand
 		return err
 	}
 	infinite, err := state.manager.SortIsInfinite(sort)
-	if err != nil || infinite {
+	if err != nil {
 		return err
+	}
+	stateHasQuantifiers := state.assertedHasQuantifiers != nil && *state.assertedHasQuantifiers
+	if infinite && !stateHasQuantifiers {
+		return nil
 	}
 	return t.ensureVariable(node)
 }
 
 func (*SMTDatatypeTheory) UseDisequalities() bool { return false }
 func (t *SMTDatatypeTheory) NewEquality(left, right SMTTheoryVar) error {
+	if left < 0 || right < 0 || uint32(left) >= t.find.GetNumVars() || uint32(right) >= t.find.GetNumVars() {
+		return ast.ErrASTDomain
+	}
+	t.find.Merge(uint32(left), uint32(right))
 	node, err := t.Enode(left)
 	if err != nil {
 		return err
@@ -473,6 +491,7 @@ func (t *SMTDatatypeTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
+	t.findTrail.PushScope()
 	t.scopes = append(t.scopes, smtDatatypeScope{
 		initialized: len(t.initializedTrail), reconstructed: len(t.reconstructedTrail),
 		unsupported: t.unsupported,
@@ -486,6 +505,9 @@ func (t *SMTDatatypeTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	if err := t.findTrail.PopScope(count); err != nil {
+		return err
+	}
 	for _, expression := range t.initializedTrail[scope.initialized:] {
 		delete(t.initialized, expression)
 	}
@@ -499,6 +521,8 @@ func (t *SMTDatatypeTheory) PopScopes(count uint32) error {
 	return t.SMTTheoryBase.PopScopes(count)
 }
 
+// Source final_check_eh: visit datatype union-find roots in variable order,
+// checking each root for cycles before requesting its lazy split.
 func (t *SMTDatatypeTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if t.unsupported {
 		return SMTFinalCheckGiveUp, nil
@@ -507,129 +531,44 @@ func (t *SMTDatatypeTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	constructors := make(map[*SMTEnode]*SMTEnode)
-	declarations := make(map[*SMTEnode]ast.ASTHandle)
-	for expression := range t.initialized {
-		node := state.context.enodes[expression]
-		if node == nil {
-			continue
-		}
-		declaration, matched, declarationErr := state.manager.DatatypeConstructorApp(expression)
-		if declarationErr != nil {
-			return SMTFinalCheckGiveUp, declarationErr
-		}
-		if !matched {
-			continue
-		}
-		root := node.root
-		if prior := constructors[root]; prior != nil && declarations[root] != declaration {
-			equality, equalityErr := t.MkEqualityLiteral(prior.owner, node.owner, true)
-			if equalityErr != nil {
-				return SMTFinalCheckGiveUp, equalityErr
-			}
-			if equalityErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated()}); equalityErr != nil {
-				return SMTFinalCheckGiveUp, equalityErr
-			}
-			return SMTFinalCheckContinue, nil
-		}
-		constructors[root], declarations[root] = node, declaration
+	check := smtDatatypeOccursCheck{
+		theory: t, onStack: make(map[*SMTEnode]bool),
+		cycleFree: make(map[*SMTEnode]bool), parent: make(map[*SMTEnode]*SMTEnode),
 	}
-	// Source final_check visits every attached root, including arguments of
-	// constructors that have no explicit recognizer in the input.
-	for _, expression := range t.initializedTrail {
-		if t.lazySplits() == 0 {
-			break
-		}
-		node := state.context.enodes[expression]
-		if node == nil || constructors[node.root] != nil {
+	result := SMTFinalCheckDone
+	count := len(t.variables)
+	for v := 0; v < count; v++ {
+		if !t.find.IsRoot(uint32(v)) {
 			continue
 		}
-		sort, sortErr := state.manager.GetSort(expression)
-		if sortErr != nil {
-			return SMTFinalCheckGiveUp, sortErr
-		}
-		if splitErr := t.split(expression, sort); splitErr != nil {
-			return SMTFinalCheckGiveUp, splitErr
-		}
-		return SMTFinalCheckContinue, nil
-	}
-	t.statistics.occursChecks++
-	visiting := make(map[*SMTEnode]int)
-	finished := make(map[*SMTEnode]bool)
-	incoming := make(map[*SMTEnode]*SMTEnode)
-	path := make([]*SMTEnode, 0)
-	var cycle []*SMTEnode
-	var visit func(*SMTEnode) error
-	visit = func(root *SMTEnode) error {
-		if finished[root] || cycle != nil {
-			return nil
-		}
-		if start, found := visiting[root]; found {
-			cycle = append([]*SMTEnode(nil), path[start:]...)
-			return nil
-		}
-		constructor := constructors[root]
-		if constructor == nil {
-			finished[root] = true
-			return nil
-		}
-		visiting[root] = len(path)
-		path = append(path, root)
-		for _, argument := range constructor.arguments {
-			sort, sortErr := state.manager.GetSort(argument.owner)
-			if sortErr != nil {
-				return sortErr
+		node := t.variables[v]
+		if !check.cycleFree[node.root] {
+			cycle, err := check.run(node)
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
 			}
-			family, familyErr := state.manager.GetFamilyID(sort)
-			if familyErr != nil {
-				return familyErr
+			if cycle {
+				return SMTFinalCheckContinue, nil
 			}
-			if family == t.FamilyID() {
-				target := argument.root
-				if _, active := visiting[target]; active || !finished[target] {
-					incoming[target] = argument
+		}
+		if t.lazySplits() > 0 {
+			constructor, err := t.classConstructor(node)
+			if err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+			if constructor == nil {
+				sort, err := state.manager.GetSort(node.owner)
+				if err != nil {
+					return SMTFinalCheckGiveUp, err
 				}
-				if visitErr := visit(target); visitErr != nil {
-					return visitErr
+				if err := t.split(node.owner, sort); err != nil {
+					return SMTFinalCheckGiveUp, err
 				}
+				result = SMTFinalCheckContinue
 			}
-			if cycle != nil {
-				break
-			}
-		}
-		path = path[:len(path)-1]
-		delete(visiting, root)
-		finished[root] = true
-		return nil
-	}
-	for root := range constructors {
-		if err = visit(root); err != nil {
-			return SMTFinalCheckGiveUp, err
-		}
-		if cycle != nil {
-			break
 		}
 	}
-	if cycle != nil {
-		clause := make([]SMTLiteral, 0, len(cycle))
-		for _, root := range cycle {
-			constructor := constructors[root]
-			argument := incoming[root]
-			if constructor == nil || argument == nil {
-				return SMTFinalCheckGiveUp, ast.ErrASTDomain
-			}
-			equality, equalityErr := t.MkEqualityLiteral(argument.owner, constructor.owner, true)
-			if equalityErr != nil {
-				return SMTFinalCheckGiveUp, equalityErr
-			}
-			clause = append(clause, equality.Negated())
-		}
-		if err = state.addTheoryAxiom(t.FamilyID(), clause); err != nil {
-			return SMTFinalCheckGiveUp, err
-		}
-		return SMTFinalCheckContinue, nil
-	}
-	return SMTFinalCheckDone, nil
+	return result, nil
 }
 
 func (*SMTDatatypeTheory) Name() string { return "datatype" }
@@ -689,7 +628,11 @@ func (p *smtDatatypeValueProcedure) MakeValue(generator *SMTModelGenerator, valu
 func (*smtDatatypeValueProcedure) IsFresh() bool { return false }
 
 func (t *SMTDatatypeTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
-	if node == nil || generator == nil || !t.IsAttachedToVariable(node) || generator.model == nil {
+	if node == nil || generator == nil || generator.model == nil {
+		return nil, ast.ErrASTDomain
+	}
+	variable := node.TheoryVar(t.FamilyID())
+	if variable < 0 || uint32(variable) >= t.find.GetNumVars() {
 		return nil, ast.ErrASTDomain
 	}
 	state, err := t.State()
