@@ -429,13 +429,11 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 	if !isTrue {
 		return t.propagateRecognizer(value)
 	}
-	valueConstructor, isConstructor, err := state.manager.DatatypeConstructorApp(value)
-	if err != nil {
+	known, err := t.classConstructor(state.context.enodes[value])
+	if err != nil || state.Inconsistent() {
 		return err
 	}
-	if isConstructor && valueConstructor == constructor {
-		t.reconstructed[expression] = true
-		t.reconstructedTrail = append(t.reconstructedTrail, expression)
+	if known != nil && known.declaration == constructor {
 		return nil
 	}
 	if err = t.assertConstructor(value, constructor, NewSMTLiteral(variable, false)); err != nil {

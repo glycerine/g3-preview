@@ -14728,7 +14728,7 @@
       "path": "src/ast/ast_smt_pp.cpp",
       "component": "ast",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_smt_renaming.go",
         "pkg/ast/ast_smt_renaming_test.go",
@@ -14741,7 +14741,10 @@
         "pkg/ast/ast_smt_legacy_benchmark.go",
         "pkg/ast/ast_smt_legacy_benchmark_test.go",
         "pkg/ast/ast_smt_legacy_let.go",
-        "pkg/ast/ast_smt_legacy_let_test.go"
+        "pkg/ast/ast_smt_legacy_let_test.go",
+        "pkg/ast/ast_smt_legacy_datatype.go",
+        "pkg/ast/ast_smt_legacy_datatype_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -14759,7 +14762,10 @@
         "TestLegacySMTPrinterBenchmarkTrueDefaultStatus",
         "TestLegacySMTPrinterLetInsertionSharedAndLargeTerms",
         "TestLegacySMTPrinterQuantifierLocalLetScope",
-        "TestLegacySMTPrinterGenericASTDispatchAndConvenience"
+        "TestLegacySMTPrinterGenericASTDispatchAndConvenience",
+        "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
+        "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -14887,20 +14893,45 @@
           "tests": [
             "TestLegacySMTPrinterGenericASTDispatchAndConvenience"
           ]
+        },
+        {
+          "name": "retained visit_app string-literal branch using zstring::encode plus doubled quotes; current legacy expression printer has no string-literal recognition/rendering branch",
+          "status": "unported",
+          "tests": []
+        },
+        {
+          "name": "legacy datatype proof/declaration printing: sort arguments omit private definition metadata, datatype constructor/accessor names omit private parameters, recognizer constructor references remain visible, and generic/mutually recursive declaration blocks are emitted once across multiple instantiations",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_datatype.go",
+          "go_targets": [
+            "pkg/ast/ast_smt_legacy_datatype.go",
+            "pkg/ast/ast_smt_legacy_datatype_test.go",
+            "pkg/ast/ast_smt_legacy_sort.go",
+            "pkg/ast/ast_smt_legacy_expr.go",
+            "pkg/ast/ast_smt_legacy_decl.go",
+            "pkg/ast/ast_smt_legacy_benchmark.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
+            "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
-        "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager. Let traversal owns native maps and slices only for one display call. LegacySMTBenchmarkConfig borrows assumption slices and callbacks synchronously."
+        "SMTRenaming borrows one symbol manager and owns native forward and reverse maps; LegacySMTPrinter borrows the AST manager and owns its renaming state. Translated spellings are interned by the borrowed manager. Let traversal owns native maps and slices only for one display call. LegacySMTBenchmarkConfig borrows assumption slices and callbacks synchronously.",
+        "Legacy datatype printing borrows manager-owned generic definition descriptions and keeps a per-benchmark sort mark set; it retains no AST references or datatype definitions after returning."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. String-literal and datatype-special branches are excluded by the retained-consumer rule because sequence literal construction/value access and the datatype plugin are not ported. If either owner becomes retained, its newly reachable printer branches must be added."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. Datatype-special branches are now implemented for retained default proof printing, including generic declarations and datatype argument/reference formatting. The old exclusion of sequence literal printing was also stale: sequence literal producers are retained, while visit_app string encoding remains unported, so this unit is partial."
       ]
     },
     {
       "path": "src/ast/ast_smt_pp.h",
       "component": "ast",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_smt_renaming.go",
         "pkg/ast/ast_smt_renaming_test.go",
@@ -14913,7 +14944,10 @@
         "pkg/ast/ast_smt_legacy_benchmark.go",
         "pkg/ast/ast_smt_legacy_benchmark_test.go",
         "pkg/ast/ast_smt_legacy_let.go",
-        "pkg/ast/ast_smt_legacy_let_test.go"
+        "pkg/ast/ast_smt_legacy_let_test.go",
+        "pkg/ast/ast_smt_legacy_datatype.go",
+        "pkg/ast/ast_smt_legacy_datatype_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -14931,7 +14965,10 @@
         "TestLegacySMTPrinterBenchmarkTrueDefaultStatus",
         "TestLegacySMTPrinterLetInsertionSharedAndLargeTerms",
         "TestLegacySMTPrinterQuantifierLocalLetScope",
-        "TestLegacySMTPrinterGenericASTDispatchAndConvenience"
+        "TestLegacySMTPrinterGenericASTDispatchAndConvenience",
+        "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
+        "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -14972,13 +15009,38 @@
             "TestLegacySMTPrinterBenchmarkMetadataDeclarationsAndAssertion",
             "TestLegacySMTPrinterBenchmarkTrueDefaultStatus"
           ]
+        },
+        {
+          "name": "retained visit_app string-literal branch using zstring::encode plus doubled quotes; current legacy expression printer has no string-literal recognition/rendering branch",
+          "status": "unported",
+          "tests": []
+        },
+        {
+          "name": "legacy datatype proof/declaration printing: sort arguments omit private definition metadata, datatype constructor/accessor names omit private parameters, recognizer constructor references remain visible, and generic/mutually recursive declaration blocks are emitted once across multiple instantiations",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt_legacy_datatype.go",
+          "go_targets": [
+            "pkg/ast/ast_smt_legacy_datatype.go",
+            "pkg/ast/ast_smt_legacy_datatype_test.go",
+            "pkg/ast/ast_smt_legacy_sort.go",
+            "pkg/ast/ast_smt_legacy_expr.go",
+            "pkg/ast/ast_smt_legacy_decl.go",
+            "pkg/ast/ast_smt_legacy_benchmark.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
+            "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
-        "The concrete renaming owner borrows the source symbol manager and owns its native translation maps. LegacySMTPrinter borrows the AST manager. LegacySMTBenchmarkConfig borrows assumption slices and declared-filter callbacks for one synchronous display call, replacing the source object's persistent expr_ref_vector ownership."
+        "The concrete renaming owner borrows the source symbol manager and owns its native translation maps. LegacySMTPrinter borrows the AST manager. LegacySMTBenchmarkConfig borrows assumption slices and declared-filter callbacks for one synchronous display call, replacing the source object's persistent expr_ref_vector ownership.",
+        "Legacy datatype printing borrows manager-owned generic definition descriptions and keeps a per-benchmark sort mark set; it retains no AST references or datatype definitions after returning."
       ],
       "deviations": [
-        "Benchmark setters are represented by one-call LegacySMTBenchmarkConfig values. This keeps configuration ownership explicit while preserving every retained header operation; implementation branches blocked on sequence literals and datatypes remain tracked on ast_smt_pp.cpp."
+        "Benchmark setters are represented by one-call LegacySMTBenchmarkConfig values. This keeps configuration ownership explicit while preserving every retained header operation; datatype declaration/printing branches are now implemented; the retained string-literal encoding branch remains unported and tracked on ast_smt_pp.cpp, so this header is partial."
       ]
     },
     {
@@ -16664,18 +16726,21 @@
       "status": "ported",
       "go_targets": [
         "pkg/ast/ast_sort_dependency_order.go",
-        "pkg/ast/ast_decl_collector.go"
+        "pkg/ast/ast_decl_collector.go",
+        "pkg/ast/ast_smt_legacy_datatype_test.go"
       ],
       "tests": [
         "TestSortDependencyOrderCollectsActualSortParameters",
-        "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
+        "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts",
+        "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
+        "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce"
       ],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
           "name": "decl_collector::visit and order_deps for uninterpreted sorts, declarations, applications and quantifiers",
-              "status": "ported",
+          "status": "ported",
           "go_target": "pkg/ast/ast_decl_collector.go",
           "tests": [
             "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
@@ -16683,18 +16748,33 @@
         },
         {
           "name": "decl_collector::collect_deps parameter-sort edges for actual AST sort metadata",
-              "status": "ported",
+          "status": "ported",
           "go_target": "pkg/ast/ast_sort_dependency_order.go",
           "tests": [
             "TestSortDependencyOrderCollectsActualSortParameters"
           ]
+        },
+        {
+          "name": "visit_sort datatype constructor/accessor traversal and collect_deps datatype argument/constructor-domain edges, with SCC dependency ordering for mutually recursive sorts",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_decl_collector.go",
+          "go_targets": [
+            "pkg/ast/ast_decl_collector.go",
+            "pkg/ast/ast_sort_dependency_order.go",
+            "pkg/ast/ast_smt_legacy_datatype_test.go"
+          ],
+          "tests": [
+            "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
+            "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce"
+          ]
         }
       ],
       "ownership": [
-        "The collector borrows real AST metadata while the manager is open and owns native visited maps plus ordered handle slices; it retains no AST references independently of the manager."
+        "The collector borrows real AST metadata while the manager is open and owns native visited maps plus ordered handle slices; it retains no AST references independently of the manager.",
+        "The collector and dependency order retain borrowed sort/declaration identities for one printing operation; datatype constructors/accessors are resolved through the existing manager utilities without additional owned AST pins."
       ],
       "deviations": [
-        "Datatype constructor/accessor dependency traversal is excluded by the retained-consumer rule while the datatype plugin is unported. The collector is integrated with both retained legacy benchmark and AST pretty-print utility consumers."
+        "Datatype constructor/accessor traversal and datatype-specific dependency edges are now ported for retained proof/benchmark consumers. The collector is integrated with both retained legacy benchmark and AST pretty-print utility consumers."
       ]
     },
     {
@@ -16704,11 +16784,14 @@
       "status": "ported",
       "go_targets": [
         "pkg/ast/ast_sort_dependency_order.go",
-        "pkg/ast/ast_decl_collector.go"
+        "pkg/ast/ast_decl_collector.go",
+        "pkg/ast/ast_smt_legacy_datatype_test.go"
       ],
       "tests": [
         "TestSortDependencyOrderCollectsActualSortParameters",
-        "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
+        "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts",
+        "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
+        "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce"
       ],
       "conditionals": [
         {
@@ -16725,7 +16808,7 @@
       "methods": [
         {
           "name": "decl_collector::visit and order_deps for uninterpreted sorts, declarations, applications and quantifiers",
-              "status": "ported",
+          "status": "ported",
           "go_target": "pkg/ast/ast_decl_collector.go",
           "tests": [
             "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
@@ -16733,18 +16816,33 @@
         },
         {
           "name": "decl_collector::collect_deps parameter-sort edges for actual AST sort metadata",
-              "status": "ported",
+          "status": "ported",
           "go_target": "pkg/ast/ast_sort_dependency_order.go",
           "tests": [
             "TestSortDependencyOrderCollectsActualSortParameters"
           ]
+        },
+        {
+          "name": "visit_sort datatype constructor/accessor traversal and collect_deps datatype argument/constructor-domain edges, with SCC dependency ordering for mutually recursive sorts",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_decl_collector.go",
+          "go_targets": [
+            "pkg/ast/ast_decl_collector.go",
+            "pkg/ast/ast_sort_dependency_order.go",
+            "pkg/ast/ast_smt_legacy_datatype_test.go"
+          ],
+          "tests": [
+            "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
+            "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce"
+          ]
         }
       ],
       "ownership": [
-        "The collector borrows real AST metadata while the manager is open and owns native visited maps plus ordered handle slices; it retains no AST references independently of the manager."
+        "The collector borrows real AST metadata while the manager is open and owns native visited maps plus ordered handle slices; it retains no AST references independently of the manager.",
+        "The collector and dependency order retain borrowed sort/declaration identities for one printing operation; datatype constructors/accessors are resolved through the existing manager utilities without additional owned AST pins."
       ],
       "deviations": [
-        "Datatype constructor/accessor dependency traversal is excluded by the retained-consumer rule while the datatype plugin is unported. The public retained collector surface is fully represented."
+        "Datatype constructor/accessor traversal and datatype-specific dependency edges are now ported for retained proof/benchmark consumers. The public retained collector surface is fully represented."
       ]
     },
     {
@@ -131548,7 +131646,9 @@
         "pkg/cmd_context/applications.go",
         "pkg/cmd_context/datatype_builtins_test.go",
         "pkg/smtcore/theory_datatype_split.go",
-        "pkg/smtcore/theory_datatype_split_test.go"
+        "pkg/smtcore/theory_datatype_split_test.go",
+        "pkg/smtcore/theory_datatype_conflicts.go",
+        "pkg/smtcore/theory_datatype_conflicts_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131568,7 +131668,11 @@
         "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments",
         "TestSMTDatatypeSplitCreatesOneRecognizerAndAwaitsAssignment",
         "TestSMTDatatypeSplitActivatesExistingRecognizerWithoutChangingPhase",
-        "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks"
+        "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks",
+        "TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck",
+        "TestSMTDatatypeDisjointConstructorsConflictDuringMerge",
+        "TestSMTDatatypeKnownConstructorPositiveRecognizerNeedsNoReconstruction",
+        "TestSMTLibRunnerProofScript"
       ],
       "assertions": [
         {
@@ -131877,11 +131981,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "sign_recognizer_conflict and merge constructor checks: immediate extended theory conflict with true negative-recognizer antecedent and actual constructor/argument equality, or pure equality evidence for disjoint constructors; positive recognition of an already known constructor is a no-op",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_conflicts.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_conflicts.go",
+            "pkg/smtcore/theory_datatype_conflicts_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck",
+            "TestSMTDatatypeDisjointConstructorsConflictDuringMerge",
+            "TestSMTDatatypeKnownConstructorPositiveRecognizerNeedsNoReconstruction",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
         "Concrete Go maps and slices own initialized-value, recognizer, reconstruction and case-split trails. AST handles and enodes remain borrowed from the manager and SMT context; the model generator owns registered datatype values.",
-        "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed."
+        "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed.",
+        "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten."
       ],
       "deviations": [
         "Guarded SAT clauses and shared egraph roots replace source var_data, union-find, region justifications and recognizer arrays. Accessor result enodes receive attach-only theory variables to satisfy the Go handled-term contract without eager recursive case expansion. Invalid source assertion states return Go errors.",
@@ -131905,7 +132030,9 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/theory_datatype_split.go",
         "pkg/smtcore/theory_datatype_split_test.go",
-        "pkg/smtcore/smt_singleton_datatype_test.go"
+        "pkg/smtcore/smt_singleton_datatype_test.go",
+        "pkg/smtcore/theory_datatype_conflicts.go",
+        "pkg/smtcore/theory_datatype_conflicts_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131924,7 +132051,11 @@
         "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments",
         "TestSMTDatatypeSplitCreatesOneRecognizerAndAwaitsAssignment",
         "TestSMTDatatypeSplitActivatesExistingRecognizerWithoutChangingPhase",
-        "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks"
+        "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks",
+        "TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck",
+        "TestSMTDatatypeDisjointConstructorsConflictDuringMerge",
+        "TestSMTDatatypeKnownConstructorPositiveRecognizerNeedsNoReconstruction",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -132003,11 +132134,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "sign_recognizer_conflict and merge constructor checks: immediate extended theory conflict with true negative-recognizer antecedent and actual constructor/argument equality, or pure equality evidence for disjoint constructors; positive recognition of an already known constructor is a no-op",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_conflicts.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_conflicts.go",
+            "pkg/smtcore/theory_datatype_conflicts_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck",
+            "TestSMTDatatypeDisjointConstructorsConflictDuringMerge",
+            "TestSMTDatatypeKnownConstructorPositiveRecognizerNeedsNoReconstruction",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
         "SMTDatatypeTheory owns concrete Go metadata and scope trails while borrowing manager-owned AST handles and context-owned enodes.",
-        "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed."
+        "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed.",
+        "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten."
       ],
       "deviations": [
         "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation.",

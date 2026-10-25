@@ -49,6 +49,34 @@ func (p *LegacySMTPrinter) sortText(sort ASTHandle) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if v.datatypeSort {
+		name, err := p.renamedText(v.name)
+		if err != nil {
+			return "", err
+		}
+		count, err := p.manager.DatatypeNumParameters(sort)
+		if err != nil {
+			return "", err
+		}
+		if count == 0 {
+			return name, nil
+		}
+		var out strings.Builder
+		out.WriteString("(" + name)
+		for i := uint32(0); i < count; i++ {
+			argument, err := p.manager.DatatypeParameter(sort, i)
+			if err != nil {
+				return "", err
+			}
+			text, err := p.sortText(argument)
+			if err != nil {
+				return "", err
+			}
+			out.WriteString(" " + text)
+		}
+		out.WriteByte(')')
+		return out.String(), nil
+	}
 	var symbol string
 	switch {
 	case v.bvSort:

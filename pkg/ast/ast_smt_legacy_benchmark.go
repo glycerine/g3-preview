@@ -99,6 +99,7 @@ func (p *LegacySMTPrinter) benchmarkText(root ASTHandle, config LegacySMTBenchma
 		out.WriteString("; ")
 		out.WriteString(config.Attributes)
 	}
+	declaredDatatypes := make(map[ASTHandle]bool)
 	for _, sort := range collector.sorts {
 		if config.IsDeclaredSort != nil {
 			declared, e := config.IsDeclaredSort(sort)
@@ -109,7 +110,16 @@ func (p *LegacySMTPrinter) benchmarkText(root ASTHandle, config LegacySMTBenchma
 				continue
 			}
 		}
-		text, e := p.sortDeclarationText(sort)
+		view, e := p.manager.smt2SortView(sort)
+		if e != nil {
+			return "", e
+		}
+		var text string
+		if view.datatypeSort {
+			text, e = p.datatypeDeclarationText(sort, declaredDatatypes)
+		} else {
+			text, e = p.sortDeclarationText(sort)
+		}
 		if e != nil {
 			return "", e
 		}

@@ -12,7 +12,7 @@ func (p *LegacySMTPrinter) sortDeclarationText(sort ASTHandle) (string, error) {
 		return "", err
 	}
 	if view.datatypeSort {
-		return "", ErrASTDomain
+		return p.datatypeDeclarationText(sort, make(map[ASTHandle]bool))
 	}
 	text, err := p.sortText(sort)
 	if err != nil {

@@ -227,6 +227,12 @@ func (p *LegacySMTPrinter) declarationText(decl ASTHandle, ctx *legacySMTExprCon
 	if err != nil {
 		return "", err
 	}
+	if p.manager.datatypePlugin != nil && family == p.manager.datatypePlugin.family {
+		if op != ASTDatatypeRecognizer && op != ASTDatatypeIs {
+			return nameText, nil
+		}
+		private = false
+	}
 	if len(parameters) == 0 || private && !includePrivate {
 		return nameText, nil
 	}

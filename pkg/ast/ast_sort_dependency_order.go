@@ -15,7 +15,7 @@ type sortDependencyOrder struct {
 
 // insertASTSort supplies the parameter-sort edges collected by
 // decl_collector::collect_deps before top_sort<sort> traverses them. Datatype
-// constructor edges belong to the separate datatype collector path.
+// constructor edges are included before ordinary sort parameters.
 func (o *sortDependencyOrder) insertASTSort(m *ASTManager, sort ASTHandle) error {
 	if o == nil || m == nil {
 		return ErrASTHandle
@@ -33,13 +33,49 @@ func (o *sortDependencyOrder) insertASTSort(m *ASTManager, sort ASTHandle) error
 	}
 	o.owner = m
 	var deps []ASTHandle
+	seen := make(map[ASTHandle]struct{})
+	add := func(child astNodeRef) {
+		h := m.external(child)
+		if h == sort {
+			return
+		}
+		if _, found := seen[h]; !found {
+			seen[h] = struct{}{}
+			deps = append(deps, h)
+		}
+	}
+	family, kind, e := m.declIdentity(r)
+	if e != nil {
+		return e
+	}
+	if m.datatypePlugin != nil && family == m.datatypePlugin.family && kind == 0 {
+		definition, e := m.datatypeDefinitionForSort(r)
+		if e != nil {
+			return e
+		}
+		parameters, e := m.datatypeSortArguments(r, definition)
+		if e != nil {
+			return e
+		}
+		for _, parameter := range parameters {
+			add(parameter)
+		}
+		for i := range definition.constructors {
+			ranges, e := m.datatypeInstantiatedRanges(r, definition, &definition.constructors[i])
+			if e != nil {
+				return e
+			}
+			for _, field := range ranges {
+				add(field)
+			}
+		}
+	}
 	info := m.sortAt(r.slot).info
 	if info != (ASTSortInfo{}) {
 		v, e := m.sortInfo(info)
 		if e != nil {
 			return e
 		}
-		seen := make(map[ASTHandle]struct{})
 		for i := v.count; i > 0; i-- {
 			p, e := m.infoParameter(v, i-1)
 			if e != nil {
@@ -52,14 +88,7 @@ func (o *sortDependencyOrder) insertASTSort(m *ASTManager, sort ASTHandle) error
 			if pv.Kind != ASTParameterAST || pv.ast == (astNodeRef{}) || m.nodeAt(pv.ast.slot).kind != ASTSort {
 				continue
 			}
-			child := m.external(pv.ast)
-			if child == sort {
-				continue
-			}
-			if _, found := seen[child]; !found {
-				seen[child] = struct{}{}
-				deps = append(deps, child)
-			}
+			add(pv.ast)
 		}
 	}
 	_, present := o.deps[sort]

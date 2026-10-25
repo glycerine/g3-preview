@@ -18,6 +18,10 @@ func (t *SMTDatatypeTheory) propagateRecognizer(value ast.ASTHandle) error {
 	if node == nil {
 		return ast.ErrASTDomain
 	}
+	known, err := t.classConstructor(node)
+	if err != nil || s.Inconsistent() {
+		return err
+	}
 	sort, err := s.manager.GetSort(value)
 	if err != nil {
 		return err
@@ -68,6 +72,9 @@ func (t *SMTDatatypeTheory) propagateRecognizer(value ast.ASTHandle) error {
 		if !found {
 			return ast.ErrASTDomain
 		}
+		if assignment == lbool.False && known != nil && known.declaration == constructor {
+			return t.setDatatypeConflict([]SMTLiteral{literal.Negated()}, []SMTEnodePair{{known, other}})
+		}
 		if assignment == lbool.True {
 			trueCases[constructor] = literal
 			trueExpressions[constructor] = expression
@@ -101,6 +108,9 @@ func (t *SMTDatatypeTheory) propagateRecognizer(value ast.ASTHandle) error {
 	}
 	if !active.IsNull() {
 		return s.markRelevant(active)
+	}
+	if known != nil {
+		return nil
 	}
 	if len(falseCases) == 0 {
 		return nil

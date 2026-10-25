@@ -3,7 +3,7 @@
 package ast
 
 // astDeclCollector retains borrowed AST identities until its manager closes.
-// Datatype constructor/accessor traversal awaits the datatype utility port.
+// Datatype constructors and accessors contribute their reached sort edges.
 type astDeclCollector struct {
 	manager                  *ASTManager
 	separatePredicates       bool
@@ -57,7 +57,19 @@ func (c *astDeclCollector) visitSort(sort ASTHandle, todo *[]ASTHandle) error {
 		return e
 	}
 	if m.datatypePlugin != nil && fid == m.datatypePlugin.family {
-		return ErrASTDomain
+		c.sorts = append(c.sorts, sort)
+		constructors, err := m.DatatypeConstructors(sort)
+		if err != nil {
+			return err
+		}
+		for _, constructor := range constructors {
+			*todo = append(*todo, constructor)
+			accessors, err := m.DatatypeConstructorAccessors(constructor)
+			if err != nil {
+				return err
+			}
+			*todo = append(*todo, accessors...)
+		}
 	}
 	if fid == NullFamilyID || fid == 4 { // source eager user-sort family ID
 		c.sorts = append(c.sorts, sort)
