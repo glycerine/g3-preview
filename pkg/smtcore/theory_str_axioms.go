@@ -254,7 +254,7 @@ func (t *SMTStringTheory) tryEvalConcat(node *SMTEnode) (result error) {
 }
 
 func (t *SMTStringTheory) CanPropagate() bool {
-	return len(t.basicTodo) != 0 || len(t.concatTodo) != 0 || len(t.concatEvalTodo) != 0 || len(t.libraryTodo) != 0 || len(t.delayedSetup) != 0
+	return len(t.basicTodo) != 0 || len(t.concatTodo) != 0 || len(t.concatEvalTodo) != 0 || len(t.libraryTodo) != 0 || len(t.delayedSetup) != 0 || (t.searchStarted && len(t.delayedAssertions) != 0)
 }
 
 func (t *SMTStringTheory) Propagate() error {
@@ -305,6 +305,8 @@ func (t *SMTStringTheory) Propagate() error {
 					err = t.instantiateReplace(node)
 				case 8:
 					err = t.instantiateCharAt(node)
+				case 10:
+					err = t.instantiateIndex(node)
 				case 3, 4:
 					err = t.instantiateBoundaryRelation(node, op == 4)
 				case 5:
@@ -331,6 +333,23 @@ func (t *SMTStringTheory) Propagate() error {
 			}
 		}
 		t.delayedSetup = nil
+		if t.searchStarted {
+			for _, ref := range t.delayedAssertions {
+				expression, err := t.state.manager.RefGet(ref)
+				if err != nil {
+					return err
+				}
+				if err := t.assertAxiom(expression); err != nil {
+					return err
+				}
+			}
+			for i := range t.delayedAssertions {
+				if err := t.state.manager.DelRef(&t.delayedAssertions[i]); err != nil {
+					return err
+				}
+			}
+			t.delayedAssertions = nil
+		}
 	}
 	return nil
 }

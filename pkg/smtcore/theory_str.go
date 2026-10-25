@@ -28,6 +28,7 @@ type SMTStringTheory struct {
 	concatEvalTodo     []*SMTEnode
 	libraryTodo        []*SMTEnode
 	delayedSetup       []ast.ASTHandle
+	delayedAssertions  []ast.ASTRef
 	conversions        []ast.ASTHandle
 	searchStarted      bool
 	freshID            uint32
@@ -338,6 +339,10 @@ func (t *SMTStringTheory) Close() (result error) {
 	for i := range t.containsRefs {
 		result = errors.Join(result, t.state.manager.DelRef(&t.containsRefs[i]))
 	}
+	// Native delayed assertions are declared between contains_map and m_trail.
+	for i := range t.delayedAssertions {
+		result = errors.Join(result, t.state.manager.DelRef(&t.delayedAssertions[i]))
+	}
 	// Native m_trail is an expr_ref_vector and releases its range forward.
 	for i := range t.refs {
 		result = errors.Join(result, t.state.manager.DelRef(&t.refs[i]))
@@ -346,6 +351,7 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.containsRefs, t.contains = nil, nil
 	t.concatTodo, t.concatEvalTodo, t.libraryTodo = nil, nil, nil
 	t.delayedSetup, t.conversions = nil, nil
+	t.delayedAssertions = nil
 	t.concatCache, t.variableSet, t.internalVariables = nil, nil, nil
 	t.variableScopes, t.axiomatized = nil, nil
 	t.containsByPair, t.containsIndex = nil, nil
