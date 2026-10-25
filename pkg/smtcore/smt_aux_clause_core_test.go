@@ -47,7 +47,9 @@ func TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions(t *testing.T) {
 			for _, literal := range core {
 				seen[literal] = true
 			}
-			if len(core) != want || !seen[la.Negated()] || fullConflict && !seen[lb.Negated()] {
+			// Source mk_unsat_core repeats raw assumption discoveries;
+			// context::mk_unsat_core deduplicates them before publication.
+			if len(seen) != want || !seen[la.Negated()] || fullConflict && !seen[lb.Negated()] {
 				t.Fatal("lost simplifying assumptions", core)
 			}
 		})

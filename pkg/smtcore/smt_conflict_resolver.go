@@ -218,29 +218,30 @@ func (r *SMTConflictResolver) Close() error {
 	return nil
 }
 
-// UnsatCore traces a base conflict back through Boolean and theory
-// justifications and returns only assumption literals.
+// UnsatCore implements mk_unsat_core's reverse assigned-literal walk.
+// The source raw result can repeat an assumption and can include the failed
+// consequent's polarity. The context maps and deduplicates that result.
 func (r *SMTConflictResolver) UnsatCore(conflict SMTBooleanJustification, notLiteral SMTLiteral) ([]SMTLiteral, error) {
 	if r == nil || r.state == nil || r.expander == nil || r.state.open() != nil {
 		return nil, ast.ErrASTHandle
 	}
+	if err := r.syncENodeLiterals(); err != nil {
+		return nil, err
+	}
 	seen := make([]bool, len(r.state.booleanData))
-	queue := make([]SMTLiteral, 0)
 	core := make([]SMTLiteral, 0)
 	add := func(literal SMTLiteral) error {
-		if literal == SMTTrueLiteral {
+		// Both constants use the reserved non-assumption variable zero.
+		if literal == SMTTrueLiteral || literal == SMTFalseLiteral {
 			return nil
-		}
-		if literal == SMTFalseLiteral {
-			return ast.ErrASTDomain
 		}
 		variable := literal.Var()
 		if variable < SMTFirstBoolVar || int(variable) >= len(seen) {
 			return ast.ErrASTDomain
 		}
-		if !seen[variable] {
-			seen[variable] = true
-			queue = append(queue, literal)
+		seen[variable] = true
+		if r.state.booleanData[variable].Assumption {
+			core = append(core, literal)
 		}
 		return nil
 	}
@@ -307,27 +308,62 @@ func (r *SMTConflictResolver) UnsatCore(conflict SMTBooleanJustification, notLit
 		}
 		return nil
 	}
+	consequent := SMTFalseLiteral
 	if notLiteral != SMTNullLiteral {
-		if err := add(notLiteral); err != nil {
-			return nil, err
-		}
+		consequent = notLiteral.Negated()
 	}
-	if err := expand(SMTFalseLiteral, conflict); err != nil {
+	levels := r.levels()
+	conflictLevel, err := SMTBooleanJustificationMaxLevel(r.expander, consequent, conflict, levels)
+	if err != nil {
 		return nil, err
 	}
-	for head := 0; head < len(queue); head++ {
-		literal := queue[head]
-		variable := literal.Var()
-		if r.state.booleanData[variable].Assumption {
-			core = append(core, literal)
-			continue
-		}
-		assigned := NewSMTLiteral(variable, r.state.assignment[NewSMTLiteral(variable, false).Index()] != lbool.True)
-		if err := expand(assigned, r.state.booleanData[variable].Justification()); err != nil {
+	searchLevel := r.state.scopeLevel
+	if r.state.searching {
+		searchLevel = r.state.searchBaseLevel
+	}
+	if conflictLevel > searchLevel {
+		return nil, ast.ErrASTDomain
+	}
+	idx := len(r.state.assignedLiterals) - 1
+	for idx >= 0 && levels[r.state.assignedLiterals[idx].Var()] > conflictLevel {
+		idx--
+	}
+	if notLiteral != SMTNullLiteral {
+		if err := add(consequent); err != nil {
 			return nil, err
 		}
 	}
-	return core, nil
+	if len(r.state.assignedLiterals) == 0 {
+		return core, nil
+	}
+	reason := conflict
+	for {
+		if err := expand(consequent, reason); err != nil {
+			return nil, err
+		}
+		if consequent.Var() >= SMTFirstBoolVar && r.state.booleanData[consequent.Var()].Assumption {
+			core = append(core, consequent)
+		}
+		for idx >= 0 {
+			literal := r.state.assignedLiterals[idx]
+			if levels[literal.Var()] < searchLevel {
+				return core, nil
+			}
+			if seen[literal.Var()] {
+				break
+			}
+			idx--
+		}
+		if idx < 0 {
+			return core, nil
+		}
+		consequent = r.state.assignedLiterals[idx]
+		if levels[consequent.Var()] != searchLevel {
+			return nil, ast.ErrASTDomain
+		}
+		reason = r.state.booleanData[consequent.Var()].Justification()
+		idx--
+	}
 }
 
 func (r *SMTConflictResolver) levels() []uint32 {

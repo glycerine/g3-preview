@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"unsat_core_reverse_trail.smt2":                "unsat\n(c)\nsat\n((a true) (b true) (c false))\nunsat\n(blocked)\nsat\nunsat\n(h)\nsat\n((e true) (h false) ((= x y) true))\nunsat\n(blocked_eq)\nsat\n",
 	"datatype_cycle_scopes.smt2":                   "unsat\n(x_edge y_edge z_edge)\nsat\n(((= (left x) (right x)) true) ((= (left (left x)) leaf) true))\nunsat\nsat\nsat\n",
 	"datatype_constructor_conflict_cores.smt2":     "sat\n((((_ is left) x) true) ((= (lf x) u) true))\nunsat\n(left_fact not_left)\nsat\nunsat\n(left_fact right_fact)\nsat\n",
 	"datatype_incremental_recognizers.smt2":        "sat\n((((_ is aa) x) false) ((= x y) true))\nsat\n((((_ is cc) x) true) (((_ is bb) y) false))\nunsat\nsat\nsat\n",

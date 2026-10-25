@@ -113861,7 +113861,7 @@
       "path": "src/smt/smt_conflict_resolution.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_conflict_polarity_test.go",
@@ -113871,7 +113871,9 @@
         "pkg/smtcore/smt_conflict_levels.go",
         "pkg/smtcore/smt_conflict_resolver.go",
         "pkg/smtcore/smt_conflict_proof.go",
-        "pkg/smtcore/smt_asserted_injectivity_test.go"
+        "pkg/smtcore/smt_asserted_injectivity_test.go",
+        "pkg/smtcore/smt_unsat_core_walk_test.go",
+        "pkg/smtcore/smt_aux_clause_core_test.go"
       ],
       "tests": [
         "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
@@ -113894,7 +113896,14 @@
         "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
         "TestSMTAssertedNNFDefinitionNamesFollowUserScopes",
         "TestSMTAssertedInjectivityConflict",
-        "TestSMTDisequalityConflictProofAcrossEqualityBranches"
+        "TestSMTDisequalityConflictProofAcrossEqualityBranches",
+        "TestSMTUnsatCoreReverseTrailDiscoveryAndDuplicates",
+        "TestSMTUnsatCoreStopsBeforeOlderAssignedReasons",
+        "TestSMTUnsatCoreSkipsAssignmentsAboveConflictLevel",
+        "TestSMTUnsatCoreFailedConsequentPolarityAndContextDedup",
+        "TestSMTUnsatCoreBooleanReasonVariants",
+        "TestSMTUnsatCoreErrorCleanupAndEmptyTrail",
+        "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions"
       ],
       "conditionals": [
         {
@@ -114270,12 +114279,25 @@
           ]
         },
         {
-          "name": "assumption unsat-core extraction through Boolean and theory justifications: Go dependency queue exists; source reverse assigned-literal traversal with conflict-level skipping and search-level termination remains unported",
-          "status": "partial",
+          "name": "mk_unsat_core, process_antecedent_for_unsat_core, process_justification_for_unsat_core and skip_literals_above_conflict_level: reverse marked assignment traversal, raw duplicate discoveries and failed-consequent polarity, reserved constant variable zero, conflict/search level boundaries, Boolean/equality/theory reasons and error cleanup",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_conflict_resolver.go",
           "tests": [
-            "TestSMTKernelAssumptionsValidateCheckAndRollback",
-            "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
+            "TestSMTUnsatCoreReverseTrailDiscoveryAndDuplicates",
+            "TestSMTUnsatCoreStopsBeforeOlderAssignedReasons",
+            "TestSMTUnsatCoreSkipsAssignmentsAboveConflictLevel",
+            "TestSMTUnsatCoreFailedConsequentPolarityAndContextDedup",
+            "TestSMTUnsatCoreBooleanReasonVariants",
+            "TestSMTUnsatCoreErrorCleanupAndEmptyTrail",
+            "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/smtcore/smt_conflict_resolver.go",
+            "pkg/smtcore/smt_unsat_core_walk_test.go",
+            "pkg/smtcore/smt_aux_clause_core_test.go",
+            "pkg/cmd/g3/main_test.go"
           ]
         },
         {
@@ -114298,25 +114320,29 @@
       ],
       "ownership": [
         "The antecedent expander owns its work queues, duplicate set and emitted event history; justifications and enodes are borrowed and temporary justification marks are always cleared.",
-        "The resolver owns its most recent lemma proof through an ASTRef and releases or replaces it across Close and Resolve."
+        "The resolver owns its most recent lemma proof through an ASTRef and releases or replaces it across Close and Resolve.",
+        "Each raw core extraction owns transient Boolean marks locally. Justification expansion clears its marks on successful and failed exits; no context mark survives the call. Raw assumption discoveries may repeat and use either failed/assigned polarity. Context capture maps those literals to the supplied assumption expressions, pins and deduplicates them, then sorts by AST identity."
       ],
       "deviations": [
         "Corrected reversed not_l polarity in failed AssignLiteral and compact binary BCP conflicts. The resolver expects a true assigned premise opposite to the failed consequent; storing the false consequent created non-false learned literals. A two-level regression checks first-UIP lemma/backjump/assertion behavior, and a symbolic BV add/sub circuit with scoped contradiction/model recovery raises strict C++ runner agreement to 119 scripts.",
         "Dynamic-Ack callbacks feed the concrete pair/triple manager during conflict expansion. Recursive Go calls replace the source explicit proof todo stack. The constructor's watch-list reference has no source read after initialization and requires no Go storage.",
         "The Go equality engine detects explicit disequalities before merging their roots. Its concrete disequality-conflict justification reconstructs the equality of the original disequality operands from both equality branches and the pending merge, then uses the existing Boolean conflict proof to resolve against the disequality literal.",
-        "Audit of smt_conflict_resolution.cpp:1326-1441 found that UnsatCore expands a Go dependency queue instead of walking marked assigned literals backward, skipping levels above the conflict and stopping below search level. Existing semantic core tests do not prove this source algorithm; these units remain partial pending that traversal."
+        "The source reverse assigned-literal unsat-core walk now replaces the former Go dependency queue. It skips assignments above the conflict and stops below the search level, retaining source raw discovery order and repetitions before context deduplication. Standalone extraction computes its conflict level and uses current scope when no search is active; live search uses the captured search base level. Reserved literal variable zero cannot be an assumption. The strict Boolean/equality scope runner agrees with the prebuilt C++ executable."
       ]
     },
     {
       "path": "src/smt/smt_conflict_resolution.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_conflict_antecedents.go",
         "pkg/smtcore/smt_conflict_levels.go",
         "pkg/smtcore/smt_conflict_resolver.go",
-        "pkg/smtcore/smt_conflict_proof.go"
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/smtcore/smt_unsat_core_walk_test.go",
+        "pkg/smtcore/smt_aux_clause_core_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
@@ -114332,7 +114358,16 @@
         "TestSMTConflictProofBuildsCongruenceEquality",
         "TestSMTConflictResolverMinimizesImpliedLemmaLiteral",
         "TestSMTKernelAssumptionsValidateCheckAndRollback",
-        "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
+        "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral",
+        "TestSMTUnsatCoreReverseTrailDiscoveryAndDuplicates",
+        "TestSMTUnsatCoreStopsBeforeOlderAssignedReasons",
+        "TestSMTUnsatCoreSkipsAssignmentsAboveConflictLevel",
+        "TestSMTUnsatCoreFailedConsequentPolarityAndContextDedup",
+        "TestSMTUnsatCoreBooleanReasonVariants",
+        "TestSMTUnsatCoreErrorCleanupAndEmptyTrail",
+        "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -114394,12 +114429,25 @@
           ]
         },
         {
-          "name": "assumption unsat-core result interface: Go dependency queue exists; source reverse assigned-literal traversal with conflict-level skipping and search-level termination remains unported",
-          "status": "partial",
+          "name": "mk_unsat_core, process_antecedent_for_unsat_core, process_justification_for_unsat_core and skip_literals_above_conflict_level: reverse marked assignment traversal, raw duplicate discoveries and failed-consequent polarity, reserved constant variable zero, conflict/search level boundaries, Boolean/equality/theory reasons and error cleanup",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_conflict_resolver.go",
           "tests": [
-            "TestSMTKernelAssumptionsValidateCheckAndRollback",
-            "TestSMTKernelUnsatCoreIncludesContradictingAssumptionLiteral"
+            "TestSMTUnsatCoreReverseTrailDiscoveryAndDuplicates",
+            "TestSMTUnsatCoreStopsBeforeOlderAssignedReasons",
+            "TestSMTUnsatCoreSkipsAssignmentsAboveConflictLevel",
+            "TestSMTUnsatCoreFailedConsequentPolarityAndContextDedup",
+            "TestSMTUnsatCoreBooleanReasonVariants",
+            "TestSMTUnsatCoreErrorCleanupAndEmptyTrail",
+            "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ],
+          "go_targets": [
+            "pkg/smtcore/smt_conflict_resolver.go",
+            "pkg/smtcore/smt_unsat_core_walk_test.go",
+            "pkg/smtcore/smt_aux_clause_core_test.go",
+            "pkg/cmd/g3/main_test.go"
           ]
         },
         {
@@ -114424,11 +114472,12 @@
         }
       ],
       "ownership": [
-        "The resolver borrows context, parameters, assignment trail and watches; the completed expander owns only native Go work storage. The resolver owns and releases its latest proof AST reference."
+        "The resolver borrows context, parameters, assignment trail and watches; the completed expander owns only native Go work storage. The resolver owns and releases its latest proof AST reference.",
+        "Each raw core extraction owns transient Boolean marks locally. Justification expansion clears its marks on successful and failed exits; no context mark survives the call. Raw assumption discoveries may repeat and use either failed/assigned polarity. Context capture maps those literals to the supplied assumption expressions, pins and deduplicates them, then sorts by AST identity."
       ],
       "deviations": [
         "The standalone expander isolates the context-independent front of conflict resolution. FUIP resolution and Boolean, theory and equality proof state are connected. The source watch-list reference is initialized but never read by this class.",
-        "Audit of smt_conflict_resolution.cpp:1326-1441 found that UnsatCore expands a Go dependency queue instead of walking marked assigned literals backward, skipping levels above the conflict and stopping below search level. Existing semantic core tests do not prove this source algorithm; these units remain partial pending that traversal."
+        "The source reverse assigned-literal unsat-core walk now replaces the former Go dependency queue. It skips assignments above the conflict and stops below the search level, retaining source raw discovery order and repetitions before context deduplication. Standalone extraction computes its conflict level and uses current scope when no search is active; live search uses the captured search base level. Reserved literal variable zero cannot be an assumption. The strict Boolean/equality scope runner agrees with the prebuilt C++ executable."
       ]
     },
     {
@@ -247481,14 +247530,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "94a0c940a2c430a09953fa794826a2d9615995ff",
+    "commit": "fe90ac5fb475889465e3adeddd69efef00e1143e",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25 03:46:29.163256 UTC",
-    "completed_utc": "2026-10-25 04:00:11.478244 UTC",
+    "started_utc": "2026-10-25 04:47:34.787604 UTC",
+    "completed_utc": "2026-10-25 05:01:15.596946 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-94a0c940.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-94a0c940.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-94a0c940.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-fe90ac5f.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-fe90ac5f.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-fe90ac5f.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -247504,9 +247553,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 714.405,
+    "lp_seconds": 716.233,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout with C++ comparisons enabled; includes prior datatype policy, plugin-copy, incremental splitting and immediate conflict/proof-printing changes. Excludes subsequent legacy string printing, datatype root/cycle/restart changes and direct datatype equality branches; those increments have separate focused integration evidence."
+    "scope_warning": "Clean isolated exact-HEAD checkout with C++ comparisons enabled; includes legacy string proof printing, datatype root/cycle/accessor/restart changes and direct datatype equality branches, plus earlier increments. Excludes the subsequent source unsat-core reverse assignment traversal, whose focused integration evidence is recorded separately."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
