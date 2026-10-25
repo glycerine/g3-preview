@@ -628,16 +628,10 @@ func (t *SMTPseudoBooleanTheory) assignNative(v int32, isTrue bool) error {
 		if !removed {
 			n++
 		}
-		if t.state.inconsistent {
-			return nil
-		}
 	}
 	for _, c := range i.variables {
 		if err := t.assignVariable(v, isTrue, c); err != nil {
 			return err
-		}
-		if t.state.inconsistent {
-			return nil
 		}
 	}
 	if i.constraint != nil {

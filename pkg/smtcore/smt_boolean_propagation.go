@@ -26,10 +26,7 @@ func (s *SMTInternalizerState) assignLiteralCore(literal SMTLiteral, justificati
 	}
 	if literal == SMTFalseLiteral || literal.Var() < SMTFirstBoolVar || int(literal.Var()) >= len(s.boolExpr) {
 		if literal == SMTFalseLiteral {
-			s.inconsistent = true
-			s.conflict = justification
-			s.conflictLiteral = SMTNullLiteral
-			s.statistics.NumConflicts++
+			s.setBooleanConflict(justification, SMTNullLiteral)
 			return nil
 		}
 		return ast.ErrASTDomain
@@ -42,11 +39,8 @@ func (s *SMTInternalizerState) assignLiteralCore(literal SMTLiteral, justificati
 		return nil
 	}
 	if value == lbool.False {
-		s.inconsistent = true
-		s.conflict = justification
 		// Source not_l is the already true opposite of the failed consequent.
-		s.conflictLiteral = literal.Negated()
-		s.statistics.NumConflicts++
+		s.setBooleanConflict(justification, literal.Negated())
 		return nil
 	}
 	want := lbool.True
@@ -72,6 +66,18 @@ func (s *SMTInternalizerState) assignLiteralCore(literal SMTLiteral, justificati
 		return s.relevancy.AssignmentEvent(s.boolExpr[literal.Var()], want == lbool.True)
 	}
 	return nil
+}
+
+// Source context::set_conflict keeps the first conflict while the current
+// theory callback continues to publish assignments and clauses.
+func (s *SMTInternalizerState) setBooleanConflict(justification SMTBooleanJustification, literal SMTLiteral) {
+	if s.inconsistent {
+		return
+	}
+	s.inconsistent = true
+	s.conflict = justification
+	s.conflictLiteral = literal
+	s.statistics.NumConflicts++
 }
 
 func (s *SMTInternalizerState) Conflict() (SMTBooleanJustification, bool) {

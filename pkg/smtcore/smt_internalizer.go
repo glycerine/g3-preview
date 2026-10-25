@@ -122,9 +122,6 @@ func (s *SMTInternalizerState) addClauseKindWithDeleteHandler(literals []SMTLite
 }
 
 func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(literals []SMTLiteral, root bool, kind SMTClauseKind, proof ast.ASTHandle, justification SMTJustification, deleteHandler SMTClauseDeleteHandler) error {
-	if s.inconsistent {
-		return nil
-	}
 	seen := make(map[SMTLiteral]struct{}, len(literals))
 	kept := make([]SMTLiteral, 0, len(literals))
 	removedFalse := make([]SMTLiteral, 0)
@@ -191,18 +188,16 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 	}
 	s.statistics.NumMkLits += uint32(len(kept))
 	if len(kept) == 0 {
-		s.inconsistent = true
-		s.conflict = NewSMTBooleanAxiom()
+		conflict := NewSMTBooleanAxiom()
 		if justification != nil {
 			wrapped, err := NewSMTBooleanJustification(justification)
 			if err != nil {
 				return err
 			}
-			s.conflict = wrapped
+			conflict = wrapped
 			s.ownedJustifications = append(s.ownedJustifications, justification)
 		}
-		s.conflictLiteral = SMTNullLiteral
-		s.statistics.NumConflicts++
+		s.setBooleanConflict(conflict, SMTNullLiteral)
 		return nil
 	}
 	if len(kept) == 1 {
@@ -262,6 +257,15 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 			return err
 		}
 		s.clauses = append(s.clauses, SMTInternalizedClause{Literals: kept, Root: root, Binary: true, Proof: proof})
+		value, err := s.Assignment(second)
+		if err != nil {
+			return err
+		}
+		if value == lbool.False {
+			if err = s.AssignLiteral(first, NewSMTBooleanBinaryClause(second.Negated())); err != nil {
+				return err
+			}
+		}
 		s.statistics.NumMkBinClause++
 		return nil
 	}
@@ -283,10 +287,7 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 		return err
 	}
 	if firstValue == lbool.False {
-		s.inconsistent = true
-		s.conflict = NewSMTBooleanClause(clause)
-		s.conflictLiteral = SMTNullLiteral
-		s.statistics.NumConflicts++
+		s.setBooleanConflict(NewSMTBooleanClause(clause), SMTNullLiteral)
 	} else if secondValue == lbool.False && firstValue == lbool.Undef {
 		s.statistics.NumPropagations++
 		if err = s.AssignLiteral(kept[0], NewSMTBooleanClause(clause)); err != nil {

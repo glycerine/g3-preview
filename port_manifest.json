@@ -114845,7 +114845,8 @@
         "pkg/smtcore/smt_pb_lifecycle.go",
         "pkg/smtcore/smt_pb_lifecycle_test.go",
         "pkg/smtcore/smt_conflict_proof.go",
-        "pkg/cmd/g3/pb_strengthening_test.go"
+        "pkg/cmd/g3/pb_strengthening_test.go",
+        "pkg/smtcore/smt_conflict_continuation_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -114979,7 +114980,10 @@
         "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
         "TestSMTPBResolutionClauseAndForeignReasonBarriers",
         "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
-        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
+        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect",
+        "TestSMTAssignmentRetainsFirstConflictDuringContinuation",
+        "TestSMTClausePublicationContinuesWithoutReplacingConflict",
+        "TestSMTBinaryClausePublicationAssignsDuringContinuation"
       ],
       "conditionals": [
         {
@@ -116534,6 +116538,20 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
           ]
+        },
+        {
+          "name": "context::set_conflict first-conflict retention during continued assignment/clause publication, including immediate optimized binary-clause assignments",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_boolean_propagation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer.go",
+            "pkg/smtcore/smt_conflict_continuation_test.go"
+          ],
+          "tests": [
+            "TestSMTAssignmentRetainsFirstConflictDuringContinuation",
+            "TestSMTClausePublicationContinuesWithoutReplacingConflict",
+            "TestSMTBinaryClausePublicationAssignsDuringContinuation"
+          ]
         }
       ],
       "ownership": [
@@ -116568,7 +116586,8 @@
         "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
         "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend.",
         "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit.",
-        "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial."
+        "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial.",
+        "Source context::set_conflict keeps the original justification and not_l while a theory callback continues. Go now preserves that first conflict without suppressing later unassigned literals or clause publication. Shared construction tests cover conflicting assignments, later false/empty clauses and optimized binary assignment reasons."
       ]
     },
     {
@@ -116645,7 +116664,8 @@
         "pkg/smtcore/smt_pb_lifecycle_test.go",
         "pkg/smtcore/smt_conflict_proof.go",
         "pkg/smtcore/smt_learned_persistence.go",
-        "pkg/cmd/g3/pb_strengthening_test.go"
+        "pkg/cmd/g3/pb_strengthening_test.go",
+        "pkg/smtcore/smt_conflict_continuation_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -116731,7 +116751,10 @@
         "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
         "TestSMTPBResolutionClauseAndForeignReasonBarriers",
         "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
-        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
+        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect",
+        "TestSMTAssignmentRetainsFirstConflictDuringContinuation",
+        "TestSMTClausePublicationContinuesWithoutReplacingConflict",
+        "TestSMTBinaryClausePublicationAssignsDuringContinuation"
       ],
       "conditionals": [
         {
@@ -117299,6 +117322,20 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
           ]
+        },
+        {
+          "name": "context::set_conflict first-conflict retention during continued assignment/clause publication, including immediate optimized binary-clause assignments",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_boolean_propagation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer.go",
+            "pkg/smtcore/smt_conflict_continuation_test.go"
+          ],
+          "tests": [
+            "TestSMTAssignmentRetainsFirstConflictDuringContinuation",
+            "TestSMTClausePublicationContinuesWithoutReplacingConflict",
+            "TestSMTBinaryClausePublicationAssignsDuringContinuation"
+          ]
         }
       ],
       "ownership": [
@@ -117317,7 +117354,8 @@
         "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
         "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend.",
         "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit.",
-        "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial."
+        "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial.",
+        "Source context::set_conflict keeps the original justification and not_l while a theory callback continues. Go now preserves that first conflict without suppressing later unassigned literals or clause publication. Shared construction tests cover conflicting assignments, later false/empty clauses and optimized binary assignment reasons."
       ]
     },
     {
@@ -118516,7 +118554,8 @@
         "pkg/cmd/g3/test_vectors/quant_seq_regex_backjump.smt2",
         "pkg/cmd/g3/test_vectors/quant_seq_unit_character_core.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2"
+        "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
+        "pkg/smtcore/smt_conflict_continuation_test.go"
       ],
       "tests": [
         "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
@@ -118561,7 +118600,9 @@
         "TestSMTBoundedWeightedDisequalitiesModel",
         "TestSMTInternalizerGateProofReservedConstants",
         "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions",
-        "TestQuantifiedArithmeticTranslatedProofAndCore"
+        "TestQuantifiedArithmeticTranslatedProofAndCore",
+        "TestSMTClausePublicationContinuesWithoutReplacingConflict",
+        "TestSMTBinaryClausePublicationAssignsDuringContinuation"
       ],
       "conditionals": [
         {
@@ -119132,6 +119173,19 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_clause continues source publication after an existing conflict, preserves first conflict and immediately assigns an optimized binary clause whose second literal is false",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer.go",
+          "go_targets": [
+            "pkg/smtcore/smt_boolean_propagation.go",
+            "pkg/smtcore/smt_conflict_continuation_test.go"
+          ],
+          "tests": [
+            "TestSMTClausePublicationContinuesWithoutReplacingConflict",
+            "TestSMTBinaryClausePublicationAssignsDuringContinuation"
+          ]
         }
       ],
       "ownership": [
@@ -119146,7 +119200,8 @@
         "Internalized logical clauses are retained as concrete typed records for the future DPLL watch and justification layer.",
         "The retained Go kernel directly encodes implication gates because the C++ preprocessing pass that normally eliminates OP_IMPLIES has not reached this facade; the clauses preserve the source Boolean semantics and conservative relevancy dependencies.",
         "NewSMTKernel enables compact binary clauses by source default when proofs are disabled. Proof mode uses ordinary clauses, and scoped clauses retain ordinary clause objects so rollback owns their lifetime.",
-        "Learned clauses are installed at their computed backjump scope. Atoms destroyed by backjump are retained and reinternalized before installation, so clauses leave with that scope instead of using the source persistent reinitialization stacks. Garbage collection compacts the unified Go clause slice and repairs every saved scope limit."
+        "Learned clauses are installed at their computed backjump scope. Atoms destroyed by backjump are retained and reinternalized before installation, so clauses leave with that scope instead of using the source persistent reinitialization stacks. Garbage collection compacts the unified Go clause slice and repairs every saved scope limit.",
+        "Removed the non-source global inconsistency early return from clause construction. Later auxiliary lemmas retain watches/storage and later empty/false clauses preserve the first conflict. Optimized binary publication now performs the source immediate assignment with the already true opposite of its false second literal as antecedent."
       ]
     },
     {
@@ -134821,7 +134876,10 @@
         "pkg/smtcore/theory_pb_resolution_trace.go",
         "pkg/smtcore/theory_pb_resolution_trace_test.go",
         "pkg/smtcore/theory_pb_stats_test.go",
-        "pkg/smtcore/theory_pb_inline_guard_test.go"
+        "pkg/smtcore/theory_pb_inline_guard_test.go",
+        "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/smt_conflict_continuation_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -134872,7 +134930,8 @@
         "TestSMTPBStatisticsSourceCollectionOrder",
         "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause",
         "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
-        "TestSMTPBInternalizeTermSourceUnreachableGuard"
+        "TestSMTPBInternalizeTermSourceUnreachableGuard",
+        "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict"
       ],
       "conditionals": [
         {
@@ -135499,6 +135558,19 @@
             "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
             "TestSMTPBInternalizeTermSourceUnreachableGuard"
           ]
+        },
+        {
+          "name": "assign_eh source continuation through remaining literal and variable watches after a literal-watch conflict, with shared context retaining the first conflict",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_watch.go",
+          "go_targets": [
+            "pkg/smtcore/smt_boolean_propagation.go",
+            "pkg/smtcore/smt_internalizer.go",
+            "pkg/smtcore/smt_conflict_continuation_test.go"
+          ],
+          "tests": [
+            "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict"
+          ]
         }
       ],
       "ownership": [
@@ -135524,7 +135596,8 @@
         "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors.",
         "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
         "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h.",
-        "Complement VERIFY now evaluates normalization in every build and checks l_undef in source debug builds, returning the established Go guard error after the normalization prefix. The internalize_term hook preserves native false and source debug UNREACHABLE. Exhaustive signed/rational normalization and strict-complement valuations check the live valid domain; final whole-unit audit remains open."
+        "Complement VERIFY now evaluates normalization in every build and checks l_undef in source debug builds, returning the established Go guard error after the normalization prefix. The internalize_term hook preserves native false and source debug UNREACHABLE. Exhaustive signed/rational normalization and strict-complement valuations check the live valid domain; final whole-unit audit remains open.",
+        "Removed non-source inconsistency exits inside the retained PB assignment callback. An actual weighted literal-watch conflict now reaches a second predicate variable-watch update and its new false assignment, preserving source watch sums/fixed counts and the original context conflict. Explicit pending callback regression fails before this correction."
       ]
     },
     {
@@ -135569,7 +135642,10 @@
         "pkg/smtcore/theory_pb_resolution_trace.go",
         "pkg/smtcore/theory_pb_resolution_trace_test.go",
         "pkg/smtcore/theory_pb_stats_test.go",
-        "pkg/smtcore/theory_pb_inline_guard_test.go"
+        "pkg/smtcore/theory_pb_inline_guard_test.go",
+        "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/smt_conflict_continuation_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -135620,7 +135696,8 @@
         "TestSMTPBStatisticsSourceCollectionOrder",
         "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause",
         "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
-        "TestSMTPBInternalizeTermSourceUnreachableGuard"
+        "TestSMTPBInternalizeTermSourceUnreachableGuard",
+        "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict"
       ],
       "assertions": [
         {
@@ -135949,6 +136026,19 @@
             "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
             "TestSMTPBInternalizeTermSourceUnreachableGuard"
           ]
+        },
+        {
+          "name": "assign_eh source continuation through remaining literal and variable watches after a literal-watch conflict, with shared context retaining the first conflict",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_watch.go",
+          "go_targets": [
+            "pkg/smtcore/smt_boolean_propagation.go",
+            "pkg/smtcore/smt_internalizer.go",
+            "pkg/smtcore/smt_conflict_continuation_test.go"
+          ],
+          "tests": [
+            "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict"
+          ]
         }
       ],
       "ownership": [
@@ -135974,7 +136064,8 @@
         "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors.",
         "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
         "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h.",
-        "Complement VERIFY now evaluates normalization in every build and checks l_undef in source debug builds, returning the established Go guard error after the normalization prefix. The internalize_term hook preserves native false and source debug UNREACHABLE. Exhaustive signed/rational normalization and strict-complement valuations check the live valid domain; final whole-unit audit remains open."
+        "Complement VERIFY now evaluates normalization in every build and checks l_undef in source debug builds, returning the established Go guard error after the normalization prefix. The internalize_term hook preserves native false and source debug UNREACHABLE. Exhaustive signed/rational normalization and strict-complement valuations check the live valid domain; final whole-unit audit remains open.",
+        "Removed non-source inconsistency exits inside the retained PB assignment callback. An actual weighted literal-watch conflict now reaches a second predicate variable-watch update and its new false assignment, preserving source watch sums/fixed counts and the original context conflict. Explicit pending callback regression fails before this correction."
       ]
     },
     {
@@ -248927,14 +249018,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "f71faaa5b2a14df870b51ddbe55adb27c8e7dfbe",
+    "commit": "20b421bbda9f5d48686732f622a67365f872bdc8",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25T08:28:23.190837+00:00",
-    "completed_utc": "2026-10-25T08:41:56.642823+00:00",
+    "started_utc": "2026-10-25T09:31:33.909368+00:00",
+    "completed_utc": "2026-10-25T09:45:13.961210+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-f71faaa5.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-f71faaa5.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-f71faaa5.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-20b421bb.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-20b421bb.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-20b421bb.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -248950,9 +249041,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 706.358,
+    "lp_seconds": 707.47,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification; includes all prior datatype/equality increments, native PB watches/weighted resolution/control snapshots, restart sorting-network compilation, optional simplex, independent PB model initialization/factory, three-pass display and core debug validators, with prebuilt C++ comparisons enabled. Excludes the subsequent PB trace, inline-assertion and source uint32 propagation-counter correction increment, whose focused integration evidence is separate. Also excludes the subsequent resolution diagnostics, aggregate/simplex counter-width and kernel no-op reset correction increment."
+    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification. Includes PB resolution diagnostics, source aggregate/simplex counter widths and kernel no-op reset corrections through 20b421bb, with prebuilt C++ comparisons enabled. Excludes subsequent literal-network diagnostics b4169f7c, complement/term guards 45f59d59 and current conflict-continuation corrections, whose focused integration evidence is separate."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
