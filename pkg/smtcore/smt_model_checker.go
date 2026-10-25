@@ -19,19 +19,20 @@ type smtAuxiliarySolverFactory func() (*SMTSolver, error)
 // retain expression bindings until restart, when they enter the ordinary
 // quantifier queue at the restored base scope.
 type SMTModelChecker struct {
-	manager        *ast.ASTManager
-	state          *SMTInternalizerState
-	registry       *SMTQuantifierRegistry
-	modelFinder    *SMTModelFinder
-	initialMaxCexs uint32
-	maxCexs        uint32
-	maxIterations  uint32
-	iteration      uint32
-	exhausted      bool
-	valueTerms     map[ast.ASTHandle]ast.ASTHandle
-	auxiliary      smtAuxiliarySolverFactory
-	newInstances   []smtModelCheckerInstance
-	closed         bool
+	manager          *ast.ASTManager
+	state            *SMTInternalizerState
+	registry         *SMTQuantifierRegistry
+	modelFinder      *SMTModelFinder
+	initialMaxCexs   uint32
+	maxCexs          uint32
+	maxIterations    uint32
+	iteration        uint32
+	exhausted        bool
+	valueTerms       map[ast.ASTHandle]ast.ASTHandle
+	auxiliary        smtAuxiliarySolverFactory
+	auxiliaryContext *SMTSolver
+	newInstances     []smtModelCheckerInstance
+	closed           bool
 }
 
 func (c *SMTModelChecker) SetModelFinder(finder *SMTModelFinder) error {
@@ -50,6 +51,24 @@ func (c *SMTModelChecker) SetAuxiliarySolverFactory(factory smtAuxiliarySolverFa
 		return err
 	}
 	c.auxiliary = factory
+	return nil
+}
+
+func (c *SMTModelChecker) initAuxiliaryContext() error {
+	if c.auxiliaryContext != nil || c.auxiliary == nil {
+		return nil
+	}
+	next, err := c.auxiliary()
+	if err != nil {
+		if next != nil {
+			err = errors.Join(err, next.Close())
+		}
+		return err
+	}
+	if next == nil {
+		return ast.ErrASTHandle
+	}
+	c.auxiliaryContext = next
 	return nil
 }
 
@@ -404,11 +423,14 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 	if err != nil {
 		return false, err
 	}
-	auxiliary, err := c.auxiliary()
-	if err != nil {
+	if err = c.initAuxiliaryContext(); err != nil {
 		return false, err
 	}
-	defer func() { result = errors.Join(result, auxiliary.Close()) }()
+	auxiliary := c.auxiliaryContext
+	if err = auxiliary.PushCore(); err != nil {
+		return false, err
+	}
+	defer func() { result = errors.Join(result, auxiliary.PopCore(1)) }()
 	if err = auxiliary.Assert(negated); err != nil {
 		return false, err
 	}
@@ -674,6 +696,9 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 	if err := model.Compress(); err != nil {
 		return false, err
 	}
+	if err := c.initAuxiliaryContext(); err != nil {
+		return false, err
+	}
 	c.exhausted = false
 	if len(quantifiers) != 0 {
 		c.iteration++
@@ -735,6 +760,10 @@ func (c *SMTModelChecker) Close() error {
 		return nil
 	}
 	result := c.ResetNewInstances()
+	if c.auxiliaryContext != nil {
+		result = errors.Join(result, c.auxiliaryContext.Close())
+		c.auxiliaryContext = nil
+	}
 	c.closed = true
 	c.state = nil
 	c.registry = nil

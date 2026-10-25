@@ -119299,7 +119299,9 @@
         "pkg/parsers/smt2/recursive_functions_test.go",
         "pkg/smtcore/smt_recursive_functions.go",
         "pkg/smtcore/smt_recursive_functions_test.go",
-        "pkg/smtcore/smt_candidate_validation.go"
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_model_checker_auxiliary_test.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -119336,7 +119338,10 @@
         "TestSMTRecursiveModelPublicationAllocationFrontiers",
         "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
         "TestSMTLibRunnerProofScript",
-        "TestSMTModelCheckerValidatesGroundModelWithNoActiveQuantifiers"
+        "TestSMTModelCheckerValidatesGroundModelWithNoActiveQuantifiers",
+        "TestSMTModelCheckerAuxiliarySnapshotAndConcretePlugins",
+        "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
+        "TestSMTModelCheckerAuxiliaryAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -119623,15 +119628,31 @@
             "TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup",
             "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate"
           ]
+        },
+        {
+          "name": "init_aux_context cached fresh context: copied persistent SMT parameter snapshot, zero relevancy, CS_ACTIVITY and empty logic, concrete retained arithmetic/BV/array mk_fresh copies, isolated query push/pop and destruction before parent parameters",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "go_targets": [
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_auxiliary_test.go"
+          ],
+          "tests": [
+            "TestSMTModelCheckerAuxiliarySnapshotAndConcretePlugins",
+            "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
+            "TestSMTModelCheckerAuxiliaryAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
         "SMTModelChecker borrows the internalizer, registry and candidate proto-model. Temporary instantiated, evaluated and Skolem expressions are held by checked AST references and released after the auxiliary solver closes; acquired counterexample models are explicitly released.",
         "auxiliaryCounterexamples registers cleanup for the actual VarSubstitution owner before checking member-construction errors; quantified UFNIA allocation frontiers verify release of partial reducer storage as well as successful auxiliary solving.",
-        "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close."
+        "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close.",
+        "SMTModelChecker owns one cached auxiliary solver after successful initialization. Each counterexample query pushes/pops its own scope even on error. Factory construction copies the persistent parameter snapshot and concrete retained plugins, closes partial owners on failure and freezes context parameters across parent updates/searches. Source arithmetic/BV/full-array parameter references retain their concrete owner semantics; no source assertions, enodes or theory instances are shared. Checker close destroys the auxiliary before parent parameter/services close."
       ],
       "deviations": [
-        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in a fresh solver using the parent logic and parameter services. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; new instance expressions are pinned until restart, then surviving quantifiers and reinternalized bindings enter the ordinary registry queue; duplicate filtering occurs at that source publication boundary. Recursive-function checking now consumes the reserved marker emitted by the command context; the remaining class/diagnostic audit is separate.",
+        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in the cached auxiliary context using the source empty logic, frozen fparams snapshot, zero relevancy, activity-based branching and concrete retained plugin copies. Each query is scoped with push/pop. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; new instance expressions are pinned until restart, then surviving quantifiers and reinternalized bindings enter the ordinary registry queue; duplicate filtering occurs at that source publication boundary. Recursive-function checking now consumes the reserved marker emitted by the command context; the remaining class/diagnostic audit is separate.",
         "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded."
       ]
     },
@@ -119667,7 +119688,9 @@
         "pkg/smtcore/smt_recursive_functions_test.go",
         "pkg/smtcore/smt_candidate_validation.go",
         "pkg/smtcore/smt_kernel.go",
-        "pkg/smtcore/smt_model_checker_lifecycle_test.go"
+        "pkg/smtcore/smt_model_checker_lifecycle_test.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_model_checker_auxiliary_test.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -119699,7 +119722,10 @@
         "TestSMTLibRunnerProofScript",
         "TestSMTModelCheckerValidatesGroundModelWithNoActiveQuantifiers",
         "TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup",
-        "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate"
+        "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate",
+        "TestSMTModelCheckerAuxiliarySnapshotAndConcretePlugins",
+        "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
+        "TestSMTModelCheckerAuxiliaryAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -119825,11 +119851,27 @@
             "TestSMTModelCheckerCandidateCompressionAndSuccessfulCleanup",
             "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate"
           ]
+        },
+        {
+          "name": "init_aux_context cached fresh context: copied persistent SMT parameter snapshot, zero relevancy, CS_ACTIVITY and empty logic, concrete retained arithmetic/BV/array mk_fresh copies, isolated query push/pop and destruction before parent parameters",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_solver.go",
+          "go_targets": [
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_auxiliary_test.go"
+          ],
+          "tests": [
+            "TestSMTModelCheckerAuxiliarySnapshotAndConcretePlugins",
+            "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
+            "TestSMTModelCheckerAuxiliaryAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
         "The Go checker has explicit borrowed state and registry pointers and no region-allocated flexible-array instances; ordinary slices carry pinned expression bindings; enodes are recovered only at restart.",
-        "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close."
+        "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close.",
+        "SMTModelChecker owns one cached auxiliary solver after successful initialization. Each counterexample query pushes/pops its own scope even on error. Factory construction copies the persistent parameter snapshot and concrete retained plugins, closes partial owners on failure and freezes context parameters across parent updates/searches. Source arithmetic/BV/full-array parameter references retain their concrete owner semantics; no source assertions, enodes or theory instances are shared. Checker close destroys the auxiliary before parent parameter/services close."
       ],
       "deviations": [
         "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded."
