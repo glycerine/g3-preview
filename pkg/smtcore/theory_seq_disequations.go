@@ -220,6 +220,42 @@ func (q *smtSequenceDisequationQueue) PushScope() error {
 	return nil
 }
 
+func (q *smtSequenceDisequationQueue) Set(index int, left, right ast.ASTHandle, leftCases, rightCases [][]ast.ASTHandle, literals []SMTLiteral, dependency *smtSequenceDependency) error {
+	if err := q.open(); err != nil {
+		return err
+	}
+	if index < 0 || index >= len(q.disequations) {
+		return ast.ErrASTDomain
+	}
+	replacement, err := newSMTSequenceDisequationCases(q.manager, left, right, leftCases, rightCases, literals, dependency)
+	if err != nil {
+		return err
+	}
+	if err = q.disequations[index].close(q.manager); err != nil {
+		return errors.Join(err, replacement.close(q.manager))
+	}
+	q.disequations[index] = replacement
+	return nil
+}
+
+// Source solve_nqs replaces a removed slot by the last record and revisits it.
+func (q *smtSequenceDisequationQueue) EraseSwapBack(index int) error {
+	if err := q.open(); err != nil {
+		return err
+	}
+	if index < 0 || index >= len(q.disequations) {
+		return ast.ErrASTDomain
+	}
+	if err := q.disequations[index].close(q.manager); err != nil {
+		return err
+	}
+	last := len(q.disequations) - 1
+	q.disequations[index] = q.disequations[last]
+	q.disequations[last] = smtSequenceDisequation{}
+	q.disequations = q.disequations[:last]
+	return nil
+}
+
 func (q *smtSequenceDisequationQueue) PopScopes(count uint32) (result error) {
 	if err := q.open(); err != nil {
 		return err

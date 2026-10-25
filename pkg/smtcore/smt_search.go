@@ -12,9 +12,10 @@ import (
 )
 
 type smtSearchProgress struct {
-	theory                       uint64
-	variables, clauses, assigned int
-	equalities, disequalities    int
+	theory                                uint64
+	variables, clauses, assigned          int
+	equalities, disequalities             int
+	queuedEqualities, processedEqualities int
 }
 
 type smtRetainedLemmaAtom struct {
@@ -79,6 +80,7 @@ func (s *SMTInternalizerState) searchProgress() smtSearchProgress {
 		theory:    s.theoryProgress,
 		variables: len(s.boolExpr), clauses: len(s.clauses), assigned: len(s.assignedLiterals),
 		equalities: len(s.theoryEqualities), disequalities: len(s.theoryDisequalities),
+		queuedEqualities: len(s.pending), processedEqualities: s.pendingHead,
 	}
 }
 

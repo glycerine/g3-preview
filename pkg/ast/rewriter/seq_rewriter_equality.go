@@ -9,10 +9,50 @@ import (
 )
 
 type sequenceEqualityReduction struct {
-	rewriter *SequenceRewriter
-	refs     []ast.ASTRef
-	left     []ast.ASTHandle
-	right    []ast.ASTHandle
+	rewriter                    *SequenceRewriter
+	refs                        []ast.ASTRef
+	left                        []ast.ASTHandle
+	right                       []ast.ASTHandle
+	parts                       *SequenceEqualityReduction
+	residualLeft, residualRight []ast.ASTHandle
+}
+
+// SequenceEqualityReduction owns the temporary ASTs used by reduce_eq.
+// Left/Right are residual word vectors; EqualitiesLeft/Right are its ordered
+// side equations, which can have sequence, regex, or element sorts.
+type SequenceEqualityReduction struct {
+	Left, Right                     []ast.ASTHandle
+	EqualitiesLeft, EqualitiesRight []ast.ASTHandle
+	Changed, Inconsistent           bool
+	manager                         *ast.ASTManager
+	refs                            []ast.ASTRef
+}
+
+func (r *SequenceEqualityReduction) Close() (err error) {
+	if r == nil || r.manager == nil {
+		return ast.ErrASTHandle
+	}
+	for i := len(r.refs) - 1; i >= 0; i-- {
+		err = errors.Join(err, r.manager.DelRef(&r.refs[i]))
+	}
+	r.refs = nil
+	r.Left, r.Right, r.EqualitiesLeft, r.EqualitiesRight = nil, nil, nil, nil
+	r.manager = nil
+	return err
+}
+
+// ReduceEquality exposes the live theory_seq reduce_eq consumer without
+// packaging residual words and element equations into one Boolean formula.
+func (r *SequenceRewriter) ReduceEquality(left, right ast.ASTHandle) (*SequenceEqualityReduction, error) {
+	if err := r.open(); err != nil {
+		return nil, err
+	}
+	parts := &SequenceEqualityReduction{manager: r.manager}
+	_, err := r.rewriteEquality(left, right, ast.ASTRef{}, parts)
+	if err != nil {
+		return nil, errors.Join(err, parts.Close())
+	}
+	return parts, nil
 }
 
 func (s *sequenceEqualityReduction) close() (err error) {
@@ -327,6 +367,14 @@ func (s *sequenceEqualityReduction) publish(out ast.ASTRef) (status RewriteStatu
 	if len(s.left) != len(s.right) {
 		return RewriteFailed, ast.ErrASTDomain
 	}
+	if s.parts != nil {
+		s.parts.Changed = true
+		s.parts.Left, s.parts.Right = s.residualLeft, s.residualRight
+		s.parts.EqualitiesLeft, s.parts.EqualitiesRight = s.left, s.right
+		s.parts.refs = append(s.parts.refs, s.refs...)
+		s.refs = nil
+		return Rewrite3, nil
+	}
 	equalities := make([]ast.ASTHandle, 0, len(s.left))
 	for i := range s.left {
 		equality, err := s.rewriter.manager.MkEq(s.left[i], s.right[i])
@@ -348,9 +396,21 @@ func (s *sequenceEqualityReduction) publish(out ast.ASTRef) (status RewriteStatu
 	return Rewrite3, nil
 }
 
+func (s *sequenceEqualityReduction) inconsistent(out ast.ASTRef) (RewriteStatus, error) {
+	if s.parts != nil {
+		s.parts.Inconsistent, s.parts.Changed = true, true
+		return RewriteDone, nil
+	}
+	return s.rewriter.assignBoolean(false, out)
+}
+
 // RewriteEquality ports the boundary cancellation, concrete String splitting,
 // unit alignment, and empty-residual portion of seq_rewriter::mk_eq_core.
 func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.ASTRef) (status RewriteStatus, err error) {
+	return r.rewriteEquality(left, right, out, nil)
+}
+
+func (r *SequenceRewriter) rewriteEquality(left, right ast.ASTHandle, out ast.ASTRef, parts *SequenceEqualityReduction) (status RewriteStatus, err error) {
 	if err = r.open(); err != nil {
 		return RewriteFailed, err
 	}
@@ -362,8 +422,18 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 	if err != nil {
 		return RewriteFailed, err
 	}
-	state := sequenceEqualityReduction{rewriter: r}
+	state := sequenceEqualityReduction{rewriter: r, parts: parts}
 	defer func() { err = errors.Join(err, state.close()) }()
+	if parts != nil {
+		parts.Left, parts.Right = append([]ast.ASTHandle(nil), ls...), append([]ast.ASTHandle(nil), rs...)
+		for _, input := range []ast.ASTHandle{left, right} {
+			ref, err := r.manager.NewRef(input)
+			if err != nil {
+				return RewriteFailed, err
+			}
+			parts.refs = append(parts.refs, ref)
+		}
+	}
 	changed := false
 	localChange := false
 
@@ -400,7 +470,7 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 				return RewriteFailed, e
 			}
 			if distinct {
-				return r.assignBoolean(false, out)
+				return state.inconsistent(out)
 			}
 			state.add(leftElement, rightElement)
 			ls, rs = ls[:len(ls)-1], rs[:len(rs)-1]
@@ -467,7 +537,7 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 				return RewriteFailed, e
 			}
 			if distinct {
-				return r.assignBoolean(false, out)
+				return state.inconsistent(out)
 			}
 			state.add(leftElement, rightElement)
 			headLeft++
@@ -516,7 +586,7 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 			common = len(rightText)
 		}
 		if leftText[:common] != rightText[:common] {
-			return r.assignBoolean(false, out)
+			return state.inconsistent(out)
 		}
 		if common == len(leftText) {
 			headLeft++
@@ -554,7 +624,7 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 			common = len(rightText)
 		}
 		if leftText[len(leftText)-common:] != rightText[len(rightText)-common:] {
-			return r.assignBoolean(false, out)
+			return state.inconsistent(out)
 		}
 		ls, rs = ls[:len(ls)-1], rs[:len(rs)-1]
 		if common < len(leftText) {
@@ -588,7 +658,7 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 	}
 	if handled {
 		if !satisfiable {
-			return r.assignBoolean(false, out)
+			return state.inconsistent(out)
 		}
 		return state.publish(out)
 	}
@@ -609,7 +679,7 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 			return RewriteFailed, e
 		}
 		if !satisfiable {
-			return r.assignBoolean(false, out)
+			return state.inconsistent(out)
 		}
 		if len(parts) == 1 && !localChange {
 			state.left = state.left[:before]
@@ -628,12 +698,16 @@ func (r *SequenceRewriter) RewriteEquality(left, right ast.ASTHandle, out ast.AS
 	}
 	if handled {
 		if !satisfiable {
-			return r.assignBoolean(false, out)
+			return state.inconsistent(out)
 		}
 		return state.publish(out)
 	}
 	if !localChange {
 		return RewriteFailed, nil
+	}
+	if parts != nil {
+		state.residualLeft, state.residualRight = remainingLeft, remainingRight
+		return state.publish(out)
 	}
 	leftResidual, e := state.concat(remainingLeft, left)
 	if e != nil {

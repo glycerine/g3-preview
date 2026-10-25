@@ -834,12 +834,24 @@ func (t *SMTSequenceTheory) checkConcreteEquations() (bool, error) {
 }
 
 func (t *SMTSequenceTheory) checkConcreteDisequations() (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+entries:
 	for index := 0; index < t.disequations.Len(); index++ {
 		left, right, _, _, literals, dependency, err := t.disequations.At(index)
 		if err != nil {
 			return false, err
 		}
 		for _, literal := range literals {
+			value, err := state.Assignment(literal)
+			if err != nil {
+				return false, err
+			}
+			if value != lbool.True {
+				continue entries
+			}
 			dependency = t.dependencies.Join(dependency, t.dependencies.Leaf(smtSequenceAssumption{literal: literal}))
 		}
 		leftText, leftConcrete, dependency, err := t.concreteString(left, dependency, make(map[ast.ASTHandle]struct{}))

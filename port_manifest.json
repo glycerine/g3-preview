@@ -37266,6 +37266,22 @@
           "tests": [
             "TestSequenceRewriterDeclarationDispatch"
           ]
+        },
+        {
+          "name": "reduce_eq live SMT consumer: owned residual word vectors and ordered side equations reuse the mk_eq_core boundary, unit, length, integer-conversion and subsequence algorithms without Boolean-formula repackaging",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter_equality.go",
+          "go_targets": [
+            "pkg/ast/rewriter/seq_rewriter_equality_test.go",
+            "pkg/smtcore/theory_seq_disequality_solve.go",
+            "pkg/smtcore/theory_seq_disequality_evidence_test.go"
+          ],
+          "tests": [
+            "TestSequenceRewriterReductionPartsRetainResidualsAndSideEquations",
+            "TestSequenceRewriterEqualityBoundaryReductions",
+            "TestSequenceRewriterEqualityArithmeticLengthAndSubsequence",
+            "TestSMTSequenceUnitDisequalityGuardsAndScopedQueue"
+          ]
         }
       ],
       "ownership": [
@@ -37275,7 +37291,8 @@
       "deviations": [
         "The Go reducer exposes theory operations directly and through declaration/argument dispatch. Standard Go strings replace zstring storage for reached String algorithms.",
         "The live eautomaton<sym_expr, sym_expr_manager> instantiation is represented by a concrete, slice-and-map Go NFA in the sequence rewriter. The generic C++ automata templates remain unported until another retained consumer requires them.",
-        "The native all-unit extraction branch passes an empty vector to an assertion-constrained concat helper when the start is beyond all units. The Go port returns the sequence empty value for that mathematically empty, otherwise undefined source case."
+        "The native all-unit extraction branch passes an empty vector to an assertion-constrained concat helper when the start is beyond all units. The Go port returns the sequence empty value for that mathematically empty, otherwise undefined source case.",
+        "The retained SMT solve_ne consumer now receives concrete owned residual word vectors and ordered side equations from the same reduction implementation as RewriteEquality. The owner pins inputs and generated characters/String remnants until the caller has adopted them into scoped queues or internalized literals, then releases them explicitly. The existing Boolean rewriting API preserves its results and source branch order; no template or callback adapter was introduced."
       ]
     },
     {
@@ -37340,13 +37357,30 @@
             "TestSequenceRewriterAutomatonMembership",
             "TestSequenceRewriterAutomatonIntersectionSolver"
           ]
+        },
+        {
+          "name": "reduce_eq live SMT consumer: owned residual word vectors and ordered side equations reuse the mk_eq_core boundary, unit, length, integer-conversion and subsequence algorithms without Boolean-formula repackaging",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/seq_rewriter_equality.go",
+          "go_targets": [
+            "pkg/ast/rewriter/seq_rewriter_equality_test.go",
+            "pkg/smtcore/theory_seq_disequality_solve.go",
+            "pkg/smtcore/theory_seq_disequality_evidence_test.go"
+          ],
+          "tests": [
+            "TestSequenceRewriterReductionPartsRetainResidualsAndSideEquations",
+            "TestSequenceRewriterEqualityBoundaryReductions",
+            "TestSequenceRewriterEqualityArithmeticLengthAndSubsequence",
+            "TestSMTSequenceUnitDisequalityGuardsAndScopedQueue"
+          ]
         }
       ],
       "ownership": [
         "SequenceRewriter borrows ASTManager and SequenceExpressionSolver. Its concrete NFA values are invocation-local and their generated AST labels are held by owning AST references until publication."
       ],
       "deviations": [
-        "Empty parameter-description and update hooks have no Go adapter because no retained consumer observes them. The live automaton template instantiation is concrete Go code rather than a universal generic adapter."
+        "Empty parameter-description and update hooks have no Go adapter because no retained consumer observes them. The live automaton template instantiation is concrete Go code rather than a universal generic adapter.",
+        "The retained SMT solve_ne consumer now receives concrete owned residual word vectors and ordered side equations from the same reduction implementation as RewriteEquality. The owner pins inputs and generated characters/String remnants until the caller has adopted them into scoped queues or internalized literals, then releases them explicitly. The existing Boolean rewriting API preserves its results and source branch order; no template or callback adapter was introduced."
       ]
     },
     {
@@ -116607,6 +116641,19 @@
             "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
             "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
           ]
+        },
+        {
+          "name": "Retained assign_eq/propagate_eqs FIFO work is observable by the Go search progress guard at both enqueue and consumption, including redundant equalities between distinct enodes in one class",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_search.go",
+          "go_targets": [
+            "pkg/smtcore/smt_core_equality_queue_test.go",
+            "pkg/smtcore/theory_seq_empty_test.go"
+          ],
+          "tests": [
+            "TestSMTCoreEqualityQueueCountsAsSearchProgress",
+            "TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound"
+          ]
         }
       ],
       "ownership": [
@@ -116644,7 +116691,8 @@
         "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial.",
         "Source context::set_conflict keeps the original justification and not_l while a theory callback continues. Go now preserves that first conflict without suppressing later unassigned literals or clause publication. Shared construction tests cover conflicting assignments, later false/empty clauses and optimized binary assignment reasons.",
         "A retained equality contradicting an already recorded UF disequality now preserves an earlier Boolean conflict, its not_l and conflict count. The regression failed before this correction and checks that the disequal classes remain separate and scope pop clears child conflict/disequality state. Retained producer queue timing is addressed in the shared FIFO increment; broader context work remains partial.",
-        "Retained explicit theory equalities now merge after atom callbacks and before theory equality events. Pending core equalities prevent premature fixed point. FIFO tests cover generated congruence conflict behind an older equality, undelivered child rollback and redundant add_eq statistics. Processed entries are scoped Go history; truncated entries are cleared and justification owners remain scoped. No C++ container internals are modeled."
+        "Retained explicit theory equalities now merge after atom callbacks and before theory equality events. Pending core equalities prevent premature fixed point. FIFO tests cover generated congruence conflict behind an older equality, undelivered child rollback and redundant add_eq statistics. Processed entries are scoped Go history; truncated entries are cleared and justification owners remain scoped. No C++ container internals are modeled.",
+        "The Go no-progress guard previously omitted the newly retained core equality FIFO. Actual queued/consumed equality work, including a redundant request, could therefore cause theory made no progress after a sequence length decomposition. Its progress snapshot now includes queue length and the consumption head. Focused tests distinguish enqueue, consume, quiescence and scope rollback; the unbounded lower-length solver regression remains satisfiable."
       ]
     },
     {
@@ -137506,6 +137554,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "solve_nqs/solve_ne retained swap-with-last completion, reduced-case replacement and immediate revisit, guard inspection, ordered unit/sequence side equations and last-undefined element propagation with scoped dependencies",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_disequality_solve.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_disequations.go",
+            "pkg/smtcore/theory_seq_disequations_test.go",
+            "pkg/smtcore/theory_seq_disequality_evidence_test.go",
+            "pkg/smtcore/theory_seq_empty_test.go",
+            "pkg/ast/rewriter/seq_rewriter_equality.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_disequality_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceUnitDisequalityGuardsAndScopedQueue",
+            "TestSMTSequenceDisequationReplacementSwapAndNestedRestore",
+            "TestSMTSequenceResidualDisequalityRetainsCancellationEvidence",
+            "TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -137519,7 +137589,8 @@
         "Concrete Go maps replace obj_map and pair hash tables. Dependency joins use an immutable concrete assumption DAG and iterative stable linearization rather than the native scoped_dependency_manager template.",
         "The sequence interface-root scan now uses the source context relevance policy, including unmarked roots when filtering is disabled; scope rollback removes the generated equality. Remaining source canonicalization and sharing refinements are outside this policy increment.",
         "Sequence solution/word equality producers now enqueue and transfer their extended-theory explanations to the logical context before publication, preserving queued and merged reason lifetime. Complete core sequence solving/scope/model and CLI comparisons check integration; the source unit remains partial.",
-        "Residual symbolic disequalities now propagate through a scoped extended theory justification retaining the original disequality literal and equality premises used by solution expansion/boundary cancellation. The former queued implication guarded only by the original disequality omitted these premises. A regression first observed an unassigned residual literal; it now checks exact literal/equality explanation ownership, no repeated progress and repeated scoped rollback. Already-true residuals are skipped because the Go queue retains the original record rather than deleting it through native solve_nqs. A four-check SMT-LIB vector compares repeated conflict/satisfiable scope recovery and a complete three-premise core against prebuilt C++. This increment does not credit the remaining general solve_ne reduction and queue-lifecycle algorithms as complete."
+        "Residual symbolic disequalities now propagate through a scoped extended theory justification retaining the original disequality literal and equality premises used by solution expansion/boundary cancellation. The former queued implication guarded only by the original disequality omitted these premises. A regression first observed an unassigned residual literal; it now checks exact literal/equality explanation ownership, no repeated progress and repeated scoped rollback. Already-true residuals are skipped because the Go queue retains the original record rather than deleting it through native solve_nqs. A four-check SMT-LIB vector compares repeated conflict/satisfiable scope recovery and a complete three-premise core against prebuilt C++. This increment does not credit the remaining general solve_ne reduction and queue-lifecycle algorithms as complete.",
+        "Disequations now inspect false/undefined element guards, reduce every word case, register ordered side equalities, propagate the last undefined guard with the original word and true-guard premises, and replace/remove records with scoped ownership. Replacement at the current index followed by immediate revisit has the native append-replacement/swap-last/pop order. A shared owned rewriter result supplies the existing complete boundary/length/integer-conversion/subsequence reductions. The earlier Go explained residual-equality propagation remains an additional consequence, and the existing all-true conflict closure is retained. Concrete fast checks skip unasserted guards. Native explain_eq conflict-premise minimization and remaining sequence diagnostics/assertions and broader integration are not credited as complete."
       ]
     },
     {
@@ -137797,6 +137868,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "solve_nqs/solve_ne retained swap-with-last completion, reduced-case replacement and immediate revisit, guard inspection, ordered unit/sequence side equations and last-undefined element propagation with scoped dependencies",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_disequality_solve.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_disequations.go",
+            "pkg/smtcore/theory_seq_disequations_test.go",
+            "pkg/smtcore/theory_seq_disequality_evidence_test.go",
+            "pkg/smtcore/theory_seq_empty_test.go",
+            "pkg/ast/rewriter/seq_rewriter_equality.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/quant_seq_unit_disequality_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceUnitDisequalityGuardsAndScopedQueue",
+            "TestSMTSequenceDisequationReplacementSwapAndNestedRestore",
+            "TestSMTSequenceResidualDisequalityRetainsCancellationEvidence",
+            "TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -137807,7 +137900,8 @@
       ],
       "deviations": [
         "Go slices and maps replace scoped native vectors and hash tables; source-private templates are represented only for the live sequence instantiation.",
-        "Residual symbolic disequalities now propagate through a scoped extended theory justification retaining the original disequality literal and equality premises used by solution expansion/boundary cancellation. The former queued implication guarded only by the original disequality omitted these premises. A regression first observed an unassigned residual literal; it now checks exact literal/equality explanation ownership, no repeated progress and repeated scoped rollback. Already-true residuals are skipped because the Go queue retains the original record rather than deleting it through native solve_nqs. A four-check SMT-LIB vector compares repeated conflict/satisfiable scope recovery and a complete three-premise core against prebuilt C++. This increment does not credit the remaining general solve_ne reduction and queue-lifecycle algorithms as complete."
+        "Residual symbolic disequalities now propagate through a scoped extended theory justification retaining the original disequality literal and equality premises used by solution expansion/boundary cancellation. The former queued implication guarded only by the original disequality omitted these premises. A regression first observed an unassigned residual literal; it now checks exact literal/equality explanation ownership, no repeated progress and repeated scoped rollback. Already-true residuals are skipped because the Go queue retains the original record rather than deleting it through native solve_nqs. A four-check SMT-LIB vector compares repeated conflict/satisfiable scope recovery and a complete three-premise core against prebuilt C++. This increment does not credit the remaining general solve_ne reduction and queue-lifecycle algorithms as complete.",
+        "Disequations now inspect false/undefined element guards, reduce every word case, register ordered side equalities, propagate the last undefined guard with the original word and true-guard premises, and replace/remove records with scoped ownership. Replacement at the current index followed by immediate revisit has the native append-replacement/swap-last/pop order. A shared owned rewriter result supplies the existing complete boundary/length/integer-conversion/subsequence reductions. The earlier Go explained residual-equality propagation remains an additional consequence, and the existing all-true conflict closure is retained. Concrete fast checks skip unasserted guards. Native explain_eq conflict-premise minimization and remaining sequence diagnostics/assertions and broader integration are not credited as complete."
       ]
     },
     {
@@ -249701,7 +249795,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 706.4,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification. Includes source first-conflict retention, shared core equality FIFO and retained theory producer scheduling/replay, datatype Boolean creation order/enode flags, initial datatype equality/entry traces and optional SMT-LIB scope counts through cb807efc, with prebuilt C++ comparisons enabled. Excludes subsequent datatype occurs-check diagnostics 48af241b and the current callback/recognizer/split diagnostic and factory-order increment, whose focused integration evidence is separate. Also excludes subsequent datatype statistics and sort/relevance trace corrections. Also excludes the recognizer/exhaustion conflict diagnostic increment following cdcd48b0. Also excludes residual sequence disequality explanation correction following 02aa4aa3."
+    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification. Includes source first-conflict retention, shared core equality FIFO and retained theory producer scheduling/replay, datatype Boolean creation order/enode flags, initial datatype equality/entry traces and optional SMT-LIB scope counts through cb807efc, with prebuilt C++ comparisons enabled. Excludes subsequent datatype occurs-check diagnostics 48af241b and the current callback/recognizer/split diagnostic and factory-order increment, whose focused integration evidence is separate. Also excludes subsequent datatype statistics and sort/relevance trace corrections. Also excludes the recognizer/exhaustion conflict diagnostic increment following cdcd48b0. Also excludes residual sequence disequality explanation correction following 02aa4aa3. Also excludes the owned sequence reduce_eq consumer, guarded disequation lifecycle and equality-FIFO search-progress increment following f4928b95."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

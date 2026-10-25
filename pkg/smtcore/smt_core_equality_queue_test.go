@@ -6,6 +6,41 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
+func TestSMTCoreEqualityQueueCountsAsSearchProgress(t *testing.T) {
+	m := astTestManager(t)
+	_, values := smtUFConstants(t, m, "queued-search-progress", 2)
+	_, _, s := smtInternalizerFixture(t, m, nil)
+	for _, value := range values {
+		astTestMust(t, s.Internalize(value, false))
+	}
+	left, right := s.context.enodes[values[0]], s.context.enodes[values[1]]
+	astTestMust(t, s.addEquality(left, right, NewSMTEqualityAxiom()))
+	_, err := s.PropagateCore()
+	astTestMust(t, err)
+	base := s.searchProgress()
+	for attempt := 0; attempt < 2; attempt++ {
+		astTestMust(t, s.PushScope())
+		astTestMust(t, s.assignEquality(left, right, NewSMTEqualityAxiom()))
+		queued := s.searchProgress()
+		if queued == base || !s.canPropagate() {
+			t.Fatal("queued redundant equality was invisible to the search progress guard")
+		}
+		astTestMust(t, s.propagateCoreEqualities())
+		consumed := s.searchProgress()
+		if consumed == queued || s.canPropagate() {
+			t.Fatal("consumed equality was invisible to the search progress guard")
+		}
+		astTestMust(t, s.propagateCoreEqualities())
+		if s.searchProgress() != consumed {
+			t.Fatal("an empty queue reported further search progress")
+		}
+		astTestMust(t, s.PopScopes(1))
+		if s.searchProgress() != base {
+			t.Fatal("queued search progress did not restore with its scope")
+		}
+	}
+}
+
 func TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict(t *testing.T) {
 	m := astTestManager(t)
 	sort, values := smtUFConstants(t, m, "queued-core", 3)

@@ -1262,7 +1262,8 @@ func TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound(t *testing.T) {
 	status, err := solver.CheckSat(nil)
 	astTestMust(t, err)
 	if status != lbool.True {
-		t.Fatal("unbounded lower-length model", status)
+		reason, _ := solver.ReasonUnknown()
+		t.Fatal("unbounded lower-length model", status, reason)
 	}
 	family, err := m.SequenceFamilyID()
 	astTestMust(t, err)
