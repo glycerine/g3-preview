@@ -88,6 +88,8 @@ type smtPBConstraint struct {
 	watchSum, maxWatch, minSum, maxSum big.Rat
 	fixed                              int
 	propagations                       uint64
+	compilationThreshold               uint32
+	compiled                           lbool.LBool
 }
 
 func (c *smtPBConstraint) current() *smtPBArgs {
@@ -264,7 +266,7 @@ func (t *SMTPseudoBooleanTheory) allLiterals(c *smtPBConstraint) ([]SMTLiteral, 
 }
 
 func (t *SMTPseudoBooleanTheory) addAssign(c *smtPBConstraint, premises []SMTLiteral, consequent SMTLiteral) error {
-	c.propagations++
+	t.incPropagations(c)
 	t.statistics.propagations++
 	base, err := NewSMTTheoryPropagationJustification(t.state.manager, t.FamilyID(), premises, consequent, nil)
 	if err != nil {
@@ -280,7 +282,7 @@ func (t *SMTPseudoBooleanTheory) addAssign(c *smtPBConstraint, premises []SMTLit
 }
 
 func (t *SMTPseudoBooleanTheory) addConflict(c *smtPBConstraint, clause []SMTLiteral) error {
-	c.propagations++
+	t.incPropagations(c)
 	t.statistics.conflicts++
 	t.statistics.clauses++
 	frequency := t.controls.ConflictFrequency

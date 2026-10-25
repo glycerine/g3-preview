@@ -299,7 +299,7 @@ func (t *SMTPseudoBooleanTheory) resolveConflict(c *smtPBConstraint) (bool, erro
 	case lbool.True:
 		return false, nil
 	case lbool.False:
-		c.propagations++
+		t.incPropagations(c)
 		t.statistics.conflicts++
 		t.statistics.clauses++
 		for i := range r.guards {

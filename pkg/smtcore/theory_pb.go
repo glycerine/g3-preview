@@ -14,20 +14,22 @@ import (
 )
 
 type smtPseudoBooleanStatistics struct {
-	predicates              uint64
-	clauses                 uint64
-	compiled                uint64
-	propagations, conflicts uint64
+	predicates                         uint64
+	clauses                            uint64
+	compiled                           uint64
+	compiledVariables, compiledClauses uint64
+	propagations, conflicts            uint64
 }
 
 // SMTPseudoBooleanTheory keeps concrete normalized constraints and native
-// variable/literal watches and weighted conflict resolution. Compilation and
-// optional simplex integration remain separate incomplete source algorithms.
+// variable/literal watches, weighted conflict resolution and restart-triggered
+// sorting-network compilation. Optional simplex integration remains incomplete.
 type SMTPseudoBooleanTheory struct {
 	*SMTTheoryBase
 	statistics     smtPseudoBooleanStatistics
 	watches        map[int32]*smtPBVariableWatches
 	constraints    []*smtPBConstraint
+	toCompile      []*smtPBConstraint
 	limits         []int
 	trail          *backtrack.TrailStack
 	controls       SMTPBState
@@ -180,6 +182,7 @@ func (t *SMTPseudoBooleanTheory) internalizeAtom(expression ast.ASTHandle, retai
 			return true, state.addTheoryAxiom(t.FamilyID(), literals)
 		}
 	}
+	t.initCompilation(c)
 	t.initVariableWatch(c)
 	t.info(variable).constraint = c
 	t.constraints = append(t.constraints, c)
@@ -221,6 +224,7 @@ func (t *SMTPseudoBooleanTheory) PopScopes(count uint32) error {
 	for _, c := range t.constraints[limit:] {
 		t.clearWatch(c)
 		t.info(c.literal.Var()).constraint = nil
+		t.toCompile = smtPBRemove(t.toCompile, c)
 	}
 	clear(t.constraints[limit:])
 	t.constraints = t.constraints[:limit]
@@ -237,6 +241,7 @@ func (t *SMTPseudoBooleanTheory) Close() error {
 	}
 	t.watches = nil
 	t.constraints = nil
+	t.toCompile = nil
 	t.limits = nil
 	t.variables = nil
 	t.parameterOwner = nil
@@ -250,6 +255,8 @@ func (t *SMTPseudoBooleanTheory) CollectStatistics(target *statistics.Statistics
 	target.UpdateUint64("pb predicates", t.statistics.predicates)
 	target.UpdateUint64("pb clauses", t.statistics.clauses)
 	target.UpdateUint64("pb compilations", t.statistics.compiled)
+	target.UpdateUint64("pb compiled vars", t.statistics.compiledVariables)
+	target.UpdateUint64("pb compiled clauses", t.statistics.compiledClauses)
 	target.UpdateUint64("pb propagations", t.statistics.propagations)
 	target.UpdateUint64("pb conflicts", t.statistics.conflicts)
 	return nil

@@ -134687,7 +134687,10 @@
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_learned_persistence.go",
         "pkg/smtcore/smt_search.go",
-        "pkg/cmd/g3/pb_strengthening_test.go"
+        "pkg/cmd/g3/pb_strengthening_test.go",
+        "pkg/smtcore/theory_pb_compile.go",
+        "pkg/smtcore/theory_pb_sort.go",
+        "pkg/smtcore/theory_pb_compile_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -134705,7 +134708,11 @@
         "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
         "TestSMTPBResolutionClauseAndForeignReasonBarriers",
         "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
-        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
+        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect",
+        "TestSMTPBCompilationNetworkIndependentTruthOracle",
+        "TestSMTPBCompilationThresholdRestartAndRollback",
+        "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
+        "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery"
       ],
       "conditionals": [
         {
@@ -135107,7 +135114,26 @@
           ]
         },
         {
-          "name": "propagation-frequency compilation scheduling and source compile_ineq sorting network; optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
+          "name": "inc_propagations threshold scheduling, restart_eh and compile_ineq: concrete literal sorting network, exact base-level folding, weighted expansion, source directional clauses, compilation statistics and trailed recompile lifecycle",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_compile.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_compile.go",
+            "pkg/smtcore/theory_pb_sort.go",
+            "pkg/smtcore/theory_pb_compile_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTPBCompilationNetworkIndependentTruthOracle",
+            "TestSMTPBCompilationThresholdRestartAndRollback",
+            "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
+            "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
           "status": "unported",
           "tests": []
         },
@@ -135168,17 +135194,18 @@
       "ownership": [
         "The theory owns typed normalized constraints, exact big.Rat coefficients, per-variable watch lists, scope limits and a concrete undo trail. SAT/context Boolean variables retain AST expressions; watch records borrow literal IDs and constraint pointers.",
         "Per-assignment numeric trails restore counters. Active predicate assignment trails remove the current literal watches, restore orientation and variable-watch mode, then restore the previous sums/fixed count. Watch-list and argument swaps persist as in source. Scoped constraints are removed only after these undo actions; empty per-variable records can remain as source high-water storage.",
-        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Native PB propagation owners now retain their originating inequality for weighted resolution; compilation scheduling controls remain unported.",
+        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Native PB propagation owners now retain their originating inequality for weighted resolution.",
         "PB propagation owners retain the concrete originating inequality in addition to the ordinary theory-propagation owner. Scope ownership keeps that inequality valid while its reasons can be resolved. Each cutting-plane frame owns temporary marks, coefficients, guards and lemma storage; no persistent global mark leaks remain on refusal/error.",
         "Before actual source setup/first use an eager Go placeholder borrows its containing parameter owner; setup copies the four scalar controls and releases that borrow. Fresh plugins copy this installed value, independently of the current mutable driver and other plugin snapshots.",
-        "Strengthened auxiliary lemmas own heap-marked theory-axiom objects, preserving their dynamic resolution-barrier type and surviving clause lifetime safely. Ordinary PB conflict lemmas retain the existing heap theory-lemma owner. Generated consequence definitions retain scoped assignment-dependent inputs instead of folding away their proof/core premises."
+        "Strengthened auxiliary lemmas own heap-marked theory-axiom objects, preserving their dynamic resolution-barrier type and surviving clause lifetime safely. Ordinary PB conflict lemmas retain the existing heap theory-lemma owner. Generated consequence definitions retain scoped assignment-dependent inputs instead of folding away their proof/core premises.",
+        "Pending compilation borrows concrete inequality pointers; pop removes deleted constraints after undo. Successful compilation installs ordinary scoped auxiliary clauses with region theory-axiom justifications; a scope undo restores compiled=false before native constraint deletion. SAT Boolean variables retain auxiliary AST names without recursive gate internalization. Network scratch is concrete native Go slices."
       ],
       "deviations": [
-        "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. The normal PB2BV rewriter remains available to its other retained consumers. Source watch algorithms now run on live PB atoms; compilation and strengthening are explicit remaining ports rather than replacements by another algorithm.",
+        "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. Native watches, weighted strengthening and source propagation-threshold/restart compilation now run on live PB atoms; the normal PB2BV rewriter remains available to its other retained consumers.",
         "Exact Go big.Rat values replace source rational/mpz storage and are copied when numeral ownership changes. The normalization implementation is concrete for SMTLiteral; no generic callback utility or STL internals are reproduced.",
         "An empty equality with a nonzero bound is folded to false before publishing a constraint. Literal source normalization can leave this impossible negative-bound case unresolved, and no variable callback exists to repair it; the direct Go internalizer regression enforces correct constant semantics.",
         "compile_arg now creates native auxiliary PB Booleans for nonowned arguments. Both source smt_model_generator.cpp mk_value_procs and Go discoverValueProcedures handle Boolean roots before sort-family model callbacks, so their model values use the Boolean assignment path. The prior claim that no retained Go producer creates auxiliary PB applications is superseded. The remaining model/factory registration/lifetime audit is not claimed complete.",
-        "Native weighted resolution, conflict frequency, complement learning and constructor snapshot/copy are now implemented. Native compilation scheduling/sorting networks, optional simplex and remaining diagnostics/model-factory lifecycle audits still keep this unit partial.",
+        "Native weighted resolution, constructor snapshots and native restart-triggered sorting-network compilation are implemented. Optional simplex and remaining TRACE/assertion/model-factory lifecycle audits keep this unit partial.",
         "Correctness correction for strengthened consequences: internalization retains the scoped false inputs of a residual PB predicate. Literal source folding can turn that definition into an axiom and discard premises needed by later Boolean learning. A pending-callback regression with 2*x+y+z+u>=3 verifies the residual definition, exact guarded learned clause and all original relation valuations; the literal-folding variant fails this regression.",
         "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits."
       ]
@@ -135206,7 +135233,10 @@
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_learned_persistence.go",
         "pkg/smtcore/smt_search.go",
-        "pkg/cmd/g3/pb_strengthening_test.go"
+        "pkg/cmd/g3/pb_strengthening_test.go",
+        "pkg/smtcore/theory_pb_compile.go",
+        "pkg/smtcore/theory_pb_sort.go",
+        "pkg/smtcore/theory_pb_compile_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -135224,7 +135254,11 @@
         "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
         "TestSMTPBResolutionClauseAndForeignReasonBarriers",
         "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
-        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
+        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect",
+        "TestSMTPBCompilationNetworkIndependentTruthOracle",
+        "TestSMTPBCompilationThresholdRestartAndRollback",
+        "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
+        "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery"
       ],
       "assertions": [
         {
@@ -135328,7 +135362,26 @@
           ]
         },
         {
-          "name": "propagation-frequency compilation scheduling and source compile_ineq sorting network; optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
+          "name": "inc_propagations threshold scheduling, restart_eh and compile_ineq: concrete literal sorting network, exact base-level folding, weighted expansion, source directional clauses, compilation statistics and trailed recompile lifecycle",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_compile.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_compile.go",
+            "pkg/smtcore/theory_pb_sort.go",
+            "pkg/smtcore/theory_pb_compile_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTPBCompilationNetworkIndependentTruthOracle",
+            "TestSMTPBCompilationThresholdRestartAndRollback",
+            "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
+            "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
           "status": "unported",
           "tests": []
         },
@@ -135389,17 +135442,18 @@
       "ownership": [
         "The theory owns typed normalized constraints, exact big.Rat coefficients, per-variable watch lists, scope limits and a concrete undo trail. SAT/context Boolean variables retain AST expressions; watch records borrow literal IDs and constraint pointers.",
         "Per-assignment numeric trails restore counters. Active predicate assignment trails remove the current literal watches, restore orientation and variable-watch mode, then restore the previous sums/fixed count. Watch-list and argument swaps persist as in source. Scoped constraints are removed only after these undo actions; empty per-variable records can remain as source high-water storage.",
-        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Native PB propagation owners now retain their originating inequality for weighted resolution; compilation scheduling controls remain unported.",
+        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Native PB propagation owners now retain their originating inequality for weighted resolution.",
         "PB propagation owners retain the concrete originating inequality in addition to the ordinary theory-propagation owner. Scope ownership keeps that inequality valid while its reasons can be resolved. Each cutting-plane frame owns temporary marks, coefficients, guards and lemma storage; no persistent global mark leaks remain on refusal/error.",
         "Before actual source setup/first use an eager Go placeholder borrows its containing parameter owner; setup copies the four scalar controls and releases that borrow. Fresh plugins copy this installed value, independently of the current mutable driver and other plugin snapshots.",
-        "Strengthened auxiliary lemmas own heap-marked theory-axiom objects, preserving their dynamic resolution-barrier type and surviving clause lifetime safely. Ordinary PB conflict lemmas retain the existing heap theory-lemma owner. Generated consequence definitions retain scoped assignment-dependent inputs instead of folding away their proof/core premises."
+        "Strengthened auxiliary lemmas own heap-marked theory-axiom objects, preserving their dynamic resolution-barrier type and surviving clause lifetime safely. Ordinary PB conflict lemmas retain the existing heap theory-lemma owner. Generated consequence definitions retain scoped assignment-dependent inputs instead of folding away their proof/core premises.",
+        "Pending compilation borrows concrete inequality pointers; pop removes deleted constraints after undo. Successful compilation installs ordinary scoped auxiliary clauses with region theory-axiom justifications; a scope undo restores compiled=false before native constraint deletion. SAT Boolean variables retain auxiliary AST names without recursive gate internalization. Network scratch is concrete native Go slices."
       ],
       "deviations": [
-        "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. The normal PB2BV rewriter remains available to its other retained consumers. Source watch algorithms now run on live PB atoms; compilation and strengthening are explicit remaining ports rather than replacements by another algorithm.",
+        "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. Native watches, weighted strengthening and source propagation-threshold/restart compilation now run on live PB atoms; the normal PB2BV rewriter remains available to its other retained consumers.",
         "Exact Go big.Rat values replace source rational/mpz storage and are copied when numeral ownership changes. The normalization implementation is concrete for SMTLiteral; no generic callback utility or STL internals are reproduced.",
         "An empty equality with a nonzero bound is folded to false before publishing a constraint. Literal source normalization can leave this impossible negative-bound case unresolved, and no variable callback exists to repair it; the direct Go internalizer regression enforces correct constant semantics.",
         "compile_arg now creates native auxiliary PB Booleans for nonowned arguments. Both source smt_model_generator.cpp mk_value_procs and Go discoverValueProcedures handle Boolean roots before sort-family model callbacks, so their model values use the Boolean assignment path. The prior claim that no retained Go producer creates auxiliary PB applications is superseded. The remaining model/factory registration/lifetime audit is not claimed complete.",
-        "Native weighted resolution, conflict frequency, complement learning and constructor snapshot/copy are now implemented. Native compilation scheduling/sorting networks, optional simplex and remaining diagnostics/model-factory lifecycle audits still keep this unit partial.",
+        "Native weighted resolution, constructor snapshots and native restart-triggered sorting-network compilation are implemented. Optional simplex and remaining TRACE/assertion/model-factory lifecycle audits keep this unit partial.",
         "Correctness correction for strengthened consequences: internalization retains the scoped false inputs of a residual PB predicate. Literal source folding can turn that definition into an axiom and discard premises needed by later Boolean learning. A pending-callback regression with 2*x+y+z+u>=3 verifies the residual definition, exact guarded learned clause and all original relation valuations; the literal-folding variant fails this regression.",
         "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits."
       ]
@@ -231385,7 +231439,7 @@
       "path": "src/util/sorting_network.h",
       "component": "util",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/util_psort_ast_network.go",
         "pkg/ast/util_psort_ast_context_source_test.go",
@@ -231396,7 +231450,12 @@
         "pkg/ast/util_psort_ast_network_source_test.go",
         "pkg/ast/util_psort_ast_ownership_source_test.go",
         "pkg/ast/util_psort_ast_recursive_oracle_source_test.go",
-        "pkg/ast/util_psort_ast_trace_test.go"
+        "pkg/ast/util_psort_ast_trace_test.go",
+        "pkg/smtcore/theory_pb_compile.go",
+        "pkg/smtcore/theory_pb_sort.go",
+        "pkg/smtcore/theory_pb_compile_test.go",
+        "pkg/ast/util_psort_ast_costs.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestPsortASTContextActualFactoriesClausesAndTrail",
@@ -231417,7 +231476,13 @@
         "TestPsortASTContextEscapedNativeStorageAfterManagerClose",
         "TestPsortASTCardSourceEntryTrace",
         "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
-        "TestPsortASTInterleaveEntryTraceBeforeOutput"
+        "TestPsortASTInterleaveEntryTraceBeforeOutput",
+        "TestSMTPBCompilationNetworkIndependentTruthOracle",
+        "TestSMTPBCompilationThresholdRestartAndRollback",
+        "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
+        "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -231612,20 +231677,41 @@
             "TestPsortASTContextNativeRepeatedFactoriesExactReferences",
             "TestPsortASTContextEscapedNativeStorageAfterManagerClose"
           ]
+        },
+        {
+          "name": "Concrete SMTLiteral psort_nw<theory_pb::psort_expr> reached by PB compile_ineq: ge/le dualization, at-most-one groups, source unsigned cost selection, card/sort/merge and subset encodings; remaining literal-instantiation TRACE/assertion audit",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_pb_sort.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_compile.go",
+            "pkg/smtcore/theory_pb_sort.go",
+            "pkg/smtcore/theory_pb_compile_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTPBCompilationNetworkIndependentTruthOracle",
+            "TestSMTPBCompilationThresholdRestartAndRollback",
+            "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
+            "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "One reflected network cold header owns its embedded real currentv/nextv Runtime unsigned columns; input/output/DebugContext/Runtime remain borrowed. Source current/next pointer exchanges move no allocation ownership. Every actual19-reservation operation prefix in both Runtime32/64 has immediate named physical/cold graph before faultlift, completed nextv-before-currentv source DT and separate exact owning pending abort. Actual lower acquisition executing guard retains returned root against real Go ErrorTransport reentry; no native callback equivalence.",
         "Actual prior returned NULL-growth acquisition transfers to charged concrete archive only at retry; exact vector/column/Runtime/nonce tokens remain named. Prephysical failure owns no token/context; first diagnostic cause stays scalar. Source DT frees current member only, explicit owning close drains every pending/archive once. Real Go ErrorTransport executing guard rejects destructive cleanup before lower token return, no native callback equivalence.",
         "A real successful Assign may publish a live distinct current field while an earlier NULL-allocation token is still pending. Next ordinary growth archives only that exact earlier token after actual current capacity/lifetime reads; pendingReplaces/dangling realloc is never repaired. Real constructor/copy publication supplies current ownership independently of the archived token.",
-        "One reflected class owner header includes true constructor-completion fields and both embedded vectors. Generated copy constructs currentv then nextv using source size/capacity/exact allocation/ascending SIZE placements. Only after completion do current/next copy original member addresses, borrowed until reached dereference. Next-member failure source-destructs completed current before return; failed member has no source DT, and actual returned allocation/published partial field stays named for distinct owning Close. Every actual constructor reservation and first/second postphysical failure retains original, caller output and separate failed/successful later class graphs before lift."
+        "One reflected class owner header includes true constructor-completion fields and both embedded vectors. Generated copy constructs currentv then nextv using source size/capacity/exact allocation/ascending SIZE placements. Only after completion do current/next copy original member addresses, borrowed until reached dereference. Next-member failure source-destructs completed current before return; failed member has no source DT, and actual returned allocation/published partial field stays named for distinct owning Close. Every actual constructor reservation and first/second postphysical failure retains original, caller output and separate failed/successful later class graphs before lift.",
+        "The SMTLiteral instantiation borrows the PB theory/context, owns only native slice scratch and scalars, and emits context-owned scoped auxiliary clauses. Fresh auxiliary and comparator AST names are retained by context Boolean variables; no universal template adapters or STL internals are ported."
       ],
       "deviations": [
         "Selected unsigned_ext source test_sorting1/test_sorting2/test_sorting4 runs2030 original is_sorted ENSURE instances; AST psort_nw branches are covered by concrete clause and independent finite-oracle tests. Concrete stateless unsigned extension preserves source mk_ite/mk_le/default0 without callbacks; source persistent appended mapping columns and reset-self-alias behavior remain literal. Callback behavior is represented by the retained unsigned and AST contexts; Go diagnostics and allocation replace TRACE/native ABI/global allocation details. Actual closed-provider/invalid get/division-by-zero and signed TLS overflow tests are explicit Go guard-domain evidence, not ordinary native algorithm/OOM credit.",
         "Remaining SAT scalar column layout is separate from the native queue. Extra unsigned context fields are reflected enclosing cold charge; each archive is real Go owner metadata charged before token transfer, with no source Runtime event. Dangling nonnull realloc retries still reach actual raw guards, no repair or native-defined continuation claim.",
         "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. The retained unsigned specialization uses checked Go lifetime and diagnostic adapters.",
         "The exported AST context preserves the complete psort algorithm; downstream SMT and tactic callers retain their own integration obligations. Literal scratch uses native []ASTHandle slices and captured spans, with no Runtime payload serialization or vector copy/growth acquisition metadata. Native frame cleanup also releases a partial range after a reached input read error. Real AST reference/registration allocations retain their separate failure and ownership checks.",
-        "Retained ast_ext2 clauses/trail now use owning []ASTHandle with INC before native append. Removed ASTRefVector construction, capacity/refusal emulation and unpublished push receipt frames. Cleanup retains reverse member/ascending element order and consumed-DEC progress; source teardown retains its first cause while owning Close can resume. Actual AST factory and network reservation campaigns and independent clause oracles remain. Forty repeated cached factories/singleton clauses verify exact reference ownership and append order; native growth needs no arena reservation, while debug retains actual factory checks. Escaped owners close after manager teardown without stale node callbacks. No source container allocation geometry is credited."
+        "Retained ast_ext2 clauses/trail now use owning []ASTHandle with INC before native append. Removed ASTRefVector construction, capacity/refusal emulation and unpublished push receipt frames. Cleanup retains reverse member/ascending element order and consumed-DEC progress; source teardown retains its first cause while owning Close can resume. Actual AST factory and network reservation campaigns and independent clause oracles remain. Forty repeated cached factories/singleton clauses verify exact reference ownership and append order; native growth needs no arena reservation, while debug retains actual factory checks. Escaped owners close after manager teardown without stale node callbacks. No source container allocation geometry is credited.",
+        "Reopened from ported to partial because PB compilation now reaches a distinct concrete SMTLiteral instantiation. Its actual algorithms, source costs, clauses and scope lifetime are implemented and independently tested; its TRACE/assertion audit remains open. Existing AST/unsigned instantiations retain their separate evidence. Corrected AST vc_card_rec to preserve source vc_smerge(a,b,c) argument order, which differs from executable smerge(c,a,b); the source-derived k=1,n=5 regression fails before correction (3 variables,6 clauses) and passes after (5,6)."
       ]
     },
     {
@@ -248295,14 +248381,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "ed52714c4f0d80f00e276d5012df7c0c7b782f97",
+    "commit": "4ba71f4d3fe6eab9938f7a2e304c6683b7b1c328",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25 05:53:08.452952 UTC",
-    "completed_utc": "2026-10-25 06:06:51.808803 UTC",
+    "started_utc": "2026-10-25T07:25:40.735246+00:00",
+    "completed_utc": "2026-10-25T07:39:21.675620+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-ed52714c.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-ed52714c.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-ed52714c.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-4ba71f4d.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-4ba71f4d.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-4ba71f4d.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -248318,9 +248404,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 714.425,
+    "lp_seconds": 713.79,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified clean isolated exact-HEAD checkout with prebuilt C++ comparisons enabled; includes datatype root metadata, synchronous relevance and source unsat-core reverse traversal, plus earlier increments. Excludes subsequent datatype display, closest-variable/origin notification, arithmetic replay retention and user-base/assumption learning fixes, whose focused integration evidence is recorded separately. Also excludes the subsequent native PB literal normalization/watch increment, whose focused integration evidence is separate. Also excludes the later PB weighted resolution and installed-control snapshot increment, whose focused integration evidence is separate."
+    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification; includes all prior datatype, equality/assumption, native PB watch, weighted resolution and control-snapshot increments, with prebuilt C++ comparisons enabled. Excludes the subsequent PB restart compilation/literal sorting-network and AST cardinality cost correction increment; its focused integration evidence is separate."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

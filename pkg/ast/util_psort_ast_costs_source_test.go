@@ -65,6 +65,16 @@ func TestPsortASTCostActualBoundModeSelection(t *testing.T) {
 		if cmp != (psortCost{2, want}) {
 			t.Fatal("source EQ-only comparator cost", mode, cmp)
 		}
+		if mode == 1 {
+			// vc_card_rec calls vc_smerge(k,l,n-l) with (a,b,c),
+			// unlike executable smerge(c,a,b). For k=1,n=5 this is
+			// (1,2,3): costs (1,1)+(1,4)+(3,1), hence (5,6).
+			card, err := s.costCardRecursive(1, 5)
+			astTestMust(t, err)
+			if card != (psortCost{5, 6}) {
+				t.Fatal("source vc_smerge argument order in cardinality cost", card)
+			}
+		}
 		d, e := s.costDirectSort(3, 4)
 		astTestMust(t, e)
 		clauses := uint32(8)

@@ -173,7 +173,10 @@ func (s *PsortASTNetwork) costCardRecursive(k, n uint32) (psortCost, error) {
 	if e != nil {
 		return b, e
 	}
-	c, e := s.costMergeSmall(k, l, n-l)
+	// vc_smerge takes (a,b,c); executable smerge takes (c,a,b).
+	// Preserve the source cost call's literal order, even where its estimate
+	// differs from the executable merge that card subsequently creates.
+	c, e := s.costMergeSmall(n-l, k, l)
 	return a.plus(b).plus(c), e
 }
 func (s *PsortASTNetwork) useDirectCard(k, n uint32) (bool, error) {

@@ -343,6 +343,7 @@ var scriptResults = map[string]string{
 	"closest_theory_variables.smt2":                "unsat\n(close_chain)\nsat\n(((= x0 x3) true) ((< (f x2) (f x4)) true))\nsat\n(((f x0) 7) ((f x3) 7) ((f x4) 8))\nunsat\n(bad_bound)\nsat\nsat\n",
 	"pb_native_watches_scopes.smt2":                "sat\n((b true))\nsat\n((b true) (d true) (e true))\nunsat\n(rejected_watch)\nsat\nsat\nunsat\n(rejected_complement)\nsat\n(((and a b) true) ((xor c d) true))\nunsat\n(rejected_proxy)\nsat\nsat\n((W true) (e true))\nsat\n",
 	"pb_strengthening_scopes.smt2":                 "unsat\n(cut_A cut_B)\nsat\nsat\n((x true) (u true) (A true) (B false))\nunsat\n(rejected_cut)\nsat\nsat\n((A true) (B false))\nsat\n",
+	"pb_compilation_pigeonhole_scopes.smt2":        "unsat\nsat\n",
 	"datatype_cycle_scopes.smt2":                   "unsat\n(x_edge y_edge z_edge)\nsat\n(((= (left x) (right x)) true) ((= (left (left x)) leaf) true))\nunsat\nsat\nsat\n",
 	"datatype_constructor_conflict_cores.smt2":     "sat\n((((_ is left) x) true) ((= (lf x) u) true))\nunsat\n(left_fact not_left)\nsat\nunsat\n(left_fact right_fact)\nsat\n",
 	"datatype_incremental_recognizers.smt2":        "sat\n((((_ is aa) x) false) ((= x y) true))\nsat\n((((_ is cc) x) true) (((_ is bb) y) false))\nunsat\nsat\nsat\n",
