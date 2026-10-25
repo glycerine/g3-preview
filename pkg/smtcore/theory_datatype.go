@@ -78,22 +78,6 @@ func (t *SMTDatatypeTheory) operation(expression ast.ASTHandle) (int32, bool, er
 	return op, err == nil, err
 }
 
-func (t *SMTDatatypeTheory) equalityAxiom(left, right ast.ASTHandle, antecedent SMTLiteral) error {
-	if left == right {
-		return nil
-	}
-	equality, err := t.MkEqualityLiteral(left, right, true)
-	if err != nil {
-		return err
-	}
-	clause := []SMTLiteral{equality}
-	if antecedent != SMTNullLiteral {
-		clause = []SMTLiteral{antecedent.Negated(), equality}
-	}
-	state, _ := t.State()
-	return state.addTheoryAxiom(t.FamilyID(), clause)
-}
-
 func (t *SMTDatatypeTheory) recognizerLiteral(constructor, value ast.ASTHandle) (SMTLiteral, ast.ASTHandle, error) {
 	state, _ := t.State()
 	parameter, err := state.manager.NewParameterAST(constructor)
@@ -116,6 +100,7 @@ func (t *SMTDatatypeTheory) recognizerLiteral(constructor, value ast.ASTHandle) 
 }
 
 func (t *SMTDatatypeTheory) publishConstructor(value, constructor ast.ASTHandle) error {
+	t.statistics.accessorAxioms++
 	state, _ := t.State()
 	accessors, err := state.manager.DatatypeConstructorAccessors(constructor)
 	if err != nil {
@@ -137,23 +122,15 @@ func (t *SMTDatatypeTheory) publishConstructor(value, constructor ast.ASTHandle)
 		if argumentErr != nil {
 			return argumentErr
 		}
-		if argumentErr = t.equalityAxiom(selected, argument, SMTNullLiteral); argumentErr != nil {
+		if argumentErr = t.equalityAxiom(argument, selected, SMTNullLiteral); argumentErr != nil {
 			return argumentErr
 		}
-		t.statistics.accessorAxioms++
 	}
-	literal, _, err := t.recognizerLiteral(constructor, value)
-	if err != nil {
-		return err
-	}
-	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
-		return err
-	}
-	t.statistics.constructorAxioms++
 	return nil
 }
 
 func (t *SMTDatatypeTheory) publishUpdate(node *SMTEnode) error {
+	t.statistics.updateAxioms++
 	if len(node.arguments) != 2 {
 		return ast.ErrASTDomain
 	}
@@ -210,15 +187,17 @@ func (t *SMTDatatypeTheory) publishUpdate(node *SMTEnode) error {
 			if selectErr != nil {
 				return fmt.Errorf("datatype update base accessor: %w", selectErr)
 			}
+			if selectErr = state.Internalize(right, false); selectErr != nil {
+				return selectErr
+			}
 		}
-		if err = t.equalityAxiom(selected, right, recognizer); err != nil {
+		if err = t.equalityAxiom(right, selected, recognizer); err != nil {
 			return fmt.Errorf("datatype update field equality: %w", err)
 		}
 	}
 	if err = t.equalityAxiom(node.owner, node.arguments[0].owner, recognizer.Negated()); err != nil {
 		return fmt.Errorf("datatype update identity: %w", err)
 	}
-	t.statistics.updateAxioms++
 	return nil
 }
 
@@ -256,6 +235,11 @@ func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
 	}
 	if matched {
 		return t.publishConstructor(node.owner, constructor)
+	}
+	if operation, own, err := t.operation(node.owner); err != nil {
+		return err
+	} else if own && operation == ast.ASTDatatypeUpdateField {
+		return t.publishUpdate(node)
 	}
 	constructors, err := state.manager.DatatypeConstructors(sort)
 	if err != nil {
@@ -354,11 +338,6 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		}
 		if err = t.ensureVariable(node); err != nil {
 			return false, fmt.Errorf("datatype result variable: %w", err)
-		}
-		if operation == ast.ASTDatatypeUpdateField {
-			if err = t.publishUpdate(node); err != nil {
-				return false, err
-			}
 		}
 	} else if len(node.arguments) == 1 {
 		if err = t.ensureVariable(node.arguments[0]); err != nil {
@@ -465,6 +444,7 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 // Source assert_is_constructor_axiom; antecedent is null for the eager
 // single-constructor case and the recognizer literal for assigned cases.
 func (t *SMTDatatypeTheory) assertConstructor(value, constructor ast.ASTHandle, antecedent SMTLiteral) error {
+	t.statistics.constructorAxioms++
 	state, err := t.State()
 	if err != nil {
 		return err

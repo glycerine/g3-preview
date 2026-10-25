@@ -961,7 +961,7 @@ func canonicalOutput(text string) string {
 }
 
 func TestSMTLibRunnerProofScript(t *testing.T) {
-	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2", "check_phase_repeated_proof.smt2", "recursive_sum_proof.smt2", "datatype_constructor_conflict_proof.smt2", "string_literal_proof.smt2", "datatype_cycle_proof.smt2"} {
+	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2", "check_phase_repeated_proof.smt2", "recursive_sum_proof.smt2", "datatype_constructor_conflict_proof.smt2", "string_literal_proof.smt2", "datatype_cycle_proof.smt2", "datatype_update_equality_proof.smt2"} {
 		t.Run(name, func(t *testing.T) { testSMTLibProofScript(t, name) })
 	}
 }

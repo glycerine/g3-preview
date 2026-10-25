@@ -113861,7 +113861,7 @@
       "path": "src/smt/smt_conflict_resolution.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_conflict_polarity_test.go",
@@ -114270,8 +114270,8 @@
           ]
         },
         {
-          "name": "assumption unsat-core extraction through Boolean and theory justifications",
-          "status": "ported",
+          "name": "assumption unsat-core extraction through Boolean and theory justifications: Go dependency queue exists; source reverse assigned-literal traversal with conflict-level skipping and search-level termination remains unported",
+          "status": "partial",
           "go_target": "pkg/smtcore/smt_conflict_resolver.go",
           "tests": [
             "TestSMTKernelAssumptionsValidateCheckAndRollback",
@@ -114303,14 +114303,15 @@
       "deviations": [
         "Corrected reversed not_l polarity in failed AssignLiteral and compact binary BCP conflicts. The resolver expects a true assigned premise opposite to the failed consequent; storing the false consequent created non-false learned literals. A two-level regression checks first-UIP lemma/backjump/assertion behavior, and a symbolic BV add/sub circuit with scoped contradiction/model recovery raises strict C++ runner agreement to 119 scripts.",
         "Dynamic-Ack callbacks feed the concrete pair/triple manager during conflict expansion. Recursive Go calls replace the source explicit proof todo stack. The constructor's watch-list reference has no source read after initialization and requires no Go storage.",
-        "The Go equality engine detects explicit disequalities before merging their roots. Its concrete disequality-conflict justification reconstructs the equality of the original disequality operands from both equality branches and the pending merge, then uses the existing Boolean conflict proof to resolve against the disequality literal."
+        "The Go equality engine detects explicit disequalities before merging their roots. Its concrete disequality-conflict justification reconstructs the equality of the original disequality operands from both equality branches and the pending merge, then uses the existing Boolean conflict proof to resolve against the disequality literal.",
+        "Audit of smt_conflict_resolution.cpp:1326-1441 found that UnsatCore expands a Go dependency queue instead of walking marked assigned literals backward, skipping levels above the conflict and stopping below search level. Existing semantic core tests do not prove this source algorithm; these units remain partial pending that traversal."
       ]
     },
     {
       "path": "src/smt/smt_conflict_resolution.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_conflict_antecedents.go",
         "pkg/smtcore/smt_conflict_levels.go",
@@ -114393,8 +114394,8 @@
           ]
         },
         {
-          "name": "assumption unsat-core result interface",
-          "status": "ported",
+          "name": "assumption unsat-core result interface: Go dependency queue exists; source reverse assigned-literal traversal with conflict-level skipping and search-level termination remains unported",
+          "status": "partial",
           "go_target": "pkg/smtcore/smt_conflict_resolver.go",
           "tests": [
             "TestSMTKernelAssumptionsValidateCheckAndRollback",
@@ -114426,7 +114427,8 @@
         "The resolver borrows context, parameters, assignment trail and watches; the completed expander owns only native Go work storage. The resolver owns and releases its latest proof AST reference."
       ],
       "deviations": [
-        "The standalone expander isolates the context-independent front of conflict resolution. FUIP resolution and Boolean, theory and equality proof state are connected. The source watch-list reference is initialized but never read by this class."
+        "The standalone expander isolates the context-independent front of conflict resolution. FUIP resolution and Boolean, theory and equality proof state are connected. The source watch-list reference is initialized but never read by this class.",
+        "Audit of smt_conflict_resolution.cpp:1326-1441 found that UnsatCore expands a Go dependency queue instead of walking marked assigned literals backward, skipping levels above the conflict and stopping below search level. Existing semantic core tests do not prove this source algorithm; these units remain partial pending that traversal."
       ]
     },
     {
@@ -131707,7 +131709,11 @@
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/ast/ast_datatype_util.go",
         "pkg/ast/ast_datatype_util_reset_test.go",
-        "pkg/smtcore/theory_datatype_restart_test.go"
+        "pkg/smtcore/theory_datatype_restart_test.go",
+        "pkg/smtcore/theory_datatype_equality.go",
+        "pkg/smtcore/theory_datatype_equality_test.go",
+        "pkg/smtcore/smt_justification_theory.go",
+        "pkg/cmd/g3/datatype_update_equality_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131736,7 +131742,11 @@
         "TestSMTDatatypeAccessorVariableContract",
         "TestSMTDatatypeAccessorResultSortConstraints",
         "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
-        "TestSMTDatatypeRestartAdvancesIndependentUtility"
+        "TestSMTDatatypeRestartAdvancesIndependentUtility",
+        "TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback",
+        "TestSMTDatatypeConstructorAccessorAxiomsAndCounters",
+        "TestSMTDatatypeAccessorCounterCountsConstructorCalls",
+        "TestSMTLibRunnerDatatypeUpdateEqualityScopes"
       ],
       "assertions": [
         {
@@ -131952,7 +131962,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "constructor, accessor, recognizer and update-field internalization with exclusive and exhaustive constructor axioms",
+          "name": "constructor, accessor, recognizer and update-field internalization with source constructor/accessor/update axioms",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_datatype.go",
           "tests": [
@@ -132020,7 +132030,7 @@
           ]
         },
         {
-          "name": "Remaining constructor/recognizer metadata merge lifecycle, theory reset and complete model audit",
+          "name": "Remaining constructor/recognizer metadata merge lifecycle and complete model audit",
           "status": "partial",
           "tests": []
         },
@@ -132098,6 +132108,32 @@
             "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
             "TestSMTDatatypeRestartAdvancesIndependentUtility"
           ]
+        },
+        {
+          "name": "assert_eq_axiom and dt_eq_justification: proof-mode theory clauses; direct unguarded equality axioms; nontrue guards mark equality and guard relevant and retain clauses; true guards propagate scoped equality justifications with null origin; source accessor/update operand order and per-call counters; no synthetic constructor recognizer units or single-constructor reconstruction for update terms",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_equality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_equality.go",
+            "pkg/smtcore/theory_datatype_equality_test.go",
+            "pkg/smtcore/smt_justification_theory.go",
+            "pkg/cmd/g3/datatype_update_equality_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/smtcore/theory_datatype.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback",
+            "TestSMTDatatypeConstructorAccessorAxiomsAndCounters",
+            "TestSMTDatatypeAccessorCounterCountsConstructorCalls",
+            "TestSMTLibRunnerDatatypeUpdateEqualityScopes",
+            "TestSMTLibRunnerProofScript",
+            "TestSMTDatatypeUpdateFieldAxioms"
+          ]
+        },
+        {
+          "name": "reset_eh has no retained caller: only override declaration/definition and unused base/other-theory reset chains exist; context reset destroys/recreates its context instead of dispatching this hook",
+          "status": "dead_deleted",
+          "tests": []
         }
       ],
       "ownership": [
@@ -132105,11 +132141,13 @@
         "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed.",
         "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten.",
         "Owns concrete backtrack.UnionFind and undo trail synchronized with base variables and scoped rollback. Traversal stacks, marks, parents and equalities belong to one final-check invocation. Context owns extended conflicts. Internalizer borrows kernel sticky asserted-quantifier state.",
-        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
+        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
+        "Conditional direct datatype equality justifications retain their datatype family for proof reconstruction but return null FromTheory for origin notification. Context takes scoped ownership before merging because a late error may have installed an edge or conflict; pop/close releases owners after equality rollback."
       ],
       "deviations": [
         "Guarded SAT clauses and scoped egraph scans still replace portions of source var_data and recognizer arrays. Datatype roots now use the concrete source union-find port. Handled accessors require enodes without artificial result variables; sort constraints attach finite or asserted-quantifier datatype results. Invalid source assertion states return Go errors.",
-        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the remaining metadata merge/lifecycle/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts."
+        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the remaining metadata merge/lifecycle/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts.",
+        "Source equality branch scheduling replaces unconditional SAT encoding and removes synthetic constructor recognizer unit clauses. Metadata scans and complete model construction remain partial. Field-update integration records one AST-identity core-order difference: native bad_identity/empty versus C++ empty/bad_identity; exact membership and every other answer are fixed oracles. Unreached datatype reset_eh is intentionally not given an unused Go API."
       ]
     },
     {
@@ -132138,7 +132176,11 @@
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/ast/ast_datatype_util.go",
         "pkg/ast/ast_datatype_util_reset_test.go",
-        "pkg/smtcore/theory_datatype_restart_test.go"
+        "pkg/smtcore/theory_datatype_restart_test.go",
+        "pkg/smtcore/theory_datatype_equality.go",
+        "pkg/smtcore/theory_datatype_equality_test.go",
+        "pkg/smtcore/smt_justification_theory.go",
+        "pkg/cmd/g3/datatype_update_equality_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -132166,7 +132208,11 @@
         "TestSMTDatatypeAccessorVariableContract",
         "TestSMTDatatypeAccessorResultSortConstraints",
         "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
-        "TestSMTDatatypeRestartAdvancesIndependentUtility"
+        "TestSMTDatatypeRestartAdvancesIndependentUtility",
+        "TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback",
+        "TestSMTDatatypeConstructorAccessorAxiomsAndCounters",
+        "TestSMTDatatypeAccessorCounterCountsConstructorCalls",
+        "TestSMTLibRunnerDatatypeUpdateEqualityScopes"
       ],
       "conditionals": [
         {
@@ -132220,7 +132266,7 @@
           ]
         },
         {
-          "name": "Remaining constructor/recognizer metadata merge lifecycle, theory reset and complete model audit",
+          "name": "Remaining constructor/recognizer metadata merge lifecycle and complete model audit",
           "status": "partial",
           "tests": []
         },
@@ -132298,6 +132344,32 @@
             "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
             "TestSMTDatatypeRestartAdvancesIndependentUtility"
           ]
+        },
+        {
+          "name": "assert_eq_axiom and dt_eq_justification: proof-mode theory clauses; direct unguarded equality axioms; nontrue guards mark equality and guard relevant and retain clauses; true guards propagate scoped equality justifications with null origin; source accessor/update operand order and per-call counters; no synthetic constructor recognizer units or single-constructor reconstruction for update terms",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_equality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_equality.go",
+            "pkg/smtcore/theory_datatype_equality_test.go",
+            "pkg/smtcore/smt_justification_theory.go",
+            "pkg/cmd/g3/datatype_update_equality_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/smtcore/theory_datatype.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback",
+            "TestSMTDatatypeConstructorAccessorAxiomsAndCounters",
+            "TestSMTDatatypeAccessorCounterCountsConstructorCalls",
+            "TestSMTLibRunnerDatatypeUpdateEqualityScopes",
+            "TestSMTLibRunnerProofScript",
+            "TestSMTDatatypeUpdateFieldAxioms"
+          ]
+        },
+        {
+          "name": "reset_eh has no retained caller: only override declaration/definition and unused base/other-theory reset chains exist; context reset destroys/recreates its context instead of dispatching this hook",
+          "status": "dead_deleted",
+          "tests": []
         }
       ],
       "ownership": [
@@ -132305,11 +132377,13 @@
         "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed.",
         "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten.",
         "Owns concrete backtrack.UnionFind and undo trail synchronized with base variables and scoped rollback. Traversal stacks, marks, parents and equalities belong to one final-check invocation. Context owns extended conflicts. Internalizer borrows kernel sticky asserted-quantifier state.",
-        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
+        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
+        "Conditional direct datatype equality justifications retain their datatype family for proof reconstruction but return null FromTheory for origin notification. Context takes scoped ownership before merging because a late error may have installed an edge or conflict; pop/close releases owners after equality rollback."
       ],
       "deviations": [
         "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation.",
-        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the remaining metadata merge/lifecycle/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts."
+        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the remaining metadata merge/lifecycle/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts.",
+        "Source equality branch scheduling replaces unconditional SAT encoding and removes synthetic constructor recognizer unit clauses. Metadata scans and complete model construction remain partial. Field-update integration records one AST-identity core-order difference: native bad_identity/empty versus C++ empty/bad_identity; exact membership and every other answer are fixed oracles. Unreached datatype reset_eh is intentionally not given an unused Go API."
       ]
     },
     {
@@ -247432,7 +247506,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 714.405,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout with C++ comparisons enabled; includes prior datatype policy, plugin-copy, incremental splitting and immediate conflict/proof-printing changes. Excludes subsequent legacy string printing and current datatype occurs/root lifecycle changes, whose integration evidence is recorded separately."
+    "scope_warning": "Clean isolated exact-HEAD checkout with C++ comparisons enabled; includes prior datatype policy, plugin-copy, incremental splitting and immediate conflict/proof-printing changes. Excludes subsequent legacy string printing, datatype root/cycle/restart changes and direct datatype equality branches; those increments have separate focused integration evidence."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

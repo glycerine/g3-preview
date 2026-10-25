@@ -56,9 +56,8 @@ func newSMTDatatypeConflictFixture(t *testing.T, proofs bool) smtDatatypeConflic
 	family, err := m.DatatypeFamilyID()
 	astTestMust(t, err)
 	f.dt = s.kernel.internalizer.theories[family].(*SMTDatatypeTheory)
-	// Keep the source legacy recognizer declaration here. The synthetic
-	// indexed recognizer published for constructor terms is a different
-	// declaration, so generic Boolean congruence cannot preempt this callback.
+	// Keep the source legacy recognizer declaration to exercise the
+	// datatype callback independently of indexed recognizer rewriting.
 	recognizer, err := m.DatatypeConstructorRecognizer(constructors[0])
 	astTestMust(t, err)
 	expression, err := m.MkApp(recognizer, []ast.ASTHandle{f.x})

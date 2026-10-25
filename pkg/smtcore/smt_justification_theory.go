@@ -211,7 +211,8 @@ func (j *SMTExtTheoryConflictJustification) Name() string { return "ext-theory-c
 
 type SMTExtTheoryEqualityPropagationJustification struct {
 	SMTExtTheoryJustification
-	Left, Right *SMTEnode
+	Left, Right   *SMTEnode
+	returnToOwner bool
 }
 
 func NewSMTExtTheoryEqualityPropagationJustification(manager *ast.ASTManager, theory SMTTheoryID, literals []SMTLiteral, equalities []SMTEnodePair, left, right *SMTEnode, parameters []ast.ASTParameter) (*SMTExtTheoryEqualityPropagationJustification, error) {
@@ -222,7 +223,15 @@ func NewSMTExtTheoryEqualityPropagationJustification(manager *ast.ASTManager, th
 	if err != nil {
 		return nil, err
 	}
-	return &SMTExtTheoryEqualityPropagationJustification{*base, left, right}, nil
+	return &SMTExtTheoryEqualityPropagationJustification{
+		SMTExtTheoryJustification: *base, Left: left, Right: right,
+	}, nil
+}
+func (j *SMTExtTheoryEqualityPropagationJustification) FromTheory() SMTTheoryID {
+	if j.returnToOwner {
+		return SMTNullTheoryID
+	}
+	return j.theory
 }
 func (j *SMTExtTheoryEqualityPropagationJustification) Name() string {
 	return "ext-theory-eq-propagation"
