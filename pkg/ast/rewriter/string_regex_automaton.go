@@ -30,6 +30,7 @@ type StringRegexAutomaton struct {
 	builder    sequenceAutomatonBuilder
 	graph      *automata.Automaton
 	conditions []StringRegexCondition
+	labels     []*sequenceAutomatonLabel
 	closed     bool
 }
 
@@ -73,6 +74,13 @@ func NewStringRegexAutomaton(m *ast.ASTManager, regex ast.ASTHandle, solver Sequ
 	if built == nil {
 		return nil, ast.ErrASTDomain
 	}
+	if err := a.materialize(built); err != nil {
+		return nil, err
+	}
+	return a, nil
+}
+
+func (a *StringRegexAutomaton) materialize(built *sequenceAutomaton) error {
 	var finals []uint32
 	for state := range built.moves {
 		if built.finals[state] {
@@ -91,17 +99,91 @@ func NewStringRegexAutomaton(m *ast.ASTManager, regex ast.ASTHandle, solver Sequ
 			if !found {
 				condition, err := a.condition(move.label)
 				if err != nil {
-					return nil, err
+					return err
 				}
 				id = uint32(len(a.conditions))
 				a.conditions = append(a.conditions, condition)
+				a.labels = append(a.labels, move.label)
 				labels[move.label] = id
 			}
 			moves = append(moves, automata.ConditionMove(uint32(source), uint32(move.destination), id))
 		}
 	}
 	a.graph = automata.New(uint32(built.initial), finals, moves)
+	return nil
+}
+
+// NewStringRegexAutomatonProduct is re2automaton::mk_product for the retained
+// String final checker. It consumes the current graphs, including Compress
+// changes, and gives the result independent ownership of both label domains.
+func NewStringRegexAutomatonProduct(left, right *StringRegexAutomaton, solver SequenceExpressionSolver) (owner *StringRegexAutomaton, result error) {
+	if left == nil || right == nil || left.closed || right.closed {
+		return nil, ast.ErrASTHandle
+	}
+	m := left.builder.rewriter.manager
+	if right.builder.rewriter.manager != m {
+		return nil, ast.ErrASTDomain
+	}
+	rw, err := NewSequenceRewriter(m)
+	if err != nil {
+		return nil, err
+	}
+	rw.solver = solver
+	a := &StringRegexAutomaton{builder: sequenceAutomatonBuilder{rewriter: rw}}
+	defer func() {
+		if result != nil {
+			result = errors.Join(result, a.Close())
+		}
+	}()
+	for _, source := range []*StringRegexAutomaton{left, right} {
+		for _, ref := range source.builder.refs {
+			value, err := m.RefGet(ref)
+			if err != nil {
+				return nil, err
+			}
+			if err := a.builder.hold(value); err != nil {
+				return nil, err
+			}
+		}
+	}
+	first, err := left.sequenceGraph()
+	if err != nil {
+		return nil, err
+	}
+	second, err := right.sequenceGraph()
+	if err != nil {
+		return nil, err
+	}
+	built, err := a.builder.product(first, second)
+	if err != nil {
+		return nil, err
+	}
+	if built == nil {
+		return nil, ast.ErrASTDomain
+	}
+	if err := a.materialize(built); err != nil {
+		return nil, err
+	}
 	return a, nil
+}
+
+func (a *StringRegexAutomaton) sequenceGraph() (*sequenceAutomaton, error) {
+	result := newSequenceAutomaton(int(a.graph.NumStates()))
+	result.initial = int(a.graph.Initial())
+	for _, state := range a.graph.FinalStates() {
+		result.finals[int(state)] = true
+	}
+	for _, move := range a.graph.Moves() {
+		var label *sequenceAutomatonLabel
+		if !move.Epsilon {
+			if uint64(move.Condition) >= uint64(len(a.labels)) {
+				return nil, ast.ErrASTDomain
+			}
+			label = a.labels[move.Condition]
+		}
+		result.moves[int(move.Source)] = append(result.moves[int(move.Source)], sequenceAutomatonMove{source: int(move.Source), destination: int(move.Destination), label: label})
+	}
+	return result, nil
 }
 
 func (a *StringRegexAutomaton) condition(label *sequenceAutomatonLabel) (StringRegexCondition, error) {
@@ -162,7 +244,7 @@ func (a *StringRegexAutomaton) Close() error {
 		return nil
 	}
 	result := a.builder.close()
-	a.conditions, a.graph = nil, nil
+	a.conditions, a.labels, a.graph = nil, nil, nil
 	a.closed = true
 	return result
 }
