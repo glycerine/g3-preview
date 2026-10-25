@@ -124,7 +124,7 @@ func (k *SMTKernel) assertedGreater(left, right ast.ASTHandle, depth map[ast.AST
 	return false, nil
 }
 
-func (k *SMTKernel) addAssertionSubstitution(substitution ast.ASTExprSubstitution, assertion SMTKernelAssertion, depth map[ast.ASTHandle]uint32) error {
+func (k *SMTKernel) addAssertionSubstitution(assertion SMTKernelAssertion, depth map[ast.ASTHandle]uint32) error {
 	ground, err := k.manager.IsGround(assertion.Formula)
 	if err != nil {
 		return err
@@ -138,7 +138,7 @@ func (k *SMTKernel) addAssertionSubstitution(substitution ast.ASTExprSubstitutio
 			if greater, err := k.assertedGreater(left, right, depth); err != nil {
 				return err
 			} else if greater {
-				return k.manager.ExprSubstitutionInsert(substitution, left, right, assertion.Proof, ast.ASTDependency{})
+				return k.manager.ScopedExprSubstitutionInsert(k.assertedScopedSubst, left, right, assertion.Proof, ast.ASTDependency{})
 			}
 			if greater, err := k.assertedGreater(right, left, depth); err != nil {
 				return err
@@ -150,7 +150,7 @@ func (k *SMTKernel) addAssertionSubstitution(substitution ast.ASTExprSubstitutio
 						return err
 					}
 				}
-				return k.manager.ExprSubstitutionInsert(substitution, right, left, proof, ast.ASTDependency{})
+				return k.manager.ScopedExprSubstitutionInsert(k.assertedScopedSubst, right, left, proof, ast.ASTDependency{})
 			}
 			return nil
 		}
@@ -178,7 +178,7 @@ func (k *SMTKernel) addAssertionSubstitution(substitution ast.ASTExprSubstitutio
 	if err != nil {
 		return err
 	}
-	return k.manager.ExprSubstitutionInsert(substitution, key, value, proof, ast.ASTDependency{})
+	return k.manager.ScopedExprSubstitutionInsert(k.assertedScopedSubst, key, value, proof, ast.ASTDependency{})
 }
 
 func (k *SMTKernel) rewritePendingAssertion(index int) (bool, error) {
@@ -208,49 +208,51 @@ func (k *SMTKernel) rewritePendingAssertion(index int) (bool, error) {
 }
 
 func (k *SMTKernel) propagatePendingAssertions() (result error) {
-	if !k.preprocess || !k.preprocessState.PropagateValues || k.preprocessor == nil || k.assertedHead == len(k.assertions) {
+	if !k.preprocess || !k.preprocessState.PropagateValues || k.preprocessor == nil {
 		return nil
 	}
-	// Source ++num_iterations < 2 permits one forward/reverse pair.
-	for iteration := 0; iteration < 1; iteration++ {
-		changed := false
-		for _, reverse := range []bool{false, true} {
-			substitution, err := k.manager.NewExprSubstitution()
-			if err != nil {
-				return err
-			}
-			func() {
-				defer func() {
-					result = errors.Join(result, k.preprocessor.SetSubstitution(nil), k.manager.DelExprSubstitution(&substitution))
-				}()
-				depth := make(map[ast.ASTHandle]uint32)
-				for i := 0; i < k.assertedHead && result == nil; i++ {
-					result = k.addAssertionSubstitution(substitution, k.assertions[i], depth)
-				}
-				if result != nil {
-					return
-				}
-				result = k.preprocessor.SetSubstitution(&substitution)
-				for step := 0; step < len(k.assertions)-k.assertedHead && result == nil; step++ {
-					i := k.assertedHead + step
-					if reverse {
-						i = len(k.assertions) - 1 - step
-					}
-					var one bool
-					one, result = k.rewritePendingAssertion(i)
-					changed = changed || one
-					if result == nil {
-						result = k.addAssertionSubstitution(substitution, k.assertions[i], depth)
-					}
+	if err := k.flushAssertedCache(); err != nil {
+		return err
+	}
+	if k.assertedInconsistent {
+		return nil
+	}
+	// Source ++num_iterations < 2 permits one forward/reverse pair on the
+	// persistent substitution. Temporary bindings die at each direction pop.
+	changed := false
+	for _, reverse := range []bool{false, true} {
+		if err := k.manager.ScopedExprSubstitutionPush(k.assertedScopedSubst); err != nil {
+			return err
+		}
+		func() {
+			defer func() {
+				if reverse {
+					result = errors.Join(result, k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1), k.flushAssertedCache())
+				} else {
+					// Source forward cleanup flushes before popping; reverse
+					// cleanup pops before its final flush.
+					result = errors.Join(result, k.flushAssertedCache(), k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1))
 				}
 			}()
-			if result != nil {
-				return result
+			depth := make(map[ast.ASTHandle]uint32)
+			for step := 0; step < len(k.assertions)-k.assertedHead && result == nil; step++ {
+				i := k.assertedHead + step
+				if reverse {
+					i = len(k.assertions) - 1 - step
+				}
+				var one bool
+				one, result = k.rewritePendingAssertion(i)
+				changed = changed || one
+				if result == nil {
+					result = k.addAssertionSubstitution(k.assertions[i], depth)
+				}
 			}
+		}()
+		if result != nil {
+			return result
 		}
-		if !changed {
-			break
-		}
+	}
+	if changed {
 		return k.reducePendingAssertions()
 	}
 	return nil

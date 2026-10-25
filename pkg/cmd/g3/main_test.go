@@ -336,6 +336,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"asserted_substitution_scopes.smt2":            "sat\n((x 7))\nunsat\nsat\n((x 7))\nsat\n((x 8))\n",
 	"assertion_conflict_prefix_scopes.smt2":        "unsat\nunsat\nunsat\nsat\n",
 	"asserted_driver_inconsistency_scopes.smt2":    "unsat\nsat\nunsat\nsat\n",
 	"asserted_driver_quantifier_scopes.smt2":       "sat\nunsat\nsat\n",

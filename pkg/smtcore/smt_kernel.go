@@ -70,6 +70,8 @@ type SMTKernel struct {
 
 	// Source m_has_quantifiers is sticky, including across scope pops.
 	assertedHasQuantifiers bool
+	assertedSubstitution   ast.ASTExprSubstitution
+	assertedScopedSubst    ast.ASTScopedExprSubstitution
 	assertedInconsistent   bool
 	assertedScopeConflicts []bool
 	assertedParams         uparams.ParamsRef
@@ -144,13 +146,22 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 		}
 		return nil, errors.Join(err, names.Close(), macroManager.Close(), manager.DelRef(&proof), internalizer.Close())
 	}
-	return &SMTKernel{
+	kernel := &SMTKernel{
 		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof, assertedMacros: macroManager, definedNames: names, bvSharing: sharing,
 		smtState: SMTParamsState{
 			MaxConflicts: ^uint32(0), InvDecay: 1.052, RandomInitialActivity: 1, RandomVarFreq: 0.01, CaseSplitStrategy: 1, RestartStrategy: 1, RestartInitial: 100, RestartFactor: 1.1,
 			RestartAdaptive: true, AgilityFactor: 0.9999, RestartAgilityThreshold: 0.18, SimplifyClauses: true,
 		},
-	}, nil
+	}
+	kernel.assertedSubstitution, err = manager.NewExprSubstitution()
+	if err != nil {
+		return nil, errors.Join(err, kernel.Close())
+	}
+	kernel.assertedScopedSubst, err = manager.NewScopedExprSubstitution(kernel.assertedSubstitution)
+	if err != nil {
+		return nil, errors.Join(err, kernel.Close())
+	}
+	return kernel, nil
 }
 
 // ConfigurePreprocessing installs the source theory-rewrite pass used before
@@ -293,6 +304,9 @@ func (k *SMTKernel) configurePreprocessing(context *uparams.ParamsContext, globa
 		return err
 	}
 	k.internalizer.theoryRewriter = value
+	if err = value.SetSubstitution(&k.assertedSubstitution); err != nil {
+		return err
+	}
 	k.preprocess = enabled
 	if err = k.setAssertedEliminateAnd(false); err != nil {
 		return err
@@ -507,6 +521,9 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 		err = k.preprocessor.UpdateParams(params)
 	}
 	if err == nil {
+		err = k.preprocessor.SetSubstitution(&k.assertedSubstitution)
+	}
+	if err == nil {
 		k.internalizer.theoryRewriter = k.preprocessor
 		k.preprocess = enabled
 		k.preprocessState = state
@@ -707,8 +724,8 @@ func (k *SMTKernel) internalizePending() error {
 	return k.commitAssertedTo(head)
 }
 
-// The native propagation pass reconstructs committed substitutions from this
-// prefix. Source commit also forbids its declarations for later macro finding.
+// Source commit forbids declarations and retains each completed row's binding
+// in the same scoped substitution borrowed by subsequent assertion rewriting.
 func (k *SMTKernel) commitAssertedTo(head int) error {
 	if head < k.assertedHead || head > len(k.assertions) {
 		return ast.ErrASTDomain
@@ -719,6 +736,12 @@ func (k *SMTKernel) commitAssertedTo(head int) error {
 	}
 	if err := k.assertedMacros.MarkForbidden(rows); err != nil {
 		return err
+	}
+	depth := make(map[ast.ASTHandle]uint32)
+	for _, row := range k.assertions[k.assertedHead:head] {
+		if err := k.addAssertionSubstitution(row, depth); err != nil {
+			return err
+		}
 	}
 	k.assertedHead = head
 	return nil
@@ -758,21 +781,24 @@ func (k *SMTKernel) Push() error {
 	if _, err := k.internalizer.PropagateCore(); err != nil {
 		return err
 	}
-	if err := k.assertedMacros.PushScope(); err != nil {
+	if err := k.manager.ScopedExprSubstitutionPush(k.assertedScopedSubst); err != nil {
 		return err
 	}
+	if err := k.assertedMacros.PushScope(); err != nil {
+		return errors.Join(err, k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1))
+	}
 	if err := k.definedNames.Push(); err != nil {
-		return errors.Join(err, k.assertedMacros.PopScope(1))
+		return errors.Join(err, k.assertedMacros.PopScope(1), k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1))
 	}
 	if err := k.bvSharing.PushScope(); err != nil {
-		return errors.Join(err, k.definedNames.Pop(1), k.assertedMacros.PopScope(1))
+		return errors.Join(err, k.definedNames.Pop(1), k.assertedMacros.PopScope(1), k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1))
 	}
 	if err := k.internalizer.PushScope(); err != nil {
-		return errors.Join(err, k.bvSharing.PopScope(1), k.definedNames.Pop(1), k.assertedMacros.PopScope(1))
+		return errors.Join(err, k.bvSharing.PopScope(1), k.definedNames.Pop(1), k.assertedMacros.PopScope(1), k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1))
 	}
 	// asserted_formulas::push_scope commits even an inconsistent manager.
 	if err := k.commitAssertedTo(len(k.assertions)); err != nil {
-		return errors.Join(err, k.internalizer.PopScopes(1), k.bvSharing.PopScope(1), k.definedNames.Pop(1), k.assertedMacros.PopScope(1))
+		return errors.Join(err, k.internalizer.PopScopes(1), k.bvSharing.PopScope(1), k.definedNames.Pop(1), k.assertedMacros.PopScope(1), k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1))
 	}
 	k.scopes = append(k.scopes, len(k.assertions))
 	k.assertedScopeConflicts = append(k.assertedScopeConflicts, k.assertedInconsistent)
@@ -800,6 +826,9 @@ func (k *SMTKernel) Pop(count uint32) error {
 	if err := k.definedNames.Pop(count); err != nil {
 		return err
 	}
+	if err := k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, count); err != nil {
+		return err
+	}
 	for index := len(k.assertions); index > limit; index-- {
 		assertion := &k.assertions[index-1]
 		if !assertion.Proof.IsNull() {
@@ -819,7 +848,7 @@ func (k *SMTKernel) Pop(count uint32) error {
 	k.assertedInconsistent = k.assertedScopeConflicts[level]
 	k.assertedScopeConflicts = k.assertedScopeConflicts[:level]
 	if k.preprocessor != nil {
-		return k.preprocessor.Reset()
+		return k.flushAssertedCache()
 	}
 	return nil
 }
@@ -1170,6 +1199,14 @@ func (k *SMTKernel) Close() error {
 		}
 	}
 	result = errors.Join(result, k.internalizer.Close())
+	if k.preprocessor == nil {
+		if k.assertedScopedSubst != (ast.ASTScopedExprSubstitution{}) {
+			result = errors.Join(result, k.manager.DelScopedExprSubstitution(&k.assertedScopedSubst))
+		}
+		if k.assertedScopedSubst == (ast.ASTScopedExprSubstitution{}) && k.assertedSubstitution != (ast.ASTExprSubstitution{}) {
+			result = errors.Join(result, k.manager.DelExprSubstitution(&k.assertedSubstitution))
+		}
+	}
 	result = errors.Join(result, k.assertedMacros.Close())
 	result = errors.Join(result, k.definedNames.Close())
 	if k.quantifierCosts != nil {

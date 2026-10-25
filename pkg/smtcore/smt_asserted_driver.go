@@ -191,7 +191,7 @@ func (k *SMTKernel) reduceAssertedPending() (bool, error) {
 		return false, err
 	}
 	if k.preprocessor != nil {
-		if err := k.preprocessor.Reset(); err != nil {
+		if err := k.flushAssertedCache(); err != nil {
 			return false, err
 		}
 	}

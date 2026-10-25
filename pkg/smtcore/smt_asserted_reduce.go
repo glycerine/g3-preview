@@ -10,6 +10,15 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 )
 
+// Source flush_cache resets the rewriter then restores its borrowed pointer.
+// SetSubstitution performs that same reset/reattachment in the native owner.
+func (k *SMTKernel) flushAssertedCache() error {
+	if k.preprocessor == nil {
+		return nil
+	}
+	return k.preprocessor.SetSubstitution(&k.assertedSubstitution)
+}
+
 // Native allocation errors can return before the local source vector is
 // swapped. Preserve only conflict state that was already present or belongs to
 // published rows; ordinary cancellation retains the source's eager flag.
@@ -54,7 +63,7 @@ func (k *SMTKernel) setAssertedEliminateAnd(flag bool) error {
 	if err := k.preprocessor.UpdateParams(&k.assertedParams); err != nil {
 		return err
 	}
-	if err := k.preprocessor.Reset(); err != nil {
+	if err := k.flushAssertedCache(); err != nil {
 		return err
 	}
 	k.assertedElimAnd, k.assertedPhaseReady = flag, true
@@ -95,7 +104,7 @@ func (k *SMTKernel) reduceAndSolveAssertions() error {
 	// Source IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE
 	// profile; the ordinary IF_VERBOSE pass labels remain enabled.
 	if k.preprocessor != nil {
-		if err := k.preprocessor.Reset(); err != nil {
+		if err := k.flushAssertedCache(); err != nil {
 			return err
 		}
 	}
