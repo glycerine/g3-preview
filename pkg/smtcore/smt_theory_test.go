@@ -203,7 +203,11 @@ func TestSMTTheoryInternalizationCallbacksVariablesAndScopes(t *testing.T) {
 	if status != SMTFinalCheckContinue || theory.finalCheckCalls != 2 || state.Statistics().NumFinalChecks != 2 {
 		t.Fatal("theory continuing final check", status, theory.finalCheckCalls, state.Statistics())
 	}
-	equality, err := m.MkEq(term, term)
+	// Native equality-propagation reasons require distinct operand enodes.
+	// Use a distinct term to exercise the theory equality callback.
+	other, err := m.MkConst(astTestSymbol(t, m, "theory-equality-other"), integer)
+	astTestMust(t, err)
+	equality, err := m.MkEq(term, other)
 	astTestMust(t, err)
 	astTestMust(t, state.Internalize(equality, true))
 	if theory.equalities != 1 {
