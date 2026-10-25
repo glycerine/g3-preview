@@ -574,6 +574,11 @@ func (p *LegacySMTPrinter) exprTextContext(h ASTHandle, ctx *legacySMTExprContex
 	} else if matched {
 		return legacySMTRational(value, integer), nil
 	}
+	if value, matched, e := p.manager.SequenceStringValue(h); e != nil {
+		return "", e
+	} else if matched {
+		return "\"" + strings.ReplaceAll(encodeSequenceString(value), "\"", "\"\"") + "\"", nil
+	}
 	if value, matched, e := p.bitVectorNumeralText(h); e != nil {
 		return "", e
 	} else if matched {

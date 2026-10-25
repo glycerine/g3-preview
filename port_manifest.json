@@ -14728,7 +14728,7 @@
       "path": "src/ast/ast_smt_pp.cpp",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_smt_renaming.go",
         "pkg/ast/ast_smt_renaming_test.go",
@@ -14744,7 +14744,8 @@
         "pkg/ast/ast_smt_legacy_let_test.go",
         "pkg/ast/ast_smt_legacy_datatype.go",
         "pkg/ast/ast_smt_legacy_datatype_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/ast/ast_smt_legacy_string_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -14765,7 +14766,8 @@
         "TestLegacySMTPrinterGenericASTDispatchAndConvenience",
         "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
         "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestLegacySMTPrinterStringLiteralByteEncoding"
       ],
       "conditionals": [
         {
@@ -14895,9 +14897,18 @@
           ]
         },
         {
-          "name": "retained visit_app string-literal branch using zstring::encode plus doubled quotes; current legacy expression printer has no string-literal recognition/rendering branch",
-          "status": "unported",
-          "tests": []
+          "name": "visit_app string-literal branch: recognize retained sequence string constants, reuse exact zstring byte encoding and double quote bytes before adding outer quotes",
+          "status": "ported",
+          "tests": [
+            "TestLegacySMTPrinterStringLiteralByteEncoding",
+            "TestSMTLibRunnerProofScript"
+          ],
+          "go_target": "pkg/ast/ast_smt_legacy_expr.go",
+          "go_targets": [
+            "pkg/ast/ast_smt_legacy_expr.go",
+            "pkg/ast/ast_smt_legacy_string_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
         },
         {
           "name": "legacy datatype proof/declaration printing: sort arguments omit private definition metadata, datatype constructor/accessor names omit private parameters, recognizer constructor references remain visible, and generic/mutually recursive declaration blocks are emitted once across multiple instantiations",
@@ -14924,14 +14935,14 @@
         "Legacy datatype printing borrows manager-owned generic definition descriptions and keeps a per-benchmark sort mark set; it retains no AST references or datatype definitions after returning."
       ],
       "deviations": [
-        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. Datatype-special branches are now implemented for retained default proof printing, including generic declarations and datatype argument/reference formatting. The old exclusion of sequence literal printing was also stale: sequence literal producers are retained, while visit_app string encoding remains unported, so this unit is partial."
+        "Native Go maps replace the source symbol maps, and native strings replace ostream fragments. Datatype-special branches are now implemented for retained default proof printing, including generic declarations and datatype argument/reference formatting. The previously omitted retained string-literal branch is now implemented using the existing exact sequence-string byte encoder followed by doubled quotes. All 256 byte values and native/C++ quoted-string proof output are checked."
       ]
     },
     {
       "path": "src/ast/ast_smt_pp.h",
       "component": "ast",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/ast_smt_renaming.go",
         "pkg/ast/ast_smt_renaming_test.go",
@@ -14947,7 +14958,8 @@
         "pkg/ast/ast_smt_legacy_let_test.go",
         "pkg/ast/ast_smt_legacy_datatype.go",
         "pkg/ast/ast_smt_legacy_datatype_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/ast/ast_smt_legacy_string_test.go"
       ],
       "tests": [
         "TestLegacySMTRenamingReservedLegalityQuotingAndCollisions",
@@ -14968,7 +14980,8 @@
         "TestLegacySMTPrinterGenericASTDispatchAndConvenience",
         "TestLegacySMTDatatypeCollectorVisitsFieldsAndOrdersMutualDefinitions",
         "TestLegacySMTParametricDatatypeBenchmarkDeclaresGenericBlockOnce",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestLegacySMTPrinterStringLiteralByteEncoding"
       ],
       "conditionals": [
         {
@@ -15011,9 +15024,18 @@
           ]
         },
         {
-          "name": "retained visit_app string-literal branch using zstring::encode plus doubled quotes; current legacy expression printer has no string-literal recognition/rendering branch",
-          "status": "unported",
-          "tests": []
+          "name": "visit_app string-literal branch: recognize retained sequence string constants, reuse exact zstring byte encoding and double quote bytes before adding outer quotes",
+          "status": "ported",
+          "tests": [
+            "TestLegacySMTPrinterStringLiteralByteEncoding",
+            "TestSMTLibRunnerProofScript"
+          ],
+          "go_target": "pkg/ast/ast_smt_legacy_expr.go",
+          "go_targets": [
+            "pkg/ast/ast_smt_legacy_expr.go",
+            "pkg/ast/ast_smt_legacy_string_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
         },
         {
           "name": "legacy datatype proof/declaration printing: sort arguments omit private definition metadata, datatype constructor/accessor names omit private parameters, recognizer constructor references remain visible, and generic/mutually recursive declaration blocks are emitted once across multiple instantiations",
@@ -15040,7 +15062,7 @@
         "Legacy datatype printing borrows manager-owned generic definition descriptions and keeps a per-benchmark sort mark set; it retains no AST references or datatype definitions after returning."
       ],
       "deviations": [
-        "Benchmark setters are represented by one-call LegacySMTBenchmarkConfig values. This keeps configuration ownership explicit while preserving every retained header operation; datatype declaration/printing branches are now implemented; the retained string-literal encoding branch remains unported and tracked on ast_smt_pp.cpp, so this header is partial."
+        "Benchmark setters are represented by one-call LegacySMTBenchmarkConfig values. This keeps configuration ownership explicit while preserving every retained header operation; datatype declaration/printing branches are now implemented; the retained string-literal encoding branch is now implemented and tested through ast_smt_pp.cpp."
       ]
     },
     {

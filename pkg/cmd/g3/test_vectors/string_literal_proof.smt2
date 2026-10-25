@@ -1,0 +1,7 @@
+(set-option :produce-proofs true)
+(set-logic ALL)
+(declare-const s String)
+(assert (= s "quoted""text"))
+(assert (= s "different"))
+(check-sat-using (using-params smt :auto_config false))
+(get-proof)
