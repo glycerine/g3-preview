@@ -772,6 +772,7 @@ func (k *SMTKernel) Push() error {
 	if err := k.internalizer.SetupTheories(); err != nil {
 		return err
 	}
+	wasConsistent := !k.internalizer.Inconsistent()
 	if err := k.internalizePending(); err != nil {
 		return err
 	}
@@ -780,6 +781,11 @@ func (k *SMTKernel) Push() error {
 	// away, and surviving arithmetic terms can disappear from later models.
 	if _, err := k.internalizer.PropagateCore(); err != nil {
 		return err
+	}
+	if wasConsistent && k.internalizer.Inconsistent() {
+		if _, err := k.resolveCheckConflict(); err != nil {
+			return err
+		}
 	}
 	if err := k.manager.ScopedExprSubstitutionPush(k.assertedScopedSubst); err != nil {
 		return err
@@ -860,36 +866,39 @@ func (k *SMTKernel) ScopeLevel() uint32 {
 	return uint32(len(k.scopes))
 }
 
-func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
+func (k *SMTKernel) prepareCheck() error {
 	if err := k.open(); err != nil {
-		return nil, err
+		return err
 	}
 	if k.smtParams != nil {
 		if err := k.configureArrayTheories(k.smtParams.array.state); err != nil {
-			return nil, err
+			return err
 		}
 	}
 	if k.copiedBVOwner != nil {
 		if err := k.configureBitVectorTheories(k.bvState, k.smtParams.preprocess.bit); err != nil {
-			return nil, err
+			return err
 		}
 	}
 	if k.copiedArithmeticOwner != nil {
 		if err := k.configureArithmeticTheories(k.arithState); err != nil {
-			return nil, err
+			return err
 		}
 	}
 	if err := k.setupAssertedBounds(true); err != nil {
-		return nil, fmt.Errorf("smt kernel configure asserted bounds: %w", err)
+		return fmt.Errorf("smt kernel configure asserted bounds: %w", err)
 	}
 	if err := k.internalizer.configureBooleanHeuristics(k.smtState); err != nil {
-		return nil, fmt.Errorf("smt kernel configure Boolean heuristics: %w", err)
+		return fmt.Errorf("smt kernel configure Boolean heuristics: %w", err)
 	}
 	if err := k.internalizer.SetupTheories(); err != nil {
-		return nil, fmt.Errorf("smt kernel setup theories: %w", err)
+		return fmt.Errorf("smt kernel setup theories: %w", err)
 	}
 	if err := k.internalizePending(); err != nil {
-		return nil, fmt.Errorf("smt kernel internalize assertions: %w", err)
+		return fmt.Errorf("smt kernel internalize assertions: %w", err)
+	}
+	if k.assertedFormulasInconsistent() || k.internalizer.Inconsistent() {
+		return nil
 	}
 	// Cached assertions may have been internalized while relevancy filtering
 	// was disabled. Reestablish their root relevance before each check so a
@@ -897,47 +906,34 @@ func (k *SMTKernel) prepareCheck() (*SMTActivityCaseSplitQueue, error) {
 	if k.repairRelevancy && k.relevancy.enabled {
 		for _, assertion := range k.assertions[:k.assertedHead] {
 			if err := k.internalizer.markRelevant(assertion.Formula); err != nil {
-				return nil, fmt.Errorf("smt kernel mark asserted formulas relevant: %w", err)
+				return fmt.Errorf("smt kernel mark asserted formulas relevant: %w", err)
 			}
 			if err := k.relevancy.restoreExpressionWatches(assertion.Formula); err != nil {
-				return nil, fmt.Errorf("smt kernel restore asserted relevance watches: %w", err)
+				return fmt.Errorf("smt kernel restore asserted relevance watches: %w", err)
 			}
 		}
 	}
-	if err := k.internalizer.InitializeTheorySearch(); err != nil {
-		return nil, fmt.Errorf("smt kernel initialize theory search: %w", err)
-	}
-	queue, err := NewSMTActivityCaseSplitQueue(k.internalizer)
-	if err != nil {
-		return nil, fmt.Errorf("smt kernel case split queue: %w", err)
-	}
-	if err = queue.ConfigurePhases(k.smtState); err != nil {
-		return nil, fmt.Errorf("smt kernel case split phases: %w", err)
-	}
-	k.internalizer.statistics.NumChecks++
-	return queue, nil
+	return nil
 }
 
-func (k *SMTKernel) Check() (lbool.LBool, error) {
-	if err := k.clearLiteralResults(); err != nil {
+func (k *SMTKernel) Check() (result lbool.LBool, resultErr error) {
+	ready, err := k.beginCheck()
+	if err != nil || !ready {
 		return lbool.Undef, err
 	}
-	if err := k.clearGeneratedModel(); err != nil {
+	if k.internalizer.Inconsistent() {
+		return lbool.False, nil
+	}
+	if err := k.prepareCheck(); err != nil {
 		return lbool.Undef, err
 	}
-	if err := k.clearUnsatCore(); err != nil {
-		return lbool.Undef, err
+	if k.assertedFormulasInconsistent() {
+		return lbool.False, nil
 	}
-	if err := k.manager.ResetRef(k.unsatProof); err != nil {
-		return lbool.Undef, err
+	if k.internalizer.Inconsistent() {
+		return k.resolveCheckConflict()
 	}
-	k.lastFailure = SMTFailureOK
-	k.labels = nil
-	queue, err := k.prepareCheck()
-	if err != nil {
-		return lbool.Undef, err
-	}
-	return k.search(queue)
+	return k.finalizeCheck(k.search())
 }
 
 func (k *SMTKernel) ConfigureModelGeneration(enabled bool, config model.ModelEvaluatorConfig) error {

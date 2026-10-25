@@ -2574,6 +2574,7 @@
         "smt_bv_lifecycle.go",
         "smt_case_split_queue.go",
         "smt_cg_table.go",
+        "smt_check.go",
         "smt_checker.go",
         "smt_clause.go",
         "smt_clause_maintenance.go",

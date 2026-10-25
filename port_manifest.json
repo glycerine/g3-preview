@@ -113848,7 +113848,9 @@
         "pkg/smtcore/smt_assertion_conflict_test.go",
         "pkg/smtcore/smt_asserted_propagate.go",
         "pkg/smtcore/smt_asserted_reduce.go",
-        "pkg/smtcore/smt_asserted_substitution_test.go"
+        "pkg/smtcore/smt_asserted_substitution_test.go",
+        "pkg/smtcore/smt_check.go",
+        "pkg/smtcore/smt_check_phases_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -113926,7 +113928,14 @@
         "TestSMTAssertedCommittedNumeralBindingNestedRollback",
         "TestSMTAssertedTemporaryPropagationBindingsDoNotEscape",
         "TestSMTAssertedEmptyPropagationRestoresBorrowedSubstitution",
-        "TestSMTAssertedSubstitutionAllocationFrontiers"
+        "TestSMTAssertedSubstitutionAllocationFrontiers",
+        "TestSMTCheckKnownConflictPreservesProofAndSkipsSearch",
+        "TestSMTCheckMemoryPreamblePrecedesKnownConflict",
+        "TestSMTCheckNewBooleanConflictAndPushBuildProofWithoutSearch",
+        "TestSMTCheckAssumptionsResolveBeforeSearchAndInitializeAfterAssumptions",
+        "TestSMTCheckFinalSATCancellationBecomesUnknown",
+        "TestSMTCheckFinalizesBeforeNativeAssumptionCleanup",
+        "TestSMTCheckBaseConflictAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -115230,6 +115239,30 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "retained check phase boundaries: memory preamble before known conflict, cached false proof preservation, newly discovered base/assumption conflict resolution before search, search-only theory initialization and proof reset, push conflict proof publication, and counted SAT cancellation finalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/smtcore/smt_check_phases_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTCheckKnownConflictPreservesProofAndSkipsSearch",
+            "TestSMTCheckMemoryPreamblePrecedesKnownConflict",
+            "TestSMTCheckNewBooleanConflictAndPushBuildProofWithoutSearch",
+            "TestSMTCheckAssumptionsResolveBeforeSearchAndInitializeAfterAssumptions",
+            "TestSMTCheckFinalSATCancellationBecomesUnknown",
+            "TestSMTCheckFinalizesBeforeNativeAssumptionCleanup",
+            "TestSMTCheckBaseConflictAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -115258,7 +115291,7 @@
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
         "With auto_config=false and MBQI disabled, the transitive-relation runner regression now agrees with C++ on UNKNOWN, UNSAT after grounded contradictory facts, then UNKNOWN after pop. The no-preprocessing solver regression additionally verifies incomplete-quantifier failure reporting and repeated scoped E-matching refutations.",
-        "This increment ports assertion internalization/conflict control flow, not the complete check/setup_and_check orchestration or its time/trace hooks. The native search wrapper still performs additional setup on known base conflicts; source check-phase short circuits remain part of the context audit."
+        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. Complete setup_and_check orchestration, theory-assumption hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles."
       ]
     },
     {
@@ -115285,7 +115318,9 @@
         "pkg/smtcore/smt_assertion_conflict_test.go",
         "pkg/smtcore/smt_asserted_propagate.go",
         "pkg/smtcore/smt_asserted_reduce.go",
-        "pkg/smtcore/smt_asserted_substitution_test.go"
+        "pkg/smtcore/smt_asserted_substitution_test.go",
+        "pkg/smtcore/smt_check.go",
+        "pkg/smtcore/smt_check_phases_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -115315,7 +115350,14 @@
         "TestSMTAssertedCommittedNumeralBindingNestedRollback",
         "TestSMTAssertedTemporaryPropagationBindingsDoNotEscape",
         "TestSMTAssertedEmptyPropagationRestoresBorrowedSubstitution",
-        "TestSMTAssertedSubstitutionAllocationFrontiers"
+        "TestSMTAssertedSubstitutionAllocationFrontiers",
+        "TestSMTCheckKnownConflictPreservesProofAndSkipsSearch",
+        "TestSMTCheckMemoryPreamblePrecedesKnownConflict",
+        "TestSMTCheckNewBooleanConflictAndPushBuildProofWithoutSearch",
+        "TestSMTCheckAssumptionsResolveBeforeSearchAndInitializeAfterAssumptions",
+        "TestSMTCheckFinalSATCancellationBecomesUnknown",
+        "TestSMTCheckFinalizesBeforeNativeAssumptionCleanup",
+        "TestSMTCheckBaseConflictAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -115632,6 +115674,30 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "retained check phase boundaries: memory preamble before known conflict, cached false proof preservation, newly discovered base/assumption conflict resolution before search, search-only theory initialization and proof reset, push conflict proof publication, and counted SAT cancellation finalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/smtcore/smt_check_phases_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTCheckKnownConflictPreservesProofAndSkipsSearch",
+            "TestSMTCheckMemoryPreamblePrecedesKnownConflict",
+            "TestSMTCheckNewBooleanConflictAndPushBuildProofWithoutSearch",
+            "TestSMTCheckAssumptionsResolveBeforeSearchAndInitializeAfterAssumptions",
+            "TestSMTCheckFinalSATCancellationBecomesUnknown",
+            "TestSMTCheckFinalizesBeforeNativeAssumptionCleanup",
+            "TestSMTCheckBaseConflictAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -115644,7 +115710,7 @@
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
-        "This increment ports assertion internalization/conflict control flow, not the complete check/setup_and_check orchestration or its time/trace hooks. The native search wrapper still performs additional setup on known base conflicts; source check-phase short circuits remain part of the context audit."
+        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. Complete setup_and_check orchestration, theory-assumption hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles."
       ]
     },
     {
@@ -244725,14 +244791,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "a427c25e02e3419387577420c1610622454f899c",
+    "commit": "888e75971080cd064e42f2e84f2ce6738a3e4c7e",
     "command": "go -C pkg test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-24 23:33:19.707435 UTC",
-    "completed_utc": "2026-10-24 23:46:56.439176 UTC",
+    "started_utc": "2026-10-25 00:42:59.298107 UTC",
+    "completed_utc": "2026-10-25 00:57:01.736179 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-a427c25e.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-a427c25e.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-a427c25e.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-888e7597.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-888e7597.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-888e7597.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -244748,9 +244814,9 @@
     "package_timeout": "30m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 711.6,
+    "lp_seconds": 736.816,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout; includes QSAT recursive elimination, tactic/QMax/CLI integration and both asserted-formula driver and per-row publication increments. Excludes subsequent assertion diagnostic/setup and caller-mark printer work, which has focused native and checked/debug/trace integration evidence."
+    "scope_warning": "Clean isolated exact-HEAD checkout; includes persistent scoped assertion substitutions and all prior assertion diagnostic/setup/conflict increments, QSAT recursive elimination and tactic/QMax/CLI integration. Excludes the subsequent check-phase increment, which has separate focused and integration validation."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

@@ -127,18 +127,9 @@ func (k *SMTKernel) searchResourceLimitExceeded(timer *stopwatch.Timer, nextProg
 		}
 		return true, nil
 	}
-	runtime := k.manager.NumeralService().RuntimeOwner()
-	if runtime == nil {
-		return false, nil
-	}
-	above := false
-	if process := runtime.ProcessOwner(); process != nil {
-		above = process.AboveWatermark()
-	} else {
-		above, err = runtime.AboveWatermark()
-		if err != nil {
-			return false, err
-		}
+	above, err := k.aboveMemoryWatermark()
+	if err != nil {
+		return false, err
 	}
 	if above {
 		k.lastFailure = SMTFailureMemory
@@ -167,7 +158,20 @@ func (k *SMTKernel) learnedBackjumpLevel(resolution SMTConflictResolution, baseL
 // search runs the retained CDCL control loop. Learned clauses are installed at
 // the computed backjump scope and therefore participate in the next propagation
 // pass instead of re-exploring the conflicting branch.
-func (k *SMTKernel) search(queue *SMTActivityCaseSplitQueue) (result lbool.LBool, resultErr error) {
+func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
+	if err := k.internalizer.InitializeTheorySearch(); err != nil {
+		return lbool.Undef, err
+	}
+	if err := k.manager.ResetRef(k.unsatProof); err != nil {
+		return lbool.Undef, err
+	}
+	queue, err := NewSMTActivityCaseSplitQueue(k.internalizer)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if err := queue.ConfigurePhases(k.smtState); err != nil {
+		return lbool.Undef, err
+	}
 	baseLevel := k.internalizer.scopeLevel
 	conflictBase := k.internalizer.statistics.NumConflicts
 	restarts := newSMTRestartState(k.smtState)

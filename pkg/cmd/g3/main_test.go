@@ -336,6 +336,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"check_base_conflict_repeated.smt2":            "unsat\nunsat\n()\nsat\nunsat\n(p)\nsat\n",
 	"asserted_substitution_scopes.smt2":            "sat\n((x 7))\nunsat\nsat\n((x 7))\nsat\n((x 8))\n",
 	"assertion_conflict_prefix_scopes.smt2":        "unsat\nunsat\nunsat\nsat\n",
 	"asserted_driver_inconsistency_scopes.smt2":    "unsat\nsat\nunsat\nsat\n",
@@ -929,7 +930,7 @@ func canonicalOutput(text string) string {
 }
 
 func TestSMTLibRunnerProofScript(t *testing.T) {
-	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2"} {
+	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2", "check_phase_repeated_proof.smt2"} {
 		t.Run(name, func(t *testing.T) { testSMTLibProofScript(t, name) })
 	}
 }

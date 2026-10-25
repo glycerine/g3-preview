@@ -48,23 +48,13 @@ func (k *SMTKernel) validAssumption(assumption ast.ASTHandle) (bool, error) {
 // assumption scope and every variable introduced in it are removed before the
 // method returns.
 func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.LBool, resultErr error) {
-	if err := k.open(); err != nil {
+	ready, err := k.beginCheck()
+	if err != nil || !ready {
 		return lbool.Undef, err
 	}
-	if err := k.clearLiteralResults(); err != nil {
-		return lbool.Undef, err
+	if k.internalizer.Inconsistent() {
+		return lbool.False, nil
 	}
-	if err := k.clearGeneratedModel(); err != nil {
-		return lbool.Undef, err
-	}
-	if err := k.clearUnsatCore(); err != nil {
-		return lbool.Undef, err
-	}
-	if err := k.manager.ResetRef(k.unsatProof); err != nil {
-		return lbool.Undef, err
-	}
-	k.lastFailure = SMTFailureOK
-	k.labels = nil
 	for index, assumption := range assumptions {
 		valid, err := k.validAssumption(assumption)
 		if err != nil {
@@ -74,16 +64,29 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 			return lbool.Undef, fmt.Errorf("assumption %d: %w", index, ast.ErrASTDomain)
 		}
 	}
-	queue, err := k.prepareCheck()
-	if err != nil {
+	if err := k.prepareCheck(); err != nil {
 		return lbool.Undef, err
 	}
-	consistent, err := k.internalizer.PropagateCore()
-	if err != nil {
-		return lbool.Undef, err
+	if k.assertedFormulasInconsistent() {
+		return lbool.False, nil
 	}
-	if !consistent || len(assumptions) == 0 {
-		return k.search(queue)
+	// The native facade also propagates an empty assumption batch here. Its
+	// search-persistence boundary must capture those base theory consequences.
+	if !k.internalizer.Inconsistent() {
+		if _, err := k.internalizer.PropagateCore(); err != nil {
+			return lbool.Undef, err
+		}
+	}
+	if k.internalizer.Inconsistent() {
+		return k.resolveCheckConflict()
+	}
+	if len(assumptions) == 0 {
+		return k.finalizeCheck(k.search())
+	}
+	if canceled, err := k.manager.Canceled(); err != nil {
+		return lbool.Undef, err
+	} else if canceled {
+		return k.finalizeCheck(k.search())
 	}
 	if err = k.internalizer.PushScope(); err != nil {
 		return lbool.Undef, err
@@ -130,7 +133,12 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 			k.assumptions[literal] = assumption
 		}
 	}
-	return k.search(queue)
+	if k.internalizer.Inconsistent() {
+		return k.resolveCheckConflict()
+	}
+	// Finalize before the native facade removes its assumption scope; source
+	// check_finalize runs while that successful search scope is still alive.
+	return k.finalizeCheck(k.search())
 }
 
 func (k *SMTKernel) clearUnsatCore() error {
