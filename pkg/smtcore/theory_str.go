@@ -46,6 +46,7 @@ type SMTStringTheory struct {
 	regexTermsByString map[ast.ASTHandle][]ast.ASTHandle
 	regexNFACache      map[ast.ASTHandle]*smtStringNFA
 	concatBreakFlags   map[[2]ast.ASTHandle]ast.ASTHandle
+	overlapAssumption  ast.ASTRef
 	closed             bool
 }
 
@@ -321,6 +322,9 @@ func (t *SMTStringTheory) Close() (result error) {
 		return nil
 	}
 	result = t.findTrail.Reset()
+	if t.overlapAssumption != (ast.ASTRef{}) {
+		result = errors.Join(result, t.state.manager.DelRef(&t.overlapAssumption))
+	}
 	// Native contains_map is a later-declared expr_ref_vector and closes
 	// before m_trail, also in forward element order.
 	for i := range t.containsRefs {

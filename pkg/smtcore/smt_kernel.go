@@ -951,7 +951,23 @@ func (k *SMTKernel) Check() (result lbool.LBool, resultErr error) {
 	if k.internalizer.Inconsistent() {
 		return lbool.False, nil
 	}
-	if err := k.prepareCheck(false); err != nil {
+	if err := k.configureCheck(false); err != nil {
+		return lbool.Undef, err
+	}
+	assumptions, refs, err := k.addTheoryAssumptions(nil)
+	defer func() {
+		resultErr = errors.Join(resultErr, k.releaseTheoryAssumptions(refs))
+		if resultErr != nil {
+			result = lbool.Undef
+		}
+	}()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if len(assumptions) != 0 {
+		return k.checkConfiguredAssumptions(assumptions)
+	}
+	if err := k.internalizeCheckAssertions(); err != nil {
 		return lbool.Undef, err
 	}
 	if k.assertedFormulasInconsistent() {

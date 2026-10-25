@@ -58,6 +58,20 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 	if err := k.configureCheck(false); err != nil {
 		return lbool.Undef, err
 	}
+	all, refs, err := k.addTheoryAssumptions(assumptions)
+	defer func() {
+		resultErr = errors.Join(resultErr, k.releaseTheoryAssumptions(refs))
+		if resultErr != nil {
+			result = lbool.Undef
+		}
+	}()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	return k.checkConfiguredAssumptions(all)
+}
+
+func (k *SMTKernel) checkConfiguredAssumptions(assumptions []ast.ASTHandle) (result lbool.LBool, resultErr error) {
 	for index, assumption := range assumptions {
 		valid, err := k.validAssumption(assumption)
 		if err != nil {
@@ -91,13 +105,12 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 	} else if canceled {
 		return k.finalizeCheck(k.search())
 	}
-	if err = k.internalizer.PushScope(); err != nil {
+	if err := k.internalizer.PushScope(); err != nil {
 		return lbool.Undef, err
 	}
 	assumptionVariables := make([]int32, 0, len(assumptions))
 	k.assumptions = make(map[SMTLiteral]ast.ASTHandle, len(assumptions))
 	defer func() {
-		tracking := len(k.assumptions) != 0
 		for _, variable := range assumptionVariables {
 			if variable >= SMTFirstBoolVar && int(variable) < len(k.internalizer.booleanData) {
 				k.internalizer.booleanData[variable].Assumption = false
@@ -105,8 +118,23 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 		}
 		resultErr = errors.Join(resultErr, k.internalizer.PopScopes(1))
 		k.assumptions = nil
-		if resultErr == nil && result == lbool.False && tracking {
+		// Native tracking_assumptions tests the assumption search scope,
+		// including a nonempty input containing only true constants.
+		if resultErr == nil && result == lbool.False {
 			resultErr = k.validateUnsatCore()
+			if resultErr == nil {
+				for _, theory := range k.internalizer.theoryOrder {
+					status, err := theory.ValidateUnsatCore(k.unsatCore)
+					if err != nil {
+						resultErr = err
+						break
+					}
+					if status == lbool.Undef {
+						result = lbool.Undef
+						break
+					}
+				}
+			}
 		}
 		if resultErr != nil {
 			result = lbool.Undef

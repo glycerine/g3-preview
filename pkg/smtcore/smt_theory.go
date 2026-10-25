@@ -2,7 +2,10 @@
 // theory-variable lifecycle used by the logical context.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
+)
 
 // SMTTheoryInternalizer is the retained concrete theory surface consumed by
 // expression internalization. Search, model, and conflict callbacks are added
@@ -26,6 +29,8 @@ type SMTTheoryInternalizer interface {
 	Propagate() error
 	Setup() error
 	InitializeSearch() error
+	AddTheoryAssumptions([]ast.ASTHandle) ([]ast.ASTHandle, error)
+	ValidateUnsatCore([]ast.ASTHandle) (lbool.LBool, error)
 	Restart() error
 	FinalCheck() (SMTFinalCheckStatus, error)
 	PushScope() error
@@ -72,6 +77,12 @@ func (*SMTTheoryBase) Relevant(ast.ASTHandle) error { return nil }
 func (*SMTTheoryBase) Setup() error                 { return nil }
 func (*SMTTheoryBase) InitializeSearch() error      { return nil }
 func (*SMTTheoryBase) Restart() error               { return nil }
+func (*SMTTheoryBase) AddTheoryAssumptions(assumptions []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	return assumptions, nil
+}
+func (*SMTTheoryBase) ValidateUnsatCore([]ast.ASTHandle) (lbool.LBool, error) {
+	return lbool.False, nil
+}
 func (*SMTTheoryBase) FinalCheck() (SMTFinalCheckStatus, error) {
 	return SMTFinalCheckDone, nil
 }

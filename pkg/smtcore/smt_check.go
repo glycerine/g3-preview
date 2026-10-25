@@ -57,8 +57,9 @@ func (k *SMTKernel) checkPreamble(countCheck bool) (bool, error) {
 
 // SetupAndCheck is context::setup_and_check, used by a fresh SMT tactic with
 // no external assumptions. Unlike ordinary Check, it enables static features
-// for automatic setup and does not increment the regular check counter.
-func (k *SMTKernel) SetupAndCheck() (lbool.LBool, error) {
+// for automatic setup. Only delegation for nonempty theory assumptions
+// increments the regular check counter.
+func (k *SMTKernel) SetupAndCheck() (result lbool.LBool, resultErr error) {
 	ready, err := k.checkPreamble(false)
 	if err != nil || !ready {
 		return lbool.Undef, err
@@ -66,7 +67,29 @@ func (k *SMTKernel) SetupAndCheck() (lbool.LBool, error) {
 	if k.ScopeLevel() != 0 || k.preprocessingSetupDone || k.internalizer.theoriesSetup || k.assertedHead != 0 {
 		return lbool.Undef, ast.ErrASTDomain
 	}
-	if err := k.prepareCheck(true); err != nil {
+	if err := k.configureCheck(true); err != nil {
+		return lbool.Undef, err
+	}
+	assumptions, refs, err := k.addTheoryAssumptions(nil)
+	defer func() {
+		resultErr = errors.Join(resultErr, k.releaseTheoryAssumptions(refs))
+		if resultErr != nil {
+			result = lbool.Undef
+		}
+	}()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if len(assumptions) != 0 {
+		// Native setup_and_check delegates to check with assumptions already
+		// collected. That path runs the ordinary preamble and counts once.
+		ready, err := k.beginCheck()
+		if err != nil || !ready {
+			return lbool.Undef, err
+		}
+		return k.checkConfiguredAssumptions(assumptions)
+	}
+	if err := k.internalizeCheckAssertions(); err != nil {
 		return lbool.Undef, err
 	}
 	if k.assertedFormulasInconsistent() {

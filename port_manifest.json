@@ -115034,7 +115034,10 @@
         "pkg/smtcore/smt_theory_case_split.go",
         "pkg/smtcore/smt_theory_case_split_test.go",
         "pkg/smtcore/smt_theory_aware_branching.go",
-        "pkg/smtcore/smt_theory_aware_branching_test.go"
+        "pkg/smtcore/smt_theory_aware_branching_test.go",
+        "pkg/smtcore/smt_theory_assumptions.go",
+        "pkg/smtcore/smt_theory_assumptions_test.go",
+        "pkg/smtcore/smt_theory.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -115183,7 +115186,13 @@
         "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
         "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
         "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
-        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
+        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice",
+        "TestSMTTheoryAssumptionsOrdinaryCheckAndValidation",
+        "TestSMTTheoryAssumptionsExternalOrderRollbackAndErrors",
+        "TestSMTTheoryAssumptionsSetupAndCheckCountsDelegatedCheck",
+        "TestSMTTheoryAssumptionsTrueInputStillValidatesEmptyCore",
+        "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+        "TestSMTStringOverlapValidationUsesEnodeIdentity"
       ],
       "conditionals": [
         {
@@ -116853,6 +116862,19 @@
           "tests": [
             "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
           ]
+        },
+        {
+          "name": "add_theory_assumptions collection before assertion internalization in check/setup_and_check; external-first owning check-local roots, one delegated check count and post-assumption-pop theory core validation with unknown short circuit, including true-only input/empty cores",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_assumptions.go",
+          "tests": [
+            "TestSMTTheoryAssumptionsOrdinaryCheckAndValidation",
+            "TestSMTTheoryAssumptionsExternalOrderRollbackAndErrors",
+            "TestSMTTheoryAssumptionsSetupAndCheckCountsDelegatedCheck",
+            "TestSMTTheoryAssumptionsTrueInputStillValidatesEmptyCore",
+            "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+            "TestSMTStringOverlapValidationUsesEnodeIdentity"
+          ]
         }
       ],
       "ownership": [
@@ -116869,7 +116891,8 @@
         "The internalizer owns distinct scalar user/search base boundaries during a search and clears both on exit. PB plugin copying transfers an independent installed control snapshot to an unused fresh destination, rather than borrowing source parameters or copying mutable watch/constraint state.",
         "The internalizer borrows a pointer to the owning kernel assertion slice, so theory search initialization sees the current processed formula entries after append/reallocation and pop. The kernel retains formula/proof lifetime; the view acquires no duplicate AST roots and is not mutated by the string theory.",
         "Case-split literal spans are copied into concrete slices. Scope limits remove signed memberships and per-literal links before Boolean slots are rolled back. Propagation snapshots the post-BCP assignment end. Literal indices add no AST ownership.",
-        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap."
+        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap.",
+        "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -116887,8 +116910,8 @@
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
         "With auto_config=false and MBQI disabled, the transitive-relation runner regression now agrees with C++ on UNKNOWN, UNSAT after grounded contradictory facts, then UNKNOWN after pop. The no-preprocessing solver regression additionally verifies incomplete-quantifier failure reporting and repeated scoped E-matching refutations.",
-        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
-        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend.",
+        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks are now connected; check time/profile/trace diagnostics and other context work remain under audit. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
+        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The retained String assumption producer and core-validation overrides are now concretely implemented and consumed by the ordinary/assumption/fresh setup check paths; the remaining String backend is partial.",
         "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit.",
         "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial.",
         "Source context::set_conflict keeps the original justification and not_l while a theory callback continues. Go now preserves that first conflict without suppressing later unassigned literals or clause publication. Shared construction tests cover conflicting assignments, later false/empty clauses and optimized binary assignment reasons.",
@@ -116986,7 +117009,10 @@
         "pkg/smtcore/smt_internalizer_true_equality_test.go",
         "pkg/smtcore/smt_theory_test.go",
         "pkg/smtcore/smt_theory_aware_branching.go",
-        "pkg/smtcore/smt_theory_aware_branching_test.go"
+        "pkg/smtcore/smt_theory_aware_branching_test.go",
+        "pkg/smtcore/smt_theory_assumptions.go",
+        "pkg/smtcore/smt_theory_assumptions_test.go",
+        "pkg/smtcore/smt_theory.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -117089,7 +117115,13 @@
         "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
         "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
         "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
-        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
+        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice",
+        "TestSMTTheoryAssumptionsOrdinaryCheckAndValidation",
+        "TestSMTTheoryAssumptionsExternalOrderRollbackAndErrors",
+        "TestSMTTheoryAssumptionsSetupAndCheckCountsDelegatedCheck",
+        "TestSMTTheoryAssumptionsTrueInputStillValidatesEmptyCore",
+        "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+        "TestSMTStringOverlapValidationUsesEnodeIdentity"
       ],
       "conditionals": [
         {
@@ -117748,6 +117780,19 @@
           "tests": [
             "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
           ]
+        },
+        {
+          "name": "add_theory_assumptions collection before assertion internalization in check/setup_and_check; external-first owning check-local roots, one delegated check count and post-assumption-pop theory core validation with unknown short circuit, including true-only input/empty cores",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_assumptions.go",
+          "tests": [
+            "TestSMTTheoryAssumptionsOrdinaryCheckAndValidation",
+            "TestSMTTheoryAssumptionsExternalOrderRollbackAndErrors",
+            "TestSMTTheoryAssumptionsSetupAndCheckCountsDelegatedCheck",
+            "TestSMTTheoryAssumptionsTrueInputStillValidatesEmptyCore",
+            "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+            "TestSMTStringOverlapValidationUsesEnodeIdentity"
+          ]
         }
       ],
       "ownership": [
@@ -117763,12 +117808,13 @@
         "The internalizer borrows a pointer to the owning kernel assertion slice, so theory search initialization sees the current processed formula entries after append/reallocation and pop. The kernel retains formula/proof lifetime; the view acquires no duplicate AST roots and is not mutated by the string theory.",
         "Case-split literal spans are copied into concrete slices. Scope limits remove signed memberships and per-literal links before Boolean slots are rolled back. Propagation snapshots the post-BCP assignment end. Literal indices add no AST ownership.",
         "New true-equality assignment occurs after enode registration/stack ownership, preserving equality justification operands through scope rollback. The theory callback fixture now uses distinct terms as native eq_propagation_justification requires, retaining its callback and scope checks.",
-        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap."
+        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap.",
+        "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
-        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
-        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend.",
+        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks are now connected; check time/profile/trace diagnostics and other context work remain under audit. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
+        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The retained String assumption producer and core-validation overrides are now concretely implemented and consumed by the ordinary/assumption/fresh setup check paths; the remaining String backend is partial.",
         "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit.",
         "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial.",
         "Source context::set_conflict keeps the original justification and not_l while a theory callback continues. Go now preserves that first conflict without suppressing later unassigned literals or clause publication. Shared construction tests cover conflicting assignments, later false/empty clauses and optimized binary assignment reasons.",
@@ -125101,7 +125147,12 @@
         "pkg/smtcore/smt_model_value.go",
         "pkg/smtcore/theory_pb_model.go",
         "pkg/smtcore/theory_pb_model_test.go",
-        "pkg/smtcore/smt_model_generator.go"
+        "pkg/smtcore/smt_model_generator.go",
+        "pkg/smtcore/smt_theory_assumptions.go",
+        "pkg/smtcore/smt_theory_assumptions_test.go",
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_check.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestSMTSearchEqualityArithmeticConventions",
@@ -125109,7 +125160,13 @@
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTTheoryBaseConstructsEqualityLiteral",
         "TestSMTPBModelInitializerRegistersFactoryWithoutValueBuilder",
-        "TestSMTPBModelInitializerGuardsAndIndependentFactories"
+        "TestSMTPBModelInitializerGuardsAndIndependentFactories",
+        "TestSMTTheoryAssumptionsOrdinaryCheckAndValidation",
+        "TestSMTTheoryAssumptionsExternalOrderRollbackAndErrors",
+        "TestSMTTheoryAssumptionsSetupAndCheckCountsDelegatedCheck",
+        "TestSMTTheoryAssumptionsTrueInputStillValidatesEmptyCore",
+        "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+        "TestSMTStringOverlapValidationUsesEnodeIdentity"
       ],
       "conditionals": [
         {
@@ -125182,9 +125239,17 @@
           ]
         },
         {
-          "name": "retained theory_str add_theory_assumptions and validate_unsat_core overrides require the unported concrete string backend",
-          "status": "unported",
-          "tests": []
+          "name": "add_theory_assumptions/validate_unsat_core retained typed callbacks, base no-op/false defaults and concrete String overrides consumed by check/setup_and_check and post-pop unsat-core validation",
+          "status": "ported",
+          "tests": [
+            "TestSMTTheoryAssumptionsOrdinaryCheckAndValidation",
+            "TestSMTTheoryAssumptionsExternalOrderRollbackAndErrors",
+            "TestSMTTheoryAssumptionsSetupAndCheckCountsDelegatedCheck",
+            "TestSMTTheoryAssumptionsTrueInputStillValidatesEmptyCore",
+            "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+            "TestSMTStringOverlapValidationUsesEnodeIdentity"
+          ],
+          "go_target": "pkg/smtcore/smt_theory.go"
         },
         {
           "name": "Independent source init_model factory registration, including PB build_models=false: initialize every actual model initializer before root discovery while retaining Boolean assignment wrappers before sort-family value dispatch",
@@ -125203,10 +125268,11 @@
         }
       ],
       "ownership": [
-        "The typed theory interface borrows AST handles and internalizer-owned enodes; SMTTheoryBase owns only Go slices of borrowed enode pointers and scope limits."
+        "The typed theory interface borrows AST handles and internalizer-owned enodes; SMTTheoryBase owns only Go slices of borrowed enode pointers and scope limits.",
+        "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion."
       ],
       "deviations": [
-        "Go splits concrete model construction, finalization, function inclusion, names and statistics into optional interfaces implemented by actual consumers. Conflict publication uses the concrete internalizer state and teardown replaces reset/flush reuse. The source theory_str backend is retained and overrides add_theory_assumptions/validate_unsat_core; those hooks cannot be classified as platform replacements or dead code. Their concrete implementation remains unported, so this header is partial; no unused generic callback adapter was added.",
+        "Go splits concrete model construction, finalization, function inclusion, names and statistics into optional interfaces implemented by actual consumers. Conflict publication uses the concrete internalizer state and teardown replaces reset/flush reuse. The source theory_str backend is retained and overrides add_theory_assumptions/validate_unsat_core; those hooks cannot be classified as platform replacements or dead code. Their concrete implementation and context consumers are now ported; other header methods/audits remain partial.",
         "Model initialization is independent of per-enode value construction, matching the source virtual init_model/build_models distinction. A PB initializer registers its live factory although it has no ModelValue implementation; Boolean roots retain assignment wrappers and no unused PB value-procedure adapter is added."
       ]
     },
@@ -138969,7 +139035,9 @@
         "pkg/smtcore/theory_str_unroll.go",
         "pkg/smtcore/theory_str_unroll_test.go",
         "pkg/smtcore/theory_str_concat_equality.go",
-        "pkg/smtcore/theory_str_concat_equality_test.go"
+        "pkg/smtcore/theory_str_concat_equality_test.go",
+        "pkg/smtcore/theory_str_assumptions.go",
+        "pkg/smtcore/theory_str_assumptions_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139026,7 +139094,9 @@
         "TestSMTStringConcatEqualityCoreCancellationAndRollback",
         "TestSMTStringConcatEqualityClassCancellationGuards",
         "TestSMTStringConcatEqualityKnownLengthGuards",
-        "TestSMTStringConcatArgumentInferenceGuardsAndRefusals"
+        "TestSMTStringConcatArgumentInferenceGuardsAndRefusals",
+        "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+        "TestSMTStringOverlapValidationUsesEnodeIdentity"
       ],
       "conditionals": [
         {
@@ -140046,6 +140116,15 @@
             "TestSMTStringConcatEqualityClassCancellationGuards",
             "TestSMTStringConcatEqualityKnownLengthGuards"
           ]
+        },
+        {
+          "name": "add_theory_assumptions/validate_unsat_core: fresh owned Boolean overlap skolem per check, negated temporary assumption and exact enode-identity recognition downgrading only matching unsat cores to unknown",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_assumptions.go",
+          "tests": [
+            "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+            "TestSMTStringOverlapValidationUsesEnodeIdentity"
+          ]
         }
       ],
       "ownership": [
@@ -140059,7 +140138,8 @@
         "Concat rebuild temporaries remain rooted through internalization/publication. Groups use retained/internalized handles. Length guards and arrangement expressions stay owned through case-split registration. Relevant integer xor flags persist across scopes and reuse reversed operand pairs.",
         "Parent traversal copies each current enode parent list before axiom publication. Folded literal/concat temporaries remain owned through internalization and guarded publication. Every pending member equality and any sibling class substitution remains an explicit premise. Initial shortcuts still perform the native post-handler private merge; existing scope trails undo it.",
         "Unroll collection borrows already internalized private-class handles. Guard/count/length construction temporaries remain rooted through axiom publication; core and private-class trails restore inferred counts and classes on pop. No unrelated regex matcher or universal adapter replaces native literal-core processing.",
-        "Concat-equality quick paths root length terms, equalities, guards and conclusions until publication. Argument inference owns independent big.Int sums/differences, reads only actual integral core roots through the existing mixed-arithmetic gate, and releases temporary AST refs in forward source-vector order. No model-value length assumptions, cut-history or witness-lifetime port credit is added."
+        "Concat-equality quick paths root length terms, equalities, guards and conclusions until publication. Argument inference owns independent big.Int sums/differences, reads only actual integral core roots through the existing mixed-arithmetic gate, and releases temporary AST refs in forward source-vector order. No model-value length assumptions, cut-history or witness-lifetime port credit is added.",
+        "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140078,7 +140158,8 @@
         "Constant arrangements and class grouping are connected to the partial equality callback. Preserve first-operand length priority, negative/overlong bounds, structural refusals, omission of known-length consequences, native split order and strong/weak parameter behavior. Active mk_concat folds two class constants before the later both-known source branch, so that unreachable case is not manufactured. Newly created empty seeds need not be attached class constants. Full handle_equality still lacks tester dispatch, initial concat shortcuts, concat/concat step 1, parent simplification and unroll processing; production routing and FinalCheck remain incomplete.",
         "Native parent simplification and initial concat shortcuts now run at their retained equality-handler positions. Preserve attached-class evaluation rather than syntactic literal folding, both independent direct positions for repeated operands, source order of nested/grandparent cases and guarded replacement. Grandparent byte order and rebuilt operand order are explicit separate choices. Source missing-sibling length inference is unreachable with the pure recursive length reader. Full handler still lacks tester dispatch, concat/concat step 1 and unroll processing; automata/final checking and production String routing remain incomplete.",
         "The equality handler now dispatches opposite-class constants to collected unroll terms after parent simplification. Preserve source unsigned byte-length floor division, including mismatching/non-divisible text in direct necessary-consequence checks; this method does not replace regex acceptance. Empty target strings and non-to_re cores remain native no-ops. A zero/nonliteral divisor returns the source precondition error. Full unroll final checking, concat/unroll arrangements, concat/concat step 1, tester dispatch, automata and final checking remain pending; production backend routing and GiveUp are unchanged.",
-        "Step 1 currently runs native cancellation and child-length inference only for unique concat groups, skipping shared concat groups as source requires. Multiple distinct concat groups remain unprocessed until retained overlap-aware pair selection and cut histories are ported. The later concat re-simplification/arrangement dispatch remains unported. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics."
+        "Step 1 currently runs native cancellation and child-length inference only for unique concat groups, skipping shared concat groups as source requires. Multiple distinct concat groups remain unprocessed until retained overlap-aware pair selection and cut histories are ported. The later concat re-simplification/arrangement dispatch remains unported. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics.",
+        "Only the overlap assumption/core-validation producer is completed here. Loop/cut arrangement producers and the complete final checker remain unported. QF_S production routing is unchanged; simulated arrangement-conflict fixtures exercise the actual callbacks without claiming a full String runner port."
       ]
     },
     {
@@ -140120,7 +140201,9 @@
         "pkg/smtcore/theory_str_unroll.go",
         "pkg/smtcore/theory_str_unroll_test.go",
         "pkg/smtcore/theory_str_concat_equality.go",
-        "pkg/smtcore/theory_str_concat_equality_test.go"
+        "pkg/smtcore/theory_str_concat_equality_test.go",
+        "pkg/smtcore/theory_str_assumptions.go",
+        "pkg/smtcore/theory_str_assumptions_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -140178,7 +140261,9 @@
         "TestSMTStringConcatEqualityCoreCancellationAndRollback",
         "TestSMTStringConcatEqualityClassCancellationGuards",
         "TestSMTStringConcatEqualityKnownLengthGuards",
-        "TestSMTStringConcatArgumentInferenceGuardsAndRefusals"
+        "TestSMTStringConcatArgumentInferenceGuardsAndRefusals",
+        "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+        "TestSMTStringOverlapValidationUsesEnodeIdentity"
       ],
       "conditionals": [
         {
@@ -140516,6 +140601,15 @@
             "TestSMTStringConcatEqualityClassCancellationGuards",
             "TestSMTStringConcatEqualityKnownLengthGuards"
           ]
+        },
+        {
+          "name": "add_theory_assumptions/validate_unsat_core: fresh owned Boolean overlap skolem per check, negated temporary assumption and exact enode-identity recognition downgrading only matching unsat cores to unknown",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_assumptions.go",
+          "tests": [
+            "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
+            "TestSMTStringOverlapValidationUsesEnodeIdentity"
+          ]
         }
       ],
       "ownership": [
@@ -140530,7 +140624,8 @@
         "Concat rebuild temporaries remain rooted through internalization/publication. Groups use retained/internalized handles. Length guards and arrangement expressions stay owned through case-split registration. Relevant integer xor flags persist across scopes and reuse reversed operand pairs.",
         "Parent traversal copies each current enode parent list before axiom publication. Folded literal/concat temporaries remain owned through internalization and guarded publication. Every pending member equality and any sibling class substitution remains an explicit premise. Initial shortcuts still perform the native post-handler private merge; existing scope trails undo it.",
         "Unroll collection borrows already internalized private-class handles. Guard/count/length construction temporaries remain rooted through axiom publication; core and private-class trails restore inferred counts and classes on pop. No unrelated regex matcher or universal adapter replaces native literal-core processing.",
-        "Concat-equality quick paths root length terms, equalities, guards and conclusions until publication. Argument inference owns independent big.Int sums/differences, reads only actual integral core roots through the existing mixed-arithmetic gate, and releases temporary AST refs in forward source-vector order. No model-value length assumptions, cut-history or witness-lifetime port credit is added."
+        "Concat-equality quick paths root length terms, equalities, guards and conclusions until publication. Argument inference owns independent big.Int sums/differences, reads only actual integral core roots through the existing mixed-arithmetic gate, and releases temporary AST refs in forward source-vector order. No model-value length assumptions, cut-history or witness-lifetime port credit is added.",
+        "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140550,7 +140645,8 @@
         "Constant arrangements and class grouping are connected to the partial equality callback. Preserve first-operand length priority, negative/overlong bounds, structural refusals, omission of known-length consequences, native split order and strong/weak parameter behavior. Active mk_concat folds two class constants before the later both-known source branch, so that unreachable case is not manufactured. Newly created empty seeds need not be attached class constants. Full handle_equality still lacks tester dispatch, initial concat shortcuts, concat/concat step 1, parent simplification and unroll processing; production routing and FinalCheck remain incomplete.",
         "Native parent simplification and initial concat shortcuts now run at their retained equality-handler positions. Preserve attached-class evaluation rather than syntactic literal folding, both independent direct positions for repeated operands, source order of nested/grandparent cases and guarded replacement. Grandparent byte order and rebuilt operand order are explicit separate choices. Source missing-sibling length inference is unreachable with the pure recursive length reader. Full handler still lacks tester dispatch, concat/concat step 1 and unroll processing; automata/final checking and production String routing remain incomplete.",
         "The equality handler now dispatches opposite-class constants to collected unroll terms after parent simplification. Preserve source unsigned byte-length floor division, including mismatching/non-divisible text in direct necessary-consequence checks; this method does not replace regex acceptance. Empty target strings and non-to_re cores remain native no-ops. A zero/nonliteral divisor returns the source precondition error. Full unroll final checking, concat/unroll arrangements, concat/concat step 1, tester dispatch, automata and final checking remain pending; production backend routing and GiveUp are unchanged.",
-        "Step 1 currently runs native cancellation and child-length inference only for unique concat groups, skipping shared concat groups as source requires. Multiple distinct concat groups remain unprocessed until retained overlap-aware pair selection and cut histories are ported. The later concat re-simplification/arrangement dispatch remains unported. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics."
+        "Step 1 currently runs native cancellation and child-length inference only for unique concat groups, skipping shared concat groups as source requires. Multiple distinct concat groups remain unprocessed until retained overlap-aware pair selection and cut histories are ported. The later concat re-simplification/arrangement dispatch remains unported. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics.",
+        "Only the overlap assumption/core-validation producer is completed here. Loop/cut arrangement producers and the complete final checker remain unported. QF_S production routing is unchanged; simulated arrangement-conflict fixtures exercise the actual callbacks without claiming a full String runner port."
       ]
     },
     {
@@ -251661,14 +251757,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "f39025659c7cd68c8b1c508032d525d1125f7f0d",
+    "commit": "4e157d484b690a7d00a10cddc48980906fd0d088",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25T18:24:31.113500+00:00",
-    "completed_utc": "2026-10-25T18:38:14.779221+00:00",
+    "started_utc": "2026-10-25T19:25:31.095189+00:00",
+    "completed_utc": "2026-10-25T19:39:15.353330+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-f3902565.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-f3902565.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-f3902565.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-4e157d48.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-4e157d48.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-4e157d48.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -251684,9 +251780,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 703.615,
+    "lp_seconds": 703.402,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated commit f39025659c7cd68c8b1c508032d525d1125f7f0d, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior containment, regex registration/initial legacy axioms/NFA consumer, core theory case splits, concat/constant arrangements, parent folding and initial concat shortcuts through f3902565. Excludes subsequent literal-core unroll/constant processing and the newly created true-equality propagation correction, which have separate focused/native/debug integration evidence. The known ALL unconstrained containment sat-versus-unknown case remains pending. Full String equality/final checking and production backend routing remain incomplete. Also excludes subsequent theory-aware strategy-6 queue/hint/lifecycle/display work and the corrected live-source audit reopening of the queue units. Subsequent concat-pair cancellation/known-length quick paths and child-length inference also have only separate focused/integration evidence."
+    "scope_warning": "Independently verified exact clean isolated 4e157d484b690a7d00a10cddc48980906fd0d088, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior containment, regex, concat/constant, parent folding, literal-core unroll processing, new true-equality propagation and the retained theory-aware strategy-6 queue/hint/lifecycle/display port and corrected source audit. Excludes subsequent concat-pair cancellation/known-length quick paths, child-length inference and the theory assumption/unsat-core validation integration, which have separate focused/native/debug evidence. The known ALL unconstrained containment sat-versus-unknown case remains pending. Full String equality/final checking and production backend routing remain incomplete."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
