@@ -31,6 +31,9 @@ type SMTSequenceTheory struct {
 	internalLog   []ast.ASTHandle
 	internalLim   []int
 	nextEquation  uint32
+	branchStart   map[uint32]int
+	branchLog     []uint32
+	branchLim     []int
 	unsupported   uint32
 	limits        []uint32
 }
@@ -40,7 +43,7 @@ func NewSMTSequenceTheory(family ast.FamilyID) (*SMTSequenceTheory, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SMTSequenceTheory{SMTTheoryBase: base, internalTerms: make(map[ast.ASTHandle]struct{})}, nil
+	return &SMTSequenceTheory{SMTTheoryBase: base, internalTerms: make(map[ast.ASTHandle]struct{}), branchStart: make(map[uint32]int)}, nil
 }
 
 func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
@@ -565,10 +568,6 @@ func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
 		if err != nil || solved {
 			return err
 		}
-		solved, err = t.solveSequenceSkolemEquality(left, right, dependency)
-		if err != nil || solved {
-			return err
-		}
 		leftParts, err := state.manager.SequenceFlattenConcat(left)
 		if err != nil {
 			return err
@@ -724,6 +723,7 @@ func (t *SMTSequenceTheory) PushScope() error {
 	}
 	t.limits = append(t.limits, t.unsupported)
 	t.internalLim = append(t.internalLim, len(t.internalLog))
+	t.branchLim = append(t.branchLim, len(t.branchLog))
 	return nil
 }
 
@@ -765,6 +765,11 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 	}
 	t.internalLog = t.internalLog[:internalLimit]
 	t.internalLim = t.internalLim[:level]
+	for _, key := range t.branchLog[t.branchLim[level]:] {
+		delete(t.branchStart, key)
+	}
+	t.branchLog = t.branchLog[:t.branchLim[level]]
+	t.branchLim = t.branchLim[:level]
 	return nil
 }
 
@@ -1242,6 +1247,9 @@ func (t *SMTSequenceTheory) Close() (result error) {
 	t.internalTerms = nil
 	t.internalLog = nil
 	t.internalLim = nil
+	t.branchStart = nil
+	t.branchLog = nil
+	t.branchLim = nil
 	t.limits = nil
 	if result != nil {
 		return fmt.Errorf("sequence theory state: %w", result)

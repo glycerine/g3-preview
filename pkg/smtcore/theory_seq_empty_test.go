@@ -882,7 +882,7 @@ func TestSMTSequenceTheoryBranchesVariablePrefixEqualities(t *testing.T) {
 	astTestMust(t, err)
 	_, _, state := smtInternalizerFixture(t, m, nil)
 	astTestMust(t, state.RegisterTheory(theory))
-	branched, err := theory.branchVariablePrefixEquality(
+	branched, err := theory.branchVariablePrefixEquality(1,
 		[]ast.ASTHandle{x, leftTail}, []ast.ASTHandle{prefix, rightTail}, nil)
 	astTestMust(t, err)
 	if !branched {
@@ -900,7 +900,7 @@ func TestSMTSequenceTheoryBranchesVariablePrefixEqualities(t *testing.T) {
 		t.Fatal("empty equality lacks native branch preference")
 	}
 	astTestMust(t, state.assignDecisionLiteral(emptyLiteral.Negated()))
-	branched, err = theory.branchVariablePrefixEquality(
+	branched, err = theory.branchVariablePrefixEquality(1,
 		[]ast.ASTHandle{x, leftTail}, []ast.ASTHandle{prefix, rightTail}, nil)
 	astTestMust(t, err)
 	if !branched {
@@ -941,7 +941,7 @@ func TestSMTSequenceTheorySkipsInfeasibleVariablePrefixes(t *testing.T) {
 	astTestMust(t, err)
 	_, _, state := smtInternalizerFixture(t, m, nil)
 	astTestMust(t, state.RegisterTheory(theory))
-	branched, err := theory.branchVariablePrefixEquality(
+	branched, err := theory.branchVariablePrefixEquality(1,
 		[]ast.ASTHandle{x}, []ast.ASTHandle{prefix, unit}, nil)
 	astTestMust(t, err)
 	if !branched {
@@ -999,7 +999,7 @@ func TestSMTSequenceTheoryClosesExhaustedUnitPrefixBranches(t *testing.T) {
 		astTestMust(t, literalErr)
 		astTestMust(t, state.assignDecisionLiteral(literal.Negated()))
 	}
-	branched, err := theory.branchVariablePrefixEquality(
+	branched, err := theory.branchVariablePrefixEquality(1,
 		[]ast.ASTHandle{x}, []ast.ASTHandle{unitA, unitB}, nil)
 	astTestMust(t, err)
 	if !branched || !state.Inconsistent() {
@@ -1362,6 +1362,18 @@ func TestSMTSequenceTheoryNativeWordVariableClassification(t *testing.T) {
 	astTestMust(t, err)
 	skolem, err := m.MkSequenceSkolem(skolemName, []ast.ASTHandle{x}, sort)
 	astTestMust(t, err)
+	empty, err := m.MkSequenceEmpty(sort)
+	astTestMust(t, err)
+	character, err := m.BitVectorNumeralUnsigned('a', 8)
+	astTestMust(t, err)
+	unit, err := m.MkSequenceUnit(character)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	condition, err := m.MkConst(astTestSymbol(t, m, "sequence-variable-condition"), boolean)
+	astTestMust(t, err)
+	conditional, err := m.MkIte(condition, x, literal)
+	astTestMust(t, err)
 	family, err := m.SequenceFamilyID()
 	astTestMust(t, err)
 	theory, err := NewSMTSequenceTheory(family)
@@ -1377,7 +1389,11 @@ func TestSMTSequenceTheoryNativeWordVariableClassification(t *testing.T) {
 		{name: "extract", expression: extract, want: true},
 		{name: "at", expression: at, want: true},
 		{name: "replace", expression: replace, want: true},
-		{name: "internal-skolem", expression: skolem},
+		{name: "internal-skolem", expression: skolem, want: true},
+		{name: "empty", expression: empty},
+		{name: "unit", expression: unit},
+		{name: "ite", expression: conditional},
+		{name: "scalar", expression: one},
 		{name: "literal", expression: literal},
 		{name: "concat", expression: concat},
 		{name: "int-to-string", expression: converted},

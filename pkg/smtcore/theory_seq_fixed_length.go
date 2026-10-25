@@ -248,6 +248,28 @@ func (t *SMTSequenceTheory) addFixedLengthDecomposition() (bool, error) {
 		if !variable {
 			continue
 		}
+		op, own, opErr := t.operation(expression)
+		if opErr != nil {
+			return false, opErr
+		}
+		if own && op == 42 {
+			decl, nameErr := state.manager.GetDecl(expression)
+			if nameErr != nil {
+				return false, nameErr
+			}
+			name, nameErr := state.manager.GetASTName(decl)
+			if nameErr != nil {
+				return false, nameErr
+			}
+			text, nameErr := state.manager.Symbols.String(name)
+			if nameErr != nil {
+				return false, nameErr
+			}
+			switch text {
+			case "seq.tail", "seq.first", "seq.idx.left", "seq.idx.right":
+				continue
+			}
+		}
 		length, makeErr := state.manager.MkSequenceLength(expression)
 		if makeErr != nil {
 			return false, makeErr

@@ -166,31 +166,6 @@ func (t *SMTSequenceTheory) assumeSequenceEquality(left, right ast.ASTHandle) (v
 	return state.Assignment(literal)
 }
 
-func (t *SMTSequenceTheory) wordHasUncoveredPart(parts []ast.ASTHandle) (bool, error) {
-	state, err := t.State()
-	if err != nil {
-		return false, err
-	}
-	for _, part := range parts {
-		if variable, variableErr := t.sequenceVariable(part); variableErr != nil {
-			return false, variableErr
-		} else if variable {
-			continue
-		}
-		if _, fixed, textErr := state.manager.SequenceStringValue(part); textErr != nil {
-			return false, textErr
-		} else if fixed {
-			continue
-		}
-		if _, unit, unitErr := state.manager.SequenceUnitArgument(part); unitErr != nil {
-			return false, unitErr
-		} else if !unit {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
 func (t *SMTSequenceTheory) sequenceWordsCanBeEqual(left, right []ast.ASTHandle) (bool, error) {
 	state, err := t.State()
 	if err != nil {
@@ -198,14 +173,17 @@ func (t *SMTSequenceTheory) sequenceWordsCanBeEqual(left, right []ast.ASTHandle)
 	}
 	index := 0
 	for index < len(left) && index < len(right) {
-		distinct, exact, distinctErr := t.concreteDistinct(left[index], right[index])
+		distinct, distinctErr := state.manager.AreDistinct(left[index], right[index])
 		if distinctErr != nil {
 			return false, distinctErr
 		}
-		if exact && distinct {
+		if distinct {
 			return false, nil
 		}
-		equal, _ := t.equalWordParts(left[index], right[index], nil)
+		equal, equalErr := state.manager.AreEqual(left[index], right[index])
+		if equalErr != nil {
+			return false, equalErr
+		}
 		if !equal {
 			break
 		}
@@ -226,131 +204,179 @@ func (t *SMTSequenceTheory) sequenceWordsCanBeEqual(left, right []ast.ASTHandle)
 	return true, nil
 }
 
-func (t *SMTSequenceTheory) branchVariablePrefixEquality(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (progress bool, result error) {
-	if len(left) == 0 || len(right) == 0 {
+func (t *SMTSequenceTheory) branchVariablePrefixEquality(id uint32, left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
+	for pass := uint32(0); pass < 2; pass++ {
+		key := 2*id + pass
+		start := t.branchStart[key]
+		found, err := t.findSequenceBranchCandidate(&start, left, right, dependency)
+		if err != nil {
+			return false, err
+		}
+		if start != t.branchStart[key] {
+			state, err := t.State()
+			if err != nil {
+				return false, err
+			}
+			// The source retains this search state even if the chosen equality
+			// already holds. Advancing it is real work for the kernel progress gate.
+			state.theoryProgress++
+		}
+		t.branchStart[key] = start
+		t.branchLog = append(t.branchLog, key)
+		if found {
+			return true, nil
+		}
+		left, right = right, left
+	}
+	return false, nil
+}
+
+func (t *SMTSequenceTheory) findSequenceBranchCandidate(start *int, left, right []ast.ASTHandle, dependency *smtSequenceDependency) (progress bool, result error) {
+	if len(left) == 0 {
 		return false, nil
+	}
+	variable, err := t.sequenceVariable(left[0])
+	if err != nil || !variable {
+		return false, err
 	}
 	state, err := t.State()
 	if err != nil {
 		return false, err
 	}
-	var candidateRefs []ast.ASTRef
+	var candidates []ast.ASTRef
 	defer func() {
-		for i := len(candidateRefs) - 1; i >= 0; i-- {
-			result = errors.Join(result, state.manager.DelRef(&candidateRefs[i]))
+		for i := len(candidates) - 1; i >= 0; i-- {
+			result = errors.Join(result, state.manager.DelRef(&candidates[i]))
 		}
 	}()
-	for pass := 0; pass < 2; pass++ {
-		variable, err := t.sequenceVariable(left[0])
-		if err != nil {
-			return false, err
-		}
-		uncovered, err := t.wordHasUncoveredPart(right)
-		if err != nil {
-			return false, err
-		}
-		allUnits := true
-		for _, part := range right {
-			if _, unit, unitErr := state.manager.SequenceUnitArgument(part); unitErr != nil {
-				return false, unitErr
-			} else if !unit {
-				allUnits = false
-				break
-			}
-		}
-		if variable && (uncovered || allUnits) {
-			sort, sortErr := state.manager.GetSort(left[0])
-			if sortErr != nil {
-				return false, sortErr
-			}
-			empty, makeErr := state.manager.MkSequenceEmpty(sort)
-			if makeErr != nil {
-				return false, makeErr
-			}
-			emptyRef, makeErr := state.manager.NewRef(empty)
-			if makeErr != nil {
-				return false, makeErr
-			}
-			candidateRefs = append(candidateRefs, emptyRef)
-			possible, possibleErr := t.sequenceWordsCanBeEqual(left[1:], right)
-			if possibleErr != nil {
-				return false, possibleErr
-			}
-			if possible {
-				assignment, assumeErr := t.assumeSequenceEquality(left[0], empty)
-				if assumeErr != nil {
-					return false, assumeErr
-				}
-				if assignment != lbool.False {
-					return true, nil
-				}
-			}
-			candidates := []ast.ASTHandle{empty}
-			for index, part := range right {
-				if part == left[0] {
-					break
-				}
-				possible, possibleErr = t.sequenceWordsCanBeEqual(left[1:], right[index+1:])
-				if possibleErr != nil {
-					return false, possibleErr
-				}
-				if !possible {
-					continue
-				}
-				prefix, prefixErr := t.makeWord(right[:index+1], sort)
-				if prefixErr != nil {
-					return false, prefixErr
-				}
-				prefixRef, prefixErr := state.manager.NewRef(prefix)
-				if prefixErr != nil {
-					return false, prefixErr
-				}
-				candidateRefs = append(candidateRefs, prefixRef)
-				assignment, assumeErr := t.assumeSequenceEquality(left[0], prefix)
-				if assumeErr != nil {
-					return false, assumeErr
-				}
-				if assignment != lbool.False {
-					return true, nil
-				}
-				candidates = append(candidates, prefix)
-			}
-			if allUnits {
-				conflictDependency := dependency
-				for _, candidate := range candidates {
-					equality, equalityErr := state.manager.MkEq(left[0], candidate)
-					if equalityErr != nil {
-						return false, equalityErr
-					}
-					if equalityErr = state.Internalize(equality, false); equalityErr != nil {
-						return false, equalityErr
-					}
-					literal, equalityErr := state.Literal(equality)
-					if equalityErr != nil {
-						return false, equalityErr
-					}
-					assignment, equalityErr := state.Assignment(literal)
-					if equalityErr != nil {
-						return false, equalityErr
-					}
-					if assignment != lbool.False {
-						data, dataErr := state.BooleanData(literal.Var())
-						if dataErr != nil {
-							return false, dataErr
-						}
-						data.SetTrueFirst()
-						return true, nil
-					}
-					conflictDependency = t.dependencies.Join(conflictDependency,
-						t.dependencies.Leaf(smtSequenceAssumption{literal: literal.Negated()}))
-				}
-				if conflictErr := t.setDependencyConflict(conflictDependency); conflictErr != nil {
-					return false, conflictErr
-				}
-				return true, nil
-			}
-		}
-		left, right = right, left
+	sort, err := state.manager.GetSort(left[0])
+	if err != nil {
+		return false, err
 	}
-	return false, nil
+	empty, err := state.manager.MkSequenceEmpty(sort)
+	if err != nil {
+		return false, err
+	}
+	emptyRef, err := state.manager.NewRef(empty)
+	if err != nil {
+		return false, err
+	}
+	candidates = append(candidates, emptyRef)
+	possible, err := t.sequenceWordsCanBeEqual(left[1:], right)
+	if err != nil {
+		return false, err
+	}
+	if possible {
+		assignment, err := t.assumeSequenceEquality(left[0], empty)
+		if err != nil {
+			return false, err
+		}
+		if assignment != lbool.False {
+			return true, nil
+		}
+	}
+	for ; *start < len(right); *start++ {
+		index := *start
+		if left[0] == right[index] {
+			return false, nil
+		}
+		possible, err := t.sequenceWordsCanBeEqual(left[1:], right[index+1:])
+		if err != nil {
+			return false, err
+		}
+		if !possible {
+			continue
+		}
+		prefix, err := t.makeWord(right[:index+1], sort)
+		if err != nil {
+			return false, err
+		}
+		ref, err := state.manager.NewRef(prefix)
+		if err != nil {
+			return false, err
+		}
+		candidates = append(candidates, ref)
+		assignment, err := t.assumeSequenceEquality(left[0], prefix)
+		if err != nil {
+			return false, err
+		}
+		if assignment != lbool.False {
+			*start++
+			return true, nil
+		}
+	}
+	for _, part := range right {
+		_, unit, err := state.manager.SequenceUnitArgument(part)
+		if err != nil || !unit {
+			return false, err
+		}
+	}
+	// Reconstruct every feasible prefix, including those before the saved
+	// cursor, so an exhaustion conflict retains all of its negative decisions.
+	choices := []ast.ASTHandle{empty}
+	for index := range right {
+		possible, err := t.sequenceWordsCanBeEqual(left[1:], right[index+1:])
+		if err != nil {
+			return false, err
+		}
+		if !possible {
+			continue
+		}
+		prefix, err := t.makeWord(right[:index+1], sort)
+		if err != nil {
+			return false, err
+		}
+		ref, err := state.manager.NewRef(prefix)
+		if err != nil {
+			return false, err
+		}
+		candidates = append(candidates, ref)
+		choices = append(choices, prefix)
+	}
+	conflictDependency := dependency
+	for _, candidate := range choices {
+		first, second := left[0], candidate
+		firstID, err := state.manager.GetASTID(first)
+		if err != nil {
+			return false, err
+		}
+		secondID, err := state.manager.GetASTID(second)
+		if err != nil {
+			return false, err
+		}
+		if firstID > secondID {
+			first, second = second, first
+		}
+		equality, err := state.manager.MkEq(first, second)
+		if err != nil {
+			return false, err
+		}
+		if err = state.Internalize(equality, false); err != nil {
+			return false, err
+		}
+		literal, err := state.Literal(equality)
+		if err != nil {
+			return false, err
+		}
+		assignment, err := state.Assignment(literal)
+		if err != nil {
+			return false, err
+		}
+		if assignment != lbool.False {
+			if assignment == lbool.Undef {
+				data, err := state.BooleanData(literal.Var())
+				if err != nil {
+					return false, err
+				}
+				if !data.PhaseAvailable || !data.Phase {
+					state.theoryProgress++
+				}
+				data.PhaseAvailable, data.Phase = true, true
+			}
+			*start = 0
+			return true, nil
+		}
+		conflictDependency = t.dependencies.Join(conflictDependency, t.dependencies.Leaf(smtSequenceAssumption{literal: literal.Negated()}))
+	}
+	return true, t.setDependencyConflict(conflictDependency)
 }

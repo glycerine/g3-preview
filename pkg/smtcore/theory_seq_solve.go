@@ -125,7 +125,7 @@ func (t *SMTSequenceTheory) sequenceVariable(expression ast.ASTHandle) (bool, er
 		case ast.ASTSequenceOpUnit, ast.ASTSequenceOpEmpty, ast.ASTSequenceOpConcat, ast.ASTSequenceOpStringConst, 27:
 			return false, nil
 		default:
-			return operation == 6 || operation == 7 || operation == 8, nil
+			return true, nil
 		}
 	}
 	op, basic, err := state.basicOperation(expression)
@@ -328,40 +328,6 @@ func (t *SMTSequenceTheory) solveUnitWord(left, right []ast.ASTHandle, dependenc
 	return false, nil
 }
 
-func (t *SMTSequenceTheory) solveGeneratedUnitWord(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
-	for pass := 0; pass < 2; pass++ {
-		if len(left) == 1 {
-			generated, err := t.generatedSequenceTerm(left[0], make(map[ast.ASTHandle]struct{}))
-			if err != nil {
-				return false, err
-			}
-			if generated {
-				cyclic, err := t.occurs(left[0], right)
-				if err != nil {
-					return false, err
-				}
-				if !cyclic {
-					state, stateErr := t.State()
-					if stateErr != nil {
-						return false, stateErr
-					}
-					sort, sortErr := state.manager.GetSort(left[0])
-					if sortErr != nil {
-						return false, sortErr
-					}
-					value, makeErr := t.makeWord(right, sort)
-					if makeErr != nil {
-						return false, makeErr
-					}
-					return t.addSolution(left[0], value, dependency)
-				}
-			}
-		}
-		left, right = right, left
-	}
-	return false, nil
-}
-
 func (t *SMTSequenceTheory) equalWordParts(left, right ast.ASTHandle, dependency *smtSequenceDependency) (bool, *smtSequenceDependency) {
 	if left == right {
 		return true, dependency
@@ -475,7 +441,34 @@ func (t *SMTSequenceTheory) removeEquation(index int) error {
 	return t.equations.PopBack()
 }
 
-func (t *SMTSequenceTheory) reduceEqualLengthBoundary(index int, id uint32, left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, bool, error) {
+func (t *SMTSequenceTheory) replaceSequenceEquation(index int, left, right []ast.ASTHandle, dependency *smtSequenceDependency) error {
+	// Source solve_eq creates a fresh eq ID for canonical residuals. Prefix
+	// cursors from the old word must not skip candidates in the new word.
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	if err = t.equations.Set(index, t.nextEquation, left, right, dependency); err != nil {
+		return err
+	}
+	t.nextEquation++
+	state.theoryProgress++
+	return nil
+}
+
+func smtSequenceWordsIdentical(left, right []ast.ASTHandle) bool {
+	if len(left) != len(right) {
+		return false
+	}
+	for i := range left {
+		if left[i] != right[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func (t *SMTSequenceTheory) reduceEqualLengthBoundary(index int, left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, bool, error) {
 	if len(left) == 0 || len(right) == 0 || len(left) <= 1 && len(right) <= 1 {
 		return false, false, nil
 	}
@@ -515,7 +508,7 @@ func (t *SMTSequenceTheory) reduceEqualLengthBoundary(index int, id uint32, left
 			if err = t.removeEquation(index); err != nil {
 				return false, false, err
 			}
-		} else if err = t.equations.Set(index, id, left, right, dependency); err != nil {
+		} else if err = t.replaceSequenceEquation(index, left, right, dependency); err != nil {
 			return false, false, err
 		}
 		progress, propagateErr := t.propagateWordEquality(leftBoundary, rightBoundary, dependency)
@@ -524,32 +517,9 @@ func (t *SMTSequenceTheory) reduceEqualLengthBoundary(index int, id uint32, left
 	return false, false, nil
 }
 
-// Source is_var/solve_unit_eq also accepts the retained sequence Skolems.
-// Solve these immediately so a forced empty tail is installed before lazy
-// negative-containment callbacks can expose another tail.
-func (t *SMTSequenceTheory) solveSequenceSkolemEquality(left, right ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
-	for _, pair := range [][2]ast.ASTHandle{{left, right}, {right, left}} {
-		op, own, err := t.operation(pair[0])
-		if err != nil {
-			return false, err
-		}
-		if !own || op != 42 {
-			continue
-		}
-		cyclic, err := t.occurs(pair[0], []ast.ASTHandle{pair[1]})
-		if err != nil {
-			return false, err
-		}
-		if !cyclic {
-			return t.addSolution(pair[0], pair[1], dependency)
-		}
-	}
-	return false, nil
-}
-
 // Source simplify_eq/reduce_eq publishes scalar side equations before any
 // egraph cancellation can discard equal unit applications and their elements.
-func (t *SMTSequenceTheory) reduceRewriterEquation(index int, id uint32, left, right []ast.ASTHandle, dependency *smtSequenceDependency) (reduced, progress bool, result error) {
+func (t *SMTSequenceTheory) reduceRewriterEquation(index int, left, right []ast.ASTHandle, dependency *smtSequenceDependency) (reduced, progress bool, result error) {
 	state, err := t.State()
 	if err != nil {
 		return false, false, err
@@ -606,12 +576,6 @@ func (t *SMTSequenceTheory) reduceRewriterEquation(index int, id uint32, left, r
 				return false, false, err
 			}
 			if !solved {
-				solved, err = t.solveSequenceSkolemEquality(l, r, dependency)
-				if err != nil {
-					return false, false, err
-				}
-			}
-			if !solved {
 				ls, err := state.manager.SequenceFlattenConcat(l)
 				if err != nil {
 					return false, false, err
@@ -633,7 +597,7 @@ func (t *SMTSequenceTheory) reduceRewriterEquation(index int, id uint32, left, r
 		}
 	}
 	if len(reduction.Left) != 0 || len(reduction.Right) != 0 {
-		err = t.equations.Set(index, id, reduction.Left, reduction.Right, dependency)
+		err = t.replaceSequenceEquation(index, reduction.Left, reduction.Right, dependency)
 	} else {
 		err = t.removeEquation(index)
 	}
@@ -646,6 +610,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil {
 			return false, err
 		}
+		originalLeft, originalRight := left, right
 		left, leftDependency, err := t.expandWord(left, dependency)
 		if err != nil {
 			return false, err
@@ -655,7 +620,14 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			return false, err
 		}
 		dependency = rightDependency
-		reduced, progress, err := t.reduceRewriterEquation(index, id, left, right, dependency)
+		if !smtSequenceWordsIdentical(originalLeft, left) || !smtSequenceWordsIdentical(originalRight, right) {
+			if err = t.replaceSequenceEquation(index, left, right, dependency); err != nil {
+				return false, err
+			}
+			index--
+			continue
+		}
+		reduced, progress, err := t.reduceRewriterEquation(index, left, right, dependency)
 		if err != nil {
 			return false, err
 		}
@@ -734,6 +706,13 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			index--
 			continue
 		}
+		if changed {
+			if err = t.replaceSequenceEquation(index, left, right, dependency); err != nil {
+				return false, err
+			}
+			index--
+			continue
+		}
 		reduced, err = t.addTailEmptyMaximum(left, right)
 		if err != nil || reduced {
 			return reduced, err
@@ -746,7 +725,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil || rejected {
 			return rejected, err
 		}
-		reduced, progress, err = t.reduceEqualLengthBoundary(index, id, left, right, dependency)
+		reduced, progress, err = t.reduceEqualLengthBoundary(index, left, right, dependency)
 		if err != nil {
 			return false, err
 		}
@@ -794,12 +773,6 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if !solved {
-			solved, err = t.solveGeneratedUnitWord(left, right, dependency)
-			if err != nil {
-				return false, err
-			}
-		}
 		if solved {
 			if err = t.removeEquation(index); err != nil {
 				return false, err
@@ -810,14 +783,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 			index--
 			continue
 		}
-		if changed {
-			if err = t.equations.Set(index, id, left, right, dependency); err != nil {
-				return false, err
-			}
-			index--
-			continue
-		}
-		branched, err = t.branchVariablePrefixEquality(left, right, dependency)
+		branched, err = t.branchVariablePrefixEquality(id, left, right, dependency)
 		if err != nil || branched {
 			return branched, err
 		}

@@ -1,0 +1,6 @@
+sat
+(((= x (str.++ (int.to.str n) "a")) true))
+unsat
+sat
+(((= x "7a") true))
+sat
