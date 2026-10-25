@@ -127,10 +127,7 @@ func TestSMTSequencePrefixExhaustionRetainsEarlierCanonicalGuards(t *testing.T) 
 		astTestMust(t, err)
 		empty, err := f.m.MkSequenceEmpty(f.sort)
 		astTestMust(t, err)
-		emptyEquality, err := f.m.MkEq(empty, x)
-		astTestMust(t, err)
-		emptyLiteral, err := f.state.Literal(emptyEquality)
-		astTestMust(t, err)
+		emptyLiteral := f.theory.equalityLiteral(x, empty)
 		if !progress || emptyLiteral == SMTNullLiteral || f.state.Inconsistent() {
 			t.Fatal("exhaustion did not revisit its undefined empty choice")
 		}

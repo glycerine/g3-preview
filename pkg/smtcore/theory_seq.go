@@ -34,6 +34,9 @@ type SMTSequenceTheory struct {
 	branchStart   map[uint32]int
 	branchLog     []uint32
 	branchLim     []int
+	lengths       map[ast.ASTHandle]struct{}
+	lengthLog     []ast.ASTRef
+	lengthLim     []int
 	unsupported   uint32
 	limits        []uint32
 }
@@ -43,7 +46,7 @@ func NewSMTSequenceTheory(family ast.FamilyID) (*SMTSequenceTheory, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &SMTSequenceTheory{SMTTheoryBase: base, internalTerms: make(map[ast.ASTHandle]struct{}), branchStart: make(map[uint32]int)}, nil
+	return &SMTSequenceTheory{SMTTheoryBase: base, internalTerms: make(map[ast.ASTHandle]struct{}), branchStart: make(map[uint32]int), lengths: make(map[ast.ASTHandle]struct{})}, nil
 }
 
 func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
@@ -264,6 +267,17 @@ func (t *SMTSequenceTheory) ensureVariable(expression ast.ASTHandle) error {
 			return err
 		}
 	}
+	sort, err := state.manager.GetSort(expression)
+	if err != nil {
+		return err
+	}
+	sequence, regex, err := t.sequenceSort(sort)
+	if err != nil {
+		return err
+	}
+	if !sequence && !regex {
+		return nil
+	}
 	if !t.IsAttachedToVariable(node) {
 		_, err = t.CreateVariable(node)
 	}
@@ -310,8 +324,6 @@ func (t *SMTSequenceTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 	if !ground {
 		if op == 9 {
 			err = t.addLengthAxiom(expression)
-		} else if op == 3 || op == 4 || op == 5 {
-			err = t.addRelationAxioms(expression, op)
 		} else if op == 8 {
 			err = t.addAtAxioms(expression)
 		} else if op == 6 {
@@ -371,17 +383,6 @@ func (t *SMTSequenceTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHand
 			return nil
 		}
 		return t.markUnsupported()
-	}
-	variable, err := t.sequenceVariable(node.Owner())
-	if err != nil {
-		return err
-	}
-	generated, err := t.generatedSequenceTerm(node.Owner(), make(map[ast.ASTHandle]struct{}))
-	if err != nil {
-		return err
-	}
-	if variable && !generated {
-		return t.addSequenceCoherenceAxiom(node.Owner())
 	}
 	return nil
 }
@@ -497,7 +498,7 @@ func (t *SMTSequenceTheory) setDependencyConflict(dependency *smtSequenceDepende
 	return nil
 }
 
-func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
+func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) (result error) {
 	leftNode, err := t.Enode(leftVar)
 	if err != nil {
 		return err
@@ -520,6 +521,14 @@ func (t *SMTSequenceTheory) NewEquality(leftVar, rightVar SMTTheoryVar) error {
 	if err != nil {
 		return err
 	}
+	if !sequence {
+		return nil
+	}
+	defer func() {
+		if result == nil {
+			result = t.enforceSequenceLengthCoherence(leftNode, rightNode)
+		}
+	}()
 	leftConcat, err := state.manager.IsSequenceConcat(leftNode.Owner())
 	if err != nil {
 		return err
@@ -653,6 +662,9 @@ func (t *SMTSequenceTheory) Assign(variable int32, value bool) error {
 	if err = t.relations.Push(expression, value, dependency); err != nil {
 		return err
 	}
+	if err = t.addRelationAxioms(expression, op, value); err != nil {
+		return err
+	}
 	if op == 5 && !value {
 		if err = t.addNegativeContainsStep(expression); err != nil {
 			return err
@@ -661,9 +673,6 @@ func (t *SMTSequenceTheory) Assign(variable int32, value bool) error {
 	}
 	if op == 3 && !value {
 		return t.addNegativePrefixStep(expression)
-	}
-	if op == 4 && !value {
-		return t.addNegativeSuffixStep(expression)
 	}
 	return nil
 }
@@ -724,6 +733,7 @@ func (t *SMTSequenceTheory) PushScope() error {
 	t.limits = append(t.limits, t.unsupported)
 	t.internalLim = append(t.internalLim, len(t.internalLog))
 	t.branchLim = append(t.branchLim, len(t.branchLog))
+	t.lengthLim = append(t.lengthLim, len(t.lengthLog))
 	return nil
 }
 
@@ -770,6 +780,18 @@ func (t *SMTSequenceTheory) PopScopes(count uint32) error {
 	}
 	t.branchLog = t.branchLog[:t.branchLim[level]]
 	t.branchLim = t.branchLim[:level]
+	for i := len(t.lengthLog) - 1; i >= t.lengthLim[level]; i-- {
+		expression, err := t.state.manager.RefGet(t.lengthLog[i])
+		if err != nil {
+			return err
+		}
+		delete(t.lengths, expression)
+		if err = t.state.manager.DelRef(&t.lengthLog[i]); err != nil {
+			return err
+		}
+	}
+	t.lengthLog = t.lengthLog[:t.lengthLim[level]]
+	t.lengthLim = t.lengthLim[:level]
 	return nil
 }
 
@@ -1095,6 +1117,22 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if conflict {
 		return SMTFinalCheckContinue, nil
 	}
+	beforeRetries := state.searchProgress()
+	for i := 0; i < t.relations.Len(); i++ {
+		expression, value, _, err := t.relations.At(i)
+		if err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+		operation, own, err := t.operation(expression)
+		if err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+		if !value && own && operation == 3 {
+			if err = t.addNegativePrefixStep(expression); err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+		}
+	}
 	for i := 0; i < t.nonContains.Len(); i++ {
 		expression, _, err := t.nonContains.At(i)
 		if err != nil {
@@ -1104,7 +1142,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 			return SMTFinalCheckGiveUp, err
 		}
 	}
-	if t.nonContains.Len() != 0 && t.axioms.Pending() {
+	if t.axioms.Pending() {
 		progress, err = propagateAxioms(true)
 		if err != nil {
 			return SMTFinalCheckGiveUp, err
@@ -1112,6 +1150,9 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		if progress {
 			return SMTFinalCheckContinue, nil
 		}
+	}
+	if state.searchProgress() != beforeRetries {
+		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.solveWordEquations()
 	if err != nil {
@@ -1132,6 +1173,18 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence reduced disequations: %w", err)
 	}
 	if conflict {
+		return SMTFinalCheckContinue, nil
+	}
+	progress, err = t.checkTrackedSequenceLengthCoherence()
+	if err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if progress {
+		if t.axioms.Pending() {
+			if err = t.Propagate(); err != nil {
+				return SMTFinalCheckGiveUp, err
+			}
+		}
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.checkSequenceExtensionality()
@@ -1232,6 +1285,12 @@ func (t *SMTSequenceTheory) Close() (result error) {
 		return ast.ErrASTHandle
 	}
 	result = errors.Join(t.solutions.Close(), t.exclusions.Close(), t.equations.Close(), t.disequations.Close(), t.nonContains.Close(), t.relations.Close(), t.axioms.Close())
+	for i := len(t.lengthLog) - 1; i >= 0; i-- {
+		result = errors.Join(result, t.state.manager.DelRef(&t.lengthLog[i]))
+	}
+	t.lengths = nil
+	t.lengthLog = nil
+	t.lengthLim = nil
 	if t.rewrite != nil {
 		result = errors.Join(result, t.rewrite.close())
 		t.rewrite = nil

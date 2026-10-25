@@ -1049,6 +1049,12 @@ func TestSMTSequenceTheoryLengthCoherenceDecomposition(t *testing.T) {
 	t.Cleanup(func() { astTestMust(t, solver.Close()) })
 	astTestMust(t, solver.Assert(xNonempty))
 	astTestMust(t, solver.Assert(notDecomposition))
+	length, err := m.MkSequenceLength(x)
+	astTestMust(t, err)
+	one := astTestInteger(t, m, 1)
+	lowerBound, err := m.MkArithmeticGE(length, one)
+	astTestMust(t, err)
+	astTestMust(t, solver.Assert(lowerBound))
 	status, err := solver.CheckSat(nil)
 	astTestMust(t, err)
 	if status != lbool.False {
@@ -1282,13 +1288,11 @@ func TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound(t *testing.T) {
 	astTestMust(t, err)
 	empty, err := m.MkSequenceEmpty(sort)
 	astTestMust(t, err)
-	minimalLength, err := m.MkEq(empty, remainder)
-	astTestMust(t, err)
-	variable, found := solver.kernel.internalizer.BoolVar(minimalLength)
-	if !found {
+	minimalLiteral := theory.equalityLiteral(remainder, empty)
+	if minimalLiteral == SMTNullLiteral {
 		t.Fatal("unbounded remainder did not expose the native minimum-length branch")
 	}
-	data, err := solver.kernel.internalizer.BooleanData(variable)
+	data, err := solver.kernel.internalizer.BooleanData(minimalLiteral.Var())
 	astTestMust(t, err)
 	if !data.TryTrueFirst() {
 		t.Fatal("minimum-length remainder branch lacks true-first preference")
@@ -2005,141 +2009,113 @@ func TestSMTSequenceTheoryNegativePrefixPropagatesToTails(t *testing.T) {
 	}
 }
 
-func TestSMTSequenceTheoryNegativeSuffixPropagatesToInitialSegments(t *testing.T) {
-	m, modelConfig := smtModelGeneratorFixture(t)
-	value, err := m.MkString("a")
+// Native assign_eh selects propagate_not_suffix, not the #else recursive
+// first/last alternative. An empty container must not expose that predicate.
+func TestSMTSequenceTheoryNegativeSuffixDoesNotExposeInactiveInitialSegments(t *testing.T) {
+	m, config := smtModelGeneratorFixture(t)
+	empty := astTestString(t, m, "")
+	sort, err := m.GetSort(empty)
 	astTestMust(t, err)
-	sort, err := m.GetSort(value)
+	boundary, err := m.MkConst(astTestSymbol(t, m, "suffix-active-boundary"), sort)
+	astTestMust(t, err)
+	container, err := m.MkConst(astTestSymbol(t, m, "suffix-active-container"), sort)
+	astTestMust(t, err)
+	suffix, err := m.MkSequenceSuffix(boundary, container)
+	astTestMust(t, err)
+	negative, err := m.MkNot(suffix)
+	astTestMust(t, err)
+	binding, err := m.MkEq(container, empty)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: config.Context, ModelEvaluator: config})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	astTestMust(t, solver.Assert(binding))
+	astTestMust(t, solver.Assert(negative))
+	status, err := solver.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("negative suffix with an empty container", status)
+	}
+	name, err := m.Symbols.Intern("seq.first")
+	astTestMust(t, err)
+	left, err := m.MkSequenceSkolem(name, []ast.ASTHandle{boundary}, sort)
+	astTestMust(t, err)
+	right, err := m.MkSequenceSkolem(name, []ast.ASTHandle{container}, sort)
+	astTestMust(t, err)
+	inactive, err := m.MkSequenceSuffix(left, right)
+	astTestMust(t, err)
+	if _, found := solver.kernel.internalizer.BoolVar(inactive); found {
+		t.Fatal("inactive first/last suffix alternative was instantiated")
+	}
+}
+
+func TestSMTSequenceTheoryNegativeBoundaryWitnesses(t *testing.T) {
+	name := "suffix"
+	m, modelConfig := smtModelGeneratorFixture(t)
+	empty, err := m.MkString("")
+	astTestMust(t, err)
+	sort, err := m.GetSort(empty)
 	astTestMust(t, err)
 	elementSort, sequence, err := m.SequenceSortElement(sort)
 	astTestMust(t, err)
 	if !sequence {
-		t.Fatal("string sort is not a sequence")
+		t.Fatal("string sequence sort")
 	}
-	boundary, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-suffix-boundary"), sort)
+	boundary, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-boundary-"+name), sort)
 	astTestMust(t, err)
-	container, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-suffix-container"), sort)
+	container, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-container-"+name), sort)
 	astTestMust(t, err)
-	suffix, err := m.MkSequenceSuffix(boundary, container)
+	var relation ast.ASTHandle
+
+	relation, err = m.MkSequenceSuffix(boundary, container)
+
 	astTestMust(t, err)
-	notSuffix, err := m.MkNot(suffix)
-	astTestMust(t, err)
-	empty, err := m.MkSequenceEmpty(sort)
+	notRelation, err := m.MkNot(relation)
 	astTestMust(t, err)
 	containerEmpty, err := m.MkEq(container, empty)
 	astTestMust(t, err)
 	containerNonempty, err := m.MkNot(containerEmpty)
 	astTestMust(t, err)
-	lastName, err := m.Symbols.Intern("seq.last")
+	prefix := "seq.suffix."
+
+	prefix = "seq.suffix."
+
+	arguments := []ast.ASTHandle{boundary, container}
+	xName, err := m.Symbols.Intern(prefix + "x")
 	astTestMust(t, err)
-	boundaryLast, err := m.MkSequenceSkolem(lastName, []ast.ASTHandle{boundary}, elementSort)
+	x, err := m.MkSequenceSkolem(xName, arguments, sort)
 	astTestMust(t, err)
-	containerLast, err := m.MkSequenceSkolem(lastName, []ast.ASTHandle{container}, elementSort)
+	yName, err := m.Symbols.Intern(prefix + "y")
 	astTestMust(t, err)
-	lastEqual, err := m.MkEq(boundaryLast, containerLast)
+	y, err := m.MkSequenceSkolem(yName, arguments, sort)
 	astTestMust(t, err)
-	firstName, err := m.Symbols.Intern("seq.first")
+	cName, err := m.Symbols.Intern(prefix + "c")
 	astTestMust(t, err)
-	boundaryInitial, err := m.MkSequenceSkolem(firstName, []ast.ASTHandle{boundary}, sort)
+	c, err := m.MkSequenceSkolem(cName, arguments, elementSort)
 	astTestMust(t, err)
-	containerInitial, err := m.MkSequenceSkolem(firstName, []ast.ASTHandle{container}, sort)
+	unit, err := m.MkSequenceUnit(c)
 	astTestMust(t, err)
-	initialSuffix, err := m.MkSequenceSuffix(boundaryInitial, containerInitial)
+	var word ast.ASTHandle
+
+	tail, makeErr := m.MkSequenceConcat(unit, x)
+	astTestMust(t, makeErr)
+	word, err = m.MkSequenceConcat(y, tail)
+
+	astTestMust(t, err)
+	definition, err := m.MkEq(boundary, word)
+	astTestMust(t, err)
+	notDefinition, err := m.MkNot(definition)
 	astTestMust(t, err)
 	solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, solver.Close()) })
-	astTestMust(t, solver.Assert(notSuffix))
+	astTestMust(t, solver.Assert(notRelation))
 	astTestMust(t, solver.Assert(containerNonempty))
-	astTestMust(t, solver.Assert(lastEqual))
-	astTestMust(t, solver.Assert(initialSuffix))
+	astTestMust(t, solver.Assert(notDefinition))
 	status, err := solver.CheckSat(nil)
 	astTestMust(t, err)
 	if status != lbool.False {
-		t.Fatal("negative suffix did not propagate to initial segments", status)
-	}
-}
-
-func TestSMTSequenceTheoryNegativeBoundaryWitnesses(t *testing.T) {
-	for _, suffix := range []bool{false, true} {
-		name := "prefix"
-		if suffix {
-			name = "suffix"
-		}
-		t.Run(name, func(t *testing.T) {
-			m, modelConfig := smtModelGeneratorFixture(t)
-			empty, err := m.MkString("")
-			astTestMust(t, err)
-			sort, err := m.GetSort(empty)
-			astTestMust(t, err)
-			elementSort, sequence, err := m.SequenceSortElement(sort)
-			astTestMust(t, err)
-			if !sequence {
-				t.Fatal("string sequence sort")
-			}
-			boundary, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-boundary-"+name), sort)
-			astTestMust(t, err)
-			container, err := m.MkConst(astTestSymbol(t, m, "sequence-negative-container-"+name), sort)
-			astTestMust(t, err)
-			var relation ast.ASTHandle
-			if suffix {
-				relation, err = m.MkSequenceSuffix(boundary, container)
-			} else {
-				relation, err = m.MkSequencePrefix(boundary, container)
-			}
-			astTestMust(t, err)
-			notRelation, err := m.MkNot(relation)
-			astTestMust(t, err)
-			containerEmpty, err := m.MkEq(container, empty)
-			astTestMust(t, err)
-			containerNonempty, err := m.MkNot(containerEmpty)
-			astTestMust(t, err)
-			prefix := "seq.prefix."
-			if suffix {
-				prefix = "seq.suffix."
-			}
-			arguments := []ast.ASTHandle{boundary, container}
-			xName, err := m.Symbols.Intern(prefix + "x")
-			astTestMust(t, err)
-			x, err := m.MkSequenceSkolem(xName, arguments, sort)
-			astTestMust(t, err)
-			yName, err := m.Symbols.Intern(prefix + "y")
-			astTestMust(t, err)
-			y, err := m.MkSequenceSkolem(yName, arguments, sort)
-			astTestMust(t, err)
-			cName, err := m.Symbols.Intern(prefix + "c")
-			astTestMust(t, err)
-			c, err := m.MkSequenceSkolem(cName, arguments, elementSort)
-			astTestMust(t, err)
-			unit, err := m.MkSequenceUnit(c)
-			astTestMust(t, err)
-			var word ast.ASTHandle
-			if suffix {
-				tail, makeErr := m.MkSequenceConcat(unit, x)
-				astTestMust(t, makeErr)
-				word, err = m.MkSequenceConcat(y, tail)
-			} else {
-				tail, makeErr := m.MkSequenceConcat(unit, y)
-				astTestMust(t, makeErr)
-				word, err = m.MkSequenceConcat(x, tail)
-			}
-			astTestMust(t, err)
-			definition, err := m.MkEq(boundary, word)
-			astTestMust(t, err)
-			notDefinition, err := m.MkNot(definition)
-			astTestMust(t, err)
-			solver, err := NewSMTSolver(m, nil, "QF_S", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
-			astTestMust(t, err)
-			t.Cleanup(func() { astTestMust(t, solver.Close()) })
-			astTestMust(t, solver.Assert(notRelation))
-			astTestMust(t, solver.Assert(containerNonempty))
-			astTestMust(t, solver.Assert(notDefinition))
-			status, err := solver.CheckSat(nil)
-			astTestMust(t, err)
-			if status != lbool.False {
-				t.Fatal("negative boundary witness", status)
-			}
-		})
+		t.Fatal("negative boundary witness", status)
 	}
 }
 

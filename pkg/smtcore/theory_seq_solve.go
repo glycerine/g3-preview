@@ -261,7 +261,7 @@ func (t *SMTSequenceTheory) addSolution(variable, value ast.ASTHandle, dependenc
 	if err = state.assignEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
 		return false, err
 	}
-	return true, nil
+	return true, t.enforceSequenceLengthCoherence(left, right)
 }
 
 func (t *SMTSequenceTheory) propagateWordEquality(leftExpression, rightExpression ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {
@@ -291,7 +291,7 @@ func (t *SMTSequenceTheory) propagateWordEquality(leftExpression, rightExpressio
 	if err = state.assignEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
 		return false, err
 	}
-	return true, nil
+	return true, t.enforceSequenceLengthCoherence(left, right)
 }
 
 func (t *SMTSequenceTheory) solveUnitWord(left, right []ast.ASTHandle, dependency *smtSequenceDependency) (bool, error) {

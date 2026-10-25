@@ -9,6 +9,89 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
+// Source relevant_eh/add_length/enforce_length: a relevant length term tracks
+// every sequence expression in its equivalence class, with scoped ownership.
+func (t *SMTSequenceTheory) Relevant(expression ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	argument, matched, err := state.manager.SequenceUnaryOperationArgument(expression, 9)
+	if err != nil || !matched {
+		return err
+	}
+	if _, tracked := t.lengths[argument]; tracked {
+		return nil
+	}
+	if node := state.context.enodes[argument]; node != nil {
+		return t.enforceSequenceLength(node)
+	}
+	return nil
+}
+
+func (t *SMTSequenceTheory) enforceSequenceLength(node *SMTEnode) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	if node == nil || node.manager != state.manager {
+		return ast.ErrASTDomain
+	}
+	for current := node; ; current = current.Next() {
+		expression := current.Owner()
+		if _, tracked := t.lengths[expression]; !tracked {
+			length, err := state.manager.MkSequenceLength(expression)
+			if err != nil {
+				return err
+			}
+			ref, err := state.manager.NewRef(expression)
+			if err != nil {
+				return err
+			}
+			t.lengths[expression] = struct{}{}
+			t.lengthLog = append(t.lengthLog, ref)
+			state.theoryProgress++
+			// The Go axiom queue contains the Boolean consequences rather
+			// than source non-Boolean axiom requests. Internalizing length
+			// installs its existing concrete length axioms into that queue.
+			if err = state.Internalize(length, false); err != nil {
+				return err
+			}
+		}
+		if current.Next() == node {
+			break
+		}
+	}
+	return nil
+}
+
+func (t *SMTSequenceTheory) enforceSequenceLengthCoherence(first, second *SMTEnode) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	leftConcat, err := state.manager.IsSequenceConcat(first.Owner())
+	if err != nil {
+		return err
+	}
+	rightConcat, err := state.manager.IsSequenceConcat(second.Owner())
+	if err != nil {
+		return err
+	}
+	if leftConcat && rightConcat {
+		return nil
+	}
+	_, left := t.lengths[first.Owner()]
+	_, right := t.lengths[second.Owner()]
+	if left && !right {
+		return t.enforceSequenceLength(second)
+	}
+	if right && !left {
+		return t.enforceSequenceLength(first)
+	}
+	return nil
+}
+
 func (t *SMTSequenceTheory) addIntegerStringLengthRefinement() (bool, error) {
 	state, err := t.State()
 	if err != nil {
@@ -220,66 +303,12 @@ func (t *SMTSequenceTheory) addLengthAxiom(length ast.ASTHandle) error {
 	if err = t.axioms.Push(nonnegative); err != nil {
 		return err
 	}
-	zeroLength, err := state.manager.MkEq(length, zero)
-	if err != nil {
-		return err
-	}
-	sort, err := state.manager.GetSort(argument)
-	if err != nil {
-		return err
-	}
-	empty, err := state.manager.MkSequenceEmpty(sort)
-	if err != nil {
-		return err
-	}
-	emptyArgument, err := state.manager.MkEq(argument, empty)
-	if err != nil {
-		return err
-	}
-	emptyExactlyZero, err := state.manager.MkEq(zeroLength, emptyArgument)
-	if err != nil {
-		return err
-	}
-	if err = t.axioms.Push(emptyExactlyZero); err != nil {
+	integer, itos, err := state.manager.SequenceIntToStringArgument(argument)
+	if err != nil || !itos {
 		return err
 	}
 	one, err := t.integer(1)
 	if err != nil {
-		return err
-	}
-	oneLength, err := state.manager.MkEq(length, one)
-	if err != nil {
-		return err
-	}
-	elementSort, sequence, err := state.manager.SequenceSortElement(sort)
-	if err != nil {
-		return err
-	}
-	if !sequence {
-		return ast.ErrASTDomain
-	}
-	head, err := t.relationSkolem("seq.nth", []ast.ASTHandle{argument, zero}, elementSort)
-	if err != nil {
-		return err
-	}
-	unit, err := state.manager.MkSequenceUnit(head)
-	if err != nil {
-		return err
-	}
-	singleton, err := state.manager.MkEq(argument, unit)
-	if err != nil {
-		return err
-	}
-	fixedOne, err := state.manager.MkImplies(oneLength, singleton)
-	if err != nil {
-		return err
-	}
-	t.trackInternalTerms(head, unit)
-	if err = t.axioms.Push(fixedOne); err != nil {
-		return err
-	}
-	integer, itos, err := state.manager.SequenceIntToStringArgument(argument)
-	if err != nil || !itos {
 		return err
 	}
 	integerNonnegative, err := state.manager.MkArithmeticGE(integer, zero)

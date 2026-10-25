@@ -59,6 +59,9 @@ func (t *SMTSequenceTheory) addLengthLowerBoundDecomposition() (bool, error) {
 			continue
 		}
 		expression := node.Owner()
+		if _, tracked := t.lengths[expression]; !tracked {
+			continue
+		}
 		if _, found := seen[expression]; found {
 			continue
 		}
@@ -237,6 +240,9 @@ func (t *SMTSequenceTheory) addFixedLengthDecomposition() (bool, error) {
 			continue
 		}
 		expression := node.Owner()
+		if _, tracked := t.lengths[expression]; !tracked {
+			continue
+		}
 		if _, found := seen[expression]; found {
 			continue
 		}

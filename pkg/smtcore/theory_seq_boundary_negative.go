@@ -1,5 +1,4 @@
-// Source: src/smt/theory_seq.cpp propagate_not_prefix and
-// propagate_not_suffix.
+// Source: src/smt/theory_seq.cpp retained propagate_not_suffix.
 package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
@@ -16,7 +15,7 @@ func (t *SMTSequenceTheory) concatThree(first, second, third ast.ASTHandle) (ast
 	return state.manager.MkSequenceConcat(first, tail)
 }
 
-func (t *SMTSequenceTheory) addNegativeBoundaryWitness(expression, boundary, container ast.ASTHandle, suffix bool) error {
+func (t *SMTSequenceTheory) addNegativeSuffixWitness(expression, boundary, container ast.ASTHandle) error {
 	state, err := t.State()
 	if err != nil {
 		return err
@@ -32,10 +31,7 @@ func (t *SMTSequenceTheory) addNegativeBoundaryWitness(expression, boundary, con
 		}
 		return ast.ErrASTDomain
 	}
-	prefix := "seq.prefix."
-	if suffix {
-		prefix = "seq.suffix."
-	}
+	prefix := "seq.suffix."
 	arguments := []ast.ASTHandle{boundary, container}
 	x, err := t.relationSkolem(prefix+"x", arguments, sort)
 	if err != nil {
@@ -66,17 +62,11 @@ func (t *SMTSequenceTheory) addNegativeBoundaryWitness(expression, boundary, con
 		return err
 	}
 	var boundaryWord, containerWord ast.ASTHandle
-	if suffix {
-		boundaryWord, err = t.concatThree(y, unitC, x)
-		if err == nil {
-			containerWord, err = t.concatThree(z, unitD, x)
-		}
-	} else {
-		boundaryWord, err = t.concatThree(x, unitC, y)
-		if err == nil {
-			containerWord, err = t.concatThree(x, unitD, z)
-		}
+	boundaryWord, err = t.concatThree(y, unitC, x)
+	if err == nil {
+		containerWord, err = t.concatThree(z, unitD, x)
 	}
+
 	if err != nil {
 		return err
 	}

@@ -136691,8 +136691,8 @@
         "pkg/smtcore/theory_seq_length_eligibility_test.go",
         "pkg/smtcore/theory_seq_assume_test.go",
         "pkg/smtcore/theory_seq_branch_state_test.go",
-        "pkg/cmd/g3/test_vectors/pending_seq_symbolic_int_prefix.smt2",
-        "pkg/cmd/g3/test_vectors/pending_seq_symbolic_int_prefix.expected_cpp"
+        "pkg/cmd/g3/test_vectors/quant_seq_symbolic_int_prefix.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_symbolic_int_prefix.expected_cpp"
       ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
@@ -136744,7 +136744,7 @@
         "TestSMTSequenceTheoryNonContainsPropagatesToTail",
         "TestSMTSequenceTheoryNegativeBoundaryWitnesses",
         "TestSMTSequenceTheoryNegativePrefixPropagatesToTails",
-        "TestSMTSequenceTheoryNegativeSuffixPropagatesToInitialSegments",
+        "TestSMTSequenceTheoryNegativeSuffixDoesNotExposeInactiveInitialSegments",
         "TestSMTSequenceTheoryAtBoundaryAxioms",
         "TestSMTSequenceTheoryExtractBoundaryAndDecompositionAxioms",
         "TestSMTSequenceTheoryExtractOversizedPrefixIsSource",
@@ -136784,7 +136784,12 @@
         "TestSMTSequencePrefixExhaustionRetainsEarlierCanonicalGuards",
         "TestSMTSequenceCanonicalResidualGetsFreshPrefixSearch",
         "TestSMTSequencePrefixFeasibilityDoesNotConsumeEgraphEqualities",
-        "TestSMTSequenceFixedLengthSkolemEligibilityAndReplay"
+        "TestSMTSequenceFixedLengthSkolemEligibilityAndReplay",
+        "TestSMTSequenceLengthRelevanceFollowsMergedClassAndScope",
+        "TestSMTSequenceLengthTermsHaveNoSequenceVariables",
+        "TestSMTSequenceRelationAtomHasNoSequenceVariable",
+        "TestSMTSequenceNegativeContainsDoesNotExposePositiveWitness",
+        "TestSMTSequencePrefixDelaysTailUntilNonemptyAndEqualHeads"
       ],
       "conditionals": [
         {
@@ -137372,8 +137377,8 @@
           ]
         },
         {
-          "name": "positive prefix, suffix and contains Skolem witnesses plus false-relation nonempty implications, non-containment prefix/suffix exclusions, and lazy non-containment propagation through the decomposed source tail (src/smt/theory_seq.cpp:3927-4010,4464-4546,4707-4739)",
-          "status": "ported",
+          "name": "assignment-time positive prefix/suffix/contains witnesses and false-relation nonempty guards; non-containment boundary/tail consequences remain extra Go logic pending the native canonization path",
+          "status": "partial",
           "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
           "tests": [
             "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms",
@@ -137383,13 +137388,13 @@
           ]
         },
         {
-          "name": "negative prefix and suffix shared-segment mismatch witnesses with distinct element or exhausted-container alternatives, plus lazy negative-prefix propagation through equal heads to decomposed tails and symmetric negative-suffix propagation through equal last elements to initial segments (src/smt/theory_seq.cpp:4464-4684)",
-          "status": "ported",
+          "name": "retained negative-suffix shared-segment mismatch witness and active lazy negative-prefix protocol; inactive prefix-mismatch and first/last suffix variants excluded; general canonization remains partial",
+          "status": "partial",
           "go_target": "pkg/smtcore/theory_seq_boundary_negative.go",
           "tests": [
             "TestSMTSequenceTheoryNegativeBoundaryWitnesses",
             "TestSMTSequenceTheoryNegativePrefixPropagatesToTails",
-            "TestSMTSequenceTheoryNegativeSuffixPropagatesToInitialSegments"
+            "TestSMTSequenceTheoryNegativeSuffixDoesNotExposeInactiveInitialSegments"
           ]
         },
         {
@@ -137704,8 +137709,8 @@
           ]
         },
         {
-          "name": "add_contains2contains retained empty-decision phase and retry: defer recursive tail exposure while empty is undefined, finish on true, and expose the guarded tail only on the nonempty branch",
-          "status": "ported",
+          "name": "Go non-containment empty-phase/retry compatibility path; native active m_ncs/canonizes/solve_nc scheduling remains partial",
+          "status": "partial",
           "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
           "go_targets": [
             "pkg/smtcore/theory_seq.go",
@@ -137846,6 +137851,85 @@
             "TestSMTSequenceTheoryLengthLowerBoundDecomposition",
             "TestSMTSequenceTheoryLengthBoundsConstrainRemainder"
           ]
+        },
+        {
+          "name": "mk_var retained sequence/regex result-sort gate and Boolean theory-atom callback ownership; new_eq_eh ignores non-sequence values",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_length_eligibility_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceLengthTermsHaveNoSequenceVariables",
+            "TestSMTSequenceRelationAtomHasNoSequenceVariable"
+          ]
+        },
+        {
+          "name": "relevant_eh length branch, add_length/enforce_length class registration, enforce_length_coherence after equality and propagation, scoped length-set ownership and tracked-root length passes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_length.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq.go",
+            "pkg/smtcore/theory_seq_solve.go",
+            "pkg/smtcore/theory_seq_fixed_length.go",
+            "pkg/smtcore/theory_seq_length_eligibility_test.go",
+            "pkg/smtcore/theory_seq_empty_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceLengthRelevanceFollowsMergedClassAndScope",
+            "TestSMTSequenceLengthCoherenceRequiresSolutionRoot",
+            "TestSMTSequenceFixedLengthSkolemEligibilityAndReplay",
+            "TestSMTSequenceTheoryLengthAxioms",
+            "TestSMTSequenceTheoryLengthBoundsConstrainRemainder"
+          ]
+        },
+        {
+          "name": "check_length_coherence retained tracked-solution-root empty-first pass and nonempty head/tail phase; unknown sequence length axioms stay nonnegative without eager zero/singleton decomposition branches",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_coherence.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_length.go",
+            "pkg/smtcore/theory_seq_fixed_length.go",
+            "pkg/smtcore/theory_seq_empty_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceTheoryLengthCoherenceDecomposition",
+            "TestSMTSequenceTheoryFixedLengthOneDecomposition",
+            "TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound",
+            "TestSMTSequenceTheoryLengthAxioms"
+          ]
+        },
+        {
+          "name": "assign_eh relation polarity scheduling and active add_prefix2prefix guard/retry protocol: prefer empty container, defer tail until nonempty and equal heads, prefer mismatch, retain three guards, record actual phase activation for kernel progress",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq.go",
+            "pkg/smtcore/theory_seq_length_eligibility_test.go",
+            "pkg/smtcore/theory_seq_empty_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceNegativeContainsDoesNotExposePositiveWitness",
+            "TestSMTSequencePrefixDelaysTailUntilNonemptyAndEqualHeads",
+            "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms",
+            "TestSMTSequenceTheoryNegativePrefixPropagatesToTails",
+            "TestSMTSequenceTheoryNegativeSuffixDoesNotExposeInactiveInitialSegments",
+            "TestSMTSequenceTheoryNegativeBoundaryWitnesses",
+            "TestSMTSequenceTheorySymbolicNonContainsModel"
+          ]
+        },
+        {
+          "name": "symbolic integer-prefix end-to-end length-coherence and assignment-scheduling integration, scoped model/unsat recovery and exact prebuilt C++ output",
+          "status": "ported",
+          "go_target": "pkg/cmd/g3/main_test.go",
+          "go_targets": [
+            "pkg/cmd/g3/test_vectors/quant_seq_symbolic_int_prefix.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_symbolic_int_prefix.expected_cpp"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -137855,7 +137939,8 @@
         "Unit-resolution antecedents and sequence equality evidence borrow scoped literals/enodes owned by the internalizer. Propagated empty equalities retain original dependencies; guessed model characters are not used as conflict evidence.",
         "Extended sequence conflicts borrow actual scoped enodes and literal evidence, validate asserted literals, and preserve both original core labels. Explicit SMTNullLiteral selects equality evidence for all retained equality-only sequence assumption constructions.",
         "Sequence equality assumptions own the original equality and a separate rewritten result through ASTRef, so rewriting cannot retire arguments before enode adoption. Prefix candidates retain temporary refs through conflict reconstruction. The sequence theory lazily owns its private default TheoryRewriter plus parameter context/catalog/global service and closes them in reverse order; the kernel preprocessor with assertion substitutions is not borrowed.",
-        "Prefix cursors contain only equation IDs and offsets; their integer erase trails follow native pop_branch scope removal. Canonical residual replacements receive fresh monotonic equation IDs while owning their AST vectors through the existing scoped queue. Candidate expressions retain temporary ASTRef roots through equality rewriting and exhaustion conflict reconstruction."
+        "Prefix cursors contain only equation IDs and offsets; their integer erase trails follow native pop_branch scope removal. Canonical residual replacements receive fresh monotonic equation IDs while owning their AST vectors through the existing scoped queue. Candidate expressions retain temporary ASTRef roots through equality rewriting and exhaustion conflict reconstruction.",
+        "The scoped length set owns one ASTRef per registered sequence expression; equality-class expansion and relevant length callbacks deduplicate registrations, and child pop releases only child entries. Length applications retain their existing core and arithmetic owners without acquiring sequence theory variables. Boolean relation atoms retain assignment callback ownership without sequence theory-variable attachments."
       ],
       "deviations": [
         "Concrete Go maps replace obj_map and pair hash tables. Dependency joins use an immutable concrete assumption DAG and iterative stable linearization rather than the native scoped_dependency_manager template.",
@@ -137870,7 +137955,9 @@
         "Lower-bound length decomposition now requires a root in the scoped solution map, as source propagate_length_coherence does. A regression failed when a solved variable acquired a decomposition; it now verifies no search/axiom mutation while solved and restored eligibility across repeated nested scopes. Retained contains/index/replace witnesses now use the actual source symbols seq.idx.left and seq.idx.right, replacing the former Go-only seq.indexof_left/right spellings. The broader source is_var classification remains incomplete: enabling it experimentally exposed non-containment no-progress/runaway behavior, so that rule and its fixed-length Skolem eligibility changes are not credited or included in this increment. General canonicalization, eager equation solving and branch-state integration still require work.",
         "Ported the retained assume_equality decision gates and context interaction. Excluded pairs and rewritten true/false return before internalization; merged roots and core disequalities return before interface atom creation; accepted pairs mark both endpoints relevant, use source base AST-ID equality order and ctx.assume_eq scoped phase/relevance, and return the canonical literal assignment. Initial regressions observed undefined splits for tautologies, contradictions, exclusions and merged roots. Two older fixtures now query the source canonical atom orientation. A private default th_rewriter performs recursive Boolean/arithmetic/sequence rewriting; a regression proves arithmetic sequence elements are simplified and another isolates the kernel preprocessor substitution environment. Go lazily constructs this owner and its default parameter services instead of the native eager member. Source TRACE/assertion coverage and broader variable/canonicalization/branch integration remain partial. Re-enabling the broader is_var Skolem rule after this change still exposes symbolic negative-containment no-progress; that experimental rule and fixed-length changes are excluded.",
         "Completed the retained source is_var rule including sequence Skolems after porting its branch-state prerequisites. Ordinary variable words are no longer skipped; each equation direction resumes its prefix cursor, advances past accepted prefixes, and erases scoped cursor keys as native pop_branch does. Exhaustion revisits every feasible prefix, uses base canonical equality atoms, forces the source available true phase for undefined choices and retains all asserted negative guards in conflicts. Feasibility now uses manager AreEqual/AreDistinct rather than unexplained egraph matches. Canonical expansions and residual reductions receive fresh equation IDs, so previous cursors cannot skip new word candidates; actual cursor/residual changes count toward the Go kernel progress gate. The fixed-length pass now excludes source seq.tail, seq.first, seq.idx.left and seq.idx.right witnesses but admits other live sequence Skolems, with repeated-scope and dedup tests. Removed the superseded Skolem-only equality helper and the Go-only generated-unit/concat solution fallback; the source variable predicate now serves their live Skolem cases. Source randomized whole-equation scheduling, diagnostics/assertions, full fixed-length bookkeeping and broader integration remain partial.",
-        "A new differential stress case pending_seq_symbolic_int_prefix.smt2 has verified clean-exit prebuilt C++ output in the adjacent .expected_cpp file. Go currently expands the unbounded integer-to-string prefix search until timeout; the vector is preserved as pending and is not registered as a passing Go runner case. An experimental eager concatenation equality callback also broke the existing lower/upper length-bound checks and was removed. The remaining immediate source solve_eqs/enforce_length_coherence interaction must be completed together; this increment does not claim that pending case or the whole sequence theory complete."
+        "The earlier symbolic integer-prefix stress case is now quant_seq_symbolic_int_prefix.smt2, promoted from pending to the regular Go/C++ runner table. The length-class tracking and active relation scheduling increment resolves its prior timeout and exactly matches the adjacent prebuilt C++ output, including four scoped checks and model invariants. The earlier eager concatenation callback experiment was removed; broader immediate equation solving remains subject to audit.",
+        "Length tracking now follows the retained source m_length protocol: relevant lengths register their whole sequence class, equality and propagated equality enforce the missing side except the native concat/concat exclusion, and fixed/lower/coherence passes inspect only tracked solution roots. Unknown sequence lengths receive source nonnegativity rather than eager zero/singleton Boolean splits; exact-length decomposition remains in the fixed-length pass. Source sort callbacks attach variables without eagerly decomposing every symbolic sequence. Typed mk_var filtering prevents integer length and Boolean relation enodes from entering the sequence variable vector, and non-sequence equality callbacks cannot populate the sequence solution map. Scope and type regressions first failed before correction. General relevant-event scheduling, replay bookkeeping and broader immediate equation solving remain partial.",
+        "Audited native assign_eh compile guards: the active false-prefix path is add_prefix2prefix (#if 0 disables propagate_not_prefix), and the active false-suffix path is propagate_not_suffix (#if 1 disables the recursive first/last alternative). Removed the inactive prefix-mismatch adapter and recursive suffix helper. Prefix tail predicates are now exposed only after nonempty-container and equal-head decisions, with available empty/mismatch phases, guarded continuation and repeated final-check retries. Actual phase/relevance activation counts as search work, while unchanged retries do not. Positive relation witnesses are created only on true assignment; false assignment never exposes them. An old test that assumed implicit first/last suffix axioms was replaced with a retained-path absence/satisfiability check, the witness fixture now covers only the active suffix variant, and internal length fixtures explicitly demand lengths. Earlier combined method credits are corrected to partial where they included inactive/general canonization paths. Go non-containment boundary/tail compatibility consequences remain, while the source active canonizes/solve_nc audit is still open."
       ]
     },
     {
@@ -137897,8 +137984,9 @@
         "pkg/smtcore/theory_seq_assume_test.go",
         "pkg/smtcore/theory_seq_branch_state_test.go",
         "pkg/smtcore/theory_seq_length_eligibility_test.go",
-        "pkg/cmd/g3/test_vectors/pending_seq_symbolic_int_prefix.smt2",
-        "pkg/cmd/g3/test_vectors/pending_seq_symbolic_int_prefix.expected_cpp"
+        "pkg/cmd/g3/test_vectors/quant_seq_symbolic_int_prefix.smt2",
+        "pkg/cmd/g3/test_vectors/quant_seq_symbolic_int_prefix.expected_cpp",
+        "pkg/smtcore/theory_seq_coherence.go"
       ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
@@ -137947,7 +138035,12 @@
         "TestSMTSequencePrefixExhaustionRetainsEarlierCanonicalGuards",
         "TestSMTSequenceCanonicalResidualGetsFreshPrefixSearch",
         "TestSMTSequencePrefixFeasibilityDoesNotConsumeEgraphEqualities",
-        "TestSMTSequenceFixedLengthSkolemEligibilityAndReplay"
+        "TestSMTSequenceFixedLengthSkolemEligibilityAndReplay",
+        "TestSMTSequenceLengthRelevanceFollowsMergedClassAndScope",
+        "TestSMTSequenceLengthTermsHaveNoSequenceVariables",
+        "TestSMTSequenceRelationAtomHasNoSequenceVariable",
+        "TestSMTSequenceNegativeContainsDoesNotExposePositiveWitness",
+        "TestSMTSequencePrefixDelaysTailUntilNonemptyAndEqualHeads"
       ],
       "conditionals": [
         {
@@ -138033,7 +138126,7 @@
           "tests": ["TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms", "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches"]
         },
         {
-          "name": "negative prefix and suffix mismatch-witness declarations",
+          "name": "retained negative-suffix mismatch-witness declaration; inactive negative-prefix mismatch alternative excluded",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_boundary_negative.go",
           "tests": ["TestSMTSequenceTheoryNegativeBoundaryWitnesses"]
@@ -138222,8 +138315,8 @@
           ]
         },
         {
-          "name": "add_contains2contains retained empty-decision phase and retry: defer recursive tail exposure while empty is undefined, finish on true, and expose the guarded tail only on the nonempty branch",
-          "status": "ported",
+          "name": "Go non-containment empty-phase/retry compatibility path; native active m_ncs/canonizes/solve_nc scheduling remains partial",
+          "status": "partial",
           "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
           "go_targets": [
             "pkg/smtcore/theory_seq.go",
@@ -138344,6 +138437,85 @@
             "TestSMTSequenceTheoryLengthLowerBoundDecomposition",
             "TestSMTSequenceTheoryLengthBoundsConstrainRemainder"
           ]
+        },
+        {
+          "name": "mk_var retained sequence/regex result-sort gate and Boolean theory-atom callback ownership; new_eq_eh ignores non-sequence values",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_length_eligibility_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceLengthTermsHaveNoSequenceVariables",
+            "TestSMTSequenceRelationAtomHasNoSequenceVariable"
+          ]
+        },
+        {
+          "name": "relevant_eh length branch, add_length/enforce_length class registration, enforce_length_coherence after equality and propagation, scoped length-set ownership and tracked-root length passes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_length.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq.go",
+            "pkg/smtcore/theory_seq_solve.go",
+            "pkg/smtcore/theory_seq_fixed_length.go",
+            "pkg/smtcore/theory_seq_length_eligibility_test.go",
+            "pkg/smtcore/theory_seq_empty_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceLengthRelevanceFollowsMergedClassAndScope",
+            "TestSMTSequenceLengthCoherenceRequiresSolutionRoot",
+            "TestSMTSequenceFixedLengthSkolemEligibilityAndReplay",
+            "TestSMTSequenceTheoryLengthAxioms",
+            "TestSMTSequenceTheoryLengthBoundsConstrainRemainder"
+          ]
+        },
+        {
+          "name": "check_length_coherence retained tracked-solution-root empty-first pass and nonempty head/tail phase; unknown sequence length axioms stay nonnegative without eager zero/singleton decomposition branches",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_coherence.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_length.go",
+            "pkg/smtcore/theory_seq_fixed_length.go",
+            "pkg/smtcore/theory_seq_empty_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceTheoryLengthCoherenceDecomposition",
+            "TestSMTSequenceTheoryFixedLengthOneDecomposition",
+            "TestSMTSequenceTheoryBranchesUnboundedLengthAtLowerBound",
+            "TestSMTSequenceTheoryLengthAxioms"
+          ]
+        },
+        {
+          "name": "assign_eh relation polarity scheduling and active add_prefix2prefix guard/retry protocol: prefer empty container, defer tail until nonempty and equal heads, prefer mismatch, retain three guards, record actual phase activation for kernel progress",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_relation_axioms.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq.go",
+            "pkg/smtcore/theory_seq_length_eligibility_test.go",
+            "pkg/smtcore/theory_seq_empty_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceNegativeContainsDoesNotExposePositiveWitness",
+            "TestSMTSequencePrefixDelaysTailUntilNonemptyAndEqualHeads",
+            "TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms",
+            "TestSMTSequenceTheoryNegativePrefixPropagatesToTails",
+            "TestSMTSequenceTheoryNegativeSuffixDoesNotExposeInactiveInitialSegments",
+            "TestSMTSequenceTheoryNegativeBoundaryWitnesses",
+            "TestSMTSequenceTheorySymbolicNonContainsModel"
+          ]
+        },
+        {
+          "name": "symbolic integer-prefix end-to-end length-coherence and assignment-scheduling integration, scoped model/unsat recovery and exact prebuilt C++ output",
+          "status": "ported",
+          "go_target": "pkg/cmd/g3/main_test.go",
+          "go_targets": [
+            "pkg/cmd/g3/test_vectors/quant_seq_symbolic_int_prefix.smt2",
+            "pkg/cmd/g3/test_vectors/quant_seq_symbolic_int_prefix.expected_cpp"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -138352,7 +138524,8 @@
         "Unit-resolution antecedents and sequence equality evidence borrow scoped literals/enodes owned by the internalizer. Propagated empty equalities retain original dependencies; guessed model characters are not used as conflict evidence.",
         "Extended sequence conflicts borrow actual scoped enodes and literal evidence, validate asserted literals, and preserve both original core labels. Explicit SMTNullLiteral selects equality evidence for all retained equality-only sequence assumption constructions.",
         "Sequence equality assumptions own the original equality and a separate rewritten result through ASTRef, so rewriting cannot retire arguments before enode adoption. Prefix candidates retain temporary refs through conflict reconstruction. The sequence theory lazily owns its private default TheoryRewriter plus parameter context/catalog/global service and closes them in reverse order; the kernel preprocessor with assertion substitutions is not borrowed.",
-        "Prefix cursors contain only equation IDs and offsets; their integer erase trails follow native pop_branch scope removal. Canonical residual replacements receive fresh monotonic equation IDs while owning their AST vectors through the existing scoped queue. Candidate expressions retain temporary ASTRef roots through equality rewriting and exhaustion conflict reconstruction."
+        "Prefix cursors contain only equation IDs and offsets; their integer erase trails follow native pop_branch scope removal. Canonical residual replacements receive fresh monotonic equation IDs while owning their AST vectors through the existing scoped queue. Candidate expressions retain temporary ASTRef roots through equality rewriting and exhaustion conflict reconstruction.",
+        "The scoped length set owns one ASTRef per registered sequence expression; equality-class expansion and relevant length callbacks deduplicate registrations, and child pop releases only child entries. Length applications retain their existing core and arithmetic owners without acquiring sequence theory variables. Boolean relation atoms retain assignment callback ownership without sequence theory-variable attachments."
       ],
       "deviations": [
         "Go slices and maps replace scoped native vectors and hash tables; source-private templates are represented only for the live sequence instantiation.",
@@ -138364,7 +138537,9 @@
         "Corrected sequence interface enumeration: relevance and sharing filter the current root only, while earlier unmarked/unshared same-sort roots remain candidates. Pure unshared roots no longer acquire equality splits. Retained word expansion plus the existing reduce_eq implementation rejects inconsistent canonical words into scoped original-pair exclusions and honors both element side-equation and residual-word exclusions before atom creation. A current canonical expr is pinned across candidate reduction owners. Accepted sequence interface equalities use base AST-ID order and scoped ctx.assume_eq true-first preference, without asserting equality. Three regressions failed before correction; scoped sharing, exclusion rollback and current-canonical lifetime now have direct checks. Two older fixtures now include a foreign parent to meet source sharing conditions. General canonicalization, diagnostics/assertions and other sequence integration remain partial.",
         "Ported the retained assume_equality decision gates and context interaction. Excluded pairs and rewritten true/false return before internalization; merged roots and core disequalities return before interface atom creation; accepted pairs mark both endpoints relevant, use source base AST-ID equality order and ctx.assume_eq scoped phase/relevance, and return the canonical literal assignment. Initial regressions observed undefined splits for tautologies, contradictions, exclusions and merged roots. Two older fixtures now query the source canonical atom orientation. A private default th_rewriter performs recursive Boolean/arithmetic/sequence rewriting; a regression proves arithmetic sequence elements are simplified and another isolates the kernel preprocessor substitution environment. Go lazily constructs this owner and its default parameter services instead of the native eager member. Source TRACE/assertion coverage and broader variable/canonicalization/branch integration remain partial. Re-enabling the broader is_var Skolem rule after this change still exposes symbolic negative-containment no-progress; that experimental rule and fixed-length changes are excluded.",
         "Completed the retained source is_var rule including sequence Skolems after porting its branch-state prerequisites. Ordinary variable words are no longer skipped; each equation direction resumes its prefix cursor, advances past accepted prefixes, and erases scoped cursor keys as native pop_branch does. Exhaustion revisits every feasible prefix, uses base canonical equality atoms, forces the source available true phase for undefined choices and retains all asserted negative guards in conflicts. Feasibility now uses manager AreEqual/AreDistinct rather than unexplained egraph matches. Canonical expansions and residual reductions receive fresh equation IDs, so previous cursors cannot skip new word candidates; actual cursor/residual changes count toward the Go kernel progress gate. The fixed-length pass now excludes source seq.tail, seq.first, seq.idx.left and seq.idx.right witnesses but admits other live sequence Skolems, with repeated-scope and dedup tests. Removed the superseded Skolem-only equality helper and the Go-only generated-unit/concat solution fallback; the source variable predicate now serves their live Skolem cases. Source randomized whole-equation scheduling, diagnostics/assertions, full fixed-length bookkeeping and broader integration remain partial.",
-        "A new differential stress case pending_seq_symbolic_int_prefix.smt2 has verified clean-exit prebuilt C++ output in the adjacent .expected_cpp file. Go currently expands the unbounded integer-to-string prefix search until timeout; the vector is preserved as pending and is not registered as a passing Go runner case. An experimental eager concatenation equality callback also broke the existing lower/upper length-bound checks and was removed. The remaining immediate source solve_eqs/enforce_length_coherence interaction must be completed together; this increment does not claim that pending case or the whole sequence theory complete."
+        "The earlier symbolic integer-prefix stress case is now quant_seq_symbolic_int_prefix.smt2, promoted from pending to the regular Go/C++ runner table. The length-class tracking and active relation scheduling increment resolves its prior timeout and exactly matches the adjacent prebuilt C++ output, including four scoped checks and model invariants. The earlier eager concatenation callback experiment was removed; broader immediate equation solving remains subject to audit.",
+        "Length tracking now follows the retained source m_length protocol: relevant lengths register their whole sequence class, equality and propagated equality enforce the missing side except the native concat/concat exclusion, and fixed/lower/coherence passes inspect only tracked solution roots. Unknown sequence lengths receive source nonnegativity rather than eager zero/singleton Boolean splits; exact-length decomposition remains in the fixed-length pass. Source sort callbacks attach variables without eagerly decomposing every symbolic sequence. Typed mk_var filtering prevents integer length and Boolean relation enodes from entering the sequence variable vector, and non-sequence equality callbacks cannot populate the sequence solution map. Scope and type regressions first failed before correction. General relevant-event scheduling, replay bookkeeping and broader immediate equation solving remain partial.",
+        "Audited native assign_eh compile guards: the active false-prefix path is add_prefix2prefix (#if 0 disables propagate_not_prefix), and the active false-suffix path is propagate_not_suffix (#if 1 disables the recursive first/last alternative). Removed the inactive prefix-mismatch adapter and recursive suffix helper. Prefix tail predicates are now exposed only after nonempty-container and equal-head decisions, with available empty/mismatch phases, guarded continuation and repeated final-check retries. Actual phase/relevance activation counts as search work, while unchanged retries do not. Positive relation witnesses are created only on true assignment; false assignment never exposes them. An old test that assumed implicit first/last suffix axioms was replaced with a retained-path absence/satisfiability check, the witness fixture now covers only the active suffix variant, and internal length fixtures explicitly demand lengths. Earlier combined method credits are corrected to partial where they included inactive/general canonization paths. Go non-containment boundary/tail compatibility consequences remain, while the source active canonizes/solve_nc audit is still open."
       ]
     },
     {
@@ -250233,14 +250408,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "c30c41775f7b33606eeb9892be356f9e94cf73e4",
+    "commit": "9a0591e2b511b7baeb6c7476ff0c7b4ae8461e2e",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25T12:59:26.906530+00:00",
-    "completed_utc": "2026-10-25T13:13:09.263954+00:00",
+    "started_utc": "2026-10-25T14:02:58.429808+00:00",
+    "completed_utc": "2026-10-25T14:16:27.629387+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-c30c4177.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-c30c4177.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-c30c4177.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-9a0591e2.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-9a0591e2.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-9a0591e2.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -250256,9 +250431,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 713.794,
+    "lp_seconds": 692.053,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated commit c30c41775f7b33606eeb9892be356f9e94cf73e4, unchanged at start/end and verification, with prebuilt C++ comparisons enabled. Includes sequence explanations, singleton equality and positive reduction, lazy negative-containment phase/retry, explicit Seq/RegEx parser/context support, source context sharing, sequence interface enumeration and canonical exclusions through c30c4177. Excludes the subsequent main-worktree solution-root length-coherence guard and source index-witness symbol correction, whose focused integration evidence is separate. Also excludes the subsequent sequence assume_equality decision protocol, private default theory-rewriter ownership and prefix candidate lifetime increment, whose native/tagged integration evidence is recorded separately. Also excludes the subsequent per-equation prefix-state/structural-feasibility/canonical-residual ID and sequence-Skolem variable/exclusion increment, and the insdict v0.14.6 dependency upgrade; their focused evidence is recorded separately."
+    "scope_warning": "Independently verified exact clean isolated commit 9a0591e2b511b7baeb6c7476ff0c7b4ae8461e2e, unchanged at start/end and verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes source sequence root guards and witness names, assume_equality gates/private rewriter/scoped phases, per-equation prefix cursors, structural feasibility, fresh canonical residual IDs, source Skolem variable classification and fixed-length exclusions through 9a0591e2. At that verified commit the saved unbounded symbolic integer-prefix comparison was still pending; its subsequent promotion and length/scheduling fix are excluded from this checkpoint. Excludes subsequent main-worktree length-relevance/class-coherence, non-sequence callback guards, assignment-time relation axioms and length-axiom scheduling work; that integration remains in progress."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
