@@ -254,7 +254,7 @@ func (t *SMTStringTheory) tryEvalConcat(node *SMTEnode) (result error) {
 }
 
 func (t *SMTStringTheory) CanPropagate() bool {
-	return len(t.basicTodo) != 0 || len(t.concatTodo) != 0 || len(t.concatEvalTodo) != 0 || len(t.libraryTodo) != 0 || len(t.delayedSetup) != 0 || (t.searchStarted && len(t.delayedAssertions) != 0)
+	return len(t.basicTodo) != 0 || len(t.concatTodo) != 0 || len(t.concatEvalTodo) != 0 || len(t.libraryTodo) != 0 || len(t.delayedSetup) != 0 || len(t.regexStage.persistedTodo) != 0 || (t.searchStarted && len(t.delayedAssertions) != 0)
 }
 
 func (t *SMTStringTheory) Propagate() error {
@@ -337,6 +337,9 @@ func (t *SMTStringTheory) Propagate() error {
 			}
 		}
 		t.delayedSetup = nil
+		if err := t.propagatePersistedStringAxioms(); err != nil {
+			return err
+		}
 		if t.searchStarted {
 			for _, ref := range t.delayedAssertions {
 				expression, err := t.state.manager.RefGet(ref)

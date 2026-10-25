@@ -14,6 +14,7 @@ import (
 // callbacks/final check must be ported before setup selects it for QF_S.
 type SMTStringTheory struct {
 	regexExpressionSolver *smtStringExpressionSolver
+	regexStage            smtStringRegexStageState
 
 	*SMTTheoryBase
 	parameterOwner      *SMTStrParams
@@ -97,6 +98,7 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	t.regexTermsByString = make(map[ast.ASTHandle][]ast.ASTHandle)
 	t.regexNFACache = make(map[ast.ASTHandle]*smtStringNFA)
 	t.regexLastLower = make(map[ast.ASTHandle]*big.Int)
+	t.regexStage = newStringRegexStageState()
 	t.stringChars = make(map[ast.ASTHandle][]ast.ASTHandle)
 	t.concatBreakFlags = make(map[[2]ast.ASTHandle]ast.ASTHandle)
 	t.cutHistory = make(map[ast.ASTHandle][]smtStringCut)
@@ -334,6 +336,9 @@ func (t *SMTStringTheory) PopScopes(count uint32) error {
 		t.basicTodo[i] = nil
 	}
 	t.basicTodo = kept
+	if err := t.popStringRegexStage(); err != nil {
+		return err
+	}
 	if err := t.findTrail.PopScope(count); err != nil {
 		return err
 	}
@@ -351,10 +356,14 @@ func (t *SMTStringTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if added, err := t.propagateStringLengths(); err != nil || added {
 		return SMTFinalCheckContinue, err
 	}
+	if _, err := t.runStringRegexAutomataStage(); err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
 	// Native deferred consistency/progress flags are initialized false and
 	// never assigned. Scope diagnostics are trace-only. The reached prefix
-	// above preserves analysis -> constants -> lengths; regex/free-variable/
-	// tester/unroll stages remain open, so this owner must not report SAT.
+	// above preserves analysis -> constants -> lengths -> regex automata.
+	// The regex stage has no live early return. Free-variable/tester/unroll
+	// stages remain open, so this owner must not report SAT.
 	return SMTFinalCheckGiveUp, nil
 }
 
@@ -363,6 +372,7 @@ func (t *SMTStringTheory) Close() (result error) {
 		return nil
 	}
 	result = t.findTrail.Reset()
+	result = errors.Join(result, t.regexStage.closeAutomata())
 	if t.overlapAssumption != (ast.ASTRef{}) {
 		result = errors.Join(result, t.state.manager.DelRef(&t.overlapAssumption))
 	}
@@ -372,10 +382,14 @@ func (t *SMTStringTheory) Close() (result error) {
 	for i := range t.conversionRefs {
 		result = errors.Join(result, t.state.manager.DelRef(&t.conversionRefs[i]))
 	}
+	result = errors.Join(result, t.regexStage.closeProducts())
 	for i := range t.containsRefs {
 		result = errors.Join(result, t.state.manager.DelRef(&t.containsRefs[i]))
 	}
-	// Native delayed assertions are declared between contains_map and m_trail.
+	if t.state != nil {
+		result = errors.Join(result, t.regexStage.closeReferences(t.state.manager))
+	}
+	// Native persisted vectors close before the earlier delayed assertions.
 	for i := range t.delayedAssertions {
 		result = errors.Join(result, t.state.manager.DelRef(&t.delayedAssertions[i]))
 	}
@@ -400,6 +414,7 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.regexVariables, t.regexTerms, t.regexNFACache = nil, nil, nil
 	t.regexLastLower = nil
 	t.stringChars = nil
+	t.regexStage = smtStringRegexStageState{}
 	t.regexMemberships, t.regexTermsByString = nil, nil
 	t.concatBreakFlags = nil
 	t.cutHistory, t.arrangementVars = nil, nil

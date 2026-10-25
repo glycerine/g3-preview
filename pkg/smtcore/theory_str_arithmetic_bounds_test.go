@@ -23,6 +23,7 @@ func stringAssertArithmeticBound(t *testing.T, m *ast.ASTManager, state *SMTInte
 	astTestMust(t, err)
 	astTestPin(t, m, atom)
 	astTestMust(t, state.Internalize(atom, true))
+	astTestMust(t, state.markRelevant(atom))
 	literal, err := state.Literal(atom)
 	astTestMust(t, err)
 	astTestMust(t, state.AssignLiteral(literal, NewSMTBooleanAxiom()))
