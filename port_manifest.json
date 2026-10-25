@@ -115125,7 +115125,9 @@
         "pkg/smtcore/smt_theory_aware_branching_test.go",
         "pkg/smtcore/smt_theory_assumptions.go",
         "pkg/smtcore/smt_theory_assumptions_test.go",
-        "pkg/smtcore/smt_theory.go"
+        "pkg/smtcore/smt_theory.go",
+        "pkg/smtcore/theory_str_expression_solver.go",
+        "pkg/smtcore/theory_str_expression_solver_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -115280,7 +115282,14 @@
         "TestSMTTheoryAssumptionsSetupAndCheckCountsDelegatedCheck",
         "TestSMTTheoryAssumptionsTrueInputStillValidatesEmptyCore",
         "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
-        "TestSMTStringOverlapValidationUsesEnodeIdentity"
+        "TestSMTStringOverlapValidationUsesEnodeIdentity",
+        "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+        "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+        "TestSMTStringExpressionSolverUnknownRestoresScope",
+        "TestSMTStringExpressionSolverBitVectorPredicates",
+        "TestSMTStringExpressionSolverAutomatonConsumer",
+        "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+        "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
       ],
       "conditionals": [
         {
@@ -116963,6 +116972,20 @@
             "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
             "TestSMTStringOverlapValidationUsesEnodeIdentity"
           ]
+        },
+        {
+          "name": "seq_expr_solver constructor/check_sat and theory_str::init: concrete owned nested kernel, borrowed context::m_fparams, fresh empty params_ref, push/assert/check/pop, shared-state refresh at query entry and teardown before parent parameters",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_str_expression_solver.go",
+          "tests": [
+            "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+            "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+            "TestSMTStringExpressionSolverUnknownRestoresScope",
+            "TestSMTStringExpressionSolverBitVectorPredicates",
+            "TestSMTStringExpressionSolverAutomatonConsumer",
+            "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+            "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
+          ]
         }
       ],
       "ownership": [
@@ -116980,7 +117003,8 @@
         "The internalizer borrows a pointer to the owning kernel assertion slice, so theory search initialization sees the current processed formula entries after append/reallocation and pop. The kernel retains formula/proof lifetime; the view acquires no duplicate AST roots and is not mutated by the string theory.",
         "Case-split literal spans are copied into concrete slices. Scope limits remove signed memberships and per-literal links before Boolean slots are rolled back. Propagation snapshots the post-BCP assignment end. Literal indices add no AST ownership.",
         "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap.",
-        "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion."
+        "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion.",
+        "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -117008,7 +117032,8 @@
         "The Go no-progress guard previously omitted the newly retained core equality FIFO. Actual queued/consumed equality work, including a redundant request, could therefore cause theory made no progress after a sequence length decomposition. Its progress snapshot now includes queue length and the consumption head. Focused tests distinguish enqueue, consume, quiescence and scope rollback; the unbounded lower-length solver regression remains satisfiable.",
         "Extracted the existing context sharing decision used by arithmetic and arrays for the live sequence interface consumer as well. Ite precedes the zero-theory-variable case, root theory counts and active MAM sharing precede foreign-family parents, and only the single-owner fallthrough consults concrete owner rules. Arithmetic underspecified-operation and array-role checks remain concrete and unchanged; sequence inherits the base false hook. No universal callback or unused theory adapter was introduced. Context sharing TRACE/assertion and broader integration audits remain open.",
         "Both native TheoryCaseSplit modes are connected to retained String arrangements. This helper enforces at most one literal, with the arrangement disjunction supplied by its caller. Source duplicate registration assertion is retained in debug builds. Whole context/String completion is not claimed.",
-        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements."
+        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements.",
+        "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter."
       ]
     },
     {
@@ -117100,7 +117125,9 @@
         "pkg/smtcore/smt_theory_aware_branching_test.go",
         "pkg/smtcore/smt_theory_assumptions.go",
         "pkg/smtcore/smt_theory_assumptions_test.go",
-        "pkg/smtcore/smt_theory.go"
+        "pkg/smtcore/smt_theory.go",
+        "pkg/smtcore/theory_str_expression_solver.go",
+        "pkg/smtcore/theory_str_expression_solver_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -117209,7 +117236,14 @@
         "TestSMTTheoryAssumptionsSetupAndCheckCountsDelegatedCheck",
         "TestSMTTheoryAssumptionsTrueInputStillValidatesEmptyCore",
         "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
-        "TestSMTStringOverlapValidationUsesEnodeIdentity"
+        "TestSMTStringOverlapValidationUsesEnodeIdentity",
+        "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+        "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+        "TestSMTStringExpressionSolverUnknownRestoresScope",
+        "TestSMTStringExpressionSolverBitVectorPredicates",
+        "TestSMTStringExpressionSolverAutomatonConsumer",
+        "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+        "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
       ],
       "conditionals": [
         {
@@ -117881,6 +117915,20 @@
             "TestSMTStringOverlapAssumptionCoreDowngradeAndFreshChecks",
             "TestSMTStringOverlapValidationUsesEnodeIdentity"
           ]
+        },
+        {
+          "name": "seq_expr_solver constructor/check_sat and theory_str::init: concrete owned nested kernel, borrowed context::m_fparams, fresh empty params_ref, push/assert/check/pop, shared-state refresh at query entry and teardown before parent parameters",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_str_expression_solver.go",
+          "tests": [
+            "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+            "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+            "TestSMTStringExpressionSolverUnknownRestoresScope",
+            "TestSMTStringExpressionSolverBitVectorPredicates",
+            "TestSMTStringExpressionSolverAutomatonConsumer",
+            "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+            "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
+          ]
         }
       ],
       "ownership": [
@@ -117897,7 +117945,8 @@
         "Case-split literal spans are copied into concrete slices. Scope limits remove signed memberships and per-literal links before Boolean slots are rolled back. Propagation snapshots the post-BCP assignment end. Literal indices add no AST ownership.",
         "New true-equality assignment occurs after enode registration/stack ownership, preserving equality justification operands through scope rollback. The theory callback fixture now uses distinct terms as native eq_propagation_justification requires, retaining its callback and scope checks.",
         "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap.",
-        "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion."
+        "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion.",
+        "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
@@ -117910,7 +117959,8 @@
         "Retained explicit theory equalities now merge after atom callbacks and before theory equality events. Pending core equalities prevent premature fixed point. FIFO tests cover generated congruence conflict behind an older equality, undelivered child rollback and redundant add_eq statistics. Processed entries are scoped Go history; truncated entries are cleared and justification owners remain scoped. No C++ container internals are modeled.",
         "Both native TheoryCaseSplit modes are connected to retained String arrangements. This helper enforces at most one literal, with the arrangement disjunction supplied by its caller. Source duplicate registration assertion is retained in debug builds. Whole context/String completion is not claimed.",
         "Unroll integration exposed a missing mk_enode true-equality assignment: delayed guards over already merged enodes previously remained undefined. Restored the native assignment using the existing equality-propagation reason and verified both gate contexts, opposite assignment conflict and pop. Native distinct-enode justification precondition is unchanged.",
-        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements."
+        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements.",
+        "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter."
       ]
     },
     {
@@ -120084,7 +120134,9 @@
         "pkg/smtcore/smt_kernel_test.go",
         "pkg/smtcore/theory_array_test.go",
         "pkg/smtcore/theory_bv_test.go",
-        "pkg/smtcore/smt_solver_test.go"
+        "pkg/smtcore/smt_solver_test.go",
+        "pkg/smtcore/theory_str_expression_solver.go",
+        "pkg/smtcore/theory_str_expression_solver_test.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -120115,7 +120167,14 @@
         "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
         "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+        "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+        "TestSMTStringExpressionSolverUnknownRestoresScope",
+        "TestSMTStringExpressionSolverBitVectorPredicates",
+        "TestSMTStringExpressionSolverAutomatonConsumer",
+        "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+        "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -120310,13 +120369,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "seq_expr_solver constructor/check_sat and theory_str::init: concrete owned nested kernel, borrowed context::m_fparams, fresh empty params_ref, push/assert/check/pop, shared-state refresh at query entry and teardown before parent parameters",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_str_expression_solver.go",
+          "tests": [
+            "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+            "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+            "TestSMTStringExpressionSolverUnknownRestoresScope",
+            "TestSMTStringExpressionSolverBitVectorPredicates",
+            "TestSMTStringExpressionSolverAutomatonConsumer",
+            "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+            "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
+          ]
         }
       ],
       "ownership": [
         "SMTKernel owns formula and proof references for asserted entries, the latest terminal unsat proof reference, and its checker, relevancy propagator, and internalizer lifecycle.",
         "After filtering is enabled following a disabled period, prepareCheck restores root relevance and source-shaped AND/OR/ITE watches from the owned active assertion DAG. Existing watches and handlers are not duplicated; scoped ones are recreated after pop. Quantifier bodies use instances, and term-ITE repair requires an existing enode. Checks that never reenable filtering retain their existing path.",
         "The kernel retains its shared theory rewriter until kernel teardown. Toggling assertion preprocessing changes whether assertion passes run and cannot close the rewriter while the quantifier manager and quick checker still borrow it.",
-        "Parameter updates mutate concrete manager and queue scalar views in place. Existing fingerprints, deferred entries, instantiated trails, enode cursors and cost-expression ASTRefs retain their owners and lifetimes."
+        "Parameter updates mutate concrete manager and queue scalar views in place. Existing fingerprints, deferred entries, instantiated trails, enode cursors and cost-expression ASTRefs retain their owners and lifetimes.",
+        "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service."
       ],
       "deviations": [
         "Check uses first-UIP learning and backjumping and returns undef when a theory gives up or requests continuation without observable progress.",
@@ -120324,7 +120398,8 @@
         "The C++ executable returns invalid Boolean models for relevancy_update_scopes.smt2 after changing smt.relevancy from 0 to 2. Go requires models satisfying p and (or a b), including after pop. TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect retains the complete case separately from exact-output comparisons, requires valid Go output, and accepts only the observed invalid reference snapshot or a corrected reference agreeing with Go. This is an explicit reference defect, not a weakened Go expectation; 90 other scripts retain exact C++ comparisons.",
         "The Go shared rewriter owner is retained independently of the hidden assertion-preprocessing switch, preventing a closed-rewriter domain error during subsequent quantifier instantiation.",
         "Core solver updates now follow source use_ematching, m_qi_max_instances and final_check_eh lazy-threshold reads. Tests exercise disabled/enabled matching across repeated contradictory child scopes, preserve the source strict-greater-than instance limit, release a previously delayed instance after a lazy-threshold update, and demonstrate that eager threshold and parsed cost remain constructor-cached. The C++ command-line tactic wrapper retains initial E-matching settings in the live-toggle experiment, so these core API update checks are kept separate from the 92 strict runner comparisons; full tactic-wrapper parameter lifecycle remains outside this increment.",
-        "Corrected ResetStatistics to the intentionally empty src/smt/smt_kernel.cpp imp::reset_statistics body: live kernel and theory counters remain unchanged. Tactics separately reset their stored statistics. Kernel, array, bit-vector and arithmetic solver checks assert preservation."
+        "Corrected ResetStatistics to the intentionally empty src/smt/smt_kernel.cpp imp::reset_statistics body: live kernel and theory counters remain unchanged. Tactics separately reset their stored statistics. Kernel, array, bit-vector and arithmetic solver checks assert preservation.",
+        "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter."
       ]
     },
     {
@@ -120343,7 +120418,9 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_tactic_impl.go",
         "pkg/smtcore/smt_setup_check_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_str_expression_solver.go",
+        "pkg/smtcore/theory_str_expression_solver_test.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -120369,7 +120446,14 @@
         "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
         "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+        "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+        "TestSMTStringExpressionSolverUnknownRestoresScope",
+        "TestSMTStringExpressionSolverBitVectorPredicates",
+        "TestSMTStringExpressionSolverAutomatonConsumer",
+        "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+        "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
       ],
       "conditionals": [
         {
@@ -120526,14 +120610,30 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "seq_expr_solver constructor/check_sat and theory_str::init: concrete owned nested kernel, borrowed context::m_fparams, fresh empty params_ref, push/assert/check/pop, shared-state refresh at query entry and teardown before parent parameters",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_str_expression_solver.go",
+          "tests": [
+            "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+            "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+            "TestSMTStringExpressionSolverUnknownRestoresScope",
+            "TestSMTStringExpressionSolverBitVectorPredicates",
+            "TestSMTStringExpressionSolverAutomatonConsumer",
+            "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+            "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
+          ]
         }
       ],
       "ownership": [
-        "Public formula, assertion, and proof views are borrowed AST handles; the kernel retains the underlying references until reset, pop, or close."
+        "Public formula, assertion, and proof views are borrowed AST handles; the kernel retains the underlying references until reset, pop, or close.",
+        "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service."
       ],
       "deviations": [
         "The Go facade exposes errors directly; theory incompleteness and final-check continuation without progress produce undef.",
-        "The retained solver facade uses Translate for copy semantics and has no reset method; no unused kernel-only reset adapter is added."
+        "The retained solver facade uses Translate for copy semantics and has no reset method; no unused kernel-only reset adapter is added.",
+        "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter."
       ]
     },
     {
@@ -139198,7 +139298,9 @@
         "pkg/smtcore/theory_str_regex_complexity.go",
         "pkg/smtcore/theory_str_regex_complexity_test.go",
         "pkg/smtcore/theory_str_arithmetic_bounds.go",
-        "pkg/smtcore/theory_str_arithmetic_bounds_test.go"
+        "pkg/smtcore/theory_str_arithmetic_bounds_test.go",
+        "pkg/smtcore/theory_str_expression_solver.go",
+        "pkg/smtcore/theory_str_expression_solver_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139350,7 +139452,14 @@
         "TestSMTStringRegexIntersectionDifficulty",
         "TestSMTStringArithmeticBoundsAssignmentAndScope",
         "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
-        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
+        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints",
+        "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+        "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+        "TestSMTStringExpressionSolverUnknownRestoresScope",
+        "TestSMTStringExpressionSolverBitVectorPredicates",
+        "TestSMTStringExpressionSolverAutomatonConsumer",
+        "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+        "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
       ],
       "conditionals": [
         {
@@ -140845,6 +140954,20 @@
             "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
             "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
           ]
+        },
+        {
+          "name": "seq_expr_solver constructor/check_sat and theory_str::init: concrete owned nested kernel, borrowed context::m_fparams, fresh empty params_ref, push/assert/check/pop, shared-state refresh at query entry and teardown before parent parameters",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_expression_solver.go",
+          "tests": [
+            "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+            "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+            "TestSMTStringExpressionSolverUnknownRestoresScope",
+            "TestSMTStringExpressionSolverBitVectorPredicates",
+            "TestSMTStringExpressionSolverAutomatonConsumer",
+            "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+            "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
+          ]
         }
       ],
       "ownership": [
@@ -140875,7 +140998,8 @@
         "Concrete StringRegexAutomaton delegates the existing sequence builder, owns the input regex and generated AST label roots, and materializes the retained uint32-condition math/automata graph plus a concrete character/range/predicate table. Graph/Condition views borrow the owner; idempotent Close releases the existing builder roots and invalidates guarded views. Constructor failure closes acquired roots. Bounds borrow only the graph; initial-bound formulas hold concrete local ASTRefs through publication. Word-keyed last-lower-bound values use independent Go big.Int storage and retain native lifetime across scope pops; no universal adapter, generics or STL internals are added.",
         "Finite automaton path construction owns all generated AST conditions, byte literals, equalities and frontier accumulators in a concrete local computation frame, releasing roots forward after transferring the owned path result and caller-owned character output. Persistent character vectors borrow input String keys from retained context/regex roots and borrow witness handles from the existing lifetime trail. Reused-cache growth preserves the native second direct trail reference for each new witness. Cache membership survives scope pop; only requested witness enodes/basic queues are refreshed. Failure retains already-created native witnesses but leaves the caller character output unchanged until final publication. No generic maps, callbacks or STL adapters are ported.",
         "Regex policy counters use concrete ASTHandle-to-uint32 Go maps with native read-inserts-zero and wrapping increments. Complexity traversal borrows retained AST roots and automaton graphs, creates no AST objects and uses exact source unsigned arithmetic, including sentinel-before-zero multiplication and comparison-based overflow detection.",
-        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation."
+        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
+        "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140911,7 +141035,8 @@
         "Complete retained lower/upper refinement and initial-bound routines are now implemented against actual automata constructed by the existing sequence builder. Preserve native no-nonzero-solution errors for empty/epsilon-only initial-bound publication, including zero-cache update before the latter guard, and omit the source upper-bound TODO. The new bridge is concretely typed for retained byte-string labels and uses existing math/automata graph algorithms; it does not substitute the separate legacy NFA. Full automata assumptions/construction scheduling, expression-solver kernel integration, path/intersection constraints and source-ordered FinalCheck dispatch remain pending. Current FinalCheck still stops after dependency/constant/length backpropagation and production routing is unchanged.",
         "Finite regex path constraints and predicate translation are now implemented and directly verified against actual constructed automata, including range swapping, NUL/high bytes, source accumulator order, scoped cache refresh/growth and independent String decomposition constraints. Call-site audit proves the helper is only reached for nonzero lengths; its unused zero-length arm is omitted per retained-consumer rules and the Go boundary rejects zero. The enclosing final checker must port its own live zero-length handling. Unsupported BV predicate declarations are not reinterpreted as String comparisons; native null/type preconditions become explicit Go errors. Complete automata assumptions/construction scheduling, nested expression-solver kernel, path/intersection dispatch and remaining tester/unroll/final checking remain pending. Production routing and current FinalCheck prefix are unchanged.",
         "Regex complexity and intersection difficulty policy helpers are directly verified, preserving asymmetric complemented concatenation, persistent pessimistic nested-complement mode, byte-width literals, unsigned reversed-range wrap and native overflow cases. These prerequisites do not yet implement the enclosing automata-stage construction scheduling or change FinalCheck/production routing. Source units remain partial.",
-        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial."
+        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial.",
+        "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter."
       ]
     },
     {
@@ -140994,7 +141119,9 @@
         "pkg/smtcore/theory_str_regex_complexity.go",
         "pkg/smtcore/theory_str_regex_complexity_test.go",
         "pkg/smtcore/theory_str_arithmetic_bounds.go",
-        "pkg/smtcore/theory_str_arithmetic_bounds_test.go"
+        "pkg/smtcore/theory_str_arithmetic_bounds_test.go",
+        "pkg/smtcore/theory_str_expression_solver.go",
+        "pkg/smtcore/theory_str_expression_solver_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -141147,7 +141274,14 @@
         "TestSMTStringRegexIntersectionDifficulty",
         "TestSMTStringArithmeticBoundsAssignmentAndScope",
         "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
-        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
+        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints",
+        "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+        "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+        "TestSMTStringExpressionSolverUnknownRestoresScope",
+        "TestSMTStringExpressionSolverBitVectorPredicates",
+        "TestSMTStringExpressionSolverAutomatonConsumer",
+        "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+        "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
       ],
       "conditionals": [
         {
@@ -141960,6 +142094,20 @@
             "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
             "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
           ]
+        },
+        {
+          "name": "seq_expr_solver constructor/check_sat and theory_str::init: concrete owned nested kernel, borrowed context::m_fparams, fresh empty params_ref, push/assert/check/pop, shared-state refresh at query entry and teardown before parent parameters",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_expression_solver.go",
+          "tests": [
+            "TestSMTStringExpressionSolverScopedQueriesAndOwnership",
+            "TestSMTStringExpressionSolverErrorsAndCancellationRestoreScope",
+            "TestSMTStringExpressionSolverUnknownRestoresScope",
+            "TestSMTStringExpressionSolverBitVectorPredicates",
+            "TestSMTStringExpressionSolverAutomatonConsumer",
+            "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
+            "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
+          ]
         }
       ],
       "ownership": [
@@ -141991,7 +142139,8 @@
         "Concrete StringRegexAutomaton delegates the existing sequence builder, owns the input regex and generated AST label roots, and materializes the retained uint32-condition math/automata graph plus a concrete character/range/predicate table. Graph/Condition views borrow the owner; idempotent Close releases the existing builder roots and invalidates guarded views. Constructor failure closes acquired roots. Bounds borrow only the graph; initial-bound formulas hold concrete local ASTRefs through publication. Word-keyed last-lower-bound values use independent Go big.Int storage and retain native lifetime across scope pops; no universal adapter, generics or STL internals are added.",
         "Finite automaton path construction owns all generated AST conditions, byte literals, equalities and frontier accumulators in a concrete local computation frame, releasing roots forward after transferring the owned path result and caller-owned character output. Persistent character vectors borrow input String keys from retained context/regex roots and borrow witness handles from the existing lifetime trail. Reused-cache growth preserves the native second direct trail reference for each new witness. Cache membership survives scope pop; only requested witness enodes/basic queues are refreshed. Failure retains already-created native witnesses but leaves the caller character output unchanged until final publication. No generic maps, callbacks or STL adapters are ported.",
         "Regex policy counters use concrete ASTHandle-to-uint32 Go maps with native read-inserts-zero and wrapping increments. Complexity traversal borrows retained AST roots and automaton graphs, creates no AST objects and uses exact source unsigned arithmetic, including sentinel-before-zero multiplication and comparison-based overflow detection.",
-        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation."
+        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
+        "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -142028,7 +142177,8 @@
         "Complete retained lower/upper refinement and initial-bound routines are now implemented against actual automata constructed by the existing sequence builder. Preserve native no-nonzero-solution errors for empty/epsilon-only initial-bound publication, including zero-cache update before the latter guard, and omit the source upper-bound TODO. The new bridge is concretely typed for retained byte-string labels and uses existing math/automata graph algorithms; it does not substitute the separate legacy NFA. Full automata assumptions/construction scheduling, expression-solver kernel integration, path/intersection constraints and source-ordered FinalCheck dispatch remain pending. Current FinalCheck still stops after dependency/constant/length backpropagation and production routing is unchanged.",
         "Finite regex path constraints and predicate translation are now implemented and directly verified against actual constructed automata, including range swapping, NUL/high bytes, source accumulator order, scoped cache refresh/growth and independent String decomposition constraints. Call-site audit proves the helper is only reached for nonzero lengths; its unused zero-length arm is omitted per retained-consumer rules and the Go boundary rejects zero. The enclosing final checker must port its own live zero-length handling. Unsupported BV predicate declarations are not reinterpreted as String comparisons; native null/type preconditions become explicit Go errors. Complete automata assumptions/construction scheduling, nested expression-solver kernel, path/intersection dispatch and remaining tester/unroll/final checking remain pending. Production routing and current FinalCheck prefix are unchanged.",
         "Regex complexity and intersection difficulty policy helpers are directly verified, preserving asymmetric complemented concatenation, persistent pessimistic nested-complement mode, byte-width literals, unsigned reversed-range wrap and native overflow cases. These prerequisites do not yet implement the enclosing automata-stage construction scheduling or change FinalCheck/production routing. Source units remain partial.",
-        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial."
+        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial.",
+        "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter."
       ]
     },
     {
@@ -253139,14 +253289,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "573456ab59393b776799cfa6fb89b5958de447a4",
+    "commit": "e8b9d5e633b2a276798889dc43b01d3d1d192ecc",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25T21:31:00.464599+00:00",
-    "completed_utc": "2026-10-25T21:44:42.351884+00:00",
+    "started_utc": "2026-10-25T22:31:16.074720+00:00",
+    "completed_utc": "2026-10-25T22:44:56.542389+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-573456ab.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-573456ab.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-573456ab.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-e8b9d5e6.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-e8b9d5e6.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-e8b9d5e6.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -253162,9 +253312,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 700.631,
+    "lp_seconds": 697.826,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated 573456ab59393b776799cfa6fb89b5958de447a4, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes all prior String arrangement/assumption/queue work, extraction/replacement/index initial library axioms, conversion initial/value-agreement routines, grounded containment and complete dependency analysis through 573456ab. Excludes the subsequent live FinalCheck constant/length backpropagation prefix and regex length-inference routines, which have separate focused/native/debug integration evidence. Known ALL unconstrained containment sat-versus-unknown remains pending. Full legacy String automata/tester/unroll/final checking and production routing remain incomplete."
+    "scope_warning": "Independently verified exact clean isolated e8b9d5e633b2a276798889dc43b01d3d1d192ecc, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes all prior String dependency/constant/length backpropagation, regex length inference, concrete automaton owner and bound traversal, and retained finite nonzero path constraints through e8b9d5e6. Excludes subsequent regex complexity helpers, mixed-arithmetic bound readers and nested expression-solver integration, which have separate focused and affected-suite evidence. Known ALL unconstrained containment sat-versus-unknown remains pending. Full legacy String automata-stage dispatch, tester/unroll/final checking and production routing remain incomplete."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

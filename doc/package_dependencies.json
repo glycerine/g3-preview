@@ -2815,6 +2815,7 @@
         "theory_str_dependencies.go",
         "theory_str_equality_lengths.go",
         "theory_str_equality_values.go",
+        "theory_str_expression_solver.go",
         "theory_str_extract.go",
         "theory_str_grounded.go",
         "theory_str_index.go",

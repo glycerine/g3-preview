@@ -13,6 +13,8 @@ import (
 // SMTStringTheory is the distinct theory_str owner. Its remaining constraint
 // callbacks/final check must be ported before setup selects it for QF_S.
 type SMTStringTheory struct {
+	regexExpressionSolver *smtStringExpressionSolver
+
 	*SMTTheoryBase
 	parameterOwner      *SMTStrParams
 	find                *backtrack.UnionFind
@@ -377,6 +379,9 @@ func (t *SMTStringTheory) Close() (result error) {
 	for i := range t.delayedAssertions {
 		result = errors.Join(result, t.state.manager.DelRef(&t.delayedAssertions[i]))
 	}
+	// re2automaton owns seq_expr_solver and closes before the earlier m_trail.
+	result = errors.Join(result, t.regexExpressionSolver.Close())
+	t.regexExpressionSolver = nil
 	// Native m_trail is an expr_ref_vector and releases its range forward.
 	for i := range t.refs {
 		result = errors.Join(result, t.state.manager.DelRef(&t.refs[i]))

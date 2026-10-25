@@ -28,6 +28,8 @@ type SMTKernelAssertion struct {
 }
 
 type SMTKernel struct {
+	smtParamsBorrowed bool
+
 	manager          *ast.ASTManager
 	checker          *SMTCheckerContext
 	relevancy        *SMTRelevancyPropagator
@@ -174,8 +176,18 @@ func (k *SMTKernel) ConfigurePreprocessing(context *uparams.ParamsContext, globa
 }
 
 func (k *SMTKernel) configurePreprocessing(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef, sourceParams *SMTParams) error {
+	return k.configurePreprocessingParams(context, globals, params, sourceParams, false)
+}
+
+// Nested source kernels borrow context::m_fparams. Solver copies retain the
+// existing owned-clone path; the String expression solver uses the borrowed
+// path and must close before the parent parameter owner.
+func (k *SMTKernel) configurePreprocessingParams(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef, sourceParams *SMTParams, borrowSource bool) error {
 	if err := k.open(); err != nil {
 		return err
+	}
+	if borrowSource && sourceParams == nil {
+		return uparams.ErrParamsOwner
 	}
 	if len(k.assertions) != 0 || k.assertedHead != 0 || len(k.scopes) != 0 || k.preprocessor != nil || k.smtParams != nil || k.assertedParamsReady {
 		return ast.ErrASTDomain
@@ -200,12 +212,15 @@ func (k *SMTKernel) configurePreprocessing(context *uparams.ParamsContext, globa
 		full, err = NewSMTParams(context, params, globals, k.manager.Budget())
 	} else if sourceParams.Context != context || sourceParams.Globals != globals {
 		return uparams.ErrParamsOwner
+	} else if borrowSource {
+		full = sourceParams
+		_, err = full.State()
 	} else {
 		full, err = sourceParams.Clone()
 	}
 	if err != nil {
 		if full != nil {
-			err = errors.Join(err, full.Close())
+			err = errors.Join(err, closeSMTKernelParams(full, borrowSource))
 		}
 		return err
 	}
@@ -213,45 +228,45 @@ func (k *SMTKernel) configurePreprocessing(context *uparams.ParamsContext, globa
 	// smt_solver applies its full update. Preserve constructor-only policies.
 	patternOptions, err := full.preprocess.pattern.InferenceOptions(nil)
 	if err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	// smt_solver constructs smt_params and its context first, then invokes the
 	// full updt_params overload. That second step updates embedded bases such as
 	// dyn_ack_params, whose constructors intentionally saw an empty params_ref.
 	if sourceParams == nil {
 		if err = full.Update(params); err != nil {
-			return errors.Join(err, full.Close())
+			return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 		}
 	}
 	fullState, err := full.State()
 	if err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	dynamic, err := full.DynamicAckState()
 	if err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	arithmetic, err := full.ArithmeticState()
 	if err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	bitVector, err := full.BitVectorState()
 	if err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	quantifiers, err := full.QuantifierState()
 	if err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	proofs, err := k.manager.ProofsEnabled()
 	if err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	if err = k.internalizer.SetBinaryClauseOptimization(fullState.BinaryClauseOpt && !proofs); err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	if err = k.internalizer.ConfigureDynamicAck(dynamic); err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	maintenance := SMTClauseMaintenanceConfig{
 		Strategy: fullState.LemmaGcStrategy, Half: fullState.LemmaGcHalf,
@@ -262,15 +277,17 @@ func (k *SMTKernel) configurePreprocessing(context *uparams.ParamsContext, globa
 		OldRelevancy: fullState.OldClauseRelevancy,
 	}
 	if err = k.internalizer.ConfigureClauseMaintenance(maintenance); err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	if err = k.internalizer.configureBooleanHeuristics(fullState); err != nil {
-		return errors.Join(err, full.Close())
+		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	k.relevancy.enabled = fullState.RelevancyLvl > 0
 	k.internalizer.relevancyLevel = fullState.RelevancyLvl
 	k.internalizer.newCore2thEq = fullState.NewCore2thEq
 	k.smtParams = full
+	k.smtParamsBorrowed = borrowSource
+	k.internalizer.smtParams = full
 	k.patternInference, err = pattern.NewInferenceRewriterWithOptions(k.manager, patternOptions)
 	if err != nil {
 		return err
@@ -327,6 +344,13 @@ func (k *SMTKernel) configurePreprocessing(context *uparams.ParamsContext, globa
 		return err
 	}
 	return nil
+}
+
+func closeSMTKernelParams(full *SMTParams, borrowed bool) error {
+	if full == nil || borrowed {
+		return nil
+	}
+	return full.Close()
 }
 
 func (k *SMTKernel) configureQuantifiers(full *SMTParams, state SMTParamsState, qi SMTQIState) error {
@@ -1250,7 +1274,7 @@ func (k *SMTKernel) Close() error {
 	if k.modelCooperation != nil {
 		result = errors.Join(result, k.modelCooperation.Close())
 	}
-	if k.smtParams != nil {
+	if k.smtParams != nil && !k.smtParamsBorrowed {
 		result = errors.Join(result, k.smtParams.Close())
 	}
 	if k.assertedParamsReady {
@@ -1278,6 +1302,7 @@ func (k *SMTKernel) Close() error {
 		k.paramContext = nil
 		k.paramGlobals = nil
 		k.smtParams = nil
+		k.smtParamsBorrowed = false
 		k.smtState = SMTParamsState{}
 		k.preprocessState = SMTPreprocessorState{}
 		k.quantifierCosts = nil

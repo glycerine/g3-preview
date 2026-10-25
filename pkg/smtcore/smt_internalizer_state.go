@@ -105,6 +105,7 @@ type SMTInternalizerState struct {
 	theoryProgress             uint64
 	manager                    *ast.ASTManager
 	theoryRewriter             *rewriter.TheoryRewriter // borrowed from the kernel
+	smtParams                  *SMTParams               // borrowed context::m_fparams
 	context                    *SMTCheckerContext
 	congruence                 *SMTCongruenceTable
 	quantifiers                *SMTQuantifierRegistry
@@ -1066,6 +1067,7 @@ func (s *SMTInternalizerState) Close() error {
 		}
 		s.closed = true
 		s.theoryRewriter = nil
+		s.smtParams = nil
 		s.context = nil
 		s.manager = nil
 	}
