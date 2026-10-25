@@ -557,6 +557,9 @@ func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	if err := k.open(); err != nil {
 		return err
 	}
+	if datatype, ok := theory.(*SMTDatatypeTheory); ok && k.smtParams != nil && datatype.parameterOwner == nil {
+		datatype.parameterOwner = &k.smtParams.datatype
+	}
 	if array := smtArrayCore(theory); array != nil && k.smtParams != nil {
 		config := k.smtParams.array.state
 		array.parameterOwner = &k.smtParams.array

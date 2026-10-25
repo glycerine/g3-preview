@@ -23,6 +23,7 @@ type smtDatatypeStatistics struct {
 // publishes reconstruction and accessor equalities through the shared egraph.
 type SMTDatatypeTheory struct {
 	*SMTTheoryBase
+	parameterOwner     *SMTDatatypeParams
 	initialized        map[ast.ASTHandle]bool
 	initializedTrail   []ast.ASTHandle
 	reconstructed      map[ast.ASTHandle]bool
@@ -34,6 +35,13 @@ type SMTDatatypeTheory struct {
 	scopes             []smtDatatypeScope
 	unsupported        bool
 	statistics         smtDatatypeStatistics
+}
+
+func (t *SMTDatatypeTheory) lazySplits() uint32 {
+	if t.parameterOwner != nil {
+		return t.parameterOwner.LazySplits
+	}
+	return 1
 }
 
 func NewSMTDatatypeTheory(family ast.FamilyID) (*SMTDatatypeTheory, error) {
@@ -130,6 +138,31 @@ func (t *SMTDatatypeTheory) publishCases(value, sort ast.ASTHandle) error {
 			if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literals[i].Negated(), literals[j].Negated()}); err != nil {
 				return err
 			}
+		}
+	}
+	// Source mk_split prefers the non-recursive constructor and marks its
+	// recognizer relevant. This also avoids expanding an unbounded recursive
+	// branch when lazy final checking first encounters a constructor-free root.
+	preferred, found, err := state.manager.DatatypeNonRecursiveConstructor(sort)
+	if err != nil {
+		return err
+	}
+	if found {
+		for i, constructor := range constructors {
+			if constructor != preferred {
+				continue
+			}
+			if _, err = state.setScopedTrueFirst(literals[i].Var()); err != nil {
+				return err
+			}
+			expression, err := state.BoolExpression(literals[i].Var())
+			if err != nil {
+				return err
+			}
+			if err = state.markRelevant(expression); err != nil {
+				return err
+			}
+			break
 		}
 	}
 	t.caseSplits[value] = true
@@ -288,7 +321,7 @@ func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
 	if err != nil {
 		return err
 	}
-	if !infinite {
+	if t.lazySplits() == 0 || t.lazySplits() == 1 && !infinite {
 		return t.publishCases(node.owner, sort)
 	}
 	return nil
@@ -415,20 +448,35 @@ func (t *SMTDatatypeTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHand
 	return t.ensureVariable(node)
 }
 
-func (*SMTDatatypeTheory) UseDisequalities() bool                          { return false }
-func (*SMTDatatypeTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error    { return nil }
-func (*SMTDatatypeTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return ast.ErrASTDomain }
-
-func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
-	if !isTrue {
-		return nil
+func (*SMTDatatypeTheory) UseDisequalities() bool { return false }
+func (t *SMTDatatypeTheory) NewEquality(left, right SMTTheoryVar) error {
+	node, err := t.Enode(left)
+	if err != nil {
+		return err
 	}
 	state, err := t.State()
 	if err != nil {
 		return err
 	}
+	sort, err := state.manager.GetSort(node.owner)
+	if err != nil {
+		return err
+	}
+	family, err := state.manager.GetFamilyID(sort)
+	if err != nil || family != t.FamilyID() {
+		return err
+	}
+	return t.propagateRecognizer(node.owner)
+}
+func (*SMTDatatypeTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return ast.ErrASTDomain }
+
+func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
 	expression, err := state.BoolExpression(variable)
-	if err != nil || t.reconstructed[expression] {
+	if err != nil || isTrue && t.reconstructed[expression] {
 		return err
 	}
 	op, own, err := t.operation(expression)
@@ -449,6 +497,9 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 	value, err := state.manager.GetArg(expression, 0)
 	if err != nil {
 		return err
+	}
+	if !isTrue {
+		return t.propagateRecognizer(value)
 	}
 	valueConstructor, isConstructor, err := state.manager.DatatypeConstructorApp(value)
 	if err != nil {
@@ -565,7 +616,12 @@ func (t *SMTDatatypeTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		}
 		constructors[root], declarations[root] = node, declaration
 	}
-	for expression := range t.recognizerValues {
+	// Source final_check visits every attached root, including arguments of
+	// constructors that have no explicit recognizer in the input.
+	for _, expression := range t.initializedTrail {
+		if t.lazySplits() == 0 {
+			break
+		}
 		node := state.context.enodes[expression]
 		if node == nil || constructors[node.root] != nil || t.caseSplits[expression] {
 			continue

@@ -75,6 +75,18 @@ func (c *Context) initBuiltins() error {
 	if err = c.addBuiltinNames(family, &names); err != nil {
 		return err
 	}
+	family, err = m.DatatypeFamilyID()
+	if err != nil {
+		return err
+	}
+	if c.logic == "" || solver.LogicHasDatatype(c.logic) {
+		if err = m.GetDatatypeOpNames(&names, logic); err != nil {
+			return err
+		}
+		if err = c.addBuiltinNames(family, &names); err != nil {
+			return err
+		}
+	}
 	family, err = m.ArrayFamilyID()
 	if err != nil {
 		return err

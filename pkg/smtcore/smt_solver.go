@@ -191,6 +191,9 @@ func (s *SMTSolver) newAuxiliarySolver() (auxiliary *SMTSolver, resultErr error)
 	if err = auxiliary.kernel.copyArrayPlugin(s.kernel); err != nil {
 		return auxiliary, err
 	}
+	if err = auxiliary.kernel.copyDatatypePlugin(s.kernel); err != nil {
+		return auxiliary, err
+	}
 	if err = auxiliary.SetProduceModels(true); err != nil {
 		return auxiliary, err
 	}
@@ -829,6 +832,9 @@ func (s *SMTSolver) Translate(manager *ast.ASTManager, params *uparams.ParamsRef
 		return nil, errors.Join(err, next.Close())
 	}
 	if err = next.kernel.copyArrayPlugin(s.kernel); err != nil {
+		return nil, errors.Join(err, next.Close())
+	}
+	if err = next.kernel.copyDatatypePlugin(s.kernel); err != nil {
 		return nil, errors.Join(err, next.Close())
 	}
 	if err = next.SetProduceModels(s.produceModels); err != nil {

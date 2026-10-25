@@ -40052,7 +40052,13 @@
         "pkg/smtcore/smt_model_checker.go",
         "pkg/smtcore/smt_model_checker_instances.go",
         "pkg/smtcore/smt_quantifier_manager.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_datatype_lifecycle.go",
+        "pkg/smtcore/smt_datatype_lifecycle_test.go",
+        "pkg/smtcore/theory_datatype.go",
+        "pkg/smtcore/theory_datatype_recognizers.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/cmd_context/datatype_builtins_test.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -40112,7 +40118,10 @@
         "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
         "TestSMTRecursiveModelPublicationAllocationFrontiers",
         "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+        "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
+        "TestCommandContextDatatypeBuiltinVisibility"
       ],
       "conditionals": [
         {
@@ -40713,7 +40722,7 @@
         {
           "name": "insert_rec_fun: published declaration, reversed parameter variables, source identity-variable macro branch, proper-term body restriction, zero-arity equation or weight-zero reserved-QID definition with function/body patterns",
           "status": "ported",
-        "go_target": "pkg/cmd_context/recursive_functions.go",
+          "go_target": "pkg/cmd_context/recursive_functions.go",
           "go_targets": [
             "pkg/ast/ast_recursive_definition.go",
             "pkg/ast/rewriter/rewriter_engine.go",
@@ -40745,6 +40754,21 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
+          ]
+        },
+        {
+          "name": "init_manager_core datatype builtin namespace: install is for datatype-enabled logic and update-field only for unspecified/ALL logic, enabling indexed constructor references through the typed parser",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/applications.go",
+          "go_targets": [
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_builtins_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextDatatypeBuiltinVisibility",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -114364,7 +114388,13 @@
         "pkg/smtcore/smt_recursive_functions_test.go",
         "pkg/smtcore/smt_candidate_validation.go",
         "pkg/smtcore/smt_core_validation.go",
-        "pkg/smtcore/smt_core_validation_test.go"
+        "pkg/smtcore/smt_core_validation_test.go",
+        "pkg/smtcore/smt_datatype_lifecycle.go",
+        "pkg/smtcore/smt_datatype_lifecycle_test.go",
+        "pkg/smtcore/theory_datatype.go",
+        "pkg/smtcore/theory_datatype_recognizers.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/datatype_builtins_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -114482,7 +114512,10 @@
         "TestSMTCoreValidationAfterAssumptionCleanup",
         "TestSMTCoreValidationRejectsInvalidCoreAndHonorsDisabledFlag",
         "TestSMTCoreValidationRejectsUnknown",
-        "TestSMTCoreValidationAllocationFrontiers"
+        "TestSMTCoreValidationAllocationFrontiers",
+        "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+        "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
+        "TestCommandContextDatatypeBuiltinVisibility"
       ],
       "conditionals": [
         {
@@ -115947,6 +115980,23 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "concrete datatype mk_fresh/copy_plugins: preserve installed datatype parameter owner through cross-manager/chained translation and cached MBQI auxiliary construction, with independent mutable theory state and destination-selected unconfigured placeholders",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_datatype_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_datatype_lifecycle.go",
+            "pkg/smtcore/smt_datatype_lifecycle_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+            "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner"
+          ]
         }
       ],
       "ownership": [
@@ -116036,7 +116086,13 @@
         "pkg/smtcore/smt_recursive_functions_test.go",
         "pkg/smtcore/smt_candidate_validation.go",
         "pkg/smtcore/smt_core_validation.go",
-        "pkg/smtcore/smt_core_validation_test.go"
+        "pkg/smtcore/smt_core_validation_test.go",
+        "pkg/smtcore/smt_datatype_lifecycle.go",
+        "pkg/smtcore/smt_datatype_lifecycle_test.go",
+        "pkg/smtcore/theory_datatype.go",
+        "pkg/smtcore/theory_datatype_recognizers.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/datatype_builtins_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -116106,7 +116162,10 @@
         "TestSMTCoreValidationAfterAssumptionCleanup",
         "TestSMTCoreValidationRejectsInvalidCoreAndHonorsDisabledFlag",
         "TestSMTCoreValidationRejectsUnknown",
-        "TestSMTCoreValidationAllocationFrontiers"
+        "TestSMTCoreValidationAllocationFrontiers",
+        "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+        "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
+        "TestCommandContextDatatypeBuiltinVisibility"
       ],
       "conditionals": [
         {
@@ -116583,6 +116642,23 @@
             "TestSMTCoreValidationAllocationFrontiers",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "concrete datatype mk_fresh/copy_plugins: preserve installed datatype parameter owner through cross-manager/chained translation and cached MBQI auxiliary construction, with independent mutable theory state and destination-selected unconfigured placeholders",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_datatype_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_datatype_lifecycle.go",
+            "pkg/smtcore/smt_datatype_lifecycle_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+            "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner"
           ]
         }
       ],
@@ -131352,11 +131428,18 @@
       "path": "src/smt/theory_datatype.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_datatype.go",
         "pkg/smtcore/smt_singleton_datatype_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_datatype_lifecycle.go",
+        "pkg/smtcore/smt_datatype_lifecycle_test.go",
+        "pkg/smtcore/theory_datatype_recognizers.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/datatype_builtins_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131369,7 +131452,11 @@
         "TestSMTDatatypeDistinctConstructorsConflict",
         "TestSMTDatatypeSingletonExcludesDisequality",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+        "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
+        "TestCommandContextDatatypeBuiltinVisibility",
+        "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments"
       ],
       "assertions": [
         {
@@ -131627,22 +131714,60 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "borrowed datatype parameter owner and eager/lazy gates; final-check traversal of all attached constructor-free roots; preferred relevant nonrecursive constructor; negative-recognizer survivor activation and guarded propagation across equal arguments; recheck recognizers after equality-class merges",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype.go",
+          "go_targets": [
+            "pkg/smtcore/smt_datatype_lifecycle.go",
+            "pkg/smtcore/smt_datatype_lifecycle_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_builtins_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+            "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
+            "TestCommandContextDatatypeBuiltinVisibility",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments"
+          ]
+        },
+        {
+          "name": "source incremental one-recognizer-at-a-time mk_split scheduling and recognizer-array/union-find lifecycle; current all-constructor SAT case encoding remains a different algorithm",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
         "Concrete Go maps and slices own initialized-value, recognizer, reconstruction and case-split trails. AST handles and enodes remain borrowed from the manager and SMT context; the model generator owns registered datatype values."
       ],
       "deviations": [
-        "Guarded SAT clauses and shared egraph roots replace source var_data, union-find, region justifications and recognizer arrays. Accessor result enodes receive attach-only theory variables to satisfy the Go handled-term contract without eager recursive case expansion. Invalid source assertion states return Go errors."
+        "Guarded SAT clauses and shared egraph roots replace source var_data, union-find, region justifications and recognizer arrays. Accessor result enodes receive attach-only theory variables to satisfy the Go handled-term contract without eager recursive case expansion. Invalid source assertion states return Go errors.",
+        "Completion correction: guarded SAT/egraph encoding does not establish a full port of source incremental mk_split scheduling. The datatype parameter reference, policy gates, preferred constructor and negative-recognizer propagation are now connected; final checking visits every attached root. This class remains partial while all-constructor clause expansion differs from source scheduling. Fresh copies retain the original concrete scalar owner through chained translations and auxiliary contexts; Go references retain scalar storage after original context closure."
       ]
     },
     {
       "path": "src/smt/theory_datatype.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_datatype.go"
+        "pkg/smtcore/theory_datatype.go",
+        "pkg/smtcore/smt_datatype_lifecycle.go",
+        "pkg/smtcore/smt_datatype_lifecycle_test.go",
+        "pkg/smtcore/theory_datatype_recognizers.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/cmd_context/applications.go",
+        "pkg/cmd_context/datatype_builtins_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131652,7 +131777,13 @@
         "TestSMTDatatypeQFDTSetup",
         "TestSMTDatatypeConstructorModelValue",
         "TestSMTDatatypeInfiniteRecognizerSplit",
-        "TestSMTDatatypeDistinctConstructorsConflict"
+        "TestSMTDatatypeDistinctConstructorsConflict",
+        "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+        "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
+        "TestCommandContextDatatypeBuiltinVisibility",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments"
       ],
       "conditionals": [
         {
@@ -131668,17 +131799,55 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "complete retained datatype theory lifecycle, internalization, propagation, final-check and model interface",
+          "name": "retained datatype interface backed by guarded SAT/egraph algorithms; source incremental split/lifecycle algorithms remain incomplete",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_datatype.go",
+          "tests": [
+            "TestSMTDatatypeRecognizerCases",
+            "TestSMTDatatypeConstructorAccessor",
+            "TestSMTDatatypeUpdateFieldAxioms",
+            "TestSMTDatatypeRecursiveOccursCheck",
+            "TestSMTDatatypeInfiniteRecognizerSplit",
+            "TestSMTDatatypeDistinctConstructorsConflict",
+            "TestSMTDatatypeConstructorModelValue"
+          ]
+        },
+        {
+          "name": "borrowed datatype parameter owner and eager/lazy gates; final-check traversal of all attached constructor-free roots; preferred relevant nonrecursive constructor; negative-recognizer survivor activation and guarded propagation across equal arguments; recheck recognizers after equality-class merges",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_datatype.go",
-          "tests": ["TestSMTDatatypeRecognizerCases", "TestSMTDatatypeConstructorAccessor", "TestSMTDatatypeUpdateFieldAxioms", "TestSMTDatatypeRecursiveOccursCheck", "TestSMTDatatypeInfiniteRecognizerSplit", "TestSMTDatatypeDistinctConstructorsConflict", "TestSMTDatatypeConstructorModelValue"]
+          "go_targets": [
+            "pkg/smtcore/smt_datatype_lifecycle.go",
+            "pkg/smtcore/smt_datatype_lifecycle_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/datatype_builtins_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+            "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
+            "TestCommandContextDatatypeBuiltinVisibility",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments"
+          ]
+        },
+        {
+          "name": "source incremental one-recognizer-at-a-time mk_split scheduling and recognizer-array/union-find lifecycle; current all-constructor SAT case encoding remains a different algorithm",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
         "SMTDatatypeTheory owns concrete Go metadata and scope trails while borrowing manager-owned AST handles and context-owned enodes."
       ],
       "deviations": [
-        "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation."
+        "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation.",
+        "Completion correction: guarded SAT/egraph encoding does not establish a full port of source incremental mk_split scheduling. The datatype parameter reference, policy gates, preferred constructor and negative-recognizer propagation are now connected; final checking visits every attached root. This class remains partial while all-constructor clause expansion differs from source scheduling. Fresh copies retain the original concrete scalar owner through chained translations and auxiliary contexts; Go references retain scalar storage after original context closure."
       ]
     },
     {
@@ -133476,9 +133645,14 @@
       "path": "src/smt/theory_pb.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/theory_pb.go"],
-      "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_pb.go"
+      ],
+      "tests": [
+        "TestSMTPseudoBooleanQFFDExactCardinality",
+        "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+      ],
       "conditionals": [
         {
           "line": 1062,
@@ -133790,19 +133964,32 @@
           "name": "exact at-most, at-least, weighted <=, >= and = atom internalization with both Boolean polarities",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_pb.go",
-          "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"]
+          "tests": [
+            "TestSMTPseudoBooleanQFFDExactCardinality",
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+          ]
         },
         {
           "name": "sorting-network and bit-vector compilation path",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_pb.go",
-          "tests": ["TestSMTPseudoBooleanQFFDExactCardinality"]
-		},
-		{
-		  "name": "native watched propagation, simplex compilation and conflict-resolution strengthening heuristics",
-		  "status": "platform_replacement",
-		  "go_target": "pkg/smtcore/theory_pb.go",
-		  "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"]
+          "tests": [
+            "TestSMTPseudoBooleanQFFDExactCardinality"
+          ]
+        },
+        {
+          "name": "native watched propagation, simplex compilation and conflict-resolution strengthening heuristics",
+          "status": "unported",
+          "go_target": "pkg/smtcore/theory_pb.go",
+          "tests": [
+            "TestSMTPseudoBooleanQFFDExactCardinality",
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+          ]
+        },
+        {
+          "name": "retained native weighted-watch propagation, conflict strengthening, compilation-frequency/complement-learning controls and optional simplex path; exact SAT encoding does not port these project algorithms",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
@@ -133810,16 +133997,22 @@
       ],
       "deviations": [
         "The theory uses the ported PB2BV sorting-network and bit-vector compiler for accepted forms and exact blocking clauses as a semantic fallback. These exact clauses replace native watch/simplex propagation and conflict-strengthening heuristics without changing accepted valuations.",
-        "The source model procedure serves native auxiliary PB applications. No retained Go producer creates them: PB2BV introduces ordinary Boolean constants and bit-vector formulas whose values use the standard model path."
+        "The source model procedure serves native auxiliary PB applications. No retained Go producer creates them: PB2BV introduces ordinary Boolean constants and bit-vector formulas whose values use the standard model path.",
+        "Completion correction: source theory_pb stores theory_pb_params by value, then caches four scalar controls in its constructor; mk_fresh copies that snapshot. Go uses unconditional PB2BV/exhaustive encoding without the native watched-constraint, conflict-strengthening and policy algorithms. Valuation tests do not prove completion of these retained project algorithms. This unit is partial; no unused parameter adapter was added."
       ]
     },
     {
       "path": "src/smt/theory_pb.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/theory_pb.go"],
-      "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_pb.go"
+      ],
+      "tests": [
+        "TestSMTPseudoBooleanQFFDExactCardinality",
+        "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+      ],
       "assertions": [
         {
           "line": 160,
@@ -133833,17 +134026,33 @@
           "name": "retained pseudo-Boolean theory registration, atom internalization and exact logical semantics",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_pb.go",
-          "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"]
+          "tests": [
+            "TestSMTPseudoBooleanQFFDExactCardinality",
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+          ]
         },
         {
           "name": "specialized watch, simplex, compilation and lemma data structures",
-          "status": "platform_replacement",
+          "status": "unported",
           "go_target": "pkg/smtcore/theory_pb.go",
-          "tests": ["TestSMTPseudoBooleanQFFDExactCardinality", "TestSMTPseudoBooleanWeightedEqualityAndPolarity"]
+          "tests": [
+            "TestSMTPseudoBooleanQFFDExactCardinality",
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+          ]
+        },
+        {
+          "name": "retained native weighted-watch propagation, conflict strengthening, compilation-frequency/complement-learning controls and optional simplex path; exact SAT encoding does not port these project algorithms",
+          "status": "unported",
+          "tests": []
         }
       ],
-      "ownership": ["Concrete Go values replace manual ineq, watch-list and temporary numeral allocation for the exact checkpoint encoder."],
-      "deviations": ["The source-private watch, simplex and lemma structures are replaced by PB2BV formulas and exact SAT clauses; no universal adapter is introduced for those implementation-only structures."]
+      "ownership": [
+        "Concrete Go values replace manual ineq, watch-list and temporary numeral allocation for the exact checkpoint encoder."
+      ],
+      "deviations": [
+        "The source-private watch, simplex and lemma structures are replaced by PB2BV formulas and exact SAT clauses; no universal adapter is introduced for those implementation-only structures.",
+        "Completion correction: source theory_pb stores theory_pb_params by value, then caches four scalar controls in its constructor; mk_fresh copies that snapshot. Go uses unconditional PB2BV/exhaustive encoding without the native watched-constraint, conflict-strengthening and policy algorithms. Valuation tests do not prove completion of these retained project algorithms. This unit is partial; no unused parameter adapter was added."
+      ]
     },
     {
       "path": "src/smt/theory_seq.cpp",
@@ -246736,14 +246945,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "8e4c6442e17318b0d77cce2854220f3713165936",
-    "command": "go -C pkg test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-25 01:42:50.573204 UTC",
-    "completed_utc": "2026-10-25 01:57:11.324937 UTC",
+    "commit": "4c50fd642a352725dbb60ed5cc065fe8fcb5fd4a",
+    "command": "go -C pkg test ./... -count=1 -timeout=35m",
+    "started_utc": "2026-10-25 02:43:26.926543 UTC",
+    "completed_utc": "2026-10-25 02:57:11.156125 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-8e4c6442.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-8e4c6442.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-8e4c6442.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-4c50fd64.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-4c50fd64.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-4c50fd64.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -246756,12 +246965,12 @@
       16
     ],
     "GOMAXPROCS": 4,
-    "package_timeout": "30m",
+    "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 752.372,
+    "lp_seconds": 718.772,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout; includes check-phase routing, static versus incremental setup, shared final-check scheduling and pinned MBQI base-restart publication, plus all earlier increments. Excludes the subsequent eager/lazy multipattern increment, which has separate passing native and checked/debug/trace integration evidence."
+    "scope_warning": "Clean isolated exact-HEAD checkout with C++ runner comparisons enabled; includes eager/lazy multipattern matching, recursive definitions, optional core validation, filtered-empty MBQI validation and cached auxiliary-context lifecycle, plus earlier increments. Excludes the subsequent datatype policy/recognizer, datatype plugin-copy and command builtin registration changes, whose focused integration evidence is recorded separately."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
