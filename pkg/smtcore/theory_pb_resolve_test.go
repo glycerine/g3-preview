@@ -44,7 +44,7 @@ func smtPBResolutionRoot(t *testing.T, s *SMTInternalizerState, literal SMTLiter
 func TestSMTPBResolutionNativeCutPreservesAssumptionGuardsAndProof(t *testing.T) {
 	for _, test := range []struct {
 		frequency uint32
-		prior     uint64
+		prior     uint32
 		cut       bool
 	}{{0, 0, true}, {1, 0, true}, {3, 0, false}, {3, 1, true}} {
 		for _, proofs := range []bool{false, true} {

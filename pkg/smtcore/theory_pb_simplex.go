@@ -2,6 +2,8 @@
 package smtcore
 
 import (
+	"fmt"
+	"io"
 	"math/big"
 	"strconv"
 	"strings"
@@ -60,6 +62,13 @@ func (t *SMTPseudoBooleanTheory) simplexUpdateBound(v uint32, explain SMTLiteral
 	}
 	if oppositeValid && (lower && bound.Cmp(&opposite) > 0 || !lower && bound.Cmp(&opposite) < 0) {
 		lit := smtPBExplain(oppositeExplains, v)
+		line := 325
+		if !lower {
+			line = 346
+		}
+		if err := t.traceClause("update_bound", line, []SMTLiteral{lit.Negated(), explain.Negated()}); err != nil {
+			return false, err
+		}
 		return false, t.compilationClause([]SMTLiteral{lit.Negated(), explain.Negated()}, SMTClauseAux)
 	}
 	var err error
@@ -117,9 +126,22 @@ func (t *SMTPseudoBooleanTheory) simplexInternalize(c *smtPBConstraint) error {
 		key.WriteByte(';')
 	}
 	representative := key.String()
+	if err := t.emitPB("internalize_atom", 555, func(out io.Writer) error {
+		_, _ = fmt.Fprintf(out, "%d\n", c.literal.Var())
+		return t.displayPBArgs(out, &rep, false)
+	}); err != nil {
+		return err
+	}
 	slack := smtPBSlackColumn(c.literal.Var())
 	if owner, found := s.representatives[representative]; found {
 		slack = smtPBSlackColumn(owner)
+		if err := t.emitPB("internalize_atom", 558, func(out io.Writer) error {
+			info := s.rows[owner]
+			_, _ = fmt.Fprintf(out, "Old row: %d |-> %d %s vs. %s\n", c.literal.Var(), owner, info.bound.RatString(), rep.bound.RatString())
+			return t.displayPBArgs(out, &rep, false)
+		}); err != nil {
+			return err
+		}
 	} else {
 		s.representatives[representative] = c.literal.Var()
 		var variables []uint32
@@ -176,6 +198,12 @@ func (t *SMTPseudoBooleanTheory) simplexInternalize(c *smtPBConstraint) error {
 		if _, err := s.solver.AddIntegerRow(slack, variables, coefficients); err != nil {
 			return err
 		}
+		if err := t.emitPB("internalize_atom", 597, func(out io.Writer) error {
+			_, _ = fmt.Fprintf(out, "New row: %d %s\n", c.literal.Var(), rep.bound.RatString())
+			return t.displayPBArgs(out, &rep, false)
+		}); err != nil {
+			return err
+		}
 	}
 	var bound big.Rat
 	bound.Set(&rep.bound)
@@ -204,6 +232,12 @@ func (t *SMTPseudoBooleanTheory) simplexCheckFeasible() (bool, error) {
 	value := s.solver.Value(base)
 	bound, valid := s.solver.Lower(base)
 	below := valid && value.Cmp(&bound) < 0
+	if smtcoreSourceDebug && !below {
+		upper, valid := s.solver.Upper(base)
+		if !valid || value.Cmp(&upper) <= 0 {
+			return false, ast.ErrASTDomain
+		}
+	}
 	cantIncrease := below && coefficient.Sign() > 0 || !below && coefficient.Sign() < 0
 	entries, err := s.solver.RowEntries(r)
 	if err != nil {
@@ -235,6 +269,9 @@ func (t *SMTPseudoBooleanTheory) simplexCheckFeasible() (bool, error) {
 		if err != nil {
 			return false, err
 		}
+	}
+	if err = t.traceClause("check_feasible", 410, literals); err != nil {
+		return false, err
 	}
 	err = t.state.addClauseKindWithJustificationAndDeleteHandler(literals, false, SMTClauseAuxLemma, ast.ASTHandle{}, owner, nil)
 	return false, err

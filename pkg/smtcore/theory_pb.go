@@ -4,10 +4,13 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/backtrack"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -36,6 +39,7 @@ type SMTPseudoBooleanTheory struct {
 	configured     bool
 	parameterOwner *SMTPBParams // borrowed only until the source setup boundary
 	simplex        *smtPBSimplex
+	trace          *diagnostic.TraceTags // optional borrowed stream; nil uses source process tags
 }
 
 func NewSMTPseudoBooleanTheory(family ast.FamilyID) (*SMTPseudoBooleanTheory, error) {
@@ -155,9 +159,42 @@ func (t *SMTPseudoBooleanTheory) internalizeAtom(expression ast.ASTHandle, retai
 			a.terms[i].coeff.Neg(&a.terms[i].coeff)
 		}
 	}
+	if err = t.traceConstraint("internalize_atom", 470, c, true); err != nil {
+		return false, err
+	}
 	a.unique()
 	truth := a.normalize(c.equality)
 	a.prune(c.equality)
+	if truth == lbool.Undef && !c.equality {
+		a.negate()
+		a.negate()
+		c.args[1] = a.copy()
+		c.args[1].negate()
+		if smtcoreSourceDebug {
+			if len(a.terms) != len(c.args[1].terms) {
+				return false, ast.ErrASTDomain
+			}
+			if err = a.validateWellFormed(); err != nil {
+				return false, err
+			}
+			if err = c.args[1].validateWellFormed(); err != nil {
+				return false, err
+			}
+		}
+	}
+	if err = t.emitPB("internalize_atom", 484, func(out io.Writer) error {
+		if err := t.displayInequality(out, c, false); err != nil {
+			return err
+		}
+		_, _ = io.WriteString(out, " := ")
+		if err := smtPBWriteLiteral(out, c.literal); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return false, err
+	}
 	if truth != lbool.Undef {
 		lit := c.literal
 		if truth == lbool.False {
@@ -166,13 +203,12 @@ func (t *SMTPseudoBooleanTheory) internalizeAtom(expression ast.ASTHandle, retai
 		return true, state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{lit})
 	}
 	if !c.equality {
-		a.negate()
-		a.negate()
-		c.args[1] = a.copy()
-		c.args[1].negate()
 		if a.bound.Cmp(big.NewRat(1, 1)) == 0 && !t.controls.EnableSimplex {
 			literals := []SMTLiteral{c.literal.Negated()}
 			for _, term := range a.terms {
+				if smtcoreSourceDebug && term.coeff.Cmp(big.NewRat(1, 1)) != 0 {
+					return false, ast.ErrASTDomain
+				}
 				literals = append(literals, term.literal)
 				if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{c.literal, term.literal.Negated()}); err != nil {
 					return false, err
@@ -184,10 +220,21 @@ func (t *SMTPseudoBooleanTheory) internalizeAtom(expression ast.ASTHandle, retai
 		}
 	}
 	t.initCompilation(c)
+	if c.compilationThreshold != ^uint32(0) {
+		if err = t.emitPB("internalize_atom", 533, func(out io.Writer) error {
+			_, err := fmt.Fprintf(out, "compilation threshold: %d\n", c.compilationThreshold)
+			return err
+		}); err != nil {
+			return false, err
+		}
+	}
 	t.initVariableWatch(c)
 	t.info(variable).constraint = c
 	t.constraints = append(t.constraints, c)
 	if err = t.simplexInternalize(c); err != nil {
+		return false, err
+	}
+	if err = t.traceConstraint("internalize_atom", 602, c, false); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -203,6 +250,9 @@ func (*SMTPseudoBooleanTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error 
 }
 func (t *SMTPseudoBooleanTheory) Assign(v int32, value bool) error { return t.assignNative(v, value) }
 func (t *SMTPseudoBooleanTheory) FinalCheck() (SMTFinalCheckStatus, error) {
+	if err := t.emitPB("final_check_eh", 776, func(out io.Writer) error { return t.Display(out) }); err != nil {
+		return SMTFinalCheckDone, err
+	}
 	if smtcoreSourceDebug {
 		for _, v := range t.watchVariables() {
 			if c := t.watches[v].constraint; c != nil {
@@ -263,6 +313,7 @@ func (t *SMTPseudoBooleanTheory) Close() error {
 	t.variables = nil
 	t.parameterOwner = nil
 	t.simplex = nil
+	t.trace = nil
 	return nil
 }
 

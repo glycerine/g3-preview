@@ -3,6 +3,7 @@
 package smtcore
 
 import (
+	"io"
 	"math/big"
 	"sort"
 
@@ -22,6 +23,15 @@ func (t *SMTPseudoBooleanTheory) compileArgument(expression ast.ASTHandle) (SMTL
 			return SMTNullLiteral, err
 		}
 		negative = true
+	}
+	// Source strips exactly one leading negation before this guard, even
+	// when the remaining expression already has a Boolean variable.
+	if smtcoreSourceDebug {
+		if op, basic, err := s.basicOperation(expression); err != nil {
+			return SMTNullLiteral, err
+		} else if basic && op == ast.ASTOpNot {
+			return SMTNullLiteral, ast.ErrASTDomain
+		}
 	}
 	if _, found := s.boolVar[expression]; !found {
 		if err := s.Internalize(expression, false); err != nil {
@@ -53,6 +63,13 @@ func (t *SMTPseudoBooleanTheory) compileArgument(expression ast.ASTHandle) (SMTL
 			}
 			iff, err := m.MkIff(proxy, expression)
 			if err != nil {
+				return SMTNullLiteral, err
+			}
+			if err = t.emitPB("compile_arg", 644, func(out io.Writer) error {
+				_, _ = io.WriteString(out, "create proxy ")
+				// The source prints the IFF before it is internalized.
+				return t.displayPBApplication(out, iff, true)
+			}); err != nil {
 				return SMTNullLiteral, err
 			}
 			if err = s.Internalize(iff, false); err != nil {
@@ -88,7 +105,7 @@ type smtPBConstraint struct {
 	watchSize                          int
 	watchSum, maxWatch, minSum, maxSum big.Rat
 	fixed                              int
-	propagations                       uint64
+	propagations                       uint32
 	compilationThreshold               uint32
 	compiled                           lbool.LBool
 }
@@ -198,6 +215,9 @@ func (t *SMTPseudoBooleanTheory) addWatch(c *smtPBConstraint, index int) {
 }
 
 func (t *SMTPseudoBooleanTheory) initLiteralWatch(c *smtPBConstraint) error {
+	if smtcoreSourceDebug && c.equality {
+		return ast.ErrASTDomain
+	}
 	c.watchSize = 0
 	c.watchSum.SetInt64(0)
 	c.maxWatch.SetInt64(0)
@@ -235,6 +255,9 @@ func (t *SMTPseudoBooleanTheory) helpful(c *smtPBConstraint, negate bool) ([]SMT
 			out = append(out, l)
 			sum.Add(sum, &term.coeff)
 		}
+	}
+	if smtcoreSourceDebug && sum.Cmp(&c.current().bound) < 0 {
+		return nil, ast.ErrASTDomain
 	}
 	return out, nil
 }
@@ -278,6 +301,9 @@ func (t *SMTPseudoBooleanTheory) allLiterals(c *smtPBConstraint) ([]SMTLiteral, 
 func (t *SMTPseudoBooleanTheory) addAssign(c *smtPBConstraint, premises []SMTLiteral, consequent SMTLiteral) error {
 	t.incPropagations(c)
 	t.statistics.propagations++
+	if err := t.traceReason("add_assign", 1431, c, premises, consequent); err != nil {
+		return err
+	}
 	base, err := NewSMTTheoryPropagationJustification(t.state.manager, t.FamilyID(), premises, consequent, nil)
 	if err != nil {
 		return err
@@ -295,8 +321,11 @@ func (t *SMTPseudoBooleanTheory) addConflict(c *smtPBConstraint, clause []SMTLit
 	t.incPropagations(c)
 	t.statistics.conflicts++
 	t.statistics.clauses++
+	if err := t.traceReason("add_clause", 1454, c, clause, SMTNullLiteral); err != nil {
+		return err
+	}
 	frequency := t.controls.ConflictFrequency
-	if frequency == 0 || uint64(frequency-1) == c.propagations%uint64(frequency) {
+	if frequency == 0 || frequency-1 == c.propagations%frequency {
 		if _, err := t.resolveConflict(c); err != nil {
 			return err
 		}
@@ -314,6 +343,9 @@ func (t *SMTPseudoBooleanTheory) addConflict(c *smtPBConstraint, clause []SMTLit
 	}
 	// Source conflict clauses are auxiliary lemmas, whose false literals
 	// remain available to resolution even without proof production.
+	if err = t.traceClause("add_clause", 1469, clause); err != nil {
+		return err
+	}
 	return t.state.addClauseKindWithJustificationAndDeleteHandler(clause, false, SMTClauseAuxLemma, ast.ASTHandle{}, owner, nil)
 }
 
@@ -333,6 +365,16 @@ func (t *SMTPseudoBooleanTheory) assignVariable(v int32, isTrue bool, c *smtPBCo
 			break
 		}
 	}
+	if err = t.emitPB("assign_watch", 1018, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "assign watch ")
+		if err := smtPBWriteLiteral(out, NewSMTLiteral(v, !isTrue)); err != nil {
+			return err
+		}
+		_, _ = io.WriteString(out, " ")
+		return t.displayInequality(out, c, true)
+	}); err != nil {
+		return err
+	}
 	if index < 0 {
 		return ast.ErrASTDomain
 	}
@@ -351,6 +393,9 @@ func (t *SMTPseudoBooleanTheory) assignVariable(v int32, isTrue bool, c *smtPBCo
 		return ast.ErrASTDomain
 	}
 	if !c.equality && c.minSum.Cmp(&a.bound) >= 0 && asgn != lbool.True {
+		if err = t.traceAssignment("assign_watch", 1047, "Set ", c.lit(), c, true); err != nil {
+			return err
+		}
 		ls, err := t.helpful(c, false)
 		if err != nil {
 			return err
@@ -358,6 +403,9 @@ func (t *SMTPseudoBooleanTheory) assignVariable(v int32, isTrue bool, c *smtPBCo
 		return t.addAssign(c, ls, c.lit())
 	}
 	if c.maxSum.Cmp(&a.bound) < 0 && asgn != lbool.False {
+		if err = t.traceAssignment("assign_watch", 1051, "Set ", c.lit().Negated(), c, true); err != nil {
+			return err
+		}
 		ls, err := t.unhelpful(c, true)
 		if err != nil {
 			return err
@@ -367,6 +415,15 @@ func (t *SMTPseudoBooleanTheory) assignVariable(v int32, isTrue bool, c *smtPBCo
 	if c.equality && c.fixed == len(a.terms) {
 		holds := c.minSum.Cmp(&a.bound) == 0
 		if holds && asgn != lbool.True || !holds && asgn != lbool.False {
+			line := 1055
+			literal := c.lit()
+			if !holds {
+				line = 1059
+				literal = literal.Negated()
+			}
+			if err = t.traceAssignment("assign_watch", line, "Set ", literal, c, true); err != nil {
+				return err
+			}
 			ls, err := t.allLiterals(c)
 			if err != nil {
 				return err
@@ -412,6 +469,9 @@ func (t *SMTPseudoBooleanTheory) assignInequality(c *smtPBConstraint, isTrue boo
 			mininc.Set(&term.coeff)
 		}
 	}
+	if err := t.traceAssignment("assign_ineq", 949, "assign: ", c.lit(), c, false); err != nil {
+		return err
+	}
 	if maxsum.Cmp(&c.current().bound) < 0 {
 		ls, err := t.unhelpful(c, false)
 		if err != nil {
@@ -451,6 +511,9 @@ func (t *SMTPseudoBooleanTheory) assignInequality(c *smtPBConstraint, isTrue boo
 
 func (t *SMTPseudoBooleanTheory) assignLiteralWatch(v int32, isTrue bool, c *smtPBConstraint, watchIndex int) (bool, error) {
 	a := c.current()
+	if smtcoreSourceDebug && (c.equality || c.watchSize < 0 || c.watchSize > len(a.terms)) {
+		return false, ast.ErrASTDomain
+	}
 	w := -1
 	for i := 0; i < c.watchSize; i++ {
 		if a.terms[i].literal.Var() == v {
@@ -460,6 +523,15 @@ func (t *SMTPseudoBooleanTheory) assignLiteralWatch(v int32, isTrue bool, c *smt
 	}
 	if w < 0 {
 		return false, ast.ErrASTDomain
+	}
+	if smtcoreSourceDebug {
+		value, err := t.state.Assignment(c.lit())
+		if err != nil {
+			return false, err
+		}
+		if value != lbool.True || isTrue != a.terms[w].literal.Sign() {
+			return false, ast.ErrASTDomain
+		}
 	}
 	kCoeff := new(big.Rat).Add(&a.bound, &a.terms[w].coeff)
 	for i := c.watchSize; c.watchSum.Cmp(new(big.Rat).Add(kCoeff, &c.maxWatch)) < 0 && i < len(a.terms); i++ {
@@ -476,7 +548,10 @@ func (t *SMTPseudoBooleanTheory) assignLiteralWatch(v int32, isTrue bool, c *smt
 		if err != nil {
 			return false, err
 		}
-		return false, t.addConflict(c, append(ls, c.lit().Negated()))
+		if err = t.addConflict(c, append(ls, c.lit().Negated())); err != nil {
+			return false, err
+		}
+		return false, t.traceAssignment("assign_watch_ge", 1157, "assign: ", NewSMTLiteral(v, !isTrue), c, false)
 	}
 	term := a.terms[w]
 	info := t.info(v)
@@ -498,6 +573,9 @@ func (t *SMTPseudoBooleanTheory) assignLiteralWatch(v int32, isTrue bool, c *smt
 				c.maxWatch.Set(&a.terms[i].coeff)
 			}
 		}
+	}
+	if smtcoreSourceDebug && c.watchSum.Cmp(&a.bound) < 0 {
+		return true, ast.ErrASTDomain
 	}
 	if c.watchSum.Cmp(new(big.Rat).Add(&a.bound, &c.maxWatch)) < 0 {
 		ls, err := t.unhelpful(c, true)
@@ -521,11 +599,17 @@ func (t *SMTPseudoBooleanTheory) assignLiteralWatch(v int32, isTrue bool, c *smt
 			}
 		}
 	}
+	if err := t.traceAssignment("assign_watch_ge", 1157, "assign: ", NewSMTLiteral(v, !isTrue), c, false); err != nil {
+		return true, err
+	}
 	return true, nil
 }
 
 func (t *SMTPseudoBooleanTheory) assignNative(v int32, isTrue bool) error {
 	i := t.info(v)
+	if err := t.traceAssignment("assign_eh", 785, "assign: ", NewSMTLiteral(v, !isTrue), nil, false); err != nil {
+		return err
+	}
 	sign := 0
 	if isTrue {
 		sign = 1

@@ -51,7 +51,11 @@ func (t *SMTPseudoBooleanTheory) displayPBExpression(out io.Writer, l SMTLiteral
 	if err != nil {
 		return err
 	}
-	format, err := t.state.manager.SMT2PPExprTree(expressions[0], nil)
+	return t.displayPBApplication(out, expressions[0], false)
+}
+
+func (t *SMTPseudoBooleanTheory) displayPBApplication(out io.Writer, expression ast.ASTHandle, newline bool) (result error) {
+	format, err := t.state.manager.SMT2PPExprTree(expression, nil)
 	if err != nil {
 		return err
 	}
@@ -68,6 +72,9 @@ func (t *SMTPseudoBooleanTheory) displayPBExpression(out io.Writer, l SMTLiteral
 		return err
 	}
 	_, err = io.WriteString(out, body)
+	if err == nil && newline {
+		_, err = io.WriteString(out, "\n")
+	}
 	return err
 }
 

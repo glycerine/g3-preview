@@ -2,6 +2,8 @@
 package smtcore
 
 import (
+	"fmt"
+	"io"
 	"math"
 	"math/big"
 
@@ -31,7 +33,7 @@ func (t *SMTPseudoBooleanTheory) initCompilation(c *smtPBConstraint) {
 
 func (t *SMTPseudoBooleanTheory) incPropagations(c *smtPBConstraint) {
 	c.propagations++
-	if c.compiled == lbool.False && c.propagations >= uint64(c.compilationThreshold) {
+	if c.compiled == lbool.False && c.propagations >= c.compilationThreshold {
 		c.compiled = lbool.Undef
 		t.toCompile = append(t.toCompile, c)
 	}
@@ -69,6 +71,9 @@ func (t *SMTPseudoBooleanTheory) compilationClause(literals []SMTLiteral, kind S
 
 func (t *SMTPseudoBooleanTheory) compileInequality(c *smtPBConstraint) error {
 	t.statistics.compiled++
+	if smtcoreSourceDebug && c.compilationThreshold == ^uint32(0) {
+		return ast.ErrASTDomain
+	}
 	s := t.state
 	base := s.scopeLevel
 	if s.searching {
@@ -102,6 +107,15 @@ func (t *SMTPseudoBooleanTheory) compileInequality(c *smtPBConstraint) error {
 			in = append(in, term.literal)
 		}
 	}
+	if err := t.emitPB("compile_ineq", 1279, func(out io.Writer) error {
+		if err := smtPBWriteLiterals(out, in, false); err != nil {
+			return err
+		}
+		_, err := fmt.Fprintf(out, " >= %d\n", k)
+		return err
+	}); err != nil {
+		return err
+	}
 	thl := c.lit()
 	value, err := s.Assignment(thl)
 	if err != nil {
@@ -112,6 +126,13 @@ func (t *SMTPseudoBooleanTheory) compileInequality(c *smtPBConstraint) error {
 	atLeast := network.ge(full, k, in)
 	if network.err != nil {
 		return network.err
+	}
+	line := 1289
+	if full {
+		line = 1294
+	}
+	if err = t.traceClause("compile_ineq", line, []SMTLiteral{thl.Negated(), atLeast}); err != nil {
+		return err
 	}
 	if err = t.compilationClause([]SMTLiteral{thl.Negated(), atLeast}, SMTClauseAux); err != nil {
 		return err

@@ -83,3 +83,25 @@ func TestSMTPBDebugVariableSumsAndFinalCheckRelevance(t *testing.T) {
 		astTestMust(t, absent.validateFinalConstraint(nil))
 	}
 }
+
+func TestSMTPBDebugNormalizedArgumentContract(t *testing.T) {
+	_, _, pb, _, _ := smtPBWatchFixture(t, []int64{4, 3, 2, 2, 1}, 6, false)
+	original := &pb.constraints[0].args[0]
+	astTestMust(t, original.validateWellFormed())
+	for _, mutate := range []func(*smtPBArgs){
+		func(a *smtPBArgs) { a.bound.SetInt64(0) },
+		func(a *smtPBArgs) { a.terms[0].coeff.SetFrac64(1, 2) },
+		func(a *smtPBArgs) { a.terms[0].coeff.SetInt64(7) },
+		func(a *smtPBArgs) { a.terms[0].literal = SMTTrueLiteral },
+		func(a *smtPBArgs) { a.terms[1].literal = a.terms[0].literal.Negated() },
+		func(a *smtPBArgs) { a.bound.SetInt64(13) },
+	} {
+		a := original.copy()
+		mutate(&a)
+		smtPBExpectDebugGuard(t, a.validateWellFormed())
+	}
+	if !smtcoreSourceDebug {
+		var absent *smtPBArgs
+		astTestMust(t, absent.validateWellFormed())
+	}
+}

@@ -262,7 +262,7 @@ func TestSMTPBCompilationWeightedDefinitionsAndBaseFolding(t *testing.T) {
 	astTestMust(t, s.AssignLiteral(inputs[0], NewSMTBooleanAxiom()))
 	astTestMust(t, s.AssignLiteral(inputs[1], NewSMTBooleanAxiom()))
 	c := pb.constraints[0]
-	c.propagations = uint64(c.compilationThreshold) - 1
+	c.propagations = c.compilationThreshold - 1
 	pb.incPropagations(c)
 	astTestMust(t, pb.Restart())
 	if c.compiled != lbool.Undef || pb.statistics.compiled != 1 || pb.statistics.compiledVariables != 0 || len(s.clauses) != 0 || len(pb.toCompile) != 0 {
@@ -283,7 +283,7 @@ func TestSMTPBCompilationThresholdRestartAndRollback(t *testing.T) {
 	// must queue the source restart callback at precisely the threshold.
 	_, native, nativePB, nativeAtom, nativeInputs := smtPBWatchFixture(t, []int64{4, 3, 2, 2, 1}, 6, false)
 	nativeConstraint := nativePB.constraints[0]
-	nativeConstraint.propagations = uint64(nativeConstraint.compilationThreshold) - 1
+	nativeConstraint.propagations = nativeConstraint.compilationThreshold - 1
 	smtPBWatchAssign(t, native, nativeAtom)
 	smtPBWatchAssign(t, native, nativeInputs[0].Negated())
 	if len(nativePB.toCompile) != 1 || nativePB.statistics.compiled != 0 {
@@ -357,7 +357,7 @@ func TestSMTPBCompilationThresholdRestartAndRollback(t *testing.T) {
 	h := smtPBResolveExpression(t, s2.manager, p2.FamilyID(), []ast.ASTHandle{smtRelevancyBool(t, s2.manager, "local-a"), smtRelevancyBool(t, s2.manager, "local-b"), smtRelevancyBool(t, s2.manager, "local-c")}, []int32{2, 2, 1}, 3)
 	astTestMust(t, s2.Internalize(h, true))
 	local := p2.constraints[1]
-	local.propagations = uint64(local.compilationThreshold) - 1
+	local.propagations = local.compilationThreshold - 1
 	p2.incPropagations(local)
 	if len(p2.toCompile) != 1 {
 		t.Fatal("local constraint not queued")
@@ -365,5 +365,19 @@ func TestSMTPBCompilationThresholdRestartAndRollback(t *testing.T) {
 	astTestMust(t, s2.PopScopes(1))
 	if len(p2.toCompile) != 0 {
 		t.Fatal("pending pointer to deleted inequality survived pop")
+	}
+}
+
+func TestSMTPBPropagationCounterWrapPrecedesCompilationThreshold(t *testing.T) {
+	_, _, pb, _, _ := smtPBWatchFixture(t, []int64{4, 3, 2}, 6, false)
+	c := pb.constraints[0]
+	c.propagations = math.MaxUint32
+	pb.incPropagations(c)
+	if c.propagations != 0 || len(pb.toCompile) != 0 || c.compiled != lbool.False {
+		t.Fatal("source unsigned propagation wrap changed compilation scheduling", c.propagations, c.compiled)
+	}
+	pb.incPropagations(c)
+	if c.propagations != 1 || len(pb.toCompile) != 0 {
+		t.Fatal("post-wrap threshold state")
 	}
 }
