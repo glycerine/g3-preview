@@ -177,5 +177,5 @@ func (t *SMTStringTheory) checkNewEqualityValuesAndLengths(left, right ast.ASTHa
 			}
 		}
 	}
-	return true, t.checkContainNewConstant(left, right)
+	return true, t.checkContainNewEquality(left, right)
 }

@@ -23,6 +23,13 @@ func (t *SMTStringTheory) stringConstantsInNode(expression ast.ASTHandle) ([]ast
 			constants = append(constants, current)
 			continue
 		}
+		kind, err := m.GetKind(current)
+		if err != nil {
+			return nil, err
+		}
+		if kind != ast.ASTApp {
+			continue
+		}
 		count, err := m.GetNumArgs(current)
 		if err != nil {
 			return nil, err
@@ -44,7 +51,7 @@ func (t *SMTStringTheory) checkContainByClassValue(variable, constant ast.ASTHan
 	if err != nil || !literal {
 		return err
 	}
-	for pair := range t.containsIndex[variable] {
+	for _, pair := range t.containmentPairs(variable) {
 		haystack, needle := pair[0], pair[1]
 		if variable != haystack && variable != needle {
 			continue
@@ -143,7 +150,14 @@ func (t *SMTStringTheory) checkContainByClassValue(variable, constant ast.ASTHan
 			if err := premises.add(guard); err != nil {
 				return err
 			}
-			implication, err := m.MkImplies(guard, conclusion)
+			negativeGuard, err := m.MkNot(guard)
+			if err != nil {
+				return err
+			}
+			if err := premises.add(negativeGuard); err != nil {
+				return err
+			}
+			implication, err := m.MkOr(negativeGuard, conclusion)
 			if err != nil {
 				return err
 			}
@@ -156,9 +170,7 @@ func (t *SMTStringTheory) checkContainByClassValue(variable, constant ast.ASTHan
 	return nil
 }
 
-// Nonconstant substring checks and the relation-pair implications remain
-// separate pending portions of check_contain_in_new_eq.
-func (t *SMTStringTheory) checkContainNewConstant(left, right ast.ASTHandle) error {
+func (t *SMTStringTheory) checkContainNewEquality(left, right ast.ASTHandle) error {
 	if len(t.contains) == 0 {
 		return nil
 	}
@@ -179,12 +191,20 @@ func (t *SMTStringTheory) checkContainNewConstant(left, right ast.ASTHandle) err
 			constant = lastConstant
 		}
 	}
-	if constant == (ast.ASTHandle{}) {
-		return nil
-	}
 	for _, member := range members {
-		if member != constant {
+		if constant.IsNull() {
+			if err := t.checkContainBySubstring(member, members); err != nil {
+				return err
+			}
+		} else if member != constant {
 			if err := t.checkContainByClassValue(member, constant); err != nil {
+				return err
+			}
+		}
+	}
+	for _, first := range members {
+		for _, second := range members {
+			if err := t.checkContainByEqualNodes(first, second); err != nil {
 				return err
 			}
 		}

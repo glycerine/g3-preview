@@ -74,7 +74,7 @@ func TestSMTStringContainmentMandatoryConcatLiteral(t *testing.T) {
 	constant := astTestString(t, m, "aaa")
 	astTestMust(t, state.Internalize(constant, false))
 	before := len(theory.refs)
-	astTestMust(t, theory.checkContainNewConstant(x, constant))
+	astTestMust(t, theory.checkContainNewEquality(x, constant))
 	if len(theory.refs) != before+1 {
 		t.Fatal("mandatory missing literal did not refute containment")
 	}
@@ -96,7 +96,7 @@ func TestSMTStringContainmentMandatoryConcatLiteral(t *testing.T) {
 	before = len(theory.refs)
 	compatible := astTestString(t, m, "abb")
 	astTestMust(t, state.Internalize(compatible, false))
-	astTestMust(t, theory.checkContainNewConstant(x, compatible))
+	astTestMust(t, theory.checkContainNewEquality(x, compatible))
 	if len(theory.refs) != before {
 		t.Fatal("presence of a mandatory literal was mistaken for a complete containment decision")
 	}
