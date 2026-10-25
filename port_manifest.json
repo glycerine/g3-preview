@@ -126234,7 +126234,9 @@
         "pkg/smtcore/theory_arith_linear.go",
         "pkg/smtcore/theory_arith_fixed_bounds.go",
         "pkg/smtcore/theory_arith_equality_guards_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_str_arithmetic_bounds.go",
+        "pkg/smtcore/theory_str_arithmetic_bounds_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -126262,7 +126264,10 @@
         "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
         "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTStringArithmeticBoundsAssignmentAndScope",
+        "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
+        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
       ],
       "conditionals": [
         {
@@ -126460,16 +126465,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained theory_str lower_bound/upper_bound with concrete theory_mi_arith get_lower/get_upper/to_expr specialization: internalized attached mixed-arithmetic variables, zero-infinitesimal integral endpoints only",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_arithmetic_bounds.go",
+          "tests": [
+            "TestSMTStringArithmeticBoundsAssignmentAndScope",
+            "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
+            "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
+          ]
         }
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
-        "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate."
+        "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
+        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
-        "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial."
+        "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
+        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial."
       ]
     },
     {
@@ -127175,7 +127192,9 @@
         "pkg/math/simplex/arithmetic_pivot_test.go",
         "pkg/math/simplex/simplex.go",
         "pkg/smtcore/theory_arith_pivot_test.go",
-        "pkg/cmd_context/qflra_solver_test.go"
+        "pkg/cmd_context/qflra_solver_test.go",
+        "pkg/smtcore/theory_str_arithmetic_bounds.go",
+        "pkg/smtcore/theory_str_arithmetic_bounds_test.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
@@ -127229,7 +127248,10 @@
         "TestArithmeticPivotStrictErrorAndStalePatch",
         "TestArithmeticBlandThresholdAndEligiblePivot",
         "TestSMTArithmeticPivotPolicySurvivesReplay",
-        "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates"
+        "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates",
+        "TestSMTStringArithmeticBoundsAssignmentAndScope",
+        "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
+        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
       ],
       "conditionals": [
         {
@@ -128263,6 +128285,16 @@
             "TestSMTArithmeticPivotPolicySurvivesReplay",
             "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates"
           ]
+        },
+        {
+          "name": "Retained theory_str lower_bound/upper_bound with concrete theory_mi_arith get_lower/get_upper/to_expr specialization: internalized attached mixed-arithmetic variables, zero-infinitesimal integral endpoints only",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_arithmetic_bounds.go",
+          "tests": [
+            "TestSMTStringArithmeticBoundsAssignmentAndScope",
+            "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
+            "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
+          ]
         }
       ],
       "ownership": [
@@ -128271,7 +128303,8 @@
         "Division application markers follow theory scopes. Concrete division calls pin generated arithmetic and Boolean terms through recursive axiom internalization. The disabled constant-modulus enumeration option has no active retained setter and is not translated.",
         "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop.",
         "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial.",
-        "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate."
+        "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
+        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation."
       ],
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
@@ -128284,7 +128317,8 @@
         "Replay comparison rows now reuse the first column with identical concrete linear coefficients; sorted column IDs and exact rational coefficient strings identify the expression independently of the RHS constant. Applying every assertion through bound tightening preserves earlier stronger bounds. This restores source expression sharing, so equality adapters fix one expression column and the live deferred integer GCD checks see its rational constant. Tests cover repeated weaker lower/upper assertions, unbounded parity contradictions, bounded extended-GCD contradictions, mixed fixed-real premises and scope restoration.",
         "Integer feasibility no longer runs a hidden recursive bounded search. Its remaining fractional model is repaired through source Boolean branching and mixed-integer Gomory propagation, sharing SMT scope restoration, conflict learning, proofs and models with the other theories. Candidate-model point bounds remain confined to separate replays. The branch/cut counter persists as in the source and its configured ratio controls alternation. Current focused tests force both paths and repeated scopes.",
         "Euclidean arithmetic bounds are now scoped alongside existing numeric replay facts. Comparison-column facts are stored by the exact logical polynomial coefficient key rather than a shifting auxiliary column ID, and replay tightens the current shared expression column. The arithmetic theory owns the source-equivalent Euclidean numeral-manager lifetime and exposes checked cleanup through the existing optional theory Close hook. Temporary model-completion point bounds are never premises for Euclidean facts.",
-        "Concrete SMT arithmetic pivot selection now consumes the previously parsed strategy and Bland threshold through the shared exact tableau. Equal-error candidates use ascending variable ID instead of C++ heap traversal order; existing normal entering-variable ties also remain deterministic rather than randomized. These are heuristic ordering differences. Source tableau trace/assertion sites and other incomplete arithmetic algorithms remain scoped to this partial unit."
+        "Concrete SMT arithmetic pivot selection now consumes the previously parsed strategy and Bland threshold through the shared exact tableau. Equal-error candidates use ascending variable ID instead of C++ heap traversal order; existing normal entering-variable ties also remain deterministic rather than randomized. These are heuristic ordering differences. Source tableau trace/assertion sites and other incomplete arithmetic algorithms remain scoped to this partial unit.",
+        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial."
       ]
     },
     {
@@ -139162,7 +139196,9 @@
         "pkg/smtcore/theory_str_automaton_paths.go",
         "pkg/smtcore/theory_str_automaton_paths_test.go",
         "pkg/smtcore/theory_str_regex_complexity.go",
-        "pkg/smtcore/theory_str_regex_complexity_test.go"
+        "pkg/smtcore/theory_str_regex_complexity_test.go",
+        "pkg/smtcore/theory_str_arithmetic_bounds.go",
+        "pkg/smtcore/theory_str_arithmetic_bounds_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139311,7 +139347,10 @@
         "TestSMTStringRegexPathNonValueCharacterAndOwnerGuards",
         "TestSMTStringRegexComplexityUnsignedPolicy",
         "TestSMTStringRegexComplexityComplementAndByteRanges",
-        "TestSMTStringRegexIntersectionDifficulty"
+        "TestSMTStringRegexIntersectionDifficulty",
+        "TestSMTStringArithmeticBoundsAssignmentAndScope",
+        "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
+        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
       ],
       "conditionals": [
         {
@@ -140796,6 +140835,16 @@
             "TestSMTStringRegexComplexityComplementAndByteRanges",
             "TestSMTStringRegexIntersectionDifficulty"
           ]
+        },
+        {
+          "name": "Retained theory_str lower_bound/upper_bound with concrete theory_mi_arith get_lower/get_upper/to_expr specialization: internalized attached mixed-arithmetic variables, zero-infinitesimal integral endpoints only",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_arithmetic_bounds.go",
+          "tests": [
+            "TestSMTStringArithmeticBoundsAssignmentAndScope",
+            "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
+            "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
+          ]
         }
       ],
       "ownership": [
@@ -140825,7 +140874,8 @@
         "Regex length inference borrows input regex/length roots and owns all newly built AST intermediates in one concrete computation frame, releasing local roots forward after acquiring the caller-owned ASTRef result. Actual fresh integer variables retain the existing theory lifetime ownership and append to the concrete output slice in native concat parent-before-child order; partial generation does not roll back already-created witnesses. Signed integer length sets use native Go maps with deterministic ascending coefficient traversal instead of porting C++ hashtable layout; no insertion-order dictionary or generic callback/STL adapter is needed.",
         "Concrete StringRegexAutomaton delegates the existing sequence builder, owns the input regex and generated AST label roots, and materializes the retained uint32-condition math/automata graph plus a concrete character/range/predicate table. Graph/Condition views borrow the owner; idempotent Close releases the existing builder roots and invalidates guarded views. Constructor failure closes acquired roots. Bounds borrow only the graph; initial-bound formulas hold concrete local ASTRefs through publication. Word-keyed last-lower-bound values use independent Go big.Int storage and retain native lifetime across scope pops; no universal adapter, generics or STL internals are added.",
         "Finite automaton path construction owns all generated AST conditions, byte literals, equalities and frontier accumulators in a concrete local computation frame, releasing roots forward after transferring the owned path result and caller-owned character output. Persistent character vectors borrow input String keys from retained context/regex roots and borrow witness handles from the existing lifetime trail. Reused-cache growth preserves the native second direct trail reference for each new witness. Cache membership survives scope pop; only requested witness enodes/basic queues are refreshed. Failure retains already-created native witnesses but leaves the caller character output unchanged until final publication. No generic maps, callbacks or STL adapters are ported.",
-        "Regex policy counters use concrete ASTHandle-to-uint32 Go maps with native read-inserts-zero and wrapping increments. Complexity traversal borrows retained AST roots and automaton graphs, creates no AST objects and uses exact source unsigned arithmetic, including sentinel-before-zero multiplication and comparison-based overflow detection."
+        "Regex policy counters use concrete ASTHandle-to-uint32 Go maps with native read-inserts-zero and wrapping increments. Complexity traversal borrows retained AST roots and automaton graphs, creates no AST objects and uses exact source unsigned arithmetic, including sentinel-before-zero multiplication and comparison-based overflow detection.",
+        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140860,7 +140910,8 @@
         "Retained regex length linearity, finite subterm-length collection and infer_all_regex_lengths are now implemented and directly verified. Preserve distinct native fallbacks, per-distinct-length plus base contributions, zero-coefficient witnesses and failure propagation rather than replacing them with modern regex-language evaluation. Counter nonnegativity belongs to the enclosing caller and is not silently asserted by the formula generator. The full regex automata stage still requires automaton construction/assumptions, initial/refined bounds and path/intersection constraints before its actual FinalCheck dispatch can preserve native order. Current FinalCheck reaches dependency/constant/length backpropagation then gives up before that suffix; production QF_S routing is unchanged and source units remain partial.",
         "Complete retained lower/upper refinement and initial-bound routines are now implemented against actual automata constructed by the existing sequence builder. Preserve native no-nonzero-solution errors for empty/epsilon-only initial-bound publication, including zero-cache update before the latter guard, and omit the source upper-bound TODO. The new bridge is concretely typed for retained byte-string labels and uses existing math/automata graph algorithms; it does not substitute the separate legacy NFA. Full automata assumptions/construction scheduling, expression-solver kernel integration, path/intersection constraints and source-ordered FinalCheck dispatch remain pending. Current FinalCheck still stops after dependency/constant/length backpropagation and production routing is unchanged.",
         "Finite regex path constraints and predicate translation are now implemented and directly verified against actual constructed automata, including range swapping, NUL/high bytes, source accumulator order, scoped cache refresh/growth and independent String decomposition constraints. Call-site audit proves the helper is only reached for nonzero lengths; its unused zero-length arm is omitted per retained-consumer rules and the Go boundary rejects zero. The enclosing final checker must port its own live zero-length handling. Unsupported BV predicate declarations are not reinterpreted as String comparisons; native null/type preconditions become explicit Go errors. Complete automata assumptions/construction scheduling, nested expression-solver kernel, path/intersection dispatch and remaining tester/unroll/final checking remain pending. Production routing and current FinalCheck prefix are unchanged.",
-        "Regex complexity and intersection difficulty policy helpers are directly verified, preserving asymmetric complemented concatenation, persistent pessimistic nested-complement mode, byte-width literals, unsigned reversed-range wrap and native overflow cases. These prerequisites do not yet implement the enclosing automata-stage construction scheduling or change FinalCheck/production routing. Source units remain partial."
+        "Regex complexity and intersection difficulty policy helpers are directly verified, preserving asymmetric complemented concatenation, persistent pessimistic nested-complement mode, byte-width literals, unsigned reversed-range wrap and native overflow cases. These prerequisites do not yet implement the enclosing automata-stage construction scheduling or change FinalCheck/production routing. Source units remain partial.",
+        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial."
       ]
     },
     {
@@ -140941,7 +140992,9 @@
         "pkg/smtcore/theory_str_automaton_paths.go",
         "pkg/smtcore/theory_str_automaton_paths_test.go",
         "pkg/smtcore/theory_str_regex_complexity.go",
-        "pkg/smtcore/theory_str_regex_complexity_test.go"
+        "pkg/smtcore/theory_str_regex_complexity_test.go",
+        "pkg/smtcore/theory_str_arithmetic_bounds.go",
+        "pkg/smtcore/theory_str_arithmetic_bounds_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -141091,7 +141144,10 @@
         "TestSMTStringRegexPathNonValueCharacterAndOwnerGuards",
         "TestSMTStringRegexComplexityUnsignedPolicy",
         "TestSMTStringRegexComplexityComplementAndByteRanges",
-        "TestSMTStringRegexIntersectionDifficulty"
+        "TestSMTStringRegexIntersectionDifficulty",
+        "TestSMTStringArithmeticBoundsAssignmentAndScope",
+        "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
+        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
       ],
       "conditionals": [
         {
@@ -141894,6 +141950,16 @@
             "TestSMTStringRegexComplexityComplementAndByteRanges",
             "TestSMTStringRegexIntersectionDifficulty"
           ]
+        },
+        {
+          "name": "Retained theory_str lower_bound/upper_bound with concrete theory_mi_arith get_lower/get_upper/to_expr specialization: internalized attached mixed-arithmetic variables, zero-infinitesimal integral endpoints only",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_arithmetic_bounds.go",
+          "tests": [
+            "TestSMTStringArithmeticBoundsAssignmentAndScope",
+            "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
+            "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
+          ]
         }
       ],
       "ownership": [
@@ -141924,7 +141990,8 @@
         "Regex length inference borrows input regex/length roots and owns all newly built AST intermediates in one concrete computation frame, releasing local roots forward after acquiring the caller-owned ASTRef result. Actual fresh integer variables retain the existing theory lifetime ownership and append to the concrete output slice in native concat parent-before-child order; partial generation does not roll back already-created witnesses. Signed integer length sets use native Go maps with deterministic ascending coefficient traversal instead of porting C++ hashtable layout; no insertion-order dictionary or generic callback/STL adapter is needed.",
         "Concrete StringRegexAutomaton delegates the existing sequence builder, owns the input regex and generated AST label roots, and materializes the retained uint32-condition math/automata graph plus a concrete character/range/predicate table. Graph/Condition views borrow the owner; idempotent Close releases the existing builder roots and invalidates guarded views. Constructor failure closes acquired roots. Bounds borrow only the graph; initial-bound formulas hold concrete local ASTRefs through publication. Word-keyed last-lower-bound values use independent Go big.Int storage and retain native lifetime across scope pops; no universal adapter, generics or STL internals are added.",
         "Finite automaton path construction owns all generated AST conditions, byte literals, equalities and frontier accumulators in a concrete local computation frame, releasing roots forward after transferring the owned path result and caller-owned character output. Persistent character vectors borrow input String keys from retained context/regex roots and borrow witness handles from the existing lifetime trail. Reused-cache growth preserves the native second direct trail reference for each new witness. Cache membership survives scope pop; only requested witness enodes/basic queues are refreshed. Failure retains already-created native witnesses but leaves the caller character output unchanged until final publication. No generic maps, callbacks or STL adapters are ported.",
-        "Regex policy counters use concrete ASTHandle-to-uint32 Go maps with native read-inserts-zero and wrapping increments. Complexity traversal borrows retained AST roots and automaton graphs, creates no AST objects and uses exact source unsigned arithmetic, including sentinel-before-zero multiplication and comparison-based overflow detection."
+        "Regex policy counters use concrete ASTHandle-to-uint32 Go maps with native read-inserts-zero and wrapping increments. Complexity traversal borrows retained AST roots and automaton graphs, creates no AST objects and uses exact source unsigned arithmetic, including sentinel-before-zero multiplication and comparison-based overflow detection.",
+        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141960,7 +142027,8 @@
         "Retained regex length linearity, finite subterm-length collection and infer_all_regex_lengths are now implemented and directly verified. Preserve distinct native fallbacks, per-distinct-length plus base contributions, zero-coefficient witnesses and failure propagation rather than replacing them with modern regex-language evaluation. Counter nonnegativity belongs to the enclosing caller and is not silently asserted by the formula generator. The full regex automata stage still requires automaton construction/assumptions, initial/refined bounds and path/intersection constraints before its actual FinalCheck dispatch can preserve native order. Current FinalCheck reaches dependency/constant/length backpropagation then gives up before that suffix; production QF_S routing is unchanged and source units remain partial.",
         "Complete retained lower/upper refinement and initial-bound routines are now implemented against actual automata constructed by the existing sequence builder. Preserve native no-nonzero-solution errors for empty/epsilon-only initial-bound publication, including zero-cache update before the latter guard, and omit the source upper-bound TODO. The new bridge is concretely typed for retained byte-string labels and uses existing math/automata graph algorithms; it does not substitute the separate legacy NFA. Full automata assumptions/construction scheduling, expression-solver kernel integration, path/intersection constraints and source-ordered FinalCheck dispatch remain pending. Current FinalCheck still stops after dependency/constant/length backpropagation and production routing is unchanged.",
         "Finite regex path constraints and predicate translation are now implemented and directly verified against actual constructed automata, including range swapping, NUL/high bytes, source accumulator order, scoped cache refresh/growth and independent String decomposition constraints. Call-site audit proves the helper is only reached for nonzero lengths; its unused zero-length arm is omitted per retained-consumer rules and the Go boundary rejects zero. The enclosing final checker must port its own live zero-length handling. Unsupported BV predicate declarations are not reinterpreted as String comparisons; native null/type preconditions become explicit Go errors. Complete automata assumptions/construction scheduling, nested expression-solver kernel, path/intersection dispatch and remaining tester/unroll/final checking remain pending. Production routing and current FinalCheck prefix are unchanged.",
-        "Regex complexity and intersection difficulty policy helpers are directly verified, preserving asymmetric complemented concatenation, persistent pessimistic nested-complement mode, byte-width literals, unsigned reversed-range wrap and native overflow cases. These prerequisites do not yet implement the enclosing automata-stage construction scheduling or change FinalCheck/production routing. Source units remain partial."
+        "Regex complexity and intersection difficulty policy helpers are directly verified, preserving asymmetric complemented concatenation, persistent pessimistic nested-complement mode, byte-width literals, unsigned reversed-range wrap and native overflow cases. These prerequisites do not yet implement the enclosing automata-stage construction scheduling or change FinalCheck/production routing. Source units remain partial.",
+        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial."
       ]
     },
     {

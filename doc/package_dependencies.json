@@ -2797,6 +2797,7 @@
         "theory_seq_state.go",
         "theory_seq_tail_bound.go",
         "theory_str.go",
+        "theory_str_arithmetic_bounds.go",
         "theory_str_arrangements.go",
         "theory_str_assumptions.go",
         "theory_str_automaton_bounds.go",
