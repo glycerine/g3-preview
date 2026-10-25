@@ -395,6 +395,7 @@ digraph packages {
   "smtcore" -> "util/cooperate";
   "smtcore" -> "util/diagnostic";
   "smtcore" -> "util/hash";
+  "smtcore" -> "util/heap";
   "smtcore" -> "util/lbool";
   "smtcore" -> "util/lp";
   "smtcore" -> "util/luby";

@@ -113152,12 +113152,24 @@
       "path": "src/smt/smt_case_split_queue.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_case_split_queue.go"
+        "pkg/smtcore/smt_case_split_queue.go",
+        "pkg/smtcore/smt_theory_aware_branching.go",
+        "pkg/smtcore/smt_theory_aware_branching_test.go",
+        "pkg/smtcore/smt_search.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
-        "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase"
+        "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
+        "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+        "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+        "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+        "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+        "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
+        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -113307,8 +113319,8 @@
           "text": "SASSERT(m_context.get_num_b_internalized() > 0);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "activity-based and random-frequency selection, delayed search-variable promotion, retained activity cache, cached assignment phases, conservative conflict-phase invalidation, phase-cache cycling, always-false/true, source-random, and literal-occurrence phase strategies",
@@ -113345,28 +113357,54 @@
           ]
         },
         {
-          "name": "theory-aware priority/phase hint registration and display",
-          "status": "dead_deleted",
-          "go_target": null,
-          "tests": []
+          "name": "theory_aware_branching_queue active hint registration, priority+activity heap, lifecycle callbacks and display",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_aware_branching.go",
+          "tests": [
+            "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+            "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+            "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+            "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+            "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder"
+          ]
+        },
+        {
+          "name": "Remaining activity/relevancy queue displays and context printer integration",
+          "status": "unported",
+          "reason": "The retained context::display in smt_context_pp.cpp calls the virtual queue display. The old no-caller/dead premise was incorrect. Theory-aware display is implemented; other queue displays and full context printer integration remain pending."
+        },
+        {
+          "name": "Go final-check no-progress availability probe does not consume a native strategy-6 decision; other strategy behavior is preserved",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
+          ]
         }
       ],
       "ownership": [
-        "The concrete activity selector borrows the internalizer and owns no AST handles or Boolean variables."
+        "The concrete activity selector borrows the internalizer and owns no AST handles or Boolean variables.",
+        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap."
       ],
       "deviations": [
         "The retained activity and generation strategies scan Go slices instead of porting the C++ heap implementations; deterministic source insertion or variable order resolves equal priorities.",
         "Relevancy queues derive their ordered candidates from the propagator's scoped relevant-expression trail at selection time; this replaces duplicate C++ queue trails while retaining base-before-search order and rollback behavior.",
-        "The only source producer for theory-aware priority and phase hints is the unretained legacy string theory. With no retained producer, strategy 6 reduces to its activity/random-frequency path; no unused hint-registration adapter is added."
+        "Reopened this source unit as partial: setup_QF_S retains theory_str, so its priority-hint producer is live, and context::display calls queue display. The earlier unretained-producer/dead-interface classification was incorrect. Strategy 6 now uses the concrete native integer heap, not the activity scan; remaining display coverage is explicit.",
+        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements.",
+        "Registered theory_aware_case_split_scopes.smt2 in the normal Go runner and live prebuilt-C++ comparison table. Adjacent expected_cpp records exact clean-exit native output for scoped SAT/UNSAT and forced Boolean model values; no new String arrangement implementation is claimed."
       ]
     },
     {
       "path": "src/smt/smt_case_split_queue.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
-        "pkg/smtcore/smt_case_split_queue.go"
+        "pkg/smtcore/smt_case_split_queue.go",
+        "pkg/smtcore/smt_theory_aware_branching.go",
+        "pkg/smtcore/smt_theory_aware_branching_test.go",
+        "pkg/smtcore/smt_search.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
@@ -113381,7 +113419,15 @@
         "TestSMTRelevantCaseSplitQueueLooksAheadAtDisequality",
         "TestSMTRelevantActivityCaseSplitDelaysSearchVariables",
         "TestSMTRelevantGoalCaseSplitUsesLowestGeneration",
-        "TestSMTTheoryAwareCaseSplitWithoutHintProducerUsesActivity"
+        "TestSMTTheoryAwareCaseSplitWithoutHintProducerUsesActivity",
+        "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+        "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+        "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+        "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+        "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
+        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -113393,8 +113439,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "next activity/random-frequency case split, delayed search-variable promotion, activity retention across reinternalization, configured phase selection, phase-cache lifecycle, and conservative conflict-phase invalidation consumed by the retained activity-based search",
@@ -113420,17 +113466,40 @@
           ]
         },
         {
-          "name": "display and theory-aware priority/phase hint interfaces without retained callers",
-          "status": "dead_deleted",
-          "go_target": null,
-          "tests": []
+          "name": "theory_aware_branching_queue active hint registration, priority+activity heap, lifecycle callbacks and display",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_aware_branching.go",
+          "tests": [
+            "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+            "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+            "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+            "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+            "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder"
+          ]
+        },
+        {
+          "name": "Remaining activity/relevancy queue displays and context printer integration",
+          "status": "unported",
+          "reason": "The retained context::display in smt_context_pp.cpp calls the virtual queue display. The old no-caller/dead premise was incorrect. Theory-aware display is implemented; other queue displays and full context printer integration remain pending."
+        },
+        {
+          "name": "Go final-check no-progress availability probe does not consume a native strategy-6 decision; other strategy behavior is preserved",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
+          ]
         }
       ],
       "ownership": [
-        "The concrete selector borrows the internalizer for the duration of a synchronous kernel check."
+        "The concrete selector borrows the internalizer for the duration of a synchronous kernel check.",
+        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap."
       ],
       "deviations": [
-        "Go exposes one concrete selector over the retained strategies instead of the C++ virtual queue hierarchy."
+        "Go exposes one concrete selector over the retained strategies instead of the C++ virtual queue hierarchy.",
+        "Reopened this source unit as partial: setup_QF_S retains theory_str, so its priority-hint producer is live, and context::display calls queue display. The earlier unretained-producer/dead-interface classification was incorrect. Strategy 6 now uses the concrete native integer heap, not the activity scan; remaining display coverage is explicit.",
+        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements.",
+        "Registered theory_aware_case_split_scopes.smt2 in the normal Go runner and live prebuilt-C++ comparison table. Adjacent expected_cpp records exact clean-exit native output for scoped SAT/UNSAT and forced Boolean model values; no new String arrangement implementation is claimed."
       ]
     },
     {
@@ -114963,7 +115032,9 @@
         "pkg/smtcore/theory_str_setup.go",
         "pkg/smtcore/theory_str_terms_test.go",
         "pkg/smtcore/smt_theory_case_split.go",
-        "pkg/smtcore/smt_theory_case_split_test.go"
+        "pkg/smtcore/smt_theory_case_split_test.go",
+        "pkg/smtcore/smt_theory_aware_branching.go",
+        "pkg/smtcore/smt_theory_aware_branching_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -115106,7 +115177,13 @@
         "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting",
         "TestSMTStringSearchSetupBorrowsKernelAssertions",
         "TestSMTTheoryCaseSplitBothModesAtMostOneAndScopes",
-        "TestSMTTheoryCaseSplitSnapshotAndRegistrationPop"
+        "TestSMTTheoryCaseSplitSnapshotAndRegistrationPop",
+        "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+        "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+        "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+        "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+        "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
+        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
       ],
       "conditionals": [
         {
@@ -116756,6 +116833,26 @@
             "TestSMTTheoryCaseSplitBothModesAtMostOneAndScopes",
             "TestSMTTheoryCaseSplitSnapshotAndRegistrationPop"
           ]
+        },
+        {
+          "name": "theory-aware branching info and variable/activity/unassignment lifecycle dispatch for strategy 6",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_aware_branching.go",
+          "tests": [
+            "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+            "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+            "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+            "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+            "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder"
+          ]
+        },
+        {
+          "name": "Go final-check no-progress availability probe does not consume a native strategy-6 decision; other strategy behavior is preserved",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
+          ]
         }
       ],
       "ownership": [
@@ -116771,7 +116868,8 @@
         "Nearby theory-variable lookup borrows the existing transitivity path before inversion. Equality snapshots own copied root attachment lists and restore newly added families on pop; event queues borrow theory variables. Assumption scopes remain above the user base, so their clause reasons are never discarded by base simplification.",
         "The internalizer owns distinct scalar user/search base boundaries during a search and clears both on exit. PB plugin copying transfers an independent installed control snapshot to an unused fresh destination, rather than borrowing source parameters or copying mutable watch/constraint state.",
         "The internalizer borrows a pointer to the owning kernel assertion slice, so theory search initialization sees the current processed formula entries after append/reallocation and pop. The kernel retains formula/proof lifetime; the view acquires no duplicate AST roots and is not mutated by the string theory.",
-        "Case-split literal spans are copied into concrete slices. Scope limits remove signed memberships and per-literal links before Boolean slots are rolled back. Propagation snapshots the post-BCP assignment end. Literal indices add no AST ownership."
+        "Case-split literal spans are copied into concrete slices. Scope limits remove signed memberships and per-literal links before Boolean slots are rolled back. Propagation snapshots the post-BCP assignment end. Literal indices add no AST ownership.",
+        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -116798,7 +116896,8 @@
         "Retained explicit theory equalities now merge after atom callbacks and before theory equality events. Pending core equalities prevent premature fixed point. FIFO tests cover generated congruence conflict behind an older equality, undelivered child rollback and redundant add_eq statistics. Processed entries are scoped Go history; truncated entries are cleared and justification owners remain scoped. No C++ container internals are modeled.",
         "The Go no-progress guard previously omitted the newly retained core equality FIFO. Actual queued/consumed equality work, including a redundant request, could therefore cause theory made no progress after a sequence length decomposition. Its progress snapshot now includes queue length and the consumption head. Focused tests distinguish enqueue, consume, quiescence and scope rollback; the unbounded lower-length solver regression remains satisfiable.",
         "Extracted the existing context sharing decision used by arithmetic and arrays for the live sequence interface consumer as well. Ite precedes the zero-theory-variable case, root theory counts and active MAM sharing precede foreign-family parents, and only the single-owner fallthrough consults concrete owner rules. Arithmetic underspecified-operation and array-role checks remain concrete and unchanged; sequence inherits the base false hook. No universal callback or unused theory adapter was introduced. Context sharing TRACE/assertion and broader integration audits remain open.",
-        "Both native TheoryCaseSplit modes are connected to retained String arrangements. This helper enforces at most one literal, with the arrangement disjunction supplied by its caller. Source duplicate registration assertion is retained in debug builds. Whole context/String completion is not claimed."
+        "Both native TheoryCaseSplit modes are connected to retained String arrangements. This helper enforces at most one literal, with the arrangement disjunction supplied by its caller. Source duplicate registration assertion is retained in debug builds. Whole context/String completion is not claimed.",
+        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements."
       ]
     },
     {
@@ -116885,7 +116984,9 @@
         "pkg/smtcore/smt_theory_case_split_test.go",
         "pkg/smtcore/smt_boolean_activity.go",
         "pkg/smtcore/smt_internalizer_true_equality_test.go",
-        "pkg/smtcore/smt_theory_test.go"
+        "pkg/smtcore/smt_theory_test.go",
+        "pkg/smtcore/smt_theory_aware_branching.go",
+        "pkg/smtcore/smt_theory_aware_branching_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -116982,7 +117083,13 @@
         "TestSMTTheoryCaseSplitBothModesAtMostOneAndScopes",
         "TestSMTTheoryCaseSplitSnapshotAndRegistrationPop",
         "TestSMTInternalizerNewTrueEqualityPropagationAndPop",
-        "TestSMTInternalizerNewTrueEqualityConflictsWithAssignedFalse"
+        "TestSMTInternalizerNewTrueEqualityConflictsWithAssignedFalse",
+        "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+        "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+        "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+        "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+        "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
+        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
       ],
       "conditionals": [
         {
@@ -117621,6 +117728,26 @@
             "TestSMTInternalizerNewTrueEqualityPropagationAndPop",
             "TestSMTInternalizerNewTrueEqualityConflictsWithAssignedFalse"
           ]
+        },
+        {
+          "name": "theory-aware branching info and variable/activity/unassignment lifecycle dispatch for strategy 6",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_aware_branching.go",
+          "tests": [
+            "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+            "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+            "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+            "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+            "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder"
+          ]
+        },
+        {
+          "name": "Go final-check no-progress availability probe does not consume a native strategy-6 decision; other strategy behavior is preserved",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
+          ]
         }
       ],
       "ownership": [
@@ -117635,7 +117762,8 @@
         "The internalizer owns distinct scalar user/search base boundaries during a search and clears both on exit. PB plugin copying transfers an independent installed control snapshot to an unused fresh destination, rather than borrowing source parameters or copying mutable watch/constraint state.",
         "The internalizer borrows a pointer to the owning kernel assertion slice, so theory search initialization sees the current processed formula entries after append/reallocation and pop. The kernel retains formula/proof lifetime; the view acquires no duplicate AST roots and is not mutated by the string theory.",
         "Case-split literal spans are copied into concrete slices. Scope limits remove signed memberships and per-literal links before Boolean slots are rolled back. Propagation snapshots the post-BCP assignment end. Literal indices add no AST ownership.",
-        "New true-equality assignment occurs after enode registration/stack ownership, preserving equality justification operands through scope rollback. The theory callback fixture now uses distinct terms as native eq_propagation_justification requires, retaining its callback and scope checks."
+        "New true-equality assignment occurs after enode registration/stack ownership, preserving equality justification operands through scope rollback. The theory callback fixture now uses distinct terms as native eq_propagation_justification requires, retaining its callback and scope checks.",
+        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
@@ -117647,7 +117775,8 @@
         "A retained equality contradicting an already recorded UF disequality now preserves an earlier Boolean conflict, its not_l and conflict count. The regression failed before this correction and checks that the disequal classes remain separate and scope pop clears child conflict/disequality state. Retained producer queue timing is addressed in the shared FIFO increment; broader context work remains partial.",
         "Retained explicit theory equalities now merge after atom callbacks and before theory equality events. Pending core equalities prevent premature fixed point. FIFO tests cover generated congruence conflict behind an older equality, undelivered child rollback and redundant add_eq statistics. Processed entries are scoped Go history; truncated entries are cleared and justification owners remain scoped. No C++ container internals are modeled.",
         "Both native TheoryCaseSplit modes are connected to retained String arrangements. This helper enforces at most one literal, with the arrangement disjunction supplied by its caller. Source duplicate registration assertion is retained in debug builds. Whole context/String completion is not claimed.",
-        "Unroll integration exposed a missing mk_enode true-equality assignment: delayed guards over already merged enodes previously remained undefined. Restored the native assignment using the existing equality-propagation reason and verified both gate contexts, opposite assignment conflict and pop. Native distinct-enode justification precondition is unchanged."
+        "Unroll integration exposed a missing mk_enode true-equality assignment: delayed guards over already merged enodes previously remained undefined. Restored the native assignment using the existing equality-propagation reason and verified both gate contexts, opposite assignment conflict and pop. Native distinct-enode justification precondition is unchanged.",
+        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements."
       ]
     },
     {
@@ -118851,7 +118980,10 @@
         "pkg/smtcore/smt_context_invariant.go",
         "pkg/smtcore/smt_core_equality_queue_test.go",
         "pkg/smtcore/smt_internalizer_true_equality_test.go",
-        "pkg/smtcore/smt_theory_test.go"
+        "pkg/smtcore/smt_theory_test.go",
+        "pkg/smtcore/smt_theory_aware_branching.go",
+        "pkg/smtcore/smt_theory_aware_branching_test.go",
+        "pkg/smtcore/smt_search.go"
       ],
       "tests": [
         "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
@@ -118902,7 +119034,13 @@
         "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
         "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting",
         "TestSMTInternalizerNewTrueEqualityPropagationAndPop",
-        "TestSMTInternalizerNewTrueEqualityConflictsWithAssignedFalse"
+        "TestSMTInternalizerNewTrueEqualityConflictsWithAssignedFalse",
+        "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+        "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+        "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+        "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+        "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
+        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
       ],
       "conditionals": [
         {
@@ -119510,13 +119648,34 @@
             "TestSMTInternalizerNewTrueEqualityPropagationAndPop",
             "TestSMTInternalizerNewTrueEqualityConflictsWithAssignedFalse"
           ]
+        },
+        {
+          "name": "theory-aware branching info and variable/activity/unassignment lifecycle dispatch for strategy 6",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_aware_branching.go",
+          "tests": [
+            "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+            "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+            "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+            "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+            "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder"
+          ]
+        },
+        {
+          "name": "Go final-check no-progress availability probe does not consume a native strategy-6 decision; other strategy behavior is preserved",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/smt_case_split_queue.go",
+          "tests": [
+            "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
+          ]
         }
       ],
       "ownership": [
         "SMTInternalizationOrder borrows the AST manager and checker context; native maps and slices own traversal colors, theory-family configuration, and returned order values.",
         "SMTInternalizerState owns references for registered Boolean expressions, enode owners, and retained clause proofs; it owns its congruence table, variable arrays, watch lists, scopes, clauses, assignment and theory-variable trails, registered theory order, and pending congruence records, and borrows the checker context, registered theory plugins, and optional relevancy propagator and quantifier registry.",
         "Unit-resolution antecedents and sequence equality evidence borrow scoped literals/enodes owned by the internalizer. Propagated empty equalities retain original dependencies; guessed model characters are not used as conflict evidence.",
-        "New true-equality assignment occurs after enode registration/stack ownership, preserving equality justification operands through scope rollback. The theory callback fixture now uses distinct terms as native eq_propagation_justification requires, retaining its callback and scope checks."
+        "New true-equality assignment occurs after enode registration/stack ownership, preserving equality justification operands through scope rollback. The theory callback fixture now uses distinct terms as native eq_propagation_justification requires, retaining its callback and scope checks.",
+        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap."
       ],
       "deviations": [
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
@@ -119528,7 +119687,8 @@
         "Learned clauses are installed at their computed backjump scope. Atoms destroyed by backjump are retained and reinternalized before installation, so clauses leave with that scope instead of using the source persistent reinitialization stacks. Garbage collection compacts the unified Go clause slice and repairs every saved scope limit.",
         "Removed the non-source global inconsistency early return from clause construction. Later auxiliary lemmas retain watches/storage and later empty/false clauses preserve the first conflict. Optimized binary publication now performs the source immediate assignment with the already true opposite of its false second literal as antecedent.",
         "Retained explicit theory equalities now merge after atom callbacks and before theory equality events. Pending core equalities prevent premature fixed point. FIFO tests cover generated congruence conflict behind an older equality, undelivered child rollback and redundant add_eq statistics. Processed entries are scoped Go history; truncated entries are cleared and justification owners remain scoped. No C++ container internals are modeled.",
-        "Unroll integration exposed a missing mk_enode true-equality assignment: delayed guards over already merged enodes previously remained undefined. Restored the native assignment using the existing equality-propagation reason and verified both gate contexts, opposite assignment conflict and pop. Native distinct-enode justification precondition is unchanged."
+        "Unroll integration exposed a missing mk_enode true-equality assignment: delayed guards over already merged enodes previously remained undefined. Restored the native assignment using the existing equality-propagation reason and verified both gate contexts, opposite assignment conflict and pop. Native distinct-enode justification precondition is unchanged.",
+        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements."
       ]
     },
     {
@@ -180089,7 +180249,9 @@
         "pkg/math/euclid/apply_solution.go",
         "pkg/math/euclid/apply_solution_test.go",
         "pkg/math/euclid/normalize_query.go",
-        "pkg/math/euclid/normalize_query_test.go"
+        "pkg/math/euclid/normalize_query_test.go",
+        "pkg/smtcore/smt_theory_aware_branching.go",
+        "pkg/smtcore/smt_theory_aware_branching_test.go"
       ],
       "tests": [
         "TestHeapNativeGrowthSwapAndWarm",
@@ -180124,7 +180286,13 @@
         "TestEuclideanSolvedQueueBorrowsHeapDebugAcrossReset",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
         "TestEuclideanNormalizeQueryAfterNonUnitSolve",
-        "TestEuclideanNormalizeQueryJustificationAndConstantOnly"
+        "TestEuclideanNormalizeQueryJustificationAndConstantOnly",
+        "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+        "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+        "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+        "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+        "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
+        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
       ],
       "conditionals": [
         {
@@ -180316,7 +180484,11 @@
           "name": "concrete Int heap CASSERT heap-tag gates and nested source SASSERT checks at construction, movement, mutation, swap, insertion and empty/absent value preconditions (heap.h:57,169,175-176,181,197,221,226,233)",
           "status": "ported",
           "go_target": "pkg/util/heap/heap.go",
-          "tests": ["TestHeapSourceConditionalAssertionsGateAndPreMutationFailure", "TestHeapBorrowsProcessDebugUnlessExplicit", "TestHeapInvalidOperationsUseSourceAssertions"]
+          "tests": [
+            "TestHeapSourceConditionalAssertionsGateAndPreMutationFailure",
+            "TestHeapBorrowsProcessDebugUnlessExplicit",
+            "TestHeapInvalidOperationsUseSourceAssertions"
+          ]
         },
         {
           "name": "move_up/move_down",
@@ -180452,7 +180624,10 @@
           "name": "concrete Euclidean solved-variable heap with borrowed elimination order",
           "status": "ported",
           "go_target": "pkg/math/euclid/solved_queue.go",
-          "go_targets": ["pkg/math/euclid/solver_setup.go", "pkg/math/euclid/solver.go"],
+          "go_targets": [
+            "pkg/math/euclid/solver_setup.go",
+            "pkg/math/euclid/solver.go"
+          ],
           "tests": [
             "TestEuclideanSetupSolvedVariableQueue",
             "TestEuclideanSolvedQueueBorrowsHeapDebugAcrossReset",
@@ -180471,8 +180646,16 @@
           ]
         },
         {
-          "name": "SMT theory-aware case-split priority heap specialization without a retained hint producer (smt_case_split_queue.cpp:1113)",
-          "status": "dead_deleted"
+          "name": "SMT theory-aware case-split concrete BoolVar priority heap, with retained theory_str hint producer",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_aware_branching.go",
+          "tests": [
+            "TestSMTTheoryAwareSelectionConsumesQueueEntry",
+            "TestSMTTheoryAwarePriorityActivityPhaseAndUnassign",
+            "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
+            "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
+            "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder"
+          ]
         },
         {
           "name": "SMT arithmetic theory variable, quantified-instance priority and difference-logic variable/DFS heaps (theory_arith.h:395; smt_quantifier_instances.h:57; diff_logic.h:201,1396)",
@@ -180492,7 +180675,8 @@
         "The concrete Int heap borrows its comparator and Budget. It owns two []int32 columns, charges its cold header and each backing-capacity change, and releases them through explicit Close; Clone and Assign use independent destination storage. The source values/indices construction and destruction order is retained.",
         "The heap borrows an explicit DebugContext where source assertion gates are tested. That context and its tag table remain caller-owned; the heap does not adopt or charge their storage.",
         "Concrete borrowed assertion/action/stream providers reuse actual charged existing headers; macro leaves and call-local scalar operands add no owning storage; actual heap refusal graph audited before fault lift.",
-        "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added."
+        "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added.",
+        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap."
       ],
       "deviations": [
         "The former concrete Int heap used by Euclid kept value and inverse-index arrays in native Go slices; Euclid now owns a local []int32 priority queue and map[int32]int inverse index using container/heap. The pkg/util/heap.Int owner is no longer imported by Euclid. Constructor, insert, bounds growth, clone, assignment and cross-budget swap no longer emulate vector capacity or reserve arena backing. Removed synthetic failed-insert ghost states and stopped assignment cleanup; only the real heap owner header remains charged. A 129-value heap and cross-budget copies/swaps pass with arena reservations refused. SMT, Hilbert and simplex heap specializations remain unported with their owning consumers.",
@@ -180506,7 +180690,9 @@
         "Shared process-global debugger/tag/locale/notify transport remains explicit borrowed adapter; Linux SIGSEGV/host transient heap qualifications retained",
         "No whole debug.h/heap.h/source-driver promotion",
         "Per-instance borrowed debug contexts represent selected source-global namespace; independent unrelated contexts are not a completed process-global registry binding",
-        "Outer check_invariant always returns true after nested C continuation; no observed false outer CASSERT or fabricated source line0 regression claim"
+        "Outer check_invariant always returns true after nested C continuation; no observed false outer CASSERT or fabricated source line0 regression claim",
+        "The theory-aware comparator specialization is live through retained theory_str and uses the existing concrete Int heap with a typed BoolVar comparator. The old no-retained-hint-producer classification is superseded; no generic or any-valued adapter is added.",
+        "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements."
       ]
     },
     {
@@ -251448,7 +251634,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 703.615,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated commit f39025659c7cd68c8b1c508032d525d1125f7f0d, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior containment, regex registration/initial legacy axioms/NFA consumer, core theory case splits, concat/constant arrangements, parent folding and initial concat shortcuts through f3902565. Excludes subsequent literal-core unroll/constant processing and the newly created true-equality propagation correction, which have separate focused/native/debug integration evidence. The known ALL unconstrained containment sat-versus-unknown case remains pending. Full String equality/final checking and production backend routing remain incomplete."
+    "scope_warning": "Independently verified exact clean isolated commit f39025659c7cd68c8b1c508032d525d1125f7f0d, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior containment, regex registration/initial legacy axioms/NFA consumer, core theory case splits, concat/constant arrangements, parent folding and initial concat shortcuts through f3902565. Excludes subsequent literal-core unroll/constant processing and the newly created true-equality propagation correction, which have separate focused/native/debug integration evidence. The known ALL unconstrained containment sat-versus-unknown case remains pending. Full String equality/final checking and production backend routing remain incomplete. Also excludes subsequent theory-aware strategy-6 queue/hint/lifecycle/display work and the corrected live-source audit reopening of the queue units."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

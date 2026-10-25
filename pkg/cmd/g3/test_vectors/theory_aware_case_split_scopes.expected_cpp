@@ -1,0 +1,10 @@
+sat
+(((or a b) true)
+ (c true))
+unsat
+sat
+sat
+((b true)
+ (c true))
+unsat
+sat

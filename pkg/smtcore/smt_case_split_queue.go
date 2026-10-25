@@ -10,9 +10,9 @@ import (
 	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
 
-// SMTActivityCaseSplitQueue is the concrete activity strategy retained by the
-// Go search loop. The C++ heap is an implementation detail; scanning the native
-// Go slices preserves its choice of a greatest-activity unassigned variable.
+// SMTActivityCaseSplitQueue selects the retained search strategy. Activity
+// and relevancy strategies scan Go slices; strategy 6 uses the context's
+// persistent concrete priority heap and its variable lifecycle callbacks.
 type SMTActivityCaseSplitQueue struct {
 	state                                 *SMTInternalizerState
 	phaseSelection, cachingOn, cachingOff uint32
@@ -55,6 +55,9 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
+	if q.strategy == 6 {
+		return q.state.ensureTheoryAwareBranching()
+	}
 	return nil
 }
 
@@ -167,6 +170,9 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 
 func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error) {
 	switch q.strategy {
+	case 6:
+		variable, err := q.state.theoryAwareBranching.next(q.randomVariableFrequency)
+		return variable, lbool.Undef, err
 	case 3:
 		next, phase, err := q.relevantVariable(false, false)
 		if err == nil && next != SMTNullBoolVar && phase != lbool.False && q.lookaheadDiseq && q.selectedEqualityDisequal(next) {
@@ -203,6 +209,35 @@ func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error)
 		}
 		return next, lbool.Undef, err
 	}
+}
+
+// The Go no-progress check needs availability, not a consumed decision.
+// Strategy 6's native next_case_split removes a selected heap entry.
+func (q *SMTActivityCaseSplitQueue) hasCaseSplit() (bool, error) {
+	if q == nil || q.state == nil {
+		return false, ast.ErrASTHandle
+	}
+	if err := q.state.open(); err != nil {
+		return false, err
+	}
+	if q.strategy != 6 {
+		variable, _, err := q.NextCaseSplit()
+		return variable != SMTNullBoolVar, err
+	}
+	values, err := q.state.theoryAwareBranching.heap.AppendValues(nil)
+	if err != nil {
+		return false, err
+	}
+	for _, variable := range values {
+		assignment, err := q.state.Assignment(NewSMTLiteral(variable, false))
+		if err != nil {
+			return false, err
+		}
+		if assignment == lbool.Undef {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 func (q *SMTActivityCaseSplitQueue) selectedEqualityDisequal(variable int32) bool {

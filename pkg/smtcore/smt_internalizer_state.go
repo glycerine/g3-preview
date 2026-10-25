@@ -125,6 +125,7 @@ type SMTInternalizerState struct {
 	random                     z3rand.Generator
 	randomInitialActivity      uint32
 	caseSplitStrategy          uint32
+	theoryAwareBranching       *smtTheoryAwareBranchingQueue
 	theoryCaseSplit            bool
 	theoryCaseSplitSets        [][]SMTLiteral
 	allTheoryCaseSplitLiterals map[SMTLiteral]struct{}
@@ -465,6 +466,11 @@ func (s *SMTInternalizerState) MkBoolVar(expression ast.ASTHandle) (int32, error
 	s.watches = append(s.watches, SMTWatchList{}, SMTWatchList{})
 	s.booleanStack = append(s.booleanStack, expression)
 	s.statistics.NumMkBoolVar++
+	if s.theoryAwareBranching != nil {
+		if err := s.theoryAwareBranching.created(variable); err != nil {
+			return SMTNullBoolVar, err
+		}
+	}
 	return variable, nil
 }
 
@@ -529,6 +535,11 @@ func (s *SMTInternalizerState) SetAssignment(variable int32, value lbool.LBool) 
 	}
 	s.assignment[positive.Index()] = value
 	s.assignment[positive.Negated().Index()] = value.Negated()
+	if value == lbool.Undef && s.theoryAwareBranching != nil {
+		if err := s.theoryAwareBranching.unassigned(variable); err != nil {
+			return err
+		}
+	}
 	return s.context.SetAssignment(s.boolExpr[variable], value)
 }
 
@@ -809,6 +820,11 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		s.assignment[positive.Negated().Index()] = entry.value.Negated()
 		s.booleanData[entry.variable].SetJustification(entry.justification)
 		s.booleanData[entry.variable].ScopeLevel = entry.scopeLevel
+		if entry.value == lbool.Undef && s.theoryAwareBranching != nil {
+			if err := s.theoryAwareBranching.unassigned(entry.variable); err != nil {
+				return err
+			}
+		}
 		if err := s.context.SetAssignment(s.boolExpr[entry.variable], entry.value); err != nil {
 			return fmt.Errorf("restore Boolean assignment: %w", err)
 		}
@@ -893,6 +909,11 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	for len(s.booleanStack) > scope.booleanLimit {
 		expression := s.booleanStack[len(s.booleanStack)-1]
 		variable := s.boolVar[expression]
+		if s.theoryAwareBranching != nil {
+			if err := s.theoryAwareBranching.deleted(variable); err != nil {
+				return err
+			}
+		}
 		if s.caseSplitStrategy == 2 && s.searching && s.activity[variable] > 0 {
 			if err := s.cacheBooleanActivity(expression, s.activity[variable]); err != nil {
 				return err
@@ -1027,6 +1048,10 @@ func (s *SMTInternalizerState) Close() error {
 	}
 	result = errors.Join(result, s.releaseLearnedUnits())
 	result = errors.Join(result, s.releaseBooleanActivityCache())
+	if s.theoryAwareBranching != nil {
+		result = errors.Join(result, s.theoryAwareBranching.heap.Close())
+		s.theoryAwareBranching = nil
+	}
 	result = errors.Join(result, s.dynamicAck.close())
 	if s.quantifierManager != nil {
 		result = errors.Join(result, s.quantifierManager.Close())

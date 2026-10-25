@@ -380,11 +380,11 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 				continue
 			}
 			if k.internalizer.searchProgress() == before {
-				variable, _, splitErr := queue.NextCaseSplit()
+				available, splitErr := queue.hasCaseSplit()
 				if splitErr != nil {
 					return lbool.Undef, fmt.Errorf("smt search final case split: %w", splitErr)
 				}
-				if variable != SMTNullBoolVar {
+				if available {
 					continue
 				}
 				k.lastFailure = SMTFailureUnknown
