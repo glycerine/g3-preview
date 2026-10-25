@@ -324,6 +324,7 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 		if err != nil {
 			return lbool.Undef, fmt.Errorf("smt search final check: %w", err)
 		}
+		restartForModel := false
 		if status == SMTFinalCheckDone && k.internalizer.quantifierManager != nil {
 			modelStatus, err := k.internalizer.quantifierManager.CheckModel()
 			if err != nil {
@@ -336,6 +337,7 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 				return lbool.Undef, nil
 			case SMTQuantifierModelRestart:
 				status = SMTFinalCheckContinue
+				restartForModel = true
 			default:
 				return lbool.Undef, ast.ErrASTDomain
 			}
@@ -356,14 +358,8 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 			k.lastFailure = SMTFailureTheory
 			return lbool.Undef, nil
 		case SMTFinalCheckContinue:
-			if manager := k.internalizer.quantifierManager; manager != nil && len(manager.modelFinder.pendingConstraints) != 0 {
-				if count := k.internalizer.scopeLevel - baseLevel; count != 0 {
-					if err = k.internalizer.PopScopes(count); err != nil {
-						return lbool.Undef, err
-					}
-				}
-				k.internalizer.statistics.NumRestarts++
-				if err = k.internalizer.RestartTheories(); err != nil {
+			if manager := k.internalizer.quantifierManager; restartForModel || manager != nil && len(manager.modelFinder.pendingConstraints) != 0 {
+				if err = k.restartSearchAtBase(baseLevel, &restarts, true); err != nil {
 					return lbool.Undef, err
 				}
 				continue

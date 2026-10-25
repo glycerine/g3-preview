@@ -54,12 +54,13 @@ func TestSMTModelCheckerFindsFiniteBooleanCounterexample(t *testing.T) {
 	t.Cleanup(func() { astTestMust(t, checker.Close()) })
 	satisfied, err := checker.Check(proto, []ast.ASTHandle{quantifier})
 	astTestMust(t, err)
-	if satisfied || !registry.schedule.HasWork() {
+	if satisfied || !checker.HasNewInstances() || registry.schedule.HasWork() {
 		t.Fatal("false Boolean binding did not queue a counterexample", satisfied)
 	}
 	if checker.iteration != 1 || checker.maxCexs != 2 {
 		t.Fatal("first model-check lifecycle", checker.iteration, checker.maxCexs)
 	}
+	astTestMust(t, checker.Restart())
 	astTestMust(t, manager.Propagate())
 	if registry.schedule.Stats().Instances != 1 {
 		t.Fatal("counterexample was not materialized", registry.schedule.Stats())

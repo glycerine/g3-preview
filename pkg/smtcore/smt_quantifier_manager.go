@@ -506,21 +506,14 @@ func (q *SMTQuantifierManager) CheckModel() (SMTQuantifierModelCheckResult, erro
 		if checkErr != nil {
 			return SMTQuantifierModelUnknown, errors.Join(checkErr, generator.Close())
 		}
-		if q.modelChecker.Exhausted() {
-			return SMTQuantifierModelUnknown, generator.Close()
-		}
 		if !modelSatisfied {
-			entries, scheduleErr := q.registry.schedule.ScheduleNew(map[*SMTFingerprint]bool{})
-			if scheduleErr == nil {
-				scheduleErr = q.instantiate(entries)
-			}
-			if scheduleErr != nil {
-				return SMTQuantifierModelUnknown, errors.Join(scheduleErr, generator.Close())
-			}
 			if err = generator.Close(); err != nil {
 				return SMTQuantifierModelUnknown, err
 			}
-			return SMTQuantifierModelRestart, nil
+			if q.modelChecker.HasNewInstances() {
+				return SMTQuantifierModelRestart, nil
+			}
+			return SMTQuantifierModelUnknown, nil
 		}
 		if q.acceptedModel != nil {
 			if err = q.acceptedModel.Close(); err != nil {

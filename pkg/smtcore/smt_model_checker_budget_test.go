@@ -43,6 +43,7 @@ func TestSMTModelCheckerCounterexampleCapAppliesToEveryQuantifier(t *testing.T) 
 		if satisfied {
 			t.Fatal("invalid finite model was accepted", cap)
 		}
+		astTestMust(t, checker.Restart())
 		counts := make(map[ast.ASTHandle]int)
 		for _, entry := range state.quantifiers.schedule.newEntries {
 			counts[entry.Fingerprint.Data()]++
@@ -58,6 +59,7 @@ func TestSMTModelCheckerCounterexampleCapAppliesToEveryQuantifier(t *testing.T) 
 		astTestMust(t, checker.InitSearch())
 		satisfied, err = checker.Check(proto, quantifiers)
 		astTestMust(t, err)
+		astTestMust(t, checker.Restart())
 		if satisfied || len(state.quantifiers.schedule.newEntries) != before {
 			t.Fatal("repeated counterexamples validated the model or escaped the cap", cap, satisfied, len(state.quantifiers.schedule.newEntries), before)
 		}

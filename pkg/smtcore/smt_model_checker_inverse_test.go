@@ -48,11 +48,15 @@ func TestSMTModelCheckerContextRecoveryUsesOldestEqualityMember(t *testing.T) {
 	astTestMust(t, checker.SetCandidateTerms(map[*SMTEnode]ast.ASTHandle{root: value}))
 	inserted, err := checker.addCounterexample(q, []ast.ASTHandle{value})
 	astTestMust(t, err)
+	if !checker.HasNewInstances() || checker.newInstances[0].bindings[0] != nodes[0].owner || registry.schedule.HasWork() {
+		t.Fatal("context recovery did not pin the oldest term before restart")
+	}
+	astTestMust(t, checker.Restart())
 	if !inserted || len(registry.schedule.newEntries) != 1 {
 		t.Fatal("recovered context counterexample was not queued")
 	}
 	entry := registry.schedule.newEntries[0]
-	if checker.valueTerms[value] != nodes[0].owner || entry.Generation != 1 || entry.Fingerprint.args[0] != root {
+	if checker.valueTerms[value] != nodes[0].owner || entry.Generation != 0 || entry.Fingerprint.args[0] != root {
 		t.Fatal("context recovery used the newer representative instead of the oldest class member", entry.Generation)
 	}
 }
@@ -92,13 +96,18 @@ func TestSMTModelCheckerInversePreservesGenerationBeforeFingerprintCanonicalizat
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, checker.Close()) })
 			checker.valueTerms = map[ast.ASTHandle]ast.ASTHandle{seven: three}
-			inserted, err := checker.enqueueCounterexample(q, []ast.ASTHandle{seven}, fromInverse)
+			generation := uint32(0)
+			if fromInverse {
+				generation = 8
+			}
+			inserted, err := checker.enqueueCounterexample(q, []ast.ASTHandle{seven}, fromInverse, generation)
 			astTestMust(t, err)
+			astTestMust(t, checker.Restart())
 			if !inserted || len(registry.schedule.newEntries) != 1 {
 				t.Fatal("counterexample was not queued")
 			}
 			entry := registry.schedule.newEntries[0]
-			want := uint32(1)
+			want := uint32(0)
 			if fromInverse {
 				want = 8
 			}
@@ -180,6 +189,7 @@ func TestSMTModelCheckerFiniteUniverseRecoversModelFinderTerm(t *testing.T) {
 	checker.valueTerms = nil
 	satisfied, err := checker.Check(proto, []ast.ASTHandle{q})
 	astTestMust(t, err)
+	astTestMust(t, checker.Restart())
 	if satisfied || checker.Exhausted() || len(state.quantifiers.schedule.newEntries) != 1 {
 		t.Fatal("finite private value was not recovered through its AUF inverse", satisfied, checker.Exhausted())
 	}
@@ -233,6 +243,7 @@ func TestSMTModelCheckerMixedUniverseRecoversFiniteInverse(t *testing.T) {
 	checker.valueTerms = nil
 	satisfied, err := checker.Check(proto, []ast.ASTHandle{q})
 	astTestMust(t, err)
+	astTestMust(t, checker.Restart())
 	if satisfied || checker.Exhausted() || len(state.quantifiers.schedule.newEntries) != 1 {
 		t.Fatal("mixed finite/infinite counterexample did not recover the finite inverse", satisfied, checker.Exhausted(), len(state.quantifiers.schedule.newEntries))
 	}

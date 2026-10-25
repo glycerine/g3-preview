@@ -72,13 +72,17 @@ func (r *smtRestartState) advance(params SMTParamsState) error {
 }
 
 func (k *SMTKernel) restartSearch(baseLevel uint32, state *smtRestartState) error {
+	return k.restartSearchAtBase(baseLevel, state, false)
+}
+
+func (k *SMTKernel) restartSearchAtBase(baseLevel uint32, state *smtRestartState, force bool) error {
 	if state == nil {
 		return ast.ErrASTHandle
 	}
 	if err := state.advance(k.smtState); err != nil {
 		return err
 	}
-	if !k.smtState.RestartAdaptive || k.internalizer.searchAgility < k.smtState.RestartAgilityThreshold {
+	if force || !k.smtState.RestartAdaptive || k.internalizer.searchAgility < k.smtState.RestartAgilityThreshold {
 		k.internalizer.statistics.NumRestarts++
 		if count := k.internalizer.scopeLevel - baseLevel; count != 0 {
 			if err := k.internalizer.PopScopes(count); err != nil {
@@ -87,6 +91,9 @@ func (k *SMTKernel) restartSearch(baseLevel uint32, state *smtRestartState) erro
 		}
 		if err := k.internalizer.RestartTheories(); err != nil {
 			return err
+		}
+		if k.internalizer.Inconsistent() {
+			return nil
 		}
 	}
 	if k.smtState.SimplifyClauses {

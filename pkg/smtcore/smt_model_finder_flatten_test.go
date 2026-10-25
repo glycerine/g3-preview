@@ -135,6 +135,7 @@ func TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal(t *testin
 			checker := state.quantifierManager.modelChecker
 			satisfied, err := checker.Check(proto, []ast.ASTHandle{outer})
 			astTestMust(t, err)
+			astTestMust(t, checker.Restart())
 			if satisfied || len(state.quantifiers.schedule.newEntries) != 1 {
 				t.Fatal("flattened counterexample was not queued", satisfied)
 			}

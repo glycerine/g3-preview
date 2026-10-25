@@ -2614,6 +2614,7 @@
         "smt_literal_display.go",
         "smt_mam.go",
         "smt_model_checker.go",
+        "smt_model_checker_instances.go",
         "smt_model_finder.go",
         "smt_model_finder_auf_analyzer.go",
         "smt_model_finder_auf_classify.go",

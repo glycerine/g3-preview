@@ -57,8 +57,13 @@ func (s *SMTInternalizerState) RestartTheories() error {
 			return err
 		}
 	}
-	if !s.inconsistent && s.quantifierManager != nil && s.quantifierManager.modelFinder != nil {
-		return s.quantifierManager.modelFinder.Restart()
+	if !s.inconsistent && s.quantifierManager != nil && s.quantifierManager.mbqi {
+		if err := s.quantifierManager.modelFinder.Restart(); err != nil {
+			return err
+		}
+		if s.quantifierManager.modelChecker != nil {
+			return s.quantifierManager.modelChecker.Restart()
+		}
 	}
 	return nil
 }

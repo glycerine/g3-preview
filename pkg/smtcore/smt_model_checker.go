@@ -16,8 +16,8 @@ type smtAuxiliarySolverFactory func() (*SMTSolver, error)
 
 // SMTModelChecker checks universal quantifiers over finite proto-model
 // universes and uses a fresh SMT solver for infinite domains. Counterexamples
-// enter the ordinary quantifier queue so proof construction and
-// internalization remain centralized in SMTQIInstanceBuilder.
+// retain expression bindings until restart, when they enter the ordinary
+// quantifier queue at the restored base scope.
 type SMTModelChecker struct {
 	manager        *ast.ASTManager
 	state          *SMTInternalizerState
@@ -30,6 +30,7 @@ type SMTModelChecker struct {
 	exhausted      bool
 	valueTerms     map[ast.ASTHandle]ast.ASTHandle
 	auxiliary      smtAuxiliarySolverFactory
+	newInstances   []smtModelCheckerInstance
 	closed         bool
 }
 
@@ -135,63 +136,8 @@ func (c *SMTModelChecker) universe(model *protomodel.ProtoModel, sort ast.ASTHan
 	return []ast.ASTHandle{value}, nil
 }
 
-func (c *SMTModelChecker) bindingNode(value ast.ASTHandle, fromInverse bool) (*SMTEnode, error) {
-	if term := c.valueTerms[value]; !fromInverse && !term.IsNull() {
-		value = term
-	}
-	private, err := containsPrivateModelTerm(c.manager, value, true)
-	if err != nil || private {
-		return nil, err
-	}
-	if node := c.state.context.enodes[value]; node != nil {
-		return node, nil
-	}
-	kind, err := c.manager.GetKind(value)
-	if err != nil || kind != ast.ASTApp {
-		if err != nil {
-			return nil, err
-		}
-		return nil, ast.ErrASTDomain
-	}
-	if err = c.state.internalizeTerm(value); err != nil {
-		return nil, err
-	}
-	if node := c.state.context.enodes[value]; node != nil {
-		return node, nil
-	}
-	return c.state.MkEnode(value, false, false, true)
-}
-
 func (c *SMTModelChecker) addCounterexample(quantifier ast.ASTHandle, values []ast.ASTHandle) (bool, error) {
-	return c.enqueueCounterexample(quantifier, values, false)
-}
-
-func (c *SMTModelChecker) enqueueCounterexample(quantifier ast.ASTHandle, values []ast.ASTHandle, fromInverse bool) (bool, error) {
-	count, err := c.manager.GetNumDeclarations(quantifier)
-	if err != nil {
-		return false, err
-	}
-	if uint32(len(values)) < count {
-		return false, ast.ErrASTDomain
-	}
-	values = values[:count]
-	nodes := make([]*SMTEnode, len(values))
-	var maxGeneration uint32
-	for i, value := range values {
-		node, err := c.bindingNode(value, fromInverse)
-		if err != nil {
-			return false, err
-		}
-		if node == nil {
-			c.exhausted = true
-			return false, nil
-		}
-		nodes[i] = node
-		if node.Generation() > maxGeneration {
-			maxGeneration = node.Generation()
-		}
-	}
-	return c.registry.AddInstance(quantifier, ast.ASTHandle{}, nodes, maxGeneration, 0, 0)
+	return c.enqueueCounterexample(quantifier, values, false, 0)
 }
 
 func (c *SMTModelChecker) addFiniteCounterexample(quantifier ast.ASTHandle, values []ast.ASTHandle) (bool, error) {
@@ -209,17 +155,21 @@ func (c *SMTModelChecker) addFiniteCounterexample(quantifier ast.ASTHandle, valu
 		_, err = c.addCounterexample(quantifier, values[:count])
 		return !c.exhausted && err == nil, err
 	}
+	var maxGeneration uint32
 	for i, value := range bindings {
-		term, _, found, err := c.modelFinder.Inverse(quantifier, uint32(i), value)
+		term, generation, found, err := c.modelFinder.Inverse(quantifier, uint32(i), value)
 		if err != nil || !found {
 			return false, err
 		}
 		bindings[i] = term
+		if generation > maxGeneration {
+			maxGeneration = generation
+		}
 	}
 	// A restricted counterexample must recover every binding from the
 	// instantiation sets. Source add_instance(use_inv=true) never combines
 	// inverse terms with representatives from the unrestricted context.
-	_, err = c.enqueueCounterexample(quantifier, bindings, true)
+	_, err = c.enqueueCounterexample(quantifier, bindings, true, maxGeneration)
 	return !c.exhausted && err == nil, err
 }
 
@@ -317,14 +267,14 @@ func (c *SMTModelChecker) addInstantiationSetRestrictions(auxiliary *SMTSolver, 
 	return asserted, nil
 }
 
-func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier ast.ASTHandle, values []ast.ASTHandle, skolemDecls []ast.ASTHandle, requireInverse bool) (raw, bindings []ast.ASTHandle, inverseOK bool, err error) {
+func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier ast.ASTHandle, values []ast.ASTHandle, skolemDecls []ast.ASTHandle, requireInverse bool) (raw, bindings []ast.ASTHandle, inverseOK bool, generation uint32, err error) {
 	flat := quantifier
 	if c.modelFinder != nil {
 		flat = c.modelFinder.flatQuantifier(quantifier)
 	}
 	count, err := c.manager.GetNumDeclarations(quantifier)
 	if err != nil {
-		return nil, nil, false, err
+		return nil, nil, false, 0, err
 	}
 	raw = append([]ast.ASTHandle(nil), values...)
 	for i, declaration := range skolemDecls {
@@ -333,16 +283,16 @@ func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier
 		}
 		value, e := cex.ConstantInterpretation(declaration)
 		if e != nil {
-			return nil, nil, false, e
+			return nil, nil, false, 0, e
 		}
 		if value.IsNull() {
 			sort, e := c.manager.GetDeclarationSort(flat, uint32(i))
 			if e != nil {
-				return nil, nil, false, e
+				return nil, nil, false, 0, e
 			}
 			value, e = cex.GetSomeValue(sort)
 			if e != nil {
-				return nil, nil, false, e
+				return nil, nil, false, 0, e
 			}
 		}
 		raw[i] = value
@@ -350,26 +300,29 @@ func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier
 	bindings = append([]ast.ASTHandle(nil), raw...)
 	inverseOK = true
 	if c.modelFinder == nil {
-		return raw, bindings, !requireInverse, nil
+		return raw, bindings, !requireInverse, generation, nil
 	}
 	if !requireInverse {
-		return raw, bindings, true, nil
+		return raw, bindings, true, generation, nil
 	}
 	for i := range bindings {
 		if uint32(i) >= count {
 			continue
 		}
-		term, _, found, e := c.modelFinder.Inverse(quantifier, uint32(i), bindings[i])
+		term, inverseGeneration, found, e := c.modelFinder.Inverse(quantifier, uint32(i), bindings[i])
 		if e != nil {
-			return nil, nil, false, e
+			return nil, nil, false, 0, e
 		}
 		if found {
 			bindings[i] = term
+			if inverseGeneration > generation {
+				generation = inverseGeneration
+			}
 		} else if requireInverse {
 			inverseOK = false
 		}
 	}
-	return raw, bindings, inverseOK, nil
+	return raw, bindings, inverseOK, generation, nil
 }
 
 func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel, quantifier ast.ASTHandle, values []ast.ASTHandle, finite []bool, remaining *uint32) (found bool, result error) {
@@ -506,7 +459,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 				return false, ast.ErrASTPending
 			}
 		}
-		raw, bindings, inverseOK, err := c.auxiliaryBindings(cex, quantifier, values, skolemDecls, restricted)
+		raw, bindings, inverseOK, generation, err := c.auxiliaryBindings(cex, quantifier, values, skolemDecls, restricted)
 		if err != nil {
 			if cex != complete {
 				err = errors.Join(err, cex.DecRef())
@@ -521,7 +474,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 			}
 			break
 		}
-		inserted, err := c.enqueueCounterexample(quantifier, bindings, restricted)
+		inserted, err := c.enqueueCounterexample(quantifier, bindings, restricted, generation)
 		if err != nil {
 			if cex != complete {
 				err = errors.Join(err, cex.DecRef())
@@ -552,7 +505,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 		}
 	}
 	if restricted && !found && *remaining != 0 {
-		_, bindings, _, err := c.auxiliaryBindings(complete, quantifier, values, skolemDecls, false)
+		_, bindings, _, _, err := c.auxiliaryBindings(complete, quantifier, values, skolemDecls, false)
 		if err != nil {
 			return false, err
 		}
@@ -751,6 +704,7 @@ func (c *SMTModelChecker) Close() error {
 	if c.closed {
 		return nil
 	}
+	result := c.ResetNewInstances()
 	c.closed = true
 	c.state = nil
 	c.registry = nil
@@ -758,5 +712,5 @@ func (c *SMTModelChecker) Close() error {
 	c.valueTerms = nil
 	c.auxiliary = nil
 	c.manager = nil
-	return nil
+	return result
 }
