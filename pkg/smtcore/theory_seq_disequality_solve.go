@@ -3,6 +3,8 @@
 package smtcore
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -99,22 +101,61 @@ func (t *SMTSequenceTheory) checkReducedDisequations() (bool, error) {
 		if originalEquality == residualEquality {
 			continue
 		}
-		originalDisequality, makeErr := state.manager.MkNot(originalEquality)
+		if makeErr = state.Internalize(residualEquality, true); makeErr != nil {
+			return false, makeErr
+		}
+		literal, makeErr := state.Literal(residualEquality)
 		if makeErr != nil {
 			return false, makeErr
 		}
-		residualDisequality, makeErr := state.manager.MkNot(residualEquality)
-		if makeErr != nil {
-			return false, makeErr
+		progress, makeErr := t.propagateSequenceLiteral(literal.Negated(), dependency)
+		if makeErr != nil || progress {
+			return progress, makeErr
 		}
-		implication, makeErr := state.manager.MkImplies(originalDisequality, residualDisequality)
-		if makeErr != nil {
-			return false, makeErr
-		}
-		if _, found := t.axioms.set[implication]; found {
-			continue
-		}
-		return true, t.axioms.Push(implication)
 	}
 	return false, nil
+}
+
+// Source propagate_lit retains both literal and enode-equality antecedents.
+// A cancellation under established equalities is not an unconditional lemma.
+func (t *SMTSequenceTheory) propagateSequenceLiteral(literal SMTLiteral, dependency *smtSequenceDependency) (bool, error) {
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	value, err := state.Assignment(literal)
+	if err != nil || value == lbool.True {
+		return false, err
+	}
+	if literal == SMTFalseLiteral {
+		return true, t.setDependencyConflict(dependency)
+	}
+	expression, err := state.BoolExpression(literal.Var())
+	if err != nil {
+		return false, err
+	}
+	if err = state.markRelevant(expression); err != nil {
+		return false, err
+	}
+	literals, equalities := t.dependencyEvidence(dependency)
+	for _, antecedent := range literals {
+		assigned, err := state.Assignment(antecedent)
+		if err != nil || assigned != lbool.True {
+			return false, err
+		}
+	}
+	owner, err := NewSMTExtTheoryPropagationJustification(state.manager, t.FamilyID(), literals, equalities, literal, nil)
+	if err != nil {
+		return false, err
+	}
+	wrapped, err := NewSMTBooleanJustification(owner)
+	if err != nil {
+		return false, errors.Join(err, owner.Release(state.manager))
+	}
+	state.ownedJustifications = append(state.ownedJustifications, owner)
+	if err = state.AssignLiteral(literal, wrapped); err != nil {
+		return false, err
+	}
+	state.theoryProgress++
+	return true, nil
 }

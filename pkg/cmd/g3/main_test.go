@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"quant_seq_residual_evidence_scopes.smt2":      "unsat\n(tails words prefixes)\nsat\nunsat\nsat\n",
 	"datatype_boolean_fields_scopes.smt2":          "sat\nsat\n((p true) ((field x) true) (((_ is box) x) true))\nunsat\nsat\nsat\n((p false) ((field x) false) (((_ is box) x) true))\nunsat\n",
 	"datatype_metadata_merge_scopes.smt2":          "sat\n((((_ is right) x) true) (((_ is right) y) true) ((= x y) true))\nunsat\n(rejected_survivor)\nsat\nsat\n(((not ((_ is left) x)) true) ((not ((_ is middle) y)) true))\nunsat\n(rejected_constructor)\nsat\nsat\n(((= u v) true) ((= (rf x) u) true) ((= (rf y) v) true))\nsat\n",
 	"unsat_core_reverse_trail.smt2":                "unsat\n(c)\nsat\n((a true) (b true) (c false))\nunsat\n(blocked)\nsat\nunsat\n(h)\nsat\n((e true) (h false) ((= x y) true))\nunsat\n(blocked_eq)\nsat\n",
