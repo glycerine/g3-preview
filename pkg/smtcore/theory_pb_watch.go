@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"math/big"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -109,6 +110,15 @@ type smtPBVariableWatches struct {
 	literals   [2][]*smtPBConstraint
 	variables  []*smtPBConstraint
 	constraint *smtPBConstraint
+}
+
+func (t *SMTPseudoBooleanTheory) watchVariables() []int32 {
+	var variables []int32
+	for v := range t.watches {
+		variables = append(variables, v)
+	}
+	sort.Slice(variables, func(i, j int) bool { return variables[i] < variables[j] })
+	return variables
 }
 
 // Source pb_justification retains the inequality used for propagation.
@@ -333,7 +343,13 @@ func (t *SMTPseudoBooleanTheory) assignVariable(v int32, isTrue bool, c *smtPBCo
 	} else {
 		c.minSum.Add(&c.minSum, &a.terms[index].coeff)
 	}
+	if err = t.validateVariableSums(c); err != nil {
+		return err
+	}
 	c.fixed++
+	if smtcoreSourceDebug && c.fixed > len(a.terms) {
+		return ast.ErrASTDomain
+	}
 	if !c.equality && c.minSum.Cmp(&a.bound) >= 0 && asgn != lbool.True {
 		ls, err := t.helpful(c, false)
 		if err != nil {
@@ -406,6 +422,9 @@ func (t *SMTPseudoBooleanTheory) assignInequality(c *smtPBConstraint, isTrue boo
 	if err := t.initLiteralWatch(c); err != nil {
 		return err
 	}
+	if err := t.validateWatch(c); err != nil {
+		return err
+	}
 	if new(big.Rat).Sub(maxsum, mininc).Cmp(&c.current().bound) < 0 {
 		ls, err := t.unhelpful(c, true)
 		if err != nil {
@@ -418,6 +437,9 @@ func (t *SMTPseudoBooleanTheory) assignInequality(c *smtPBConstraint, isTrue boo
 				return err
 			}
 			if v == lbool.Undef {
+				if err = t.validateAssign(c, ls, term.literal); err != nil {
+					return err
+				}
 				if err = t.addAssign(c, ls, term.literal); err != nil {
 					return err
 				}
@@ -490,6 +512,9 @@ func (t *SMTPseudoBooleanTheory) assignLiteralWatch(v int32, isTrue bool, c *smt
 				return true, err
 			}
 			if value == lbool.Undef && deficit.Cmp(&term.coeff) < 0 {
+				if err = t.validateAssign(c, ls, term.literal); err != nil {
+					return true, err
+				}
 				if err = t.addAssign(c, ls, term.literal); err != nil {
 					return true, err
 				}

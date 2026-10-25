@@ -94,10 +94,16 @@ type SMTModelValueProcedure interface {
 	IsFresh() bool
 }
 
+// SMTModelInitializer is the independent source init_model hook. A theory may
+// register a factory without opting into enode value construction.
+type SMTModelInitializer interface {
+	InitializeModel(*SMTModelGenerator) error
+}
+
 // SMTModelValueTheory is the retained model-generation surface implemented by
 // theories that assign concrete values to their enode roots.
 type SMTModelValueTheory interface {
-	InitializeModel(*SMTModelGenerator) error
+	SMTModelInitializer
 	ModelValue(*SMTEnode, *SMTModelGenerator) (SMTModelValueProcedure, error)
 }
 

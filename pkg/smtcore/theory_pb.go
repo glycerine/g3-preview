@@ -202,7 +202,16 @@ func (*SMTPseudoBooleanTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error 
 	return ast.ErrASTDomain
 }
 func (t *SMTPseudoBooleanTheory) Assign(v int32, value bool) error { return t.assignNative(v, value) }
-func (*SMTPseudoBooleanTheory) FinalCheck() (SMTFinalCheckStatus, error) {
+func (t *SMTPseudoBooleanTheory) FinalCheck() (SMTFinalCheckStatus, error) {
+	if smtcoreSourceDebug {
+		for _, v := range t.watchVariables() {
+			if c := t.watches[v].constraint; c != nil {
+				if err := t.validateFinalConstraint(c); err != nil {
+					return SMTFinalCheckDone, err
+				}
+			}
+		}
+	}
 	return SMTFinalCheckDone, nil
 }
 func (*SMTPseudoBooleanTheory) Name() string { return "pb" }

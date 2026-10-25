@@ -199,7 +199,7 @@ func (g *SMTModelGenerator) discoverValueProcedures(state *SMTInternalizerState)
 		return nil, nil, ast.ErrASTDomain
 	}
 	for _, theory := range state.theoryOrder {
-		if modelTheory, ok := theory.(SMTModelValueTheory); ok {
+		if modelTheory, ok := theory.(SMTModelInitializer); ok {
 			if err := modelTheory.InitializeModel(g); err != nil {
 				return nil, nil, err
 			}
