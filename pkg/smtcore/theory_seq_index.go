@@ -147,11 +147,11 @@ func (t *SMTSequenceTheory) addIndexAxioms(expression ast.ASTHandle) error {
 			return makeErr
 		}
 		arguments := []ast.ASTHandle{source, needle}
-		prefix, makeErr := t.relationSkolem("seq.indexof_left", arguments, sort)
+		prefix, makeErr := t.relationSkolem("seq.idx.left", arguments, sort)
 		if makeErr != nil {
 			return makeErr
 		}
-		suffix, makeErr := t.relationSkolem("seq.indexof_right", arguments, sort)
+		suffix, makeErr := t.relationSkolem("seq.idx.right", arguments, sort)
 		if makeErr != nil {
 			return makeErr
 		}
@@ -243,11 +243,11 @@ func (t *SMTSequenceTheory) addIndexAxioms(expression ast.ASTHandle) error {
 	}
 	valid := []ast.ASTHandle{offsetNonnegative, beforeEnd}
 	arguments := []ast.ASTHandle{source, needle, offset}
-	prefix, err := t.relationSkolem("seq.indexof_left", arguments, sort)
+	prefix, err := t.relationSkolem("seq.idx.left", arguments, sort)
 	if err != nil {
 		return err
 	}
-	suffix, err := t.relationSkolem("seq.indexof_right", arguments, sort)
+	suffix, err := t.relationSkolem("seq.idx.right", arguments, sort)
 	if err != nil {
 		return err
 	}

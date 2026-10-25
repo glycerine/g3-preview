@@ -67,7 +67,7 @@ func (t *SMTSequenceTheory) addLengthLowerBoundDecomposition() (bool, error) {
 		if variableErr != nil {
 			return false, variableErr
 		}
-		if !variable {
+		if !variable || !t.solutions.IsRoot(expression) {
 			continue
 		}
 		length, makeErr := state.manager.MkSequenceLength(expression)

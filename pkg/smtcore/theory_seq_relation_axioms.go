@@ -339,11 +339,11 @@ func (t *SMTSequenceTheory) addRelationAxioms(expression ast.ASTHandle, operatio
 		}
 		definition, err = state.manager.MkEq(word, right)
 	case 5:
-		prefix, makeErr := t.relationSkolem("seq.indexof_left", arguments, sort)
+		prefix, makeErr := t.relationSkolem("seq.idx.left", arguments, sort)
 		if makeErr != nil {
 			return makeErr
 		}
-		suffix, makeErr := t.relationSkolem("seq.indexof_right", arguments, sort)
+		suffix, makeErr := t.relationSkolem("seq.idx.right", arguments, sort)
 		if makeErr != nil {
 			return makeErr
 		}

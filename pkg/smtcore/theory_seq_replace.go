@@ -75,11 +75,11 @@ func (t *SMTSequenceTheory) addReplaceAxioms(expression ast.ASTHandle) error {
 	}
 
 	arguments := []ast.ASTHandle{source, needle}
-	prefix, err := t.relationSkolem("seq.indexof_left", arguments, sort)
+	prefix, err := t.relationSkolem("seq.idx.left", arguments, sort)
 	if err != nil {
 		return err
 	}
-	suffix, err := t.relationSkolem("seq.indexof_right", arguments, sort)
+	suffix, err := t.relationSkolem("seq.idx.right", arguments, sort)
 	if err != nil {
 		return err
 	}

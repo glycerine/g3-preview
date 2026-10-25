@@ -1771,7 +1771,7 @@ func TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms(t *testing.T) {
 	}{
 		{name: "prefix", operation: 3, skolem: "seq.p.suffix"},
 		{name: "suffix", operation: 4, skolem: "seq.s.prefix"},
-		{name: "contains", operation: 5, skolem: "seq.indexof_left"},
+		{name: "contains", operation: 5, skolem: "seq.idx.left"},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			m, modelConfig := smtModelGeneratorFixture(t)
@@ -1804,7 +1804,7 @@ func TestSMTSequenceTheoryRelationWitnessAndNonemptyAxioms(t *testing.T) {
 			case 4:
 				word, err = m.MkSequenceConcat(first, left)
 			case 5:
-				rightName, symbolErr := m.Symbols.Intern("seq.indexof_right")
+				rightName, symbolErr := m.Symbols.Intern("seq.idx.right")
 				astTestMust(t, symbolErr)
 				last, makeErr := m.MkSequenceSkolem(rightName, []ast.ASTHandle{left, right}, sort)
 				astTestMust(t, makeErr)
@@ -2479,7 +2479,7 @@ func TestSMTSequenceTheoryIndexAxioms(t *testing.T) {
 	astTestMust(t, err)
 	contains, err := m.MkSequenceContains(source, needle)
 	astTestMust(t, err)
-	prefixName, err := m.Symbols.Intern("seq.indexof_left")
+	prefixName, err := m.Symbols.Intern("seq.idx.left")
 	astTestMust(t, err)
 	prefix, err := m.MkSequenceSkolem(prefixName, []ast.ASTHandle{source, needle}, sort)
 	astTestMust(t, err)
@@ -2539,7 +2539,7 @@ func TestSMTSequenceTheoryIndexTightestPrefixAxioms(t *testing.T) {
 			astTestMust(t, err)
 			needleNonempty, err := m.MkNot(needleEmpty)
 			astTestMust(t, err)
-			prefixName, err := m.Symbols.Intern("seq.indexof_left")
+			prefixName, err := m.Symbols.Intern("seq.idx.left")
 			astTestMust(t, err)
 			prefix, err := m.MkSequenceSkolem(prefixName, []ast.ASTHandle{source, needle}, sort)
 			astTestMust(t, err)
@@ -2644,11 +2644,11 @@ func TestSMTSequenceTheoryReplaceAxioms(t *testing.T) {
 			assertion := contains
 			want := source
 			if found {
-				prefixName, makeErr := m.Symbols.Intern("seq.indexof_left")
+				prefixName, makeErr := m.Symbols.Intern("seq.idx.left")
 				astTestMust(t, makeErr)
 				prefix, makeErr := m.MkSequenceSkolem(prefixName, []ast.ASTHandle{source, needle}, sort)
 				astTestMust(t, makeErr)
-				suffixName, makeErr := m.Symbols.Intern("seq.indexof_right")
+				suffixName, makeErr := m.Symbols.Intern("seq.idx.right")
 				astTestMust(t, makeErr)
 				suffix, makeErr := m.MkSequenceSkolem(suffixName, []ast.ASTHandle{source, needle}, sort)
 				astTestMust(t, makeErr)
@@ -2716,7 +2716,7 @@ func TestSMTSequenceTheoryReplaceTightestPrefixAxioms(t *testing.T) {
 	_, _, state := smtInternalizerFixture(t, m, nil)
 	astTestMust(t, state.RegisterTheory(theory))
 	astTestMust(t, theory.addReplaceAxioms(result))
-	prefixName, err := m.Symbols.Intern("seq.indexof_left")
+	prefixName, err := m.Symbols.Intern("seq.idx.left")
 	astTestMust(t, err)
 	prefix, err := m.MkSequenceSkolem(prefixName, []ast.ASTHandle{source, needle}, sort)
 	astTestMust(t, err)
