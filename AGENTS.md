@@ -14,7 +14,7 @@ about eight minutes. Keep commits frequent and do not commit known failing
 focused checks. No Go generics, C/cgo, source hashing, wasm/wasi builds, or race
 checks for the current single-goroutine porting work. Preserve the pkg/ split.
 
-Insertion-ordered dictionaries: use github.com/glycerine/insdict at v0.10.1
+Insertion-ordered dictionaries: use github.com/glycerine/insdict at v0.14.6
 when a dictionary/hashmap must iterate keys in insertion order. Its generics
 are an explicitly approved exception to the general no-generics rule.
 
