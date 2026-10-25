@@ -2,9 +2,11 @@
 package smtcore
 
 import (
+	"fmt"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/backtrack"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"io"
 )
 
 type smtDatatypeVarData struct {
@@ -37,6 +39,12 @@ func (t *SMTDatatypeTheory) rootData(variable SMTTheoryVar) (uint32, *smtDatatyp
 func (t *SMTDatatypeTheory) mergeDatatypeClasses(root, child uint32) error {
 	s, err := t.State()
 	if err != nil {
+		return err
+	}
+	if err = t.emitDatatype("datatype", "merge_eh", 663, func(out io.Writer) error {
+		_, err := fmt.Fprintf(out, "merging v%d v%d\n", root, child)
+		return err
+	}); err != nil {
 		return err
 	}
 	first, second := t.data[root], t.data[child]
@@ -120,6 +128,17 @@ func (t *SMTDatatypeTheory) addRecognizer(variable SMTTheoryVar, recognizer *SMT
 	}
 	value, err := s.Assignment(literal)
 	if err != nil {
+		return err
+	}
+	if err = t.emitDatatype("datatype", "add_recognizer", 712, func(out io.Writer) error {
+		_, _ = fmt.Fprintf(out, "adding recognizer to v%d rec: #", root)
+		id, err := recognizer.OwnerID()
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "%d val: %s\n", id, value.String())
+		return err
+	}); err != nil {
 		return err
 	}
 	if value == lbool.True {

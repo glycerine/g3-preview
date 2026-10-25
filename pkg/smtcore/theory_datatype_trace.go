@@ -121,7 +121,11 @@ func (t *SMTDatatypeTheory) displayDatatypeExpression(out io.Writer, expression 
 }
 
 func (t *SMTDatatypeTheory) traceDatatypeExpression(function string, line int, heading string, expression ast.ASTHandle) error {
-	return t.emitDatatype("datatype", function, line, func(out io.Writer) error {
+	return t.traceDatatypeTaggedExpression("datatype", function, line, heading, expression)
+}
+
+func (t *SMTDatatypeTheory) traceDatatypeTaggedExpression(tag, function string, line int, heading string, expression ast.ASTHandle) error {
+	return t.emitDatatype(tag, function, line, func(out io.Writer) error {
 		_, _ = io.WriteString(out, heading)
 		if err := t.displayDatatypeExpression(out, expression); err != nil {
 			return err

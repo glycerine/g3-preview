@@ -179,3 +179,135 @@ func TestSMTDatatypeOccursTraceLeafExitAndCachedSkip(t *testing.T) {
 		t.Fatal("sticky ostream failure stopped cycle-free publication")
 	}
 }
+
+func TestSMTDatatypeSplitTracePrecedesRecognizerInternalization(t *testing.T) {
+	_, dt, x, sort, _ := smtDatatypeSplitFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("datatype")
+	tags.Enable("datatype_bug")
+	dt.trace = tags
+	before := dt.statistics.splits
+	astTestMust(t, dt.split(x, sort))
+	if dt.statistics.splits != before+1 {
+		t.Fatal("split trace changed source counter")
+	}
+	if tags.ShouldTrace("datatype") {
+		last := -1
+		for _, site := range []string{"[datatype_bug] mk_split src/smt/theory_datatype.cpp:829", "[datatype] mk_split src/smt/theory_datatype.cpp:879", "[datatype] internalize_atom src/smt/theory_datatype.cpp:258", "[datatype] internalize_term src/smt/theory_datatype.cpp:263", "[datatype] add_recognizer src/smt/theory_datatype.cpp:712"} {
+			i := strings.Index(output.String(), site)
+			if i <= last {
+				t.Fatal("source split/registration trace order", site, output.String())
+			}
+			last = i
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("native split trace was not erased")
+	}
+	output.Reset()
+	astTestMust(t, dt.split(x, sort))
+	if tags.ShouldTrace("datatype_bug") {
+		want := smtDatatypeTraceRecord("datatype_bug", "mk_split", 829, "non_rec_c: incremental-b\n")
+		if output.String() != want {
+			t.Fatal("waiting on existing recognizer emitted a creation record", output.String(), want)
+		}
+	}
+	if dt.statistics.splits != before+2 {
+		t.Fatal("waiting split did not retain its source call count")
+	}
+}
+
+func TestSMTDatatypeRecognizerAssignmentTraceAndConstructorPrefix(t *testing.T) {
+	for _, truth := range []bool{false, true} {
+		t.Run(fmt.Sprint(truth), func(t *testing.T) {
+			_, dt, x, _, constructors := smtDatatypeSplitFixture(t)
+			s, err := dt.State()
+			astTestMust(t, err)
+			literal, expression, err := dt.recognizerLiteral(constructors[1], x)
+			astTestMust(t, err)
+			astTestMust(t, s.markRelevant(expression))
+			assigned := literal
+			if !truth {
+				assigned = assigned.Negated()
+			}
+			astTestMust(t, s.AssignLiteral(assigned, NewSMTBooleanAxiom()))
+			var output bytes.Buffer
+			tags := diagnostic.NewTraceTagsWithWriter(&output)
+			tags.Enable("datatype")
+			tags.Enable("datatype_bug")
+			dt.trace = tags
+			before := dt.statistics.constructorAxioms
+			astTestMust(t, s.propagateAssignedAtom(assigned))
+			wantDelta := uint64(0)
+			bit := 0
+			if truth {
+				wantDelta, bit = 1, 1
+			}
+			if dt.statistics.constructorAxioms != before+wantDelta {
+				t.Fatal("assignment diagnostic changed constructor publication")
+			}
+			if tags.ShouldTrace("datatype") {
+				id, err := s.context.enodes[expression].OwnerID()
+				astTestMust(t, err)
+				prefix := fmt.Sprintf("-------- [datatype] assign_eh src/smt/theory_datatype.cpp:367 ---------\nassigning recognizer: #%d is_true: %d\n", id, bit)
+				if !strings.HasPrefix(output.String(), prefix) {
+					t.Fatal("source recognizer assignment record", output.String(), prefix)
+				}
+				constructor := strings.Index(output.String(), "[datatype_bug] assert_is_constructor_axiom src/smt/theory_datatype.cpp:129")
+				if truth && constructor <= 0 || !truth && constructor >= 0 {
+					t.Fatal("constructor trace branch/order", output.String())
+				}
+			} else if output.Len() != 0 {
+				t.Fatal("native assignment trace was not erased")
+			}
+			_, err = s.PropagateCore()
+			astTestMust(t, err)
+			if s.Inconsistent() {
+				t.Fatal("diagnostic changed consistent recognizer assignment")
+			}
+		})
+	}
+}
+
+func TestSMTDatatypeMergeTracePrecedesImportedRecognizer(t *testing.T) {
+	m, dt, x, sort, constructors := smtDatatypeSplitFixture(t)
+	s, err := dt.State()
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "merge-trace-y"), sort)
+	astTestMust(t, err)
+	astTestMust(t, s.Internalize(y, false))
+	_, first, err := dt.recognizerLiteral(constructors[0], x)
+	astTestMust(t, err)
+	_, second, err := dt.recognizerLiteral(constructors[1], y)
+	astTestMust(t, err)
+	for _, h := range []ast.ASTHandle{first, second} {
+		astTestMust(t, s.markRelevant(h))
+	}
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("datatype")
+	dt.trace = tags
+	left, right := s.context.enodes[x], s.context.enodes[y]
+	astTestMust(t, s.addEquality(left, right, NewSMTEqualityAxiom()))
+	astTestMust(t, s.PropagateTheoryEvents())
+	root, data, err := dt.rootData(left.TheoryVar(dt.FamilyID()))
+	astTestMust(t, err)
+	child := left.TheoryVar(dt.FamilyID())
+	imported := first
+	if uint32(child) == root {
+		child, imported = right.TheoryVar(dt.FamilyID()), second
+	}
+	if len(data.recognizers) != 3 || data.recognizers[0] == nil || data.recognizers[1] == nil {
+		t.Fatal("merge diagnostic changed recognizer import")
+	}
+	if tags.ShouldTrace("datatype") {
+		id, err := s.context.enodes[imported].OwnerID()
+		astTestMust(t, err)
+		want := smtDatatypeTraceRecord("datatype", "merge_eh", 663, fmt.Sprintf("merging v%d v%d\n", root, child)) + smtDatatypeTraceRecord("datatype", "add_recognizer", 712, fmt.Sprintf("adding recognizer to v%d rec: #%d val: l_undef\n", root, id))
+		if output.String() != want {
+			t.Fatal("source merge/import records", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("native merge trace was not erased")
+	}
+}

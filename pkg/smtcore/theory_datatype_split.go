@@ -2,8 +2,10 @@
 package smtcore
 
 import (
+	"fmt"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"io"
 )
 
 func (t *SMTDatatypeTheory) split(value, sort ast.ASTHandle) error {
@@ -35,6 +37,21 @@ func (t *SMTDatatypeTheory) split(value, sort ast.ASTHandle) error {
 	}
 	if !found {
 		return ast.ErrASTDomain
+	}
+	if err = t.emitDatatype("datatype_bug", "mk_split", 829, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "non_rec_c: ")
+		name, err := s.manager.GetASTName(preferred)
+		if err != nil {
+			return err
+		}
+		text, err := s.manager.Symbols.Display(name)
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintln(out, text)
+		return err
+	}); err != nil {
+		return err
 	}
 	index, found, err := s.manager.DatatypeConstructorIndex(preferred)
 	if err != nil {
@@ -80,7 +97,17 @@ func (t *SMTDatatypeTheory) split(value, sort ast.ASTHandle) error {
 			return nil
 		}
 	}
-	literal, expression, err := t.recognizerLiteral(constructor, node.owner)
+	expression, err := t.recognizerApplication(constructor, node.owner)
+	if err != nil {
+		return err
+	}
+	if err = t.traceDatatypeExpression("mk_split", 879, "creating split: ", expression); err != nil {
+		return err
+	}
+	if err = s.Internalize(expression, false); err != nil {
+		return err
+	}
+	literal, err := s.Literal(expression)
 	if err != nil {
 		return err
 	}

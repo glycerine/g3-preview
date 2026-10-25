@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
@@ -74,21 +75,33 @@ func (t *SMTDatatypeTheory) operation(expression ast.ASTHandle) (int32, bool, er
 	return op, err == nil, err
 }
 
-func (t *SMTDatatypeTheory) recognizerLiteral(constructor, value ast.ASTHandle) (SMTLiteral, ast.ASTHandle, error) {
-	state, _ := t.State()
+func (t *SMTDatatypeTheory) recognizerApplication(constructor, value ast.ASTHandle) (ast.ASTHandle, error) {
+	state, err := t.State()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
 	parameter, err := state.manager.NewParameterAST(constructor)
 	if err != nil {
-		return SMTNullLiteral, ast.ASTHandle{}, err
+		return ast.ASTHandle{}, err
 	}
 	application, err := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTDatatypeIs, []ast.ASTParameter{parameter}, []ast.ASTHandle{value})
 	deleteErr := state.manager.DelParameter(&parameter)
 	if err != nil {
-		return SMTNullLiteral, ast.ASTHandle{}, err
+		return ast.ASTHandle{}, err
 	}
 	if deleteErr != nil {
-		return SMTNullLiteral, ast.ASTHandle{}, deleteErr
+		return ast.ASTHandle{}, deleteErr
 	}
-	if err = state.Internalize(application, true); err != nil {
+	return application, nil
+}
+
+func (t *SMTDatatypeTheory) recognizerLiteral(constructor, value ast.ASTHandle) (SMTLiteral, ast.ASTHandle, error) {
+	application, err := t.recognizerApplication(constructor, value)
+	if err != nil {
+		return SMTNullLiteral, ast.ASTHandle{}, err
+	}
+	state, _ := t.State()
+	if err = state.Internalize(application, false); err != nil {
 		return SMTNullLiteral, ast.ASTHandle{}, err
 	}
 	literal, err := state.Literal(application)
@@ -407,6 +420,29 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 	if err != nil || !own || op != ast.ASTDatatypeRecognizer && op != ast.ASTDatatypeIs {
 		return err
 	}
+	recognizerNode := state.context.enodes[expression]
+	if recognizerNode == nil {
+		return ast.ErrASTDomain
+	}
+	if err = t.emitDatatype("datatype", "assign_eh", 367, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "assigning recognizer: #")
+		id, err := recognizerNode.OwnerID()
+		if err != nil {
+			return err
+		}
+		truth := 0
+		if isTrue {
+			truth = 1
+		}
+		_, _ = fmt.Fprintf(out, "%d is_true: %d\n", id, truth)
+		if err = t.displayDatatypeBounded(out, expression); err != nil {
+			return err
+		}
+		_, err = io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return err
+	}
 	declaration, err := state.manager.GetDecl(expression)
 	if err != nil {
 		return err
@@ -452,11 +488,14 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 // Source assert_is_constructor_axiom; antecedent is null for the eager
 // single-constructor case and the recognizer literal for assigned cases.
 func (t *SMTDatatypeTheory) assertConstructor(value, constructor ast.ASTHandle, antecedent SMTLiteral) error {
-	t.statistics.constructorAxioms++
 	state, err := t.State()
 	if err != nil {
 		return err
 	}
+	if err = t.traceDatatypeTaggedExpression("datatype_bug", "assert_is_constructor_axiom", 129, "creating axiom (= n (c (acc_1 n) ... (acc_m n))) for\n", value); err != nil {
+		return err
+	}
+	t.statistics.constructorAxioms++
 	accessors, err := state.manager.DatatypeConstructorAccessors(constructor)
 	if err != nil {
 		return err
