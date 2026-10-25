@@ -139108,7 +139108,9 @@
         "pkg/smtcore/theory_str_dependencies.go",
         "pkg/smtcore/theory_str_dependencies_test.go",
         "pkg/smtcore/theory_str_backpropagation.go",
-        "pkg/smtcore/theory_str_backpropagation_test.go"
+        "pkg/smtcore/theory_str_backpropagation_test.go",
+        "pkg/smtcore/theory_str_regex_lengths.go",
+        "pkg/smtcore/theory_str_regex_lengths_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139232,7 +139234,13 @@
         "TestSMTStringFinalCheckBackpropagatesConstantBytesAndGuards",
         "TestSMTStringLengthBackpropagationPreservesShadowedNativeConclusion",
         "TestSMTStringFinalCheckLengthSumsDuplicateLeavesAndGuards",
-        "TestSMTStringLengthCollectorRolesAndRelevancy"
+        "TestSMTStringLengthCollectorRolesAndRelevancy",
+        "TestSMTStringRegexLengthLinearityAndFiniteSets",
+        "TestSMTStringRegexLengthConcatWitnessOrderAndFormula",
+        "TestSMTStringRegexLengthStarPlusNativeCombination",
+        "TestSMTStringRegexLengthLeafUnionAndFallbackFormulas",
+        "TestSMTStringRegexLengthGenerationPreconditionsAndPartialWitnesses",
+        "TestSMTStringRegexLengthZeroOptionAndDeduplicatedCounters"
       ],
       "conditionals": [
         {
@@ -140608,6 +140616,36 @@
           "tests": [
             "TestSMTStringLengthBackpropagationPreservesShadowedNativeConclusion"
           ]
+        },
+        {
+          "name": "check_regex_length_linearity/check_regex_length_linearity_helper complete retained classifiers: literal/range/full-char/full-sequence acceptance, concat/union short-circuit recursion, one star/plus level, complement refusal and unknown-operation precondition error",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_lengths.go",
+          "tests": [
+            "TestSMTStringRegexLengthLinearityAndFiniteSets",
+            "TestSMTStringRegexLengthGenerationPreconditionsAndPartialWitnesses"
+          ]
+        },
+        {
+          "name": "check_subterm_lengths complete retained finite-length collection: literal byte widths including zero, pairwise concat sums and union deduplication, empty-set failure propagation, one-byte range/full-char result and empty fallback for repetition/full-sequence/complement/unknown operations; concrete signed integer set uses Go maps",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_lengths.go",
+          "tests": [
+            "TestSMTStringRegexLengthLinearityAndFiniteSets",
+            "TestSMTStringRegexLengthZeroOptionAndDeduplicatedCounters"
+          ]
+        },
+        {
+          "name": "infer_all_regex_lengths complete retained formula generator: literal/union/concat constraints, native parent-before-child rlen1/rlen2 witnesses, distinct-length rstar linear combinations and per-option positive base for plus, zero coefficients retained, leaf/range/nonnegative fallbacks, caller-owned result root and separately returned free variables; enclosing regex automata dispatch remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_lengths.go",
+          "tests": [
+            "TestSMTStringRegexLengthConcatWitnessOrderAndFormula",
+            "TestSMTStringRegexLengthStarPlusNativeCombination",
+            "TestSMTStringRegexLengthLeafUnionAndFallbackFormulas",
+            "TestSMTStringRegexLengthGenerationPreconditionsAndPartialWitnesses",
+            "TestSMTStringRegexLengthZeroOptionAndDeduplicatedCounters"
+          ]
         }
       ],
       "ownership": [
@@ -140633,7 +140671,8 @@
         "Conversion-agreement implication operands and parsed numeral/string temporaries own local concrete ASTRefs through assertion. string_int_axioms holds borrowed keys already rooted by assert_axiom lifetime storage; its concrete map records the insertion scope and PopScopes removes only entries from popped scopes. Root/current-outer entries persist. Invalid int-to-string conflicts deliberately do not enter the memo set. Go big.Int implements project decimal accumulation without C atoi/ctype or STL adapters.",
         "Grounded containment uses concrete typed Go maps/slices for project alias/value/concat graphs and grounded byte-expression vectors. Analysis inputs borrow context/class roots; newly allocated equality and folded-literal intermediates have local concrete ASTRefs through publication, released forward. Published axioms keep their existing lifetime roots. Condition sets and vector/first-concat traversal use the established stable handle slot/generation order instead of process-specific C++ pointer addresses; no generic map, comparator or STL adapter is ported.",
         "Dependency analysis borrows live context/private-class AST roots and returns concrete typed alias/value/relation/count maps for its caller. Newly generated grounding conditions stay locally rooted through compute_contains publication and release forward before the analysis returns; output maps do not retain temporary grounded conditions. Native length/value/unroll tester membership uses three distinct concrete sets and owns no duplicate AST references. These classifier consumers are ported; their tester producers/final-check stages remain pending. Stable expression handle order replaces C++ pointer-map order, and no generic map/template/callback layer is added.",
-        "Constant/length backpropagation owns temporary byte literals, length/numeral operands and premise/conclusion ASTs through publication using concrete local ASTRefs, released forward through existing helpers. Analysis results borrow context/private-class roots only for the actual FinalCheck call. The reached prefix uses no universal callbacks or C++ string/set/template adapters; iterative typed traversal preserves source leaf multiplicity and unique-premise sets."
+        "Constant/length backpropagation owns temporary byte literals, length/numeral operands and premise/conclusion ASTs through publication using concrete local ASTRefs, released forward through existing helpers. Analysis results borrow context/private-class roots only for the actual FinalCheck call. The reached prefix uses no universal callbacks or C++ string/set/template adapters; iterative typed traversal preserves source leaf multiplicity and unique-premise sets.",
+        "Regex length inference borrows input regex/length roots and owns all newly built AST intermediates in one concrete computation frame, releasing local roots forward after acquiring the caller-owned ASTRef result. Actual fresh integer variables retain the existing theory lifetime ownership and append to the concrete output slice in native concat parent-before-child order; partial generation does not roll back already-created witnesses. Signed integer length sets use native Go maps with deterministic ascending coefficient traversal instead of porting C++ hashtable layout; no insertion-order dictionary or generic callback/STL adapter is needed."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140664,7 +140703,8 @@
         "The retained finalcheck_str2int/finalcheck_int2str routines are now implemented and directly verified, including source unknown-arithmetic zero-split continuation, root-only numeric lookup (not candidate models), private String-class values, leading-zero decimal parsing, arbitrary-size integers and invalid-value refusals. They are not yet dispatched by the unfinished enclosing final_check_eh pipeline: dependency analysis, backpropagation, free-variable/tester/unroll/automata prerequisites remain to be ported before preserving its stage order. Production String FinalCheck still gives up and production QF_S routing remains unchanged. Missing int-to-string class preserves the source explicit unimplemented precondition as a Go error; no invented fallback model is added.",
         "Retained compute_contains and its dealias/grounding/partial-subsequence routines are now implemented and directly tested as a prerequisite of ctx_dep_analysis. Preserve source first-concat-only expansion, first sufficient condition set, unroll exclusion, empty operator[] map entries, unchecked variable head in multi-part matching, and lack of a negative assertion for nonmatching partial groundings. Constant-boundary folding delegates the existing source-faithful mk_concat specialization, including its attached-value preconditions. Enclosing dependency/free-variable analysis, backpropagation/tester/unroll/automata/final-check dispatch remains pending. Production QF_S routing is unchanged and String FinalCheck still gives up; source units remain partial.",
         "ctx_dep_analysis and its classifiers/helpers are now implemented and directly verified, including the actual grounded containment consumer. Preserve source-only empty literal boundary constraints, asymmetric left/right concrete-node filtering, first-existing boundary group reuse without unioning existing groups, dependency priorities, self-dependency exclusion and exact free-variable reference counts rather than inferring stronger SCC-based selection. The active source analysis always returns zero; its unused assignment snapshot has no semantic consumer. Enclosing final-check constant/length backpropagation, tester/unroll/automata stages and production routing remain pending. String FinalCheck remains GiveUp, source units remain partial and existing runner comparisons do not establish completion of the legacy owner.",
-        "The actual String FinalCheck now runs dependency analysis, constant backpropagation and length propagation in native order and returns Continue on added constant/length axioms, then GiveUp before the unfinished regex/free-variable/tester/unroll suffix. It still never claims SAT from the incomplete owner, and production QF_S routing remains unchanged. Preserve a retained C++ shadowing behavior explicitly: theory_str.cpp propagate_length_within_eqc replaces rational varLen with expr_ref varLen; ast.h defines expr_ref as obj_ref and util/obj_ref.h supplies implicit operator bool, so mk_int(int) receives 1 for that valid length AST. Go emits 1 in the conclusion while retaining the actual member-length numeral in its premise. Scope/progress diagnostic traces remain outside this algorithmic-prefix credit; constant/length operational effects are directly tested."
+        "The actual String FinalCheck now runs dependency analysis, constant backpropagation and length propagation in native order and returns Continue on added constant/length axioms, then GiveUp before the unfinished regex/free-variable/tester/unroll suffix. It still never claims SAT from the incomplete owner, and production QF_S routing remains unchanged. Preserve a retained C++ shadowing behavior explicitly: theory_str.cpp propagate_length_within_eqc replaces rational varLen with expr_ref varLen; ast.h defines expr_ref as obj_ref and util/obj_ref.h supplies implicit operator bool, so mk_int(int) receives 1 for that valid length AST. Go emits 1 in the conclusion while retaining the actual member-length numeral in its premise. Scope/progress diagnostic traces remain outside this algorithmic-prefix credit; constant/length operational effects are directly tested.",
+        "Retained regex length linearity, finite subterm-length collection and infer_all_regex_lengths are now implemented and directly verified. Preserve distinct native fallbacks, per-distinct-length plus base contributions, zero-coefficient witnesses and failure propagation rather than replacing them with modern regex-language evaluation. Counter nonnegativity belongs to the enclosing caller and is not silently asserted by the formula generator. The full regex automata stage still requires automaton construction/assumptions, initial/refined bounds and path/intersection constraints before its actual FinalCheck dispatch can preserve native order. Current FinalCheck reaches dependency/constant/length backpropagation then gives up before that suffix; production QF_S routing is unchanged and source units remain partial."
       ]
     },
     {
@@ -140735,7 +140775,9 @@
         "pkg/smtcore/theory_str_dependencies.go",
         "pkg/smtcore/theory_str_dependencies_test.go",
         "pkg/smtcore/theory_str_backpropagation.go",
-        "pkg/smtcore/theory_str_backpropagation_test.go"
+        "pkg/smtcore/theory_str_backpropagation_test.go",
+        "pkg/smtcore/theory_str_regex_lengths.go",
+        "pkg/smtcore/theory_str_regex_lengths_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -140860,7 +140902,13 @@
         "TestSMTStringFinalCheckBackpropagatesConstantBytesAndGuards",
         "TestSMTStringLengthBackpropagationPreservesShadowedNativeConclusion",
         "TestSMTStringFinalCheckLengthSumsDuplicateLeavesAndGuards",
-        "TestSMTStringLengthCollectorRolesAndRelevancy"
+        "TestSMTStringLengthCollectorRolesAndRelevancy",
+        "TestSMTStringRegexLengthLinearityAndFiniteSets",
+        "TestSMTStringRegexLengthConcatWitnessOrderAndFormula",
+        "TestSMTStringRegexLengthStarPlusNativeCombination",
+        "TestSMTStringRegexLengthLeafUnionAndFallbackFormulas",
+        "TestSMTStringRegexLengthGenerationPreconditionsAndPartialWitnesses",
+        "TestSMTStringRegexLengthZeroOptionAndDeduplicatedCounters"
       ],
       "conditionals": [
         {
@@ -141554,6 +141602,36 @@
           "tests": [
             "TestSMTStringLengthBackpropagationPreservesShadowedNativeConclusion"
           ]
+        },
+        {
+          "name": "check_regex_length_linearity/check_regex_length_linearity_helper complete retained classifiers: literal/range/full-char/full-sequence acceptance, concat/union short-circuit recursion, one star/plus level, complement refusal and unknown-operation precondition error",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_lengths.go",
+          "tests": [
+            "TestSMTStringRegexLengthLinearityAndFiniteSets",
+            "TestSMTStringRegexLengthGenerationPreconditionsAndPartialWitnesses"
+          ]
+        },
+        {
+          "name": "check_subterm_lengths complete retained finite-length collection: literal byte widths including zero, pairwise concat sums and union deduplication, empty-set failure propagation, one-byte range/full-char result and empty fallback for repetition/full-sequence/complement/unknown operations; concrete signed integer set uses Go maps",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_lengths.go",
+          "tests": [
+            "TestSMTStringRegexLengthLinearityAndFiniteSets",
+            "TestSMTStringRegexLengthZeroOptionAndDeduplicatedCounters"
+          ]
+        },
+        {
+          "name": "infer_all_regex_lengths complete retained formula generator: literal/union/concat constraints, native parent-before-child rlen1/rlen2 witnesses, distinct-length rstar linear combinations and per-option positive base for plus, zero coefficients retained, leaf/range/nonnegative fallbacks, caller-owned result root and separately returned free variables; enclosing regex automata dispatch remains pending",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_lengths.go",
+          "tests": [
+            "TestSMTStringRegexLengthConcatWitnessOrderAndFormula",
+            "TestSMTStringRegexLengthStarPlusNativeCombination",
+            "TestSMTStringRegexLengthLeafUnionAndFallbackFormulas",
+            "TestSMTStringRegexLengthGenerationPreconditionsAndPartialWitnesses",
+            "TestSMTStringRegexLengthZeroOptionAndDeduplicatedCounters"
+          ]
         }
       ],
       "ownership": [
@@ -141580,7 +141658,8 @@
         "Conversion-agreement implication operands and parsed numeral/string temporaries own local concrete ASTRefs through assertion. string_int_axioms holds borrowed keys already rooted by assert_axiom lifetime storage; its concrete map records the insertion scope and PopScopes removes only entries from popped scopes. Root/current-outer entries persist. Invalid int-to-string conflicts deliberately do not enter the memo set. Go big.Int implements project decimal accumulation without C atoi/ctype or STL adapters.",
         "Grounded containment uses concrete typed Go maps/slices for project alias/value/concat graphs and grounded byte-expression vectors. Analysis inputs borrow context/class roots; newly allocated equality and folded-literal intermediates have local concrete ASTRefs through publication, released forward. Published axioms keep their existing lifetime roots. Condition sets and vector/first-concat traversal use the established stable handle slot/generation order instead of process-specific C++ pointer addresses; no generic map, comparator or STL adapter is ported.",
         "Dependency analysis borrows live context/private-class AST roots and returns concrete typed alias/value/relation/count maps for its caller. Newly generated grounding conditions stay locally rooted through compute_contains publication and release forward before the analysis returns; output maps do not retain temporary grounded conditions. Native length/value/unroll tester membership uses three distinct concrete sets and owns no duplicate AST references. These classifier consumers are ported; their tester producers/final-check stages remain pending. Stable expression handle order replaces C++ pointer-map order, and no generic map/template/callback layer is added.",
-        "Constant/length backpropagation owns temporary byte literals, length/numeral operands and premise/conclusion ASTs through publication using concrete local ASTRefs, released forward through existing helpers. Analysis results borrow context/private-class roots only for the actual FinalCheck call. The reached prefix uses no universal callbacks or C++ string/set/template adapters; iterative typed traversal preserves source leaf multiplicity and unique-premise sets."
+        "Constant/length backpropagation owns temporary byte literals, length/numeral operands and premise/conclusion ASTs through publication using concrete local ASTRefs, released forward through existing helpers. Analysis results borrow context/private-class roots only for the actual FinalCheck call. The reached prefix uses no universal callbacks or C++ string/set/template adapters; iterative typed traversal preserves source leaf multiplicity and unique-premise sets.",
+        "Regex length inference borrows input regex/length roots and owns all newly built AST intermediates in one concrete computation frame, releasing local roots forward after acquiring the caller-owned ASTRef result. Actual fresh integer variables retain the existing theory lifetime ownership and append to the concrete output slice in native concat parent-before-child order; partial generation does not roll back already-created witnesses. Signed integer length sets use native Go maps with deterministic ascending coefficient traversal instead of porting C++ hashtable layout; no insertion-order dictionary or generic callback/STL adapter is needed."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141612,7 +141691,8 @@
         "The retained finalcheck_str2int/finalcheck_int2str routines are now implemented and directly verified, including source unknown-arithmetic zero-split continuation, root-only numeric lookup (not candidate models), private String-class values, leading-zero decimal parsing, arbitrary-size integers and invalid-value refusals. They are not yet dispatched by the unfinished enclosing final_check_eh pipeline: dependency analysis, backpropagation, free-variable/tester/unroll/automata prerequisites remain to be ported before preserving its stage order. Production String FinalCheck still gives up and production QF_S routing remains unchanged. Missing int-to-string class preserves the source explicit unimplemented precondition as a Go error; no invented fallback model is added.",
         "Retained compute_contains and its dealias/grounding/partial-subsequence routines are now implemented and directly tested as a prerequisite of ctx_dep_analysis. Preserve source first-concat-only expansion, first sufficient condition set, unroll exclusion, empty operator[] map entries, unchecked variable head in multi-part matching, and lack of a negative assertion for nonmatching partial groundings. Constant-boundary folding delegates the existing source-faithful mk_concat specialization, including its attached-value preconditions. Enclosing dependency/free-variable analysis, backpropagation/tester/unroll/automata/final-check dispatch remains pending. Production QF_S routing is unchanged and String FinalCheck still gives up; source units remain partial.",
         "ctx_dep_analysis and its classifiers/helpers are now implemented and directly verified, including the actual grounded containment consumer. Preserve source-only empty literal boundary constraints, asymmetric left/right concrete-node filtering, first-existing boundary group reuse without unioning existing groups, dependency priorities, self-dependency exclusion and exact free-variable reference counts rather than inferring stronger SCC-based selection. The active source analysis always returns zero; its unused assignment snapshot has no semantic consumer. Enclosing final-check constant/length backpropagation, tester/unroll/automata stages and production routing remain pending. String FinalCheck remains GiveUp, source units remain partial and existing runner comparisons do not establish completion of the legacy owner.",
-        "The actual String FinalCheck now runs dependency analysis, constant backpropagation and length propagation in native order and returns Continue on added constant/length axioms, then GiveUp before the unfinished regex/free-variable/tester/unroll suffix. It still never claims SAT from the incomplete owner, and production QF_S routing remains unchanged. Preserve a retained C++ shadowing behavior explicitly: theory_str.cpp propagate_length_within_eqc replaces rational varLen with expr_ref varLen; ast.h defines expr_ref as obj_ref and util/obj_ref.h supplies implicit operator bool, so mk_int(int) receives 1 for that valid length AST. Go emits 1 in the conclusion while retaining the actual member-length numeral in its premise. Scope/progress diagnostic traces remain outside this algorithmic-prefix credit; constant/length operational effects are directly tested."
+        "The actual String FinalCheck now runs dependency analysis, constant backpropagation and length propagation in native order and returns Continue on added constant/length axioms, then GiveUp before the unfinished regex/free-variable/tester/unroll suffix. It still never claims SAT from the incomplete owner, and production QF_S routing remains unchanged. Preserve a retained C++ shadowing behavior explicitly: theory_str.cpp propagate_length_within_eqc replaces rational varLen with expr_ref varLen; ast.h defines expr_ref as obj_ref and util/obj_ref.h supplies implicit operator bool, so mk_int(int) receives 1 for that valid length AST. Go emits 1 in the conclusion while retaining the actual member-length numeral in its premise. Scope/progress diagnostic traces remain outside this algorithmic-prefix credit; constant/length operational effects are directly tested.",
+        "Retained regex length linearity, finite subterm-length collection and infer_all_regex_lengths are now implemented and directly verified. Preserve distinct native fallbacks, per-distinct-length plus base contributions, zero-coefficient witnesses and failure propagation rather than replacing them with modern regex-language evaluation. Counter nonnegativity belongs to the enclosing caller and is not silently asserted by the formula generator. The full regex automata stage still requires automaton construction/assumptions, initial/refined bounds and path/intersection constraints before its actual FinalCheck dispatch can preserve native order. Current FinalCheck reaches dependency/constant/length backpropagation then gives up before that suffix; production QF_S routing is unchanged and source units remain partial."
       ]
     },
     {
@@ -252723,14 +252803,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "b73285021519be9cb153f785f2a09dfbea538976",
+    "commit": "573456ab59393b776799cfa6fb89b5958de447a4",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25T20:30:47.858885+00:00",
-    "completed_utc": "2026-10-25T20:44:17.188555+00:00",
+    "started_utc": "2026-10-25T21:31:00.464599+00:00",
+    "completed_utc": "2026-10-25T21:44:42.351884+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-b7328502.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-b7328502.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-b7328502.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-573456ab.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-573456ab.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-573456ab.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -252746,9 +252826,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 688.389,
+    "lp_seconds": 700.631,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated b73285021519be9cb153f785f2a09dfbea538976, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior String containment/regex/unroll, core true-equality correction, theory-aware branching, theory assumptions/core validation, all six concat arrangement families, cut history lifecycle and overlap-aware pair selection through b7328502. Excludes subsequent character-at/substring/replacement initial library axioms and the fresh-default rewriter service bridge, which have separate focused/native/debug integration evidence. Known ALL unconstrained containment sat-versus-unknown remains pending. Full legacy String library/tester/unroll/automata/final checking and production backend routing remain incomplete."
+    "scope_warning": "Independently verified exact clean isolated 573456ab59393b776799cfa6fb89b5958de447a4, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes all prior String arrangement/assumption/queue work, extraction/replacement/index initial library axioms, conversion initial/value-agreement routines, grounded containment and complete dependency analysis through 573456ab. Excludes the subsequent live FinalCheck constant/length backpropagation prefix and regex length-inference routines, which have separate focused/native/debug integration evidence. Known ALL unconstrained containment sat-versus-unknown remains pending. Full legacy String automata/tester/unroll/final checking and production routing remain incomplete."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
