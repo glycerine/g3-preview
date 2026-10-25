@@ -42,6 +42,6 @@ func TestSMTDatatypeSingletonExcludesDisequality(t *testing.T) {
 	astTestMust(t, err)
 	if status != lbool.False {
 		theory := s.kernel.internalizer.theories[family].(*SMTDatatypeTheory)
-		t.Fatalf("singleton disequality: %v initialized=%v reconstructed=%v cases=%v", status, theory.initialized, theory.reconstructed, theory.caseSplits)
+		t.Fatalf("singleton disequality: %v initialized=%v reconstructed=%v splits=%v", status, theory.initialized, theory.reconstructed, theory.statistics.splits)
 	}
 }

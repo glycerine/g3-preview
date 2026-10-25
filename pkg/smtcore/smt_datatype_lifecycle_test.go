@@ -40,28 +40,31 @@ func TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer(t *testing.T) 
 				astTestMust(t, state.Internalize(x, false))
 				astTestMust(t, dt.ensureVariable(state.context.enodes[x]))
 				eager := policy == 0 || policy == 1 && !infinite
-				if dt.caseSplits[x] != eager {
+				slots, err := dt.recognizerSlots(x)
+				astTestMust(t, err)
+				if (len(slots) != 0) != eager {
 					t.Fatal("wrong eager split policy", policy, infinite)
 				}
 				if !eager {
 					// x has no input recognizer; it still belongs to the source
 					// final-check traversal because it has a theory variable.
-					if len(dt.recognizerValues) != 0 {
+					if len(slots) != 0 {
 						t.Fatal("fixture already has recognizers")
 					}
 					status, err := dt.FinalCheck()
 					astTestMust(t, err)
-					if status != SMTFinalCheckContinue || !dt.caseSplits[x] {
+					slots, err = dt.recognizerSlots(x)
+					astTestMust(t, err)
+					if status != SMTFinalCheckContinue || len(slots) != 1 {
 						t.Fatal("lazy root was omitted by final check")
 					}
 				}
-				constructors, err := m.DatatypeConstructors(sort)
-				astTestMust(t, err)
+				if len(slots) != 1 {
+					t.Fatal("split expanded all constructors", len(slots))
+				}
 				preferred := 0
-				for _, constructor := range constructors {
-					literal, expression, err := dt.recognizerLiteral(constructor, x)
-					astTestMust(t, err)
-					data, err := state.BooleanData(literal.Var())
+				for constructor, slot := range slots {
+					data, err := state.BooleanData(slot.literal.Var())
 					astTestMust(t, err)
 					if !data.TryTrueFirst() {
 						continue
@@ -69,7 +72,7 @@ func TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer(t *testing.T) 
 					preferred++
 					fields, err := m.DatatypeConstructorAccessors(constructor)
 					astTestMust(t, err)
-					if !state.relevancy.IsRelevant(expression) || infinite && len(fields) != 0 {
+					if !state.relevancy.IsRelevant(slot.expression) || infinite && len(fields) != 0 {
 						t.Fatal("preferred split is not a relevant base constructor")
 					}
 				}

@@ -1,10 +1,14 @@
 package protomodel
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"errors"
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 type DatatypeFactory struct {
 	structuredFactory
-	last map[ast.ASTHandle]ast.ASTHandle
+	last    map[ast.ASTHandle]ast.ASTHandle
+	utility *ast.DatatypeUtil
 }
 
 func NewDatatypeFactory(md *ProtoModel) (*DatatypeFactory, error) {
@@ -15,7 +19,11 @@ func NewDatatypeFactory(md *ProtoModel) (*DatatypeFactory, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &DatatypeFactory{structuredFactory: newStructuredFactory(md.manager, fid, md), last: make(map[ast.ASTHandle]ast.ASTHandle)}, nil
+	utility, err := ast.NewDatatypeUtil(md.manager)
+	if err != nil {
+		return nil, err
+	}
+	return &DatatypeFactory{structuredFactory: newStructuredFactory(md.manager, fid, md), last: make(map[ast.ASTHandle]ast.ASTHandle), utility: utility}, nil
 }
 func (f *DatatypeFactory) constructorArguments(c ast.ASTHandle, fresh func(ast.ASTHandle) (ast.ASTHandle, error)) ([]ast.ASTHandle, bool, error) {
 	n, err := f.manager.GetArity(c)
@@ -54,7 +62,7 @@ func (f *DatatypeFactory) SomeValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	if len(set.values) != 0 {
 		return set.values[0], nil
 	}
-	c, found, err := f.manager.DatatypeNonRecursiveConstructor(s)
+	c, found, err := f.utility.NonRecursiveConstructor(s)
 	if err != nil || !found {
 		return ast.ASTHandle{}, err
 	}
@@ -314,5 +322,9 @@ func (f *DatatypeFactory) SomeValues(s ast.ASTHandle) (ast.ASTHandle, ast.ASTHan
 }
 func (f *DatatypeFactory) Close() error {
 	f.last = nil
-	return f.structuredFactory.Close()
+	var err error
+	if f.utility != nil {
+		err = f.utility.Close()
+	}
+	return errors.Join(err, f.structuredFactory.Close())
 }

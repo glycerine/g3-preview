@@ -774,6 +774,30 @@ func (m *ASTManager) DatatypeIsRecursive(sort ASTHandle) (bool, error) {
 }
 
 func (m *ASTManager) datatypeNonRecursiveConstructor(sort astNodeRef, forbidden map[astNodeRef]bool) (astNodeRef, bool, error) {
+	if m.datatypePlugin == nil {
+		return astNodeRef{}, false, ErrASTHandle
+	}
+	p := m.datatypePlugin
+	if constructor, found := p.nonRecursive[sort]; found {
+		return constructor, true, nil
+	}
+	constructor, found, err := m.datatypeNonRecursiveConstructorCore(sort, forbidden, &p.utilityStart)
+	if err != nil || !found {
+		return astNodeRef{}, found, err
+	}
+	if err = m.incNode(sort); err != nil {
+		return astNodeRef{}, false, err
+	}
+	if err = m.incNode(constructor); err != nil {
+		_, undoErr := m.decNode(sort)
+		return astNodeRef{}, false, errors.Join(err, undoErr)
+	}
+	p.definitionRefs = append(p.definitionRefs, sort, constructor)
+	p.nonRecursive[sort] = constructor
+	return constructor, true, nil
+}
+
+func (m *ASTManager) datatypeNonRecursiveConstructorCore(sort astNodeRef, forbidden map[astNodeRef]bool, counter *uint32) (astNodeRef, bool, error) {
 	definition, err := m.datatypeDefinitionForSort(sort)
 	if err != nil {
 		return astNodeRef{}, false, err
@@ -782,8 +806,8 @@ func (m *ASTManager) datatypeNonRecursiveConstructor(sort astNodeRef, forbidden 
 	if n == 0 {
 		return astNodeRef{}, false, nil
 	}
-	m.datatypePlugin.utilityStart++
-	start := int(m.datatypePlugin.utilityStart % uint32(n))
+	*counter++
+	start := int(*counter % uint32(n))
 	allNonDatatype := func(ranges []astNodeRef) bool {
 		for _, field := range ranges {
 			if _, e := m.datatypeDefinitionForSort(field); e == nil {
@@ -819,7 +843,7 @@ func (m *ASTManager) datatypeNonRecursiveConstructor(sort astNodeRef, forbidden 
 				break
 			}
 			forbidden[field] = true
-			_, found, e := m.datatypeNonRecursiveConstructor(field, forbidden)
+			_, found, e := m.datatypeNonRecursiveConstructorCore(field, forbidden, counter)
 			delete(forbidden, field)
 			if e != nil {
 				return astNodeRef{}, false, e

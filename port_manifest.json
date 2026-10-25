@@ -16287,7 +16287,9 @@
         "pkg/ast/ast_translation_datatype.go",
         "pkg/ast/rewriter/datatype_rewriter_test.go",
         "pkg/ast/ast_datatype_plugin.go",
-        "pkg/ast/ast_datatype_plugin_source_test.go"
+        "pkg/ast/ast_datatype_plugin_source_test.go",
+        "pkg/ast/ast_datatype_util.go",
+        "pkg/ast/ast_datatype_util_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16299,7 +16301,9 @@
         "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
         "TestASTParametricDatatypeDefinitionInstantiation",
         "TestASTDatatypeValueAndSomeValueCallbacks",
-        "TestASTTranslationInheritsDatatypeDefinitions"
+        "TestASTTranslationInheritsDatatypeDefinitions",
+        "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
+        "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
       ],
       "assertions": [
         {
@@ -16465,7 +16469,9 @@
           "name": "Retained datatype constructor, recognizer and accessor relationship queries used by datatype rewriting (datatype_decl_plugin.cpp:753-872)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_utility.go",
-          "go_targets": ["pkg/ast/rewriter/datatype_rewriter_test.go"],
+          "go_targets": [
+            "pkg/ast/rewriter/datatype_rewriter_test.go"
+          ],
           "tests": [
             "TestDatatypeRewriterOriginalApplicationReductions",
             "TestDatatypeRewriterOriginalConstructorEquality"
@@ -16487,10 +16493,26 @@
           "tests": [
             "TestASTDatatypeRegistrationLifecycle"
           ]
+        },
+        {
+          "name": "util::get_non_rec_constructor per-instance selection counter, cached sort/declaration AST pins and release; manager plugin utility cache used by get_some_value; private core shares the actual recursive search algorithm with independent counters",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_util.go",
+          "go_targets": [
+            "pkg/ast/ast_datatype_definition.go",
+            "pkg/ast/ast_datatype_plugin.go",
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_util_test.go"
+          ],
+          "tests": [
+            "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
+            "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
+          ]
         }
       ],
       "ownership": [
-        "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Translation snapshots definitions without retaining source pointers, then destination definitions acquire their own translated sort references. Declaration and description query results remain borrowed manager nodes."
+        "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Translation snapshots definitions without retaining source pointers, then destination definitions acquire their own translated sort references. Declaration and description query results remain borrowed manager nodes.",
+        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in reverse order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache."
       ],
       "deviations": [
         "Private utility memoization maps are omitted because concrete Go queries reconstruct hash-consed declarations and compute recursion/enum properties directly. The unused plugin remove entry point and undeclared get_datatype_size declaration are not ported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed."
@@ -16512,7 +16534,10 @@
         "pkg/ast/ast_datatype_display.go",
         "pkg/ast/ast_datatype_names.go",
         "pkg/ast/ast_translation_datatype.go",
-        "pkg/ast/rewriter/datatype_rewriter_test.go"
+        "pkg/ast/rewriter/datatype_rewriter_test.go",
+        "pkg/ast/ast_datatype_plugin.go",
+        "pkg/ast/ast_datatype_util.go",
+        "pkg/ast/ast_datatype_util_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16523,7 +16548,9 @@
         "TestASTDatatypeDefinitionEnumAndWellFoundedRefusal",
         "TestASTParametricDatatypeDefinitionInstantiation",
         "TestASTDatatypeValueAndSomeValueCallbacks",
-        "TestASTTranslationInheritsDatatypeDefinitions"
+        "TestASTTranslationInheritsDatatypeDefinitions",
+        "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
+        "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
       ],
       "conditionals": [
         {
@@ -16589,7 +16616,9 @@
           "name": "Retained datatype utility recognition and constructor/accessor relationship interface (datatype_decl_plugin.h:290-391)",
           "status": "ported",
           "go_target": "pkg/ast/ast_datatype_utility.go",
-          "go_targets": ["pkg/ast/rewriter/datatype_rewriter_test.go"],
+          "go_targets": [
+            "pkg/ast/rewriter/datatype_rewriter_test.go"
+          ],
           "tests": [
             "TestDatatypeRewriterOriginalApplicationReductions",
             "TestDatatypeRewriterOriginalConstructorEquality"
@@ -16603,10 +16632,26 @@
             "TestASTDatatypeSortAndOriginalDeclarations",
             "TestASTDatatypeDeclarationRefusals"
           ]
+        },
+        {
+          "name": "util::get_non_rec_constructor per-instance selection counter, cached sort/declaration AST pins and release; manager plugin utility cache used by get_some_value; private core shares the actual recursive search algorithm with independent counters",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_datatype_util.go",
+          "go_targets": [
+            "pkg/ast/ast_datatype_definition.go",
+            "pkg/ast/ast_datatype_plugin.go",
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_util_test.go"
+          ],
+          "tests": [
+            "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
+            "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
+          ]
         }
       ],
       "ownership": [
-        "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager. Exported definition descriptions contain borrowed handles and copied native slices."
+        "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager. Exported definition descriptions contain borrowed handles and copied native slices.",
+        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in reverse order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache."
       ],
       "deviations": [
         "Private utility caches, the unused plugin remove entry point, and the undeclared get_datatype_size implementation are omitted under the retained-consumer rule. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes."
@@ -111943,8 +111988,15 @@
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/datatype_factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestArrayAndDatatypeFactories"],
+      "go_targets": [
+        "pkg/smtcore/proto_model/datatype_factory.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/datatype_utility_test.go"
+      ],
+      "tests": [
+        "TestArrayAndDatatypeFactories",
+        "TestDatatypeFactoryUsesIndependentCachedConstructorUtility"
+      ],
       "assertions": [
         {
           "line": 83,
@@ -111977,8 +112029,32 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "nonrecursive representatives, fresh argument search, recursive sibling growth, almost-fresh construction, and subterm guard", "status": "ported", "go_target": "pkg/smtcore/proto_model/datatype_factory.go", "tests": ["TestArrayAndDatatypeFactories"]}],
-      "ownership": ["DatatypeFactory retains generated datatype values and borrows constructor metadata from the AST manager."],
+      "methods": [
+        {
+          "name": "nonrecursive representatives, fresh argument search, recursive sibling growth, almost-fresh construction, and subterm guard",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/datatype_factory.go",
+          "tests": [
+            "TestArrayAndDatatypeFactories"
+          ]
+        },
+        {
+          "name": "datatype_factory constructor owns an independent datatype utility; get_some_value uses its frozen per-sort constructor preference rather than the manager plugin counter; destruction releases utility pins before the structured factory base",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/datatype_factory.go",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/datatype_utility_test.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryUsesIndependentCachedConstructorUtility"
+          ]
+        }
+      ],
+      "ownership": [
+        "DatatypeFactory retains generated datatype values and borrows constructor metadata from the AST manager.",
+        "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime."
+      ],
       "deviations": []
     },
     {
@@ -111986,8 +112062,15 @@
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/datatype_factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestArrayAndDatatypeFactories"],
+      "go_targets": [
+        "pkg/smtcore/proto_model/datatype_factory.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/datatype_utility_test.go"
+      ],
+      "tests": [
+        "TestArrayAndDatatypeFactories",
+        "TestDatatypeFactoryUsesIndependentCachedConstructorUtility"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -112000,8 +112083,32 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "datatype factory construction and some/fresh value interface", "status": "ported", "go_target": "pkg/smtcore/proto_model/datatype_factory.go", "tests": ["TestArrayAndDatatypeFactories"]}],
-      "ownership": ["The last-fresh table borrows handles whose owning references are held by the structured factory."],
+      "methods": [
+        {
+          "name": "datatype factory construction and some/fresh value interface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/datatype_factory.go",
+          "tests": [
+            "TestArrayAndDatatypeFactories"
+          ]
+        },
+        {
+          "name": "datatype_factory constructor owns an independent datatype utility; get_some_value uses its frozen per-sort constructor preference rather than the manager plugin counter; destruction releases utility pins before the structured factory base",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/datatype_factory.go",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/datatype_utility_test.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryUsesIndependentCachedConstructorUtility"
+          ]
+        }
+      ],
+      "ownership": [
+        "The last-fresh table borrows handles whose owning references are held by the structured factory.",
+        "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime."
+      ],
       "deviations": []
     },
     {
@@ -131439,7 +131546,9 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_solver.go",
         "pkg/cmd_context/applications.go",
-        "pkg/cmd_context/datatype_builtins_test.go"
+        "pkg/cmd_context/datatype_builtins_test.go",
+        "pkg/smtcore/theory_datatype_split.go",
+        "pkg/smtcore/theory_datatype_split_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131456,7 +131565,10 @@
         "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
         "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
         "TestCommandContextDatatypeBuiltinVisibility",
-        "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments"
+        "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments",
+        "TestSMTDatatypeSplitCreatesOneRecognizerAndAwaitsAssignment",
+        "TestSMTDatatypeSplitActivatesExistingRecognizerWithoutChangingPhase",
+        "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks"
       ],
       "assertions": [
         {
@@ -131740,17 +131852,40 @@
           ]
         },
         {
-          "name": "source incremental one-recognizer-at-a-time mk_split scheduling and recognizer-array/union-find lifecycle; current all-constructor SAT case encoding remains a different algorithm",
-          "status": "unported",
+          "name": "remaining source merge/recognizer-array lifecycle and complete final-check/model audit",
+          "status": "partial",
           "tests": []
+        },
+        {
+          "name": "mk_split: activate exactly one cached nonrecursive recognizer, mark existing irrelevant slots without changing phase, await relevant unassigned/true slots, advance false preferred slots in constructor declaration order, set true-first only on newly created splits, and preserve scope rollback; no all-constructor exhaustiveness/pairwise clauses",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_split.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_split.go",
+            "pkg/smtcore/theory_datatype_split_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/smt_datatype_lifecycle_test.go",
+            "pkg/smtcore/smt_singleton_datatype_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeSplitCreatesOneRecognizerAndAwaitsAssignment",
+            "TestSMTDatatypeSplitActivatesExistingRecognizerWithoutChangingPhase",
+            "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks",
+            "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Concrete Go maps and slices own initialized-value, recognizer, reconstruction and case-split trails. AST handles and enodes remain borrowed from the manager and SMT context; the model generator owns registered datatype values."
+        "Concrete Go maps and slices own initialized-value, recognizer, reconstruction and case-split trails. AST handles and enodes remain borrowed from the manager and SMT context; the model generator owns registered datatype values.",
+        "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed."
       ],
       "deviations": [
         "Guarded SAT clauses and shared egraph roots replace source var_data, union-find, region justifications and recognizer arrays. Accessor result enodes receive attach-only theory variables to satisfy the Go handled-term contract without eager recursive case expansion. Invalid source assertion states return Go errors.",
-        "Completion correction: guarded SAT/egraph encoding does not establish a full port of source incremental mk_split scheduling. The datatype parameter reference, policy gates, preferred constructor and negative-recognizer propagation are now connected; final checking visits every attached root. This class remains partial while all-constructor clause expansion differs from source scheduling. Fresh copies retain the original concrete scalar owner through chained translations and auxiliary contexts; Go references retain scalar storage after original context closure."
+        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the broader merge/lifecycle/final-check/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts."
       ]
     },
     {
@@ -131767,7 +131902,10 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/cmd_context/applications.go",
         "pkg/cmd_context/datatype_builtins_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_datatype_split.go",
+        "pkg/smtcore/theory_datatype_split_test.go",
+        "pkg/smtcore/smt_singleton_datatype_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131783,7 +131921,10 @@
         "TestCommandContextDatatypeBuiltinVisibility",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments"
+        "TestSMTDatatypeNegativeRecognizerAcrossEqualArguments",
+        "TestSMTDatatypeSplitCreatesOneRecognizerAndAwaitsAssignment",
+        "TestSMTDatatypeSplitActivatesExistingRecognizerWithoutChangingPhase",
+        "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks"
       ],
       "conditionals": [
         {
@@ -131799,7 +131940,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "retained datatype interface backed by guarded SAT/egraph algorithms; source incremental split/lifecycle algorithms remain incomplete",
+          "name": "retained datatype interface with source incremental splitting; broader merge/recognizer lifecycle audit remains incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_datatype.go",
           "tests": [
@@ -131837,17 +131978,40 @@
           ]
         },
         {
-          "name": "source incremental one-recognizer-at-a-time mk_split scheduling and recognizer-array/union-find lifecycle; current all-constructor SAT case encoding remains a different algorithm",
-          "status": "unported",
+          "name": "remaining source merge/recognizer-array lifecycle and complete final-check/model audit",
+          "status": "partial",
           "tests": []
+        },
+        {
+          "name": "mk_split: activate exactly one cached nonrecursive recognizer, mark existing irrelevant slots without changing phase, await relevant unassigned/true slots, advance false preferred slots in constructor declaration order, set true-first only on newly created splits, and preserve scope rollback; no all-constructor exhaustiveness/pairwise clauses",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_split.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_split.go",
+            "pkg/smtcore/theory_datatype_split_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/smt_datatype_lifecycle_test.go",
+            "pkg/smtcore/smt_singleton_datatype_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeSplitCreatesOneRecognizerAndAwaitsAssignment",
+            "TestSMTDatatypeSplitActivatesExistingRecognizerWithoutChangingPhase",
+            "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks",
+            "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "SMTDatatypeTheory owns concrete Go metadata and scope trails while borrowing manager-owned AST handles and context-owned enodes."
+        "SMTDatatypeTheory owns concrete Go metadata and scope trails while borrowing manager-owned AST handles and context-owned enodes.",
+        "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed."
       ],
       "deviations": [
         "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation.",
-        "Completion correction: guarded SAT/egraph encoding does not establish a full port of source incremental mk_split scheduling. The datatype parameter reference, policy gates, preferred constructor and negative-recognizer propagation are now connected; final checking visits every attached root. This class remains partial while all-constructor clause expansion differs from source scheduling. Fresh copies retain the original concrete scalar owner through chained translations and auxiliary contexts; Go references retain scalar storage after original context closure."
+        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the broader merge/lifecycle/final-check/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts."
       ]
     },
     {

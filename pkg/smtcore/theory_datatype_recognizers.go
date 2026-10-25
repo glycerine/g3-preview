@@ -122,7 +122,7 @@ func (t *SMTDatatypeTheory) propagateRecognizer(value ast.ASTHandle) error {
 			return err
 		}
 		if t.lazySplits() == 0 || t.lazySplits() == 1 && !infinite {
-			return t.publishCases(value, sort)
+			return t.split(value, sort)
 		}
 		return nil
 	}
