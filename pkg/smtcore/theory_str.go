@@ -30,6 +30,7 @@ type SMTStringTheory struct {
 	delayedSetup       []ast.ASTHandle
 	delayedAssertions  []ast.ASTRef
 	conversions        []ast.ASTHandle
+	conversionRefs     []ast.ASTRef
 	searchStarted      bool
 	freshID            uint32
 	concatCache        map[[2]ast.ASTHandle]ast.ASTHandle
@@ -336,6 +337,10 @@ func (t *SMTStringTheory) Close() (result error) {
 	}
 	// Native contains_map is a later-declared expr_ref_vector and closes
 	// before m_trail, also in forward element order.
+	// string_int_conversion_terms is declared later still.
+	for i := range t.conversionRefs {
+		result = errors.Join(result, t.state.manager.DelRef(&t.conversionRefs[i]))
+	}
 	for i := range t.containsRefs {
 		result = errors.Join(result, t.state.manager.DelRef(&t.containsRefs[i]))
 	}
@@ -351,6 +356,7 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.containsRefs, t.contains = nil, nil
 	t.concatTodo, t.concatEvalTodo, t.libraryTodo = nil, nil, nil
 	t.delayedSetup, t.conversions = nil, nil
+	t.conversionRefs = nil
 	t.delayedAssertions = nil
 	t.concatCache, t.variableSet, t.internalVariables = nil, nil, nil
 	t.variableScopes, t.axiomatized = nil, nil

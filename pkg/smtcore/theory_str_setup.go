@@ -65,7 +65,9 @@ func (t *SMTStringTheory) setUpAxioms(expression ast.ASTHandle) error {
 			} else if own && (op == 6 || op == 7 || op == 8 || op == 27) {
 				t.libraryTodo = append(t.libraryTodo, node)
 				if op == 27 {
-					t.conversions = append(t.conversions, expression)
+					if err := t.recordStringIntConversion(expression); err != nil {
+						return err
+					}
 				}
 			} else if _, constant, err := m.SequenceStringValue(expression); err != nil {
 				return err
@@ -121,7 +123,9 @@ func (t *SMTStringTheory) setUpAxioms(expression ast.ASTHandle) error {
 				if own && ((isBoolean && (op == 3 || op == 4 || op == 5 || op == 12)) || (isInteger && (op == 10 || op == 28))) {
 					t.libraryTodo = append(t.libraryTodo, node)
 					if op == 28 {
-						t.conversions = append(t.conversions, expression)
+						if err := t.recordStringIntConversion(expression); err != nil {
+							return err
+						}
 					}
 				}
 			}

@@ -2802,6 +2802,7 @@
         "theory_str_concat_equality.go",
         "theory_str_containment.go",
         "theory_str_containment_pairs.go",
+        "theory_str_conversion.go",
         "theory_str_cuts.go",
         "theory_str_equality_lengths.go",
         "theory_str_equality_values.go",

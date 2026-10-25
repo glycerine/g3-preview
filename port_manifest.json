@@ -139098,7 +139098,9 @@
         "pkg/ast/rewriter/th_rewriter.go",
         "pkg/ast/rewriter/th_rewriter_fresh_default_test.go",
         "pkg/smtcore/theory_str_index.go",
-        "pkg/smtcore/theory_str_index_test.go"
+        "pkg/smtcore/theory_str_index_test.go",
+        "pkg/smtcore/theory_str_conversion.go",
+        "pkg/smtcore/theory_str_conversion_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139195,7 +139197,11 @@
         "TestSMTStringIndexFirstOccurrenceAndNoMatch",
         "TestSMTStringIndexExtendedBoundsAndTailRelativeResult",
         "TestSMTStringIndexQueueDefersHeuristicUntilSearch",
-        "TestSMTStringIndexDeferredOwnershipBeforeSearchClose"
+        "TestSMTStringIndexDeferredOwnershipBeforeSearchClose",
+        "TestSMTStringToIntInitialBoundsZeroAndDecimalLanguage",
+        "TestSMTIntToStringInitialNegativeEmptyEquivalence",
+        "TestSMTStringConversionLibraryQueueAndRegexRegistration",
+        "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits"
       ],
       "conditionals": [
         {
@@ -140421,6 +140427,33 @@
             "TestSMTStringIndexQueueDefersHeuristicUntilSearch",
             "TestSMTStringIndexDeferredOwnershipBeforeSearchClose"
           ]
+        },
+        {
+          "name": "instantiate_axiom_str_to_int complete initial constraints: result >= -1, result-zero iff input is literal zero, positive result implies membership in [1-9][0-9]*; eager existing mk_RegexIn constructor and recursive membership worklist setup; duplicate suppression and native operation 28 dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion.go",
+          "tests": [
+            "TestSMTStringToIntInitialBoundsZeroAndDecimalLanguage",
+            "TestSMTStringConversionLibraryQueueAndRegexRegistration"
+          ]
+        },
+        {
+          "name": "instantiate_axiom_int_to_str complete initial constraint: negative integer iff empty string result, simplifying source negation, duplicate suppression and native operation 27 dispatch; full decimal-value agreement belongs to final checking",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion.go",
+          "tests": [
+            "TestSMTIntToStringInitialNegativeEmptyEquivalence",
+            "TestSMTStringConversionLibraryQueueAndRegexRegistration"
+          ]
+        },
+        {
+          "name": "set_up_axioms string_int_conversion_terms retained concrete expr_ref_vector specialization: insertion-order repeated visits, independent owned conversion references and forward release before contains_map according to native member order",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion.go",
+          "tests": [
+            "TestSMTStringConversionLibraryQueueAndRegexRegistration",
+            "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits"
+          ]
         }
       ],
       "ownership": [
@@ -140441,7 +140474,8 @@
         "Prefix-literal family 3 reuses the retained single-residual/integer-flag cache without an initial witness self seed. Known and unknown positive cuts merge x then n at the theory level. Fixed prefix extraction uses Go byte slices after the native equality-consistency predecessor; temporary length/guard/crop AST roots survive until publication and release forward. Unknown literal alternatives preserve len(x)=len(crop_literal) expressions rather than substituting numeral text, and enum order/preference differs from suffix family 2.",
         "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward.",
         "String extraction/replacement constructors root every temporary AST through rewrite and publication, retain the native named fresh String/integer witnesses, and release local vectors forward. Character-at borrows the configured context rewriter; substring/replacement own a reached fresh default rewriter borrowing only the existing manager/parameter services, with partial-owner cleanup delegated to the already ported constructor/destructor. Contains construction retains its term, internalizes it and recursively queues native setup immediately. No C++ string/container internals or universal callback layer is added.",
-        "Index constructors and all case/formula temporaries own AST roots through publication; fresh head/tail/index witnesses follow native creation order. Deferred containment equivalences have their own concrete ASTRef queue, retained independently before search, released forward after publication or in native member-destruction order if still pending at close. No permanent substitute queue root or generic callback layer is added."
+        "Index constructors and all case/formula temporaries own AST roots through publication; fresh head/tail/index witnesses follow native creation order. Deferred containment equivalences have their own concrete ASTRef queue, retained independently before search, released forward after publication or in native member-destruction order if still pending at close. No permanent substitute queue root or generic callback layer is added.",
+        "Initial conversion ASTs and decimal regex range/star/concat intermediates hold concrete local AST roots through internalization and publication. Existing regexMembership implements reached mk_RegexIn without a universal adapter. Conversion registry visits now acquire separate ASTRefs, preserve duplicate/insertion order, and release forward before contains_map at destruction, matching string_int_conversion_terms declaration order; initial axiom ownership is independent."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140467,7 +140501,8 @@
         "Prefix family 3 is connected to actual equality dispatch. Its known alignment honors StrongArrangements unlike family 2; when positive-cut feasibility fails, native negation is commented out and no new refusal is introduced. Literal-prefix splits precede the residual cut, full-prefix alignment gets priority 0.5, and other options 0.1. A native predecessor regression rejects a negative inferred crop before cache/arrangement construction. Tester dispatch, unroll/automata final processing and final checking remain pending; production QF_S routing is unchanged and passing existing production runner comparisons does not establish complete legacy String behavior.",
         "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior.",
         "Reached library operations 6/7/8 now dispatch substring/replacement/character-at initial axioms instead of the previous unported-operation error. The raw first-occurrence constraints are preserved rather than replacing project algorithms with a modern concrete evaluator. Complete legacy String still requires index/conversion handlers, tester dispatch, additional unroll and automata/final checking. The native extended index-of source decomposes fresh head/tail strings rather than calling substring directly; it will reuse the reached containment constructor. Production QF_S routing is unchanged and FinalCheck remains GiveUp.",
-        "Reached library operation 10 now handles both literal-zero and extended index-of paths. Preserve the old source tail-relative extended result without adding the start offset; preserve its active delayed containment heuristic, but do not activate the simple path's commented-out assertion. Source assert_implication uses simplifying mk_not, required when a rewritten constant-start guard is itself negated. Conversion handlers 27/28, tester/dependency/unroll/automata/final-check algorithms remain pending. Production QF_S routing remains unchanged; FinalCheck remains GiveUp and legacy String source units remain partial."
+        "Reached library operation 10 now handles both literal-zero and extended index-of paths. Preserve the old source tail-relative extended result without adding the start offset; preserve its active delayed containment heuristic, but do not activate the simple path's commented-out assertion. Source assert_implication uses simplifying mk_not, required when a rewritten constant-start guard is itself negated. Conversion handlers 27/28, tester/dependency/unroll/automata/final-check algorithms remain pending. Production QF_S routing remains unchanged; FinalCheck remains GiveUp and legacy String source units remain partial.",
+        "All currently reached initial library dispatch operations, including int-to-string 27 and string-to-int 28, now have handlers. Initial conversion constraints intentionally do not imply complete decimal-value agreement: positive string-to-int results only constrain decimal syntax, and nonnegative int-to-string results are initially only nonempty. Native finalcheck_str2int/finalcheck_int2str, dependency/free-variable/tester/unroll/automata/final-check algorithms remain pending. No routing change or legacy String SAT/completion claim is made; FinalCheck remains GiveUp."
       ]
     },
     {
@@ -140528,7 +140563,9 @@
         "pkg/ast/rewriter/th_rewriter.go",
         "pkg/ast/rewriter/th_rewriter_fresh_default_test.go",
         "pkg/smtcore/theory_str_index.go",
-        "pkg/smtcore/theory_str_index_test.go"
+        "pkg/smtcore/theory_str_index_test.go",
+        "pkg/smtcore/theory_str_conversion.go",
+        "pkg/smtcore/theory_str_conversion_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -140626,7 +140663,11 @@
         "TestSMTStringIndexFirstOccurrenceAndNoMatch",
         "TestSMTStringIndexExtendedBoundsAndTailRelativeResult",
         "TestSMTStringIndexQueueDefersHeuristicUntilSearch",
-        "TestSMTStringIndexDeferredOwnershipBeforeSearchClose"
+        "TestSMTStringIndexDeferredOwnershipBeforeSearchClose",
+        "TestSMTStringToIntInitialBoundsZeroAndDecimalLanguage",
+        "TestSMTIntToStringInitialNegativeEmptyEquivalence",
+        "TestSMTStringConversionLibraryQueueAndRegexRegistration",
+        "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits"
       ],
       "conditionals": [
         {
@@ -141170,6 +141211,33 @@
             "TestSMTStringIndexQueueDefersHeuristicUntilSearch",
             "TestSMTStringIndexDeferredOwnershipBeforeSearchClose"
           ]
+        },
+        {
+          "name": "instantiate_axiom_str_to_int complete initial constraints: result >= -1, result-zero iff input is literal zero, positive result implies membership in [1-9][0-9]*; eager existing mk_RegexIn constructor and recursive membership worklist setup; duplicate suppression and native operation 28 dispatch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion.go",
+          "tests": [
+            "TestSMTStringToIntInitialBoundsZeroAndDecimalLanguage",
+            "TestSMTStringConversionLibraryQueueAndRegexRegistration"
+          ]
+        },
+        {
+          "name": "instantiate_axiom_int_to_str complete initial constraint: negative integer iff empty string result, simplifying source negation, duplicate suppression and native operation 27 dispatch; full decimal-value agreement belongs to final checking",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion.go",
+          "tests": [
+            "TestSMTIntToStringInitialNegativeEmptyEquivalence",
+            "TestSMTStringConversionLibraryQueueAndRegexRegistration"
+          ]
+        },
+        {
+          "name": "set_up_axioms string_int_conversion_terms retained concrete expr_ref_vector specialization: insertion-order repeated visits, independent owned conversion references and forward release before contains_map according to native member order",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_conversion.go",
+          "tests": [
+            "TestSMTStringConversionLibraryQueueAndRegexRegistration",
+            "TestSMTStringConversionRegistryOwnsRepeatedSetupVisits"
+          ]
         }
       ],
       "ownership": [
@@ -141191,7 +141259,8 @@
         "Prefix-literal family 3 reuses the retained single-residual/integer-flag cache without an initial witness self seed. Known and unknown positive cuts merge x then n at the theory level. Fixed prefix extraction uses Go byte slices after the native equality-consistency predecessor; temporary length/guard/crop AST roots survive until publication and release forward. Unknown literal alternatives preserve len(x)=len(crop_literal) expressions rather than substituting numeral text, and enum order/preference differs from suffix family 2.",
         "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward.",
         "String extraction/replacement constructors root every temporary AST through rewrite and publication, retain the native named fresh String/integer witnesses, and release local vectors forward. Character-at borrows the configured context rewriter; substring/replacement own a reached fresh default rewriter borrowing only the existing manager/parameter services, with partial-owner cleanup delegated to the already ported constructor/destructor. Contains construction retains its term, internalizes it and recursively queues native setup immediately. No C++ string/container internals or universal callback layer is added.",
-        "Index constructors and all case/formula temporaries own AST roots through publication; fresh head/tail/index witnesses follow native creation order. Deferred containment equivalences have their own concrete ASTRef queue, retained independently before search, released forward after publication or in native member-destruction order if still pending at close. No permanent substitute queue root or generic callback layer is added."
+        "Index constructors and all case/formula temporaries own AST roots through publication; fresh head/tail/index witnesses follow native creation order. Deferred containment equivalences have their own concrete ASTRef queue, retained independently before search, released forward after publication or in native member-destruction order if still pending at close. No permanent substitute queue root or generic callback layer is added.",
+        "Initial conversion ASTs and decimal regex range/star/concat intermediates hold concrete local AST roots through internalization and publication. Existing regexMembership implements reached mk_RegexIn without a universal adapter. Conversion registry visits now acquire separate ASTRefs, preserve duplicate/insertion order, and release forward before contains_map at destruction, matching string_int_conversion_terms declaration order; initial axiom ownership is independent."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141218,7 +141287,8 @@
         "Prefix family 3 is connected to actual equality dispatch. Its known alignment honors StrongArrangements unlike family 2; when positive-cut feasibility fails, native negation is commented out and no new refusal is introduced. Literal-prefix splits precede the residual cut, full-prefix alignment gets priority 0.5, and other options 0.1. A native predecessor regression rejects a negative inferred crop before cache/arrangement construction. Tester dispatch, unroll/automata final processing and final checking remain pending; production QF_S routing is unchanged and passing existing production runner comparisons does not establish complete legacy String behavior.",
         "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior.",
         "Reached library operations 6/7/8 now dispatch substring/replacement/character-at initial axioms instead of the previous unported-operation error. The raw first-occurrence constraints are preserved rather than replacing project algorithms with a modern concrete evaluator. Complete legacy String still requires index/conversion handlers, tester dispatch, additional unroll and automata/final checking. The native extended index-of source decomposes fresh head/tail strings rather than calling substring directly; it will reuse the reached containment constructor. Production QF_S routing is unchanged and FinalCheck remains GiveUp.",
-        "Reached library operation 10 now handles both literal-zero and extended index-of paths. Preserve the old source tail-relative extended result without adding the start offset; preserve its active delayed containment heuristic, but do not activate the simple path's commented-out assertion. Source assert_implication uses simplifying mk_not, required when a rewritten constant-start guard is itself negated. Conversion handlers 27/28, tester/dependency/unroll/automata/final-check algorithms remain pending. Production QF_S routing remains unchanged; FinalCheck remains GiveUp and legacy String source units remain partial."
+        "Reached library operation 10 now handles both literal-zero and extended index-of paths. Preserve the old source tail-relative extended result without adding the start offset; preserve its active delayed containment heuristic, but do not activate the simple path's commented-out assertion. Source assert_implication uses simplifying mk_not, required when a rewritten constant-start guard is itself negated. Conversion handlers 27/28, tester/dependency/unroll/automata/final-check algorithms remain pending. Production QF_S routing remains unchanged; FinalCheck remains GiveUp and legacy String source units remain partial.",
+        "All currently reached initial library dispatch operations, including int-to-string 27 and string-to-int 28, now have handlers. Initial conversion constraints intentionally do not imply complete decimal-value agreement: positive string-to-int results only constrain decimal syntax, and nonnegative int-to-string results are initially only nonempty. Native finalcheck_str2int/finalcheck_int2str, dependency/free-variable/tester/unroll/automata/final-check algorithms remain pending. No routing change or legacy String SAT/completion claim is made; FinalCheck remains GiveUp."
       ]
     },
     {

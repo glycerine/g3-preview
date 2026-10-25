@@ -313,6 +313,10 @@ func (t *SMTStringTheory) Propagate() error {
 					err = t.instantiateContains(node)
 				case 12:
 					err = t.instantiateRegexMembership(node)
+				case 27:
+					err = t.instantiateIntToString(node)
+				case 28:
+					err = t.instantiateStringToInt(node)
 				default:
 					return fmt.Errorf("string theory library operation %d is not ported", op)
 				}
