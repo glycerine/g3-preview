@@ -13,18 +13,34 @@ import (
 // callbacks/final check must be ported before setup selects it for QF_S.
 type SMTStringTheory struct {
 	*SMTTheoryBase
-	parameterOwner *SMTStrParams
-	find           *backtrack.UnionFind
-	findTrail      *backtrack.TrailStack
-	level          uint32
-	charset        [256]byte
-	charsetLookup  map[byte]int
-	strings        map[string]ast.ASTHandle
-	refs           []ast.ASTRef
-	cacheAccesses  uint64
-	unusedID       uint32
-	basicTodo      []*SMTEnode
-	closed         bool
+	parameterOwner    *SMTStrParams
+	find              *backtrack.UnionFind
+	findTrail         *backtrack.TrailStack
+	level             uint32
+	charset           [256]byte
+	charsetLookup     map[byte]int
+	strings           map[string]ast.ASTHandle
+	refs              []ast.ASTRef
+	cacheAccesses     uint64
+	unusedID          uint32
+	basicTodo         []*SMTEnode
+	concatTodo        []*SMTEnode
+	concatEvalTodo    []*SMTEnode
+	libraryTodo       []*SMTEnode
+	delayedSetup      []ast.ASTHandle
+	conversions       []ast.ASTHandle
+	searchStarted     bool
+	freshID           uint32
+	concatCache       map[[2]ast.ASTHandle]ast.ASTHandle
+	variableSet       map[ast.ASTHandle]struct{}
+	internalVariables map[ast.ASTHandle]struct{}
+	variableScopes    map[uint32]map[ast.ASTHandle]struct{}
+	axiomatized       map[ast.ASTHandle]struct{}
+	contains          []ast.ASTHandle
+	containsRefs      []ast.ASTRef
+	containsByPair    map[[2]ast.ASTHandle]ast.ASTHandle
+	containsIndex     map[ast.ASTHandle]map[[2]ast.ASTHandle]struct{}
+	closed            bool
 }
 
 func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStringTheory, error) {
@@ -43,6 +59,13 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 		return nil, err
 	}
 	t := &SMTStringTheory{SMTTheoryBase: base, parameterOwner: parameters, find: find, findTrail: context.GetTrailStack(), strings: make(map[string]ast.ASTHandle), charsetLookup: make(map[byte]int)}
+	t.concatCache = make(map[[2]ast.ASTHandle]ast.ASTHandle)
+	t.variableSet = make(map[ast.ASTHandle]struct{})
+	t.internalVariables = make(map[ast.ASTHandle]struct{})
+	t.variableScopes = make(map[uint32]map[ast.ASTHandle]struct{})
+	t.axiomatized = make(map[ast.ASTHandle]struct{})
+	t.containsByPair = make(map[[2]ast.ASTHandle]ast.ASTHandle)
+	t.containsIndex = make(map[ast.ASTHandle]map[[2]ast.ASTHandle]struct{})
 	// Source initialize_charset's active default alphabet. The unused final
 	// slot remains zero; NUL is excluded from the 255-character search order.
 	index := 0
@@ -268,11 +291,22 @@ func (t *SMTStringTheory) Close() (result error) {
 		return nil
 	}
 	result = t.findTrail.Reset()
+	// Native contains_map is a later-declared expr_ref_vector and closes
+	// before m_trail, also in forward element order.
+	for i := range t.containsRefs {
+		result = errors.Join(result, t.state.manager.DelRef(&t.containsRefs[i]))
+	}
 	// Native m_trail is an expr_ref_vector and releases its range forward.
 	for i := range t.refs {
 		result = errors.Join(result, t.state.manager.DelRef(&t.refs[i]))
 	}
 	t.refs, t.basicTodo, t.strings = nil, nil, nil
+	t.containsRefs, t.contains = nil, nil
+	t.concatTodo, t.concatEvalTodo, t.libraryTodo = nil, nil, nil
+	t.delayedSetup, t.conversions = nil, nil
+	t.concatCache, t.variableSet, t.internalVariables = nil, nil, nil
+	t.variableScopes, t.axiomatized = nil, nil
+	t.containsByPair, t.containsIndex = nil, nil
 	t.closed = true
 	return result
 }

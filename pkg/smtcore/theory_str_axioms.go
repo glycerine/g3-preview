@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -248,24 +249,76 @@ func (t *SMTStringTheory) tryEvalConcat(node *SMTEnode) (result error) {
 	return t.assertAxiom(equality)
 }
 
-func (t *SMTStringTheory) CanPropagate() bool { return len(t.basicTodo) != 0 }
+func (t *SMTStringTheory) CanPropagate() bool {
+	return len(t.basicTodo) != 0 || len(t.concatTodo) != 0 || len(t.concatEvalTodo) != 0 || len(t.libraryTodo) != 0 || len(t.delayedSetup) != 0
+}
 
 func (t *SMTStringTheory) Propagate() error {
 	if _, err := t.State(); err != nil {
 		return err
 	}
 	// Native basic-string work can recursively internalize fresh constants.
-	for len(t.basicTodo) != 0 {
-		before := len(t.basicTodo)
-		snapshot := append([]*SMTEnode(nil), t.basicTodo...)
-		for _, node := range snapshot {
-			if err := t.instantiateBasicStringAxioms(node); err != nil {
+	for t.CanPropagate() {
+		for len(t.basicTodo) != 0 {
+			before := len(t.basicTodo)
+			snapshot := append([]*SMTEnode(nil), t.basicTodo...)
+			for _, node := range snapshot {
+				if err := t.instantiateBasicStringAxioms(node); err != nil {
+					return err
+				}
+			}
+			if len(t.basicTodo) <= before {
+				t.basicTodo = nil
+			}
+		}
+		for _, node := range t.concatTodo {
+			if err := t.instantiateConcatAxiom(node); err != nil {
 				return err
 			}
 		}
-		if len(t.basicTodo) <= before {
-			t.basicTodo = nil
+		t.concatTodo = nil
+		for _, node := range t.concatEvalTodo {
+			if err := t.tryEvalConcat(node); err != nil {
+				return err
+			}
 		}
+		t.concatEvalTodo = nil
+		for len(t.libraryTodo) != 0 {
+			before := len(t.libraryTodo)
+			snapshot := append([]*SMTEnode(nil), t.libraryTodo...)
+			for _, node := range snapshot {
+				op, own, err := t.operation(node.Owner())
+				if err != nil {
+					return err
+				}
+				if !own {
+					return ast.ErrASTDomain
+				}
+				switch op {
+				case 3, 4:
+					err = t.instantiateBoundaryRelation(node, op == 4)
+				case 5:
+					err = t.instantiateContains(node)
+				default:
+					return fmt.Errorf("string theory library operation %d is not ported", op)
+				}
+				if err != nil {
+					return err
+				}
+			}
+			if len(t.libraryTodo) <= before {
+				t.libraryTodo = nil
+			}
+		}
+		for _, expression := range t.delayedSetup {
+			if err := t.state.Internalize(expression, false); err != nil {
+				return err
+			}
+			if err := t.setUpAxioms(expression); err != nil {
+				return err
+			}
+		}
+		t.delayedSetup = nil
 	}
 	return nil
 }
