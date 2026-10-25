@@ -153,7 +153,7 @@ func (t *SMTDatatypeTheory) addRecognizer(variable SMTTheoryVar, recognizer *SMT
 	data.recognizers[index] = recognizer
 	_ = t.findTrail.PushUndo(func() { data.recognizers[index] = nil })
 	if value == lbool.False {
-		return t.propagateRecognizer(SMTTheoryVar(root))
+		return t.propagateRecognizer(SMTTheoryVar(root), recognizer)
 	}
 	return nil
 }

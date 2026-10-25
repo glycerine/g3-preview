@@ -3,6 +3,7 @@ package smtcore
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -49,6 +50,19 @@ func (t *SMTDatatypeTheory) signRecognizerConflict(constructor, recognizer *SMTE
 	}
 	if constructor == nil || recognizer == nil || len(recognizer.arguments) != 1 {
 		return ast.ErrASTDomain
+	}
+	if err = t.emitDatatype("recognizer_conflict", "sign_recognizer_conflict", 177, func(out io.Writer) error {
+		if err := t.displayDatatypeExpression(out, constructor.owner); err != nil {
+			return err
+		}
+		_, _ = io.WriteString(out, "\n")
+		if err := t.displayDatatypeExpression(out, recognizer.owner); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return err
 	}
 	literal, err := s.Literal(recognizer.owner)
 	if err != nil {

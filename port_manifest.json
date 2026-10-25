@@ -132800,7 +132800,7 @@
           ]
         },
         {
-          "name": "Remaining datatype conflict TRACE/assertion and context integration audit",
+          "name": "Remaining datatype assertions, empty-recognizer context TRACE and broader context integration audit",
           "status": "partial",
           "tests": []
         },
@@ -133029,6 +133029,21 @@
             "TestSMTDatatypeSortConstraintTraceIncludesAttachedSkip",
             "TestSMTDatatypeRelevanceTracePrecedesRegistrationAndDuplicateSkip"
           ]
+        },
+        {
+          "name": "sign_recognizer_conflict and propagate_recognizer exhaustion TRACE sites 177/780: actual callback trigger, source constructor/recognizer expressions, ordered detailed literals and class-equality evidence before conflict publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_conflicts.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/theory_datatype_trace.go",
+            "pkg/smtcore/theory_datatype_conflicts_test.go",
+            "pkg/smtcore/theory_datatype_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck",
+            "TestSMTDatatypeExhaustionTraceUsesTriggerAndOrderedEvidence"
+          ]
         }
       ],
       "ownership": [
@@ -133048,7 +133063,8 @@
         "Corrected eager recognizer Boolean allocation and fallback Boolean accessor handling. Datatype Boolean variables now follow argument/accessor/recognizer source order, carry datatype notification and an enode flag in gate context, and restore across repeated scope reuse. The regression failed before correction (argument/accessor/recognizer IDs 2/3/1). Added datatype entry records at 258/263 and equality records at 100/116/118, independent datatype_detail, source operand order, native/disabled erasure and sticky ostream behavior. Remaining datatype TRACE/assertion/context sites stay open. A scoped Boolean-field SMT-LIB script is compared strictly against clean-exit prebuilt C++ with forced true/false field and recognizer values.",
         "Added source datatype TRACE sites 524,538,461,556 in traversal/publication order. Trace tails display the actual retained conflict equalities, including the already documented Go correction for the C++ closing-premise omission; this does not claim identical defective C++ proof-edge lists. Exact leaf entry/enter/exit, cached-skip and sticky ostream checks accompany existing proof/non-proof, one/three-node and repeated-scope cycle evidence tests. Native/disabled tags erase formatter operands. Remaining datatype diagnostic/assertion/context audit stays open.",
         "Recognizer application construction is separated from internalization so mk_split emits its creation record before ctx.internalize(...,false). All retained recognizerLiteral callers use the source non-gate context. Constructor diagnostics precede constructor-statistic mutation; assignment prints source ostream Boolean 0/1; private merge precedes imported-recognizer records; an already relevant unassigned split emits only the preferred-constructor record while retaining its source split-call count. Remaining sort/relevance/conflict diagnostics, source guards/statistics width and broader context audit remain incomplete.",
-        "All five datatype statistics now use source uint32 counters. Actual occurs traversal, split, reconstruction, constructor internalization and update-field publication wrap at the source boundary; the old uint64 implementation failed all five cases with 4294967296. Collection matches source order and datatype update ax spelling. Sort diagnostics precede the attached-variable return; relevance diagnostics precede the recognizer filter/registration, with independent datatype_bug and native erasure. Go ResetStatistics remains an extra helper, not a new kernel reset callback. Conflict diagnostics, source guards and broader datatype/context audit remain partial."
+        "All five datatype statistics now use source uint32 counters. Actual occurs traversal, split, reconstruction, constructor internalization and update-field publication wrap at the source boundary; the old uint64 implementation failed all five cases with 4294967296. Collection matches source order and datatype update ax spelling. Sort diagnostics precede the attached-variable return; relevance diagnostics precede the recognizer filter/registration, with independent datatype_bug and native erasure. Go ResetStatistics remains an extra helper, not a new kernel reset callback. Conflict diagnostics, source guards and broader datatype/context audit remain partial.",
+        "Added recognizer_conflict and datatype_conflict packets at source sites 177/780. Both retained propagate_recognizer callers now preserve the actual triggering recognizer. Batched negative assignments demonstrate that the first theory callback, not the last assignment, supplies the exhaustion prefix; diagnostics preserve declaration-order negative literal premises and actual merged-class equality evidence before installing the conflict. Source guards, empty-recognizer context display and broader context integration remain open."
       ]
     },
     {
@@ -133202,7 +133218,7 @@
           ]
         },
         {
-          "name": "Remaining datatype conflict TRACE/assertion and context integration audit",
+          "name": "Remaining datatype assertions, empty-recognizer context TRACE and broader context integration audit",
           "status": "partial",
           "tests": []
         },
@@ -133431,6 +133447,21 @@
             "TestSMTDatatypeSortConstraintTraceIncludesAttachedSkip",
             "TestSMTDatatypeRelevanceTracePrecedesRegistrationAndDuplicateSkip"
           ]
+        },
+        {
+          "name": "sign_recognizer_conflict and propagate_recognizer exhaustion TRACE sites 177/780: actual callback trigger, source constructor/recognizer expressions, ordered detailed literals and class-equality evidence before conflict publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_conflicts.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/theory_datatype_trace.go",
+            "pkg/smtcore/theory_datatype_conflicts_test.go",
+            "pkg/smtcore/theory_datatype_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck",
+            "TestSMTDatatypeExhaustionTraceUsesTriggerAndOrderedEvidence"
+          ]
         }
       ],
       "ownership": [
@@ -133450,7 +133481,8 @@
         "Corrected eager recognizer Boolean allocation and fallback Boolean accessor handling. Datatype Boolean variables now follow argument/accessor/recognizer source order, carry datatype notification and an enode flag in gate context, and restore across repeated scope reuse. The regression failed before correction (argument/accessor/recognizer IDs 2/3/1). Added datatype entry records at 258/263 and equality records at 100/116/118, independent datatype_detail, source operand order, native/disabled erasure and sticky ostream behavior. Remaining datatype TRACE/assertion/context sites stay open. A scoped Boolean-field SMT-LIB script is compared strictly against clean-exit prebuilt C++ with forced true/false field and recognizer values.",
         "Added source datatype TRACE sites 524,538,461,556 in traversal/publication order. Trace tails display the actual retained conflict equalities, including the already documented Go correction for the C++ closing-premise omission; this does not claim identical defective C++ proof-edge lists. Exact leaf entry/enter/exit, cached-skip and sticky ostream checks accompany existing proof/non-proof, one/three-node and repeated-scope cycle evidence tests. Native/disabled tags erase formatter operands. Remaining datatype diagnostic/assertion/context audit stays open.",
         "Recognizer application construction is separated from internalization so mk_split emits its creation record before ctx.internalize(...,false). All retained recognizerLiteral callers use the source non-gate context. Constructor diagnostics precede constructor-statistic mutation; assignment prints source ostream Boolean 0/1; private merge precedes imported-recognizer records; an already relevant unassigned split emits only the preferred-constructor record while retaining its source split-call count. Remaining sort/relevance/conflict diagnostics, source guards/statistics width and broader context audit remain incomplete.",
-        "All five datatype statistics now use source uint32 counters. Actual occurs traversal, split, reconstruction, constructor internalization and update-field publication wrap at the source boundary; the old uint64 implementation failed all five cases with 4294967296. Collection matches source order and datatype update ax spelling. Sort diagnostics precede the attached-variable return; relevance diagnostics precede the recognizer filter/registration, with independent datatype_bug and native erasure. Go ResetStatistics remains an extra helper, not a new kernel reset callback. Conflict diagnostics, source guards and broader datatype/context audit remain partial."
+        "All five datatype statistics now use source uint32 counters. Actual occurs traversal, split, reconstruction, constructor internalization and update-field publication wrap at the source boundary; the old uint64 implementation failed all five cases with 4294967296. Collection matches source order and datatype update ax spelling. Sort diagnostics precede the attached-variable return; relevance diagnostics precede the recognizer filter/registration, with independent datatype_bug and native erasure. Go ResetStatistics remains an extra helper, not a new kernel reset callback. Conflict diagnostics, source guards and broader datatype/context audit remain partial.",
+        "Added recognizer_conflict and datatype_conflict packets at source sites 177/780. Both retained propagate_recognizer callers now preserve the actual triggering recognizer. Batched negative assignments demonstrate that the first theory callback, not the last assignment, supplies the exhaustion prefix; diagnostics preserve declaration-order negative literal premises and actual merged-class equality evidence before installing the conflict. Source guards, empty-recognizer context display and broader context integration remain open."
       ]
     },
     {
@@ -249631,7 +249663,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 706.4,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification. Includes source first-conflict retention, shared core equality FIFO and retained theory producer scheduling/replay, datatype Boolean creation order/enode flags, initial datatype equality/entry traces and optional SMT-LIB scope counts through cb807efc, with prebuilt C++ comparisons enabled. Excludes subsequent datatype occurs-check diagnostics 48af241b and the current callback/recognizer/split diagnostic and factory-order increment, whose focused integration evidence is separate. Also excludes subsequent datatype statistics and sort/relevance trace corrections."
+    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification. Includes source first-conflict retention, shared core equality FIFO and retained theory producer scheduling/replay, datatype Boolean creation order/enode flags, initial datatype equality/entry traces and optional SMT-LIB scope counts through cb807efc, with prebuilt C++ comparisons enabled. Excludes subsequent datatype occurs-check diagnostics 48af241b and the current callback/recognizer/split diagnostic and factory-order increment, whose focused integration evidence is separate. Also excludes subsequent datatype statistics and sort/relevance trace corrections. Also excludes the recognizer/exhaustion conflict diagnostic increment following cdcd48b0."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

@@ -491,7 +491,7 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 			}
 			return nil
 		}
-		return t.propagateRecognizer(SMTTheoryVar(root))
+		return t.propagateRecognizer(SMTTheoryVar(root), recognizerNode)
 	}
 	if known != nil && known.declaration == constructor {
 		return nil

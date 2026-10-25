@@ -14,6 +14,97 @@ func smtDatatypeTraceRecord(tag, function string, line int, body string) string 
 	return fmt.Sprintf("-------- [%s] %s src/smt/theory_datatype.cpp:%d ---------\n%s------------------------------------------------\n", tag, function, line, body)
 }
 
+func TestSMTDatatypeExhaustionTraceUsesTriggerAndOrderedEvidence(t *testing.T) {
+	for _, first := range []int{2, 0} {
+		t.Run(fmt.Sprint(first), func(t *testing.T) {
+			m, dt, x, sort, constructors := smtDatatypeSplitFixture(t)
+			s, err := dt.State()
+			astTestMust(t, err)
+			y, err := m.MkConst(astTestSymbol(t, m, "exhaustion-y"), sort)
+			astTestMust(t, err)
+			astTestMust(t, s.Internalize(y, false))
+			var literals []SMTLiteral
+			var expressions []ast.ASTHandle
+			for i, constructor := range constructors {
+				value := x
+				if i != 0 {
+					value = y
+				}
+				literal, expression, err := dt.recognizerLiteral(constructor, value)
+				astTestMust(t, err)
+				astTestMust(t, s.markRelevant(expression))
+				literals = append(literals, literal)
+				expressions = append(expressions, expression)
+			}
+			astTestMust(t, s.addEquality(s.context.enodes[x], s.context.enodes[y], NewSMTEqualityAxiom()))
+			_, err = s.PropagateCore()
+			astTestMust(t, err)
+			if s.Inconsistent() {
+				t.Fatal("unassigned recognizers conflicted during merge")
+			}
+			for attempt := 0; attempt < 2; attempt++ {
+				astTestMust(t, s.PushScope())
+				var trace bytes.Buffer
+				tags := diagnostic.NewTraceTagsWithWriter(&trace)
+				tags.Enable("datatype_conflict")
+				dt.trace = tags
+				order := []int{first}
+				for i := range literals {
+					if i != first {
+						order = append(order, i)
+					}
+				}
+				// All assignments precede theory callbacks. The first callback,
+				// rather than the last assignment, triggers exhaustion.
+				for _, i := range order {
+					astTestMust(t, s.AssignLiteral(literals[i].Negated(), NewSMTBooleanAxiom()))
+				}
+				_, err = s.PropagateCore()
+				astTestMust(t, err)
+				conflict, found := s.Conflict()
+				if !found {
+					t.Fatal("exhausted recognizers did not conflict")
+				}
+				owner, _ := conflict.Justification()
+				extended, ok := owner.(*SMTExtTheoryConflictJustification)
+				if !ok || len(extended.Literals) != 3 || len(extended.Equalities) == 0 {
+					t.Fatal("exhaustion lost literal or merged-class equality evidence", owner)
+				}
+				want := ""
+				if tags.ShouldTrace("datatype_conflict") {
+					var body bytes.Buffer
+					astTestMust(t, dt.displayDatatypeExpression(&body, expressions[first]))
+					body.WriteByte('\n')
+					for i, literal := range extended.Literals {
+						if literal != literals[i].Negated() {
+							t.Fatal("exhaustion evidence not in constructor declaration order")
+						}
+						astTestMust(t, literal.Display(&body, m, s.boolExpr))
+						body.WriteByte('\n')
+					}
+					for _, pair := range extended.Equalities {
+						if pair.First.root != pair.Second.root || pair.First == pair.Second {
+							t.Fatal("exhaustion used invalid class equality")
+						}
+						astTestMust(t, dt.displayDatatypeExpression(&body, pair.First.owner))
+						body.WriteString(" = ")
+						astTestMust(t, dt.displayDatatypeExpression(&body, pair.Second.owner))
+						body.WriteByte('\n')
+					}
+					want = smtDatatypeTraceRecord("datatype_conflict", "propagate_recognizer", 780, body.String())
+				}
+				if trace.String() != want {
+					t.Fatal("exhaustion trigger/evidence trace", trace.String(), want)
+				}
+				astTestMust(t, s.PopScopes(1))
+				if s.Inconsistent() {
+					t.Fatal("exhaustion conflict survived pop")
+				}
+			}
+		})
+	}
+}
+
 func TestSMTDatatypeEqualityTraceSourceBranchesBeforeQueuedMerge(t *testing.T) {
 	for _, proofs := range []bool{false, true} {
 		for _, guard := range []string{"null", "true", "undefined"} {

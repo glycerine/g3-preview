@@ -1,10 +1,12 @@
 package smtcore
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -104,6 +106,10 @@ func TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck(t *testing.T)
 				}
 				for attempt := 0; attempt < 2; attempt++ {
 					astTestMust(t, s.PushScope())
+					var trace bytes.Buffer
+					tags := diagnostic.NewTraceTagsWithWriter(&trace)
+					tags.Enable("recognizer_conflict")
+					f.dt.trace = tags
 					reconstructions := f.dt.statistics.constructorAxioms
 					conflicts := s.statistics.NumConflicts
 					f.assert(t, child)
@@ -119,6 +125,13 @@ func TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck(t *testing.T)
 					pair := extended.Equalities[0]
 					if pair.First.owner != f.left || pair.Second.owner != f.x || pair.First.root != pair.Second.root || f.dt.statistics.constructorAxioms != reconstructions || s.statistics.NumConflicts != conflicts+1 {
 						t.Fatal("conflict reconstructed another constructor or lost its actual class evidence")
+					}
+					wantTrace := ""
+					if tags.ShouldTrace("recognizer_conflict") {
+						wantTrace = smtDatatypeTraceRecord("recognizer_conflict", "sign_recognizer_conflict", 177, "(conflict-left conflict-element)\n(conflict-is-left conflict-x)\n")
+					}
+					if trace.String() != wantTrace {
+						t.Fatal("constructor/recognizer conflict trace", trace.String(), wantTrace)
 					}
 					status, err := f.k.resolveCheckConflict()
 					astTestMust(t, err)

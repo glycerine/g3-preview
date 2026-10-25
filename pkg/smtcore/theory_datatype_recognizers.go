@@ -7,7 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-func (t *SMTDatatypeTheory) propagateRecognizer(variable SMTTheoryVar) error {
+func (t *SMTDatatypeTheory) propagateRecognizer(variable SMTTheoryVar, trigger *SMTEnode) error {
 	s, err := t.State()
 	if err != nil {
 		return err
@@ -50,6 +50,9 @@ func (t *SMTDatatypeTheory) propagateRecognizer(variable SMTTheoryVar) error {
 		unassigned++
 	}
 	if unassigned == 0 {
+		if err = t.traceDatatypeRecognizerExhaustion(trigger, literals, equalities); err != nil {
+			return err
+		}
 		return t.setDatatypeConflict(literals, equalities)
 	}
 	sort, err := s.manager.GetSort(node.owner)

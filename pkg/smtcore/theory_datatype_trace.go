@@ -95,6 +95,39 @@ func (t *SMTDatatypeTheory) emitDatatype(tag, function string, line int, body fu
 	return err
 }
 
+func (t *SMTDatatypeTheory) traceDatatypeRecognizerExhaustion(trigger *SMTEnode, literals []SMTLiteral, equalities []SMTEnodePair) error {
+	return t.emitDatatype("datatype_conflict", "propagate_recognizer", 780, func(out io.Writer) error {
+		s, err := t.State()
+		if err != nil {
+			return err
+		}
+		if trigger == nil {
+			return ast.ErrASTDomain
+		}
+		if err = t.displayDatatypeExpression(out, trigger.owner); err != nil {
+			return err
+		}
+		_, _ = io.WriteString(out, "\n")
+		for _, literal := range literals {
+			if err = literal.Display(out, s.manager, s.boolExpr); err != nil {
+				return err
+			}
+			_, _ = io.WriteString(out, "\n")
+		}
+		for _, pair := range equalities {
+			if err = t.displayDatatypeExpression(out, pair.First.owner); err != nil {
+				return err
+			}
+			_, _ = io.WriteString(out, " = ")
+			if err = t.displayDatatypeExpression(out, pair.Second.owner); err != nil {
+				return err
+			}
+			_, _ = io.WriteString(out, "\n")
+		}
+		return nil
+	})
+}
+
 func (t *SMTDatatypeTheory) displayDatatypeExpression(out io.Writer, expression ast.ASTHandle) (result error) {
 	s, err := t.State()
 	if err != nil {
