@@ -62,8 +62,8 @@ func TestSMTPseudoBooleanQFFDExactCardinality(t *testing.T) {
 			if status != lbool.False {
 				t.Fatal("pseudo-Boolean cardinality violation accepted", status)
 			}
-			if pbTheory.statistics.compiled == 0 {
-				t.Fatal("pseudo-Boolean atom bypassed the sorting-network compiler")
+			if pbTheory.statistics.compiled != 0 || pbTheory.statistics.predicates == 0 {
+				t.Fatal("native pseudo-Boolean atom was eagerly compiled or not internalized")
 			}
 		})
 	}

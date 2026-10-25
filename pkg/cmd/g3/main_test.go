@@ -341,6 +341,7 @@ var scriptResults = map[string]string{
 	"datatype_metadata_merge_scopes.smt2":          "sat\n((((_ is right) x) true) (((_ is right) y) true) ((= x y) true))\nunsat\n(rejected_survivor)\nsat\nsat\n(((not ((_ is left) x)) true) ((not ((_ is middle) y)) true))\nunsat\n(rejected_constructor)\nsat\nsat\n(((= u v) true) ((= (rf x) u) true) ((= (rf y) v) true))\nsat\n",
 	"unsat_core_reverse_trail.smt2":                "unsat\n(c)\nsat\n((a true) (b true) (c false))\nunsat\n(blocked)\nsat\nunsat\n(h)\nsat\n((e true) (h false) ((= x y) true))\nunsat\n(blocked_eq)\nsat\n",
 	"closest_theory_variables.smt2":                "unsat\n(close_chain)\nsat\n(((= x0 x3) true) ((< (f x2) (f x4)) true))\nsat\n(((f x0) 7) ((f x3) 7) ((f x4) 8))\nunsat\n(bad_bound)\nsat\nsat\n",
+	"pb_native_watches_scopes.smt2":                "sat\n((b true))\nsat\n((b true) (d true) (e true))\nunsat\n(rejected_watch)\nsat\nsat\nunsat\n(rejected_complement)\nsat\n(((and a b) true) ((xor c d) true))\nunsat\n(rejected_proxy)\nsat\nsat\n((W true) (e true))\nsat\n",
 	"datatype_cycle_scopes.smt2":                   "unsat\n(x_edge y_edge z_edge)\nsat\n(((= (left x) (right x)) true) ((= (left (left x)) leaf) true))\nunsat\nsat\nsat\n",
 	"datatype_constructor_conflict_cores.smt2":     "sat\n((((_ is left) x) true) ((= (lf x) u) true))\nunsat\n(left_fact not_left)\nsat\nunsat\n(left_fact right_fact)\nsat\n",
 	"datatype_incremental_recognizers.smt2":        "sat\n((((_ is aa) x) false) ((= x y) true))\nsat\n((((_ is cc) x) true) (((_ is bb) y) false))\nunsat\nsat\nsat\n",
@@ -964,7 +965,7 @@ func canonicalOutput(text string) string {
 }
 
 func TestSMTLibRunnerProofScript(t *testing.T) {
-	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2", "check_phase_repeated_proof.smt2", "recursive_sum_proof.smt2", "datatype_constructor_conflict_proof.smt2", "string_literal_proof.smt2", "datatype_cycle_proof.smt2", "datatype_update_equality_proof.smt2", "datatype_metadata_proof.smt2", "closest_theory_variables_proof.smt2"} {
+	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2", "check_phase_repeated_proof.smt2", "recursive_sum_proof.smt2", "datatype_constructor_conflict_proof.smt2", "string_literal_proof.smt2", "datatype_cycle_proof.smt2", "datatype_update_equality_proof.smt2", "datatype_metadata_proof.smt2", "closest_theory_variables_proof.smt2", "pb_native_watches_proof.smt2"} {
 		t.Run(name, func(t *testing.T) { testSMTLibProofScript(t, name) })
 	}
 }

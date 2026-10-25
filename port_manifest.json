@@ -34554,11 +34554,16 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/ast/rewriter/pb_rewriter.go"
+        "pkg/ast/rewriter/pb_rewriter.go",
+        "pkg/smtcore/theory_pb_normalize.go",
+        "pkg/smtcore/theory_pb_normalize_test.go",
+        "pkg/smtcore/theory_pb.go"
       ],
       "tests": [
         "TestPseudoBooleanRewriterCardinalityAndConstants",
-        "TestPseudoBooleanRewriterUniqueNormalizeAndPrune"
+        "TestPseudoBooleanRewriterUniqueNormalizeAndPrune",
+        "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+        "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks"
       ],
       "conditionals": [
         {
@@ -34611,13 +34616,29 @@
             "TestPseudoBooleanRewriterCardinalityAndConstants",
             "TestPseudoBooleanRewriterUniqueNormalizeAndPrune"
           ]
+        },
+        {
+          "name": "concrete literal instantiation of unique/normalize/prune/negate: signed-literal coalescing, constants, exact rational scaling, coefficient caps, gcd/cutting-plane/cardinality reductions, pruning and strict integer complements",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_normalize.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_normalize_test.go",
+            "pkg/smtcore/theory_pb_watch_test.go"
+          ],
+          "tests": [
+            "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+            "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks"
+          ]
         }
       ],
       "ownership": [
-        "Normalization mutates invocation-local exact rational copies and borrowed Boolean AST handles; generated negations are retained by the caller output or rebuilt PB application."
+        "Normalization mutates invocation-local exact rational copies and borrowed Boolean AST handles; generated negations are retained by the caller output or rebuilt PB application.",
+        "The live SMT literal specialization owns concrete literal/coefficient slices and independent rational copies for positive/complement constraints; existing AST-expression specialization ownership is unchanged."
       ],
       "deviations": [
-        "Only the concrete AST/rational instantiation reached by pb_rewriter is ported, using math/big.Rat instead of a generic numeral adapter."
+        "Only the concrete AST/rational instantiation reached by pb_rewriter is ported, using math/big.Rat instead of a generic numeral adapter.",
+        "The SMT literal specialization folds a constant equality with nonzero bound to false, avoiding an inert empty constraint with no future assignment callbacks; this is separately covered by the native PB constant-equality regression."
       ]
     },
     {
@@ -134564,11 +134585,25 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_pb.go"
+        "pkg/smtcore/theory_pb.go",
+        "pkg/smtcore/theory_pb_normalize.go",
+        "pkg/smtcore/theory_pb_watch.go",
+        "pkg/smtcore/theory_pb_normalize_test.go",
+        "pkg/smtcore/theory_pb_watch_test.go",
+        "pkg/smtcore/theory_pb_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
-        "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+        "TestSMTPseudoBooleanWeightedEqualityAndPolarity",
+        "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+        "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+        "TestSMTPBUnassignedAtomBoundsAndEqualityInference",
+        "TestSMTPBLargeArityUsesLinearWatchStorage",
+        "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -134878,44 +134913,114 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "exact at-most, at-least, weighted <=, >= and = atom internalization with both Boolean polarities",
+          "name": "native internalize_atom/compile_arg: normalize actual literal constraints, attach eligible uninterpreted Boolean notifications, introduce PB-owned proxies for other theory/gate arguments, fold assigned inputs and constant constraints, retain the source bound-one OR clauses; no eager PB2BV or valuation enumeration",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_pb.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb_normalize_test.go",
+            "pkg/smtcore/theory_pb_watch_test.go",
+            "pkg/smtcore/theory_pb_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
           "tests": [
+            "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+            "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+            "TestSMTPBUnassignedAtomBoundsAndEqualityInference",
+            "TestSMTPBLargeArityUsesLinearWatchStorage",
+            "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
             "TestSMTPseudoBooleanQFFDExactCardinality",
-            "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
           ]
         },
         {
-          "name": "sorting-network and bit-vector compilation path",
+          "name": "concrete literal instantiation of unique/normalize/prune/negate: signed-literal coalescing, constants, exact rational scaling, coefficient caps, gcd/cutting-plane/cardinality reductions, pruning and strict integer complements",
           "status": "ported",
-          "go_target": "pkg/smtcore/theory_pb.go",
+          "go_target": "pkg/smtcore/theory_pb_normalize.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_normalize_test.go",
+            "pkg/smtcore/theory_pb_watch_test.go"
+          ],
           "tests": [
-            "TestSMTPseudoBooleanQFFDExactCardinality"
+            "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+            "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks"
           ]
         },
         {
-          "name": "native watched propagation, simplex compilation and conflict-resolution strengthening heuristics",
-          "status": "unported",
-          "go_target": "pkg/smtcore/theory_pb.go",
+          "name": "ineq/var_info and variable/literal watch paths: weighted prefix growth and replacement, max-watch updates, unassigned-atom min/max/fixed inference, equality final-value inference, active positive/negative inequality modes, deficit-based forced literals, ordered theory-propagation premises and auxiliary-lemma conflict publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_watch.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb_normalize_test.go",
+            "pkg/smtcore/theory_pb_watch_test.go",
+            "pkg/smtcore/theory_pb_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
           "tests": [
+            "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+            "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+            "TestSMTPBUnassignedAtomBoundsAndEqualityInference",
+            "TestSMTPBLargeArityUsesLinearWatchStorage",
+            "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
             "TestSMTPseudoBooleanQFFDExactCardinality",
-            "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
           ]
         },
         {
-          "name": "retained native weighted-watch propagation, conflict strengthening, compilation-frequency/complement-learning controls and optional simplex path; exact SAT encoding does not port these project algorithms",
+          "name": "scope lifecycle: trail variable-watch numeric updates, restore mode/orientation and current variable watches after active literal-watch rollback, preserve untrailed argument permutations, delete scoped constraints and clear stale watch entries before Boolean IDs are reused",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_watch.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb_normalize_test.go",
+            "pkg/smtcore/theory_pb_watch_test.go",
+            "pkg/smtcore/theory_pb_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+            "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+            "TestSMTPBUnassignedAtomBoundsAndEqualityInference",
+            "TestSMTPBLargeArityUsesLinearWatchStorage",
+            "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
+            "TestSMTPseudoBooleanQFFDExactCardinality",
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
+        },
+        {
+          "name": "native conflict-strengthening resolution and complement learning; constructor policy snapshot/copy; propagation-frequency compilation scheduling and source compile_ineq sorting network; optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
           "status": "unported",
           "tests": []
         }
       ],
       "ownership": [
-        "The current exact encoder owns only temporary Go slices and big.Rat values while the SAT core owns generated clauses and literals."
+        "The theory owns typed normalized constraints, exact big.Rat coefficients, per-variable watch lists, scope limits and a concrete undo trail. SAT/context Boolean variables retain AST expressions; watch records borrow literal IDs and constraint pointers.",
+        "Per-assignment numeric trails restore counters. Active predicate assignment trails remove the current literal watches, restore orientation and variable-watch mode, then restore the previous sums/fixed count. Watch-list and argument swaps persist as in source. Scoped constraints are removed only after these undo actions; empty per-variable records can remain as source high-water storage.",
+        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Source conflict-strengthening-specific inequality owners and scheduling controls remain unported."
       ],
       "deviations": [
-        "The theory uses the ported PB2BV sorting-network and bit-vector compiler for accepted forms and exact blocking clauses as a semantic fallback. These exact clauses replace native watch/simplex propagation and conflict-strengthening heuristics without changing accepted valuations.",
-        "The source model procedure serves native auxiliary PB applications. No retained Go producer creates them: PB2BV introduces ordinary Boolean constants and bit-vector formulas whose values use the standard model path.",
-        "Completion correction: source theory_pb stores theory_pb_params by value, then caches four scalar controls in its constructor; mk_fresh copies that snapshot. Go uses unconditional PB2BV/exhaustive encoding without the native watched-constraint, conflict-strengthening and policy algorithms. Valuation tests do not prove completion of these retained project algorithms. This unit is partial; no unused parameter adapter was added."
+        "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. The normal PB2BV rewriter remains available to its other retained consumers. Source watch algorithms now run on live PB atoms; compilation and strengthening are explicit remaining ports rather than replacements by another algorithm.",
+        "Exact Go big.Rat values replace source rational/mpz storage and are copied when numeral ownership changes. The normalization implementation is concrete for SMTLiteral; no generic callback utility or STL internals are reproduced.",
+        "An empty equality with a nonzero bound is folded to false before publishing a constraint. Literal source normalization can leave this impossible negative-bound case unresolved, and no variable callback exists to repair it; the direct Go internalizer regression enforces correct constant semantics.",
+        "compile_arg now creates native auxiliary PB Booleans for nonowned arguments. Both source smt_model_generator.cpp mk_value_procs and Go discoverValueProcedures handle Boolean roots before sort-family model callbacks, so their model values use the Boolean assignment path. The prior claim that no retained Go producer creates auxiliary PB applications is superseded. The remaining model/factory registration/lifetime audit is not claimed complete.",
+        "The source default compilation, conflict-frequency/complement-learning controls and optional simplex algorithms are still unported. Ordinary watch propagation and auxiliary conflict clauses preserve semantics, but do not prove those project algorithms complete. The class remains partial."
       ]
     },
     {
@@ -134924,11 +135029,25 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_pb.go"
+        "pkg/smtcore/theory_pb.go",
+        "pkg/smtcore/theory_pb_normalize.go",
+        "pkg/smtcore/theory_pb_watch.go",
+        "pkg/smtcore/theory_pb_normalize_test.go",
+        "pkg/smtcore/theory_pb_watch_test.go",
+        "pkg/smtcore/theory_pb_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
-        "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+        "TestSMTPseudoBooleanWeightedEqualityAndPolarity",
+        "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+        "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+        "TestSMTPBUnassignedAtomBoundsAndEqualityInference",
+        "TestSMTPBLargeArityUsesLinearWatchStorage",
+        "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerProofScript"
       ],
       "assertions": [
         {
@@ -134940,35 +135059,114 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "retained pseudo-Boolean theory registration, atom internalization and exact logical semantics",
+          "name": "native internalize_atom/compile_arg: normalize actual literal constraints, attach eligible uninterpreted Boolean notifications, introduce PB-owned proxies for other theory/gate arguments, fold assigned inputs and constant constraints, retain the source bound-one OR clauses; no eager PB2BV or valuation enumeration",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_pb.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb_normalize_test.go",
+            "pkg/smtcore/theory_pb_watch_test.go",
+            "pkg/smtcore/theory_pb_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
           "tests": [
+            "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+            "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+            "TestSMTPBUnassignedAtomBoundsAndEqualityInference",
+            "TestSMTPBLargeArityUsesLinearWatchStorage",
+            "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
             "TestSMTPseudoBooleanQFFDExactCardinality",
-            "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
           ]
         },
         {
-          "name": "specialized watch, simplex, compilation and lemma data structures",
-          "status": "unported",
-          "go_target": "pkg/smtcore/theory_pb.go",
+          "name": "concrete literal instantiation of unique/normalize/prune/negate: signed-literal coalescing, constants, exact rational scaling, coefficient caps, gcd/cutting-plane/cardinality reductions, pruning and strict integer complements",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_normalize.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_normalize_test.go",
+            "pkg/smtcore/theory_pb_watch_test.go"
+          ],
           "tests": [
-            "TestSMTPseudoBooleanQFFDExactCardinality",
-            "TestSMTPseudoBooleanWeightedEqualityAndPolarity"
+            "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+            "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks"
           ]
         },
         {
-          "name": "retained native weighted-watch propagation, conflict strengthening, compilation-frequency/complement-learning controls and optional simplex path; exact SAT encoding does not port these project algorithms",
+          "name": "ineq/var_info and variable/literal watch paths: weighted prefix growth and replacement, max-watch updates, unassigned-atom min/max/fixed inference, equality final-value inference, active positive/negative inequality modes, deficit-based forced literals, ordered theory-propagation premises and auxiliary-lemma conflict publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_watch.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb_normalize_test.go",
+            "pkg/smtcore/theory_pb_watch_test.go",
+            "pkg/smtcore/theory_pb_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+            "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+            "TestSMTPBUnassignedAtomBoundsAndEqualityInference",
+            "TestSMTPBLargeArityUsesLinearWatchStorage",
+            "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
+            "TestSMTPseudoBooleanQFFDExactCardinality",
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
+        },
+        {
+          "name": "scope lifecycle: trail variable-watch numeric updates, restore mode/orientation and current variable watches after active literal-watch rollback, preserve untrailed argument permutations, delete scoped constraints and clear stale watch entries before Boolean IDs are reused",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_watch.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb_normalize_test.go",
+            "pkg/smtcore/theory_pb_watch_test.go",
+            "pkg/smtcore/theory_pb_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTPBLiteralNormalizationIndependentValuationOracle",
+            "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+            "TestSMTPBUnassignedAtomBoundsAndEqualityInference",
+            "TestSMTPBLargeArityUsesLinearWatchStorage",
+            "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
+            "TestSMTPseudoBooleanQFFDExactCardinality",
+            "TestSMTPseudoBooleanWeightedEqualityAndPolarity",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
+        },
+        {
+          "name": "native conflict-strengthening resolution and complement learning; constructor policy snapshot/copy; propagation-frequency compilation scheduling and source compile_ineq sorting network; optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
           "status": "unported",
           "tests": []
         }
       ],
       "ownership": [
-        "Concrete Go values replace manual ineq, watch-list and temporary numeral allocation for the exact checkpoint encoder."
+        "The theory owns typed normalized constraints, exact big.Rat coefficients, per-variable watch lists, scope limits and a concrete undo trail. SAT/context Boolean variables retain AST expressions; watch records borrow literal IDs and constraint pointers.",
+        "Per-assignment numeric trails restore counters. Active predicate assignment trails remove the current literal watches, restore orientation and variable-watch mode, then restore the previous sums/fixed count. Watch-list and argument swaps persist as in source. Scoped constraints are removed only after these undo actions; empty per-variable records can remain as source high-water storage.",
+        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Source conflict-strengthening-specific inequality owners and scheduling controls remain unported."
       ],
       "deviations": [
-        "The source-private watch, simplex and lemma structures are replaced by PB2BV formulas and exact SAT clauses; no universal adapter is introduced for those implementation-only structures.",
-        "Completion correction: source theory_pb stores theory_pb_params by value, then caches four scalar controls in its constructor; mk_fresh copies that snapshot. Go uses unconditional PB2BV/exhaustive encoding without the native watched-constraint, conflict-strengthening and policy algorithms. Valuation tests do not prove completion of these retained project algorithms. This unit is partial; no unused parameter adapter was added."
+        "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. The normal PB2BV rewriter remains available to its other retained consumers. Source watch algorithms now run on live PB atoms; compilation and strengthening are explicit remaining ports rather than replacements by another algorithm.",
+        "Exact Go big.Rat values replace source rational/mpz storage and are copied when numeral ownership changes. The normalization implementation is concrete for SMTLiteral; no generic callback utility or STL internals are reproduced.",
+        "An empty equality with a nonzero bound is folded to false before publishing a constraint. Literal source normalization can leave this impossible negative-bound case unresolved, and no variable callback exists to repair it; the direct Go internalizer regression enforces correct constant semantics.",
+        "compile_arg now creates native auxiliary PB Booleans for nonowned arguments. Both source smt_model_generator.cpp mk_value_procs and Go discoverValueProcedures handle Boolean roots before sort-family model callbacks, so their model values use the Boolean assignment path. The prior claim that no retained Go producer creates auxiliary PB applications is superseded. The remaining model/factory registration/lifetime audit is not claimed complete.",
+        "The source default compilation, conflict-frequency/complement-learning controls and optional simplex algorithms are still unported. Ordinary watch propagation and auxiliary conflict clauses preserve semantics, but do not prove those project algorithms complete. The class remains partial."
       ]
     },
     {
@@ -247887,7 +248085,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 714.425,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified clean isolated exact-HEAD checkout with prebuilt C++ comparisons enabled; includes datatype root metadata, synchronous relevance and source unsat-core reverse traversal, plus earlier increments. Excludes subsequent datatype display, closest-variable/origin notification, arithmetic replay retention and user-base/assumption learning fixes, whose focused integration evidence is recorded separately."
+    "scope_warning": "Verified clean isolated exact-HEAD checkout with prebuilt C++ comparisons enabled; includes datatype root metadata, synchronous relevance and source unsat-core reverse traversal, plus earlier increments. Excludes subsequent datatype display, closest-variable/origin notification, arithmetic replay retention and user-base/assumption learning fixes, whose focused integration evidence is recorded separately. Also excludes the subsequent native PB literal normalization/watch increment, whose focused integration evidence is separate."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
