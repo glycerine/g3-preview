@@ -134820,7 +134820,8 @@
         "pkg/smtcore/theory_pb_trace_test.go",
         "pkg/smtcore/theory_pb_resolution_trace.go",
         "pkg/smtcore/theory_pb_resolution_trace_test.go",
-        "pkg/smtcore/theory_pb_stats_test.go"
+        "pkg/smtcore/theory_pb_stats_test.go",
+        "pkg/smtcore/theory_pb_inline_guard_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -134869,7 +134870,9 @@
         "TestSMTPBResolvedLemmaDisplayAndVerboseGate",
         "TestSMTPBStatisticsUnsignedWrapThroughRetainedOperations",
         "TestSMTPBStatisticsSourceCollectionOrder",
-        "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
+        "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause",
+        "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
+        "TestSMTPBInternalizeTermSourceUnreachableGuard"
       ],
       "conditionals": [
         {
@@ -135482,6 +135485,20 @@
             "TestSMTPBStatisticsSourceCollectionOrder",
             "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
           ]
+        },
+        {
+          "name": "arg_t::negate VERIFY normalization result after the actual mutation prefix, and internalize_term source debug UNREACHABLE with native false return",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_normalize.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_inline_guard_test.go",
+            "pkg/smtcore/theory_pb_normalize_test.go"
+          ],
+          "tests": [
+            "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
+            "TestSMTPBInternalizeTermSourceUnreachableGuard"
+          ]
         }
       ],
       "ownership": [
@@ -135506,7 +135523,8 @@
         "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits.",
         "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors.",
         "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
-        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h."
+        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h.",
+        "Complement VERIFY now evaluates normalization in every build and checks l_undef in source debug builds, returning the established Go guard error after the normalization prefix. The internalize_term hook preserves native false and source debug UNREACHABLE. Exhaustive signed/rational normalization and strict-complement valuations check the live valid domain; final whole-unit audit remains open."
       ]
     },
     {
@@ -135550,7 +135568,8 @@
         "pkg/smtcore/theory_pb_trace_test.go",
         "pkg/smtcore/theory_pb_resolution_trace.go",
         "pkg/smtcore/theory_pb_resolution_trace_test.go",
-        "pkg/smtcore/theory_pb_stats_test.go"
+        "pkg/smtcore/theory_pb_stats_test.go",
+        "pkg/smtcore/theory_pb_inline_guard_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -135599,7 +135618,9 @@
         "TestSMTPBResolvedLemmaDisplayAndVerboseGate",
         "TestSMTPBStatisticsUnsignedWrapThroughRetainedOperations",
         "TestSMTPBStatisticsSourceCollectionOrder",
-        "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
+        "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause",
+        "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
+        "TestSMTPBInternalizeTermSourceUnreachableGuard"
       ],
       "assertions": [
         {
@@ -135914,6 +135935,20 @@
             "TestSMTPBStatisticsSourceCollectionOrder",
             "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
           ]
+        },
+        {
+          "name": "arg_t::negate VERIFY normalization result after the actual mutation prefix, and internalize_term source debug UNREACHABLE with native false return",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_normalize.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_inline_guard_test.go",
+            "pkg/smtcore/theory_pb_normalize_test.go"
+          ],
+          "tests": [
+            "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
+            "TestSMTPBInternalizeTermSourceUnreachableGuard"
+          ]
         }
       ],
       "ownership": [
@@ -135938,7 +135973,8 @@
         "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits.",
         "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors.",
         "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
-        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h."
+        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h.",
+        "Complement VERIFY now evaluates normalization in every build and checks l_undef in source debug builds, returning the established Go guard error after the normalization prefix. The internalize_term hook preserves native false and source debug UNREACHABLE. Exhaustive signed/rational normalization and strict-complement valuations check the live valid domain; final whole-unit audit remains open."
       ]
     },
     {

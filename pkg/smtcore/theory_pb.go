@@ -166,10 +166,16 @@ func (t *SMTPseudoBooleanTheory) internalizeAtom(expression ast.ASTHandle, retai
 	truth := a.normalize(c.equality)
 	a.prune(c.equality)
 	if truth == lbool.Undef && !c.equality {
-		a.negate()
-		a.negate()
+		if err = a.negate(); err != nil {
+			return false, err
+		}
+		if err = a.negate(); err != nil {
+			return false, err
+		}
 		c.args[1] = a.copy()
-		c.args[1].negate()
+		if err = c.args[1].negate(); err != nil {
+			return false, err
+		}
 		if smtcoreSourceDebug {
 			if len(a.terms) != len(c.args[1].terms) {
 				return false, ast.ErrASTDomain
@@ -246,7 +252,12 @@ func (t *SMTPseudoBooleanTheory) internalizeAtom(expression ast.ASTHandle, retai
 	return true, nil
 }
 
-func (*SMTPseudoBooleanTheory) InternalizeTerm(ast.ASTHandle) (bool, error)        { return false, nil }
+func (*SMTPseudoBooleanTheory) InternalizeTerm(ast.ASTHandle) (bool, error) {
+	if smtcoreSourceDebug {
+		return false, ast.ErrASTDomain
+	}
+	return false, nil
+}
 func (*SMTPseudoBooleanTheory) InternalizeEquality(ast.ASTHandle, int32) error     { return nil }
 func (*SMTPseudoBooleanTheory) ApplySortConstraint(*SMTEnode, ast.ASTHandle) error { return nil }
 func (*SMTPseudoBooleanTheory) UseDisequalities() bool                             { return false }

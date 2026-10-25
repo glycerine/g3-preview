@@ -75,7 +75,7 @@ func TestSMTPBLiteralNormalizationIndependentValuationOracle(t *testing.T) {
 				}
 				if !eq && truth == lbool.Undef && len(normal.terms) > 0 {
 					complement := normal.copy()
-					complement.negate()
+					astTestMust(t, complement.negate())
 					for bits := uint32(0); bits < 8; bits++ {
 						if smtPBTestHolds(&complement, bits, false) == smtPBTestHolds(&original, bits, false) {
 							t.Fatal("strict integer complement lost polarity")

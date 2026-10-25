@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"sort"
 
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -209,7 +210,7 @@ func (a *smtPBArgs) prune(eq bool) {
 	}
 }
 
-func (a *smtPBArgs) negate() {
+func (a *smtPBArgs) negate() error {
 	sum := new(big.Rat)
 	for i := range a.terms {
 		a.terms[i].literal = a.terms[i].literal.Negated()
@@ -217,7 +218,13 @@ func (a *smtPBArgs) negate() {
 	}
 	a.bound.Sub(sum, &a.bound)
 	a.bound.Add(&a.bound, big.NewRat(1, 1))
-	a.normalize(false)
+	// VERIFY evaluates normalize in every build, then checks its result
+	// only in debug builds. Preserve normalization before reporting failure.
+	truth := a.normalize(false)
+	if smtcoreSourceDebug && truth != lbool.Undef {
+		return ast.ErrASTDomain
+	}
+	return nil
 }
 
 func (a *smtPBArgs) copy() smtPBArgs {
