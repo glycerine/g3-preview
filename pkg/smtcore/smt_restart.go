@@ -96,7 +96,7 @@ func (k *SMTKernel) restartSearchAtBase(baseLevel uint32, state *smtRestartState
 			return nil
 		}
 	}
-	if k.smtState.SimplifyClauses {
+	if k.smtState.SimplifyClauses && k.assumptions == nil {
 		if err := k.internalizer.simplifyClausesAtBase(baseLevel); err != nil {
 			return err
 		}

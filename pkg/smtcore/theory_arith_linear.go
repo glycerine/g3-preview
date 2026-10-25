@@ -891,8 +891,17 @@ func (t *SMTLinearArithmeticTheory) propagateEqualityWithParameters(state *SMTIn
 	if err != nil {
 		return false, err
 	}
+	state.ownedJustifications = append(state.ownedJustifications, justification)
 	if err = state.addEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
 		return false, err
+	}
+	// The source tableau retains the equality it just proved. This Go
+	// tableau is replayed, so retain the same equality in its replay inputs
+	// here; context correctly suppresses notification to the origin theory.
+	if !state.inconsistent {
+		if err = t.NewEquality(leftVariable, rightVariable); err != nil {
+			return false, err
+		}
 	}
 	return true, nil
 }

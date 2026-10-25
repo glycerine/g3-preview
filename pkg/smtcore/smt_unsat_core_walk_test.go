@@ -72,6 +72,34 @@ func TestSMTUnsatCoreReverseTrailDiscoveryAndDuplicates(t *testing.T) {
 	}
 }
 
+func TestSMTConflictLearningRetainsAssumptionsBelowSearchDecision(t *testing.T) {
+	_, s, literals := smtCoreWalkFixture(t, 3)
+	a, decision, implied := literals[0], literals[1], literals[2]
+	astTestMust(t, s.PushScope())
+	astTestMust(t, s.AssignLiteral(a, NewSMTBooleanAxiom()))
+	s.booleanData[a.Var()].Assumption = true
+	astTestMust(t, s.PushScope())
+	astTestMust(t, s.AssignLiteral(decision, NewSMTBooleanAxiom()))
+	astTestMust(t, s.AssignLiteral(implied, smtCoreWalkReason(t, a, decision)))
+	r := smtCoreWalkResolver(t, s)
+	result, err := r.resolve(smtCoreWalkReason(t, implied, decision), SMTNullLiteral, 1, 0)
+	astTestMust(t, err)
+	if !result.Resolved || result.NewScopeLevel != 1 {
+		t.Fatal("resolution did not backtrack to the assumption search level", result)
+	}
+	expectSMTRawCore(t, result.Lemma, []SMTLiteral{decision.Negated(), a.Negated()})
+	astTestMust(t, s.PopScopes(1))
+	astTestMust(t, s.AddLearnedClause(result.Lemma))
+	consistent, err := s.Propagate()
+	astTestMust(t, err)
+	if !consistent {
+		t.Fatal("learned guarded literal conflicted")
+	}
+	core, err := r.UnsatCore(smtCoreWalkReason(t, decision.Negated()), SMTNullLiteral)
+	astTestMust(t, err)
+	expectSMTRawCore(t, core, []SMTLiteral{a, a})
+}
+
 func TestSMTUnsatCoreStopsBeforeOlderAssignedReasons(t *testing.T) {
 	_, s, ls := smtCoreWalkFixture(t, 4)
 	a, b, c, d := ls[0], ls[1], ls[2], ls[3]

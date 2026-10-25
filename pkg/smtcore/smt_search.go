@@ -230,7 +230,11 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 				return lbool.Undef, fmt.Errorf("smt search missing conflict: %w", ast.ErrASTDomain)
 			}
 			conflictLiteral := k.internalizer.ConflictLiteral()
-			resolution, err := resolver.Resolve(conflict, conflictLiteral, baseLevel)
+			userBaseLevel := baseLevel
+			if k.assumptions != nil {
+				userBaseLevel--
+			}
+			resolution, err := resolver.resolve(conflict, conflictLiteral, baseLevel, userBaseLevel)
 			if err != nil {
 				return lbool.Undef, fmt.Errorf("smt search resolve conflict: %w", err)
 			}
@@ -298,7 +302,9 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 		if exceeded {
 			return lbool.Undef, nil
 		}
-		if k.smtState.SimplifyClauses {
+		// Source simplification is restricted to the user base, below the
+		// temporary assumption scope. Discarding reasons there loses cores.
+		if k.smtState.SimplifyClauses && k.assumptions == nil {
 			if err = k.internalizer.simplifyClausesAtBase(baseLevel); err != nil {
 				return lbool.Undef, fmt.Errorf("smt search simplify clauses: %w", err)
 			}

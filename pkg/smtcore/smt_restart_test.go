@@ -38,6 +38,42 @@ func TestSMTRestartSchedulesMatchSource(t *testing.T) {
 	}
 }
 
+func TestSMTRestartPreservesAssumptionScopeClauseReasons(t *testing.T) {
+	m := astTestManager(t)
+	k := smtTestKernel(t, m)
+	k.smtState.SimplifyClauses = true
+	s := k.internalizer
+	p := smtRelevancyBool(t, m, "restart-assumption-p")
+	q := smtRelevancyBool(t, m, "restart-assumption-q")
+	for _, h := range []ast.ASTHandle{p, q} {
+		astTestMust(t, s.Internalize(h, true))
+	}
+	pl, err := s.Literal(p)
+	astTestMust(t, err)
+	ql, err := s.Literal(q)
+	astTestMust(t, err)
+	astTestMust(t, s.PushScope())
+	k.assumptions = map[SMTLiteral]ast.ASTHandle{pl: p}
+	defer func() { k.assumptions = nil }()
+	astTestMust(t, s.AssignLiteral(pl, NewSMTBooleanAxiom()))
+	s.booleanData[pl.Var()].Assumption = true
+	astTestMust(t, s.AddLearnedClause([]SMTLiteral{ql, pl.Negated()}))
+	_, err = s.Propagate()
+	astTestMust(t, err)
+	before, found := s.booleanData[ql.Var()].Justification().Clause()
+	if !found || before == nil {
+		t.Fatal("fixture did not retain a clause reason")
+	}
+	astTestMust(t, s.beginSearchPersistence(1, k.smtState))
+	defer func() { astTestMust(t, s.endSearchPersistence()) }()
+	restart := newSMTRestartState(k.smtState)
+	astTestMust(t, k.restartSearchAtBase(1, &restart, true))
+	after, found := s.booleanData[ql.Var()].Justification().Clause()
+	if !found || after != before || len(s.clauses) != 1 {
+		t.Fatal("restart simplified above the user base and discarded an assumption reason")
+	}
+}
+
 func TestSMTRestartBacktracksAndPreservesLearnedClause(t *testing.T) {
 	m := astTestManager(t)
 	kernel, err := NewSMTKernel(m, nil)

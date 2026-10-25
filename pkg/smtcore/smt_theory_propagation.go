@@ -51,7 +51,10 @@ func (s *SMTInternalizerState) enqueueExistingDisequalities(root *SMTEnode, vari
 		if left.root != root || right.root == root {
 			continue
 		}
-		other := right.root.TheoryVar(plugin.FamilyID())
+		other := s.theoryVariableNear(right, plugin.FamilyID())
+		if nearby := s.theoryVariableNear(left, plugin.FamilyID()); nearby != SMTNullTheoryVar {
+			variable = nearby
+		}
 		if other != SMTNullTheoryVar && other != variable {
 			if err = s.enqueueTheoryDisequality(plugin.FamilyID(), variable, other); err != nil {
 				return err

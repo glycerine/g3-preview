@@ -141,6 +141,7 @@ type SMTInternalizerState struct {
 	atomNotified             map[int32]bool
 	atomNotifiedTrail        []int32
 	relevancyLevel           uint32
+	newCore2thEq             bool
 	clauses                  []SMTInternalizedClause
 	ownedJustifications      []SMTJustification
 	assignedLiterals         []SMTLiteral
@@ -191,6 +192,7 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		activityCache:         make(map[ast.ASTHandle]float64),
 		clauseMaintenance:     defaultSMTClauseMaintenanceConfig(),
 		lemmaGCThreshold:      5000,
+		newCore2thEq:          true,
 	}
 	state.booleanData[0].Initialize(0)
 	dynamicAck, err := newSMTDynAckManager(state, defaultSMTDynAckState())

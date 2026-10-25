@@ -375,6 +375,12 @@ func (r *SMTConflictResolver) levels() []uint32 {
 }
 
 func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiteral SMTLiteral, baseLevel uint32) (SMTConflictResolution, error) {
+	return r.resolve(conflict, notLiteral, baseLevel, baseLevel)
+}
+
+// The search level includes temporary assumptions, while the user base does
+// not. Assumption-level antecedents must remain in learned clauses and cores.
+func (r *SMTConflictResolver) resolve(conflict SMTBooleanJustification, notLiteral SMTLiteral, searchLevel, userBaseLevel uint32) (SMTConflictResolution, error) {
 	if r == nil || r.state == nil || r.expander == nil || r.closed || r.state.open() != nil {
 		return SMTConflictResolution{}, ast.ErrASTHandle
 	}
@@ -398,7 +404,7 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 		return SMTConflictResolution{}, err
 	}
 	result := SMTConflictResolution{ConflictLevel: conflictLevel}
-	if conflictLevel <= baseLevel {
+	if conflictLevel <= searchLevel {
 		proof, proofErr := r.conflictProof(originalConflict, notLiteral, nil)
 		if proofErr != nil {
 			return SMTConflictResolution{}, proofErr
@@ -425,7 +431,7 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 			return ast.ErrASTDomain
 		}
 		level := levels[variable]
-		if marks[variable] || level <= baseLevel {
+		if marks[variable] || level <= userBaseLevel {
 			return nil
 		}
 		marks[variable] = true
@@ -534,13 +540,13 @@ func (r *SMTConflictResolver) Resolve(conflict SMTBooleanJustification, notLiter
 		}
 	}
 	lemma[0] = consequent.Negated()
-	lemma, err = r.minimizeLemma(lemma, marks, levels, baseLevel)
+	lemma, err = r.minimizeLemma(lemma, marks, levels, userBaseLevel)
 	if err != nil {
 		return SMTConflictResolution{}, err
 	}
 	result.Resolved, result.Lemma = true, lemma
 	result.InternalScopeLevel = r.state.booleanData[lemma[0].Var()].InternalLevel()
-	result.NewScopeLevel = baseLevel
+	result.NewScopeLevel = searchLevel
 	for _, literal := range lemma[1:] {
 		variable := literal.Var()
 		marks[variable] = false

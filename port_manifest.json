@@ -113873,7 +113873,8 @@
         "pkg/smtcore/smt_conflict_proof.go",
         "pkg/smtcore/smt_asserted_injectivity_test.go",
         "pkg/smtcore/smt_unsat_core_walk_test.go",
-        "pkg/smtcore/smt_aux_clause_core_test.go"
+        "pkg/smtcore/smt_aux_clause_core_test.go",
+        "pkg/smtcore/smt_search.go"
       ],
       "tests": [
         "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
@@ -113903,7 +113904,9 @@
         "TestSMTUnsatCoreFailedConsequentPolarityAndContextDedup",
         "TestSMTUnsatCoreBooleanReasonVariants",
         "TestSMTUnsatCoreErrorCleanupAndEmptyTrail",
-        "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions"
+        "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions",
+        "TestSMTConflictLearningRetainsAssumptionsBelowSearchDecision",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -114316,18 +114319,37 @@
             "TestSMTConflictProofBuildsEqualityRootAndConflictJustifications",
             "TestSMTConflictProofBuildsCongruenceEquality"
           ]
+        },
+        {
+          "name": "process_antecedent/minimize_lemma/finalize_resolve: separate user base from temporary assumption search level; retain assumption-level guards in learned clauses and minimization while terminal conflict detection and backtracking use search level",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_resolver.go",
+          "go_targets": [
+            "pkg/smtcore/smt_conflict_resolver.go",
+            "pkg/smtcore/smt_unsat_core_walk_test.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTConflictLearningRetainsAssumptionsBelowSearchDecision",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
         "The antecedent expander owns its work queues, duplicate set and emitted event history; justifications and enodes are borrowed and temporary justification marks are always cleared.",
         "The resolver owns its most recent lemma proof through an ASTRef and releases or replaces it across Close and Resolve.",
-        "Each raw core extraction owns transient Boolean marks locally. Justification expansion clears its marks on successful and failed exits; no context mark survives the call. Raw assumption discoveries may repeat and use either failed/assigned polarity. Context capture maps those literals to the supplied assumption expressions, pins and deduplicates them, then sorts by AST identity."
+        "Each raw core extraction owns transient Boolean marks locally. Justification expansion clears its marks on successful and failed exits; no context mark survives the call. Raw assumption discoveries may repeat and use either failed/assigned polarity. Context capture maps those literals to the supplied assumption expressions, pins and deduplicates them, then sorts by AST identity.",
+        "User-base and search levels are borrowed scalar search boundaries. Learned clauses retain their actual assumption guards, so subsequent conflicts can recover cores after Boolean backtracking without preserving an external dependency queue."
       ],
       "deviations": [
         "Corrected reversed not_l polarity in failed AssignLiteral and compact binary BCP conflicts. The resolver expects a true assigned premise opposite to the failed consequent; storing the false consequent created non-false learned literals. A two-level regression checks first-UIP lemma/backjump/assertion behavior, and a symbolic BV add/sub circuit with scoped contradiction/model recovery raises strict C++ runner agreement to 119 scripts.",
         "Dynamic-Ack callbacks feed the concrete pair/triple manager during conflict expansion. Recursive Go calls replace the source explicit proof todo stack. The constructor's watch-list reference has no source read after initialization and requires no Go storage.",
         "The Go equality engine detects explicit disequalities before merging their roots. Its concrete disequality-conflict justification reconstructs the equality of the original disequality operands from both equality branches and the pending merge, then uses the existing Boolean conflict proof to resolve against the disequality literal.",
-        "The source reverse assigned-literal unsat-core walk now replaces the former Go dependency queue. It skips assignments above the conflict and stops below the search level, retaining source raw discovery order and repetitions before context deduplication. Standalone extraction computes its conflict level and uses current scope when no search is active; live search uses the captured search base level. Reserved literal variable zero cannot be an assumption. The strict Boolean/equality scope runner agrees with the prebuilt C++ executable."
+        "The source reverse assigned-literal unsat-core walk now replaces the former Go dependency queue. It skips assignments above the conflict and stops below the search level, retaining source raw discovery order and repetitions before context deduplication. Standalone extraction computes its conflict level and uses current scope when no search is active; live search uses the captured search base level. Reserved literal variable zero cannot be an assumption. The strict Boolean/equality scope runner agrees with the prebuilt C++ executable.",
+        "The standalone Resolve facade uses one level when no separate assumption boundary is supplied. Kernel search passes both source boundaries to the concrete resolver. A prior conflation could learn an unjustified unit, producing an empty core; exact guarded-clause and validated CLI tests now cover the distinction."
       ]
     },
     {
@@ -114342,7 +114364,8 @@
         "pkg/smtcore/smt_conflict_proof.go",
         "pkg/smtcore/smt_unsat_core_walk_test.go",
         "pkg/smtcore/smt_aux_clause_core_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_search.go"
       ],
       "tests": [
         "TestSMTAntecedentExpanderNestedJustificationOrderAndCleanup",
@@ -114367,7 +114390,9 @@
         "TestSMTUnsatCoreErrorCleanupAndEmptyTrail",
         "TestSMTAuxiliaryClauseNullAntecedentPreservesAssumptions",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTConflictLearningRetainsAssumptionsBelowSearchDecision",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -114469,15 +114494,34 @@
           "status": "reference_only",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "process_antecedent/minimize_lemma/finalize_resolve: separate user base from temporary assumption search level; retain assumption-level guards in learned clauses and minimization while terminal conflict detection and backtracking use search level",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_conflict_resolver.go",
+          "go_targets": [
+            "pkg/smtcore/smt_conflict_resolver.go",
+            "pkg/smtcore/smt_unsat_core_walk_test.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTConflictLearningRetainsAssumptionsBelowSearchDecision",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
         "The resolver borrows context, parameters, assignment trail and watches; the completed expander owns only native Go work storage. The resolver owns and releases its latest proof AST reference.",
-        "Each raw core extraction owns transient Boolean marks locally. Justification expansion clears its marks on successful and failed exits; no context mark survives the call. Raw assumption discoveries may repeat and use either failed/assigned polarity. Context capture maps those literals to the supplied assumption expressions, pins and deduplicates them, then sorts by AST identity."
+        "Each raw core extraction owns transient Boolean marks locally. Justification expansion clears its marks on successful and failed exits; no context mark survives the call. Raw assumption discoveries may repeat and use either failed/assigned polarity. Context capture maps those literals to the supplied assumption expressions, pins and deduplicates them, then sorts by AST identity.",
+        "User-base and search levels are borrowed scalar search boundaries. Learned clauses retain their actual assumption guards, so subsequent conflicts can recover cores after Boolean backtracking without preserving an external dependency queue."
       ],
       "deviations": [
         "The standalone expander isolates the context-independent front of conflict resolution. FUIP resolution and Boolean, theory and equality proof state are connected. The source watch-list reference is initialized but never read by this class.",
-        "The source reverse assigned-literal unsat-core walk now replaces the former Go dependency queue. It skips assignments above the conflict and stops below the search level, retaining source raw discovery order and repetitions before context deduplication. Standalone extraction computes its conflict level and uses current scope when no search is active; live search uses the captured search base level. Reserved literal variable zero cannot be an assumption. The strict Boolean/equality scope runner agrees with the prebuilt C++ executable."
+        "The source reverse assigned-literal unsat-core walk now replaces the former Go dependency queue. It skips assignments above the conflict and stops below the search level, retaining source raw discovery order and repetitions before context deduplication. Standalone extraction computes its conflict level and uses current scope when no search is active; live search uses the captured search base level. Reserved literal variable zero cannot be an assumption. The strict Boolean/equality scope runner agrees with the prebuilt C++ executable.",
+        "The standalone Resolve facade uses one level when no separate assumption boundary is supplied. Kernel search passes both source boundaries to the concrete resolver. A prior conflation could learn an unjustified unit, producing an empty core; exact guarded-clause and validated CLI tests now cover the distinction."
       ]
     },
     {
@@ -114704,7 +114748,9 @@
         "pkg/cmd_context/applications.go",
         "pkg/cmd_context/datatype_builtins_test.go",
         "pkg/smtcore/smt_internalizer.go",
-        "pkg/smtcore/theory_datatype_metadata_test.go"
+        "pkg/smtcore/theory_datatype_metadata_test.go",
+        "pkg/smtcore/smt_closest_theory_var_test.go",
+        "pkg/smtcore/smt_restart_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -114827,7 +114873,12 @@
         "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
         "TestCommandContextDatatypeBuiltinVisibility",
         "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
-        "TestSMTDatatypeWatchRegistrationAndScopedSlots"
+        "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+        "TestSMTClosestTheoryVariableEqualityDisequalityAndRollback",
+        "TestSMTClosestTheoryVariableWalksUnattachedProofNodes",
+        "TestSMTTheoryEqualityOriginFilteringAndMultiTheoryOrder",
+        "TestSMTTheoryMergeExposesExistingDisequalities",
+        "TestSMTRestartPreservesAssumptionScopeClauseReasons"
       ],
       "conditionals": [
         {
@@ -116327,6 +116378,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "get_closest_var/merge_theory_vars/add_diseq/push_new_th_diseqs: source proof-branch variable lookup with retained NewCore2thEq control; original merge endpoints, common/multi-family order, FromTheory suppression, newly exposed parent disequalities, scoped root attachments; simplify_clauses is disabled above user base during assumption searches and restarts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_equality_propagation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_closest_theory_var_test.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/smtcore/smt_restart.go",
+            "pkg/smtcore/smt_restart_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTClosestTheoryVariableEqualityDisequalityAndRollback",
+            "TestSMTClosestTheoryVariableWalksUnattachedProofNodes",
+            "TestSMTTheoryEqualityOriginFilteringAndMultiTheoryOrder",
+            "TestSMTTheoryMergeExposesExistingDisequalities",
+            "TestSMTRestartPreservesAssumptionScopeClauseReasons",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -116338,7 +116415,8 @@
         "A preprocessing conflict uses the existing concrete root-literal proof wrapper owned by the logical context scope, or the immediate Boolean axiom when no false-row proof exists. The kernel retains the source false proof independently until its result owner resets/closes. No pending term/quantifier/theory atom is internalized on the early-conflict branch. Scope pop releases the context wrapper; repeated internalization preserves an existing Boolean conflict.",
         "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage.",
         "The kernel owns one ASTExprSubstitution and its concrete ASTScopedExprSubstitution wrapper from construction. Commit inserts into that same owner; forward/reverse propagation push/pop temporary bindings instead of rebuilding committed state. Assertion-time and shared theory rewriting borrow the owner; cache flush and parameter updates reattach it after native resets. User scopes restore bindings before shrinking formulas. Rewriter destruction precedes scoped-wrapper destruction, which precedes underlying substitution destruction; six constructor/commit/propagation first-success campaigns cover both proof modes and release all charged fixture storage.",
-        "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner."
+        "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner.",
+        "Nearby theory-variable lookup borrows the existing transitivity path before inversion. Equality snapshots own copied root attachment lists and restore newly added families on pop; event queues borrow theory variables. Assumption scopes remain above the user base, so their clause reasons are never discarded by base simplification."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -116358,7 +116436,8 @@
         "With auto_config=false and MBQI disabled, the transitive-relation runner regression now agrees with C++ on UNKNOWN, UNSAT after grounded contradictory facts, then UNKNOWN after pop. The no-preprocessing solver regression additionally verifies incomplete-quantifier failure reporting and repeated scoped E-matching refutations.",
         "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
         "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend.",
-        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit."
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit.",
+        "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial."
       ]
     },
     {
@@ -116426,7 +116505,9 @@
         "pkg/cmd_context/datatype_builtins_test.go",
         "pkg/smtcore/smt_internalizer.go",
         "pkg/smtcore/smt_relevancy.go",
-        "pkg/smtcore/theory_datatype_metadata_test.go"
+        "pkg/smtcore/theory_datatype_metadata_test.go",
+        "pkg/smtcore/smt_closest_theory_var_test.go",
+        "pkg/smtcore/smt_restart_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -116501,7 +116582,12 @@
         "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
         "TestCommandContextDatatypeBuiltinVisibility",
         "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
-        "TestSMTDatatypeWatchRegistrationAndScopedSlots"
+        "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+        "TestSMTClosestTheoryVariableEqualityDisequalityAndRollback",
+        "TestSMTClosestTheoryVariableWalksUnattachedProofNodes",
+        "TestSMTTheoryEqualityOriginFilteringAndMultiTheoryOrder",
+        "TestSMTTheoryMergeExposesExistingDisequalities",
+        "TestSMTRestartPreservesAssumptionScopeClauseReasons"
       ],
       "conditionals": [
         {
@@ -117014,6 +117100,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "get_closest_var/merge_theory_vars/add_diseq/push_new_th_diseqs: source proof-branch variable lookup with retained NewCore2thEq control; original merge endpoints, common/multi-family order, FromTheory suppression, newly exposed parent disequalities, scoped root attachments; simplify_clauses is disabled above user base during assumption searches and restarts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_equality_propagation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_equality_propagation.go",
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_closest_theory_var_test.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/smtcore/smt_restart.go",
+            "pkg/smtcore/smt_restart_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTClosestTheoryVariableEqualityDisequalityAndRollback",
+            "TestSMTClosestTheoryVariableWalksUnattachedProofNodes",
+            "TestSMTTheoryEqualityOriginFilteringAndMultiTheoryOrder",
+            "TestSMTTheoryMergeExposesExistingDisequalities",
+            "TestSMTRestartPreservesAssumptionScopeClauseReasons",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -117023,13 +117135,15 @@
         "A preprocessing conflict uses the existing concrete root-literal proof wrapper owned by the logical context scope, or the immediate Boolean axiom when no false-row proof exists. The kernel retains the source false proof independently until its result owner resets/closes. No pending term/quantifier/theory atom is internalized on the early-conflict branch. Scope pop releases the context wrapper; repeated internalization preserves an existing Boolean conflict.",
         "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage.",
         "The kernel owns one ASTExprSubstitution and its concrete ASTScopedExprSubstitution wrapper from construction. Commit inserts into that same owner; forward/reverse propagation push/pop temporary bindings instead of rebuilding committed state. Assertion-time and shared theory rewriting borrow the owner; cache flush and parameter updates reattach it after native resets. User scopes restore bindings before shrinking formulas. Rewriter destruction precedes scoped-wrapper destruction, which precedes underlying substitution destruction; six constructor/commit/propagation first-success campaigns cover both proof modes and release all charged fixture storage.",
-        "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner."
+        "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner.",
+        "Nearby theory-variable lookup borrows the existing transitivity path before inversion. Equality snapshots own copied root attachment lists and restore newly added families on pop; event queues borrow theory variables. Assumption scopes remain above the user base, so their clause reasons are never discarded by base simplification."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
         "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
         "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend.",
-        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit."
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. The complete source default-plugin lazy matching and other retained lifecycle methods still require a separate audit.",
+        "The source user base and assumption search level are distinct: source clause simplification is skipped in a temporary assumption scope, including restarts. The previous search-base shortcut could discard assumption reasons. Nearby-variable selection and origin filtering now follow source; remaining context algorithms and TRACE/assertion integration remain partial."
       ]
     },
     {
@@ -127294,7 +127408,9 @@
         "pkg/smtcore/theory_arith_fixed_bounds.go",
         "pkg/smtcore/theory_arith_fixed_bounds_test.go",
         "pkg/smtcore/theory_arith_bound_dependency.go",
-        "pkg/smtcore/theory_arith_equality_guards_test.go"
+        "pkg/smtcore/theory_arith_equality_guards_test.go",
+        "pkg/smtcore/theory_arith_equality_bounds.go",
+        "pkg/smtcore/theory_arith_equality_bounds_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
@@ -127308,7 +127424,9 @@
         "TestSMTSharedArithmeticFixedRowsScopedProofs",
         "TestSMTArithmeticEqualityPropagationHonorsConfigurationAndConflictThreshold",
         "TestSMTArithmeticEqualityConflictThresholdSurvivesPopAndResetsForSearch",
-        "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation"
+        "TestSMTArithmeticEqualityOptionControlsImpliedRowPropagation",
+        "TestSMTArithmeticOwnEqualityRetainedForReplayWithoutContextBounce",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -127464,15 +127582,34 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "propagate_eq_to_core replay lifetime: transfer the extended equality justification to context before merge; retain the proved equality in the concrete arithmetic replay inputs locally instead of depending on a context notification back to its origin",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_equality_bounds.go",
+            "pkg/smtcore/theory_arith_equality_bounds_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticOwnEqualityRetainedForReplayWithoutContextBounce",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
         "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial.",
-        "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate."
+        "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
+        "Context takes scoped extended-equality justification ownership before merging. Arithmetic retains its own derived equality in scoped replay endpoints/bounds; these roll back with its tableau inputs. FromTheory remains the arithmetic family and context suppresses the origin callback."
       ],
       "deviations": [
-        "The linear specialization recognizes active opposite bound pairs, substitutes fixed monomials, and compares affine definition rows directly instead of maintaining the source row-id offset index."
+        "The linear specialization recognizes active opposite bound pairs, substitutes fixed monomials, and compares affine definition rows directly instead of maintaining the source row-id offset index.",
+        "C++ retains the proved equality in its persistent tableau; the Go arithmetic tableau replays inputs. Own propagation now records that equality locally through the concrete existing bound/adapter path, replacing an implicit dependence on context bouncing the equality back. Existing nonlinear-alias and mixed-floor scripts enforce behavior; the broader arithmetic source unit remains partial."
       ]
     },
     {
@@ -247725,14 +247862,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "fe90ac5fb475889465e3adeddd69efef00e1143e",
+    "commit": "ed52714c4f0d80f00e276d5012df7c0c7b782f97",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25 04:47:34.787604 UTC",
-    "completed_utc": "2026-10-25 05:01:15.596946 UTC",
+    "started_utc": "2026-10-25 05:53:08.452952 UTC",
+    "completed_utc": "2026-10-25 06:06:51.808803 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-fe90ac5f.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-fe90ac5f.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-fe90ac5f.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-ed52714c.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-ed52714c.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-ed52714c.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -247748,9 +247885,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 716.233,
+    "lp_seconds": 714.425,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout with C++ comparisons enabled; includes legacy string proof printing, datatype root/cycle/accessor/restart changes and direct datatype equality branches, plus earlier increments. Excludes the subsequent source unsat-core reverse assignment traversal, whose focused integration evidence is recorded separately. Also excludes the subsequent datatype root metadata and synchronous relevance increment, whose focused integration checks are recorded separately."
+    "scope_warning": "Verified clean isolated exact-HEAD checkout with prebuilt C++ comparisons enabled; includes datatype root metadata, synchronous relevance and source unsat-core reverse traversal, plus earlier increments. Excludes subsequent datatype display, closest-variable/origin notification, arithmetic replay retention and user-base/assumption learning fixes, whose focused integration evidence is recorded separately."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

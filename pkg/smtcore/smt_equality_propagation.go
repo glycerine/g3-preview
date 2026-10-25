@@ -95,10 +95,11 @@ func (s *SMTInternalizerState) addDisequality(left, right *SMTEnode, literal SMT
 	}
 	s.context.disequalities[key] = struct{}{}
 	s.disequalityReasons[key] = literal
-	for item := &key.first.theoryVariables; item != nil && item.theory != SMTNullTheoryID; item = item.next {
-		other := key.second.TheoryVar(item.theory)
-		if other != SMTNullTheoryVar && other != item.variable && s.theories[item.theory] != nil && s.theories[item.theory].UseDisequalities() {
-			if err = s.enqueueTheoryDisequality(item.theory, item.variable, other); err != nil {
+	for item := &left.root.theoryVariables; item != nil && item.theory != SMTNullTheoryID; item = item.next {
+		variable := s.theoryVariableNear(left, item.theory)
+		other := s.theoryVariableNear(right, item.theory)
+		if other != SMTNullTheoryVar && other != variable && s.theories[item.theory] != nil && s.theories[item.theory].UseDisequalities() {
+			if err = s.enqueueTheoryDisequality(item.theory, variable, other); err != nil {
 				return err
 			}
 		}
@@ -106,15 +107,86 @@ func (s *SMTInternalizerState) addDisequality(left, right *SMTEnode, literal SMT
 	return nil
 }
 
-func (s *SMTInternalizerState) mergeTheoryVariables(from, to *SMTEnode) error {
-	for item := &from.theoryVariables; item != nil && item.theory != SMTNullTheoryID; item = item.next {
-		other := to.TheoryVar(item.theory)
-		if other == SMTNullTheoryVar {
-			if err := to.AddTheoryVar(item.theory, item.variable); err != nil {
+// Source get_closest_var walks the proof branch, before it is inverted by
+// add_eq, so a theory receives the actual nearby terms rather than root IDs.
+func (s *SMTInternalizerState) theoryVariableNear(node *SMTEnode, theory SMTTheoryID) SMTTheoryVar {
+	if theory == SMTNullTheoryID {
+		return SMTNullTheoryVar
+	}
+	if !s.newCore2thEq {
+		return node.root.TheoryVar(theory)
+	}
+	for node != nil {
+		if variable := node.TheoryVar(theory); variable != SMTNullTheoryVar {
+			return variable
+		}
+		node = node.trans.Target
+	}
+	return SMTNullTheoryVar
+}
+
+func (s *SMTInternalizerState) mergeTheoryVariables(from, to *SMTEnode, justification SMTEqualityJustification) error {
+	r1, r2 := from.root, to.root
+	fromTheory := SMTNullTheoryID
+	if owner, object := justification.Justification(); object && owner != nil {
+		fromTheory = owner.FromTheory()
+	}
+	pushEquality := func(theory SMTTheoryID, first, second SMTTheoryVar) error {
+		if theory == fromTheory {
+			return nil
+		}
+		return s.enqueueTheoryEquality(theory, first, second)
+	}
+	pushDisequalities := func(root *SMTEnode, theory SMTTheoryID, variable SMTTheoryVar) error {
+		plugin := s.theories[theory]
+		if plugin == nil {
+			return ast.ErrASTDomain
+		}
+		return s.enqueueExistingDisequalities(root, variable, plugin)
+	}
+	if r1.theoryVariables.next == nil && r2.theoryVariables.next == nil {
+		t1, t2 := r1.theoryVariables.theory, r2.theoryVariables.theory
+		v1, v2 := s.theoryVariableNear(from, t1), s.theoryVariableNear(to, t2)
+		if v1 != SMTNullTheoryVar && v2 != SMTNullTheoryVar {
+			if t1 == t2 {
+				return pushEquality(t1, v2, v1)
+			}
+			if err := r2.AddTheoryVar(t1, v1); err != nil {
 				return err
 			}
-		} else if other != item.variable && s.theories[item.theory] != nil {
-			if err := s.enqueueTheoryEquality(item.theory, other, item.variable); err != nil {
+			if err := pushDisequalities(r2, t1, v1); err != nil {
+				return err
+			}
+			return pushDisequalities(r1, t2, v2)
+		}
+		if v1 == SMTNullTheoryVar && v2 != SMTNullTheoryVar {
+			return pushDisequalities(r1, t2, v2)
+		}
+		if v1 != SMTNullTheoryVar && v2 == SMTNullTheoryVar {
+			if err := r2.AddTheoryVar(t1, v1); err != nil {
+				return err
+			}
+			return pushDisequalities(r2, t1, v1)
+		}
+		return nil
+	}
+	for item := &r2.theoryVariables; item != nil && item.theory != SMTNullTheoryID; item = item.next {
+		v2, v1 := s.theoryVariableNear(to, item.theory), s.theoryVariableNear(from, item.theory)
+		if v1 != SMTNullTheoryVar {
+			if err := pushEquality(item.theory, v2, v1); err != nil {
+				return err
+			}
+		} else if err := pushDisequalities(r1, item.theory, v2); err != nil {
+			return err
+		}
+	}
+	for item := &r1.theoryVariables; item != nil && item.theory != SMTNullTheoryID; item = item.next {
+		if r2.TheoryVar(item.theory) == SMTNullTheoryVar {
+			variable := s.theoryVariableNear(from, item.theory)
+			if err := r2.AddTheoryVar(item.theory, variable); err != nil {
+				return err
+			}
+			if err := pushDisequalities(r2, item.theory, variable); err != nil {
 				return err
 			}
 		}
@@ -455,7 +527,7 @@ func (s *SMTInternalizerState) addEquality(left, right *SMTEnode, justification 
 	if err := s.propagateEqualityClassRelevancy(r1, r2); err != nil {
 		return fmt.Errorf("propagate equality-class relevancy: %w", err)
 	}
-	if err := s.mergeTheoryVariables(r1, r2); err != nil {
+	if err := s.mergeTheoryVariables(left, right, justification); err != nil {
 		return fmt.Errorf("merge theory variables: %w", err)
 	}
 	smtInvertTrans(left)
