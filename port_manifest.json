@@ -251006,14 +251006,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "708bb63c4da0f28157e974fa36b8c2194d095691",
+    "commit": "964bf9837cc13de67dade38297c48c05e0fa8bb1",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25T16:18:38.895364+00:00",
-    "completed_utc": "2026-10-25T16:32:07.775219+00:00",
+    "started_utc": "2026-10-25T17:23:43.648437+00:00",
+    "completed_utc": "2026-10-25T17:37:23.809180+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-708bb63c.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-708bb63c.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-708bb63c.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-964bf983.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-964bf983.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-964bf983.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -251029,9 +251029,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 690.942,
+    "lp_seconds": 698.669,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated commit 708bb63c4da0f28157e974fa36b8c2194d095691, unchanged at start/end and verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes scoped sequence length/relation scheduling and the promoted integer-prefix comparison, canonical negative-containment queue reduction, standalone theory_str NFA/native factory, and the distinct partial String owner/basic axioms/model callbacks through 708bb63c. The known ALL unconstrained containment sat-versus-unknown differential remains pending. Excludes subsequent main-worktree fresh/canonical concat helpers, prefix/suffix/Contains witness formulas/registries, borrowed kernel assertion view and supported search-setup/worklist integration; those have separate focused evidence and do not complete the string backend. Also excludes the subsequent pre-merge syntactic feasibility and guarded length-consistency pair-loop increment."
+    "scope_warning": "Independently verified exact clean isolated commit 964bf9837cc13de67dade38297c48c05e0fa8bb1, unchanged at start/end and verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Covers all earlier sequence and distinct partial String owner increments through 964bf983, including canonical concat/relation witnesses, borrowed kernel assertion setup and pre-merge value/length consistency. The known ALL unconstrained containment sat-versus-unknown differential remains pending. Excludes subsequent constant-class containment (1d6a6689) and nonconstant substring/congruence/monotonicity (81985ff4); their separate focused/native/debug integration evidence does not complete the String backend. Production backend routing and remaining equality/final-check stages are still incomplete."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
