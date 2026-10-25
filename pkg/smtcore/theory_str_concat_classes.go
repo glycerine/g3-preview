@@ -159,8 +159,11 @@ func (t *SMTStringTheory) handleConstantEqualityStages(left, right ast.ASTHandle
 	if err != nil {
 		return err
 	}
-	// Source step 1, concat/concat arrangements, remains pending. Step 2
-	// runs here, then parent simplification and unroll/constant processing.
+	if err := t.simplifyStringConcatGroups(l, r); err != nil {
+		return err
+	}
+	// Step 2 follows the ported step-1 quick paths. General arrangements
+	// remain pending, followed by parent and unroll/constant processing.
 	if len(l.constants) != 0 {
 		for _, concat := range r.concats {
 			if err := t.solveConcatConstant(concat, l.constants[0]); err != nil {

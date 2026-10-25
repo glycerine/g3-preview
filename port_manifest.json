@@ -138967,7 +138967,9 @@
         "pkg/smtcore/theory_str_parents.go",
         "pkg/smtcore/theory_str_parents_test.go",
         "pkg/smtcore/theory_str_unroll.go",
-        "pkg/smtcore/theory_str_unroll_test.go"
+        "pkg/smtcore/theory_str_unroll_test.go",
+        "pkg/smtcore/theory_str_concat_equality.go",
+        "pkg/smtcore/theory_str_concat_equality_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139020,7 +139022,11 @@
         "TestSMTStringUnrollConstantQuotientGuards",
         "TestSMTStringUnrollClassCollectionCycleAndRollback",
         "TestSMTStringUnrollConstantEmptyAndUnsupportedCases",
-        "TestSMTStringUnrollConstantLegacyCoreCallbackAndPop"
+        "TestSMTStringUnrollConstantLegacyCoreCallbackAndPop",
+        "TestSMTStringConcatEqualityCoreCancellationAndRollback",
+        "TestSMTStringConcatEqualityClassCancellationGuards",
+        "TestSMTStringConcatEqualityKnownLengthGuards",
+        "TestSMTStringConcatArgumentInferenceGuardsAndRefusals"
       ],
       "conditionals": [
         {
@@ -140022,6 +140028,24 @@
             "TestSMTStringUnrollConstantEmptyAndUnsupportedCases",
             "TestSMTStringUnrollConstantLegacyCoreCallbackAndPop"
           ]
+        },
+        {
+          "name": "infer_len_concat_arg/infer_len_concat_equality active child-length inference: mixed-arithmetic core-root reads, first-known total, nonnegative residual and both total/known-child guards; infer_len_concat assertion effects remain audited dead",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_concat_equality.go",
+          "tests": [
+            "TestSMTStringConcatArgumentInferenceGuardsAndRefusals"
+          ]
+        },
+        {
+          "name": "simplify_concat_equality syntactic/private-class prefix and suffix cancellation, equal-known-prefix/suffix-length quick paths and pre-inference length snapshots; unique-pair handle_equality dispatch and shared-concat group skip are connected; overlap-aware selection of multiple pairs, re-simplification and six cut/arrangement families remain unported",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_str_concat_equality.go",
+          "tests": [
+            "TestSMTStringConcatEqualityCoreCancellationAndRollback",
+            "TestSMTStringConcatEqualityClassCancellationGuards",
+            "TestSMTStringConcatEqualityKnownLengthGuards"
+          ]
         }
       ],
       "ownership": [
@@ -140034,7 +140058,8 @@
         "Regex memberships are retained by the Go theory trail even when automata-mode registration publishes no axiom, protecting persistent raw-handle registries after scope pop and text-key overwrites. Native NFA cache values become read-only Go-owned concrete byte NFAs keyed by retained regex ASTs. Fresh owners borrow parameters but start with empty membership/automata/witness/NFA state. Regex axiom expression temporaries remain pinned through publication and close in reverse lexical order; native clause/premise vectors keep forward release.",
         "Concat rebuild temporaries remain rooted through internalization/publication. Groups use retained/internalized handles. Length guards and arrangement expressions stay owned through case-split registration. Relevant integer xor flags persist across scopes and reuse reversed operand pairs.",
         "Parent traversal copies each current enode parent list before axiom publication. Folded literal/concat temporaries remain owned through internalization and guarded publication. Every pending member equality and any sibling class substitution remains an explicit premise. Initial shortcuts still perform the native post-handler private merge; existing scope trails undo it.",
-        "Unroll collection borrows already internalized private-class handles. Guard/count/length construction temporaries remain rooted through axiom publication; core and private-class trails restore inferred counts and classes on pop. No unrelated regex matcher or universal adapter replaces native literal-core processing."
+        "Unroll collection borrows already internalized private-class handles. Guard/count/length construction temporaries remain rooted through axiom publication; core and private-class trails restore inferred counts and classes on pop. No unrelated regex matcher or universal adapter replaces native literal-core processing.",
+        "Concat-equality quick paths root length terms, equalities, guards and conclusions until publication. Argument inference owns independent big.Int sums/differences, reads only actual integral core roots through the existing mixed-arithmetic gate, and releases temporary AST refs in forward source-vector order. No model-value length assumptions, cut-history or witness-lifetime port credit is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140052,7 +140077,8 @@
         "RegexIn registration and initial legacy axioms now use the actual theory_str library worklist, with the cached NFA reached from pre-merge equality consistency only when RegexAutomata is disabled. Default automata mode records terms for its still-unported later final-check path. Registry keys preserve source NUL omission/text collisions and twelve-character escaping without porting C++ string internals. Legacy range axioms normalize reversed endpoints, while the separate native NFA keeps the reversed range empty; neither algorithm is silently replaced by the other. Legacy concat/union axioms retain unconditional child memberships as source requires. Star setup preserves separate inner/outer empty-literal cache accesses. This does not complete handle_equality, unroll/arrangement processing, automata final checking or String production routing; FinalCheck remains GiveUp. No new runner comparison vector is credited to this unselected owner.",
         "Constant arrangements and class grouping are connected to the partial equality callback. Preserve first-operand length priority, negative/overlong bounds, structural refusals, omission of known-length consequences, native split order and strong/weak parameter behavior. Active mk_concat folds two class constants before the later both-known source branch, so that unreachable case is not manufactured. Newly created empty seeds need not be attached class constants. Full handle_equality still lacks tester dispatch, initial concat shortcuts, concat/concat step 1, parent simplification and unroll processing; production routing and FinalCheck remain incomplete.",
         "Native parent simplification and initial concat shortcuts now run at their retained equality-handler positions. Preserve attached-class evaluation rather than syntactic literal folding, both independent direct positions for repeated operands, source order of nested/grandparent cases and guarded replacement. Grandparent byte order and rebuilt operand order are explicit separate choices. Source missing-sibling length inference is unreachable with the pure recursive length reader. Full handler still lacks tester dispatch, concat/concat step 1 and unroll processing; automata/final checking and production String routing remain incomplete.",
-        "The equality handler now dispatches opposite-class constants to collected unroll terms after parent simplification. Preserve source unsigned byte-length floor division, including mismatching/non-divisible text in direct necessary-consequence checks; this method does not replace regex acceptance. Empty target strings and non-to_re cores remain native no-ops. A zero/nonliteral divisor returns the source precondition error. Full unroll final checking, concat/unroll arrangements, concat/concat step 1, tester dispatch, automata and final checking remain pending; production backend routing and GiveUp are unchanged."
+        "The equality handler now dispatches opposite-class constants to collected unroll terms after parent simplification. Preserve source unsigned byte-length floor division, including mismatching/non-divisible text in direct necessary-consequence checks; this method does not replace regex acceptance. Empty target strings and non-to_re cores remain native no-ops. A zero/nonliteral divisor returns the source precondition error. Full unroll final checking, concat/unroll arrangements, concat/concat step 1, tester dispatch, automata and final checking remain pending; production backend routing and GiveUp are unchanged.",
+        "Step 1 currently runs native cancellation and child-length inference only for unique concat groups, skipping shared concat groups as source requires. Multiple distinct concat groups remain unprocessed until retained overlap-aware pair selection and cut histories are ported. The later concat re-simplification/arrangement dispatch remains unported. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics."
       ]
     },
     {
@@ -140092,7 +140118,9 @@
         "pkg/smtcore/theory_str_parents.go",
         "pkg/smtcore/theory_str_parents_test.go",
         "pkg/smtcore/theory_str_unroll.go",
-        "pkg/smtcore/theory_str_unroll_test.go"
+        "pkg/smtcore/theory_str_unroll_test.go",
+        "pkg/smtcore/theory_str_concat_equality.go",
+        "pkg/smtcore/theory_str_concat_equality_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -140146,7 +140174,11 @@
         "TestSMTStringUnrollConstantQuotientGuards",
         "TestSMTStringUnrollClassCollectionCycleAndRollback",
         "TestSMTStringUnrollConstantEmptyAndUnsupportedCases",
-        "TestSMTStringUnrollConstantLegacyCoreCallbackAndPop"
+        "TestSMTStringUnrollConstantLegacyCoreCallbackAndPop",
+        "TestSMTStringConcatEqualityCoreCancellationAndRollback",
+        "TestSMTStringConcatEqualityClassCancellationGuards",
+        "TestSMTStringConcatEqualityKnownLengthGuards",
+        "TestSMTStringConcatArgumentInferenceGuardsAndRefusals"
       ],
       "conditionals": [
         {
@@ -140466,6 +140498,24 @@
             "TestSMTStringUnrollConstantEmptyAndUnsupportedCases",
             "TestSMTStringUnrollConstantLegacyCoreCallbackAndPop"
           ]
+        },
+        {
+          "name": "infer_len_concat_arg/infer_len_concat_equality active child-length inference: mixed-arithmetic core-root reads, first-known total, nonnegative residual and both total/known-child guards; infer_len_concat assertion effects remain audited dead",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_concat_equality.go",
+          "tests": [
+            "TestSMTStringConcatArgumentInferenceGuardsAndRefusals"
+          ]
+        },
+        {
+          "name": "simplify_concat_equality syntactic/private-class prefix and suffix cancellation, equal-known-prefix/suffix-length quick paths and pre-inference length snapshots; unique-pair handle_equality dispatch and shared-concat group skip are connected; overlap-aware selection of multiple pairs, re-simplification and six cut/arrangement families remain unported",
+          "status": "partial",
+          "go_target": "pkg/smtcore/theory_str_concat_equality.go",
+          "tests": [
+            "TestSMTStringConcatEqualityCoreCancellationAndRollback",
+            "TestSMTStringConcatEqualityClassCancellationGuards",
+            "TestSMTStringConcatEqualityKnownLengthGuards"
+          ]
         }
       ],
       "ownership": [
@@ -140479,7 +140529,8 @@
         "Regex memberships are retained by the Go theory trail even when automata-mode registration publishes no axiom, protecting persistent raw-handle registries after scope pop and text-key overwrites. Native NFA cache values become read-only Go-owned concrete byte NFAs keyed by retained regex ASTs. Fresh owners borrow parameters but start with empty membership/automata/witness/NFA state. Regex axiom expression temporaries remain pinned through publication and close in reverse lexical order; native clause/premise vectors keep forward release.",
         "Concat rebuild temporaries remain rooted through internalization/publication. Groups use retained/internalized handles. Length guards and arrangement expressions stay owned through case-split registration. Relevant integer xor flags persist across scopes and reuse reversed operand pairs.",
         "Parent traversal copies each current enode parent list before axiom publication. Folded literal/concat temporaries remain owned through internalization and guarded publication. Every pending member equality and any sibling class substitution remains an explicit premise. Initial shortcuts still perform the native post-handler private merge; existing scope trails undo it.",
-        "Unroll collection borrows already internalized private-class handles. Guard/count/length construction temporaries remain rooted through axiom publication; core and private-class trails restore inferred counts and classes on pop. No unrelated regex matcher or universal adapter replaces native literal-core processing."
+        "Unroll collection borrows already internalized private-class handles. Guard/count/length construction temporaries remain rooted through axiom publication; core and private-class trails restore inferred counts and classes on pop. No unrelated regex matcher or universal adapter replaces native literal-core processing.",
+        "Concat-equality quick paths root length terms, equalities, guards and conclusions until publication. Argument inference owns independent big.Int sums/differences, reads only actual integral core roots through the existing mixed-arithmetic gate, and releases temporary AST refs in forward source-vector order. No model-value length assumptions, cut-history or witness-lifetime port credit is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140498,7 +140549,8 @@
         "RegexIn registration and initial legacy axioms now use the actual theory_str library worklist, with the cached NFA reached from pre-merge equality consistency only when RegexAutomata is disabled. Default automata mode records terms for its still-unported later final-check path. Registry keys preserve source NUL omission/text collisions and twelve-character escaping without porting C++ string internals. Legacy range axioms normalize reversed endpoints, while the separate native NFA keeps the reversed range empty; neither algorithm is silently replaced by the other. Legacy concat/union axioms retain unconditional child memberships as source requires. Star setup preserves separate inner/outer empty-literal cache accesses. This does not complete handle_equality, unroll/arrangement processing, automata final checking or String production routing; FinalCheck remains GiveUp. No new runner comparison vector is credited to this unselected owner.",
         "Constant arrangements and class grouping are connected to the partial equality callback. Preserve first-operand length priority, negative/overlong bounds, structural refusals, omission of known-length consequences, native split order and strong/weak parameter behavior. Active mk_concat folds two class constants before the later both-known source branch, so that unreachable case is not manufactured. Newly created empty seeds need not be attached class constants. Full handle_equality still lacks tester dispatch, initial concat shortcuts, concat/concat step 1, parent simplification and unroll processing; production routing and FinalCheck remain incomplete.",
         "Native parent simplification and initial concat shortcuts now run at their retained equality-handler positions. Preserve attached-class evaluation rather than syntactic literal folding, both independent direct positions for repeated operands, source order of nested/grandparent cases and guarded replacement. Grandparent byte order and rebuilt operand order are explicit separate choices. Source missing-sibling length inference is unreachable with the pure recursive length reader. Full handler still lacks tester dispatch, concat/concat step 1 and unroll processing; automata/final checking and production String routing remain incomplete.",
-        "The equality handler now dispatches opposite-class constants to collected unroll terms after parent simplification. Preserve source unsigned byte-length floor division, including mismatching/non-divisible text in direct necessary-consequence checks; this method does not replace regex acceptance. Empty target strings and non-to_re cores remain native no-ops. A zero/nonliteral divisor returns the source precondition error. Full unroll final checking, concat/unroll arrangements, concat/concat step 1, tester dispatch, automata and final checking remain pending; production backend routing and GiveUp are unchanged."
+        "The equality handler now dispatches opposite-class constants to collected unroll terms after parent simplification. Preserve source unsigned byte-length floor division, including mismatching/non-divisible text in direct necessary-consequence checks; this method does not replace regex acceptance. Empty target strings and non-to_re cores remain native no-ops. A zero/nonliteral divisor returns the source precondition error. Full unroll final checking, concat/unroll arrangements, concat/concat step 1, tester dispatch, automata and final checking remain pending; production backend routing and GiveUp are unchanged.",
+        "Step 1 currently runs native cancellation and child-length inference only for unique concat groups, skipping shared concat groups as source requires. Multiple distinct concat groups remain unprocessed until retained overlap-aware pair selection and cut histories are ported. The later concat re-simplification/arrangement dispatch remains unported. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics."
       ]
     },
     {
@@ -251634,7 +251686,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 703.615,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated commit f39025659c7cd68c8b1c508032d525d1125f7f0d, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior containment, regex registration/initial legacy axioms/NFA consumer, core theory case splits, concat/constant arrangements, parent folding and initial concat shortcuts through f3902565. Excludes subsequent literal-core unroll/constant processing and the newly created true-equality propagation correction, which have separate focused/native/debug integration evidence. The known ALL unconstrained containment sat-versus-unknown case remains pending. Full String equality/final checking and production backend routing remain incomplete. Also excludes subsequent theory-aware strategy-6 queue/hint/lifecycle/display work and the corrected live-source audit reopening of the queue units."
+    "scope_warning": "Independently verified exact clean isolated commit f39025659c7cd68c8b1c508032d525d1125f7f0d, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior containment, regex registration/initial legacy axioms/NFA consumer, core theory case splits, concat/constant arrangements, parent folding and initial concat shortcuts through f3902565. Excludes subsequent literal-core unroll/constant processing and the newly created true-equality propagation correction, which have separate focused/native/debug integration evidence. The known ALL unconstrained containment sat-versus-unknown case remains pending. Full String equality/final checking and production backend routing remain incomplete. Also excludes subsequent theory-aware strategy-6 queue/hint/lifecycle/display work and the corrected live-source audit reopening of the queue units. Subsequent concat-pair cancellation/known-length quick paths and child-length inference also have only separate focused/integration evidence."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
