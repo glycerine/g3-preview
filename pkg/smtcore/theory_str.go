@@ -255,15 +255,23 @@ func (t *SMTStringTheory) NewEquality(left, right SMTTheoryVar) error {
 	if left < 0 || right < 0 || uint32(left) >= t.find.GetNumVars() || uint32(right) >= t.find.GetNumVars() {
 		return ast.ErrASTDomain
 	}
-	// Native handle_equality runs before merging. Consistency, coherence,
-	// grouping and concat/constant stages are connected; others remain open.
-	consistent, err := t.checkNewEqualityValuesAndLengths(t.variables[left].Owner(), t.variables[right].Owner())
+	// Native handle_equality runs before merging. Initial concat shortcuts,
+	// consistency, coherence, grouping, constant and parent stages are
+	// connected; concat/concat arrangements and unroll/testers remain open.
+	lhs, rhs := t.variables[left].Owner(), t.variables[right].Owner()
+	shortcut, err := t.stringConcatEqualityShortcut(lhs, rhs)
 	if err != nil {
 		return err
 	}
-	if consistent {
-		if err := t.handleConstantEqualityStages(t.variables[left].Owner(), t.variables[right].Owner()); err != nil {
+	if !shortcut {
+		consistent, err := t.checkNewEqualityValuesAndLengths(lhs, rhs)
+		if err != nil {
 			return err
+		}
+		if consistent {
+			if err := t.handleConstantEqualityStages(lhs, rhs); err != nil {
+				return err
+			}
 		}
 	}
 	t.find.Merge(uint32(left), uint32(right))

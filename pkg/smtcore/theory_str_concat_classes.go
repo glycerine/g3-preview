@@ -159,8 +159,8 @@ func (t *SMTStringTheory) handleConstantEqualityStages(left, right ast.ASTHandle
 	if err != nil {
 		return err
 	}
-	// Source step 1, concat/concat arrangements, remains pending. This is
-	// step 2; parent and unroll processing must also follow it in the port.
+	// Source step 1, concat/concat arrangements, remains pending. Step 2
+	// runs here, then parent simplification; unroll processing must follow.
 	if len(l.constants) != 0 {
 		for _, concat := range r.concats {
 			if err := t.solveConcatConstant(concat, l.constants[0]); err != nil {
@@ -174,7 +174,7 @@ func (t *SMTStringTheory) handleConstantEqualityStages(left, right ast.ASTHandle
 			}
 		}
 	}
-	return nil
+	return t.simplifyEqualityParents(left, right)
 }
 
 func (t *SMTStringTheory) stringZeroLengthCoherence(left, right ast.ASTHandle) (result error) {
