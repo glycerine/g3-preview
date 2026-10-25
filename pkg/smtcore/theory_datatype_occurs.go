@@ -55,6 +55,19 @@ func (c *smtDatatypeOccursCheck) explain(app, root *SMTEnode) error {
 			return ast.ErrASTDomain
 		}
 	}
+	// The source closing step can omit the constructor equality when the
+	// datatype representative is a variable. Retain that necessary edge;
+	// app=root alone does not explain app=C(...,root,...).
+	constructor, err = c.theory.classConstructor(app)
+	if err != nil {
+		return err
+	}
+	if constructor == nil {
+		return ast.ErrASTDomain
+	}
+	if app != constructor && root != constructor {
+		c.equalities = append(c.equalities, SMTEnodePair{app, constructor})
+	}
 	if app != root {
 		c.equalities = append(c.equalities, SMTEnodePair{app, root})
 	}

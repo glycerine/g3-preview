@@ -43,7 +43,7 @@ func (k *SMTKernel) copyDatatypePlugin(source *SMTKernel) error {
 		// The destination's eagerly constructed placeholder is already a fresh
 		// datatype instance. It must still be unused at this copy boundary.
 		next, ok := old.(*SMTDatatypeTheory)
-		if !ok || k.internalizer.theoriesSetup || len(k.internalizer.scopes) != 0 || next.NumVariables() != 0 || len(next.initializedTrail) != 0 {
+		if !ok || k.internalizer.theoriesSetup || len(k.internalizer.scopes) != 0 || next.NumVariables() != 0 || len(next.data) != 0 {
 			return ast.ErrASTDomain
 		}
 		next.parameterOwner = owner

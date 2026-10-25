@@ -12,8 +12,8 @@ import (
 )
 
 type smtDatatypeScope struct {
-	initialized, reconstructed int
-	unsupported                bool
+	unsupported bool
+	mergeError  error
 }
 
 type smtDatatypeStatistics struct {
@@ -24,17 +24,15 @@ type smtDatatypeStatistics struct {
 // publishes reconstruction and accessor equalities through the shared egraph.
 type SMTDatatypeTheory struct {
 	*SMTTheoryBase
-	parameterOwner     *SMTDatatypeParams
-	utility            *ast.DatatypeUtil
-	find               *backtrack.UnionFind
-	findTrail          *backtrack.TrailStack
-	initialized        map[ast.ASTHandle]bool
-	initializedTrail   []ast.ASTHandle
-	reconstructed      map[ast.ASTHandle]bool
-	reconstructedTrail []ast.ASTHandle
-	scopes             []smtDatatypeScope
-	unsupported        bool
-	statistics         smtDatatypeStatistics
+	parameterOwner *SMTDatatypeParams
+	utility        *ast.DatatypeUtil
+	find           *backtrack.UnionFind
+	findTrail      *backtrack.TrailStack
+	data           []*smtDatatypeVarData
+	mergeError     error
+	scopes         []smtDatatypeScope
+	unsupported    bool
+	statistics     smtDatatypeStatistics
 }
 
 func (t *SMTDatatypeTheory) lazySplits() uint32 {
@@ -49,17 +47,13 @@ func NewSMTDatatypeTheory(family ast.FamilyID) (*SMTDatatypeTheory, error) {
 	if err != nil {
 		return nil, err
 	}
-	context := backtrack.NewUnionFindDefaultContext()
-	find, err := backtrack.NewUnionFind(context)
+	t := &SMTDatatypeTheory{SMTTheoryBase: base, findTrail: backtrack.NewTrailStack()}
+	find, err := backtrack.NewUnionFind(&smtDatatypeUnionContext{theory: t})
 	if err != nil {
 		return nil, err
 	}
-	return &SMTDatatypeTheory{
-		SMTTheoryBase: base,
-		find:          find, findTrail: context.GetTrailStack(),
-		initialized:   make(map[ast.ASTHandle]bool),
-		reconstructed: make(map[ast.ASTHandle]bool),
-	}, nil
+	t.find = find
+	return t, nil
 }
 
 func (t *SMTDatatypeTheory) operation(expression ast.ASTHandle) (int32, bool, error) {
@@ -201,30 +195,32 @@ func (t *SMTDatatypeTheory) publishUpdate(node *SMTEnode) error {
 	return nil
 }
 
-func (t *SMTDatatypeTheory) attachVariable(node *SMTEnode) error {
+func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
 	if t.IsAttachedToVariable(node) {
 		return nil
 	}
-	variable, err := t.CreateVariable(node)
+	_, err := t.CreateVariable(node)
+	return err
+}
+
+func (t *SMTDatatypeTheory) CreateVariable(node *SMTEnode) (SMTTheoryVar, error) {
+	variable, err := t.SMTTheoryBase.CreateVariable(node)
+	if err != nil {
+		return variable, err
+	}
+	if t.find.MkVar() != uint32(variable) {
+		return variable, ast.ErrASTDomain
+	}
+	data := &smtDatatypeVarData{}
+	t.data = append(t.data, data)
+	return variable, t.initializeVariable(node, data)
+}
+
+func (t *SMTDatatypeTheory) initializeVariable(node *SMTEnode, data *smtDatatypeVarData) error {
+	state, err := t.State()
 	if err != nil {
 		return err
 	}
-	if t.find.MkVar() != uint32(variable) {
-		return ast.ErrASTDomain
-	}
-	return nil
-}
-
-func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
-	if t.initialized[node.owner] {
-		return nil
-	}
-	if err := t.attachVariable(node); err != nil {
-		return err
-	}
-	t.initialized[node.owner] = true
-	t.initializedTrail = append(t.initializedTrail, node.owner)
-	state, _ := t.State()
 	sort, err := state.manager.GetSort(node.owner)
 	if err != nil {
 		return err
@@ -234,6 +230,7 @@ func (t *SMTDatatypeTheory) ensureVariable(node *SMTEnode) error {
 		return err
 	}
 	if matched {
+		data.constructor = node
 		return t.publishConstructor(node.owner, constructor)
 	}
 	if operation, own, err := t.operation(node.owner); err != nil {
@@ -314,6 +311,11 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		}
 	}
 	node := state.context.enodes[expression]
+	// Source internalize_term can encounter an enode created while its
+	// arguments were internalized; that term must not be initialized twice.
+	if node != nil {
+		return true, nil
+	}
 	if node == nil {
 		boolean, booleanErr := state.isBoolean(expression)
 		if booleanErr != nil {
@@ -341,6 +343,11 @@ func (t *SMTDatatypeTheory) InternalizeTerm(expression ast.ASTHandle) (bool, err
 		}
 	} else if len(node.arguments) == 1 {
 		if err = t.ensureVariable(node.arguments[0]); err != nil {
+			return false, err
+		}
+	}
+	if (operation == ast.ASTDatatypeRecognizer || operation == ast.ASTDatatypeIs) && (state.relevancy == nil || !state.relevancy.enabled) {
+		if err = t.addRecognizer(node.arguments[0].TheoryVar(t.FamilyID()), node); err != nil {
 			return false, err
 		}
 	}
@@ -375,23 +382,7 @@ func (t *SMTDatatypeTheory) NewEquality(left, right SMTTheoryVar) error {
 		return ast.ErrASTDomain
 	}
 	t.find.Merge(uint32(left), uint32(right))
-	node, err := t.Enode(left)
-	if err != nil {
-		return err
-	}
-	state, err := t.State()
-	if err != nil {
-		return err
-	}
-	sort, err := state.manager.GetSort(node.owner)
-	if err != nil {
-		return err
-	}
-	family, err := state.manager.GetFamilyID(sort)
-	if err != nil || family != t.FamilyID() {
-		return err
-	}
-	return t.propagateRecognizer(node.owner)
+	return t.mergeError
 }
 func (*SMTDatatypeTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error { return ast.ErrASTDomain }
 
@@ -401,7 +392,7 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 		return err
 	}
 	expression, err := state.BoolExpression(variable)
-	if err != nil || isTrue && t.reconstructed[expression] {
+	if err != nil {
 		return err
 	}
 	op, own, err := t.operation(expression)
@@ -423,12 +414,23 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 	if err != nil {
 		return err
 	}
-	if !isTrue {
-		return t.propagateRecognizer(value)
+	node := state.context.enodes[value]
+	if node == nil {
+		return ast.ErrASTDomain
 	}
-	known, err := t.classConstructor(state.context.enodes[value])
-	if err != nil || state.Inconsistent() {
+	root, data, err := t.rootData(node.TheoryVar(t.FamilyID()))
+	if err != nil {
 		return err
+	}
+	known := data.constructor
+	if !isTrue {
+		if known != nil {
+			if known.declaration == constructor {
+				return t.signRecognizerConflict(known, state.context.enodes[expression])
+			}
+			return nil
+		}
+		return t.propagateRecognizer(SMTTheoryVar(root))
 	}
 	if known != nil && known.declaration == constructor {
 		return nil
@@ -436,8 +438,6 @@ func (t *SMTDatatypeTheory) Assign(variable int32, isTrue bool) error {
 	if err = t.assertConstructor(value, constructor, NewSMTLiteral(variable, false)); err != nil {
 		return err
 	}
-	t.reconstructed[expression] = true
-	t.reconstructedTrail = append(t.reconstructedTrail, expression)
 	return nil
 }
 
@@ -473,8 +473,7 @@ func (t *SMTDatatypeTheory) PushScope() error {
 	}
 	t.findTrail.PushScope()
 	t.scopes = append(t.scopes, smtDatatypeScope{
-		initialized: len(t.initializedTrail), reconstructed: len(t.reconstructedTrail),
-		unsupported: t.unsupported,
+		unsupported: t.unsupported, mergeError: t.mergeError,
 	})
 	return nil
 }
@@ -485,18 +484,17 @@ func (t *SMTDatatypeTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	oldVars, err := t.OldNumVariables(count)
+	if err != nil {
+		return err
+	}
 	if err := t.findTrail.PopScope(count); err != nil {
 		return err
 	}
-	for _, expression := range t.initializedTrail[scope.initialized:] {
-		delete(t.initialized, expression)
-	}
-	for _, expression := range t.reconstructedTrail[scope.reconstructed:] {
-		delete(t.reconstructed, expression)
-	}
-	t.initializedTrail = t.initializedTrail[:scope.initialized]
-	t.reconstructedTrail = t.reconstructedTrail[:scope.reconstructed]
+	clear(t.data[oldVars:])
+	t.data = t.data[:oldVars]
 	t.unsupported = scope.unsupported
+	t.mergeError = scope.mergeError
 	t.scopes = t.scopes[:level]
 	return t.SMTTheoryBase.PopScopes(count)
 }
@@ -532,11 +530,7 @@ func (t *SMTDatatypeTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 			}
 		}
 		if t.lazySplits() > 0 {
-			constructor, err := t.classConstructor(node)
-			if err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-			if constructor == nil {
+			if t.data[v].constructor == nil {
 				sort, err := state.manager.GetSort(node.owner)
 				if err != nil {
 					return SMTFinalCheckGiveUp, err
@@ -608,46 +602,28 @@ func (p *smtDatatypeValueProcedure) MakeValue(generator *SMTModelGenerator, valu
 func (*smtDatatypeValueProcedure) IsFresh() bool { return false }
 
 func (t *SMTDatatypeTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
-	if node == nil || generator == nil || generator.model == nil {
-		return nil, ast.ErrASTDomain
-	}
-	variable := node.TheoryVar(t.FamilyID())
-	if variable < 0 || uint32(variable) >= t.find.GetNumVars() {
-		return nil, ast.ErrASTDomain
-	}
 	state, err := t.State()
 	if err != nil {
 		return nil, err
 	}
-	for expression := range t.initialized {
-		candidate := state.context.enodes[expression]
-		if candidate == nil || candidate.root != node.root {
-			continue
-		}
-		constructor, matched, constructorErr := state.manager.DatatypeConstructorApp(expression)
-		if constructorErr != nil {
-			return nil, constructorErr
-		}
-		if !matched {
-			continue
-		}
-		dependencies := make([]SMTModelValueDependency, 0, len(candidate.arguments))
-		for _, argument := range candidate.arguments {
-			dependency, dependencyErr := NewSMTEnodeValueDependency(argument)
-			if dependencyErr != nil {
-				return nil, dependencyErr
-			}
-			dependencies = append(dependencies, dependency)
-		}
-		return &smtDatatypeValueProcedure{constructor: constructor, dependencies: dependencies}, nil
+	if node == nil || node.manager != state.manager || generator == nil || generator.manager != state.manager || generator.model == nil {
+		return nil, ast.ErrASTDomain
 	}
-	sort, err := state.manager.GetSort(node.owner)
+	_, data, err := t.rootData(node.TheoryVar(t.FamilyID()))
 	if err != nil {
 		return nil, err
 	}
-	value, err := generator.SomeValue(sort)
-	if err != nil {
-		return nil, err
+	constructor := data.constructor
+	if constructor == nil {
+		return nil, ast.ErrASTDomain
 	}
-	return NewSMTExpressionValueProcedure(value)
+	dependencies := make([]SMTModelValueDependency, 0, len(constructor.arguments))
+	for _, argument := range constructor.arguments {
+		dependency, err := NewSMTEnodeValueDependency(argument)
+		if err != nil {
+			return nil, err
+		}
+		dependencies = append(dependencies, dependency)
+	}
+	return &smtDatatypeValueProcedure{constructor: constructor.declaration, dependencies: dependencies}, nil
 }

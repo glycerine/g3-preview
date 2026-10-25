@@ -114702,7 +114702,9 @@
         "pkg/smtcore/theory_datatype.go",
         "pkg/smtcore/theory_datatype_recognizers.go",
         "pkg/cmd_context/applications.go",
-        "pkg/cmd_context/datatype_builtins_test.go"
+        "pkg/cmd_context/datatype_builtins_test.go",
+        "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/theory_datatype_metadata_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -114823,7 +114825,9 @@
         "TestSMTCoreValidationAllocationFrontiers",
         "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
         "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
-        "TestCommandContextDatatypeBuiltinVisibility"
+        "TestCommandContextDatatypeBuiltinVisibility",
+        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+        "TestSMTDatatypeWatchRegistrationAndScopedSlots"
       ],
       "conditionals": [
         {
@@ -116305,6 +116309,24 @@
             "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
             "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner"
           ]
+        },
+        {
+          "name": "synchronous relevancy::set_relevant to context::relevant_eh callback at the marking scope; PropagateCore runs relevance before atom assignment delivery; bound context callback ownership is exclusive and released on replacement/close; ordered newly-relevant events deliver already-assigned atoms without duplicating theory relevance callbacks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_internalizer.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/theory_datatype_metadata_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+            "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -116315,7 +116337,8 @@
         "Preprocessing publishes a returned partial TheoryRewriter into the actual kernel owner before inspecting its construction error; solver/kernel teardown therefore closes the allocated configuration on every reached reservation failure.",
         "A preprocessing conflict uses the existing concrete root-literal proof wrapper owned by the logical context scope, or the immediate Boolean axiom when no false-row proof exists. The kernel retains the source false proof independently until its result owner resets/closes. No pending term/quantifier/theory atom is internalized on the early-conflict branch. Scope pop releases the context wrapper; repeated internalization preserves an existing Boolean conflict.",
         "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage.",
-        "The kernel owns one ASTExprSubstitution and its concrete ASTScopedExprSubstitution wrapper from construction. Commit inserts into that same owner; forward/reverse propagation push/pop temporary bindings instead of rebuilding committed state. Assertion-time and shared theory rewriting borrow the owner; cache flush and parameter updates reattach it after native resets. User scopes restore bindings before shrinking formulas. Rewriter destruction precedes scoped-wrapper destruction, which precedes underlying substitution destruction; six constructor/commit/propagation first-success campaigns cover both proof modes and release all charged fixture storage."
+        "The kernel owns one ASTExprSubstitution and its concrete ASTScopedExprSubstitution wrapper from construction. Commit inserts into that same owner; forward/reverse propagation push/pop temporary bindings instead of rebuilding committed state. Assertion-time and shared theory rewriting borrow the owner; cache flush and parameter updates reattach it after native resets. User scopes restore bindings before shrinking formulas. Rewriter destruction precedes scoped-wrapper destruction, which precedes underlying substitution destruction; six constructor/commit/propagation first-success campaigns cover both proof modes and release all charged fixture storage.",
+        "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -116400,7 +116423,10 @@
         "pkg/smtcore/theory_datatype.go",
         "pkg/smtcore/theory_datatype_recognizers.go",
         "pkg/cmd_context/applications.go",
-        "pkg/cmd_context/datatype_builtins_test.go"
+        "pkg/cmd_context/datatype_builtins_test.go",
+        "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/smt_relevancy.go",
+        "pkg/smtcore/theory_datatype_metadata_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -116473,7 +116499,9 @@
         "TestSMTCoreValidationAllocationFrontiers",
         "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
         "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
-        "TestCommandContextDatatypeBuiltinVisibility"
+        "TestCommandContextDatatypeBuiltinVisibility",
+        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+        "TestSMTDatatypeWatchRegistrationAndScopedSlots"
       ],
       "conditionals": [
         {
@@ -116968,6 +116996,24 @@
             "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
             "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner"
           ]
+        },
+        {
+          "name": "synchronous relevancy::set_relevant to context::relevant_eh callback at the marking scope; PropagateCore runs relevance before atom assignment delivery; bound context callback ownership is exclusive and released on replacement/close; ordered newly-relevant events deliver already-assigned atoms without duplicating theory relevance callbacks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_internalizer.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/theory_datatype_metadata_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+            "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -116976,7 +117022,8 @@
         "The read-side checker context borrows the concrete relevancy service installed by SetRelevancy. Queries follow its current enabled flag without creating marks, callbacks, owning AST roots, or synthetic relevance trails; standalone contexts without a service retain their explicit marks.",
         "A preprocessing conflict uses the existing concrete root-literal proof wrapper owned by the logical context scope, or the immediate Boolean axiom when no false-row proof exists. The kernel retains the source false proof independently until its result owner resets/closes. No pending term/quantifier/theory atom is internalized on the early-conflict branch. Scope pop releases the context wrapper; repeated internalization preserves an existing Boolean conflict.",
         "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage.",
-        "The kernel owns one ASTExprSubstitution and its concrete ASTScopedExprSubstitution wrapper from construction. Commit inserts into that same owner; forward/reverse propagation push/pop temporary bindings instead of rebuilding committed state. Assertion-time and shared theory rewriting borrow the owner; cache flush and parameter updates reattach it after native resets. User scopes restore bindings before shrinking formulas. Rewriter destruction precedes scoped-wrapper destruction, which precedes underlying substitution destruction; six constructor/commit/propagation first-success campaigns cover both proof modes and release all charged fixture storage."
+        "The kernel owns one ASTExprSubstitution and its concrete ASTScopedExprSubstitution wrapper from construction. Commit inserts into that same owner; forward/reverse propagation push/pop temporary bindings instead of rebuilding committed state. Assertion-time and shared theory rewriting borrow the owner; cache flush and parameter updates reattach it after native resets. User scopes restore bindings before shrinking formulas. Rewriter destruction precedes scoped-wrapper destruction, which precedes underlying substitution destruction; six constructor/commit/propagation first-success campaigns cover both proof modes and release all charged fixture storage.",
+        "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
@@ -122383,7 +122430,11 @@
         "pkg/parsers/smt2/commands_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_relevancy_test.go",
-        "pkg/smtcore/theory_arith_bounded_disequalities_test.go"
+        "pkg/smtcore/theory_arith_bounded_disequalities_test.go",
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/theory_datatype_metadata_test.go"
       ],
       "tests": [
         "TestSMTRelevancyBooleanConnectivePropagation",
@@ -122396,7 +122447,9 @@
         "TestSMTRelevancyNegatedArgumentsAndLiteralWatches",
         "TestSMTBoundedWeightedDisequalitiesModel",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+        "TestSMTDatatypeWatchRegistrationAndScopedSlots"
       ],
       "conditionals": [
         {
@@ -122596,14 +122649,33 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "synchronous relevancy::set_relevant to context::relevant_eh callback at the marking scope; PropagateCore runs relevance before atom assignment delivery; bound context callback ownership is exclusive and released on replacement/close; ordered newly-relevant events deliver already-assigned atoms without duplicating theory relevance callbacks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_internalizer.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/theory_datatype_metadata_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+            "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "SMTRelevancyPropagator borrows its concrete checker context and AST manager; native maps and slices own handler records, watch lists, scopes, and ordered relevance events.",
-        "After filtering is enabled following a disabled period, prepareCheck restores root relevance and source-shaped AND/OR/ITE watches from the owned active assertion DAG. Existing watches and handlers are not duplicated; scoped ones are recreated after pop. Quantifier bodies use instances, and term-ITE repair requires an existing enode. Checks that never reenable filtering retain their existing path."
+        "After filtering is enabled following a disabled period, prepareCheck restores root relevance and source-shaped AND/OR/ITE watches from the owned active assertion DAG. Existing watches and handlers are not duplicated; scoped ones are recreated after pop. Quantifier bodies use instances, and term-ITE repair requires an existing enode. Checks that never reenable filtering retain their existing path.",
+        "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner."
       ],
       "deviations": [
-        "The source region-allocated virtual handlers are closed typed Go records for the retained handler kinds. Context relevant_eh notification is exposed as ordered DrainNewlyRelevant events for the eventual context owner.",
+        "The source region-allocated virtual handlers are closed typed Go records for the retained handler kinds. Context relevant_eh now runs synchronously through a borrowed concrete internalizer; ordered DrainNewlyRelevant events remain for assigned-atom delivery and read-side observers.",
         "The C++ executable returns invalid Boolean models for relevancy_update_scopes.smt2 after changing smt.relevancy from 0 to 2. Go requires models satisfying p and (or a b), including after pop. TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect retains the complete case separately from exact-output comparisons, requires valid Go output, and accepts only the observed invalid reference snapshot or a corrected reference agreeing with Go. This is an explicit reference defect, not a weakened Go expectation; 90 other scripts retain exact C++ comparisons."
       ]
     },
@@ -122613,13 +122685,19 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/smt_relevancy.go"
+        "pkg/smtcore/smt_relevancy.go",
+        "pkg/smtcore/smt_theory_propagation.go",
+        "pkg/smtcore/smt_internalizer.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/theory_datatype_metadata_test.go"
       ],
       "tests": [
         "TestSMTRelevancyBooleanConnectivePropagation",
         "TestSMTRelevancySharedAssignmentWatches",
         "TestSMTRelevancyDependenciesWatchesScopesAndEqualityClasses",
-        "TestSMTRelevancyDisabledAndTermITEHandler"
+        "TestSMTRelevancyDisabledAndTermITEHandler",
+        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+        "TestSMTDatatypeWatchRegistrationAndScopedSlots"
       ],
       "conditionals": [
         {
@@ -122652,10 +122730,29 @@
             "TestSMTRelevancyDependenciesWatchesScopesAndEqualityClasses",
             "TestSMTRelevancyDisabledAndTermITEHandler"
           ]
+        },
+        {
+          "name": "synchronous relevancy::set_relevant to context::relevant_eh callback at the marking scope; PropagateCore runs relevance before atom assignment delivery; bound context callback ownership is exclusive and released on replacement/close; ordered newly-relevant events deliver already-assigned atoms without duplicating theory relevance callbacks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_relevancy.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_propagation.go",
+            "pkg/smtcore/smt_internalizer.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/theory_datatype_metadata_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+            "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "The propagator borrows context-owned AST and enode state and owns concrete Go handler values; no C++ region or polymorphic callback lifetime is reproduced."
+        "The propagator borrows context-owned AST and enode state and owns concrete Go handler values; no C++ region or polymorphic callback lifetime is reproduced.",
+        "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner."
       ],
       "deviations": [
         "Invalid source assertion states return Go errors. The retained internalizer uses concrete AddAndWatches, AddOrWatches, AddITEWatches, and AddTermITEWatches methods instead of exposing a universal callback interface."
@@ -131762,7 +131859,9 @@
         "pkg/smtcore/theory_datatype_equality.go",
         "pkg/smtcore/theory_datatype_equality_test.go",
         "pkg/smtcore/smt_justification_theory.go",
-        "pkg/cmd/g3/datatype_update_equality_test.go"
+        "pkg/cmd/g3/datatype_update_equality_test.go",
+        "pkg/smtcore/theory_datatype_metadata.go",
+        "pkg/smtcore/theory_datatype_metadata_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131795,7 +131894,12 @@
         "TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback",
         "TestSMTDatatypeConstructorAccessorAxiomsAndCounters",
         "TestSMTDatatypeAccessorCounterCountsConstructorCalls",
-        "TestSMTLibRunnerDatatypeUpdateEqualityScopes"
+        "TestSMTLibRunnerDatatypeUpdateEqualityScopes",
+        "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+        "TestSMTDatatypeMergedFalseRecognizersPropagateWithSourceEvidence",
+        "TestSMTDatatypeConstructorMetadataAndModelProcedureRollback",
+        "TestSMTDatatypeMergePreservesFirstWatchPerConstructor",
+        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope"
       ],
       "assertions": [
         {
@@ -132055,7 +132159,7 @@
           ]
         },
         {
-          "name": "borrowed datatype parameter owner and eager/lazy gates; final-check traversal of all attached constructor-free roots; preferred relevant nonrecursive constructor; negative-recognizer survivor activation and guarded propagation across equal arguments; recheck recognizers after equality-class merges",
+          "name": "borrowed datatype parameter owner and eager/lazy gates; final-check traversal of all attached constructor-free roots; preferred relevant nonrecursive constructor; negative-recognizer survivor activation with literal/equality justification across equal arguments; recheck recognizers after equality-class merges",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_datatype.go",
           "go_targets": [
@@ -132079,7 +132183,7 @@
           ]
         },
         {
-          "name": "Remaining constructor/recognizer metadata merge lifecycle and complete model audit",
+          "name": "Remaining datatype TRACE/display/assertion and context integration audit",
           "status": "partial",
           "tests": []
         },
@@ -132183,20 +132287,42 @@
           "name": "reset_eh has no retained caller: only override declaration/definition and unused base/other-theory reset chains exist; context reset destroys/recreates its context instead of dispatching this hook",
           "status": "dead_deleted",
           "tests": []
+        },
+        {
+          "name": "var_data/mk_var/merge_eh/add_recognizer/relevant_eh: typed constructor and first recognizer slots at private union-find roots; declaration-order registration and merge; untrailed vector allocation with trailed slot/constructor writes; source positive/negative assignment branches and extended survivor evidence; mk_value uses cached constructor and ordered argument dependencies without arbitrary-value fallback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_metadata.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_metadata.go",
+            "pkg/smtcore/theory_datatype_metadata_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+            "TestSMTDatatypeMergedFalseRecognizersPropagateWithSourceEvidence",
+            "TestSMTDatatypeConstructorMetadataAndModelProcedureRollback",
+            "TestSMTDatatypeMergePreservesFirstWatchPerConstructor",
+            "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
         "Concrete Go maps and slices own initialized-value, recognizer, reconstruction and case-split trails. AST handles and enodes remain borrowed from the manager and SMT context; the model generator owns registered datatype values.",
-        "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed.",
         "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten.",
         "Owns concrete backtrack.UnionFind and undo trail synchronized with base variables and scoped rollback. Traversal stacks, marks, parents and equalities belong to one final-check invocation. Context owns extended conflicts. Internalizer borrows kernel sticky asserted-quantifier state.",
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
-        "Conditional direct datatype equality justifications retain their datatype family for proof reconstruction but return null FromTheory for origin notification. Context takes scoped ownership before merging because a late error may have installed an edge or conflict; pop/close releases owners after equality rollback."
+        "Conditional direct datatype equality justifications retain their datatype family for proof reconstruction but return null FromTheory for origin notification. Context takes scoped ownership before merging because a late error may have installed an edge or conflict; pop/close releases owners after equality rollback.",
+        "Each theory owns an independent DatatypeUtil and typed var_data records. Constructor and recognizer pointers borrow context enodes. The private union-find trail restores root constructor/slot writes before scoped var_data and base variables shrink; recognizer-vector allocation survives pop but scoped entries do not. Relevant callbacks register at the marking scope. Model procedures borrow the cached constructor declaration and record ordered root dependencies."
       ],
       "deviations": [
         "Guarded SAT clauses and scoped egraph scans still replace portions of source var_data and recognizer arrays. Datatype roots now use the concrete source union-find port. Handled accessors require enodes without artificial result variables; sort constraints attach finite or asserted-quantifier datatype results. Invalid source assertion states return Go errors.",
-        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the remaining metadata merge/lifecycle/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts.",
-        "Source equality branch scheduling replaces unconditional SAT encoding and removes synthetic constructor recognizer unit clauses. Metadata scans and complete model construction remain partial. Field-update integration records one AST-identity core-order difference: native bad_identity/empty versus C++ empty/bad_identity; exact membership and every other answer are fixed oracles. Unreached datatype reset_eh is intentionally not given an unused Go API."
+        "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/display/assertion and broader context integration still require audit.",
+        "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order."
       ]
     },
     {
@@ -132229,7 +132355,9 @@
         "pkg/smtcore/theory_datatype_equality.go",
         "pkg/smtcore/theory_datatype_equality_test.go",
         "pkg/smtcore/smt_justification_theory.go",
-        "pkg/cmd/g3/datatype_update_equality_test.go"
+        "pkg/cmd/g3/datatype_update_equality_test.go",
+        "pkg/smtcore/theory_datatype_metadata.go",
+        "pkg/smtcore/theory_datatype_metadata_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -132261,7 +132389,12 @@
         "TestSMTDatatypeEqualityAxiomSourceBranchesAndRollback",
         "TestSMTDatatypeConstructorAccessorAxiomsAndCounters",
         "TestSMTDatatypeAccessorCounterCountsConstructorCalls",
-        "TestSMTLibRunnerDatatypeUpdateEqualityScopes"
+        "TestSMTLibRunnerDatatypeUpdateEqualityScopes",
+        "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+        "TestSMTDatatypeMergedFalseRecognizersPropagateWithSourceEvidence",
+        "TestSMTDatatypeConstructorMetadataAndModelProcedureRollback",
+        "TestSMTDatatypeMergePreservesFirstWatchPerConstructor",
+        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope"
       ],
       "conditionals": [
         {
@@ -132277,7 +132410,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "retained datatype interface with source incremental splitting; broader merge/recognizer lifecycle audit remains incomplete",
+          "name": "retained datatype interface; remaining TRACE/display/assertion and context integration audit",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_datatype.go",
           "tests": [
@@ -132291,7 +132424,7 @@
           ]
         },
         {
-          "name": "borrowed datatype parameter owner and eager/lazy gates; final-check traversal of all attached constructor-free roots; preferred relevant nonrecursive constructor; negative-recognizer survivor activation and guarded propagation across equal arguments; recheck recognizers after equality-class merges",
+          "name": "borrowed datatype parameter owner and eager/lazy gates; final-check traversal of all attached constructor-free roots; preferred relevant nonrecursive constructor; negative-recognizer survivor activation with literal/equality justification across equal arguments; recheck recognizers after equality-class merges",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_datatype.go",
           "go_targets": [
@@ -132315,7 +132448,7 @@
           ]
         },
         {
-          "name": "Remaining constructor/recognizer metadata merge lifecycle and complete model audit",
+          "name": "Remaining datatype TRACE/display/assertion and context integration audit",
           "status": "partial",
           "tests": []
         },
@@ -132419,20 +132552,42 @@
           "name": "reset_eh has no retained caller: only override declaration/definition and unused base/other-theory reset chains exist; context reset destroys/recreates its context instead of dispatching this hook",
           "status": "dead_deleted",
           "tests": []
+        },
+        {
+          "name": "var_data/mk_var/merge_eh/add_recognizer/relevant_eh: typed constructor and first recognizer slots at private union-find roots; declaration-order registration and merge; untrailed vector allocation with trailed slot/constructor writes; source positive/negative assignment branches and extended survivor evidence; mk_value uses cached constructor and ordered argument dependencies without arbitrary-value fallback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_metadata.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_metadata.go",
+            "pkg/smtcore/theory_datatype_metadata_test.go",
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+            "TestSMTDatatypeMergedFalseRecognizersPropagateWithSourceEvidence",
+            "TestSMTDatatypeConstructorMetadataAndModelProcedureRollback",
+            "TestSMTDatatypeMergePreservesFirstWatchPerConstructor",
+            "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
         "SMTDatatypeTheory owns concrete Go metadata and scope trails while borrowing manager-owned AST handles and context-owned enodes.",
-        "Each datatype theory owns a fresh DatatypeUtil with independent cached constructor preferences and checked sort/declaration pins, released at theory close. Recognizer slots are concrete typed views of current egraph equivalence classes, so pop removes scoped recognizers without retaining obsolete enodes. The old permanent case-completed map and recognizer-value bookkeeping are removed.",
         "Immediate datatype conflicts transfer their extended justification to the context only after construction/wrapping succeeds. The context owns and releases it across scope pop; actual scoped enodes retain equality evidence until proof/core extraction. Failed wrapping releases its owner, and an existing conflict is never overwritten.",
         "Owns concrete backtrack.UnionFind and undo trail synchronized with base variables and scoped rollback. Traversal stacks, marks, parents and equalities belong to one final-check invocation. Context owns extended conflicts. Internalizer borrows kernel sticky asserted-quantifier state.",
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
-        "Conditional direct datatype equality justifications retain their datatype family for proof reconstruction but return null FromTheory for origin notification. Context takes scoped ownership before merging because a late error may have installed an edge or conflict; pop/close releases owners after equality rollback."
+        "Conditional direct datatype equality justifications retain their datatype family for proof reconstruction but return null FromTheory for origin notification. Context takes scoped ownership before merging because a late error may have installed an edge or conflict; pop/close releases owners after equality rollback.",
+        "Each theory owns an independent DatatypeUtil and typed var_data records. Constructor and recognizer pointers borrow context enodes. The private union-find trail restores root constructor/slot writes before scoped var_data and base variables shrink; recognizer-vector allocation survives pop but scoped entries do not. Relevant callbacks register at the marking scope. Model procedures borrow the cached constructor declaration and record ordered root dependencies."
       ],
       "deviations": [
         "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation.",
-        "Source incremental mk_split scheduling is now implemented, replacing all-constructor clause expansion. The actual cached nonrecursive utility choice is per theory, independent of the AST plugin and model factory. Concrete egraph slot scans replace the source recognizer-pointer lookup; the remaining metadata merge/lifecycle/model audit still keeps this class partial. Fresh copies retain the original concrete parameter owner through chained translations and auxiliary contexts.",
-        "Source equality branch scheduling replaces unconditional SAT encoding and removes synthetic constructor recognizer unit clauses. Metadata scans and complete model construction remain partial. Field-update integration records one AST-identity core-order difference: native bad_identity/empty versus C++ empty/bad_identity; exact membership and every other answer are fixed oracles. Unreached datatype reset_eh is intentionally not given an unused Go API."
+        "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/display/assertion and broader context integration still require audit.",
+        "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order."
       ]
     },
     {
@@ -247555,7 +247710,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 716.233,
     "checkout_held_unchanged": true,
-    "scope_warning": "Clean isolated exact-HEAD checkout with C++ comparisons enabled; includes legacy string proof printing, datatype root/cycle/accessor/restart changes and direct datatype equality branches, plus earlier increments. Excludes the subsequent source unsat-core reverse assignment traversal, whose focused integration evidence is recorded separately."
+    "scope_warning": "Clean isolated exact-HEAD checkout with C++ comparisons enabled; includes legacy string proof printing, datatype root/cycle/accessor/restart changes and direct datatype equality branches, plus earlier increments. Excludes the subsequent source unsat-core reverse assignment traversal, whose focused integration evidence is recorded separately. Also excludes the subsequent datatype root metadata and synchronous relevance increment, whose focused integration checks are recorded separately."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"datatype_metadata_merge_scopes.smt2":          "sat\n((((_ is right) x) true) (((_ is right) y) true) ((= x y) true))\nunsat\n(rejected_survivor)\nsat\nsat\n(((not ((_ is left) x)) true) ((not ((_ is middle) y)) true))\nunsat\n(rejected_constructor)\nsat\nsat\n(((= u v) true) ((= (rf x) u) true) ((= (rf y) v) true))\nsat\n",
 	"unsat_core_reverse_trail.smt2":                "unsat\n(c)\nsat\n((a true) (b true) (c false))\nunsat\n(blocked)\nsat\nunsat\n(h)\nsat\n((e true) (h false) ((= x y) true))\nunsat\n(blocked_eq)\nsat\n",
 	"datatype_cycle_scopes.smt2":                   "unsat\n(x_edge y_edge z_edge)\nsat\n(((= (left x) (right x)) true) ((= (left (left x)) leaf) true))\nunsat\nsat\nsat\n",
 	"datatype_constructor_conflict_cores.smt2":     "sat\n((((_ is left) x) true) ((= (lf x) u) true))\nunsat\n(left_fact not_left)\nsat\nunsat\n(left_fact right_fact)\nsat\n",
@@ -962,7 +963,7 @@ func canonicalOutput(text string) string {
 }
 
 func TestSMTLibRunnerProofScript(t *testing.T) {
-	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2", "check_phase_repeated_proof.smt2", "recursive_sum_proof.smt2", "datatype_constructor_conflict_proof.smt2", "string_literal_proof.smt2", "datatype_cycle_proof.smt2", "datatype_update_equality_proof.smt2"} {
+	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2", "check_phase_repeated_proof.smt2", "recursive_sum_proof.smt2", "datatype_constructor_conflict_proof.smt2", "string_literal_proof.smt2", "datatype_cycle_proof.smt2", "datatype_update_equality_proof.smt2", "datatype_metadata_proof.smt2"} {
 		t.Run(name, func(t *testing.T) { testSMTLibProofScript(t, name) })
 	}
 }

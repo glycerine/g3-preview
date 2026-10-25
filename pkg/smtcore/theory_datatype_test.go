@@ -96,7 +96,7 @@ func TestSMTDatatypeRecognizerCases(t *testing.T) {
 	status, err := solver.CheckSat(nil)
 	astTestMust(t, err)
 	theory, _ := solver.kernel.internalizer.theories[family].(*SMTDatatypeTheory)
-	if theory == nil || len(theory.initialized) == 0 {
+	if theory == nil || len(theory.data) == 0 {
 		t.Fatal("datatype value did not receive a theory variable")
 	}
 	if status != lbool.False {

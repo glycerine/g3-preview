@@ -27,33 +27,32 @@ func (t *SMTDatatypeTheory) setDatatypeConflict(literals []SMTLiteral, equalitie
 	return nil
 }
 
-// Source var_data stores this constructor at the datatype union-find root.
-// The Go context already owns the scoped equivalence class, so inspect that
-// class directly and retain its actual constructor enodes as evidence.
+// Source oc_get_cstor looks up the datatype root through the egraph root.
 func (t *SMTDatatypeTheory) classConstructor(node *SMTEnode) (*SMTEnode, error) {
-	if node == nil {
+	if node == nil || node.root == nil {
 		return nil, ast.ErrASTDomain
 	}
-	s, err := t.State()
+	if _, err := t.State(); err != nil {
+		return nil, err
+	}
+	_, data, err := t.rootData(node.root.TheoryVar(t.FamilyID()))
 	if err != nil {
 		return nil, err
 	}
-	var constructor *SMTEnode
-	root := node.root
-	for member := root; ; member = member.next {
-		_, found, err := s.manager.DatatypeConstructorApp(member.owner)
-		if err != nil {
-			return nil, err
-		}
-		if found {
-			if constructor != nil && constructor.declaration != member.declaration {
-				return constructor, t.setDatatypeConflict(nil, []SMTEnodePair{{constructor, member}})
-			}
-			constructor = member
-		}
-		if member.next == root {
-			break
-		}
+	return data.constructor, nil
+}
+
+func (t *SMTDatatypeTheory) signRecognizerConflict(constructor, recognizer *SMTEnode) error {
+	s, err := t.State()
+	if err != nil {
+		return err
 	}
-	return constructor, nil
+	if constructor == nil || recognizer == nil || len(recognizer.arguments) != 1 {
+		return ast.ErrASTDomain
+	}
+	literal, err := s.Literal(recognizer.owner)
+	if err != nil {
+		return err
+	}
+	return t.setDatatypeConflict([]SMTLiteral{literal.Negated()}, []SMTEnodePair{{constructor, recognizer.arguments[0]}})
 }

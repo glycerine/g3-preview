@@ -44,6 +44,7 @@ type smtRelevancyScope struct {
 
 type SMTRelevancyPropagator struct {
 	context       *SMTCheckerContext
+	internalizer  *SMTInternalizerState // borrowed logical-context callback owner
 	enabled       bool
 	relevant      []ast.ASTHandle
 	qhead         int
@@ -122,13 +123,17 @@ func (p *SMTRelevancyPropagator) addLiteralWatch(expression ast.ASTHandle, value
 	return p.addWatch(expression, value, handler)
 }
 
-func (p *SMTRelevancyPropagator) setRelevant(expression ast.ASTHandle) {
+func (p *SMTRelevancyPropagator) setRelevant(expression ast.ASTHandle) error {
 	if p.context.relevant[expression] {
-		return
+		return nil
 	}
 	p.context.relevant[expression] = true
 	p.relevant = append(p.relevant, expression)
 	p.newlyRelevant = append(p.newlyRelevant, expression)
+	if p.internalizer != nil {
+		return p.internalizer.notifyRelevant(expression)
+	}
+	return nil
 }
 
 func (p *SMTRelevancyPropagator) MarkRelevant(expression ast.ASTHandle) error {
@@ -147,13 +152,17 @@ func (p *SMTRelevancyPropagator) MarkRelevant(expression ast.ASTHandle) error {
 			if current == nil || current.owner.IsNull() {
 				return ast.ErrASTDomain
 			}
-			p.setRelevant(current.owner)
+			if err := p.setRelevant(current.owner); err != nil {
+				return err
+			}
 			if current.next == start {
 				break
 			}
 		}
 	} else {
-		p.setRelevant(expression)
+		if err := p.setRelevant(expression); err != nil {
+			return err
+		}
 	}
 	return nil
 }

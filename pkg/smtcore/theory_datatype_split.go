@@ -6,63 +6,23 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-type smtDatatypeRecognizer struct {
-	expression ast.ASTHandle
-	literal    SMTLiteral
-}
-
-func (t *SMTDatatypeTheory) recognizerSlots(value ast.ASTHandle) (map[ast.ASTHandle]smtDatatypeRecognizer, error) {
-	s, err := t.State()
-	if err != nil {
-		return nil, err
-	}
-	node := s.context.enodes[value]
-	if node == nil {
-		return nil, ast.ErrASTDomain
-	}
-	slots := make(map[ast.ASTHandle]smtDatatypeRecognizer)
-	for variable, expression := range s.boolExpr {
-		if expression.IsNull() {
-			continue
-		}
-		op, own, err := t.operation(expression)
-		if err != nil {
-			return nil, err
-		}
-		if !own || op != ast.ASTDatatypeRecognizer && op != ast.ASTDatatypeIs {
-			continue
-		}
-		argument, err := s.manager.GetArg(expression, 0)
-		if err != nil {
-			return nil, err
-		}
-		other := s.context.enodes[argument]
-		if other == nil || other.root != node.root {
-			continue
-		}
-		decl, err := s.manager.GetDecl(expression)
-		if err != nil {
-			return nil, err
-		}
-		constructor, found, err := s.manager.DatatypeRecognizerConstructor(decl)
-		if err != nil {
-			return nil, err
-		}
-		if !found {
-			return nil, ast.ErrASTDomain
-		}
-		if _, exists := slots[constructor]; !exists {
-			slots[constructor] = smtDatatypeRecognizer{expression, NewSMTLiteral(int32(variable), false)}
-		}
-	}
-	return slots, nil
-}
-
 func (t *SMTDatatypeTheory) split(value, sort ast.ASTHandle) error {
 	s, err := t.State()
 	if err != nil {
 		return err
 	}
+	node := s.context.enodes[value]
+	if node == nil {
+		return ast.ErrASTDomain
+	}
+	root, data, err := t.rootData(node.TheoryVar(t.FamilyID()))
+	if err != nil {
+		return err
+	}
+	if data.constructor != nil {
+		return ast.ErrASTDomain
+	}
+	node = t.variables[root]
 	if t.utility == nil {
 		t.utility, err = ast.NewDatatypeUtil(s.manager)
 		if err != nil {
@@ -76,23 +36,28 @@ func (t *SMTDatatypeTheory) split(value, sort ast.ASTHandle) error {
 	if !found {
 		return ast.ErrASTDomain
 	}
-	slots, err := t.recognizerSlots(value)
+	index, found, err := s.manager.DatatypeConstructorIndex(preferred)
 	if err != nil {
 		return err
 	}
+	if !found {
+		return ast.ErrASTDomain
+	}
 	t.statistics.splits++
-	// Existing recognizers are activated or awaited without creating another
-	// split. A false preferred recognizer advances in declaration order.
-	activate := func(slot smtDatatypeRecognizer) (bool, error) {
-		if !s.isRelevant(slot.expression) {
-			return true, s.markRelevant(slot.expression)
+	activate := func(recognizer *SMTEnode) (bool, error) {
+		if !s.isRelevant(recognizer.owner) {
+			return true, s.markRelevant(recognizer.owner)
 		}
-		assignment, err := s.Assignment(slot.literal)
+		literal, err := s.Literal(recognizer.owner)
+		if err != nil {
+			return false, err
+		}
+		assignment, err := s.Assignment(literal)
 		return assignment != lbool.False, err
 	}
 	constructor := preferred
-	if slot, exists := slots[preferred]; exists {
-		stop, err := activate(slot)
+	if len(data.recognizers) > 0 && data.recognizers[index] != nil {
+		stop, err := activate(data.recognizers[index])
 		if err != nil || stop {
 			return err
 		}
@@ -101,13 +66,12 @@ func (t *SMTDatatypeTheory) split(value, sort ast.ASTHandle) error {
 			return err
 		}
 		constructor = ast.ASTHandle{}
-		for _, candidate := range constructors {
-			slot, exists := slots[candidate]
-			if !exists {
-				constructor = candidate
+		for i, recognizer := range data.recognizers {
+			if recognizer == nil {
+				constructor = constructors[i]
 				break
 			}
-			stop, err := activate(slot)
+			stop, err := activate(recognizer)
 			if err != nil || stop {
 				return err
 			}
@@ -116,7 +80,7 @@ func (t *SMTDatatypeTheory) split(value, sort ast.ASTHandle) error {
 			return nil
 		}
 	}
-	literal, expression, err := t.recognizerLiteral(constructor, value)
+	literal, expression, err := t.recognizerLiteral(constructor, node.owner)
 	if err != nil {
 		return err
 	}
@@ -139,6 +103,9 @@ func (t *SMTDatatypeTheory) Close() error {
 	if err := t.findTrail.Reset(); err != nil {
 		return err
 	}
+	t.data = nil
+	t.scopes = nil
+	t.mergeError = nil
 	t.variables = nil
 	t.limits = nil
 	return nil

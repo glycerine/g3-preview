@@ -104,7 +104,7 @@ func TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck(t *testing.T)
 				}
 				for attempt := 0; attempt < 2; attempt++ {
 					astTestMust(t, s.PushScope())
-					reconstructions := len(f.dt.reconstructedTrail)
+					reconstructions := f.dt.statistics.constructorAxioms
 					conflicts := s.statistics.NumConflicts
 					f.assert(t, child)
 					conflict, found := s.Conflict()
@@ -117,7 +117,7 @@ func TestSMTDatatypeConstructorRecognizerConflictsBeforeFinalCheck(t *testing.T)
 						t.Fatal("conflict did not retain source literal/equality evidence", owner)
 					}
 					pair := extended.Equalities[0]
-					if pair.First.owner != f.left || pair.Second.owner != f.x || pair.First.root != pair.Second.root || len(f.dt.reconstructedTrail) != reconstructions || s.statistics.NumConflicts != conflicts+1 {
+					if pair.First.owner != f.left || pair.Second.owner != f.x || pair.First.root != pair.Second.root || f.dt.statistics.constructorAxioms != reconstructions || s.statistics.NumConflicts != conflicts+1 {
 						t.Fatal("conflict reconstructed another constructor or lost its actual class evidence")
 					}
 					status, err := f.k.resolveCheckConflict()
@@ -185,9 +185,9 @@ func TestSMTDatatypeKnownConstructorPositiveRecognizerNeedsNoReconstruction(t *t
 	s := f.k.internalizer
 	expression, err := s.BoolExpression(f.recognizer.Var())
 	astTestMust(t, err)
-	values, reconstructions := len(f.dt.initializedTrail), len(f.dt.reconstructedTrail)
+	values, reconstructions := len(f.dt.data), f.dt.statistics.constructorAxioms
 	f.assert(t, expression)
-	if s.Inconsistent() || len(f.dt.initializedTrail) != values || len(f.dt.reconstructedTrail) != reconstructions {
+	if s.Inconsistent() || len(f.dt.data) != values || f.dt.statistics.constructorAxioms != reconstructions {
 		t.Fatal("known constructor was reconstructed again")
 	}
 	assignment, err := s.Assignment(f.recognizer)

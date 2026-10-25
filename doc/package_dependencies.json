@@ -2731,6 +2731,7 @@
         "theory_datatype.go",
         "theory_datatype_conflicts.go",
         "theory_datatype_equality.go",
+        "theory_datatype_metadata.go",
         "theory_datatype_occurs.go",
         "theory_datatype_recognizers.go",
         "theory_datatype_split.go",

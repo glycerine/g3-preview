@@ -1002,6 +1002,9 @@ func (s *SMTInternalizerState) Close() error {
 	}
 	result = errors.Join(result, s.congruence.Close())
 	if result == nil {
+		if s.relevancy != nil && s.relevancy.internalizer == s {
+			s.relevancy.internalizer = nil
+		}
 		s.closed = true
 		s.theoryRewriter = nil
 		s.context = nil

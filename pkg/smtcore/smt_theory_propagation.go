@@ -194,6 +194,50 @@ func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 	return nil
 }
 
+// Source context::relevant_eh is called by set_relevant immediately,
+// before assignment propagation and at the scope where the mark was made.
+func (s *SMTInternalizerState) notifyRelevant(expression ast.ASTHandle) error {
+	kind, err := s.manager.GetKind(expression)
+	if err != nil {
+		return err
+	}
+	if kind != ast.ASTApp {
+		return nil
+	}
+	if s.quantifierManager != nil {
+		s.quantifierManager.NotifyRelevant(s.context.enodes[expression])
+	}
+	notified := make(map[SMTTheoryID]struct{})
+	family, err := s.manager.GetFamilyID(expression)
+	if err != nil {
+		return err
+	}
+	if family != s.manager.BasicFamilyID() {
+		if plugin := s.theories[family]; plugin != nil {
+			if err = plugin.Relevant(expression); err != nil {
+				return fmt.Errorf("theory %d relevant expression %d: %w", family, expression.Slot(), err)
+			}
+			notified[family] = struct{}{}
+		}
+	}
+	if node := s.context.enodes[expression]; node != nil {
+		for item := &node.theoryVariables; item != nil && item.theory != SMTNullTheoryID; item = item.next {
+			if _, found := notified[item.theory]; found {
+				continue
+			}
+			plugin := s.theories[item.theory]
+			if plugin == nil {
+				return ast.ErrASTDomain
+			}
+			if err = plugin.Relevant(expression); err != nil {
+				return fmt.Errorf("attached theory %d relevant expression %d: %w", item.theory, expression.Slot(), err)
+			}
+			notified[item.theory] = struct{}{}
+		}
+	}
+	return nil
+}
+
 func (s *SMTInternalizerState) propagateTheoryRelevancy() error {
 	if s.relevancy == nil {
 		return nil
@@ -208,37 +252,6 @@ func (s *SMTInternalizerState) propagateTheoryRelevancy() error {
 		}
 		if kind != ast.ASTApp {
 			continue
-		}
-		if s.quantifierManager != nil {
-			s.quantifierManager.NotifyRelevant(s.context.enodes[expression])
-		}
-		notified := make(map[SMTTheoryID]struct{})
-		family, err := s.manager.GetFamilyID(expression)
-		if err != nil {
-			return err
-		}
-		if family != s.manager.BasicFamilyID() {
-			if plugin := s.theories[family]; plugin != nil {
-				if err = plugin.Relevant(expression); err != nil {
-					return fmt.Errorf("theory %d relevant expression %d: %w", family, expression.Slot(), err)
-				}
-				notified[family] = struct{}{}
-			}
-		}
-		if node := s.context.enodes[expression]; node != nil {
-			for item := &node.theoryVariables; item != nil && item.theory != SMTNullTheoryID; item = item.next {
-				if _, found := notified[item.theory]; found {
-					continue
-				}
-				plugin := s.theories[item.theory]
-				if plugin == nil {
-					return ast.ErrASTDomain
-				}
-				if err = plugin.Relevant(expression); err != nil {
-					return fmt.Errorf("attached theory %d relevant expression %d: %w", item.theory, expression.Slot(), err)
-				}
-				notified[item.theory] = struct{}{}
-			}
 		}
 		// Source relevant_eh queues an already assigned atom when it first
 		// becomes relevant. Notify once per assignment and restore on pop.
@@ -277,11 +290,11 @@ func (s *SMTInternalizerState) PropagateCore() (bool, error) {
 			}
 			return consistent, nil
 		}
-		if err = s.PropagateTheoryAssignments(); err != nil {
-			return false, fmt.Errorf("theory assignments: %w", err)
-		}
 		if err = s.propagateTheoryRelevancy(); err != nil {
 			return false, fmt.Errorf("theory relevancy: %w", err)
+		}
+		if err = s.PropagateTheoryAssignments(); err != nil {
+			return false, fmt.Errorf("theory assignments: %w", err)
 		}
 		if err = s.PropagateTheoryEvents(); err != nil {
 			return false, fmt.Errorf("theory events: %w", err)
