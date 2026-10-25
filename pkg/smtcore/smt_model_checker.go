@@ -672,29 +672,56 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 		return false, err
 	}
 	c.exhausted = false
-	found := false
 	if len(quantifiers) != 0 {
 		c.iteration++
 	}
-	for _, quantifier := range quantifiers {
-		remaining := c.maxCexs
-		if remaining == 0 {
-			remaining = 1
-		}
-		added, err := c.checkQuantifier(model, quantifier, &remaining)
-		if err != nil {
-			return false, err
-		}
-		found = found || added
+	found, err := c.checkQuantifiers(model, quantifiers, false)
+	if err != nil {
+		return false, err
 	}
 	c.maxCexs += c.initialMaxCexs
 	if found || c.exhausted {
 		return false, nil
 	}
+	valid, err := c.validateGroundAssignments(model)
+	if err != nil {
+		return false, err
+	}
+	if !valid {
+		_, err := c.checkQuantifiers(model, quantifiers, true)
+		return false, err
+	}
 	if err := model.Cleanup(); err != nil {
 		return false, err
 	}
 	return true, nil
+}
+
+func (c *SMTModelChecker) checkQuantifiers(md *protomodel.ProtoModel, quantifiers []ast.ASTHandle, strict bool) (found bool, err error) {
+	for _, q := range quantifiers {
+		recursive, err := c.manager.IsRecursiveFunctionDefinition(q)
+		if err != nil {
+			return false, err
+		}
+		if recursive {
+			satisfied, err := c.checkRecursiveFunction(md, q, strict)
+			if err != nil {
+				return false, err
+			}
+			found = found || !satisfied
+			continue
+		}
+		remaining := c.maxCexs
+		if remaining == 0 {
+			remaining = 1
+		}
+		added, err := c.checkQuantifier(md, q, &remaining)
+		if err != nil {
+			return false, err
+		}
+		found = found || added
+	}
+	return found, nil
 }
 
 func (c *SMTModelChecker) Close() error {

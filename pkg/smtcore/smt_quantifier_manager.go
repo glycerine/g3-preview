@@ -278,7 +278,14 @@ func (q *SMTQuantifierManager) activatePatterns() error {
 			eagerLimit++
 		}
 		var multipatterns uint32
+		recursive, err := q.state.manager.IsRecursiveFunctionDefinition(quantifier)
+		if err != nil {
+			return err
+		}
 		for i := uint32(0); i < count; i++ {
+			if recursive && i > 0 {
+				continue
+			}
 			pattern, err := q.state.manager.GetPattern(quantifier, i)
 			if err != nil {
 				return err

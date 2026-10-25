@@ -40,6 +40,10 @@ func (c *Context) containsMacro(name string, domain []ast.ASTHandle) bool {
 // DefineFunction installs a nonrecursive SMT-LIB definition. The parser has
 // checked the declared result sort; variables in body use reversed binder order.
 func (c *Context) DefineFunction(name string, domain []ast.ASTHandle, body ast.ASTHandle) error {
+	return c.defineFunction(name, domain, body, false)
+}
+
+func (c *Context) defineFunction(name string, domain []ast.ASTHandle, body ast.ASTHandle, recursiveIdentity bool) error {
 	m, err := c.Manager()
 	if err != nil {
 		return err
@@ -55,6 +59,9 @@ func (c *Context) DefineFunction(name string, domain []ast.ASTHandle, body ast.A
 		return err
 	}
 	for _, d := range c.functions[name] {
+		if recursiveIdentity {
+			break
+		}
 		arity, err := m.GetArity(d)
 		if err != nil {
 			return err

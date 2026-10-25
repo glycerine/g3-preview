@@ -1,0 +1,6 @@
+(set-option :produce-proofs true)
+(set-logic AUFLIA)
+(define-fun-rec sum ((n Int)) Int (ite (<= n 0) 0 (+ n (sum (- n 1)))))
+(assert (not (= (sum 2) 3)))
+(check-sat-using (using-params smt :auto_config false))
+(get-proof)

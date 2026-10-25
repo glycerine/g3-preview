@@ -986,6 +986,9 @@ func (k *SMTKernel) buildGeneratedModel() error {
 	if err != nil {
 		return fail(err)
 	}
+	if err = k.addRecursiveFunctionsToModel(generated.Core()); err != nil {
+		return errors.Join(err, generated.Close(), generator.Close())
+	}
 	if err = generator.Close(); err != nil {
 		return errors.Join(err, generated.Close())
 	}

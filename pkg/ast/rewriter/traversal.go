@@ -167,6 +167,20 @@ func (r *Traversal) Rewrite(t ast.ASTHandle, out ast.ASTRef) error {
 	}
 	return r.engine.Rewrite(t, out)
 }
+
+// EnableModelBooleanShortCircuit avoids evaluating dead recursive model
+// branches after AND/OR already has a determining operand. Ordinary rewriting
+// retains source traversal order; this correction is confined to model use.
+func (r *Traversal) EnableModelBooleanShortCircuit() error {
+	if err := r.engine.open(); err != nil {
+		return err
+	}
+	if r.engine.core.proofGen {
+		return ast.ErrASTDomain
+	}
+	r.engine.modelBooleanShortCircuit = true
+	return nil
+}
 func (r *Traversal) RewriteWithProof(t ast.ASTHandle, out, proof ast.ASTRef) error {
 	if r == nil {
 		return ast.ErrASTHandle

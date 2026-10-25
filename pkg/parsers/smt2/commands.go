@@ -274,6 +274,10 @@ func (p *commandParser) command() (bool, error) {
 		if err := p.defineFunction(name == "define-fun"); err != nil {
 			return false, err
 		}
+	case "define-fun-rec", "define-funs-rec":
+		if err := p.defineRecursiveFunctions(name == "define-funs-rec"); err != nil {
+			return false, err
+		}
 	case "assert":
 		expression, named, err := p.expression()
 		if err != nil {

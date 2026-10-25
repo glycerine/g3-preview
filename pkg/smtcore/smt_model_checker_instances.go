@@ -55,7 +55,13 @@ func (c *SMTModelChecker) enqueueCounterexample(quantifier ast.ASTHandle, values
 	if quantifierGeneration > generation {
 		generation = quantifierGeneration
 	}
-	instance := smtModelCheckerInstance{quantifier: quantifier, bindings: bindings, generation: generation}
+	return c.pinInstance(quantifier, bindings, generation)
+}
+
+// The recursive-definition consumer supplies ground call arguments directly;
+// the auxiliary-model consumer has already recovered and validated its terms.
+func (c *SMTModelChecker) pinInstance(quantifier ast.ASTHandle, bindings []ast.ASTHandle, generation uint32) (bool, error) {
+	instance := smtModelCheckerInstance{quantifier: quantifier, bindings: append([]ast.ASTHandle(nil), bindings...), generation: generation}
 	// Pin all bindings before the quantifier, as the source owner does. Publish
 	// only a complete instance; failed reference construction releases its prefix.
 	for _, expression := range append(append([]ast.ASTHandle(nil), bindings...), quantifier) {

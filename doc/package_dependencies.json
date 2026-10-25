@@ -395,6 +395,7 @@
         "ast_proof_transitivity_trace.go",
         "ast_proof_utils_trace.go",
         "ast_quantifier_unused_vars.go",
+        "ast_recursive_definition.go",
         "ast_ref.go",
         "ast_reg_decl_plugins.go",
         "ast_registered_plugin_memory_trace.go",
@@ -920,6 +921,7 @@
         "function_references.go",
         "macros.go",
         "reason_unknown.go",
+        "recursive_functions.go",
         "results.go",
         "runtime.go",
         "tactic_commands.go"
@@ -2107,6 +2109,7 @@
         "local_sort_names.go",
         "local_sort_stack.go",
         "local_sorted_vars.go",
+        "recursive_functions.go",
         "scanner.go",
         "tactics.go"
       ]
@@ -2572,6 +2575,7 @@
         "smt_boolean_activity.go",
         "smt_boolean_propagation.go",
         "smt_bv_lifecycle.go",
+        "smt_candidate_validation.go",
         "smt_case_split_queue.go",
         "smt_cg_table.go",
         "smt_check.go",
@@ -2646,6 +2650,7 @@
         "smt_quantifier_registry.go",
         "smt_quantifier_stat.go",
         "smt_quick_checker.go",
+        "smt_recursive_functions.go",
         "smt_relevancy.go",
         "smt_relevant_expr.go",
         "smt_restart.go",

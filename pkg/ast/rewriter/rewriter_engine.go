@@ -14,17 +14,18 @@ import (
 // bounded revisit depths and borrowed binding vectors. The core proofGen bit
 // selects the source's proof-generating bookkeeping without changing frames.
 type rewriterEngine struct {
-	self                 *rewriterEngine
-	core                 rewriterCore
-	cfg                  rewriterConfiguration
-	numSteps             uint32
-	bindings             []ast.ASTHandle
-	patterns, noPatterns []ast.ASTHandle
-	shifter, invShifter  variableShifter
-	r, pr, pr2           ast.ASTRef
-	shifts               []uint32
-	header               uint64
-	ready, closed        bool
+	self                     *rewriterEngine
+	core                     rewriterCore
+	cfg                      rewriterConfiguration
+	numSteps                 uint32
+	bindings                 []ast.ASTHandle
+	patterns, noPatterns     []ast.ASTHandle
+	shifter, invShifter      variableShifter
+	r, pr, pr2               ast.ASTRef
+	shifts                   []uint32
+	header                   uint64
+	ready, closed            bool
+	modelBooleanShortCircuit bool
 }
 
 func newRewriterEngine(m *ast.ASTManager, cfg rewriterConfiguration) (*rewriterEngine, error) {
@@ -582,6 +583,30 @@ func (r *rewriterEngine) constantFold(frameIndex int) (bool, error) {
 	c := &r.core
 	m := c.manager
 	fr := c.frames[frameIndex]
+	if r.modelBooleanShortCircuit && fr.index() > 0 {
+		helper := boolRewriter{manager: m}
+		and, err := helper.isOperator(fr.curr, ast.ASTOpAnd)
+		if err != nil {
+			return false, err
+		}
+		or, err := helper.isOperator(fr.curr, ast.ASTOpOr)
+		if err != nil {
+			return false, err
+		}
+		if and || or {
+			value, err := c.resultAt(fr.spos + fr.index() - 1)
+			if err != nil {
+				return false, err
+			}
+			decisive := and && m.IsFalse(value) || or && m.IsTrue(value)
+			if decisive {
+				if err := m.SetRef(r.r, value); err != nil {
+					return false, err
+				}
+				return true, r.finish(fr, false, true)
+			}
+		}
+	}
 	if fr.index() != 1 {
 		return false, nil
 	}

@@ -12763,7 +12763,24 @@
         "pkg/cmd_context/datatype_declarations.go",
         "pkg/parsers/smt2/commands.go",
         "pkg/parsers/smt2/check_logic_test.go",
-        "pkg/ast/ast_decl_parameter_access.go"
+        "pkg/ast/ast_decl_parameter_access.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_instances.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestASTFuncDeclInfoSourceText",
@@ -12914,7 +12931,17 @@
         "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
         "TestLogicCheckerDifferenceTraceAndClosedStream",
         "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
-        "TestSMT2LogicValidationCPP"
+        "TestSMT2LogicValidationCPP",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -13691,6 +13718,43 @@
           ],
           "tests": [
             "TestLogicCheckerTheoryFamiliesAndQuantifierChildren"
+          ]
+        },
+        {
+          "name": "reserved :rec-fun identifier access and recursive-definition quantifier marker detection",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_recursive_definition.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
           ]
         }
       ],
@@ -36099,7 +36163,22 @@
         "pkg/ast/rewriter/rewriter_roots.go",
         "pkg/ast/rewriter/rewriter_roots_test.go",
         "pkg/ast/normal_forms/pull_quant_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_instances.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestBoolRewriterStarOriginalTraversalAndIndependentTruthTables",
@@ -36123,7 +36202,15 @@
         "TestPullQuantProofTraversalPreservesBindersAndMetadata",
         "TestPullNestedQuantifiersRewritesBelowApplications",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -36344,6 +36431,43 @@
             "TestTheoryRewriterProofTraversal",
             "TestDefaultExprReplacerProofOverload"
           ]
+        },
+        {
+          "name": "Go model-evaluation correction for a reproduced old-reference recursive Boolean hang: determining AND/OR operands skip dead branches in model-only non-proof traversal; ordinary/proof rewriting keeps source traversal order",
+          "status": "platform_replacement",
+        "go_target": "pkg/ast/rewriter/rewriter_engine.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -36355,7 +36479,8 @@
         "The public concrete Traversal exposes explicit no-proof and proof-generating constructors through an inline borrowed configuration adapter. MaxStepsExceeded propagates resource errors before testing the source step limit, preserving the model evaluator memory exception call point.",
         "Native rewriter roots: base result/proof stacks, variable-shifter results and lexical quantifier pattern/no-pattern lists now use []ASTHandle. Append acquires one AST reference; shrink/pop retire consumed DEC roots before reporting errors and keep remaining ownership reachable for retry. Replacement retains the incoming alias first. Proof compaction transfers nonnull roots without changing reference counts. Engine fields keep interrupted annotation cleanup reachable through Reset/Cleanup/Close. Removed vector cold records, payload codecs, backing-growth allocation/free events and result-vector input adapters at these callers. Actual traversal/scopes/cache/AST construction and numerical failure behavior remain; no C++ generic container/STL implementation credit is added.",
         "Native rewriter traversal storage: frame/scope records, owning ActivityCache pointer directories and borrowed binding/shift arrays now use ordinary Go slices. Removed manual 3/2 capacity policies, backing reservations/refunds, byte counters, vector-capacity helpers and the cache pointer-append failure owner. Actual cache objects retain their charged constructor/destructor and stopped reference cleanup. Packed frame bitfields, scope restoration, cache reuse, binder ordering and resource/cancellation behavior remain. Native cold frame/scope/binding growth adds no Runtime faultpoints or C++ container/STL implementation credit.",
-        "The release-native definition_coercions.smt2 vector accepts an Int macro argument in a Real binder, but source process_var at line49 asserts exact replacement sort before enclosing-application coercion in debug builds. The runner now checks that exact debug precondition refusal and independently checks the C++ release result, rather than demanding release/debug equivalence in this source-excluded domain."
+        "The release-native definition_coercions.smt2 vector accepts an Int macro argument in a Real binder, but source process_var at line49 asserts exact replacement sort before enclosing-application coercion in debug builds. The runner now checks that exact debug precondition refusal and independently checks the C++ release result, rather than demanding release/debug equivalence in this source-excluded domain.",
+        "The prebuilt C++ 4.7.1 reference and the original Go traversal both hang after SAT on mutual Boolean recursive model values: preprocessing turns the definition ITEs into OR/NOT, then eager evaluation follows an unbounded dead recursive branch. Go model evaluation now short-circuits determining AND/OR operands. This deliberately changes dead-branch model-completion side effects; ordinary rewriting/proof traversal is unchanged. The Boolean CLI regression requires the full native expected output and bounds only that known reference case to two seconds, accepting solely the observed SAT prefix on timeout or a fully agreeing corrected reference. Integer mutual recursion and sum/model/scope/proof scripts retain exact reference checks. No C++ executable was rebuilt."
       ]
     },
     {
@@ -39912,7 +40037,22 @@
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
         "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_instances.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -39964,7 +40104,15 @@
         "TestAUFLIAQICostTraceAndClosedOutput",
         "TestQuantifiedArithmeticTranslatedProofAndCore",
         "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
-        "TestSMTLibRunnerAUFLIAExpressionLimit"
+        "TestSMTLibRunnerAUFLIAExpressionLimit",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -40230,7 +40378,7 @@
           ]
         },
         {
-          "name": "remaining command context: logic validation, parametric sorts/datatypes, recursive definitions, reset, limits, optimization and tactic/extension commands",
+          "name": "remaining command context: logic validation, parametric sorts/datatypes, reset, limits, optimization and tactic/extension commands",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -40561,6 +40709,43 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "insert_rec_fun: published declaration, reversed parameter variables, source identity-variable macro branch, proper-term body restriction, zero-arity equation or weight-zero reserved-QID definition with function/body patterns",
+          "status": "ported",
+        "go_target": "pkg/cmd_context/recursive_functions.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -40601,7 +40786,22 @@
         "pkg/cmd_context/check_logic_test.go",
         "pkg/cmd_context/datatype_declarations.go",
         "pkg/parsers/smt2/check_logic_test.go",
-        "pkg/ast/ast_decl_parameter_access.go"
+        "pkg/ast/ast_decl_parameter_access.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_instances.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestCommandContextScopesDeclarationsAndModel",
@@ -40616,7 +40816,15 @@
         "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
         "TestLogicCheckerDifferenceTraceAndClosedStream",
         "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
-        "TestSMT2LogicValidationCPP"
+        "TestSMT2LogicValidationCPP",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -40710,7 +40918,7 @@
           ]
         },
         {
-          "name": "remaining command context: logic validation, parametric sorts/datatypes, recursive definitions, reset, limits, optimization and tactic/extension commands",
+          "name": "remaining command context: logic validation, parametric sorts/datatypes, reset, limits, optimization and tactic/extension commands",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -40762,6 +40970,43 @@
             "TestLogicCheckerDifferenceTraceAndClosedStream",
             "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
             "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "insert_rec_fun: published declaration, reversed parameter variables, source identity-variable macro branch, proper-term body restriction, zero-arity equation or weight-zero reserved-QID definition with function/body patterns",
+          "status": "ported",
+        "go_target": "pkg/cmd_context/recursive_functions.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
           ]
         }
       ],
@@ -76550,7 +76795,24 @@
         "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
         "pkg/model/model_evaluator_theories_test.go",
         "pkg/model/model_evaluator_params.go",
-        "pkg/model/model_params_test.go"
+        "pkg/model/model_params_test.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_instances.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestModelEvaluatorFPAEqualityAndApplicationReduction",
@@ -76592,7 +76854,17 @@
         "TestModelArrayNativeRootsPartialAppendAndGrowth",
         "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
         "TestModelEvaluatorOriginalTheoryReducerDispatch",
-        "TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence"
+        "TestGeneratedModelParameterFacadesDefaultsSnapshotsAndLocalPrecedence",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerProofScript"
       ],
       "assertions": [
         {
@@ -76631,59 +76903,87 @@
           "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,468,476,482,497 with source SMT2 rendering; release reaches non-ground entry diagnostic, while debug rejects that entry at its source constructor assertion",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
-          "go_targets": ["pkg/model/model_evaluator_array_expansion.go"],
-          "tests": ["TestModelEvaluatorArrayExtractionSourceTrace"]
+          "go_targets": [
+            "pkg/model/model_evaluator_array_expansion.go"
+          ],
+          "tests": [
+            "TestModelEvaluatorArrayExtractionSourceTrace"
+          ]
         },
         {
           "name": "Model evaluator reached TRACE writer refusals retain sticky stream state without stopping evaluation",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
-          "tests": ["TestModelEvaluatorTraceStreamRefusalKeepsEvaluation", "TestModelEvaluatorDirectEntrySourceTrace", "TestModelEvaluatorBooleanReductionSourceStatusTrace"]
+          "tests": [
+            "TestModelEvaluatorTraceStreamRefusalKeepsEvaluation",
+            "TestModelEvaluatorDirectEntrySourceTrace",
+            "TestModelEvaluatorBooleanReductionSourceStatusTrace"
+          ]
         },
         {
           "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
-          "tests": ["TestModelEvaluatorBooleanReductionSourceStatusTrace"]
+          "tests": [
+            "TestModelEvaluatorBooleanReductionSourceStatusTrace"
+          ]
         },
         {
           "name": "Reached model_evaluator::reduce_app label-elimination conditional result CTRACE at model_evaluator.cpp:180-202",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
-          "go_targets": ["pkg/model/model_evaluator_trace.go"],
-          "tests": ["TestModelEvaluatorLabelReductionSourceStatusTrace"]
+          "go_targets": [
+            "pkg/model/model_evaluator_trace.go"
+          ],
+          "tests": [
+            "TestModelEvaluatorLabelReductionSourceStatusTrace"
+          ]
         },
         {
           "name": "Reached model_evaluator::reduce_app array-rewrite conditional result CTRACE at model_evaluator.cpp:169-202",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
-          "go_targets": ["pkg/model/model_evaluator_trace.go"],
-          "tests": ["TestModelEvaluatorArraySelectSourceStatusTrace"]
+          "go_targets": [
+            "pkg/model/model_evaluator_trace.go"
+          ],
+          "tests": [
+            "TestModelEvaluatorArraySelectSourceStatusTrace"
+          ]
         },
         {
           "name": "Reached model_evaluator::reduce_app partial-theory BR_REWRITE_FULL conditional result CTRACE at model_evaluator.cpp:194-202,254-276",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
-          "go_targets": ["pkg/model/model_evaluator_trace.go"],
-          "tests": ["TestModelEvaluatorArrayPartialTheoryGraphCompletion"]
+          "go_targets": [
+            "pkg/model/model_evaluator_trace.go"
+          ],
+          "tests": [
+            "TestModelEvaluatorArrayPartialTheoryGraphCompletion"
+          ]
         },
         {
           "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
-          "tests": ["TestModelEvaluatorDirectEntrySourceTrace"]
+          "tests": [
+            "TestModelEvaluatorDirectEntrySourceTrace"
+          ]
         },
         {
           "name": "Reached model_evaluator::operator()(expr*, expr_ref&) entry TRACE at model_evaluator.cpp:566, with source SMT2 term before traversal",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
-          "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
+          "tests": [
+            "TestModelEvaluatorGetMacroSourceTraceBranches"
+          ]
         },
         {
           "name": "Reached model_evaluator::operator()(expr*) value-returning entry TRACE at model_evaluator.cpp:572 before result-reference construction and the nested output-reference TRACE at 566",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
-          "tests": ["TestModelEvaluatorValueOverloadOwnsResultAndTracesBothEntries"]
+          "tests": [
+            "TestModelEvaluatorValueOverloadOwnsResultAndTracesBothEntries"
+          ]
         },
         {
           "name": "Concrete model_evaluator::imp allocation, cleanup replacement and destructor debug memory records (model_evaluator.cpp:523,556-557,531)",
@@ -76698,7 +76998,9 @@
           "name": "Reached get_macro TRACE records for existing and completion-created function interpretations (model_evaluator.cpp:228,247)",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
-          "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
+          "tests": [
+            "TestModelEvaluatorGetMacroSourceTraceBranches"
+          ]
         },
         {
           "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
@@ -76771,6 +77073,43 @@
             "TestModelEvaluatorBVUnspecifiedConstantLookupAndCompletion",
             "TestModelEvaluatorBVUnspecifiedCompletionEveryReservation"
           ]
+        },
+        {
+          "name": "Go model-evaluation correction for a reproduced old-reference recursive Boolean hang: determining AND/OR operands skip dead branches in model-only non-proof traversal; ordinary/proof rewriting keeps source traversal order",
+          "status": "platform_replacement",
+        "go_target": "pkg/model/model_evaluator.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -76787,7 +77126,8 @@
         "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed.",
         "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage.",
         "The five BV zero-divisor symbols and three arithmetic unspecified symbols follow original plugin-uninterpreted interpretation/completion paths. Arithmetic/BV NUM declarations preserve original BR_FAILED then macro fallback. Registered plugin family tags replace native plugin-pointer dispatch.",
-        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added."
+        "Native model array collections: extracted rows, copies, argument/conjunction roots are []ASTHandle with explicit INC/consumed-DEC cleanup. Row publication transfers ownership; pruning releases one row then shifts slices. Tuple tables use insdict.Dict v0.10.1 with complete ordered handle identities, replacement preserving insertion order, and borrowed rows. Removed simulated vector/hashtable backing, growth/tombstone/rehash faultpoints and unpublished vector-INC receipts. Final unmatched-row constraint order follows dictionary insertion order; source array precedence, groundness/value guards, reconstruction, output prefixes and actual AST/numeral failures remain. Prior storage geometry/failure claims are superseded; no generic C++ container/hash or STL implementation credit is added.",
+        "The prebuilt C++ 4.7.1 reference and the original Go traversal both hang after SAT on mutual Boolean recursive model values: preprocessing turns the definition ITEs into OR/NOT, then eager evaluation follows an unbounded dead recursive branch. Go model evaluation now short-circuits determining AND/OR operands. This deliberately changes dead-branch model-completion side effects; ordinary rewriting/proof traversal is unchanged. The Boolean CLI regression requires the full native expected output and bounds only that known reference case to two seconds, accepting solely the observed SAT prefix on timeout or a fully agreeing corrected reference. Integer mutual recursion and sum/model/scope/proof scripts retain exact reference checks. No C++ executable was rebuilt."
       ]
     },
     {
@@ -89806,7 +90146,23 @@
         "pkg/cmd_context/check_logic_test.go",
         "pkg/cmd_context/applications.go",
         "pkg/parsers/smt2/check_logic_test.go",
-        "pkg/ast/ast_decl_parameter_access.go"
+        "pkg/ast/ast_decl_parameter_access.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_instances.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -89844,7 +90200,15 @@
         "TestLogicCheckerPostorderDifferenceFormsAndFailureAtomicity",
         "TestLogicCheckerDifferenceTraceAndClosedStream",
         "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
-        "TestSMT2LogicValidationCPP"
+        "TestSMT2LogicValidationCPP",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerProofScript"
       ],
       "assertions": [
         {
@@ -90502,7 +90866,7 @@
           ]
         },
         {
-          "name": "remaining parser grammar and command recovery: recursive functions, parametric datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
+          "name": "remaining parser grammar and command recovery: parametric datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -90657,6 +91021,43 @@
             "TestLogicCheckerDifferenceTraceAndClosedStream",
             "TestLogicCheckerTheoryFamiliesAndQuantifierChildren",
             "TestSMT2LogicValidationCPP"
+          ]
+        },
+        {
+          "name": "parse_define_fun_rec and parse_define_funs_rec: declare before body, mutual forward declarations, sorted local binder scopes, body sort/proper-term validation, count and syntax guards, retained declaration prefix after body failure",
+          "status": "ported",
+        "go_target": "pkg/parsers/smt2/recursive_functions.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
           ]
         }
       ],
@@ -113948,7 +114349,20 @@
         "pkg/smtcore/smt_model_checker_inverse_test.go",
         "pkg/smtcore/smt_model_checker_test.go",
         "pkg/smtcore/smt_model_checker_budget_test.go",
-        "pkg/smtcore/smt_model_finder_flatten_test.go"
+        "pkg/smtcore/smt_model_finder_flatten_test.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -114055,7 +114469,14 @@
         "TestSMTModelCheckerInversePreservesGenerationBeforeFingerprintCanonicalization",
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
         "TestSMTModelCheckerCounterexampleCapAppliesToEveryQuantifier",
-        "TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal"
+        "TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation"
       ],
       "conditionals": [
         {
@@ -115464,6 +115885,43 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "add_rec_funs_to_model after finalization: source counted cancellation scan, reserved marker and two-pattern extraction, declaration-order to function-interpretation variable reversal, recursive else-body registration and owned cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_recursive_functions.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -115538,7 +115996,20 @@
         "pkg/smtcore/smt_model_checker_inverse_test.go",
         "pkg/smtcore/smt_model_checker_test.go",
         "pkg/smtcore/smt_model_checker_budget_test.go",
-        "pkg/smtcore/smt_model_finder_flatten_test.go"
+        "pkg/smtcore/smt_model_finder_flatten_test.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -115597,7 +116068,14 @@
         "TestSMTModelCheckerInversePreservesGenerationBeforeFingerprintCanonicalization",
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
         "TestSMTModelCheckerCounterexampleCapAppliesToEveryQuantifier",
-        "TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal"
+        "TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation"
       ],
       "conditionals": [
         {
@@ -116019,6 +116497,43 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "add_rec_funs_to_model after finalization: source counted cancellation scan, reserved marker and two-pattern extraction, declaration-order to function-interpretation variable reversal, recursive else-body registration and owned cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_recursive_functions.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -116040,14 +116555,42 @@
       "path": "src/smt/smt_context_inv.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_context_invariant.go",
-        "pkg/smtcore/smt_context_invariant_test.go"
+        "pkg/smtcore/smt_context_invariant_test.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_instances.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTContextInvariantWatchesAssignmentsAndJustifications",
-        "TestSMTContextInvariantDetectsInvalidClauseJustification"
+        "TestSMTContextInvariantDetectsInvalidClauseJustification",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -116186,15 +116729,58 @@
           ]
         },
         {
-          "name": "Debug-only missing-propagation, relevancy and theory-disequality audits plus model and unsat-core validation (src/smt/smt_context_inv.cpp:158-287,315-403,418-487)",
+          "name": "Debug-only missing-propagation, relevancy and theory-disequality audits (source guarded sections)",
           "status": "reference_only"
+        },
+        {
+          "name": "runtime optional core_validate re-solving of current assertions and the unsat core",
+          "status": "unported",
+          "tests": []
+        },
+        {
+          "name": "validate_model over relevant ground assignments: skip recursive-definition quantifiers, accept unavailable/unknown evaluation, reject Boolean values opposite to literal assignment and trigger strict recursive checking",
+          "status": "ported",
+        "go_target": "pkg/smtcore/smt_candidate_validation.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
         "Invariant checks borrow the internalizer-owned slices, clauses, enodes, congruence table and checker-context maps without retaining them."
       ],
       "deviations": [
-        "Source assertion failures return ast.ErrASTDomain. Go validates every live ordinary clause because it does not split clauses into native auxiliary and lemma vectors. The remaining source routines are Z3DEBUG-only cross-component audits; retained propagation, relevancy, model, disequality and unsat-core paths validate their own invariants and tests instead of duplicating one monolithic sweep."
+        "Source assertion failures return ast.ErrASTDomain. Go validates every live ordinary clause because it does not split clauses into native auxiliary and lemma vectors. The remaining source routines are Z3DEBUG-only cross-component audits; retained propagation, relevancy, model, disequality and unsat-core paths validate their own invariants and tests instead of duplicating one monolithic sweep.",
+        "Earlier metadata incorrectly grouped model and unsat-core validation under debug-only reference code. Both source methods are outside the Z3DEBUG guard. Ground candidate-model validation is now implemented; live core.validate re-solving remains unported, so this unit is partial."
       ]
     },
     {
@@ -118628,7 +119214,20 @@
         "pkg/smtcore/smt_restart.go",
         "pkg/smtcore/smt_model_checker_instances_test.go",
         "pkg/smtcore/smt_model_checker_test.go",
-        "pkg/smtcore/smt_model_finder_flatten_test.go"
+        "pkg/smtcore/smt_model_finder_flatten_test.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -118656,7 +119255,15 @@
         "TestSMTModelCheckerCaptureUsesInverseGenerationRatherThanEnodeGeneration",
         "TestSMTModelCheckerPinnedInstanceAllocationFrontiers",
         "TestSMTMBQICounterexamplesPublishAfterForcedBaseRestart",
-        "TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal"
+        "TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerProofScript"
       ],
       "assertions": [
         {
@@ -118740,9 +119347,40 @@
         },
         {
           "name": "recursive-function checking",
-          "status": "unported",
+          "status": "ported",
           "go_target": null,
-          "tests": []
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ],
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ]
         },
         {
           "name": "candidate compression before checking, cleanup only after success, and rejection of unresolved finite evaluations",
@@ -118860,6 +119498,43 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "check_rec_fun over relevant function enodes, standard-order argument substitution, source non-strict false/strict non-true rejection, direct generation-zero pinned instance, and strict recheck after ground candidate validation failure",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_recursive_functions.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -118868,7 +119543,7 @@
         "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close."
       ],
       "deviations": [
-        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in a fresh solver using the parent logic and parameter services. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; new instance expressions are pinned until restart, then surviving quantifiers and reinternalized bindings enter the ordinary registry queue; duplicate filtering occurs at that source publication boundary. Recursive-function checking remains open, pending a retained recursive-function producer."
+        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in a fresh solver using the parent logic and parameter services. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; new instance expressions are pinned until restart, then surviving quantifiers and reinternalized bindings enter the ordinary registry queue; duplicate filtering occurs at that source publication boundary. Recursive-function checking now consumes the reserved marker emitted by the command context; the remaining class/diagnostic audit is separate."
       ]
     },
     {
@@ -118888,7 +119563,21 @@
         "pkg/smtcore/smt_model_checker_test.go",
         "pkg/smtcore/smt_model_checker_budget_test.go",
         "pkg/smtcore/smt_model_finder_flatten_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_kernel.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -118909,7 +119598,15 @@
         "TestSMTModelCheckerCounterexampleCapAppliesToEveryQuantifier",
         "TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -118982,6 +119679,43 @@
             "TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "check_rec_fun over relevant function enodes, standard-order argument substitution, source non-strict false/strict non-true rejection, direct generation-zero pinned instance, and strict recheck after ground candidate validation failure",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_recursive_functions.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
           ]
         }
       ],
@@ -120245,7 +120979,20 @@
         "pkg/smtcore/smt_equality_propagation.go",
         "pkg/smtcore/theory_arith_shared.go",
         "pkg/smtcore/theory_array_shared.go",
-        "pkg/smtcore/smt_lazy_mam_test.go"
+        "pkg/smtcore/smt_lazy_mam_test.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go"
       ],
       "tests": [
         "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
@@ -120287,7 +121034,15 @@
         "TestSMTLazyMatchingCounterTrailsIncrementsAcrossSearchReset",
         "TestSMTLazyInstantiationControlsNonFullPreflight",
         "TestSMTLazyPatternsRestoreScopesAndContributeSharedGroundTerms",
-        "TestSMTKernelUpdatesLiveMultipatternControls"
+        "TestSMTKernelUpdatesLiveMultipatternControls",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerProofScript"
       ],
       "assertions": [
         {
@@ -120520,6 +121275,43 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "reserved recursive-definition assignment installs only the first function trigger, excluding the secondary body trigger while preserving ordinary eager/lazy partitions",
+          "status": "ported",
+        "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -120533,8 +121325,8 @@
         "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Finite MBQI uses a concrete Go model checker, honors mbqi.id prefixes, and resets and grows the source counterexample and iteration limits on each search. Auxiliary-solver checking and full model-finder adjustment remain open.",
         "The concrete matcher observes newly internalized unmarked terms when relevancy is disabled, including equal-length replacement scopes. Source instruction-tree optimizations remain represented by the existing direct typed matcher. Quantified E-matching saturation does not itself authorize SAT; the search boundary requires a model accepted by the quantifier checker.",
         "Core solver updates now follow source use_ematching, m_qi_max_instances and final_check_eh lazy-threshold reads. Tests exercise disabled/enabled matching across repeated contradictory child scopes, preserve the source strict-greater-than instance limit, release a previously delayed instance after a lazy-threshold update, and demonstrate that eager threshold and parsed cost remain constructor-cached. The C++ command-line tactic wrapper retains initial E-matching settings in the live-toggle experiment, so these core API update checks are kept separate from the 92 strict runner comparisons; full tactic-wrapper parameter lifecycle remains outside this increment.",
-        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. Retained eager/lazy multipattern partitioning, bounded rematches and scope trails are now implemented; recursive-function-specific pattern selection and remaining lifecycle/diagnostic consumers still need audit.",
-        "The default plugin owns two concrete SMTMAM instances. Unary triggers are eager; multipatterns use the live qi.max_multi_patterns limit plus one extra eager slot when no unary trigger exists. Deferred patterns match only in bounded final-check rematches, and their dirty flag does not itself request ordinary propagation. Lazy-index increments are individually trailed; init_search resets the current index without replacing scope trails. The source instruction-tree/indexing optimizations remain represented by the existing typed exhaustive matcher. Recursive-function definition trigger filtering awaits its concrete retained producer and is not claimed complete."
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. Retained eager/lazy multipattern partitioning, bounded rematches and scope trails are now implemented; recursive-definition first-trigger selection is now implemented; remaining lifecycle/diagnostic consumers still need audit.",
+        "The default plugin owns two concrete SMTMAM instances. Unary triggers are eager; multipatterns use the live qi.max_multi_patterns limit plus one extra eager slot when no unary trigger exists. Deferred patterns match only in bounded final-check rematches, and their dirty flag does not itself request ordinary propagation. Lazy-index increments are individually trailed; init_search resets the current index without replacing scope trails. The source instruction-tree/indexing optimizations remain represented by the existing typed exhaustive matcher. Recursive-function definitions now have their concrete parser/context producer and select only the first function trigger."
       ]
     },
     {
@@ -120565,7 +121357,20 @@
         "pkg/smtcore/smt_equality_propagation.go",
         "pkg/smtcore/theory_arith_shared.go",
         "pkg/smtcore/theory_array_shared.go",
-        "pkg/smtcore/smt_lazy_mam_test.go"
+        "pkg/smtcore/smt_lazy_mam_test.go",
+        "pkg/ast/ast_recursive_definition.go",
+        "pkg/ast/rewriter/rewriter_engine.go",
+        "pkg/ast/rewriter/traversal.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/cmd_context/recursive_functions.go",
+        "pkg/cmd_context/macros.go",
+        "pkg/cmd_context/recursive_functions_test.go",
+        "pkg/parsers/smt2/recursive_functions.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/recursive_functions_test.go",
+        "pkg/smtcore/smt_recursive_functions.go",
+        "pkg/smtcore/smt_recursive_functions_test.go",
+        "pkg/smtcore/smt_candidate_validation.go"
       ],
       "tests": [
         "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
@@ -120601,7 +121406,15 @@
         "TestSMTLazyMatchingCounterTrailsIncrementsAcrossSearchReset",
         "TestSMTLazyInstantiationControlsNonFullPreflight",
         "TestSMTLazyPatternsRestoreScopesAndContributeSharedGroundTerms",
-        "TestSMTKernelUpdatesLiveMultipatternControls"
+        "TestSMTKernelUpdatesLiveMultipatternControls",
+        "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+        "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+        "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+        "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+        "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+        "TestSMTRecursiveModelPublicationAllocationFrontiers",
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTLibRunnerProofScript"
       ],
       "conditionals": [
         {
@@ -120770,6 +121583,43 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "reserved recursive-definition assignment installs only the first function trigger, excluding the secondary body trigger while preserving ordinary eager/lazy partitions",
+          "status": "ported",
+        "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "go_targets": [
+            "pkg/ast/ast_recursive_definition.go",
+            "pkg/ast/rewriter/rewriter_engine.go",
+            "pkg/ast/rewriter/traversal.go",
+            "pkg/model/model_evaluator.go",
+            "pkg/cmd_context/recursive_functions.go",
+            "pkg/cmd_context/macros.go",
+            "pkg/cmd_context/recursive_functions_test.go",
+            "pkg/parsers/smt2/recursive_functions.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/recursive_functions_test.go",
+            "pkg/smtcore/smt_recursive_functions.go",
+            "pkg/smtcore/smt_recursive_functions_test.go",
+            "pkg/smtcore/smt_candidate_validation.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestCommandContextRecursiveDefinitionsPreserveMarkerPatternsAndIdentity",
+            "TestCommandContextRecursiveDefinitionAllocationFrontiers",
+            "TestSMT2RecursiveDefinitionsKeepDeclarationsAfterBodyErrors",
+            "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTRecursiveModelPublicationAllocationFrontiers",
+            "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerProofScript"
+          ]
         }
       ],
       "ownership": [
@@ -120777,8 +121627,8 @@
       ],
       "deviations": [
         "The abstract C++ plugin surface is not reproduced as a universal adapter; retained MAM and MBQI behavior will use concrete typed Go components.",
-        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. Retained eager/lazy multipattern partitioning, bounded rematches and scope trails are now implemented; recursive-function-specific pattern selection and remaining lifecycle/diagnostic consumers still need audit.",
-        "The default plugin owns two concrete SMTMAM instances. Unary triggers are eager; multipatterns use the live qi.max_multi_patterns limit plus one extra eager slot when no unary trigger exists. Deferred patterns match only in bounded final-check rematches, and their dirty flag does not itself request ordinary propagation. Lazy-index increments are individually trailed; init_search resets the current index without replacing scope trails. The source instruction-tree/indexing optimizations remain represented by the existing typed exhaustive matcher. Recursive-function definition trigger filtering awaits its concrete retained producer and is not claimed complete."
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. Retained eager/lazy multipattern partitioning, bounded rematches and scope trails are now implemented; recursive-definition first-trigger selection is now implemented; remaining lifecycle/diagnostic consumers still need audit.",
+        "The default plugin owns two concrete SMTMAM instances. Unary triggers are eager; multipatterns use the live qi.max_multi_patterns limit plus one extra eager slot when no unary trigger exists. Deferred patterns match only in bounded final-check rematches, and their dirty flag does not itself request ordinary propagation. Lazy-index increments are individually trailed; init_search resets the current index without replacing scope trails. The source instruction-tree/indexing optimizations remain represented by the existing typed exhaustive matcher. Recursive-function definitions now have their concrete parser/context producer and select only the first function trigger."
       ]
     },
     {
