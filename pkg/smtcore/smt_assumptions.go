@@ -55,6 +55,9 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 	if k.internalizer.Inconsistent() {
 		return lbool.False, nil
 	}
+	if err := k.configureCheck(false); err != nil {
+		return lbool.Undef, err
+	}
 	for index, assumption := range assumptions {
 		valid, err := k.validAssumption(assumption)
 		if err != nil {
@@ -64,7 +67,7 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 			return lbool.Undef, fmt.Errorf("assumption %d: %w", index, ast.ErrASTDomain)
 		}
 	}
-	if err := k.prepareCheck(); err != nil {
+	if err := k.internalizeCheckAssertions(); err != nil {
 		return lbool.Undef, err
 	}
 	if k.assertedFormulasInconsistent() {

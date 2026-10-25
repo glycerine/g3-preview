@@ -55,7 +55,7 @@ func TestSMTBasicArithmeticModesBeforeFirstBoundary(t *testing.T) {
 					if push {
 						astTestMust(t, solver.Push())
 					}
-					status, err := solver.CheckSat(nil)
+					status, err := smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if mode == 0 {
 						if status != lbool.Undef {
@@ -121,13 +121,13 @@ func TestSMTBasicArithmeticModesBeforeFirstBoundary(t *testing.T) {
 					conflict, err := m.MkFamilyApp(family, smtArithOpLE, nil, []ast.ASTHandle{x, zero})
 					astTestMust(t, err)
 					astTestMust(t, solver.Assert(conflict))
-					status, err = solver.CheckSat(nil)
+					status, err = smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.False {
 						t.Fatal("basic backend child contradiction", status)
 					}
 					astTestMust(t, solver.Pop(1))
-					status, err = solver.CheckSat(nil)
+					status, err = smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.True {
 						t.Fatal("basic backend parent recovery", status)
@@ -164,7 +164,7 @@ func TestSMTBasicArithmeticSeesPreSetupParameterUpdate(t *testing.T) {
 	equality, err := m.MkEq(x, zero)
 	astTestMust(t, err)
 	astTestMust(t, solver.Assert(equality))
-	status, err := solver.CheckSat(nil)
+	status, err := smtSetupProfileCheck(solver)
 	astTestMust(t, err)
 	family, err := m.ArithmeticFamilyID()
 	astTestMust(t, err)

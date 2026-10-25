@@ -48,7 +48,7 @@ func TestSMTArrayLogicSetupStaticAndFirstPushProfiles(t *testing.T) {
 				if profile == "first-push" {
 					astTestMust(t, solver.Push())
 				}
-				status, err := solver.CheckSat(nil)
+				status, err := smtSetupProfileCheck(solver)
 				astTestMust(t, err)
 				if status != lbool.True {
 					t.Fatal("array setup changed satisfiability", status)
@@ -103,7 +103,7 @@ func TestSMTQFAUFLIAStaticSetupRejectsRealSorts(t *testing.T) {
 	formula, err := m.MkFamilyApp(family, smtArithOpGE, nil, []ast.ASTHandle{x, zero})
 	astTestMust(t, err)
 	astTestMust(t, solver.Assert(formula))
-	_, err = solver.CheckSat(nil)
+	_, err = smtSetupProfileCheck(solver)
 	if err == nil || !strings.Contains(err.Error(), "real variables") || solver.kernel.preprocessingSetupDone {
 		t.Fatal("QF_AUFLIA feature validation did not reject real arithmetic", err)
 	}

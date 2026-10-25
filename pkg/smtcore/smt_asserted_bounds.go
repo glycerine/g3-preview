@@ -11,8 +11,8 @@ import (
 )
 
 // Source setup_AUFLIA / setup_AUFLIRA enable this hidden preprocessor field.
-// A first push selects CFG_LOGIC; a first check uses static quantifier features
-// for setup_unknown. Other setup tuning remains in the ongoing setup port.
+// Ordinary checks and push select CFG_LOGIC. A fresh tactic's SetupAndCheck
+// selects static formula features for automatic setup_unknown.
 func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 	if k.preprocessingSetupDone || k.smtParams == nil {
 		return nil

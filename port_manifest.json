@@ -113850,7 +113850,10 @@
         "pkg/smtcore/smt_asserted_reduce.go",
         "pkg/smtcore/smt_asserted_substitution_test.go",
         "pkg/smtcore/smt_check.go",
-        "pkg/smtcore/smt_check_phases_test.go"
+        "pkg/smtcore/smt_check_phases_test.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_tactic_impl.go",
+        "pkg/smtcore/smt_setup_check_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -113935,7 +113938,11 @@
         "TestSMTCheckAssumptionsResolveBeforeSearchAndInitializeAfterAssumptions",
         "TestSMTCheckFinalSATCancellationBecomesUnknown",
         "TestSMTCheckFinalizesBeforeNativeAssumptionCleanup",
-        "TestSMTCheckBaseConflictAllocationFrontiers"
+        "TestSMTCheckBaseConflictAllocationFrontiers",
+        "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+        "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+        "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization"
       ],
       "conditionals": [
         {
@@ -115263,6 +115270,28 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "retained setup/check entry separation: fresh scope-zero setup_and_check selects static features without incrementing regular check statistics; Check and CheckAssumptions use logic-only setup, and assumption validation occurs after setup but before assertion internalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_check.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_setup_check_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+            "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+            "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+            "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -115291,7 +115320,8 @@
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
         "With auto_config=false and MBQI disabled, the transitive-relation runner regression now agrees with C++ on UNKNOWN, UNSAT after grounded contradictory facts, then UNKNOWN after pop. The no-preprocessing solver regression additionally verifies incomplete-quantifier failure reporting and repeated scoped E-matching refutations.",
-        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. Complete setup_and_check orchestration, theory-assumption hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles."
+        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
+        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend."
       ]
     },
     {
@@ -115320,7 +115350,10 @@
         "pkg/smtcore/smt_asserted_reduce.go",
         "pkg/smtcore/smt_asserted_substitution_test.go",
         "pkg/smtcore/smt_check.go",
-        "pkg/smtcore/smt_check_phases_test.go"
+        "pkg/smtcore/smt_check_phases_test.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_tactic_impl.go",
+        "pkg/smtcore/smt_setup_check_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -115357,7 +115390,11 @@
         "TestSMTCheckAssumptionsResolveBeforeSearchAndInitializeAfterAssumptions",
         "TestSMTCheckFinalSATCancellationBecomesUnknown",
         "TestSMTCheckFinalizesBeforeNativeAssumptionCleanup",
-        "TestSMTCheckBaseConflictAllocationFrontiers"
+        "TestSMTCheckBaseConflictAllocationFrontiers",
+        "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+        "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+        "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization"
       ],
       "conditionals": [
         {
@@ -115698,6 +115735,28 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "retained setup/check entry separation: fresh scope-zero setup_and_check selects static features without incrementing regular check statistics; Check and CheckAssumptions use logic-only setup, and assumption validation occurs after setup but before assertion internalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_check.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_setup_check_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+            "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+            "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+            "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -115710,7 +115769,8 @@
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
-        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. Complete setup_and_check orchestration, theory-assumption hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles."
+        "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
+        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend."
       ]
     },
     {
@@ -117700,7 +117760,11 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_relevancy.go",
         "pkg/parsers/smt2/commands_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_check.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_tactic_impl.go",
+        "pkg/smtcore/smt_setup_check_test.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -117725,7 +117789,13 @@
         "TestSMT2RelevancyUpdatesRestoreCachedBooleanAndTermITEWatches",
         "TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect",
         "TestSMTQuantifiedSearchRequiresModelValidation",
-        "TestSMTQuantifierLiveParamsPreservePendingAndConstructorCaches"
+        "TestSMTQuantifierLiveParamsPreservePendingAndConstructorCaches",
+        "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+        "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+        "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -117898,6 +117968,28 @@
             "TestSMTQuantifierLiveParamsPreservePendingAndConstructorCaches",
             "TestSMTQuantifiedSearchRequiresModelValidation"
           ]
+        },
+        {
+          "name": "retained setup/check entry separation: fresh scope-zero setup_and_check selects static features without incrementing regular check statistics; Check and CheckAssumptions use logic-only setup, and assumption validation occurs after setup but before assertion internalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_check.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_setup_check_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+            "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+            "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+            "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -117925,7 +118017,12 @@
         "pkg/smtcore/smt_assumptions.go",
         "pkg/smtcore/smt_search.go",
         "pkg/smtcore/smt_kernel_results.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_check.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_tactic_impl.go",
+        "pkg/smtcore/smt_setup_check_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -117945,7 +118042,13 @@
         "TestSMTSolverDerivesBooleanConsequences",
         "TestSMTSolverFindsBinaryClauseMutexes",
         "TestSMTSolverTranslatesBaseKernelAndTrackedAssertions",
-        "TestSMTSolverPreferredSATReturnsConflictingPreferenceCores"
+        "TestSMTSolverPreferredSATReturnsConflictingPreferenceCores",
+        "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+        "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+        "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -118080,6 +118183,28 @@
           "status": "dead_deleted",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "retained setup/check entry separation: fresh scope-zero setup_and_check selects static features without incrementing regular check statistics; Check and CheckAssumptions use logic-only setup, and assumption validation occurs after setup but before assertion internalization",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_check.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_setup_check_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+            "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+            "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+            "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -120525,7 +120650,12 @@
         "pkg/smtcore/theory_dense_diff_logic.go",
         "pkg/smtcore/theory_dense_diff_logic_test.go",
         "pkg/smtcore/smt_setup_rdl_test.go",
-        "pkg/smtcore/smt_setup_ufidl_test.go"
+        "pkg/smtcore/smt_setup_ufidl_test.go",
+        "pkg/smtcore/smt_check.go",
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_tactic_impl.go",
+        "pkg/smtcore/smt_setup_check_test.go"
       ],
       "tests": [
         "TestSMTArraySharedRolesAndScopedInterfaceEqualities",
@@ -120585,7 +120715,11 @@
         "TestSMTRDLSetupSelectsConcreteBackend",
         "TestSMTRDLStaticSetupRejectsWrongFeatures",
         "TestSMTUFIDLSetupProfilesAndBackends",
-        "TestSMTUFIDLStaticValidationMatchesSource"
+        "TestSMTUFIDLStaticValidationMatchesSource",
+        "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+        "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+        "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization"
       ],
       "assertions": [
         {
@@ -120962,6 +121096,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "CFG_AUTO static features are selected by the fresh tactic setup_and_check entry; regular check and push select CFG_LOGIC, with CFG_BASIC when auto_config is disabled",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_check.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_setup_check_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+            "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+            "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+            "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -120991,14 +121147,15 @@
         "The QF_LIA setup policy now includes both retained overloads, with static-feature depth >50, unit-only input, clausal restart/phase settings and the CNF unit/binary constant-sum >100000 guard. The first push selects the logic-only overload and prevents later feature reclassification; auto_config=false bypasses this tuning. Manual Euclidean, Gomory and equality-branch tests explicitly disable automatic setup before setting their own theory controls. The 52-level ITE runner regression preserves SAT model values and a scoped UNSAT refutation in 93 exact C++ script comparisons. Other logic profiles, backend-selection policies and full automatic configuration remain partial.",
         "The retained QF_LRA logic and feature policy now follows both source overloads. Tests cover each rational threshold independently, the exact numerator boundary, CNF/non-CNF inputs, first-push logic mode and disabled automatic configuration. The decimal 3906.255859375 exercises reduced numerator 2000003 and denominator 512 in a scoped SAT/model/UNSAT C++ comparison, bringing strict runner comparisons to 94. Remaining automatic backend selection and other logic profiles remain partial.",
         "QF_UF and QF_UFLRA simple setup policy now follows retained source bodies, with permanent first-boundary selection and auto_config=false bypass. NNF and relevance-model fixtures disable automatic setup when testing their explicit controls. All 94 strict C++ runner comparisons remain enabled. Other logic profiles, automatic theory/backend selection and string-theory routing remain incomplete.",
-        "The retained QF_AX and QF_AUFLIA setup policies now distinguish the logic-only first-push path from feature-dependent first checking. QF_AUFLIA unit-only input preserves the existing restart strategy/factor, while clausal input selects geometric restart factor 1.5 and zero initial activity. QF_DT applies the shared UF setup without the QF_UF arithmetic-validation overload, alongside its existing concrete datatype registration. Explicit relevance-mode tests disable automatic setup to retain their chosen controls. A QF_AX unit-profile array-model scope regression raises the strict C++ runner set to 96; other backend-selection and logic-profile work remains partial.",
+        "The retained QF_AX and QF_AUFLIA setup policies now distinguish the logic-only first-push path from feature-dependent fresh-tactic setup_and_check. QF_AUFLIA unit-only input preserves the existing restart strategy/factor, while clausal input selects geometric restart factor 1.5 and zero initial activity. QF_DT applies the shared UF setup without the QF_UF arithmetic-validation overload, alongside its existing concrete datatype registration. Explicit relevance-mode tests disable automatic setup to retain their chosen controls. A QF_AX unit-profile array-model scope regression raises the strict C++ runner set to 96; other backend-selection and logic-profile work remains partial.",
         "Quantified logic scalar policies now cover AUFLIA, AUFLIRA, UFNIA, AUFNIRA, their retained aliases, UFLRA and quantified unknown-logic classification. Static features deliberately skip bound variables as in the source. The mixed quantified automatic-profile runner restores SAT/model/UNSAT scope behavior with initially disabled MBQI and E-matching, bringing strict C++ script comparisons to 97. Backend selection, remaining logic profiles and string-theory routing remain incomplete.",
-        "LRA now preserves NNF/CNF and Eq2Ineq settings while applying its own source profile. First-push, first-check, disabled automatic setup, scoped contradiction and pop recovery are covered. LRA and UFLRA now instantiate mixed rather than real-only arithmetic as their source setup requires. A term-ITE SAT/model/UNSAT/pop script brings strict C++ comparisons to 98. Other arithmetic backend modes and automatic feature selection remain incomplete.",
-        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
-        "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based first-check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. The initial increment retained integer simplex for the dense branch; the subsequent concrete dense integration is recorded below. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial.",
+        "LRA now preserves NNF/CNF and Eq2Ineq settings while applying its own source profile. First-push, fresh static setup_and_check, disabled automatic setup, scoped contradiction and pop recovery are covered. LRA and UFLRA now instantiate mixed rather than real-only arithmetic as their source setup requires. A term-ITE SAT/model/UNSAT/pop script brings strict C++ comparisons to 98. Other arithmetic backend modes and automatic feature selection remain incomplete.",
+        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, fresh static setup_and_check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
+        "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based fresh static setup_and_check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. The initial increment retained integer simplex for the dense branch; the subsequent concrete dense integration is recorded below. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
+        "Earlier profile tests entered feature setup through ordinary CheckSat. They now explicitly use the fresh setup_and_check entry before later incremental checks; expectations for backend selection and parameter owners are unchanged. New regressions independently require logic-only policy for ordinary zero-assumption checks and static policy for fresh no-assumption tactics."
       ]
     },
     {
@@ -121049,7 +121206,12 @@
         "pkg/smtcore/theory_dense_diff_logic.go",
         "pkg/smtcore/theory_dense_diff_logic_test.go",
         "pkg/smtcore/smt_setup_rdl_test.go",
-        "pkg/smtcore/smt_setup_ufidl_test.go"
+        "pkg/smtcore/smt_setup_ufidl_test.go",
+        "pkg/smtcore/smt_check.go",
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_tactic_impl.go",
+        "pkg/smtcore/smt_setup_check_test.go"
       ],
       "tests": [
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
@@ -121092,7 +121254,11 @@
         "TestSMTRDLSetupSelectsConcreteBackend",
         "TestSMTRDLStaticSetupRejectsWrongFeatures",
         "TestSMTUFIDLSetupProfilesAndBackends",
-        "TestSMTUFIDLStaticValidationMatchesSource"
+        "TestSMTUFIDLStaticValidationMatchesSource",
+        "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+        "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+        "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization"
       ],
       "conditionals": [
         {
@@ -121379,6 +121545,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "CFG_AUTO static features are selected by the fresh tactic setup_and_check entry; regular check and push select CFG_LOGIC, with CFG_BASIC when auto_config is disabled",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_check.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_setup_check_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+            "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+            "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+            "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -121405,14 +121593,15 @@
         "The QF_LIA setup policy now includes both retained overloads, with static-feature depth >50, unit-only input, clausal restart/phase settings and the CNF unit/binary constant-sum >100000 guard. The first push selects the logic-only overload and prevents later feature reclassification; auto_config=false bypasses this tuning. Manual Euclidean, Gomory and equality-branch tests explicitly disable automatic setup before setting their own theory controls. The 52-level ITE runner regression preserves SAT model values and a scoped UNSAT refutation in 93 exact C++ script comparisons. Other logic profiles, backend-selection policies and full automatic configuration remain partial.",
         "The retained QF_LRA logic and feature policy now follows both source overloads. Tests cover each rational threshold independently, the exact numerator boundary, CNF/non-CNF inputs, first-push logic mode and disabled automatic configuration. The decimal 3906.255859375 exercises reduced numerator 2000003 and denominator 512 in a scoped SAT/model/UNSAT C++ comparison, bringing strict runner comparisons to 94. Remaining automatic backend selection and other logic profiles remain partial.",
         "QF_UF and QF_UFLRA simple setup policy now follows retained source bodies, with permanent first-boundary selection and auto_config=false bypass. NNF and relevance-model fixtures disable automatic setup when testing their explicit controls. All 94 strict C++ runner comparisons remain enabled. Other logic profiles, automatic theory/backend selection and string-theory routing remain incomplete.",
-        "The retained QF_AX and QF_AUFLIA setup policies now distinguish the logic-only first-push path from feature-dependent first checking. QF_AUFLIA unit-only input preserves the existing restart strategy/factor, while clausal input selects geometric restart factor 1.5 and zero initial activity. QF_DT applies the shared UF setup without the QF_UF arithmetic-validation overload, alongside its existing concrete datatype registration. Explicit relevance-mode tests disable automatic setup to retain their chosen controls. A QF_AX unit-profile array-model scope regression raises the strict C++ runner set to 96; other backend-selection and logic-profile work remains partial.",
+        "The retained QF_AX and QF_AUFLIA setup policies now distinguish the logic-only first-push path from feature-dependent fresh-tactic setup_and_check. QF_AUFLIA unit-only input preserves the existing restart strategy/factor, while clausal input selects geometric restart factor 1.5 and zero initial activity. QF_DT applies the shared UF setup without the QF_UF arithmetic-validation overload, alongside its existing concrete datatype registration. Explicit relevance-mode tests disable automatic setup to retain their chosen controls. A QF_AX unit-profile array-model scope regression raises the strict C++ runner set to 96; other backend-selection and logic-profile work remains partial.",
         "Quantified logic scalar policies now cover AUFLIA, AUFLIRA, UFNIA, AUFNIRA, their retained aliases, UFLRA and quantified unknown-logic classification. Static features deliberately skip bound variables as in the source. The mixed quantified automatic-profile runner restores SAT/model/UNSAT scope behavior with initially disabled MBQI and E-matching, bringing strict C++ script comparisons to 97. Backend selection, remaining logic profiles and string-theory routing remain incomplete.",
-        "LRA now preserves NNF/CNF and Eq2Ineq settings while applying its own source profile. First-push, first-check, disabled automatic setup, scoped contradiction and pop recovery are covered. LRA and UFLRA now instantiate mixed rather than real-only arithmetic as their source setup requires. A term-ITE SAT/model/UNSAT/pop script brings strict C++ comparisons to 98. Other arithmetic backend modes and automatic feature selection remain incomplete.",
-        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
-        "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based first-check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. The initial increment retained integer simplex for the dense branch; the subsequent concrete dense integration is recorded below. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial.",
+        "LRA now preserves NNF/CNF and Eq2Ineq settings while applying its own source profile. First-push, fresh static setup_and_check, disabled automatic setup, scoped contradiction and pop recovery are covered. LRA and UFLRA now instantiate mixed rather than real-only arithmetic as their source setup requires. A term-ITE SAT/model/UNSAT/pop script brings strict C++ comparisons to 98. Other arithmetic backend modes and automatic feature selection remain incomplete.",
+        "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, fresh static setup_and_check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
+        "Normal automatic QF_IDL setup now uses integer simplex instead of the separately tested difference-graph theory. Default first-push and feature-based fresh static setup_and_check policies, invalid difference/real/UF inputs, dense feature settings and proof-mode integrality have focused coverage. The initial increment retained integer simplex for the dense branch; the subsequent concrete dense integration is recorded below. The valid first-push IDL SAT/model/UNSAT/pop script brings strict C++ comparisons to 100. Other arithmetic-mode and automatic backend-selection branches remain partial.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
+        "Earlier profile tests entered feature setup through ordinary CheckSat. They now explicitly use the fresh setup_and_check entry before later incremental checks; expectations for backend selection and parameter owners are unchanged. New regressions independently require logic-only policy for ordinary zero-assumption checks and static policy for fresh no-assumption tactics."
       ]
     },
     {
@@ -121432,7 +121621,12 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_dyn_ack_manager.go",
         "pkg/smtcore/smt_preprocessor_constructor_frontier_test.go",
-        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+        "pkg/smtcore/smt_check.go",
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_tactic_impl.go",
+        "pkg/smtcore/smt_setup_check_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -121455,7 +121649,13 @@
         "TestSMTKernelSamplesSlowProgressAtConfiguredCPUIntervals",
         "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites",
         "TestSMTKernelPreprocessorConstructionAllocationFrontiers",
-        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+        "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+        "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+        "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -121611,6 +121811,28 @@
           "status": "reference_only",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "ordinary check_sat_core follows the logic-only setup entry; the private fresh-tactic entry publishes setup_and_check results through the same owned result object",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_check.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_setup_check_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+            "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+            "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+            "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -122471,7 +122693,10 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/tactic/tactic_stored_model.go",
         "pkg/util/lp/gparams_catalog_collectors.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_check.go",
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_setup_check_test.go"
       ],
       "tests": [
         "TestSMTTacticPreservesDerivedInputProof",
@@ -122484,7 +122709,13 @@
         "TestSMTTacticPublishesIndependentModelsAcrossApplications",
         "TestSMTTacticCPPApplyReference",
         "TestNewSMTTacticUsingCopiesAndFixesAutoConfig",
-        "TestSMTLibRunnerQFIDLBranchEvidence"
+        "TestSMTLibRunnerQFIDLBranchEvidence",
+        "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+        "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+        "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -122599,6 +122830,28 @@
           "tests": [
             "TestSMTLibRunnerQFIDLBranchEvidence",
             "TestSMTTacticCPPApplyReference"
+          ]
+        },
+        {
+          "name": "SMT tactic dispatch uses setup_and_check only without extracted assumptions; assumption-bearing goals use ordinary check, while result/model publication and statistics survive both branches",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_check.go",
+          "go_targets": [
+            "pkg/smtcore/smt_check.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_setup_check_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+            "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
+            "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
+            "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],

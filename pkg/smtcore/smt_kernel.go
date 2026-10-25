@@ -866,7 +866,14 @@ func (k *SMTKernel) ScopeLevel() uint32 {
 	return uint32(len(k.scopes))
 }
 
-func (k *SMTKernel) prepareCheck() error {
+func (k *SMTKernel) prepareCheck(useStaticFeatures bool) error {
+	if err := k.configureCheck(useStaticFeatures); err != nil {
+		return err
+	}
+	return k.internalizeCheckAssertions()
+}
+
+func (k *SMTKernel) configureCheck(useStaticFeatures bool) error {
 	if err := k.open(); err != nil {
 		return err
 	}
@@ -885,7 +892,7 @@ func (k *SMTKernel) prepareCheck() error {
 			return err
 		}
 	}
-	if err := k.setupAssertedBounds(true); err != nil {
+	if err := k.setupAssertedBounds(useStaticFeatures); err != nil {
 		return fmt.Errorf("smt kernel configure asserted bounds: %w", err)
 	}
 	if err := k.internalizer.configureBooleanHeuristics(k.smtState); err != nil {
@@ -894,6 +901,10 @@ func (k *SMTKernel) prepareCheck() error {
 	if err := k.internalizer.SetupTheories(); err != nil {
 		return fmt.Errorf("smt kernel setup theories: %w", err)
 	}
+	return nil
+}
+
+func (k *SMTKernel) internalizeCheckAssertions() error {
 	if err := k.internalizePending(); err != nil {
 		return fmt.Errorf("smt kernel internalize assertions: %w", err)
 	}
@@ -924,7 +935,7 @@ func (k *SMTKernel) Check() (result lbool.LBool, resultErr error) {
 	if k.internalizer.Inconsistent() {
 		return lbool.False, nil
 	}
-	if err := k.prepareCheck(); err != nil {
+	if err := k.prepareCheck(false); err != nil {
 		return lbool.Undef, err
 	}
 	if k.assertedFormulasInconsistent() {

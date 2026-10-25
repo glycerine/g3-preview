@@ -56,7 +56,7 @@ func TestSMTQFLIAAutomaticSetupUsesFeaturesAtFirstBoundary(t *testing.T) {
 			if profile == "first-push" {
 				astTestMust(t, solver.Push())
 			}
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.True {
 				t.Fatal("setup changed satisfiability", status)
@@ -107,7 +107,7 @@ func TestSMTQFLIAAutomaticSetupUsesFeaturesAtFirstBoundary(t *testing.T) {
 			before := k.smtState.RelevancyLvl
 			astTestMust(t, solver.Push())
 			astTestMust(t, solver.Assert(formula))
-			status, err = solver.CheckSat(nil)
+			status, err = smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			astTestMust(t, solver.Pop(1))
 			if status != lbool.True || k.smtState.RelevancyLvl != before {
@@ -132,7 +132,7 @@ func TestSMTQFLIAStaticSetupRejectsUninterpretedFunctions(t *testing.T) {
 	formula, err := m.MkApp(predicate, []ast.ASTHandle{zero})
 	astTestMust(t, err)
 	astTestMust(t, solver.Assert(formula))
-	_, err = solver.CheckSat(nil)
+	_, err = smtSetupProfileCheck(solver)
 	if err == nil || !strings.Contains(err.Error(), "uninterpreted function symbols") {
 		t.Fatal("static QF_LIA validation accepted an uninterpreted function", err)
 	}

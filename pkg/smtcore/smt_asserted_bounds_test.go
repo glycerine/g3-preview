@@ -58,14 +58,14 @@ func TestSMTAssertedBoundEliminationGuardsProofsAndScopes(t *testing.T) {
 					}
 				}
 				if mode == "enabled" {
-					status, err := solver.CheckSat(nil)
+					status, err := smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.False {
 						t.Fatal("bound elimination conflict", status)
 					}
 				}
 				astTestMust(t, solver.Pop(1))
-				status, err := solver.CheckSat(nil)
+				status, err := smtSetupProfileCheck(solver)
 				astTestMust(t, err)
 				if status != lbool.True {
 					t.Fatal("scope retained an eliminated bound", status)
@@ -107,7 +107,7 @@ func TestSMTAssertedBoundsSourceSetupAndUpdates(t *testing.T) {
 				astTestMust(t, solver.Push())
 			}
 			if tc.checkEmptyFirst {
-				status, err := solver.CheckSat(nil)
+				status, err := smtSetupProfileCheck(solver)
 				astTestMust(t, err)
 				if status != lbool.True {
 					t.Fatal("empty prefix", status)
@@ -130,7 +130,7 @@ func TestSMTAssertedBoundsSourceSetupAndUpdates(t *testing.T) {
 			q, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{s}, Names: []symbol.Symbol{symbol.Numerical(0)}, Body: body, Weight: 1})
 			astTestMust(t, err)
 			astTestMust(t, solver.Assert(q))
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.False {
 				reason, _ := solver.ReasonUnknown()

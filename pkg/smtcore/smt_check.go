@@ -21,6 +21,10 @@ func (k *SMTKernel) aboveMemoryWatermark() (bool, error) {
 }
 
 func (k *SMTKernel) beginCheck() (bool, error) {
+	return k.checkPreamble(true)
+}
+
+func (k *SMTKernel) checkPreamble(countCheck bool) (bool, error) {
 	if err := k.open(); err != nil {
 		return false, err
 	}
@@ -35,7 +39,9 @@ func (k *SMTKernel) beginCheck() (bool, error) {
 	}
 	k.lastFailure = SMTFailureOK
 	k.labels = nil
-	k.internalizer.statistics.NumChecks++
+	if countCheck {
+		k.internalizer.statistics.NumChecks++
+	}
 	// Source m_unsat_proof is reset by init_search, not by check. A known
 	// base conflict therefore retains its original proof across checks.
 	above, err := k.aboveMemoryWatermark()
@@ -47,6 +53,36 @@ func (k *SMTKernel) beginCheck() (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+// SetupAndCheck is context::setup_and_check, used by a fresh SMT tactic with
+// no external assumptions. Unlike ordinary Check, it enables static features
+// for automatic setup and does not increment the regular check counter.
+func (k *SMTKernel) SetupAndCheck() (lbool.LBool, error) {
+	ready, err := k.checkPreamble(false)
+	if err != nil || !ready {
+		return lbool.Undef, err
+	}
+	if k.ScopeLevel() != 0 || k.preprocessingSetupDone || k.internalizer.theoriesSetup || k.assertedHead != 0 {
+		return lbool.Undef, ast.ErrASTDomain
+	}
+	if err := k.prepareCheck(true); err != nil {
+		return lbool.Undef, err
+	}
+	if k.assertedFormulasInconsistent() {
+		return lbool.False, nil
+	}
+	// As in the native assumption facade, capture base theory consequences
+	// before entering search persistence, including for an empty assumption set.
+	if !k.internalizer.Inconsistent() {
+		if _, err := k.internalizer.PropagateCore(); err != nil {
+			return lbool.Undef, err
+		}
+	}
+	if k.internalizer.Inconsistent() {
+		return k.resolveCheckConflict()
+	}
+	return k.finalizeCheck(k.search())
 }
 
 func (k *SMTKernel) finalizeCheck(result lbool.LBool, resultErr error) (lbool.LBool, error) {

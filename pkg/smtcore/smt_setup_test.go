@@ -127,7 +127,7 @@ func TestSMTQFAUFLIASetupUsesIntegerArithmeticAndArrays(t *testing.T) {
 	}
 	astTestMust(t, solver.Assert(less))
 	astTestMust(t, solver.Assert(greaterEqual))
-	status, err := solver.CheckSat(nil)
+	status, err := smtSetupProfileCheck(solver)
 	astTestMust(t, err)
 	if status != lbool.False {
 		t.Fatal("QF_AUFLIA linear contradiction", status)
@@ -174,7 +174,7 @@ func TestSMTLinearRealLogicSetupUsesConcreteArithmetic(t *testing.T) {
 			}
 			astTestMust(t, solver.Assert(less))
 			astTestMust(t, solver.Assert(greaterEqual))
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.False {
 				t.Fatal(test.logic, "linear contradiction", status)
@@ -216,7 +216,7 @@ func TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset(t *testing.T) {
 			}
 			astTestMust(t, solver.Assert(less))
 			astTestMust(t, solver.Assert(greaterEqual))
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.False {
 				t.Fatal(logic, "linear contradiction", status)
@@ -268,7 +268,7 @@ func TestSMTUnknownLogicSetupInstallsMixedArithmetic(t *testing.T) {
 				t.Fatal(test.logic, "did not install setup_unknown array theory")
 			}
 			astTestMust(t, solver.Assert(positive))
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			want := lbool.Undef
 			if test.integer {

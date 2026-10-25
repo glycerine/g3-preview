@@ -68,7 +68,7 @@ func TestSMTUFIDLSetupProfilesAndBackends(t *testing.T) {
 			if tc.push {
 				astTestMust(t, solver.Push())
 			}
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.True {
 				t.Fatal("UFIDL profile changed satisfiability", status)
@@ -98,13 +98,13 @@ func TestSMTUFIDLSetupProfilesAndBackends(t *testing.T) {
 			}
 			astTestMust(t, solver.Push())
 			astTestMust(t, solver.Assert(fixture.bound(t, smtArithOpLE, y, x, -2)))
-			status, err = solver.CheckSat(nil)
+			status, err = smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.False {
 				t.Fatal("UFIDL scoped contradiction", status)
 			}
 			astTestMust(t, solver.Pop(1))
-			status, err = solver.CheckSat(nil)
+			status, err = smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.True {
 				t.Fatal("UFIDL pop recovery", status)
@@ -146,7 +146,7 @@ func TestSMTUFIDLStaticValidationMatchesSource(t *testing.T) {
 			bound, err := m.MkFamilyApp(family, smtArithOpLE, nil, []ast.ASTHandle{sum, one})
 			astTestMust(t, err)
 			astTestMust(t, solver.Assert(bound))
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			if real {
 				if err == nil || !strings.Contains(err.Error(), "has real variables") || solver.kernel.preprocessingSetupDone {
 					t.Fatal("UFIDL real-feature guard", err)

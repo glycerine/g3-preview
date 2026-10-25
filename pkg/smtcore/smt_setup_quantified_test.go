@@ -109,7 +109,7 @@ func TestSMTQuantifiedLogicSetupProfilesAndConstructorCaches(t *testing.T) {
 			} else if !patternState.UseDatabase || k.smtState.RestartStrategy != 0 || k.smtState.RestartFactor != 1.5 {
 				t.Fatal("integer quantified profile omitted pattern database or restart settings")
 			}
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.True {
 				t.Fatal("quantified setup failed to validate a satisfiable universal", status)
@@ -147,7 +147,7 @@ func TestSMTAUFLIAFeatureSetupRejectsRealSorts(t *testing.T) {
 	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{real}, Names: []symbol.Symbol{symbol.Numerical(0)}, Body: equality, Weight: 1})
 	astTestMust(t, err)
 	astTestMust(t, solver.Assert(quantifier))
-	_, err = solver.CheckSat(nil)
+	_, err = smtSetupProfileCheck(solver)
 	if err == nil || solver.kernel.preprocessingSetupDone {
 		t.Fatal("AUFLIA feature setup accepted real arithmetic", err)
 	}

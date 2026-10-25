@@ -76,7 +76,7 @@ func TestSMTSimpleLogicSetupBeforeFirstPushAndCheck(t *testing.T) {
 							}
 						}
 					}
-					status, err := solver.CheckSat(nil)
+					status, err := smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.True {
 						t.Fatal("UF equality did not remain satisfiable", status)
@@ -108,7 +108,7 @@ func TestSMTUFStaticSetupRejectsArithmetic(t *testing.T) {
 	formula, err := m.MkFamilyApp(family, smtArithOpGE, nil, []ast.ASTHandle{x, zero})
 	astTestMust(t, err)
 	astTestMust(t, solver.Assert(formula))
-	_, err = solver.CheckSat(nil)
+	_, err = smtSetupProfileCheck(solver)
 	if err == nil || !strings.Contains(err.Error(), "constains arithmetic") || solver.kernel.preprocessingSetupDone {
 		t.Fatal("UF feature validation did not reject arithmetic", err)
 	}

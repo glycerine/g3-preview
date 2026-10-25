@@ -56,7 +56,7 @@ func TestSMTLRASetupPreservesNNFAndArithmeticControls(t *testing.T) {
 						astTestMust(t, solver.Push())
 						check()
 					}
-					status, err := solver.CheckSat(nil)
+					status, err := smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.True {
 						t.Fatal("LRA setup changed satisfiability", status)
@@ -66,13 +66,13 @@ func TestSMTLRASetupPreservesNNFAndArithmeticControls(t *testing.T) {
 					negated, err := m.MkNot(equality)
 					astTestMust(t, err)
 					astTestMust(t, solver.Assert(negated))
-					status, err = solver.CheckSat(nil)
+					status, err = smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.False {
 						t.Fatal("LRA child contradiction", status)
 					}
 					astTestMust(t, solver.Pop(1))
-					status, err = solver.CheckSat(nil)
+					status, err = smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.True {
 						t.Fatal("LRA pop failed to restore satisfiability", status)
@@ -133,7 +133,7 @@ func TestSMTQFLRAAutomaticSetupRationalThresholdsAndCNF(t *testing.T) {
 			if tc.firstPush {
 				astTestMust(t, solver.Push())
 			}
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.True {
 				t.Fatal("real setup changed satisfiability", status)

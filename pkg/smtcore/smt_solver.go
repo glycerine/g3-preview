@@ -493,6 +493,12 @@ func (s *SMTSolver) ScopeLevel() (uint32, error) {
 }
 
 func (s *SMTSolver) CheckSatCore(assumptions []ast.ASTHandle) (lbool.LBool, error) {
+	return s.checkSatCore(assumptions, false)
+}
+
+// The fresh tactic context uses setup_and_check without external assumptions.
+// Both entry paths publish results through the same owning result object.
+func (s *SMTSolver) checkSatCore(assumptions []ast.ASTHandle, setup bool) (lbool.LBool, error) {
 	if err := s.open(); err != nil {
 		return lbool.Undef, err
 	}
@@ -504,7 +510,12 @@ func (s *SMTSolver) CheckSatCore(assumptions []ast.ASTHandle) (lbool.LBool, erro
 		_ = result.Close()
 		return lbool.Undef, err
 	}
-	status, err := s.kernel.CheckAssumptions(assumptions)
+	var status lbool.LBool
+	if setup {
+		status, err = s.kernel.SetupAndCheck()
+	} else {
+		status, err = s.kernel.CheckAssumptions(assumptions)
+	}
 	if err != nil {
 		return lbool.Undef, err
 	}

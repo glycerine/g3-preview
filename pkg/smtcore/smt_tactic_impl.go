@@ -232,7 +232,13 @@ func (t *SMTTactic) Apply(in *tactic.Goal, result *tactic.TacticResult) (err err
 	if extraction != nil {
 		assumptions = extraction.Assumptions
 	}
-	status, checkErr := local.CheckSat(assumptions)
+	var status lbool.LBool
+	var checkErr error
+	if len(assumptions) == 0 {
+		status, checkErr = local.checkSatCore(nil, true)
+	} else {
+		status, checkErr = local.CheckSat(assumptions)
+	}
 	// Collect before approximation and UNKNOWN policy, including on a check
 	// exception, while the temporary context is still alive.
 	statsErr := local.CollectStatistics(&t.stats)

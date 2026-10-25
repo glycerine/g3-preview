@@ -59,7 +59,7 @@ func TestSMTBitVectorLogicSetupProfiles(t *testing.T) {
 						astTestMust(t, solver.Push())
 						check()
 					}
-					status, err := solver.CheckSat(nil)
+					status, err := smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.True {
 						t.Fatal("BV profile changed satisfiability", status)

@@ -70,7 +70,7 @@ func TestSMTRDLSetupSelectsConcreteBackend(t *testing.T) {
 			if tc.push {
 				astTestMust(t, solver.Push())
 			}
-			status, err := solver.CheckSat(nil)
+			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.True {
 				t.Fatal("RDL profile changed satisfiability", status)
@@ -106,13 +106,13 @@ func TestSMTRDLSetupSelectsConcreteBackend(t *testing.T) {
 			}
 			astTestMust(t, solver.Push())
 			astTestMust(t, solver.Assert(fixture.bound(t, smtArithOpLE, y, x, -2, 3)))
-			status, err = solver.CheckSat(nil)
+			status, err = smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.False {
 				t.Fatal("RDL child contradiction", status)
 			}
 			astTestMust(t, solver.Pop(1))
-			status, err = solver.CheckSat(nil)
+			status, err = smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			if status != lbool.True {
 				t.Fatal("RDL pop recovery", status)
@@ -160,7 +160,7 @@ func TestSMTRDLStaticSetupRejectsWrongFeatures(t *testing.T) {
 			bound, err := m.MkFamilyApp(family, smtArithOpLE, nil, []ast.ASTHandle{term, one})
 			astTestMust(t, err)
 			astTestMust(t, solver.Assert(bound))
-			_, err = solver.CheckSat(nil)
+			_, err = smtSetupProfileCheck(solver)
 			if err == nil || !strings.Contains(err.Error(), want) || solver.kernel.preprocessingSetupDone {
 				t.Fatal("invalid RDL features accepted", err, want)
 			}

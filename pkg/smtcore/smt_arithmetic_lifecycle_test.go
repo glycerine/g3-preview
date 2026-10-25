@@ -100,7 +100,9 @@ func TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels(t *testing.T) 
 					boolean := smtRelevancyBool(t, m, "arithmetic-clone-p")
 					astTestMust(t, s.Assert(boolean))
 				}
-				status, err := s.CheckSat(nil)
+				// Select each source backend through the static setup overload;
+				// subsequent translated and original checks are incremental.
+				status, err := smtSetupProfileCheck(s)
 				astTestMust(t, err)
 				want := lbool.True
 				if sourceCase.kind == "dummy" {

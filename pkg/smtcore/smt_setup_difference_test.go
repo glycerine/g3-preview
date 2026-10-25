@@ -58,7 +58,7 @@ func TestSMTIDLSetupFirstBoundaryAndSimplex(t *testing.T) {
 					astTestMust(t, solver.Push())
 					check()
 				}
-				status, err := solver.CheckSat(nil)
+				status, err := smtSetupProfileCheck(solver)
 				astTestMust(t, err)
 				if status != lbool.True {
 					t.Fatal("IDL feasible difference", status)
@@ -66,13 +66,13 @@ func TestSMTIDLSetupFirstBoundaryAndSimplex(t *testing.T) {
 				check()
 				astTestMust(t, solver.Push())
 				astTestMust(t, solver.Assert(fixture.bound(t, smtArithOpLE, y, x, -2)))
-				status, err = solver.CheckSat(nil)
+				status, err = smtSetupProfileCheck(solver)
 				astTestMust(t, err)
 				if status != lbool.False {
 					t.Fatal("IDL contradictory differences", status)
 				}
 				astTestMust(t, solver.Pop(1))
-				status, err = solver.CheckSat(nil)
+				status, err = smtSetupProfileCheck(solver)
 				astTestMust(t, err)
 				if status != lbool.True {
 					t.Fatal("IDL pop did not restore SAT", status)
@@ -123,7 +123,7 @@ func TestSMTIDLStaticSetupRejectsWrongFeatures(t *testing.T) {
 			bound, err := m.MkFamilyApp(family, smtArithOpLE, nil, []ast.ASTHandle{term, one})
 			astTestMust(t, err)
 			astTestMust(t, solver.Assert(bound))
-			_, err = solver.CheckSat(nil)
+			_, err = smtSetupProfileCheck(solver)
 			if err == nil || !strings.Contains(err.Error(), want) || solver.kernel.preprocessingSetupDone {
 				t.Fatal("IDL accepted invalid static features", err, want)
 			}
@@ -161,7 +161,7 @@ func TestSMTIDLDenseFeaturePolicyAndProofRouting(t *testing.T) {
 					if push {
 						astTestMust(t, solver.Push())
 					}
-					status, err := solver.CheckSat(nil)
+					status, err := smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.True {
 						t.Fatal("dense IDL conjunction", status)
@@ -181,13 +181,13 @@ func TestSMTIDLDenseFeaturePolicyAndProofRouting(t *testing.T) {
 					}
 					astTestMust(t, solver.Push())
 					astTestMust(t, solver.Assert(fixture.bound(t, smtArithOpLE, y, x, -1)))
-					status, err = solver.CheckSat(nil)
+					status, err = smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.False {
 						t.Fatal("dense IDL child conflict", status)
 					}
 					astTestMust(t, solver.Pop(1))
-					status, err = solver.CheckSat(nil)
+					status, err = smtSetupProfileCheck(solver)
 					astTestMust(t, err)
 					if status != lbool.True {
 						t.Fatal("dense IDL pop recovery", status)
