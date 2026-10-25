@@ -40,9 +40,10 @@ func TestSMTKernelDisplayStatisticsResetAndCancellation(t *testing.T) {
 	if status != lbool.True || kernel.Statistics().NumChecks != 1 {
 		t.Fatal("statistics before reset", status, kernel.Statistics())
 	}
+	beforeReset := kernel.Statistics()
 	astTestMust(t, kernel.ResetStatistics())
-	if got := kernel.Statistics(); got != (SMTContextStatistics{}) {
-		t.Fatal("statistics after reset", got)
+	if got := kernel.Statistics(); got != beforeReset {
+		t.Fatal("source kernel statistics reset must be a no-op", got, beforeReset)
 	}
 
 	canceled, err := kernel.Canceled()

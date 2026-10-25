@@ -17,11 +17,11 @@ import (
 )
 
 type smtPseudoBooleanStatistics struct {
-	predicates                         uint64
+	predicates                         uint32
 	clauses                            uint64
-	compiled                           uint64
-	compiledVariables, compiledClauses uint64
-	propagations, conflicts            uint64
+	compiled                           uint32
+	compiledVariables, compiledClauses uint32
+	propagations, conflicts            uint32
 }
 
 // SMTPseudoBooleanTheory keeps concrete normalized constraints and native
@@ -221,6 +221,12 @@ func (t *SMTPseudoBooleanTheory) internalizeAtom(expression ast.ASTHandle, retai
 	}
 	t.initCompilation(c)
 	if c.compilationThreshold != ^uint32(0) {
+		if err = smtPBVerbose(2, func(out io.Writer) error {
+			_, err := fmt.Fprintf(out, "(smt.pb setting compilation threshold to %d)\n", c.compilationThreshold)
+			return err
+		}); err != nil {
+			return false, err
+		}
 		if err = t.emitPB("internalize_atom", 533, func(out io.Writer) error {
 			_, err := fmt.Fprintf(out, "compilation threshold: %d\n", c.compilationThreshold)
 			return err
@@ -321,20 +327,21 @@ func (t *SMTPseudoBooleanTheory) CollectStatistics(target *statistics.Statistics
 	if t == nil || target == nil {
 		return ast.ErrASTHandle
 	}
-	target.UpdateUint64("pb predicates", t.statistics.predicates)
-	target.UpdateUint64("pb clauses", t.statistics.clauses)
-	target.UpdateUint64("pb compilations", t.statistics.compiled)
-	target.UpdateUint64("pb compiled vars", t.statistics.compiledVariables)
-	target.UpdateUint64("pb compiled clauses", t.statistics.compiledClauses)
-	target.UpdateUint64("pb propagations", t.statistics.propagations)
-	target.UpdateUint64("pb conflicts", t.statistics.conflicts)
+	target.UpdateUint("pb conflicts", t.statistics.conflicts)
+	target.UpdateUint("pb propagations", t.statistics.propagations)
+	target.UpdateUint("pb predicates", t.statistics.predicates)
+	target.UpdateUint("pb compilations", t.statistics.compiled)
+	target.UpdateUint("pb compiled clauses", t.statistics.compiledClauses)
+	target.UpdateUint("pb compiled vars", t.statistics.compiledVariables)
 	if t.simplex != nil {
 		s := t.simplex.solver
-		target.UpdateUint64("simplex add rows", s.Matrix().AddRowCount())
-		target.UpdateUint64("simplex num pivots", s.Stats.NumPivots)
-		target.UpdateUint64("simplex num infeasible", s.Stats.NumInfeasible)
-		target.UpdateUint64("simplex num checks", s.Stats.NumChecks)
+		target.UpdateUint("simplex add rows", s.Matrix().AddRowCount())
+		target.UpdateUint("simplex num pivots", s.Stats.NumPivots)
+		target.UpdateUint("simplex num infeasible", s.Stats.NumInfeasible)
+		target.UpdateUint("simplex num checks", s.Stats.NumChecks)
 	}
+	// This additional Go metric is outside the six source PB counters.
+	target.UpdateUint64("pb clauses", t.statistics.clauses)
 	return nil
 }
 

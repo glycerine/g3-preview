@@ -1142,16 +1142,9 @@ func (k *SMTKernel) Statistics() SMTContextStatistics {
 
 // ResetStatistics clears the cumulative counters retained by the kernel.
 func (k *SMTKernel) ResetStatistics() error {
-	if err := k.open(); err != nil {
-		return err
-	}
-	k.internalizer.statistics.Reset()
-	for _, theory := range k.internalizer.theories {
-		if resetter, ok := theory.(interface{ ResetStatistics() }); ok {
-			resetter.ResetStatistics()
-		}
-	}
-	return nil
+	// Source smt_kernel.cpp imp::reset_statistics intentionally has no
+	// body. Tactics clear their separately stored statistics themselves.
+	return k.open()
 }
 
 // Canceled performs the same resource-limit check used by the source context.

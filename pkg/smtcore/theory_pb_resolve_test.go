@@ -1,11 +1,14 @@
 package smtcore
 
 import (
+	"bytes"
 	"fmt"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func smtPBResolveExpression(t *testing.T, m *ast.ASTManager, family ast.FamilyID, args []ast.ASTHandle, coefficients []int32, k int32) ast.ASTHandle {
@@ -278,10 +281,31 @@ func TestSMTPBResolutionClauseAndForeignReasonBarriers(t *testing.T) {
 			}
 			astTestMust(t, s.AssignLiteral(inputs[0].Negated(), reason))
 			astTestMust(t, s.AssignLiteral(inputs[2].Negated(), NewSMTBooleanAxiom()))
+			var trace bytes.Buffer
+			tags := diagnostic.NewTraceTagsWithWriter(&trace)
+			tags.Enable("pb")
+			pb.trace = tags
 			resolved, err := pb.resolveConflict(pb.constraints[0])
 			astTestMust(t, err)
 			if !resolved || !s.inconsistent {
 				t.Fatal("reason branch did not publish a guarded cut")
+			}
+			if tags.ShouldTrace("pb") {
+				line := 1699
+				switch kind {
+				case "foreign-object":
+					line = 1733
+				case "opaque-clause":
+					line = 1683
+				case "binary":
+					line = 1704
+				}
+				if !strings.Contains(trace.String(), fmt.Sprintf("[pb] resolve_conflict src/smt/theory_pb.cpp:%d", line)) {
+					t.Fatal("missing concrete reason source trace", kind, trace.String())
+				}
+				if (kind == "foreign-object" || kind == "opaque-clause") && !strings.Contains(trace.String(), " simple\n") {
+					t.Fatal("lost concrete justification identity", trace.String())
+				}
 			}
 			conflict, _ := s.Conflict()
 			clause, ok := conflict.Clause()

@@ -1304,7 +1304,7 @@ func (t *SMTLinearArithmeticTheory) buildSimplexReplay(values map[uint32]*big.Ra
 	if err != nil {
 		return nil, lbool.Undef, err
 	}
-	t.statistics.pivots += solver.Stats.NumPivots
+	t.statistics.pivots += uint64(solver.Stats.NumPivots)
 	return solver, status, nil
 }
 

@@ -4,6 +4,8 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -43,6 +45,9 @@ func (r *smtPBResolution) antecedent(literal SMTLiteral, coefficient *big.Rat) e
 	if value != lbool.False {
 		r.lemma.bound.Sub(&r.lemma.bound, coefficient)
 		if index, marked := r.marks[v]; marked && r.theory.controls.LearnComplements {
+			if smtcoreSourceDebug && value != lbool.True {
+				return ast.ErrASTDomain
+			}
 			c := &r.lemma.terms[index].coeff
 			c.Sub(c, coefficient)
 			if c.Sign() <= 0 {
@@ -52,14 +57,38 @@ func (r *smtPBResolution) antecedent(literal SMTLiteral, coefficient *big.Rat) e
 	} else if level > r.base {
 		if index, marked := r.marks[v]; marked {
 			r.lemma.terms[index].coeff.Add(&r.lemma.terms[index].coeff, coefficient)
+			if smtcoreSourceDebug && r.lemma.terms[index].coeff.Sign() <= 0 {
+				return ast.ErrASTDomain
+			}
 		} else {
 			if level == r.level {
+				if err := r.theory.emitPB("process_antecedent", 1529, func(out io.Writer) error {
+					_, _ = io.WriteString(out, "add mark: ")
+					if err := smtPBWriteLiteral(out, literal); err != nil {
+						return err
+					}
+					_, err := fmt.Fprintf(out, " %s\n", coefficient.RatString())
+					return err
+				}); err != nil {
+					return err
+				}
 				r.numMarks++
 			}
 			r.marks[v] = len(r.lemma.terms)
 			var c big.Rat
 			c.Set(coefficient)
 			r.lemma.terms = append(r.lemma.terms, smtPBTerm{literal, c})
+		}
+		if err := r.theory.emitPBTag("pb_verbose", "process_antecedent", 1535, func(out io.Writer) error {
+			term := r.lemma.terms[r.marks[v]]
+			_, _ = io.WriteString(out, "ante: ")
+			if err := smtPBWriteLiteral(out, term.literal); err != nil {
+				return err
+			}
+			_, err := fmt.Fprintf(out, "*%s %d\n", term.coeff.RatString(), level)
+			return err
+		}); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -93,6 +122,15 @@ func (r *smtPBResolution) inequality(c *smtPBConstraint, consequent SMTLiteral, 
 	for _, term := range c.current().terms {
 		if err := r.antecedent(term.literal, new(big.Rat).Mul(scale, &term.coeff)); err != nil {
 			return err
+		}
+	}
+	if smtcoreSourceDebug {
+		value, err := r.theory.state.Assignment(c.lit())
+		if err != nil {
+			return err
+		}
+		if value != lbool.True {
+			return ast.ErrASTDomain
 		}
 	}
 	if r.theory.state.booleanData[c.lit().Var()].ScopeLevel > r.base {
@@ -182,6 +220,9 @@ func (t *SMTPseudoBooleanTheory) resolveConflict(c *smtPBConstraint) (bool, erro
 	if c.equality {
 		return false, nil
 	}
+	if err := t.traceConstraint("resolve_conflict", 1595, c, true); err != nil {
+		return false, err
+	}
 	s := t.state
 	base := s.scopeLevel
 	if s.searching {
@@ -204,13 +245,31 @@ func (t *SMTPseudoBooleanTheory) resolveConflict(c *smtPBConstraint) (bool, erro
 		return false, err
 	}
 	index := len(s.assignedLiterals) - 1
+	if smtcoreSourceDebug && index < 0 {
+		return false, ast.ErrASTDomain
+	}
 	for r.numMarks > 0 {
+		if err := r.traceLemma("pb_verbose", 1624, "lemma ", false); err != nil {
+			return false, err
+		}
 		truth := r.lemma.normalize(false)
 		if truth == lbool.False {
 			break
 		}
 		if truth == lbool.True {
+			if err := smtPBVerbose(0, func(out io.Writer) error { _, err := io.WriteString(out, "lemma already evaluated\n"); return err }); err != nil {
+				return false, err
+			}
+			if err := t.emitPB("resolve_conflict", 1632, func(out io.Writer) error { _, err := io.WriteString(out, "lemma already evaluated\n"); return err }); err != nil {
+				return false, err
+			}
 			return false, nil
+		}
+		if err := r.traceLemma("pb", 1635, "", false); err != nil {
+			return false, err
+		}
+		if err := r.lemma.validateWellFormed(); err != nil {
+			return false, err
 		}
 		var consequent SMTLiteral
 		position := -1
@@ -225,7 +284,26 @@ func (t *SMTPseudoBooleanTheory) resolveConflict(c *smtPBConstraint) (bool, erro
 		// Source refuses an asynchronous reason whose marked assignment
 		// cannot be found earlier in the trail. Never index past the trail.
 		if position < 0 {
+			if err := smtPBVerbose(12, r.displayResolvedLemma); err != nil {
+				return false, err
+			}
+			if err := t.emitPB("resolve_conflict", 1657, r.displayResolvedLemma); err != nil {
+				return false, err
+			}
 			return false, nil
+		}
+		if err := t.emitPB("resolve_conflict", 1664, func(out io.Writer) error {
+			if err := t.displayPBArgs(out, &r.lemma, true); err != nil {
+				return err
+			}
+			_, _ = io.WriteString(out, "conseq: ")
+			if err := smtPBWriteLiteral(out, consequent); err != nil {
+				return err
+			}
+			_, err := fmt.Fprintf(out, " at index: %d\n", position)
+			return err
+		}); err != nil {
+			return false, err
 		}
 		if r.lemma.terms[position].literal != consequent.Negated() {
 			return false, ast.ErrASTDomain
@@ -241,6 +319,16 @@ func (t *SMTPseudoBooleanTheory) resolveConflict(c *smtPBConstraint) (bool, erro
 			}
 			if owner := clause.Justification(); owner != nil {
 				if _, proof := owner.(*SMTJustificationProofWrapper); !proof {
+					if err := t.emitPB("resolve_conflict", 1683, func(out io.Writer) error {
+						_, _ = io.WriteString(out, "skipping justification for clause over: ")
+						if err := smtPBWriteLiteral(out, consequent); err != nil {
+							return err
+						}
+						_, err := fmt.Fprintf(out, " %s\n", smtPBJustificationTraceName(owner))
+						return err
+					}); err != nil {
+						return false, err
+					}
 					r.guards = append(r.guards, consequent)
 					continue
 				}
@@ -263,6 +351,15 @@ func (t *SMTPseudoBooleanTheory) resolveConflict(c *smtPBConstraint) (bool, erro
 					return false, err
 				}
 			}
+			if err := t.emitPB("resolve_conflict", 1699, func(out io.Writer) error {
+				if err := smtPBWriteLiterals(out, clause.literals, true); err != nil {
+					return err
+				}
+				_, err := io.WriteString(out, "\n")
+				return err
+			}); err != nil {
+				return false, err
+			}
 		case SMTBooleanJustificationBinaryClause:
 			literal, ok := reason.Literal()
 			if !ok {
@@ -271,9 +368,15 @@ func (t *SMTPseudoBooleanTheory) resolveConflict(c *smtPBConstraint) (bool, erro
 			if err := r.antecedent(literal.Negated(), coefficient); err != nil {
 				return false, err
 			}
+			if err := t.traceAssignment("resolve_conflict", 1704, "binary: ", literal, nil, false); err != nil {
+				return false, err
+			}
 		case SMTBooleanJustificationAxiom:
 			if s.booleanData[consequent.Var()].ScopeLevel > base {
 				r.guards = append(r.guards, consequent)
+			}
+			if err := t.traceAssignment("resolve_conflict", 1710, "axiom ", consequent, nil, false); err != nil {
+				return false, err
 			}
 		case SMTBooleanJustificationObject:
 			owner, ok := reason.Justification()
@@ -282,21 +385,67 @@ func (t *SMTPseudoBooleanTheory) resolveConflict(c *smtPBConstraint) (bool, erro
 			}
 			pb, owned := owner.(*smtPBJustification)
 			if !consequent.Sign() && owner.FromTheory() == t.FamilyID() && owned && pb.constraint != nil && !pb.constraint.equality && pb.constraint.lit() != consequent {
+				if err := t.emitPB("resolve_conflict", 1729, func(out io.Writer) error {
+					_, _ = io.WriteString(out, "resolve with inequality")
+					return t.displayInequality(out, pb.constraint, true)
+				}); err != nil {
+					return false, err
+				}
 				if err := r.inequality(pb.constraint, consequent, coefficient); err != nil {
 					return false, err
 				}
 			} else {
+				if err := t.emitPB("resolve_conflict", 1733, func(out io.Writer) error {
+					_, _ = io.WriteString(out, "skipping justification for ")
+					if err := smtPBWriteLiteral(out, consequent); err != nil {
+						return err
+					}
+					_, err := fmt.Fprintf(out, " from theory %d %s\n", owner.FromTheory(), smtPBJustificationTraceName(owner))
+					return err
+				}); err != nil {
+					return false, err
+				}
 				r.guards = append(r.guards, consequent)
 			}
 		default:
 			return false, ast.ErrASTDomain
 		}
 	}
+	if err := t.emitPB("resolve_conflict", 1745, func(out io.Writer) error {
+		if err := smtPBWriteLiterals(out, r.guards, true); err != nil {
+			return err
+		}
+		_, _ = io.WriteString(out, "=> ")
+		return t.displayPBArgs(out, &r.lemma, false)
+	}); err != nil {
+		return false, err
+	}
+	if err := smtPBVerbose(14, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "lemma1: ")
+		return t.displayPBArgs(out, &r.lemma, false)
+	}); err != nil {
+		return false, err
+	}
 	r.hoist()
 	truth := r.lemma.normalize(false)
 	r.lemma.prune(false)
+	if err := smtPBVerbose(14, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "lemma2: ")
+		return t.displayPBArgs(out, &r.lemma, false)
+	}); err != nil {
+		return false, err
+	}
+	if err := smtPBVerbose(1, func(out io.Writer) error {
+		_, err := fmt.Fprintf(out, "(pb.conflict %d %d)\n", len(r.guards), len(r.lemma.terms))
+		return err
+	}); err != nil {
+		return false, err
+	}
 	switch truth {
 	case lbool.True:
+		if smtcoreSourceDebug {
+			return false, ast.ErrASTDomain
+		}
 		return false, nil
 	case lbool.False:
 		t.incPropagations(c)
@@ -304,6 +453,9 @@ func (t *SMTPseudoBooleanTheory) resolveConflict(c *smtPBConstraint) (bool, erro
 		t.statistics.clauses++
 		for i := range r.guards {
 			r.guards[i] = r.guards[i].Negated()
+		}
+		if err := t.traceClause("resolve_conflict", 1776, r.guards); err != nil {
+			return false, err
 		}
 		return true, t.resolutionClause(r.guards)
 	default:

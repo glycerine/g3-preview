@@ -17,9 +17,13 @@ func (t *SMTPseudoBooleanTheory) pbTraceTags() *diagnostic.TraceTags {
 }
 
 func (t *SMTPseudoBooleanTheory) emitPB(function string, line int, body func(io.Writer) error) error {
+	return t.emitPBTag("pb", function, line, body)
+}
+
+func (t *SMTPseudoBooleanTheory) emitPBTag(tag, function string, line int, body func(io.Writer) error) error {
 	tags := t.pbTraceTags()
 	var operandErr error
-	err := tags.EmitConditional("pb", function, "src/smt/theory_pb.cpp", line, func() bool { return true }, func(out io.Writer) error {
+	err := tags.EmitConditional(tag, function, "src/smt/theory_pb.cpp", line, func() bool { return true }, func(out io.Writer) error {
 		// Keep evaluating later source operands after ostream badbit. The
 		// diagnostic stream retains the write failure independently.
 		operandErr = body(assertedTraceWriter{out})

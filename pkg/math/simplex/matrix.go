@@ -37,7 +37,7 @@ type Matrix struct {
 	rows    []matrixRow
 	dead    []uint32
 	columns [][]uint32
-	addRows uint64
+	addRows uint32
 }
 
 func (m *Matrix) EnsureVariable(v uint32) {
@@ -259,7 +259,7 @@ func (m *Matrix) ColumnRows(variable uint32) []Row {
 	}
 	return out
 }
-func (m *Matrix) AddRowCount() uint64 { return m.addRows }
+func (m *Matrix) AddRowCount() uint32 { return m.addRows }
 
 func (m *Matrix) Reset() { *m = Matrix{} }
 

@@ -187,13 +187,23 @@ func TestSMTBitVectorAdditionCircuit(t *testing.T) {
 	if !found {
 		t.Fatal("missing BV equality statistics")
 	}
+	var beforeReset uint32
+	for i := 0; i < stats.Size(); i++ {
+		if stats.Key(i) == "bv dynamic eqs" {
+			beforeReset = stats.UintValue(i)
+		}
+	}
 	astTestMust(t, solver.kernel.ResetStatistics())
 	stats.Reset()
 	astTestMust(t, solver.CollectStatistics(stats))
+	found = false
 	for i := 0; i < stats.Size(); i++ {
 		if stats.Key(i) == "bv dynamic eqs" {
-			t.Fatal("BV statistics survived reset")
+			found = stats.IsUint(i) && stats.UintValue(i) == beforeReset
 		}
+	}
+	if !found {
+		t.Fatal("source no-op reset changed BV statistics")
 	}
 }
 

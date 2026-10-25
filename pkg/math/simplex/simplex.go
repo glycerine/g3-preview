@@ -72,7 +72,7 @@ type variableInfo struct {
 	lowerExplained, upperExplained       bool
 }
 
-type Stats struct{ NumPivots, NumInfeasible, NumChecks uint64 }
+type Stats struct{ NumPivots, NumInfeasible, NumChecks uint32 }
 
 // Solver is the concrete exact tableau used by both retained mpz and mpq
 // consumers. Integer rows are accepted through AddIntegerRow.

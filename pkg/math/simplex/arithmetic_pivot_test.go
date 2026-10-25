@@ -46,7 +46,7 @@ func TestArithmeticPivotPolicyChangesFeasiblePath(t *testing.T) {
 						t.Fatal("unrepaired variable", v)
 					}
 				}
-				want := uint64(2)
+				want := uint32(2)
 				if strategy == 1 {
 					want = 1
 				}

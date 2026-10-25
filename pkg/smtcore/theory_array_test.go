@@ -358,13 +358,23 @@ func TestSMTArrayMapRead(t *testing.T) {
 	if !found {
 		t.Fatal("missing array map statistics")
 	}
+	var beforeReset uint32
+	for i := 0; i < stats.Size(); i++ {
+		if stats.Key(i) == "array map ax" {
+			beforeReset = stats.UintValue(i)
+		}
+	}
 	astTestMust(t, solver.kernel.ResetStatistics())
 	stats.Reset()
 	astTestMust(t, solver.CollectStatistics(stats))
+	found = false
 	for index := 0; index < stats.Size(); index++ {
 		if stats.Key(index) == "array map ax" {
-			t.Fatal("array statistics survived reset")
+			found = stats.IsUint(index) && stats.UintValue(index) == beforeReset
 		}
+	}
+	if !found {
+		t.Fatal("source no-op reset changed array statistics")
 	}
 }
 

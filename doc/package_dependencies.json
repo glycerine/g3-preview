@@ -2749,6 +2749,7 @@
         "theory_pb_display.go",
         "theory_pb_model.go",
         "theory_pb_normalize.go",
+        "theory_pb_resolution_trace.go",
         "theory_pb_resolve.go",
         "theory_pb_simplex.go",
         "theory_pb_sort.go",

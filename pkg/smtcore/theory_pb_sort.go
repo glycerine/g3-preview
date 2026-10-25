@@ -17,7 +17,7 @@ const (
 type smtPBSort struct {
 	theory                              *SMTPseudoBooleanTheory
 	mode                                uint8
-	variables, clauses, clauseVariables uint64
+	variables, clauses, clauseVariables uint32
 	err                                 error
 }
 
@@ -73,7 +73,7 @@ func (s *smtPBSort) add(ls ...SMTLiteral) {
 		return
 	}
 	s.clauses++
-	s.clauseVariables += uint64(len(ls))
+	s.clauseVariables += uint32(len(ls))
 	s.err = s.theory.compilationClause(ls, SMTClauseAux)
 }
 

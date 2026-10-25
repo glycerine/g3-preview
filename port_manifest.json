@@ -71229,7 +71229,9 @@
         "pkg/math/simplex/simplex.go",
         "pkg/math/simplex/simplex_test.go",
         "pkg/smtcore/theory_arith_cluster.go",
-        "pkg/smtcore/theory_arith_cluster_test.go"
+        "pkg/smtcore/theory_arith_cluster_test.go",
+        "pkg/math/simplex/statistics_test.go",
+        "pkg/smtcore/theory_arith_linear.go"
       ],
       "tests": [
         "TestArithmeticRowConflictPreservesEqualityPremises",
@@ -71240,7 +71242,8 @@
         "TestSimplexMinimizeBoundedAndUnbounded",
         "TestSimplexDeleteBaseAndNonbasicRows",
         "TestSimplexRetainedSourceFeasibilityCases",
-        "TestSMTNonlinearClusterInequalityRowsScopedProofs"
+        "TestSMTNonlinearClusterInequalityRowsScopedProofs",
+        "TestSimplexStatisticsUnsignedWrapPreservesPivotAndWitness"
       ],
       "conditionals": [
         {
@@ -71294,7 +71297,8 @@
       ],
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
-        "Solver is the concrete retained exact tableau API. Go errors replace assertion-only invalid-handle behavior, and Stats replaces the source statistics accumulator adapter."
+        "Solver is the concrete retained exact tableau API. Go errors replace assertion-only invalid-handle behavior, and Stats replaces the source statistics accumulator adapter.",
+        "Source unsigned pivot, infeasible and check counters use uint32 and wrap during actual feasibility/pivot operations. The arithmetic consumer widens only after source-width wrapping; PB collection retains source width."
       ]
     },
     {
@@ -71306,11 +71310,20 @@
         "pkg/math/simplex/bound_dependency.go",
         "pkg/math/simplex/arith_row_conflict.go",
         "pkg/math/simplex/bound_equality_dependency_test.go",
-        "pkg/math/simplex/simplex.go", "pkg/math/simplex/simplex_test.go"
+        "pkg/math/simplex/simplex.go",
+        "pkg/math/simplex/simplex_test.go",
+        "pkg/math/simplex/statistics_test.go",
+        "pkg/smtcore/theory_arith_linear.go"
       ],
       "tests": [
         "TestArithmeticRowConflictPreservesEqualityPremises",
-        "TestSimplexFeasiblePivotAndValues", "TestSimplexInfeasibleFixedNonbasicAndWitnessRow", "TestSimplexInfinitesimalStrictBounds", "TestSimplexMinimizeBoundedAndUnbounded", "TestSimplexDeleteBaseAndNonbasicRows", "TestSimplexRetainedSourceFeasibilityCases"
+        "TestSimplexFeasiblePivotAndValues",
+        "TestSimplexInfeasibleFixedNonbasicAndWitnessRow",
+        "TestSimplexInfinitesimalStrictBounds",
+        "TestSimplexMinimizeBoundedAndUnbounded",
+        "TestSimplexDeleteBaseAndNonbasicRows",
+        "TestSimplexRetainedSourceFeasibilityCases",
+        "TestSimplexStatisticsUnsignedWrapPreservesPivotAndWitness"
       ],
       "conditionals": [
         {
@@ -71527,14 +71540,23 @@
             "TestArithmeticRowConflictPreservesEqualityPremises"
           ]
         },
-        {"name": "tableau feasibility pivots, value propagation, primal minimization, Bland default selection, and invariants", "status": "ported", "go_target": "pkg/math/simplex/simplex.go", "tests": ["TestSimplexRetainedSourceFeasibilityCases", "TestSimplexDeleteBaseAndNonbasicRows"]}
+        {
+          "name": "tableau feasibility pivots, value propagation, primal minimization, Bland default selection, and invariants",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/simplex.go",
+          "tests": [
+            "TestSimplexRetainedSourceFeasibilityCases",
+            "TestSimplexDeleteBaseAndNonbasicRows"
+          ]
+        }
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters."
       ],
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
-        "The source default pivot strategy is the smallest-variable strategy, implemented deterministically with a Go map plus sorted selection. The dormant greatest/least-error strategies and random tie choice are not reached by retained consumers."
+        "The source default pivot strategy is the smallest-variable strategy, implemented deterministically with a Go map plus sorted selection. The dormant greatest/least-error strategies and random tie choice are not reached by retained consumers.",
+        "Source unsigned pivot, infeasible and check counters use uint32 and wrap during actual feasibility/pivot operations. The arithmetic consumer widens only after source-width wrapping; PB collection retains source width."
       ]
     },
     {
@@ -71542,8 +71564,18 @@
       "component": "math",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/math/simplex/matrix.go", "pkg/math/simplex/matrix_test.go"],
-      "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay", "TestSparseMatrixRationalGCDScansPastUnitPrefix", "TestSparseMatrixIntegerEntryAndCancellation"],
+      "go_targets": [
+        "pkg/math/simplex/matrix.go",
+        "pkg/math/simplex/matrix_test.go",
+        "pkg/math/simplex/statistics_test.go"
+      ],
+      "tests": [
+        "TestSparseMatrixRowArithmeticColumnsAndReuse",
+        "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay",
+        "TestSparseMatrixRationalGCDScansPastUnitPrefix",
+        "TestSparseMatrixIntegerEntryAndCancellation",
+        "TestSparseMatrixRowAdditionStatisticUnsignedWrap"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -71556,17 +71588,40 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "concrete sparse matrix rows, entries, column traversal, arithmetic, deletion, normalization, reset, and display API", "status": "ported", "go_target": "pkg/math/simplex/matrix.go", "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay"]}],
+      "methods": [
+        {
+          "name": "concrete sparse matrix rows, entries, column traversal, arithmetic, deletion, normalization, reset, and display API",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/matrix.go",
+          "tests": [
+            "TestSparseMatrixRowArithmeticColumnsAndReuse",
+            "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": ["Matrix uses exact math/big.Rat coefficients, slices, and explicit column row identifiers. Returned entries are copied because Go has no safe analogue of the source mutable intrusive iterators."]
+      "deviations": [
+        "Matrix uses exact math/big.Rat coefficients, slices, and explicit column row identifiers. Returned entries are copied because Go has no safe analogue of the source mutable intrusive iterators.",
+        "Source unsigned row-addition counter uses uint32; an actual row merge across wrap preserves coefficient arithmetic and well-formedness."
+      ]
     },
     {
       "path": "src/math/simplex/sparse_matrix_def.h",
       "component": "math",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/math/simplex/matrix.go", "pkg/math/simplex/matrix_test.go"],
-      "tests": ["TestSparseMatrixRowArithmeticColumnsAndReuse", "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay", "TestSparseMatrixRationalGCDScansPastUnitPrefix", "TestSparseMatrixIntegerEntryAndCancellation"],
+      "go_targets": [
+        "pkg/math/simplex/matrix.go",
+        "pkg/math/simplex/matrix_test.go",
+        "pkg/math/simplex/statistics_test.go"
+      ],
+      "tests": [
+        "TestSparseMatrixRowArithmeticColumnsAndReuse",
+        "TestSparseMatrixRationalGCDNormalizeMultiplyAndDisplay",
+        "TestSparseMatrixRationalGCDScansPastUnitPrefix",
+        "TestSparseMatrixIntegerEntryAndCancellation",
+        "TestSparseMatrixRowAdditionStatisticUnsignedWrap"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -71689,9 +71744,22 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "sparse row insertion, addition, multiplication, cancellation, column maintenance, recycling, normalization, and well-formed checks", "status": "ported", "go_target": "pkg/math/simplex/matrix.go", "tests": ["TestSparseMatrixRationalGCDScansPastUnitPrefix", "TestSparseMatrixIntegerEntryAndCancellation"]}],
+      "methods": [
+        {
+          "name": "sparse row insertion, addition, multiplication, cancellation, column maintenance, recycling, normalization, and well-formed checks",
+          "status": "ported",
+          "go_target": "pkg/math/simplex/matrix.go",
+          "tests": [
+            "TestSparseMatrixRationalGCDScansPastUnitPrefix",
+            "TestSparseMatrixIntegerEntryAndCancellation"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": ["Sparse row arithmetic, cancellation, column maintenance, row recycling, normalization, display, reset, and well-formed checks are implemented for the two retained exact numeral paths. Dead internal entry-slot compaction is represented by ordinary Go slice removal."]
+      "deviations": [
+        "Sparse row arithmetic, cancellation, column maintenance, row recycling, normalization, display, reset, and well-formed checks are implemented for the two retained exact numeral paths. Dead internal entry-slot compaction is represented by ordinary Go slice removal.",
+        "Source unsigned row-addition counter uses uint32; an actual row merge across wrap preserves coefficient arithmetic and well-formedness."
+      ]
     },
     {
       "path": "src/math/subpaving/CMakeLists.txt",
@@ -119336,7 +119404,11 @@
         "pkg/smtcore/smt_check.go",
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_tactic_impl.go",
-        "pkg/smtcore/smt_setup_check_test.go"
+        "pkg/smtcore/smt_setup_check_test.go",
+        "pkg/smtcore/smt_kernel_test.go",
+        "pkg/smtcore/theory_array_test.go",
+        "pkg/smtcore/theory_bv_test.go",
+        "pkg/smtcore/smt_solver_test.go"
       ],
       "tests": [
         "TestSMTKernelAssertionCheckAndDecisionClause",
@@ -119452,7 +119524,7 @@
           ]
         },
         {
-          "name": "assertion display, cumulative statistics reset, and resource-counting cancellation query",
+          "name": "assertion display, source no-op statistics reset, and resource-counting cancellation query",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_kernel.go",
           "tests": [
@@ -119575,7 +119647,8 @@
         "Cross-manager Translate reconstructs a kernel and replays owned base assertions instead of invoking context::copy; the solver interface has no reset operation, so the source placement-new reset is not exposed.",
         "The C++ executable returns invalid Boolean models for relevancy_update_scopes.smt2 after changing smt.relevancy from 0 to 2. Go requires models satisfying p and (or a b), including after pop. TestSMTLibRunnerRelevancyUpdatesKeepModelsValidWithKnownCPPDefect retains the complete case separately from exact-output comparisons, requires valid Go output, and accepts only the observed invalid reference snapshot or a corrected reference agreeing with Go. This is an explicit reference defect, not a weakened Go expectation; 90 other scripts retain exact C++ comparisons.",
         "The Go shared rewriter owner is retained independently of the hidden assertion-preprocessing switch, preventing a closed-rewriter domain error during subsequent quantifier instantiation.",
-        "Core solver updates now follow source use_ematching, m_qi_max_instances and final_check_eh lazy-threshold reads. Tests exercise disabled/enabled matching across repeated contradictory child scopes, preserve the source strict-greater-than instance limit, release a previously delayed instance after a lazy-threshold update, and demonstrate that eager threshold and parsed cost remain constructor-cached. The C++ command-line tactic wrapper retains initial E-matching settings in the live-toggle experiment, so these core API update checks are kept separate from the 92 strict runner comparisons; full tactic-wrapper parameter lifecycle remains outside this increment."
+        "Core solver updates now follow source use_ematching, m_qi_max_instances and final_check_eh lazy-threshold reads. Tests exercise disabled/enabled matching across repeated contradictory child scopes, preserve the source strict-greater-than instance limit, release a previously delayed instance after a lazy-threshold update, and demonstrate that eager threshold and parsed cost remain constructor-cached. The C++ command-line tactic wrapper retains initial E-matching settings in the live-toggle experiment, so these core API update checks are kept separate from the 92 strict runner comparisons; full tactic-wrapper parameter lifecycle remains outside this increment.",
+        "Corrected ResetStatistics to the intentionally empty src/smt/smt_kernel.cpp imp::reset_statistics body: live kernel and theory counters remain unchanged. Tactics separately reset their stored statistics. Kernel, array, bit-vector and arithmetic solver checks assert preservation."
       ]
     },
     {
@@ -134744,7 +134817,10 @@
         "pkg/smtcore/theory_pb_validate.go",
         "pkg/smtcore/theory_pb_validate_test.go",
         "pkg/smtcore/theory_pb_trace.go",
-        "pkg/smtcore/theory_pb_trace_test.go"
+        "pkg/smtcore/theory_pb_trace_test.go",
+        "pkg/smtcore/theory_pb_resolution_trace.go",
+        "pkg/smtcore/theory_pb_resolution_trace_test.go",
+        "pkg/smtcore/theory_pb_stats_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -134787,7 +134863,13 @@
         "TestSMTPBTraceSimplexAndCompilationUseSourceSites",
         "TestSMTPBTraceWatchConflictStillEmitsTrailingRecord",
         "TestSMTPBDebugNormalizedArgumentContract",
-        "TestSMTPBPropagationCounterWrapPrecedesCompilationThreshold"
+        "TestSMTPBPropagationCounterWrapPrecedesCompilationThreshold",
+        "TestSMTPBResolutionTraceNativeCutPreservesSourceOrder",
+        "TestSMTPBResolutionVerboseTagIndependentAndMarkPrefix",
+        "TestSMTPBResolvedLemmaDisplayAndVerboseGate",
+        "TestSMTPBStatisticsUnsignedWrapThroughRetainedOperations",
+        "TestSMTPBStatisticsSourceCollectionOrder",
+        "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
       ],
       "conditionals": [
         {
@@ -135232,7 +135314,7 @@
           ]
         },
         {
-          "name": "weighted-resolution pb/pb_verbose TRACE records, remaining resolution/mark assertions, PB verbose output and aggregate-statistic unsigned-width audit; literal sorting-network TRACE/assertions tracked separately in sorting_network.h",
+          "name": "Remaining whole-unit and inline PB assertion/VERIFY audit; literal sorting-network TRACE/assertions tracked separately in sorting_network.h",
           "status": "unported",
           "tests": []
         },
@@ -135378,6 +135460,28 @@
             "TestSMTPBPropagationCounterWrapPrecedesCompilationThreshold",
             "TestSMTPBWeightedWatchReplacementJustificationAndRollback"
           ]
+        },
+        {
+          "name": "Weighted-resolution pb/pb_verbose TRACE records, display_resolved_lemma and IF_VERBOSE gates; source aggregate PB, network and delegated simplex unsigned counters and collection order",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_resolution_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_resolution_trace.go",
+            "pkg/smtcore/theory_pb_resolution_trace_test.go",
+            "pkg/smtcore/theory_pb_stats_test.go",
+            "pkg/smtcore/theory_pb_resolve_test.go",
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_compile.go",
+            "pkg/smtcore/theory_pb_sort.go"
+          ],
+          "tests": [
+            "TestSMTPBResolutionTraceNativeCutPreservesSourceOrder",
+            "TestSMTPBResolutionVerboseTagIndependentAndMarkPrefix",
+            "TestSMTPBResolvedLemmaDisplayAndVerboseGate",
+            "TestSMTPBStatisticsUnsignedWrapThroughRetainedOperations",
+            "TestSMTPBStatisticsSourceCollectionOrder",
+            "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
+          ]
         }
       ],
       "ownership": [
@@ -135401,7 +135505,8 @@
         "Correctness correction for strengthened consequences: internalization retains the scoped false inputs of a residual PB predicate. Literal source folding can turn that definition into an axiom and discard premises needed by later Boolean learning. A pending-callback regression with 2*x+y+z+u>=3 verifies the residual definition, exact guarded learned clause and all original relation valuations; the literal-folding variant fails this regression.",
         "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits.",
         "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors.",
-        "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete."
+        "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
+        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and literal-network diagnostic audits remain incomplete."
       ]
     },
     {
@@ -135442,7 +135547,10 @@
         "pkg/smtcore/theory_pb_validate.go",
         "pkg/smtcore/theory_pb_validate_test.go",
         "pkg/smtcore/theory_pb_trace.go",
-        "pkg/smtcore/theory_pb_trace_test.go"
+        "pkg/smtcore/theory_pb_trace_test.go",
+        "pkg/smtcore/theory_pb_resolution_trace.go",
+        "pkg/smtcore/theory_pb_resolution_trace_test.go",
+        "pkg/smtcore/theory_pb_stats_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -135485,7 +135593,13 @@
         "TestSMTPBTraceSimplexAndCompilationUseSourceSites",
         "TestSMTPBTraceWatchConflictStillEmitsTrailingRecord",
         "TestSMTPBDebugNormalizedArgumentContract",
-        "TestSMTPBPropagationCounterWrapPrecedesCompilationThreshold"
+        "TestSMTPBPropagationCounterWrapPrecedesCompilationThreshold",
+        "TestSMTPBResolutionTraceNativeCutPreservesSourceOrder",
+        "TestSMTPBResolutionVerboseTagIndependentAndMarkPrefix",
+        "TestSMTPBResolvedLemmaDisplayAndVerboseGate",
+        "TestSMTPBStatisticsUnsignedWrapThroughRetainedOperations",
+        "TestSMTPBStatisticsSourceCollectionOrder",
+        "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
       ],
       "assertions": [
         {
@@ -135632,7 +135746,7 @@
           ]
         },
         {
-          "name": "weighted-resolution pb/pb_verbose TRACE records, remaining resolution/mark assertions, PB verbose output and aggregate-statistic unsigned-width audit; literal sorting-network TRACE/assertions tracked separately in sorting_network.h",
+          "name": "Remaining whole-unit and inline PB assertion/VERIFY audit; literal sorting-network TRACE/assertions tracked separately in sorting_network.h",
           "status": "unported",
           "tests": []
         },
@@ -135778,6 +135892,28 @@
             "TestSMTPBPropagationCounterWrapPrecedesCompilationThreshold",
             "TestSMTPBWeightedWatchReplacementJustificationAndRollback"
           ]
+        },
+        {
+          "name": "Weighted-resolution pb/pb_verbose TRACE records, display_resolved_lemma and IF_VERBOSE gates; source aggregate PB, network and delegated simplex unsigned counters and collection order",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_resolution_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_resolution_trace.go",
+            "pkg/smtcore/theory_pb_resolution_trace_test.go",
+            "pkg/smtcore/theory_pb_stats_test.go",
+            "pkg/smtcore/theory_pb_resolve_test.go",
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_compile.go",
+            "pkg/smtcore/theory_pb_sort.go"
+          ],
+          "tests": [
+            "TestSMTPBResolutionTraceNativeCutPreservesSourceOrder",
+            "TestSMTPBResolutionVerboseTagIndependentAndMarkPrefix",
+            "TestSMTPBResolvedLemmaDisplayAndVerboseGate",
+            "TestSMTPBStatisticsUnsignedWrapThroughRetainedOperations",
+            "TestSMTPBStatisticsSourceCollectionOrder",
+            "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
+          ]
         }
       ],
       "ownership": [
@@ -135801,7 +135937,8 @@
         "Correctness correction for strengthened consequences: internalization retains the scoped false inputs of a residual PB predicate. Literal source folding can turn that definition into an axiom and discard premises needed by later Boolean learning. A pending-callback regression with 2*x+y+z+u>=3 verifies the residual definition, exact guarded learned clause and all original relation valuations; the literal-folding variant fails this regression.",
         "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits.",
         "Correctness correction for nested PB expressions: source uses the same Boolean ID for a predicate and its numeric slack and explicitly notes that nesting is unsupported. A direct retained internalizer regression with A=(x+y>=2), B=(A+z=1), A/B true and z false fails under literal shared IDs with AST source precondition: B applies [0,1] to A's weighted sum. Distinct even Boolean and odd slack columns preserve nonnested relative ordering and SMT literal/core IDs while separating these roles. The corrected direct test passes. The prebuilt C++ CLI returns sat on the corresponding script because its outer preprocessing avoids that direct construction; no C++ wrong-output or teardown-defect exception is claimed for these new vectors.",
-        "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete."
+        "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
+        "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and literal-network diagnostic audits remain incomplete."
       ]
     },
     {
@@ -231801,7 +231938,8 @@
         "pkg/smtcore/theory_pb_sort.go",
         "pkg/smtcore/theory_pb_compile_test.go",
         "pkg/ast/util_psort_ast_costs.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_pb_stats_test.go"
       ],
       "tests": [
         "TestPsortASTContextActualFactoriesClausesAndTrail",
@@ -231828,7 +231966,8 @@
         "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
         "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause"
       ],
       "conditionals": [
         {
@@ -232057,7 +232196,8 @@
         "Generated copy counterpart has no originating registered-driver copy assertion credit. Empty/cold/closed-provider/accidental-copy guards are Go representation/lifetime domains. Default reference-member assignment has no generated supported operator, so no assignment API is invented. Source scalar pointer aliases deliberately remain original; ended original is unread on zero input, then actual source kernel dereference returns typed lifetime guard after caller/own-member prefixes. The retained unsigned specialization uses checked Go lifetime and diagnostic adapters.",
         "The exported AST context preserves the complete psort algorithm; downstream SMT and tactic callers retain their own integration obligations. Literal scratch uses native []ASTHandle slices and captured spans, with no Runtime payload serialization or vector copy/growth acquisition metadata. Native frame cleanup also releases a partial range after a reached input read error. Real AST reference/registration allocations retain their separate failure and ownership checks.",
         "Retained ast_ext2 clauses/trail now use owning []ASTHandle with INC before native append. Removed ASTRefVector construction, capacity/refusal emulation and unpublished push receipt frames. Cleanup retains reverse member/ascending element order and consumed-DEC progress; source teardown retains its first cause while owning Close can resume. Actual AST factory and network reservation campaigns and independent clause oracles remain. Forty repeated cached factories/singleton clauses verify exact reference ownership and append order; native growth needs no arena reservation, while debug retains actual factory checks. Escaped owners close after manager teardown without stale node callbacks. No source container allocation geometry is credited.",
-        "Reopened from ported to partial because PB compilation now reaches a distinct concrete SMTLiteral instantiation. Its actual algorithms, source costs, clauses and scope lifetime are implemented and independently tested; its TRACE/assertion audit remains open. Existing AST/unsigned instantiations retain their separate evidence. Corrected AST vc_card_rec to preserve source vc_smerge(a,b,c) argument order, which differs from executable smerge(c,a,b); the source-derived k=1,n=5 regression fails before correction (3 variables,6 clauses) and passes after (5,6)."
+        "Reopened from ported to partial because PB compilation now reaches a distinct concrete SMTLiteral instantiation. Its actual algorithms, source costs, clauses and scope lifetime are implemented and independently tested; its TRACE/assertion audit remains open. Existing AST/unsigned instantiations retain their separate evidence. Corrected AST vc_card_rec to preserve source vc_smerge(a,b,c) argument order, which differs from executable smerge(c,a,b); the source-derived k=1,n=5 regression fails before correction (3 variables,6 clauses) and passes after (5,6).",
+        "Concrete SMTLiteral network variable/clause/literal statistics use source unsigned uint32 wrap before factory/clause effects. Literal-network TRACE/assertion audit remains open."
       ]
     },
     {
@@ -248752,7 +248892,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 706.358,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification; includes all prior datatype/equality increments, native PB watches/weighted resolution/control snapshots, restart sorting-network compilation, optional simplex, independent PB model initialization/factory, three-pass display and core debug validators, with prebuilt C++ comparisons enabled. Excludes the subsequent PB trace, inline-assertion and source uint32 propagation-counter correction increment, whose focused integration evidence is separate."
+    "scope_warning": "Verified exact clean isolated committed checkout, unchanged at start/end and independent verification; includes all prior datatype/equality increments, native PB watches/weighted resolution/control snapshots, restart sorting-network compilation, optional simplex, independent PB model initialization/factory, three-pass display and core debug validators, with prebuilt C++ comparisons enabled. Excludes the subsequent PB trace, inline-assertion and source uint32 propagation-counter correction increment, whose focused integration evidence is separate. Also excludes the subsequent resolution diagnostics, aggregate/simplex counter-width and kernel no-op reset correction increment."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

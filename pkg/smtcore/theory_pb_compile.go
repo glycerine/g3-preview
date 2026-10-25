@@ -144,6 +144,12 @@ func (t *SMTPseudoBooleanTheory) compileInequality(c *smtPBConstraint) error {
 	}
 	t.statistics.compiledVariables += network.variables
 	t.statistics.compiledClauses += network.clauses
+	if err = smtPBVerbose(2, func(out io.Writer) error {
+		_, err := fmt.Fprintf(out, "(smt.pb compile sorting network bound: %d literals: %d clauses: %d vars: %d)\n", k, uint32(len(in)), network.clauses, network.variables)
+		return err
+	}); err != nil {
+		return err
+	}
 	// Clauses disappear on scope pop; the surviving native constraint must
 	// become eligible for another compilation after that same rollback.
 	c.compiled = lbool.False

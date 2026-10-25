@@ -1332,13 +1332,23 @@ func TestSMTSolverCollectsAndResetsLinearArithmeticStatistics(t *testing.T) {
 	if !found {
 		t.Fatal("missing arithmetic statistics")
 	}
+	var beforeReset uint32
+	for i := 0; i < stats.Size(); i++ {
+		if stats.Key(i) == "arith add rows" {
+			beforeReset = stats.UintValue(i)
+		}
+	}
 	astTestMust(t, s.kernel.ResetStatistics())
 	stats.Reset()
 	astTestMust(t, s.CollectStatistics(stats))
+	found = false
 	for index := 0; index < stats.Size(); index++ {
 		if stats.Key(index) == "arith add rows" {
-			t.Fatal("arithmetic statistics survived reset")
+			found = stats.IsUint(index) && stats.UintValue(index) == beforeReset
 		}
+	}
+	if !found {
+		t.Fatal("source no-op reset changed arithmetic statistics")
 	}
 }
 
