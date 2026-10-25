@@ -10,6 +10,10 @@ import (
 )
 
 func (t *SMTStringTheory) freshStringVariable(name string) (ast.ASTHandle, error) {
+	return t.createStringVariable(name, true)
+}
+
+func (t *SMTStringTheory) createStringVariable(name string, basicAxioms bool) (ast.ASTHandle, error) {
 	m := t.state.manager
 	// Native seq_util::str.mk_string_sort uses the internal _STRING_SORT.
 	sort, err := m.MkFamilySort(t.FamilyID(), 2, nil)
@@ -36,7 +40,9 @@ func (t *SMTStringTheory) freshStringVariable(name string) (ast.ASTHandle, error
 	if _, err = t.mkVar(node); err != nil {
 		return ast.ASTHandle{}, err
 	}
-	t.basicTodo = append(t.basicTodo, node)
+	if basicAxioms {
+		t.basicTodo = append(t.basicTodo, node)
+	}
 	t.variableSet[variable] = struct{}{}
 	t.internalVariables[variable] = struct{}{}
 	if t.variableScopes[t.level] == nil {

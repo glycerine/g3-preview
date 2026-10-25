@@ -72,9 +72,8 @@ func (t *SMTStringTheory) inferStringConcatEquality(left, right ast.ASTHandle) e
 	return t.inferStringConcatArgument(right, total)
 }
 
-// Only a unique pair is selected until overlap-aware pair selection and
-// arrangement cut histories are ported. Native shared-concat groups skip
-// step 1 entirely, even if they contain other distinct concat members.
+// Native shared-concat groups skip step 1 entirely. Otherwise select the
+// first nonoverlapping pair, falling back to the first pair if all overlap.
 func (t *SMTStringTheory) simplifyStringConcatGroups(left, right smtStringClassGroups) error {
 	for _, l := range left.concats {
 		for _, r := range right.concats {
@@ -83,10 +82,21 @@ func (t *SMTStringTheory) simplifyStringConcatGroups(left, right smtStringClassG
 			}
 		}
 	}
-	if len(left.concats) == 1 && len(right.concats) == 1 {
-		return t.simplifyStringConcatEquality(left.concats[0], right.concats[0])
+	if len(left.concats) == 0 || len(right.concats) == 0 {
+		return nil
 	}
-	return nil
+	for _, l := range left.concats {
+		for _, r := range right.concats {
+			overlap, err := t.stringConcatOverlap(l, r)
+			if err != nil {
+				return err
+			}
+			if !overlap {
+				return t.simplifyStringConcatEquality(l, r)
+			}
+		}
+	}
+	return t.simplifyStringConcatEquality(left.concats[0], right.concats[0])
 }
 
 func (t *SMTStringTheory) simplifyStringConcatEquality(left, right ast.ASTHandle) (result error) {
@@ -204,7 +214,93 @@ func (t *SMTStringTheory) simplifyStringConcatEquality(left, right ast.ASTHandle
 		}
 		return premises.imply(conclusion)
 	}
-	// The following concat re-simplification and six arrangement families
-	// remain pending; FinalCheck continues to report GiveUp.
+	newLeft, err := t.simplifyStringConcat(left)
+	if err != nil {
+		return err
+	}
+	if err := temporaries.add(newLeft); err != nil {
+		return err
+	}
+	newRight, err := t.simplifyStringConcat(right)
+	if err != nil || newLeft == newRight {
+		return err
+	}
+	if err := temporaries.add(newRight); err != nil {
+		return err
+	}
+	possible, err := t.canTwoNodesEqual(newLeft, newRight)
+	if err != nil {
+		return err
+	}
+	if !possible {
+		equality, err := m.MkEq(newLeft, newRight)
+		if err != nil {
+			return err
+		}
+		if err := temporaries.add(equality); err != nil {
+			return err
+		}
+		negative, err := m.MkNot(equality)
+		if err != nil {
+			return err
+		}
+		return t.assertAxiom(negative)
+	}
+	x, y, lc, err = m.SequenceConcatParts(newLeft)
+	if err != nil {
+		return err
+	}
+	a, b, rc, err = m.SequenceConcatParts(newRight)
+	if err != nil {
+		return err
+	}
+	if !lc || !rc {
+		if _, literal, err := m.SequenceStringValue(newLeft); err != nil {
+			return err
+		} else if literal && rc {
+			return t.simplifyStringParents(newRight, newLeft)
+		}
+		if _, literal, err := m.SequenceStringValue(newRight); err != nil {
+			return err
+		} else if literal && lc {
+			return t.simplifyStringParents(newLeft, newRight)
+		}
+		return nil
+	}
+	same, err := t.sameStringClass(newLeft, newRight)
+	if err != nil {
+		return err
+	}
+	if !same && (left != newLeft || right != newRight) {
+		guards := smtStringLengthPremises{theory: t}
+		defer func() { result = errors.Join(result, guards.close()) }()
+		for _, pair := range [][2]ast.ASTHandle{{left, newLeft}, {right, newRight}, {left, right}} {
+			if err := guards.equate(pair[0], pair[1]); err != nil {
+				return err
+			}
+		}
+		equality, err := m.MkEq(newLeft, newRight)
+		if err != nil {
+			return err
+		}
+		if err := guards.imply(equality); err != nil {
+			return err
+		}
+	}
+	allVariables := true
+	for _, expression := range []ast.ASTHandle{x, y, a, b} {
+		if err := t.initializeStringCut(expression); err != nil {
+			return err
+		}
+		_, literal, err := m.SequenceStringValue(expression)
+		if err != nil {
+			return err
+		}
+		allVariables = allVariables && !literal
+	}
+	if allVariables {
+		return t.arrangeVariableConcats(newLeft, newRight)
+	}
+	// Literal-boundary arrangement families 2 through 6 remain pending.
 	return nil
 }

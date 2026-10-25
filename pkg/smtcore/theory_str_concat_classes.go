@@ -1,5 +1,5 @@
 // Source: src/smt/theory_str.cpp in_same_eqc, simplify_concat,
-// group_terms_by_eqc and the initial/coherence/constant steps of handle_equality.
+// group_terms_by_eqc and the initial/coherence/concat steps of handle_equality.
 package smtcore
 
 import (
@@ -162,8 +162,8 @@ func (t *SMTStringTheory) handleConstantEqualityStages(left, right ast.ASTHandle
 	if err := t.simplifyStringConcatGroups(l, r); err != nil {
 		return err
 	}
-	// Step 2 follows the ported step-1 quick paths. General arrangements
-	// remain pending, followed by parent and unroll/constant processing.
+	// Step 2 follows the quick paths and variable-concat arrangements.
+	// Literal-boundary arrangements remain pending.
 	if len(l.constants) != 0 {
 		for _, concat := range r.concats {
 			if err := t.solveConcatConstant(concat, l.constants[0]); err != nil {

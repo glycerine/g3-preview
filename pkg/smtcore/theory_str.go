@@ -47,6 +47,10 @@ type SMTStringTheory struct {
 	regexNFACache      map[ast.ASTHandle]*smtStringNFA
 	concatBreakFlags   map[[2]ast.ASTHandle]ast.ASTHandle
 	overlapAssumption  ast.ASTRef
+	cutHistory         map[ast.ASTHandle][]smtStringCut
+	arrangementVars    map[[2]ast.ASTHandle][3]ast.ASTHandle
+	nonemptyID         uint32
+	loopDetected       bool
 	closed             bool
 }
 
@@ -79,6 +83,8 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	t.regexTermsByString = make(map[ast.ASTHandle][]ast.ASTHandle)
 	t.regexNFACache = make(map[ast.ASTHandle]*smtStringNFA)
 	t.concatBreakFlags = make(map[[2]ast.ASTHandle]ast.ASTHandle)
+	t.cutHistory = make(map[ast.ASTHandle][]smtStringCut)
+	t.arrangementVars = make(map[[2]ast.ASTHandle][3]ast.ASTHandle)
 	// Source initialize_charset's active default alphabet. The unused final
 	// slot remains zero; NUL is excluded from the 255-character search order.
 	index := 0
@@ -258,8 +264,9 @@ func (t *SMTStringTheory) NewEquality(left, right SMTTheoryVar) error {
 	}
 	// Native handle_equality runs before merging. Initial concat shortcuts,
 	// consistency, coherence, grouping, concat cancellation/length quick
-	// paths, constant, parent and literal-unroll stages are connected;
-	// general concat arrangements and unroll/tester processing remain open.
+	// paths, variable-concat arrangements, constant, parent and literal-
+	// unroll stages are connected; literal-boundary arrangements and the
+	// remaining unroll/tester processing remain open.
 	lhs, rhs := t.variables[left].Owner(), t.variables[right].Owner()
 	shortcut, err := t.stringConcatEqualityShortcut(lhs, rhs)
 	if err != nil {
@@ -294,6 +301,7 @@ func (t *SMTStringTheory) PopScopes(count uint32) error {
 		return ast.ErrASTDomain
 	}
 	t.level -= count
+	t.popStringCuts()
 	kept := t.basicTodo[:0]
 	for _, node := range t.basicTodo {
 		if node.InternalScopeLevel() <= t.level {
@@ -312,8 +320,8 @@ func (t *SMTStringTheory) PopScopes(count uint32) error {
 
 func (t *SMTStringTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	_, err := t.State()
-	// The native final_check_eh/handle_equality/library pipeline is not yet
-	// connected. This owner must not turn an incomplete port into SAT.
+	// Remaining native equality/library/final-check stages are incomplete.
+	// This owner must not turn an incomplete port into SAT.
 	return SMTFinalCheckGiveUp, err
 }
 
@@ -344,6 +352,7 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.regexVariables, t.regexTerms, t.regexNFACache = nil, nil, nil
 	t.regexMemberships, t.regexTermsByString = nil, nil
 	t.concatBreakFlags = nil
+	t.cutHistory, t.arrangementVars = nil, nil
 	t.closed = true
 	return result
 }
