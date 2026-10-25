@@ -141111,25 +141111,6 @@
           ]
         },
         {
-          "name": "get_var_in_eqc and process_free_var representative/leaf/standalone selection prefix: registered private-class members, regex exclusion, deduplication, direct-parent concat checks, standalone core-length probe and native leaf-before-alone visitation",
-          "status": "ported",
-          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
-          "tests": [
-            "TestSMTStringFreeVariableOrderPrivateRepresentativesAndRoles",
-            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone",
-            "TestSMTStringFreeVariableOrderUsesRepresentativeDirectParents",
-            "TestSMTStringFreeVariableOrderInternalizesMissingCandidate"
-          ]
-        },
-        {
-          "name": "input_var_in_len insertion in set_up_axioms at theory_str.cpp:8297-8305: requires String sort and is_length simultaneously; actual length terms have Int sort. No other retained producer exists, so omit unreachable cache storage and preserve its empty-set behavior in free-variable selection",
-          "status": "reference_only",
-          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
-          "tests": [
-            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone"
-          ]
-        },
-        {
           "name": "final_check_eh !needToAssignFreeVars branch: ordered dynamic stoi/itos conversion agreement, Continue after all callbacks if any progress, assigned-regex path completeness gate, then native Done",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_str_final_assigned.go",
@@ -141148,6 +141129,25 @@
           "tests": [
             "TestSMTStringFinalVariableScanUsesAllPrivateClasses",
             "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes"
+          ]
+        },
+        {
+          "name": "get_var_in_eqc and process_free_var representative/leaf/standalone selection prefix: registered private-class members, regex exclusion, deduplication, direct-parent concat checks, standalone core-length probe and native leaf-before-alone visitation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
+          "tests": [
+            "TestSMTStringFreeVariableOrderPrivateRepresentativesAndRoles",
+            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone",
+            "TestSMTStringFreeVariableOrderUsesRepresentativeDirectParents",
+            "TestSMTStringFreeVariableOrderInternalizesMissingCandidate"
+          ]
+        },
+        {
+          "name": "input_var_in_len insertion in set_up_axioms at theory_str.cpp:8297-8305: requires String sort and is_length simultaneously; actual length terms have Int sort. No other retained producer exists, so omit unreachable cache storage and preserve its empty-set behavior in free-variable selection",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
+          "tests": [
+            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone"
           ]
         }
       ],
@@ -142402,25 +142402,6 @@
           ]
         },
         {
-          "name": "get_var_in_eqc and process_free_var representative/leaf/standalone selection prefix: registered private-class members, regex exclusion, deduplication, direct-parent concat checks, standalone core-length probe and native leaf-before-alone visitation",
-          "status": "ported",
-          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
-          "tests": [
-            "TestSMTStringFreeVariableOrderPrivateRepresentativesAndRoles",
-            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone",
-            "TestSMTStringFreeVariableOrderUsesRepresentativeDirectParents",
-            "TestSMTStringFreeVariableOrderInternalizesMissingCandidate"
-          ]
-        },
-        {
-          "name": "input_var_in_len insertion in set_up_axioms at theory_str.cpp:8297-8305: requires String sort and is_length simultaneously; actual length terms have Int sort. No other retained producer exists, so omit unreachable cache storage and preserve its empty-set behavior in free-variable selection",
-          "status": "reference_only",
-          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
-          "tests": [
-            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone"
-          ]
-        },
-        {
           "name": "final_check_eh !needToAssignFreeVars branch: ordered dynamic stoi/itos conversion agreement, Continue after all callbacks if any progress, assigned-regex path completeness gate, then native Done",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_str_final_assigned.go",
@@ -142439,6 +142420,25 @@
           "tests": [
             "TestSMTStringFinalVariableScanUsesAllPrivateClasses",
             "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes"
+          ]
+        },
+        {
+          "name": "get_var_in_eqc and process_free_var representative/leaf/standalone selection prefix: registered private-class members, regex exclusion, deduplication, direct-parent concat checks, standalone core-length probe and native leaf-before-alone visitation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
+          "tests": [
+            "TestSMTStringFreeVariableOrderPrivateRepresentativesAndRoles",
+            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone",
+            "TestSMTStringFreeVariableOrderUsesRepresentativeDirectParents",
+            "TestSMTStringFreeVariableOrderInternalizesMissingCandidate"
+          ]
+        },
+        {
+          "name": "input_var_in_len insertion in set_up_axioms at theory_str.cpp:8297-8305: requires String sort and is_length simultaneously; actual length terms have Int sort. No other retained producer exists, so omit unreachable cache storage and preserve its empty-set behavior in free-variable selection",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_free_variable_order.go",
+          "tests": [
+            "TestSMTStringFreeVariableOrderLeafBeforeUnknownStandalone"
           ]
         }
       ],
