@@ -84,7 +84,7 @@ func TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery(t *testing.T) {
 						if status != SMTFinalCheckContinue || !state.Inconsistent() {
 							t.Fatal("cycle escaped final check")
 						}
-						wantSplits := uint64(0)
+						wantSplits := uint32(0)
 						if unknownFirst {
 							wantSplits = 1
 						}
@@ -146,7 +146,7 @@ func TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery(t *testing.T) {
 					splits := dt.statistics.splits
 					status, err := dt.FinalCheck()
 					astTestMust(t, err)
-					if status != SMTFinalCheckContinue || state.Inconsistent() || dt.statistics.splits-splits != uint64(length+1) {
+					if status != SMTFinalCheckContinue || state.Inconsistent() || dt.statistics.splits-splits != uint32(length+1) {
 						t.Fatal("final-check cleanup lost roots or retained a cycle")
 					}
 				})

@@ -41,7 +41,7 @@ func TestSMTDatatypeSplitCreatesOneRecognizerAndAwaitsAssignment(t *testing.T) {
 		astTestMust(t, dt.split(x, sort))
 		slots, err := dt.recognizerSlots(x)
 		astTestMust(t, err)
-		if len(slots) != 1 || slots[constructors[1]].expression.IsNull() || len(s.clauses) != clauses || dt.statistics.splits != uint64(i+1) {
+		if len(slots) != 1 || slots[constructors[1]].expression.IsNull() || len(s.clauses) != clauses || dt.statistics.splits != uint32(i+1) {
 			t.Fatal("split expanded cases or changed source split-call statistics")
 		}
 		assignment, err := s.Assignment(slots[constructors[1]].literal)

@@ -19,7 +19,7 @@ type smtDatatypeScope struct {
 }
 
 type smtDatatypeStatistics struct {
-	constructorAxioms, accessorAxioms, updateAxioms, splits, occursChecks uint64
+	constructorAxioms, accessorAxioms, updateAxioms, splits, occursChecks uint32
 }
 
 // SMTDatatypeTheory encodes constructor cases with recognizer clauses and
@@ -382,6 +382,23 @@ func (t *SMTDatatypeTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHand
 	if err != nil {
 		return err
 	}
+	if node == nil {
+		return ast.ErrASTDomain
+	}
+	if err = t.emitDatatype("datatype", "apply_sort_cnstr", 343, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "apply_sort_cnstr: #")
+		id, err := node.OwnerID()
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "%d\n", id)
+		return err
+	}); err != nil {
+		return err
+	}
+	if err = t.traceDatatypeTaggedExpression("datatype_bug", "apply_sort_cnstr", 344, "apply_sort_cnstr:\n", node.owner); err != nil {
+		return err
+	}
 	family, err := state.manager.GetFamilyID(sort)
 	if err != nil || family != t.FamilyID() || t.IsAttachedToVariable(node) {
 		return err
@@ -598,11 +615,11 @@ func (t *SMTDatatypeTheory) CollectStatistics(target *statistics.Statistics) err
 	if t == nil || target == nil {
 		return ast.ErrASTHandle
 	}
-	target.UpdateUint64("datatype splits", t.statistics.splits)
-	target.UpdateUint64("datatype constructor ax", t.statistics.constructorAxioms)
-	target.UpdateUint64("datatype accessor ax", t.statistics.accessorAxioms)
-	target.UpdateUint64("datatype update field ax", t.statistics.updateAxioms)
-	target.UpdateUint64("datatype occurs check", t.statistics.occursChecks)
+	target.UpdateUint("datatype occurs check", t.statistics.occursChecks)
+	target.UpdateUint("datatype splits", t.statistics.splits)
+	target.UpdateUint("datatype constructor ax", t.statistics.constructorAxioms)
+	target.UpdateUint("datatype accessor ax", t.statistics.accessorAxioms)
+	target.UpdateUint("datatype update ax", t.statistics.updateAxioms)
 	return nil
 }
 

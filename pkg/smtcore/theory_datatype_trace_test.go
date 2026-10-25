@@ -238,7 +238,7 @@ func TestSMTDatatypeRecognizerAssignmentTraceAndConstructorPrefix(t *testing.T) 
 			dt.trace = tags
 			before := dt.statistics.constructorAxioms
 			astTestMust(t, s.propagateAssignedAtom(assigned))
-			wantDelta := uint64(0)
+			wantDelta := uint32(0)
 			bit := 0
 			if truth {
 				wantDelta, bit = 1, 1
@@ -309,5 +309,87 @@ func TestSMTDatatypeMergeTracePrecedesImportedRecognizer(t *testing.T) {
 		}
 	} else if output.Len() != 0 {
 		t.Fatal("native merge trace was not erased")
+	}
+}
+
+func TestSMTDatatypeSortConstraintTraceIncludesAttachedSkip(t *testing.T) {
+	_, dt, x, sort, _ := smtDatatypeSplitFixture(t)
+	s, err := dt.State()
+	astTestMust(t, err)
+	node := s.context.enodes[x]
+	id, err := node.OwnerID()
+	astTestMust(t, err)
+	before := dt.NumVariables()
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("datatype")
+	tags.Enable("datatype_bug")
+	dt.trace = tags
+	astTestMust(t, dt.ApplySortConstraint(node, sort))
+	if dt.NumVariables() != before {
+		t.Fatal("sort constraint diagnostic duplicated an attached variable")
+	}
+	bug := smtDatatypeTraceRecord("datatype_bug", "apply_sort_cnstr", 344, "apply_sort_cnstr:\nincremental-x\n")
+	if tags.ShouldTrace("datatype") {
+		want := smtDatatypeTraceRecord("datatype", "apply_sort_cnstr", 343, fmt.Sprintf("apply_sort_cnstr: #%d\n", id)) + bug
+		if output.String() != want {
+			t.Fatal("source sort constraint records", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("native sort constraint diagnostic was not erased")
+	}
+	output.Reset()
+	tags.Disable("datatype")
+	astTestMust(t, dt.ApplySortConstraint(node, sort))
+	if tags.ShouldTrace("datatype_bug") && output.String() != bug {
+		t.Fatal("sort-constraint bug tag was coupled to datatype tag", output.String())
+	}
+}
+
+func TestSMTDatatypeRelevanceTracePrecedesRegistrationAndDuplicateSkip(t *testing.T) {
+	m, dt, x, _, constructors := smtDatatypeSplitFixture(t)
+	s, err := dt.State()
+	astTestMust(t, err)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("datatype")
+	dt.trace = tags
+	astTestMust(t, dt.Relevant(x))
+	if tags.ShouldTrace("datatype") {
+		want := smtDatatypeTraceRecord("datatype", "relevant_eh", 396, "relevant_eh: incremental-x\n")
+		if output.String() != want {
+			t.Fatal("non-recognizer relevance entry was skipped", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("native relevance entry was not erased")
+	}
+	_, expression, err := dt.recognizerLiteral(constructors[1], x)
+	astTestMust(t, err)
+	output.Reset()
+	astTestMust(t, s.markRelevant(expression))
+	if tags.ShouldTrace("datatype") {
+		last := -1
+		for _, site := range []string{"[datatype] relevant_eh src/smt/theory_datatype.cpp:396", "[datatype] relevant_eh src/smt/theory_datatype.cpp:400", "[datatype] add_recognizer src/smt/theory_datatype.cpp:712"} {
+			i := strings.Index(output.String(), site)
+			if i <= last {
+				t.Fatal("source relevance/registration record order", site, output.String())
+			}
+			last = i
+		}
+		id, err := m.GetASTID(expression)
+		astTestMust(t, err)
+		if !strings.Contains(output.String(), fmt.Sprintf("relevant_eh: #%d\n", id)) {
+			t.Fatal("relevance record lost source AST identity", output.String())
+		}
+	}
+	output.Reset()
+	astTestMust(t, dt.Relevant(expression))
+	if strings.Contains(output.String(), "[datatype] add_recognizer") {
+		t.Fatal("already watched recognizer was registered twice")
+	}
+	_, data, err := dt.rootData(s.context.enodes[x].TheoryVar(dt.FamilyID()))
+	astTestMust(t, err)
+	if len(data.recognizers) != 3 || data.recognizers[1] != s.context.enodes[expression] {
+		t.Fatal("relevance diagnostic changed source watch slot")
 	}
 }

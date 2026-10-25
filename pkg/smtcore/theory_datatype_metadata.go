@@ -159,12 +159,37 @@ func (t *SMTDatatypeTheory) addRecognizer(variable SMTTheoryVar, recognizer *SMT
 }
 
 func (t *SMTDatatypeTheory) Relevant(expression ast.ASTHandle) error {
+	s, err := t.State()
+	if err != nil {
+		return err
+	}
+	if err = t.emitDatatype("datatype", "relevant_eh", 396, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "relevant_eh: ")
+		if err := t.displayDatatypeBounded(out, expression); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return err
+	}
 	op, own, err := t.operation(expression)
 	if err != nil || !own || op != ast.ASTDatatypeRecognizer && op != ast.ASTDatatypeIs {
 		return err
 	}
-	s, err := t.State()
-	if err != nil {
+	if err = t.emitDatatype("datatype", "relevant_eh", 400, func(out io.Writer) error {
+		_, _ = io.WriteString(out, "relevant_eh: #")
+		id, err := s.manager.GetASTID(expression)
+		if err != nil {
+			return err
+		}
+		_, _ = fmt.Fprintf(out, "%d\n", id)
+		if err = t.displayDatatypeBounded(out, expression); err != nil {
+			return err
+		}
+		_, err = io.WriteString(out, "\n")
+		return err
+	}); err != nil {
 		return err
 	}
 	node := s.context.enodes[expression]
