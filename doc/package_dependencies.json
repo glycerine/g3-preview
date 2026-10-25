@@ -2825,6 +2825,7 @@
         "theory_str_prefix_arrangements.go",
         "theory_str_regex.go",
         "theory_str_regex_axioms.go",
+        "theory_str_regex_complexity.go",
         "theory_str_regex_lengths.go",
         "theory_str_relations.go",
         "theory_str_replace.go",

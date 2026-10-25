@@ -139160,7 +139160,9 @@
         "pkg/smtcore/theory_str_automaton_bounds.go",
         "pkg/smtcore/theory_str_automaton_bounds_test.go",
         "pkg/smtcore/theory_str_automaton_paths.go",
-        "pkg/smtcore/theory_str_automaton_paths_test.go"
+        "pkg/smtcore/theory_str_automaton_paths_test.go",
+        "pkg/smtcore/theory_str_regex_complexity.go",
+        "pkg/smtcore/theory_str_regex_complexity_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139306,7 +139308,10 @@
         "TestSMTStringRegexPathUnitLengthConstraints",
         "TestSMTStringRegexPathWitnessCacheRefreshGrowthAndShorterPrefix",
         "TestSMTStringRegexPathUnsupportedPredicateKeepsOutputAndWitnesses",
-        "TestSMTStringRegexPathNonValueCharacterAndOwnerGuards"
+        "TestSMTStringRegexPathNonValueCharacterAndOwnerGuards",
+        "TestSMTStringRegexComplexityUnsignedPolicy",
+        "TestSMTStringRegexComplexityComplementAndByteRanges",
+        "TestSMTStringRegexIntersectionDifficulty"
       ],
       "conditionals": [
         {
@@ -140781,6 +140786,16 @@
           "tests": [
             "TestSMTStringRegexPathRejectsUnreachedZeroLength"
           ]
+        },
+        {
+          "name": "regex_inc_counter, regex_get_counter, _qadd, _qmul, estimate_regex_complexity, estimate_regex_complexity_under_complement, estimate_automata_intersection_difficulty",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_complexity.go",
+          "tests": [
+            "TestSMTStringRegexComplexityUnsignedPolicy",
+            "TestSMTStringRegexComplexityComplementAndByteRanges",
+            "TestSMTStringRegexIntersectionDifficulty"
+          ]
         }
       ],
       "ownership": [
@@ -140809,7 +140824,8 @@
         "Constant/length backpropagation owns temporary byte literals, length/numeral operands and premise/conclusion ASTs through publication using concrete local ASTRefs, released forward through existing helpers. Analysis results borrow context/private-class roots only for the actual FinalCheck call. The reached prefix uses no universal callbacks or C++ string/set/template adapters; iterative typed traversal preserves source leaf multiplicity and unique-premise sets.",
         "Regex length inference borrows input regex/length roots and owns all newly built AST intermediates in one concrete computation frame, releasing local roots forward after acquiring the caller-owned ASTRef result. Actual fresh integer variables retain the existing theory lifetime ownership and append to the concrete output slice in native concat parent-before-child order; partial generation does not roll back already-created witnesses. Signed integer length sets use native Go maps with deterministic ascending coefficient traversal instead of porting C++ hashtable layout; no insertion-order dictionary or generic callback/STL adapter is needed.",
         "Concrete StringRegexAutomaton delegates the existing sequence builder, owns the input regex and generated AST label roots, and materializes the retained uint32-condition math/automata graph plus a concrete character/range/predicate table. Graph/Condition views borrow the owner; idempotent Close releases the existing builder roots and invalidates guarded views. Constructor failure closes acquired roots. Bounds borrow only the graph; initial-bound formulas hold concrete local ASTRefs through publication. Word-keyed last-lower-bound values use independent Go big.Int storage and retain native lifetime across scope pops; no universal adapter, generics or STL internals are added.",
-        "Finite automaton path construction owns all generated AST conditions, byte literals, equalities and frontier accumulators in a concrete local computation frame, releasing roots forward after transferring the owned path result and caller-owned character output. Persistent character vectors borrow input String keys from retained context/regex roots and borrow witness handles from the existing lifetime trail. Reused-cache growth preserves the native second direct trail reference for each new witness. Cache membership survives scope pop; only requested witness enodes/basic queues are refreshed. Failure retains already-created native witnesses but leaves the caller character output unchanged until final publication. No generic maps, callbacks or STL adapters are ported."
+        "Finite automaton path construction owns all generated AST conditions, byte literals, equalities and frontier accumulators in a concrete local computation frame, releasing roots forward after transferring the owned path result and caller-owned character output. Persistent character vectors borrow input String keys from retained context/regex roots and borrow witness handles from the existing lifetime trail. Reused-cache growth preserves the native second direct trail reference for each new witness. Cache membership survives scope pop; only requested witness enodes/basic queues are refreshed. Failure retains already-created native witnesses but leaves the caller character output unchanged until final publication. No generic maps, callbacks or STL adapters are ported.",
+        "Regex policy counters use concrete ASTHandle-to-uint32 Go maps with native read-inserts-zero and wrapping increments. Complexity traversal borrows retained AST roots and automaton graphs, creates no AST objects and uses exact source unsigned arithmetic, including sentinel-before-zero multiplication and comparison-based overflow detection."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140843,7 +140859,8 @@
         "The actual String FinalCheck now runs dependency analysis, constant backpropagation and length propagation in native order and returns Continue on added constant/length axioms, then GiveUp before the unfinished regex/free-variable/tester/unroll suffix. It still never claims SAT from the incomplete owner, and production QF_S routing remains unchanged. Preserve a retained C++ shadowing behavior explicitly: theory_str.cpp propagate_length_within_eqc replaces rational varLen with expr_ref varLen; ast.h defines expr_ref as obj_ref and util/obj_ref.h supplies implicit operator bool, so mk_int(int) receives 1 for that valid length AST. Go emits 1 in the conclusion while retaining the actual member-length numeral in its premise. Scope/progress diagnostic traces remain outside this algorithmic-prefix credit; constant/length operational effects are directly tested.",
         "Retained regex length linearity, finite subterm-length collection and infer_all_regex_lengths are now implemented and directly verified. Preserve distinct native fallbacks, per-distinct-length plus base contributions, zero-coefficient witnesses and failure propagation rather than replacing them with modern regex-language evaluation. Counter nonnegativity belongs to the enclosing caller and is not silently asserted by the formula generator. The full regex automata stage still requires automaton construction/assumptions, initial/refined bounds and path/intersection constraints before its actual FinalCheck dispatch can preserve native order. Current FinalCheck reaches dependency/constant/length backpropagation then gives up before that suffix; production QF_S routing is unchanged and source units remain partial.",
         "Complete retained lower/upper refinement and initial-bound routines are now implemented against actual automata constructed by the existing sequence builder. Preserve native no-nonzero-solution errors for empty/epsilon-only initial-bound publication, including zero-cache update before the latter guard, and omit the source upper-bound TODO. The new bridge is concretely typed for retained byte-string labels and uses existing math/automata graph algorithms; it does not substitute the separate legacy NFA. Full automata assumptions/construction scheduling, expression-solver kernel integration, path/intersection constraints and source-ordered FinalCheck dispatch remain pending. Current FinalCheck still stops after dependency/constant/length backpropagation and production routing is unchanged.",
-        "Finite regex path constraints and predicate translation are now implemented and directly verified against actual constructed automata, including range swapping, NUL/high bytes, source accumulator order, scoped cache refresh/growth and independent String decomposition constraints. Call-site audit proves the helper is only reached for nonzero lengths; its unused zero-length arm is omitted per retained-consumer rules and the Go boundary rejects zero. The enclosing final checker must port its own live zero-length handling. Unsupported BV predicate declarations are not reinterpreted as String comparisons; native null/type preconditions become explicit Go errors. Complete automata assumptions/construction scheduling, nested expression-solver kernel, path/intersection dispatch and remaining tester/unroll/final checking remain pending. Production routing and current FinalCheck prefix are unchanged."
+        "Finite regex path constraints and predicate translation are now implemented and directly verified against actual constructed automata, including range swapping, NUL/high bytes, source accumulator order, scoped cache refresh/growth and independent String decomposition constraints. Call-site audit proves the helper is only reached for nonzero lengths; its unused zero-length arm is omitted per retained-consumer rules and the Go boundary rejects zero. The enclosing final checker must port its own live zero-length handling. Unsupported BV predicate declarations are not reinterpreted as String comparisons; native null/type preconditions become explicit Go errors. Complete automata assumptions/construction scheduling, nested expression-solver kernel, path/intersection dispatch and remaining tester/unroll/final checking remain pending. Production routing and current FinalCheck prefix are unchanged.",
+        "Regex complexity and intersection difficulty policy helpers are directly verified, preserving asymmetric complemented concatenation, persistent pessimistic nested-complement mode, byte-width literals, unsigned reversed-range wrap and native overflow cases. These prerequisites do not yet implement the enclosing automata-stage construction scheduling or change FinalCheck/production routing. Source units remain partial."
       ]
     },
     {
@@ -140922,7 +140939,9 @@
         "pkg/smtcore/theory_str_automaton_bounds.go",
         "pkg/smtcore/theory_str_automaton_bounds_test.go",
         "pkg/smtcore/theory_str_automaton_paths.go",
-        "pkg/smtcore/theory_str_automaton_paths_test.go"
+        "pkg/smtcore/theory_str_automaton_paths_test.go",
+        "pkg/smtcore/theory_str_regex_complexity.go",
+        "pkg/smtcore/theory_str_regex_complexity_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -141069,7 +141088,10 @@
         "TestSMTStringRegexPathUnitLengthConstraints",
         "TestSMTStringRegexPathWitnessCacheRefreshGrowthAndShorterPrefix",
         "TestSMTStringRegexPathUnsupportedPredicateKeepsOutputAndWitnesses",
-        "TestSMTStringRegexPathNonValueCharacterAndOwnerGuards"
+        "TestSMTStringRegexPathNonValueCharacterAndOwnerGuards",
+        "TestSMTStringRegexComplexityUnsignedPolicy",
+        "TestSMTStringRegexComplexityComplementAndByteRanges",
+        "TestSMTStringRegexIntersectionDifficulty"
       ],
       "conditionals": [
         {
@@ -141862,6 +141884,16 @@
           "tests": [
             "TestSMTStringRegexPathRejectsUnreachedZeroLength"
           ]
+        },
+        {
+          "name": "regex_inc_counter, regex_get_counter, _qadd, _qmul, estimate_regex_complexity, estimate_regex_complexity_under_complement, estimate_automata_intersection_difficulty",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_regex_complexity.go",
+          "tests": [
+            "TestSMTStringRegexComplexityUnsignedPolicy",
+            "TestSMTStringRegexComplexityComplementAndByteRanges",
+            "TestSMTStringRegexIntersectionDifficulty"
+          ]
         }
       ],
       "ownership": [
@@ -141891,7 +141923,8 @@
         "Constant/length backpropagation owns temporary byte literals, length/numeral operands and premise/conclusion ASTs through publication using concrete local ASTRefs, released forward through existing helpers. Analysis results borrow context/private-class roots only for the actual FinalCheck call. The reached prefix uses no universal callbacks or C++ string/set/template adapters; iterative typed traversal preserves source leaf multiplicity and unique-premise sets.",
         "Regex length inference borrows input regex/length roots and owns all newly built AST intermediates in one concrete computation frame, releasing local roots forward after acquiring the caller-owned ASTRef result. Actual fresh integer variables retain the existing theory lifetime ownership and append to the concrete output slice in native concat parent-before-child order; partial generation does not roll back already-created witnesses. Signed integer length sets use native Go maps with deterministic ascending coefficient traversal instead of porting C++ hashtable layout; no insertion-order dictionary or generic callback/STL adapter is needed.",
         "Concrete StringRegexAutomaton delegates the existing sequence builder, owns the input regex and generated AST label roots, and materializes the retained uint32-condition math/automata graph plus a concrete character/range/predicate table. Graph/Condition views borrow the owner; idempotent Close releases the existing builder roots and invalidates guarded views. Constructor failure closes acquired roots. Bounds borrow only the graph; initial-bound formulas hold concrete local ASTRefs through publication. Word-keyed last-lower-bound values use independent Go big.Int storage and retain native lifetime across scope pops; no universal adapter, generics or STL internals are added.",
-        "Finite automaton path construction owns all generated AST conditions, byte literals, equalities and frontier accumulators in a concrete local computation frame, releasing roots forward after transferring the owned path result and caller-owned character output. Persistent character vectors borrow input String keys from retained context/regex roots and borrow witness handles from the existing lifetime trail. Reused-cache growth preserves the native second direct trail reference for each new witness. Cache membership survives scope pop; only requested witness enodes/basic queues are refreshed. Failure retains already-created native witnesses but leaves the caller character output unchanged until final publication. No generic maps, callbacks or STL adapters are ported."
+        "Finite automaton path construction owns all generated AST conditions, byte literals, equalities and frontier accumulators in a concrete local computation frame, releasing roots forward after transferring the owned path result and caller-owned character output. Persistent character vectors borrow input String keys from retained context/regex roots and borrow witness handles from the existing lifetime trail. Reused-cache growth preserves the native second direct trail reference for each new witness. Cache membership survives scope pop; only requested witness enodes/basic queues are refreshed. Failure retains already-created native witnesses but leaves the caller character output unchanged until final publication. No generic maps, callbacks or STL adapters are ported.",
+        "Regex policy counters use concrete ASTHandle-to-uint32 Go maps with native read-inserts-zero and wrapping increments. Complexity traversal borrows retained AST roots and automaton graphs, creates no AST objects and uses exact source unsigned arithmetic, including sentinel-before-zero multiplication and comparison-based overflow detection."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141926,7 +141959,8 @@
         "The actual String FinalCheck now runs dependency analysis, constant backpropagation and length propagation in native order and returns Continue on added constant/length axioms, then GiveUp before the unfinished regex/free-variable/tester/unroll suffix. It still never claims SAT from the incomplete owner, and production QF_S routing remains unchanged. Preserve a retained C++ shadowing behavior explicitly: theory_str.cpp propagate_length_within_eqc replaces rational varLen with expr_ref varLen; ast.h defines expr_ref as obj_ref and util/obj_ref.h supplies implicit operator bool, so mk_int(int) receives 1 for that valid length AST. Go emits 1 in the conclusion while retaining the actual member-length numeral in its premise. Scope/progress diagnostic traces remain outside this algorithmic-prefix credit; constant/length operational effects are directly tested.",
         "Retained regex length linearity, finite subterm-length collection and infer_all_regex_lengths are now implemented and directly verified. Preserve distinct native fallbacks, per-distinct-length plus base contributions, zero-coefficient witnesses and failure propagation rather than replacing them with modern regex-language evaluation. Counter nonnegativity belongs to the enclosing caller and is not silently asserted by the formula generator. The full regex automata stage still requires automaton construction/assumptions, initial/refined bounds and path/intersection constraints before its actual FinalCheck dispatch can preserve native order. Current FinalCheck reaches dependency/constant/length backpropagation then gives up before that suffix; production QF_S routing is unchanged and source units remain partial.",
         "Complete retained lower/upper refinement and initial-bound routines are now implemented against actual automata constructed by the existing sequence builder. Preserve native no-nonzero-solution errors for empty/epsilon-only initial-bound publication, including zero-cache update before the latter guard, and omit the source upper-bound TODO. The new bridge is concretely typed for retained byte-string labels and uses existing math/automata graph algorithms; it does not substitute the separate legacy NFA. Full automata assumptions/construction scheduling, expression-solver kernel integration, path/intersection constraints and source-ordered FinalCheck dispatch remain pending. Current FinalCheck still stops after dependency/constant/length backpropagation and production routing is unchanged.",
-        "Finite regex path constraints and predicate translation are now implemented and directly verified against actual constructed automata, including range swapping, NUL/high bytes, source accumulator order, scoped cache refresh/growth and independent String decomposition constraints. Call-site audit proves the helper is only reached for nonzero lengths; its unused zero-length arm is omitted per retained-consumer rules and the Go boundary rejects zero. The enclosing final checker must port its own live zero-length handling. Unsupported BV predicate declarations are not reinterpreted as String comparisons; native null/type preconditions become explicit Go errors. Complete automata assumptions/construction scheduling, nested expression-solver kernel, path/intersection dispatch and remaining tester/unroll/final checking remain pending. Production routing and current FinalCheck prefix are unchanged."
+        "Finite regex path constraints and predicate translation are now implemented and directly verified against actual constructed automata, including range swapping, NUL/high bytes, source accumulator order, scoped cache refresh/growth and independent String decomposition constraints. Call-site audit proves the helper is only reached for nonzero lengths; its unused zero-length arm is omitted per retained-consumer rules and the Go boundary rejects zero. The enclosing final checker must port its own live zero-length handling. Unsupported BV predicate declarations are not reinterpreted as String comparisons; native null/type preconditions become explicit Go errors. Complete automata assumptions/construction scheduling, nested expression-solver kernel, path/intersection dispatch and remaining tester/unroll/final checking remain pending. Production routing and current FinalCheck prefix are unchanged.",
+        "Regex complexity and intersection difficulty policy helpers are directly verified, preserving asymmetric complemented concatenation, persistent pessimistic nested-complement mode, byte-width literals, unsigned reversed-range wrap and native overflow cases. These prerequisites do not yet implement the enclosing automata-stage construction scheduling or change FinalCheck/production routing. Source units remain partial."
       ]
     },
     {
