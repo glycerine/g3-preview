@@ -138683,9 +138683,16 @@
       "path": "src/smt/theory_str.cpp",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_str_nfa.go",
+        "pkg/smtcore/theory_str_nfa_test.go"
+      ],
+      "tests": [
+        "TestSMTStringNFAThompsonLanguage",
+        "TestSMTStringNFAEpsilonCyclesAndEveryByte",
+        "TestSMTStringNFAUnsupportedAndNonconstantLiteral"
+      ],
       "conditionals": [
         {
           "line": 8740,
@@ -139388,17 +139395,42 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "nfa concrete Thompson construction for constant to_re, concat, union, star, byte range, full sequence and full character; epsilon closure and matching; unsupported-operator validity and nonconstant to_re refusal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_nfa.go",
+          "tests": [
+            "TestSMTStringNFAThompsonLanguage",
+            "TestSMTStringNFAEpsilonCyclesAndEveryByte",
+            "TestSMTStringNFAUnsupportedAndNonconstantLiteral"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete NFA consumes an AST only during construction and retains only Go state/transition/epsilon data. Membership and closure sets use Go maps without observable iteration-order dependencies; state allocation follows source operand order. No C++ standard-library code or generic container adapter is ported."
+      ],
+      "deviations": [
+        "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. Backend construction/internalization, equality/constraint callbacks, regex cache/consumer integration, final checking, model callback wiring and setup_QF_S/string_solver routing are still unported. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks."
+      ]
     },
     {
       "path": "src/smt/theory_str.h",
       "component": "smt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/theory_str_nfa.go",
+        "pkg/smtcore/theory_str_nfa_test.go",
+        "pkg/smtcore/proto_model/string_factory.go",
+        "pkg/smtcore/proto_model/string_factory_test.go"
+      ],
+      "tests": [
+        "TestSMTStringNFAThompsonLanguage",
+        "TestSMTStringNFAEpsilonCyclesAndEveryByte",
+        "TestSMTStringNFAUnsupportedAndNonconstantLiteral",
+        "TestStringFactoryNativeDefaultsFreshNamesAndIgnoredRegistration"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -139411,9 +139443,34 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "nfa concrete Thompson construction for constant to_re, concat, union, star, byte range, full sequence and full character; epsilon closure and matching; unsupported-operator validity and nonconstant to_re refusal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_nfa.go",
+          "tests": [
+            "TestSMTStringNFAThompsonLanguage",
+            "TestSMTStringNFAEpsilonCyclesAndEveryByte",
+            "TestSMTStringNFAUnsupportedAndNonconstantLiteral"
+          ]
+        },
+        {
+          "name": "str_value_factory get_some_value/get_some_values source string defaults; hexadecimal unsigned fresh counter and generated-name membership; recursive regex fresh values; intentionally ignored register_value",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/string_factory.go",
+          "tests": [
+            "TestStringFactoryNativeDefaultsFreshNamesAndIgnoredRegistration"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete NFA consumes an AST only during construction and retains only Go state/transition/epsilon data. Membership and closure sets use Go maps without observable iteration-order dependencies; state allocation follows source operand order. No C++ standard-library code or generic container adapter is ported.",
+        "StringFactory retains generated expression refs because the Go ValueFactory interface returns raw handles rather than source expr_ref output parameters. Values are deduplicated by handle, refs close in reverse generation order, and model-owned factory teardown is idempotent. Its string-symbol set contains only generated fresh names; register_value intentionally does not populate it or change the delimiter."
+      ],
+      "deviations": [
+        "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. Backend construction/internalization, equality/constraint callbacks, regex cache/consumer integration, final checking, model callback wiring and setup_QF_S/string_solver routing are still unported. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
+        "The header str_value_factory is implemented separately from seq_factory. Some values are exactly some value/value 1/value 2; fresh names use !hex! with a wrapping uint32 counter, skip previously generated names and share the counter with regex fresh values. Registering an existing !0! is ignored, as native requires, rather than adopting SequenceFactory collision avoidance. Go owns returned handles through factory close to represent native output-ref lifetime. The theory_str init_model/mk_value consumers remain unported and are not credited here."
+      ]
     },
     {
       "path": "src/smt/theory_utvpi.cpp",
