@@ -159,8 +159,12 @@ func (t *SMTStringTheory) instantiateConcatAxiom(node *SMTEnode) (result error) 
 }
 
 func (t *SMTStringTheory) instantiateStringEqualityLengthAxiom(left, right *SMTEnode) (result error) {
+	return t.assertStringLengthEquality(left.Owner(), right.Owner())
+}
+
+func (t *SMTStringTheory) assertStringLengthEquality(left, right ast.ASTHandle) (result error) {
 	m := t.state.manager
-	premise, err := m.MkEq(left.Owner(), right.Owner())
+	premise, err := m.MkEq(left, right)
 	if err != nil {
 		return err
 	}
@@ -176,8 +180,8 @@ func (t *SMTStringTheory) instantiateStringEqualityLengthAxiom(left, right *SMTE
 	}
 	refs = append(refs, ref)
 	var lengths [2]ast.ASTHandle
-	for i, node := range []*SMTEnode{left, right} {
-		lengths[i], err = m.MkSequenceLength(node.Owner())
+	for i, expression := range []ast.ASTHandle{left, right} {
+		lengths[i], err = m.MkSequenceLength(expression)
 		if err != nil {
 			return err
 		}

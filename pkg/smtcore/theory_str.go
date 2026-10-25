@@ -243,8 +243,11 @@ func (t *SMTStringTheory) NewEquality(left, right SMTTheoryVar) error {
 	if left < 0 || right < 0 || uint32(left) >= t.find.GetNumVars() || uint32(right) >= t.find.GetNumVars() {
 		return ast.ErrASTDomain
 	}
-	// Native handle_equality runs before this merge. Its constraint routines
-	// are still being ported; FinalCheck refuses completion until connected.
+	// Native handle_equality checks the classes before merging. The retained
+	// value/length pair loop is connected; other handler stages remain open.
+	if _, err := t.checkNewEqualityValuesAndLengths(t.variables[left].Owner(), t.variables[right].Owner()); err != nil {
+		return err
+	}
 	t.find.Merge(uint32(left), uint32(right))
 	return nil
 }
