@@ -2730,6 +2730,7 @@
         "theory_bv_boolean_gates.go",
         "theory_datatype.go",
         "theory_datatype_conflicts.go",
+        "theory_datatype_display.go",
         "theory_datatype_equality.go",
         "theory_datatype_metadata.go",
         "theory_datatype_occurs.go",

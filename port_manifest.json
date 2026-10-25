@@ -131861,7 +131861,9 @@
         "pkg/smtcore/smt_justification_theory.go",
         "pkg/cmd/g3/datatype_update_equality_test.go",
         "pkg/smtcore/theory_datatype_metadata.go",
-        "pkg/smtcore/theory_datatype_metadata_test.go"
+        "pkg/smtcore/theory_datatype_metadata_test.go",
+        "pkg/smtcore/theory_datatype_display.go",
+        "pkg/smtcore/theory_datatype_display_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -131899,7 +131901,10 @@
         "TestSMTDatatypeMergedFalseRecognizersPropagateWithSourceEvidence",
         "TestSMTDatatypeConstructorMetadataAndModelProcedureRollback",
         "TestSMTDatatypeMergePreservesFirstWatchPerConstructor",
-        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope"
+        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+        "TestSMTDatatypeDisplayPrivateRootsAndScopedMetadata",
+        "TestSMTDatatypeEmptyDisplayAndClosedOwner",
+        "TestSMTDatatypeDisplayBoundsConstructorArguments"
       ],
       "assertions": [
         {
@@ -132183,7 +132188,7 @@
           ]
         },
         {
-          "name": "Remaining datatype TRACE/display/assertion and context integration audit",
+          "name": "Remaining datatype TRACE/assertion and context integration audit",
           "status": "partial",
           "tests": []
         },
@@ -132309,6 +132314,20 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "display/display_var: retained context display dispatch; declaration-order variable rows, private union-find root, each variable own constructor metadata rather than root data, source bounded low-level depth three and empty-theory omission",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_display.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_display.go",
+            "pkg/smtcore/theory_datatype_display_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeDisplayPrivateRootsAndScopedMetadata",
+            "TestSMTDatatypeEmptyDisplayAndClosedOwner",
+            "TestSMTDatatypeDisplayBoundsConstructorArguments"
+          ]
         }
       ],
       "ownership": [
@@ -132317,11 +132336,12 @@
         "Owns concrete backtrack.UnionFind and undo trail synchronized with base variables and scoped rollback. Traversal stacks, marks, parents and equalities belong to one final-check invocation. Context owns extended conflicts. Internalizer borrows kernel sticky asserted-quantifier state.",
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
         "Conditional direct datatype equality justifications retain their datatype family for proof reconstruction but return null FromTheory for origin notification. Context takes scoped ownership before merging because a late error may have installed an edge or conflict; pop/close releases owners after equality rollback.",
-        "Each theory owns an independent DatatypeUtil and typed var_data records. Constructor and recognizer pointers borrow context enodes. The private union-find trail restores root constructor/slot writes before scoped var_data and base variables shrink; recognizer-vector allocation survives pop but scoped entries do not. Relevant callbacks register at the marking scope. Model procedures borrow the cached constructor declaration and record ordered root dependencies."
+        "Each theory owns an independent DatatypeUtil and typed var_data records. Constructor and recognizer pointers borrow context enodes. The private union-find trail restores root constructor/slot writes before scoped var_data and base variables shrink; recognizer-vector allocation survives pop but scoped entries do not. Relevant callbacks register at the marking scope. Model procedures borrow the cached constructor declaration and record ordered root dependencies.",
+        "Datatype diagnostic rows borrow enodes and var_data without modifying roots or watches. Constructor printing owns one temporary budgeted NumericTextStream, released on success or failure; supplied io.Writer failures are returned."
       ],
       "deviations": [
         "Guarded SAT clauses and scoped egraph scans still replace portions of source var_data and recognizer arrays. Datatype roots now use the concrete source union-find port. Handled accessors require enodes without artificial result variables; sort constraints attach finite or asserted-quantifier datatype results. Invalid source assertion states return Go errors.",
-        "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/display/assertion and broader context integration still require audit.",
+        "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/assertion and broader context integration still require audit.",
         "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order."
       ]
     },
@@ -132357,7 +132377,9 @@
         "pkg/smtcore/smt_justification_theory.go",
         "pkg/cmd/g3/datatype_update_equality_test.go",
         "pkg/smtcore/theory_datatype_metadata.go",
-        "pkg/smtcore/theory_datatype_metadata_test.go"
+        "pkg/smtcore/theory_datatype_metadata_test.go",
+        "pkg/smtcore/theory_datatype_display.go",
+        "pkg/smtcore/theory_datatype_display_test.go"
       ],
       "tests": [
         "TestSMTDatatypeRecognizerCases",
@@ -132394,7 +132416,10 @@
         "TestSMTDatatypeMergedFalseRecognizersPropagateWithSourceEvidence",
         "TestSMTDatatypeConstructorMetadataAndModelProcedureRollback",
         "TestSMTDatatypeMergePreservesFirstWatchPerConstructor",
-        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope"
+        "TestSMTDatatypeRelevanceBeforePushRegistersAtBaseScope",
+        "TestSMTDatatypeDisplayPrivateRootsAndScopedMetadata",
+        "TestSMTDatatypeEmptyDisplayAndClosedOwner",
+        "TestSMTDatatypeDisplayBoundsConstructorArguments"
       ],
       "conditionals": [
         {
@@ -132410,7 +132435,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "retained datatype interface; remaining TRACE/display/assertion and context integration audit",
+          "name": "retained datatype interface; remaining TRACE/assertion and context integration audit",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_datatype.go",
           "tests": [
@@ -132448,7 +132473,7 @@
           ]
         },
         {
-          "name": "Remaining datatype TRACE/display/assertion and context integration audit",
+          "name": "Remaining datatype TRACE/assertion and context integration audit",
           "status": "partial",
           "tests": []
         },
@@ -132574,6 +132599,20 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "display/display_var: retained context display dispatch; declaration-order variable rows, private union-find root, each variable own constructor metadata rather than root data, source bounded low-level depth three and empty-theory omission",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_datatype_display.go",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype_display.go",
+            "pkg/smtcore/theory_datatype_display_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeDisplayPrivateRootsAndScopedMetadata",
+            "TestSMTDatatypeEmptyDisplayAndClosedOwner",
+            "TestSMTDatatypeDisplayBoundsConstructorArguments"
+          ]
         }
       ],
       "ownership": [
@@ -132582,11 +132621,12 @@
         "Owns concrete backtrack.UnionFind and undo trail synchronized with base variables and scoped rollback. Traversal stacks, marks, parents and equalities belong to one final-check invocation. Context owns extended conflicts. Internalizer borrows kernel sticky asserted-quantifier state.",
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
         "Conditional direct datatype equality justifications retain their datatype family for proof reconstruction but return null FromTheory for origin notification. Context takes scoped ownership before merging because a late error may have installed an edge or conflict; pop/close releases owners after equality rollback.",
-        "Each theory owns an independent DatatypeUtil and typed var_data records. Constructor and recognizer pointers borrow context enodes. The private union-find trail restores root constructor/slot writes before scoped var_data and base variables shrink; recognizer-vector allocation survives pop but scoped entries do not. Relevant callbacks register at the marking scope. Model procedures borrow the cached constructor declaration and record ordered root dependencies."
+        "Each theory owns an independent DatatypeUtil and typed var_data records. Constructor and recognizer pointers borrow context enodes. The private union-find trail restores root constructor/slot writes before scoped var_data and base variables shrink; recognizer-vector allocation survives pop but scoped entries do not. Relevant callbacks register at the marking scope. Model procedures borrow the cached constructor declaration and record ordered root dependencies.",
+        "Datatype diagnostic rows borrow enodes and var_data without modifying roots or watches. Constructor printing owns one temporary budgeted NumericTextStream, released on success or failure; supplied io.Writer failures are returned."
       ],
       "deviations": [
         "The public Go theory interface replaces C++ inheritance, nested trail classes and manual allocation.",
-        "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/display/assertion and broader context integration still require audit.",
+        "Root metadata and source recognizer-pointer lookup replace runtime egraph scans and synthetic SAT equality guards. The observation scan is test-only. Field-update core output now agrees exactly with C++ (empty bad_identity), superseding the prior separate-order expectation. Unreached reset_eh receives no unused Go API; TRACE/assertion and broader context integration still require audit.",
         "Explicit source defect correction in occurs_check_explain: when proof-mode union-find selects a variable representative, add the actual variable-to-cached-constructor closing equality if both differ from the representative argument. Literal C++ traversal can omit this necessary premise (zero equalities for a self-cycle, two for a three-node cycle). Existing exact one/three-edge proof and scope-recovery tests enforce the complete explanation while preserving traversal order."
       ]
     },
