@@ -465,27 +465,49 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 			return SMTFinalCheckContinue, nil
 		}
 	}
+	return SMTFinalCheckDone, nil
+}
+
+// Source quantifier_manager::check_model is called after ground final checking,
+// separately from the round-robin full quantifier-instantiation slot.
+type SMTQuantifierModelCheckResult uint8
+
+const (
+	SMTQuantifierModelSAT SMTQuantifierModelCheckResult = iota
+	SMTQuantifierModelUnknown
+	SMTQuantifierModelRestart
+)
+
+// CheckModel validates and retains a candidate only after the context's ground
+// final-check cycle has completed. It reports UNKNOWN when MBQI is unavailable.
+func (q *SMTQuantifierManager) CheckModel() (SMTQuantifierModelCheckResult, error) {
+	if err := q.open(); err != nil {
+		return SMTQuantifierModelUnknown, err
+	}
+	if q.registry.Empty() {
+		return SMTQuantifierModelSAT, nil
+	}
 	if q.mbqi && q.modelChecker != nil && q.candidateModel != nil {
 		generator, err := q.candidateModel()
 		if err != nil {
-			return SMTFinalCheckGiveUp, err
+			return SMTQuantifierModelUnknown, err
 		}
 		if len(q.modelFinder.pendingConstraints) != 0 {
-			return SMTFinalCheckContinue, generator.Close()
+			return SMTQuantifierModelRestart, generator.Close()
 		}
 		if err = q.modelChecker.SetCandidateTerms(generator.rootValues); err != nil {
-			return SMTFinalCheckGiveUp, errors.Join(err, generator.Close())
+			return SMTQuantifierModelUnknown, errors.Join(err, generator.Close())
 		}
 		active, activeErr := q.activeQuantifiers()
 		if activeErr != nil {
-			return SMTFinalCheckGiveUp, errors.Join(activeErr, generator.Close())
+			return SMTQuantifierModelUnknown, errors.Join(activeErr, generator.Close())
 		}
 		modelSatisfied, checkErr := q.modelChecker.Check(generator.model, active)
 		if checkErr != nil {
-			return SMTFinalCheckGiveUp, errors.Join(checkErr, generator.Close())
+			return SMTQuantifierModelUnknown, errors.Join(checkErr, generator.Close())
 		}
 		if q.modelChecker.Exhausted() {
-			return SMTFinalCheckGiveUp, generator.Close()
+			return SMTQuantifierModelUnknown, generator.Close()
 		}
 		if !modelSatisfied {
 			entries, scheduleErr := q.registry.schedule.ScheduleNew(map[*SMTFingerprint]bool{})
@@ -493,21 +515,22 @@ func (q *SMTQuantifierManager) FinalCheck(full bool) (SMTFinalCheckStatus, error
 				scheduleErr = q.instantiate(entries)
 			}
 			if scheduleErr != nil {
-				return SMTFinalCheckGiveUp, errors.Join(scheduleErr, generator.Close())
+				return SMTQuantifierModelUnknown, errors.Join(scheduleErr, generator.Close())
 			}
 			if err = generator.Close(); err != nil {
-				return SMTFinalCheckGiveUp, err
+				return SMTQuantifierModelUnknown, err
 			}
-			return SMTFinalCheckContinue, nil
+			return SMTQuantifierModelRestart, nil
 		}
 		if q.acceptedModel != nil {
 			if err = q.acceptedModel.Close(); err != nil {
-				return SMTFinalCheckGiveUp, errors.Join(err, generator.Close())
+				return SMTQuantifierModelUnknown, errors.Join(err, generator.Close())
 			}
 		}
 		q.acceptedModel = generator
+		return SMTQuantifierModelSAT, nil
 	}
-	return SMTFinalCheckDone, nil
+	return SMTQuantifierModelUnknown, nil
 }
 
 func (q *SMTQuantifierManager) mbqiEnabled(quantifier ast.ASTHandle) (bool, error) {

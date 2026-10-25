@@ -113853,7 +113853,11 @@
         "pkg/smtcore/smt_check_phases_test.go",
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_tactic_impl.go",
-        "pkg/smtcore/smt_setup_check_test.go"
+        "pkg/smtcore/smt_setup_check_test.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_final_check_order_test.go",
+        "pkg/smtcore/smt_model_publication_test.go",
+        "pkg/smtcore/smt_quantifier_manager_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -113942,7 +113946,15 @@
         "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
         "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
         "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
-        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization"
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+        "TestSMTFinalCheckQuantifierSlotResumesBeforeTheories",
+        "TestSMTQuantifierFinalCheckDefersCandidateModelValidation",
+        "TestSMTFinalCheckPendingAssignmentOverridesGiveUp",
+        "TestSMTSearchInitializationResetsFinalCheckRotationAndIncompleteTheories",
+        "TestSMTSearchDefersMBQIUntilAllTheoriesFinish",
+        "TestSMTTheoryRestartStopsAfterNewConflict",
+        "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+        "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker"
       ],
       "conditionals": [
         {
@@ -115292,6 +115304,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "final_check shared theory/quantifier rotating slot, pending logical-context queues overriding give-up, model validation only after a completed ground cycle, search-init cursor/incomplete reset, and restart callback short-circuit on a newly discovered conflict",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_lifecycle.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/smtcore/smt_final_check_order_test.go",
+            "pkg/smtcore/smt_model_publication_test.go",
+            "pkg/smtcore/smt_quantifier_manager_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTFinalCheckQuantifierSlotResumesBeforeTheories",
+            "TestSMTQuantifierFinalCheckDefersCandidateModelValidation",
+            "TestSMTFinalCheckPendingAssignmentOverridesGiveUp",
+            "TestSMTSearchInitializationResetsFinalCheckRotationAndIncompleteTheories",
+            "TestSMTSearchDefersMBQIUntilAllTheoriesFinish",
+            "TestSMTTheoryRestartStopsAfterNewConflict",
+            "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+            "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -115321,7 +115359,8 @@
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
         "With auto_config=false and MBQI disabled, the transitive-relation runner regression now agrees with C++ on UNKNOWN, UNSAT after grounded contradictory facts, then UNKNOWN after pop. The no-preprocessing solver regression additionally verifies incomplete-quantifier failure reporting and repeated scoped E-matching refutations.",
         "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
-        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend."
+        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend.",
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Native counterexample publication still uses the existing concrete queue/internalization path; pending model-finder constraints trigger the existing base restart. The complete source default-plugin lazy matching and model-check restart/instance-publication lifecycle require a separate retained audit; this increment does not claim those broader algorithms complete."
       ]
     },
     {
@@ -115353,7 +115392,11 @@
         "pkg/smtcore/smt_check_phases_test.go",
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_tactic_impl.go",
-        "pkg/smtcore/smt_setup_check_test.go"
+        "pkg/smtcore/smt_setup_check_test.go",
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_final_check_order_test.go",
+        "pkg/smtcore/smt_model_publication_test.go",
+        "pkg/smtcore/smt_quantifier_manager_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -115394,7 +115437,15 @@
         "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
         "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
         "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
-        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization"
+        "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
+        "TestSMTFinalCheckQuantifierSlotResumesBeforeTheories",
+        "TestSMTQuantifierFinalCheckDefersCandidateModelValidation",
+        "TestSMTFinalCheckPendingAssignmentOverridesGiveUp",
+        "TestSMTSearchInitializationResetsFinalCheckRotationAndIncompleteTheories",
+        "TestSMTSearchDefersMBQIUntilAllTheoriesFinish",
+        "TestSMTTheoryRestartStopsAfterNewConflict",
+        "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+        "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker"
       ],
       "conditionals": [
         {
@@ -115757,6 +115808,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "final_check shared theory/quantifier rotating slot, pending logical-context queues overriding give-up, model validation only after a completed ground cycle, search-init cursor/incomplete reset, and restart callback short-circuit on a newly discovered conflict",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_lifecycle.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/smtcore/smt_final_check_order_test.go",
+            "pkg/smtcore/smt_model_publication_test.go",
+            "pkg/smtcore/smt_quantifier_manager_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTFinalCheckQuantifierSlotResumesBeforeTheories",
+            "TestSMTQuantifierFinalCheckDefersCandidateModelValidation",
+            "TestSMTFinalCheckPendingAssignmentOverridesGiveUp",
+            "TestSMTSearchInitializationResetsFinalCheckRotationAndIncompleteTheories",
+            "TestSMTSearchDefersMBQIUntilAllTheoriesFinish",
+            "TestSMTTheoryRestartStopsAfterNewConflict",
+            "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+            "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -115770,7 +115847,8 @@
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
         "Retained early-conflict and check finalization control flow now bypasses search initialization on known or newly resolved base conflicts and preserves cached false proofs. The Go facade snapshots assumption results and removes its temporary assumption scope immediately; finalization occurs before that cleanup, matching the source successful-scope boundary. The theory_str-specific assumption/core-validation hooks and check time/profile/trace diagnostics remain under audit; the context unit remains partial. The native CheckAssumptions facade also propagates base consequences for an empty assumption batch before entering search persistence; removing this existing step made TestSMTSequenceTheorySymbolicNonContainsModel stall. The restored boundary is covered by that regression in both integration profiles.",
-        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend."
+        "SetupAndCheck now serves the retained fresh-tactic consumer and rejects configured, scoped or already-internalized contexts. Like the native assumption facade, it propagates base consequences before entering search persistence. The only C++ theory overriding add_theory_assumptions/validate_unsat_core is theory_str, whose concrete backend remains unported; no unused generic callback adapter was added for that missing backend.",
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Native counterexample publication still uses the existing concrete queue/internalization path; pending model-finder constraints trigger the existing base restart. The complete source default-plugin lazy matching and model-check restart/instance-publication lifecycle require a separate retained audit; this increment does not claim those broader algorithms complete."
       ]
     },
     {
@@ -119837,7 +119915,11 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/cached_var_subst.go",
         "pkg/smtcore/smt_preprocessor_constructor_frontier_test.go",
-        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+        "pkg/smtcore/smt_theory_lifecycle.go",
+        "pkg/smtcore/smt_search.go",
+        "pkg/smtcore/smt_final_check_order_test.go",
+        "pkg/smtcore/smt_model_publication_test.go"
       ],
       "tests": [
         "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
@@ -119856,7 +119938,14 @@
         "TestSMTQuantifiedSearchRequiresModelValidation",
         "TestSMTQuantifierLiveParamsPreservePendingAndConstructorCaches",
         "TestSMTKernelPreprocessorConstructionAllocationFrontiers",
-        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+        "TestSMTFinalCheckQuantifierSlotResumesBeforeTheories",
+        "TestSMTQuantifierFinalCheckDefersCandidateModelValidation",
+        "TestSMTFinalCheckPendingAssignmentOverridesGiveUp",
+        "TestSMTSearchInitializationResetsFinalCheckRotationAndIncompleteTheories",
+        "TestSMTSearchDefersMBQIUntilAllTheoriesFinish",
+        "TestSMTTheoryRestartStopsAfterNewConflict",
+        "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding"
       ],
       "assertions": [
         {
@@ -119987,6 +120076,32 @@
             "TestSMTQuantifierLiveParamsPreservePendingAndConstructorCaches",
             "TestSMTQuantifiedSearchRequiresModelValidation"
           ]
+        },
+        {
+          "name": "separate full instantiation FinalCheck and candidate CheckModel phases; explicit SAT/UNKNOWN/RESTART result with accepted generator publication after all theory final checks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_lifecycle.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/smtcore/smt_final_check_order_test.go",
+            "pkg/smtcore/smt_model_publication_test.go",
+            "pkg/smtcore/smt_quantifier_manager_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTFinalCheckQuantifierSlotResumesBeforeTheories",
+            "TestSMTQuantifierFinalCheckDefersCandidateModelValidation",
+            "TestSMTFinalCheckPendingAssignmentOverridesGiveUp",
+            "TestSMTSearchInitializationResetsFinalCheckRotationAndIncompleteTheories",
+            "TestSMTSearchDefersMBQIUntilAllTheoriesFinish",
+            "TestSMTTheoryRestartStopsAfterNewConflict",
+            "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+            "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -119999,7 +120114,8 @@
       "deviations": [
         "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Finite MBQI uses a concrete Go model checker, honors mbqi.id prefixes, and resets and grows the source counterexample and iteration limits on each search. Auxiliary-solver checking and full model-finder adjustment remain open.",
         "The concrete matcher observes newly internalized unmarked terms when relevancy is disabled, including equal-length replacement scopes. Source instruction-tree optimizations remain represented by the existing direct typed matcher. Quantified E-matching saturation does not itself authorize SAT; the search boundary requires a model accepted by the quantifier checker.",
-        "Core solver updates now follow source use_ematching, m_qi_max_instances and final_check_eh lazy-threshold reads. Tests exercise disabled/enabled matching across repeated contradictory child scopes, preserve the source strict-greater-than instance limit, release a previously delayed instance after a lazy-threshold update, and demonstrate that eager threshold and parsed cost remain constructor-cached. The C++ command-line tactic wrapper retains initial E-matching settings in the live-toggle experiment, so these core API update checks are kept separate from the 92 strict runner comparisons; full tactic-wrapper parameter lifecycle remains outside this increment."
+        "Core solver updates now follow source use_ematching, m_qi_max_instances and final_check_eh lazy-threshold reads. Tests exercise disabled/enabled matching across repeated contradictory child scopes, preserve the source strict-greater-than instance limit, release a previously delayed instance after a lazy-threshold update, and demonstrate that eager threshold and parsed cost remain constructor-cached. The C++ command-line tactic wrapper retains initial E-matching settings in the live-toggle experiment, so these core API update checks are kept separate from the 92 strict runner comparisons; full tactic-wrapper parameter lifecycle remains outside this increment.",
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Native counterexample publication still uses the existing concrete queue/internalization path; pending model-finder constraints trigger the existing base restart. The complete source default-plugin lazy matching and model-check restart/instance-publication lifecycle require a separate retained audit; this increment does not claim those broader algorithms complete."
       ]
     },
     {
@@ -120010,7 +120126,13 @@
       "go_targets": [
         "pkg/smtcore/smt_quantifier_registry.go",
         "pkg/smtcore/smt_quantifier_manager.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_theory_lifecycle.go",
+        "pkg/smtcore/smt_search.go",
+        "pkg/smtcore/smt_final_check_order_test.go",
+        "pkg/smtcore/smt_model_publication_test.go",
+        "pkg/smtcore/smt_quantifier_manager_test.go",
+        "pkg/cmd/g3/main_test.go"
       ],
       "tests": [
         "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
@@ -120021,7 +120143,16 @@
         "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
         "TestSMTSolverInstallsQuantifierManagerAndEMatches",
         "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
-        "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample"
+        "TestSMTSolverMBQIFindsUninterpretedUniverseCounterexample",
+        "TestSMTFinalCheckQuantifierSlotResumesBeforeTheories",
+        "TestSMTQuantifierFinalCheckDefersCandidateModelValidation",
+        "TestSMTFinalCheckPendingAssignmentOverridesGiveUp",
+        "TestSMTSearchInitializationResetsFinalCheckRotationAndIncompleteTheories",
+        "TestSMTSearchDefersMBQIUntilAllTheoriesFinish",
+        "TestSMTTheoryRestartStopsAfterNewConflict",
+        "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -120087,13 +120218,40 @@
             "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
             "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample"
           ]
+        },
+        {
+          "name": "separate full instantiation FinalCheck and candidate CheckModel phases; explicit SAT/UNKNOWN/RESTART result with accepted generator publication after all theory final checks",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_lifecycle.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/smtcore/smt_final_check_order_test.go",
+            "pkg/smtcore/smt_model_publication_test.go",
+            "pkg/smtcore/smt_quantifier_manager_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTFinalCheckQuantifierSlotResumesBeforeTheories",
+            "TestSMTQuantifierFinalCheckDefersCandidateModelValidation",
+            "TestSMTFinalCheckPendingAssignmentOverridesGiveUp",
+            "TestSMTSearchInitializationResetsFinalCheckRotationAndIncompleteTheories",
+            "TestSMTSearchDefersMBQIUntilAllTheoriesFinish",
+            "TestSMTTheoryRestartStopsAfterNewConflict",
+            "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+            "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The registry owns its Go maps and slices while borrowing manager-owned AST handles and SMT enodes. The concrete manager owns its cached substitution; its checker, builder and queue composition borrow context-owned state."
       ],
       "deviations": [
-        "The abstract C++ plugin surface is not reproduced as a universal adapter; retained MAM and MBQI behavior will use concrete typed Go components."
+        "The abstract C++ plugin surface is not reproduced as a universal adapter; retained MAM and MBQI behavior will use concrete typed Go components.",
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Native counterexample publication still uses the existing concrete queue/internalization path; pending model-finder constraints trigger the existing base restart. The complete source default-plugin lazy matching and model-check restart/instance-publication lifecycle require a separate retained audit; this increment does not claim those broader algorithms complete."
       ]
     },
     {
@@ -122065,7 +122223,7 @@
       "path": "src/smt/smt_theory.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_equality_atom.go",
         "pkg/smtcore/smt_equality_atom_test.go",
@@ -122144,19 +122302,24 @@
           ]
         },
         {
-          "name": "conflict, display, model, validation, assumptions, statistics, reset/flush, and fresh-theory interface",
+          "name": "current concrete Go theory conflict, display, model, statistics, reset/flush, and fresh-theory interfaces",
           "status": "platform_replacement",
           "go_target": "pkg/smtcore/smt_model_value.go",
           "tests": [
             "TestSMTTheoryInternalizationCallbacksVariablesAndScopes"
           ]
+        },
+        {
+          "name": "retained theory_str add_theory_assumptions and validate_unsat_core overrides require the unported concrete string backend",
+          "status": "unported",
+          "tests": []
         }
       ],
       "ownership": [
         "The typed theory interface borrows AST handles and internalizer-owned enodes; SMTTheoryBase owns only Go slices of borrowed enode pointers and scope limits."
       ],
       "deviations": [
-        "Go splits model construction, model finalization, function inclusion, names and statistics into narrow optional interfaces implemented only by theories that consume them. Conflict publication remains on the concrete internalizer state, teardown replaces reset/flush reuse, and display/validation/fresh-theory hooks with no retained caller are omitted."
+        "Go splits concrete model construction, finalization, function inclusion, names and statistics into optional interfaces implemented by actual consumers. Conflict publication uses the concrete internalizer state and teardown replaces reset/flush reuse. The source theory_str backend is retained and overrides add_theory_assumptions/validate_unsat_core; those hooks cannot be classified as platform replacements or dead code. Their concrete implementation remains unported, so this header is partial; no unused generic callback adapter was added."
       ]
     },
     {
