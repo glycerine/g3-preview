@@ -2589,6 +2589,7 @@
         "smt_conflict_resolver.go",
         "smt_context_invariant.go",
         "smt_context_stat.go",
+        "smt_core_validation.go",
         "smt_dense_diff_matrix.go",
         "smt_diff_graph_inf_rational.go",
         "smt_diff_graph_inf_zero.go",

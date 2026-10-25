@@ -97,6 +97,7 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 	assumptionVariables := make([]int32, 0, len(assumptions))
 	k.assumptions = make(map[SMTLiteral]ast.ASTHandle, len(assumptions))
 	defer func() {
+		tracking := len(k.assumptions) != 0
 		for _, variable := range assumptionVariables {
 			if variable >= SMTFirstBoolVar && int(variable) < len(k.internalizer.booleanData) {
 				k.internalizer.booleanData[variable].Assumption = false
@@ -104,6 +105,9 @@ func (k *SMTKernel) CheckAssumptions(assumptions []ast.ASTHandle) (result lbool.
 		}
 		resultErr = errors.Join(resultErr, k.internalizer.PopScopes(1))
 		k.assumptions = nil
+		if resultErr == nil && result == lbool.False && tracking {
+			resultErr = k.validateUnsatCore()
+		}
 		if resultErr != nil {
 			result = lbool.Undef
 		}

@@ -114362,7 +114362,9 @@
         "pkg/parsers/smt2/recursive_functions_test.go",
         "pkg/smtcore/smt_recursive_functions.go",
         "pkg/smtcore/smt_recursive_functions_test.go",
-        "pkg/smtcore/smt_candidate_validation.go"
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_core_validation.go",
+        "pkg/smtcore/smt_core_validation_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -114476,7 +114478,11 @@
         "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
         "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
         "TestSMTRecursiveModelPublicationAllocationFrontiers",
-        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation"
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTCoreValidationAfterAssumptionCleanup",
+        "TestSMTCoreValidationRejectsInvalidCoreAndHonorsDisabledFlag",
+        "TestSMTCoreValidationRejectsUnknown",
+        "TestSMTCoreValidationAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -115922,6 +115928,25 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "runtime optional core_validate re-solving of current assertions and the unsat core after assumption cleanup, with fresh independent context, persistent parameter snapshot, UNSAT requirement and stopped-owner cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_core_validation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_core_validation.go",
+            "pkg/smtcore/smt_core_validation_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTCoreValidationAfterAssumptionCleanup",
+            "TestSMTCoreValidationRejectsInvalidCoreAndHonorsDisabledFlag",
+            "TestSMTCoreValidationRejectsUnknown",
+            "TestSMTCoreValidationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -116009,7 +116034,9 @@
         "pkg/parsers/smt2/recursive_functions_test.go",
         "pkg/smtcore/smt_recursive_functions.go",
         "pkg/smtcore/smt_recursive_functions_test.go",
-        "pkg/smtcore/smt_candidate_validation.go"
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_core_validation.go",
+        "pkg/smtcore/smt_core_validation_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -116075,7 +116102,11 @@
         "TestSMTRecursiveDefinitionActivatesOnlyFunctionTrigger",
         "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
         "TestSMTRecursiveModelPublicationAllocationFrontiers",
-        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation"
+        "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
+        "TestSMTCoreValidationAfterAssumptionCleanup",
+        "TestSMTCoreValidationRejectsInvalidCoreAndHonorsDisabledFlag",
+        "TestSMTCoreValidationRejectsUnknown",
+        "TestSMTCoreValidationAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -116534,6 +116565,25 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "runtime optional core_validate re-solving of current assertions and the unsat core after assumption cleanup, with fresh independent context, persistent parameter snapshot, UNSAT requirement and stopped-owner cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_core_validation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_core_validation.go",
+            "pkg/smtcore/smt_core_validation_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTCoreValidationAfterAssumptionCleanup",
+            "TestSMTCoreValidationRejectsInvalidCoreAndHonorsDisabledFlag",
+            "TestSMTCoreValidationRejectsUnknown",
+            "TestSMTCoreValidationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -116555,7 +116605,7 @@
       "path": "src/smt/smt_context_inv.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_context_invariant.go",
         "pkg/smtcore/smt_context_invariant_test.go",
@@ -116576,7 +116626,10 @@
         "pkg/smtcore/smt_model_checker_instances.go",
         "pkg/smtcore/smt_quantifier_manager.go",
         "pkg/smtcore/smt_kernel.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_assumptions.go",
+        "pkg/smtcore/smt_core_validation.go",
+        "pkg/smtcore/smt_core_validation_test.go"
       ],
       "tests": [
         "TestSMTContextInvariantWatchesAssignmentsAndJustifications",
@@ -116590,7 +116643,11 @@
         "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTCoreValidationAfterAssumptionCleanup",
+        "TestSMTCoreValidationRejectsInvalidCoreAndHonorsDisabledFlag",
+        "TestSMTCoreValidationRejectsUnknown",
+        "TestSMTCoreValidationAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -116733,14 +116790,28 @@
           "status": "reference_only"
         },
         {
-          "name": "runtime optional core_validate re-solving of current assertions and the unsat core",
-          "status": "unported",
-          "tests": []
+          "name": "runtime optional core_validate re-solving of current assertions and the unsat core after assumption cleanup, with fresh independent context, persistent parameter snapshot, UNSAT requirement and stopped-owner cleanup",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_core_validation.go",
+          "go_targets": [
+            "pkg/smtcore/smt_assumptions.go",
+            "pkg/smtcore/smt_core_validation.go",
+            "pkg/smtcore/smt_core_validation_test.go",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTCoreValidationAfterAssumptionCleanup",
+            "TestSMTCoreValidationRejectsInvalidCoreAndHonorsDisabledFlag",
+            "TestSMTCoreValidationRejectsUnknown",
+            "TestSMTCoreValidationAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         },
         {
           "name": "validate_model over relevant ground assignments: skip recursive-definition quantifiers, accept unavailable/unknown evaluation, reject Boolean values opposite to literal assignment and trigger strict recursive checking",
           "status": "ported",
-        "go_target": "pkg/smtcore/smt_candidate_validation.go",
+          "go_target": "pkg/smtcore/smt_candidate_validation.go",
           "go_targets": [
             "pkg/ast/ast_recursive_definition.go",
             "pkg/ast/rewriter/rewriter_engine.go",
@@ -116776,11 +116847,12 @@
         }
       ],
       "ownership": [
-        "Invariant checks borrow the internalizer-owned slices, clauses, enodes, congruence table and checker-context maps without retaining them."
+        "Invariant checks borrow the internalizer-owned slices, clauses, enodes, congruence table and checker-context maps without retaining them.",
+        "Core validation borrows pinned assertion/core expressions and parameter services; the fresh solver independently owns its assertions, result, plugins and copied parameters and is closed on every return."
       ],
       "deviations": [
         "Source assertion failures return ast.ErrASTDomain. Go validates every live ordinary clause because it does not split clauses into native auxiliary and lemma vectors. The remaining source routines are Z3DEBUG-only cross-component audits; retained propagation, relevancy, model, disequality and unsat-core paths validate their own invariants and tests instead of duplicating one monolithic sweep.",
-        "Earlier metadata incorrectly grouped model and unsat-core validation under debug-only reference code. Both source methods are outside the Z3DEBUG guard. Ground candidate-model validation is now implemented; live core.validate re-solving remains unported, so this unit is partial."
+        "Earlier metadata incorrectly grouped model and unsat-core validation under debug-only reference code. Both source methods are outside the Z3DEBUG guard. Ground candidate-model validation and live core.validate re-solving are now implemented. The latter uses an independent fresh context after assumption cleanup, requires UNSAT and rejects SAT or UNKNOWN."
       ]
     },
     {
