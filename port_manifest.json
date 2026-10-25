@@ -114771,7 +114771,13 @@
         "pkg/smtcore/smt_internalizer.go",
         "pkg/smtcore/theory_datatype_metadata_test.go",
         "pkg/smtcore/smt_closest_theory_var_test.go",
-        "pkg/smtcore/smt_restart_test.go"
+        "pkg/smtcore/smt_restart_test.go",
+        "pkg/smtcore/theory_pb_resolve.go",
+        "pkg/smtcore/theory_pb_resolve_test.go",
+        "pkg/smtcore/smt_pb_lifecycle.go",
+        "pkg/smtcore/smt_pb_lifecycle_test.go",
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/cmd/g3/pb_strengthening_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -114899,7 +114905,13 @@
         "TestSMTClosestTheoryVariableWalksUnattachedProofNodes",
         "TestSMTTheoryEqualityOriginFilteringAndMultiTheoryOrder",
         "TestSMTTheoryMergeExposesExistingDisequalities",
-        "TestSMTRestartPreservesAssumptionScopeClauseReasons"
+        "TestSMTRestartPreservesAssumptionScopeClauseReasons",
+        "TestSMTPBResolutionNativeCutPreservesAssumptionGuardsAndProof",
+        "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+        "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
+        "TestSMTPBResolutionClauseAndForeignReasonBarriers",
+        "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
+        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
       ],
       "conditionals": [
         {
@@ -116425,6 +116437,35 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "installed PB plugin copy retains source constructor controls by value through translation and MBQI auxiliary contexts; internalizer tracks the actual user base separately from assumption search base for both Boolean and native PB resolution",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_pb_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_resolve.go",
+            "pkg/smtcore/theory_pb_resolve_test.go",
+            "pkg/smtcore/smt_pb_lifecycle.go",
+            "pkg/smtcore/smt_pb_lifecycle_test.go",
+            "pkg/smtcore/smt_conflict_proof.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_learned_persistence.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/pb_strengthening_test.go"
+          ],
+          "tests": [
+            "TestSMTPBResolutionNativeCutPreservesAssumptionGuardsAndProof",
+            "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+            "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
+            "TestSMTPBResolutionClauseAndForeignReasonBarriers",
+            "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
+          ]
         }
       ],
       "ownership": [
@@ -116437,7 +116478,8 @@
         "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage.",
         "The kernel owns one ASTExprSubstitution and its concrete ASTScopedExprSubstitution wrapper from construction. Commit inserts into that same owner; forward/reverse propagation push/pop temporary bindings instead of rebuilding committed state. Assertion-time and shared theory rewriting borrow the owner; cache flush and parameter updates reattach it after native resets. User scopes restore bindings before shrinking formulas. Rewriter destruction precedes scoped-wrapper destruction, which precedes underlying substitution destruction; six constructor/commit/propagation first-success campaigns cover both proof modes and release all charged fixture storage.",
         "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner.",
-        "Nearby theory-variable lookup borrows the existing transitivity path before inversion. Equality snapshots own copied root attachment lists and restore newly added families on pop; event queues borrow theory variables. Assumption scopes remain above the user base, so their clause reasons are never discarded by base simplification."
+        "Nearby theory-variable lookup borrows the existing transitivity path before inversion. Equality snapshots own copied root attachment lists and restore newly added families on pop; event queues borrow theory variables. Assumption scopes remain above the user base, so their clause reasons are never discarded by base simplification.",
+        "The internalizer owns distinct scalar user/search base boundaries during a search and clears both on exit. PB plugin copying transfers an independent installed control snapshot to an unused fresh destination, rather than borrowing source parameters or copying mutable watch/constraint state."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -116528,7 +116570,14 @@
         "pkg/smtcore/smt_relevancy.go",
         "pkg/smtcore/theory_datatype_metadata_test.go",
         "pkg/smtcore/smt_closest_theory_var_test.go",
-        "pkg/smtcore/smt_restart_test.go"
+        "pkg/smtcore/smt_restart_test.go",
+        "pkg/smtcore/theory_pb_resolve.go",
+        "pkg/smtcore/theory_pb_resolve_test.go",
+        "pkg/smtcore/smt_pb_lifecycle.go",
+        "pkg/smtcore/smt_pb_lifecycle_test.go",
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/smtcore/smt_learned_persistence.go",
+        "pkg/cmd/g3/pb_strengthening_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -116608,7 +116657,13 @@
         "TestSMTClosestTheoryVariableWalksUnattachedProofNodes",
         "TestSMTTheoryEqualityOriginFilteringAndMultiTheoryOrder",
         "TestSMTTheoryMergeExposesExistingDisequalities",
-        "TestSMTRestartPreservesAssumptionScopeClauseReasons"
+        "TestSMTRestartPreservesAssumptionScopeClauseReasons",
+        "TestSMTPBResolutionNativeCutPreservesAssumptionGuardsAndProof",
+        "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+        "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
+        "TestSMTPBResolutionClauseAndForeignReasonBarriers",
+        "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
+        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
       ],
       "conditionals": [
         {
@@ -117147,6 +117202,35 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "installed PB plugin copy retains source constructor controls by value through translation and MBQI auxiliary contexts; internalizer tracks the actual user base separately from assumption search base for both Boolean and native PB resolution",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_pb_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_resolve.go",
+            "pkg/smtcore/theory_pb_resolve_test.go",
+            "pkg/smtcore/smt_pb_lifecycle.go",
+            "pkg/smtcore/smt_pb_lifecycle_test.go",
+            "pkg/smtcore/smt_conflict_proof.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_learned_persistence.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/pb_strengthening_test.go"
+          ],
+          "tests": [
+            "TestSMTPBResolutionNativeCutPreservesAssumptionGuardsAndProof",
+            "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+            "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
+            "TestSMTPBResolutionClauseAndForeignReasonBarriers",
+            "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
+          ]
         }
       ],
       "ownership": [
@@ -117157,7 +117241,8 @@
         "The first-success early-conflict proof allocation campaign verifies a failed wrapper-reference construction publishes no Boolean conflict, can retry without visiting pending formulas, and releases all charged fixture storage.",
         "The kernel owns one ASTExprSubstitution and its concrete ASTScopedExprSubstitution wrapper from construction. Commit inserts into that same owner; forward/reverse propagation push/pop temporary bindings instead of rebuilding committed state. Assertion-time and shared theory rewriting borrow the owner; cache flush and parameter updates reattach it after native resets. User scopes restore bindings before shrinking formulas. Rewriter destruction precedes scoped-wrapper destruction, which precedes underlying substitution destruction; six constructor/commit/propagation first-success campaigns cover both proof modes and release all charged fixture storage.",
         "SetRelevancy binds one borrowed concrete internalizer callback owner. Marks invoke relevant_eh immediately at their own scope; assignment delivery remains queued. Replacing the service or successfully closing its internalizer clears the binding. Standalone read-side propagators retain ordered observation events without an internalizer owner.",
-        "Nearby theory-variable lookup borrows the existing transitivity path before inversion. Equality snapshots own copied root attachment lists and restore newly added families on pop; event queues borrow theory variables. Assumption scopes remain above the user base, so their clause reasons are never discarded by base simplification."
+        "Nearby theory-variable lookup borrows the existing transitivity path before inversion. Equality snapshots own copied root attachment lists and restore newly added families on pop; event queues borrow theory variables. Assumption scopes remain above the user base, so their clause reasons are never discarded by base simplification.",
+        "The internalizer owns distinct scalar user/search base boundaries during a search and clears both on exit. PB plugin copying transfers an independent installed control snapshot to an unused fresh destination, rather than borrowing source parameters or copying mutable watch/constraint state."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
@@ -134591,7 +134676,18 @@
         "pkg/smtcore/theory_pb_normalize_test.go",
         "pkg/smtcore/theory_pb_watch_test.go",
         "pkg/smtcore/theory_pb_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_pb_resolve.go",
+        "pkg/smtcore/theory_pb_resolve_test.go",
+        "pkg/smtcore/smt_pb_lifecycle.go",
+        "pkg/smtcore/smt_pb_lifecycle_test.go",
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_learned_persistence.go",
+        "pkg/smtcore/smt_search.go",
+        "pkg/cmd/g3/pb_strengthening_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -134603,7 +134699,13 @@
         "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTPBResolutionNativeCutPreservesAssumptionGuardsAndProof",
+        "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+        "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
+        "TestSMTPBResolutionClauseAndForeignReasonBarriers",
+        "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
+        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
       ],
       "conditionals": [
         {
@@ -135005,22 +135107,80 @@
           ]
         },
         {
-          "name": "native conflict-strengthening resolution and complement learning; constructor policy snapshot/copy; propagation-frequency compilation scheduling and source compile_ineq sorting network; optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
+          "name": "propagation-frequency compilation scheduling and source compile_ineq sorting network; optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "process_antecedent/process_ineq/resolve_conflict/remove_from_lemma/hoist_maximal_values: source weighted cutting-plane resolution, LCM coefficient alignment, assignment-trail marks, complement cancellation, Boolean clause/binary/axiom/proof-wrapper handling, foreign/equality/predicate reason barriers, maximal-coefficient hoisting and guarded clause/new-predicate publication; exact conflict-frequency gate",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_resolve.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_resolve.go",
+            "pkg/smtcore/theory_pb_resolve_test.go",
+            "pkg/smtcore/smt_pb_lifecycle.go",
+            "pkg/smtcore/smt_pb_lifecycle_test.go",
+            "pkg/smtcore/smt_conflict_proof.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_learned_persistence.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/pb_strengthening_test.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb.go"
+          ],
+          "tests": [
+            "TestSMTPBResolutionNativeCutPreservesAssumptionGuardsAndProof",
+            "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+            "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
+            "TestSMTPBResolutionClauseAndForeignReasonBarriers",
+            "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
+          ]
+        },
+        {
+          "name": "constructor/mk_fresh controls by value: freeze all four scalar PB controls at actual source setup or first use rather than eager Go placeholder allocation; ignore later driver changes; preserve the installed snapshot through cross-manager/chained translations and cached MBQI auxiliary construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_pb_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_resolve.go",
+            "pkg/smtcore/theory_pb_resolve_test.go",
+            "pkg/smtcore/smt_pb_lifecycle.go",
+            "pkg/smtcore/smt_pb_lifecycle_test.go",
+            "pkg/smtcore/smt_conflict_proof.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_learned_persistence.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/pb_strengthening_test.go"
+          ],
+          "tests": [
+            "TestSMTPBConstructorSnapshotTranslationAndAuxiliary"
+          ]
         }
       ],
       "ownership": [
         "The theory owns typed normalized constraints, exact big.Rat coefficients, per-variable watch lists, scope limits and a concrete undo trail. SAT/context Boolean variables retain AST expressions; watch records borrow literal IDs and constraint pointers.",
         "Per-assignment numeric trails restore counters. Active predicate assignment trails remove the current literal watches, restore orientation and variable-watch mode, then restore the previous sums/fixed count. Watch-list and argument swaps persist as in source. Scoped constraints are removed only after these undo actions; empty per-variable records can remain as source high-water storage.",
-        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Source conflict-strengthening-specific inequality owners and scheduling controls remain unported."
+        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Native PB propagation owners now retain their originating inequality for weighted resolution; compilation scheduling controls remain unported.",
+        "PB propagation owners retain the concrete originating inequality in addition to the ordinary theory-propagation owner. Scope ownership keeps that inequality valid while its reasons can be resolved. Each cutting-plane frame owns temporary marks, coefficients, guards and lemma storage; no persistent global mark leaks remain on refusal/error.",
+        "Before actual source setup/first use an eager Go placeholder borrows its containing parameter owner; setup copies the four scalar controls and releases that borrow. Fresh plugins copy this installed value, independently of the current mutable driver and other plugin snapshots.",
+        "Strengthened auxiliary lemmas own heap-marked theory-axiom objects, preserving their dynamic resolution-barrier type and surviving clause lifetime safely. Ordinary PB conflict lemmas retain the existing heap theory-lemma owner. Generated consequence definitions retain scoped assignment-dependent inputs instead of folding away their proof/core premises."
       ],
       "deviations": [
         "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. The normal PB2BV rewriter remains available to its other retained consumers. Source watch algorithms now run on live PB atoms; compilation and strengthening are explicit remaining ports rather than replacements by another algorithm.",
         "Exact Go big.Rat values replace source rational/mpz storage and are copied when numeral ownership changes. The normalization implementation is concrete for SMTLiteral; no generic callback utility or STL internals are reproduced.",
         "An empty equality with a nonzero bound is folded to false before publishing a constraint. Literal source normalization can leave this impossible negative-bound case unresolved, and no variable callback exists to repair it; the direct Go internalizer regression enforces correct constant semantics.",
         "compile_arg now creates native auxiliary PB Booleans for nonowned arguments. Both source smt_model_generator.cpp mk_value_procs and Go discoverValueProcedures handle Boolean roots before sort-family model callbacks, so their model values use the Boolean assignment path. The prior claim that no retained Go producer creates auxiliary PB applications is superseded. The remaining model/factory registration/lifetime audit is not claimed complete.",
-        "The source default compilation, conflict-frequency/complement-learning controls and optional simplex algorithms are still unported. Ordinary watch propagation and auxiliary conflict clauses preserve semantics, but do not prove those project algorithms complete. The class remains partial."
+        "Native weighted resolution, conflict frequency, complement learning and constructor snapshot/copy are now implemented. Native compilation scheduling/sorting networks, optional simplex and remaining diagnostics/model-factory lifecycle audits still keep this unit partial.",
+        "Correctness correction for strengthened consequences: internalization retains the scoped false inputs of a residual PB predicate. Literal source folding can turn that definition into an axiom and discard premises needed by later Boolean learning. A pending-callback regression with 2*x+y+z+u>=3 verifies the residual definition, exact guarded learned clause and all original relation valuations; the literal-folding variant fails this regression.",
+        "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits."
       ]
     },
     {
@@ -135035,7 +135195,18 @@
         "pkg/smtcore/theory_pb_normalize_test.go",
         "pkg/smtcore/theory_pb_watch_test.go",
         "pkg/smtcore/theory_pb_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_pb_resolve.go",
+        "pkg/smtcore/theory_pb_resolve_test.go",
+        "pkg/smtcore/smt_pb_lifecycle.go",
+        "pkg/smtcore/smt_pb_lifecycle_test.go",
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_learned_persistence.go",
+        "pkg/smtcore/smt_search.go",
+        "pkg/cmd/g3/pb_strengthening_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -135047,7 +135218,13 @@
         "TestSMTPBConstantEqualityDoesNotWaitForAbsentCallbacks",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTPBResolutionNativeCutPreservesAssumptionGuardsAndProof",
+        "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+        "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
+        "TestSMTPBResolutionClauseAndForeignReasonBarriers",
+        "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
+        "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
       ],
       "assertions": [
         {
@@ -135151,22 +135328,80 @@
           ]
         },
         {
-          "name": "native conflict-strengthening resolution and complement learning; constructor policy snapshot/copy; propagation-frequency compilation scheduling and source compile_ineq sorting network; optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
+          "name": "propagation-frequency compilation scheduling and source compile_ineq sorting network; optional simplex path; remaining TRACE/assertion and model/factory lifecycle audit",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "process_antecedent/process_ineq/resolve_conflict/remove_from_lemma/hoist_maximal_values: source weighted cutting-plane resolution, LCM coefficient alignment, assignment-trail marks, complement cancellation, Boolean clause/binary/axiom/proof-wrapper handling, foreign/equality/predicate reason barriers, maximal-coefficient hoisting and guarded clause/new-predicate publication; exact conflict-frequency gate",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_pb_resolve.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_resolve.go",
+            "pkg/smtcore/theory_pb_resolve_test.go",
+            "pkg/smtcore/smt_pb_lifecycle.go",
+            "pkg/smtcore/smt_pb_lifecycle_test.go",
+            "pkg/smtcore/smt_conflict_proof.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_learned_persistence.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/pb_strengthening_test.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb.go"
+          ],
+          "tests": [
+            "TestSMTPBResolutionNativeCutPreservesAssumptionGuardsAndProof",
+            "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+            "TestSMTPBResolutionResidualPredicateRetainsScopedFalsePremises",
+            "TestSMTPBResolutionClauseAndForeignReasonBarriers",
+            "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTLibRunnerPBStrengtheningProofKnownCPPTeardownDefect"
+          ]
+        },
+        {
+          "name": "constructor/mk_fresh controls by value: freeze all four scalar PB controls at actual source setup or first use rather than eager Go placeholder allocation; ignore later driver changes; preserve the installed snapshot through cross-manager/chained translations and cached MBQI auxiliary construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_pb_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_resolve.go",
+            "pkg/smtcore/theory_pb_resolve_test.go",
+            "pkg/smtcore/smt_pb_lifecycle.go",
+            "pkg/smtcore/smt_pb_lifecycle_test.go",
+            "pkg/smtcore/smt_conflict_proof.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver.go",
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_learned_persistence.go",
+            "pkg/smtcore/smt_search.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/pb_strengthening_test.go"
+          ],
+          "tests": [
+            "TestSMTPBConstructorSnapshotTranslationAndAuxiliary"
+          ]
         }
       ],
       "ownership": [
         "The theory owns typed normalized constraints, exact big.Rat coefficients, per-variable watch lists, scope limits and a concrete undo trail. SAT/context Boolean variables retain AST expressions; watch records borrow literal IDs and constraint pointers.",
         "Per-assignment numeric trails restore counters. Active predicate assignment trails remove the current literal watches, restore orientation and variable-watch mode, then restore the previous sums/fixed count. Watch-list and argument swaps persist as in source. Scoped constraints are removed only after these undo actions; empty per-variable records can remain as source high-water storage.",
-        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Source conflict-strengthening-specific inequality owners and scheduling controls remain unported."
+        "The context owns scoped theory-propagation justifications before assignment. Conflict clauses use CLS_AUX_LEMMA; proof mode uses heap theory-lemma owners retaining expression refs through clause lifetime. Native PB propagation owners now retain their originating inequality for weighted resolution; compilation scheduling controls remain unported.",
+        "PB propagation owners retain the concrete originating inequality in addition to the ordinary theory-propagation owner. Scope ownership keeps that inequality valid while its reasons can be resolved. Each cutting-plane frame owns temporary marks, coefficients, guards and lemma storage; no persistent global mark leaks remain on refusal/error.",
+        "Before actual source setup/first use an eager Go placeholder borrows its containing parameter owner; setup copies the four scalar controls and releases that borrow. Fresh plugins copy this installed value, independently of the current mutable driver and other plugin snapshots.",
+        "Strengthened auxiliary lemmas own heap-marked theory-axiom objects, preserving their dynamic resolution-barrier type and surviving clause lifetime safely. Ordinary PB conflict lemmas retain the existing heap theory-lemma owner. Generated consequence definitions retain scoped assignment-dependent inputs instead of folding away their proof/core premises."
       ],
       "deviations": [
         "The previous eager PB2BV wrapper and exhaustive valuation fallback are removed from this plugin. The normal PB2BV rewriter remains available to its other retained consumers. Source watch algorithms now run on live PB atoms; compilation and strengthening are explicit remaining ports rather than replacements by another algorithm.",
         "Exact Go big.Rat values replace source rational/mpz storage and are copied when numeral ownership changes. The normalization implementation is concrete for SMTLiteral; no generic callback utility or STL internals are reproduced.",
         "An empty equality with a nonzero bound is folded to false before publishing a constraint. Literal source normalization can leave this impossible negative-bound case unresolved, and no variable callback exists to repair it; the direct Go internalizer regression enforces correct constant semantics.",
         "compile_arg now creates native auxiliary PB Booleans for nonowned arguments. Both source smt_model_generator.cpp mk_value_procs and Go discoverValueProcedures handle Boolean roots before sort-family model callbacks, so their model values use the Boolean assignment path. The prior claim that no retained Go producer creates auxiliary PB applications is superseded. The remaining model/factory registration/lifetime audit is not claimed complete.",
-        "The source default compilation, conflict-frequency/complement-learning controls and optional simplex algorithms are still unported. Ordinary watch propagation and auxiliary conflict clauses preserve semantics, but do not prove those project algorithms complete. The class remains partial."
+        "Native weighted resolution, conflict frequency, complement learning and constructor snapshot/copy are now implemented. Native compilation scheduling/sorting networks, optional simplex and remaining diagnostics/model-factory lifecycle audits still keep this unit partial.",
+        "Correctness correction for strengthened consequences: internalization retains the scoped false inputs of a residual PB predicate. Literal source folding can turn that definition into an axiom and discard premises needed by later Boolean learning. A pending-callback regression with 2*x+y+z+u>=3 verifies the residual definition, exact guarded learned clause and all original relation valuations; the literal-folding variant fails this regression.",
+        "Source PB justify uses context region allocation, but resolve_conflict attaches that theory axiom to CLS_AUX_LEMMA; smt_clause.cpp deallocate requires a nonregion owner and deletes it. The prebuilt C++ reference emits a complete PB proof/core then aborts with free(): invalid pointer. Go uses a heap-marked owner of the same theory-axiom type. A dedicated reference-defect test requires successful Go output and a complete balanced C++ proof/core; it accepts only clean reference success or that exact abort/stderr combination. Other proof and exact-output oracles still require clean C++ exits."
       ]
     },
     {
@@ -248085,7 +248320,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 714.425,
     "checkout_held_unchanged": true,
-    "scope_warning": "Verified clean isolated exact-HEAD checkout with prebuilt C++ comparisons enabled; includes datatype root metadata, synchronous relevance and source unsat-core reverse traversal, plus earlier increments. Excludes subsequent datatype display, closest-variable/origin notification, arithmetic replay retention and user-base/assumption learning fixes, whose focused integration evidence is recorded separately. Also excludes the subsequent native PB literal normalization/watch increment, whose focused integration evidence is separate."
+    "scope_warning": "Verified clean isolated exact-HEAD checkout with prebuilt C++ comparisons enabled; includes datatype root metadata, synchronous relevance and source unsat-core reverse traversal, plus earlier increments. Excludes subsequent datatype display, closest-variable/origin notification, arithmetic replay retention and user-base/assumption learning fixes, whose focused integration evidence is recorded separately. Also excludes the subsequent native PB literal normalization/watch increment, whose focused integration evidence is separate. Also excludes the later PB weighted resolution and installed-control snapshot increment, whose focused integration evidence is separate."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

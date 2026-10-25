@@ -30,6 +30,7 @@ func (s *SMTInternalizerState) beginSearchPersistence(base uint32, params SMTPar
 	}
 	s.searching = true
 	s.searchBaseLevel = base
+	s.searchUserBaseLevel = base
 	s.searchAgility = 0
 	s.searchAgilityFactor = params.AgilityFactor
 	s.searchRestartAdaptive = params.RestartAdaptive
@@ -39,6 +40,7 @@ func (s *SMTInternalizerState) beginSearchPersistence(base uint32, params SMTPar
 func (s *SMTInternalizerState) endSearchPersistence() (result error) {
 	s.searching = false
 	s.searchBaseLevel = 0
+	s.searchUserBaseLevel = 0
 	s.searchAgility = 0
 	s.searchAgilityFactor = 0
 	s.searchRestartAdaptive = false

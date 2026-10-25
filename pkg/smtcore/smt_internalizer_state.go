@@ -163,6 +163,7 @@ type SMTInternalizerState struct {
 	simplifyCounter          int
 	learnedUnits             []smtPersistentLearnedUnit
 	searchBaseLevel          uint32
+	searchUserBaseLevel      uint32
 	searchAgility            float64
 	searchAgilityFactor      float64
 	searchRestartAdaptive    bool

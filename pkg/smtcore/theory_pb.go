@@ -21,15 +21,18 @@ type smtPseudoBooleanStatistics struct {
 }
 
 // SMTPseudoBooleanTheory keeps concrete normalized constraints and native
-// variable/literal watches. Source strengthening and compilation remain separate
-// incomplete algorithms; ordinary propagation no longer enumerates valuations.
+// variable/literal watches and weighted conflict resolution. Compilation and
+// optional simplex integration remain separate incomplete source algorithms.
 type SMTPseudoBooleanTheory struct {
 	*SMTTheoryBase
-	statistics  smtPseudoBooleanStatistics
-	watches     map[int32]*smtPBVariableWatches
-	constraints []*smtPBConstraint
-	limits      []int
-	trail       *backtrack.TrailStack
+	statistics     smtPseudoBooleanStatistics
+	watches        map[int32]*smtPBVariableWatches
+	constraints    []*smtPBConstraint
+	limits         []int
+	trail          *backtrack.TrailStack
+	controls       SMTPBState
+	configured     bool
+	parameterOwner *SMTPBParams // borrowed only until the source setup boundary
 }
 
 func NewSMTPseudoBooleanTheory(family ast.FamilyID) (*SMTPseudoBooleanTheory, error) {
@@ -37,7 +40,7 @@ func NewSMTPseudoBooleanTheory(family ast.FamilyID) (*SMTPseudoBooleanTheory, er
 	if err != nil {
 		return nil, err
 	}
-	return &SMTPseudoBooleanTheory{SMTTheoryBase: base, trail: backtrack.NewTrailStack()}, nil
+	return &SMTPseudoBooleanTheory{SMTTheoryBase: base, trail: backtrack.NewTrailStack(), controls: SMTPBState{ConflictFrequency: 1000, LearnComplements: true, EnableCompilation: true}}, nil
 }
 
 func (t *SMTPseudoBooleanTheory) operation(expression ast.ASTHandle) (int32, bool, error) {
@@ -68,6 +71,13 @@ func smtPseudoBooleanRational(manager *ast.ASTManager, value unumeral.OwnedRatio
 }
 
 func (t *SMTPseudoBooleanTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool, error) {
+	return t.internalizeAtom(expression, false)
+}
+
+func (t *SMTPseudoBooleanTheory) internalizeAtom(expression ast.ASTHandle, retainAssignments bool) (bool, error) {
+	if err := t.Setup(); err != nil {
+		return false, err
+	}
 	op, own, err := t.operation(expression)
 	if err != nil || !own || op < ast.ASTPBOpAtMost || op > ast.ASTPBOpAuxBool {
 		return false, err
@@ -122,6 +132,12 @@ func (t *SMTPseudoBooleanTheory) InternalizeAtom(expression ast.ASTHandle, _ boo
 		if err != nil {
 			return false, err
 		}
+		// A strengthened consequence must keep its scoped false inputs in
+		// the definition. Folding them into an axiom can erase assumption
+		// premises and produce an invalid learned Boolean unit.
+		if retainAssignments {
+			value = lbool.Undef
+		}
 		switch value {
 		case lbool.True:
 			c.args[0].bound.Sub(&c.args[0].bound, q)
@@ -151,7 +167,7 @@ func (t *SMTPseudoBooleanTheory) InternalizeAtom(expression ast.ASTHandle, _ boo
 		a.negate()
 		c.args[1] = a.copy()
 		c.args[1].negate()
-		if a.bound.Cmp(big.NewRat(1, 1)) == 0 {
+		if a.bound.Cmp(big.NewRat(1, 1)) == 0 && !t.controls.EnableSimplex {
 			literals := []SMTLiteral{c.literal.Negated()}
 			for _, term := range a.terms {
 				literals = append(literals, term.literal)
@@ -223,6 +239,7 @@ func (t *SMTPseudoBooleanTheory) Close() error {
 	t.constraints = nil
 	t.limits = nil
 	t.variables = nil
+	t.parameterOwner = nil
 	return nil
 }
 

@@ -190,6 +190,9 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 	if err = k.internalizer.beginSearchPersistence(baseLevel, k.smtState); err != nil {
 		return lbool.Undef, errors.Join(err, resolver.Close(), timer.Close())
 	}
+	if k.assumptions != nil {
+		k.internalizer.searchUserBaseLevel--
+	}
 	defer func() {
 		if closeErr := resolver.Close(); closeErr != nil {
 			resultErr = errors.Join(resultErr, fmt.Errorf("smt search close resolver: %w", closeErr))
@@ -230,10 +233,7 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 				return lbool.Undef, fmt.Errorf("smt search missing conflict: %w", ast.ErrASTDomain)
 			}
 			conflictLiteral := k.internalizer.ConflictLiteral()
-			userBaseLevel := baseLevel
-			if k.assumptions != nil {
-				userBaseLevel--
-			}
+			userBaseLevel := k.internalizer.searchUserBaseLevel
 			resolution, err := resolver.resolve(conflict, conflictLiteral, baseLevel, userBaseLevel)
 			if err != nil {
 				return lbool.Undef, fmt.Errorf("smt search resolve conflict: %w", err)

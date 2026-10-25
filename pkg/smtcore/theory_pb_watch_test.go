@@ -86,8 +86,8 @@ func TestSMTPBWeightedWatchReplacementJustificationAndRollback(t *testing.T) {
 		data, err := s.BooleanData(ls[1].Var())
 		astTestMust(t, err)
 		owner, _ := data.Justification().Justification()
-		j, ok := owner.(*SMTTheoryPropagationJustification)
-		if !ok || len(j.Literals) != 2 || j.Literals[0] != ls[0].Negated() || j.Literals[1] != atom || j.Consequent != ls[1] {
+		j, ok := owner.(*smtPBJustification)
+		if !ok || j.constraint != c || len(j.Literals) != 2 || j.Literals[0] != ls[0].Negated() || j.Literals[1] != atom || j.Consequent != ls[1] {
 			t.Fatal("lost ordered PB premises", owner)
 		}
 		smtPBWatchAssign(t, s, ls[2].Negated())

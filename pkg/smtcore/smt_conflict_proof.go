@@ -375,6 +375,8 @@ func (b *smtConflictProofBuilder) objectProof(object SMTJustification) (ast.ASTH
 			return ast.ASTHandle{}, e
 		}
 		proof, err = b.state.manager.MkProofTheoryLemma(ast.FamilyID(value.theory), fact, parents, value.Parameters())
+	case *smtPBJustification:
+		proof, err = b.objectProof(value.SMTTheoryPropagationJustification)
 	case *SMTTheoryConflictJustification:
 		parents, e := b.literalProofs(value.Literals)
 		if e != nil {

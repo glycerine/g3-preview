@@ -563,6 +563,9 @@ func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	if datatype, ok := theory.(*SMTDatatypeTheory); ok && k.smtParams != nil && datatype.parameterOwner == nil {
 		datatype.parameterOwner = &k.smtParams.datatype
 	}
+	if pb, ok := theory.(*SMTPseudoBooleanTheory); ok && k.smtParams != nil && !pb.configured {
+		pb.parameterOwner = &k.smtParams.pb
+	}
 	if array := smtArrayCore(theory); array != nil && k.smtParams != nil {
 		config := k.smtParams.array.state
 		array.parameterOwner = &k.smtParams.array

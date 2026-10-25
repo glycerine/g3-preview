@@ -109,6 +109,12 @@ type smtPBVariableWatches struct {
 	constraint *smtPBConstraint
 }
 
+// Source pb_justification retains the inequality used for propagation.
+type smtPBJustification struct {
+	*SMTTheoryPropagationJustification
+	constraint *smtPBConstraint
+}
+
 func (t *SMTPseudoBooleanTheory) info(v int32) *smtPBVariableWatches {
 	if t.watches == nil {
 		t.watches = make(map[int32]*smtPBVariableWatches)
@@ -260,10 +266,11 @@ func (t *SMTPseudoBooleanTheory) allLiterals(c *smtPBConstraint) ([]SMTLiteral, 
 func (t *SMTPseudoBooleanTheory) addAssign(c *smtPBConstraint, premises []SMTLiteral, consequent SMTLiteral) error {
 	c.propagations++
 	t.statistics.propagations++
-	owner, err := NewSMTTheoryPropagationJustification(t.state.manager, t.FamilyID(), premises, consequent, nil)
+	base, err := NewSMTTheoryPropagationJustification(t.state.manager, t.FamilyID(), premises, consequent, nil)
 	if err != nil {
 		return err
 	}
+	owner := &smtPBJustification{SMTTheoryPropagationJustification: base, constraint: c}
 	wrapped, err := NewSMTBooleanJustification(owner)
 	if err != nil {
 		return err
@@ -276,6 +283,12 @@ func (t *SMTPseudoBooleanTheory) addConflict(c *smtPBConstraint, clause []SMTLit
 	c.propagations++
 	t.statistics.conflicts++
 	t.statistics.clauses++
+	frequency := t.controls.ConflictFrequency
+	if frequency == 0 || uint64(frequency-1) == c.propagations%uint64(frequency) {
+		if _, err := t.resolveConflict(c); err != nil {
+			return err
+		}
+	}
 	var owner SMTJustification
 	proofs, err := t.state.manager.ProofsEnabled()
 	if err != nil {
