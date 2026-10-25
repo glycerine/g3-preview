@@ -139045,7 +139045,9 @@
         "pkg/smtcore/theory_str_suffix_arrangements.go",
         "pkg/smtcore/theory_str_suffix_arrangements_test.go",
         "pkg/smtcore/theory_str_prefix_arrangements.go",
-        "pkg/smtcore/theory_str_prefix_arrangements_test.go"
+        "pkg/smtcore/theory_str_prefix_arrangements_test.go",
+        "pkg/smtcore/theory_str_literal_boundaries.go",
+        "pkg/smtcore/theory_str_literal_boundaries_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139126,7 +139128,13 @@
         "TestSMTStringPrefixConcatWitnessReuseAndFiltering",
         "TestSMTStringPrefixConcatLengthPredecessorRejectsNegativeCrop",
         "TestSMTStringPrefixConcatOverlapKnownAndUnknown",
-        "TestSMTStringPrefixConcatAlignmentUsesStrongParameter"
+        "TestSMTStringPrefixConcatAlignmentUsesStrongParameter",
+        "TestSMTStringMatchingLiteralBoundariesCoreAndRollback",
+        "TestSMTStringMatchingLiteralBoundaryExactFormulasAndBytes",
+        "TestSMTStringOpposingLiteralBoundariesCoreAndRollback",
+        "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder",
+        "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
+        "TestSMTStringOpposingBoundaryLoopAlternatives"
       ],
       "conditionals": [
         {
@@ -140138,8 +140146,8 @@
           ]
         },
         {
-          "name": "simplify_concat_equality cancellation/known-length quick paths, pre-inference snapshots, re-simplification with equality bridge guards, feasibility refusal and collapsed-concat parent dispatch; shared-group skip and overlap-aware multi-pair selection are connected; families 1-3 variable/literal-suffix/literal-prefix arrangements are ported, literal-boundary families 4 through 6 remain unported",
-          "status": "partial",
+          "name": "simplify_concat_equality retained active path: length inference/snapshots, syntactic/private-class cancellation, known-length quick paths, guarded re-simplification, structural refusal, collapsed parent dispatch, shared-group skip, overlap-aware pair selection and all six concat arrangement families; fixed-disabled diagnostic options and pure recursive dead inference effects stay audited separately",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_concat_equality.go",
           "tests": [
             "TestSMTStringConcatEqualityCoreCancellationAndRollback",
@@ -140166,7 +140174,13 @@
             "TestSMTStringPrefixConcatWitnessReuseAndFiltering",
             "TestSMTStringPrefixConcatLengthPredecessorRejectsNegativeCrop",
             "TestSMTStringPrefixConcatOverlapKnownAndUnknown",
-            "TestSMTStringPrefixConcatAlignmentUsesStrongParameter"
+            "TestSMTStringPrefixConcatAlignmentUsesStrongParameter",
+            "TestSMTStringMatchingLiteralBoundariesCoreAndRollback",
+            "TestSMTStringMatchingLiteralBoundaryExactFormulasAndBytes",
+            "TestSMTStringOpposingLiteralBoundariesCoreAndRollback",
+            "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder",
+            "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
+            "TestSMTStringOpposingBoundaryLoopAlternatives"
           ]
         },
         {
@@ -140243,7 +140257,7 @@
           ]
         },
         {
-          "name": "type-2/type-3 varForBreakConcat retained concrete witness/flag cache specialization: first/reverse key lookup, membership-based reuse across pops, enode/basic-queue refresh and nonempty reassertion; unlike type 1 no initial self-cut seed is inserted",
+          "name": "type-2/type-3/type-6 varForBreakConcat retained concrete witness/flag cache specialization: first/reverse key lookup, membership-based reuse across pops, enode/basic-queue refresh and nonempty reassertion; unlike type 1 no initial self-cut seed is inserted",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_str_suffix_arrangements.go",
           "tests": [
@@ -140251,7 +140265,9 @@
             "TestSMTStringSuffixConcatWitnessReuseAndFiltering",
             "TestSMTStringSuffixConcatOverlapKnownAndUnknown",
             "TestSMTStringPrefixConcatWitnessReuseAndFiltering",
-            "TestSMTStringPrefixConcatUnknownBytesAndOrder"
+            "TestSMTStringPrefixConcatUnknownBytesAndOrder",
+            "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
+            "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder"
           ]
         },
         {
@@ -140266,6 +140282,26 @@
             "TestSMTStringPrefixConcatLengthPredecessorRejectsNegativeCrop",
             "TestSMTStringPrefixConcatOverlapKnownAndUnknown",
             "TestSMTStringPrefixConcatAlignmentUsesStrongParameter"
+          ]
+        },
+        {
+          "name": "process_concat_eq_type4/type5 complete literal-prefix/suffix cancellation: incompatible boundary disequality, both residual directions, native equal-length equality orientation, private-class duplicate suppression and strong/weak equivalence/implication without witnesses or cuts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_literal_boundaries.go",
+          "tests": [
+            "TestSMTStringMatchingLiteralBoundariesCoreAndRollback",
+            "TestSMTStringMatchingLiteralBoundaryExactFormulasAndBytes"
+          ]
+        },
+        {
+          "name": "process_concat_eq_type6 complete opposing literal boundaries in both orientations: nonempty common witness/native unused flag, source zero/ascending suffix-prefix overlap list, unfiltered overlap alternatives and exact length-expression order, native 0.1/0.5 priorities, loop/finite alternatives, strong/weak forms and mutual exclusion; source deliberately does not merge cut origins into commonVar",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_literal_boundaries.go",
+          "tests": [
+            "TestSMTStringOpposingLiteralBoundariesCoreAndRollback",
+            "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder",
+            "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
+            "TestSMTStringOpposingBoundaryLoopAlternatives"
           ]
         }
       ],
@@ -140284,7 +140320,8 @@
         "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion.",
         "Concrete cut history is map[ASTHandle][]smtStringCut with native Go maps, signed levels and copy-on-higher-level membership. Project AST roots retain each reached seed/merge operand until owner Close; no C++ stack/map/allocation geometry is reproduced. Popped unreachable history maps are Go-managed, root/negative seeds and persistent witness membership/cache follow source behavior. Witness reuse refreshes enodes and basic queues without swapping reverse-key residuals. New nonempty strings have explicit empty-disequality/positive-length constraints, and the native integer flag is created despite its unused type-1 value. Local axiom roots are released forward after publication.",
         "Suffix-literal type 2 owns one nonempty String residual and the native unused integer flag in the existing concrete cache. Reverse-key reuse checks only the String membership, refreshes its enode and reasserts nonempty constraints. No -1 self-cut seed is introduced: the first allowed cut merges y then m into a new source-level frame; a suppressed overlap adds no witness cut frame. Literal crops use Go byte slices under the native predecessor range precondition; check-local AST roots survive until guarded publication and release forward.",
-        "Prefix-literal family 3 reuses the retained single-residual/integer-flag cache without an initial witness self seed. Known and unknown positive cuts merge x then n at the theory level. Fixed prefix extraction uses Go byte slices after the native equality-consistency predecessor; temporary length/guard/crop AST roots survive until publication and release forward. Unknown literal alternatives preserve len(x)=len(crop_literal) expressions rather than substituting numeral text, and enum order/preference differs from suffix family 2."
+        "Prefix-literal family 3 reuses the retained single-residual/integer-flag cache without an initial witness self seed. Known and unknown positive cuts merge x then n at the theory level. Fixed prefix extraction uses Go byte slices after the native equality-consistency predecessor; temporary length/guard/crop AST roots survive until publication and release forward. Unknown literal alternatives preserve len(x)=len(crop_literal) expressions rather than substituting numeral text, and enum order/preference differs from suffix family 2.",
+        "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140303,11 +140340,12 @@
         "Constant arrangements and class grouping are connected to the partial equality callback. Preserve first-operand length priority, negative/overlong bounds, structural refusals, omission of known-length consequences, native split order and strong/weak parameter behavior. Active mk_concat folds two class constants before the later both-known source branch, so that unreachable case is not manufactured. Newly created empty seeds need not be attached class constants. Full handle_equality still lacks tester dispatch, initial concat shortcuts, concat/concat step 1, parent simplification and unroll processing; production routing and FinalCheck remain incomplete.",
         "Native parent simplification and initial concat shortcuts now run at their retained equality-handler positions. Preserve attached-class evaluation rather than syntactic literal folding, both independent direct positions for repeated operands, source order of nested/grandparent cases and guarded replacement. Grandparent byte order and rebuilt operand order are explicit separate choices. Source missing-sibling length inference is unreachable with the pure recursive length reader. Full handler still lacks tester dispatch, concat/concat step 1 and unroll processing; automata/final checking and production String routing remain incomplete.",
         "The equality handler now dispatches opposite-class constants to collected unroll terms after parent simplification. Preserve source unsigned byte-length floor division, including mismatching/non-divisible text in direct necessary-consequence checks; this method does not replace regex acceptance. Empty target strings and non-to_re cores remain native no-ops. A zero/nonliteral divisor returns the source precondition error. Full unroll final checking, concat/unroll arrangements, concat/concat step 1, tester dispatch, automata and final checking remain pending; production backend routing and GiveUp are unchanged.",
-        "Step 1 now performs native overlap-aware selection across multiple concat groups, shared-group skip, cancellation/inference, guarded re-simplification and the complete variable-concat family 1 algorithm with cut histories. Literal-boundary families 4 through 6 remain unported; families 2 and 3 suffix/prefix arrangements are complete. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics.",
-        "Only the overlap assumption/core-validation producer is completed here. The variable-concat family 1 loop/cut producer is now ported; literal-boundary families 4 through 6 and the complete final checker remain unported; the family-2/3 suffix/prefix producers are complete. QF_S production routing is unchanged; simulated arrangement-conflict fixtures exercise the actual callbacks without claiming a full String runner port.",
-        "All variable-concat family 1 branches are connected to actual equality dispatch. Initial cut-frame seeds preserve source -1 levels; pop removes nonzero frames whose level is >= the resulting scope, while level zero persists. The source empty-destination merge branch reads an invalid top; valid pop erases empty entries, and reached-state precondition errors remain explicit rather than inventing an empty-stack interpretation. Remaining literal-boundary families 4 through 6, tester dispatch, unroll/automata final processing and full final checking still prevent complete legacy String routing. Runner/C++ integration checks cover the existing production engine, while these focused tests exercise the distinct partial legacy owner directly.",
+        "Step 1 now performs native overlap-aware selection across multiple concat groups, shared-group skip, cancellation/inference, guarded re-simplification and the complete variable-concat family 1 algorithm with cut histories. All six concat arrangement families are now ported; full final checking and other library/equality stages remain incomplete. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics.",
+        "Only the overlap assumption/core-validation producer is completed here. The variable-concat family 1 loop/cut producer is now ported; all six concat arrangement producers are now ported, while the complete final checker remains unported. QF_S production routing is unchanged; simulated arrangement-conflict fixtures exercise the actual callbacks without claiming a full String runner port.",
+        "All variable-concat family 1 branches are connected to actual equality dispatch. Initial cut-frame seeds preserve source -1 levels; pop removes nonzero frames whose level is >= the resulting scope, while level zero persists. The source empty-destination merge branch reads an invalid top; valid pop erases empty entries, and reached-state precondition errors remain explicit rather than inventing an empty-stack interpretation. Remaining tester dispatch, unroll/automata final processing and full final checking still prevent complete legacy String routing. Runner/C++ integration checks cover the existing production engine, while these focused tests exercise the distinct partial legacy owner directly.",
         "Known type-2 cropping relies on the retained new_eq_check length-consistency predecessor to reject deltas exceeding the literal; direct invalid extraction states return the existing domain/precondition error rather than executing an invalid unsigned/signed C++ extract. The actual-core oversized-crop regression proves refusal occurs before cache/arrangement creation. The unknown positive-cut branch has no added strict length inequalities: its nonempty witness supplies the native restriction. All byte positions 0..len(literal) are considered in source order, with original-string alignment at priority 0.5 and other feasible branches at 0.1. Complete legacy String routing/final checking remain pending.",
-        "Prefix family 3 is connected to actual equality dispatch. Its known alignment honors StrongArrangements unlike family 2; when positive-cut feasibility fails, native negation is commented out and no new refusal is introduced. Literal-prefix splits precede the residual cut, full-prefix alignment gets priority 0.5, and other options 0.1. A native predecessor regression rejects a negative inferred crop before cache/arrangement construction. Families 4-6, tester dispatch, unroll/automata final processing and final checking remain pending; production QF_S routing is unchanged and passing existing production runner comparisons does not establish complete legacy String behavior."
+        "Prefix family 3 is connected to actual equality dispatch. Its known alignment honors StrongArrangements unlike family 2; when positive-cut feasibility fails, native negation is commented out and no new refusal is introduced. Literal-prefix splits precede the residual cut, full-prefix alignment gets priority 0.5, and other options 0.1. A native predecessor regression rejects a negative inferred crop before cache/arrangement construction. Tester dispatch, unroll/automata final processing and final checking remain pending; production QF_S routing is unchanged and passing existing production runner comparisons does not establish complete legacy String behavior.",
+        "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior."
       ]
     },
     {
@@ -140359,7 +140397,9 @@
         "pkg/smtcore/theory_str_suffix_arrangements.go",
         "pkg/smtcore/theory_str_suffix_arrangements_test.go",
         "pkg/smtcore/theory_str_prefix_arrangements.go",
-        "pkg/smtcore/theory_str_prefix_arrangements_test.go"
+        "pkg/smtcore/theory_str_prefix_arrangements_test.go",
+        "pkg/smtcore/theory_str_literal_boundaries.go",
+        "pkg/smtcore/theory_str_literal_boundaries_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -140441,7 +140481,13 @@
         "TestSMTStringPrefixConcatWitnessReuseAndFiltering",
         "TestSMTStringPrefixConcatLengthPredecessorRejectsNegativeCrop",
         "TestSMTStringPrefixConcatOverlapKnownAndUnknown",
-        "TestSMTStringPrefixConcatAlignmentUsesStrongParameter"
+        "TestSMTStringPrefixConcatAlignmentUsesStrongParameter",
+        "TestSMTStringMatchingLiteralBoundariesCoreAndRollback",
+        "TestSMTStringMatchingLiteralBoundaryExactFormulasAndBytes",
+        "TestSMTStringOpposingLiteralBoundariesCoreAndRollback",
+        "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder",
+        "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
+        "TestSMTStringOpposingBoundaryLoopAlternatives"
       ],
       "conditionals": [
         {
@@ -140771,8 +140817,8 @@
           ]
         },
         {
-          "name": "simplify_concat_equality cancellation/known-length quick paths, pre-inference snapshots, re-simplification with equality bridge guards, feasibility refusal and collapsed-concat parent dispatch; shared-group skip and overlap-aware multi-pair selection are connected; families 1-3 variable/literal-suffix/literal-prefix arrangements are ported, literal-boundary families 4 through 6 remain unported",
-          "status": "partial",
+          "name": "simplify_concat_equality retained active path: length inference/snapshots, syntactic/private-class cancellation, known-length quick paths, guarded re-simplification, structural refusal, collapsed parent dispatch, shared-group skip, overlap-aware pair selection and all six concat arrangement families; fixed-disabled diagnostic options and pure recursive dead inference effects stay audited separately",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_concat_equality.go",
           "tests": [
             "TestSMTStringConcatEqualityCoreCancellationAndRollback",
@@ -140799,7 +140845,13 @@
             "TestSMTStringPrefixConcatWitnessReuseAndFiltering",
             "TestSMTStringPrefixConcatLengthPredecessorRejectsNegativeCrop",
             "TestSMTStringPrefixConcatOverlapKnownAndUnknown",
-            "TestSMTStringPrefixConcatAlignmentUsesStrongParameter"
+            "TestSMTStringPrefixConcatAlignmentUsesStrongParameter",
+            "TestSMTStringMatchingLiteralBoundariesCoreAndRollback",
+            "TestSMTStringMatchingLiteralBoundaryExactFormulasAndBytes",
+            "TestSMTStringOpposingLiteralBoundariesCoreAndRollback",
+            "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder",
+            "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
+            "TestSMTStringOpposingBoundaryLoopAlternatives"
           ]
         },
         {
@@ -140876,7 +140928,7 @@
           ]
         },
         {
-          "name": "type-2/type-3 varForBreakConcat retained concrete witness/flag cache specialization: first/reverse key lookup, membership-based reuse across pops, enode/basic-queue refresh and nonempty reassertion; unlike type 1 no initial self-cut seed is inserted",
+          "name": "type-2/type-3/type-6 varForBreakConcat retained concrete witness/flag cache specialization: first/reverse key lookup, membership-based reuse across pops, enode/basic-queue refresh and nonempty reassertion; unlike type 1 no initial self-cut seed is inserted",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_str_suffix_arrangements.go",
           "tests": [
@@ -140884,7 +140936,9 @@
             "TestSMTStringSuffixConcatWitnessReuseAndFiltering",
             "TestSMTStringSuffixConcatOverlapKnownAndUnknown",
             "TestSMTStringPrefixConcatWitnessReuseAndFiltering",
-            "TestSMTStringPrefixConcatUnknownBytesAndOrder"
+            "TestSMTStringPrefixConcatUnknownBytesAndOrder",
+            "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
+            "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder"
           ]
         },
         {
@@ -140899,6 +140953,26 @@
             "TestSMTStringPrefixConcatLengthPredecessorRejectsNegativeCrop",
             "TestSMTStringPrefixConcatOverlapKnownAndUnknown",
             "TestSMTStringPrefixConcatAlignmentUsesStrongParameter"
+          ]
+        },
+        {
+          "name": "process_concat_eq_type4/type5 complete literal-prefix/suffix cancellation: incompatible boundary disequality, both residual directions, native equal-length equality orientation, private-class duplicate suppression and strong/weak equivalence/implication without witnesses or cuts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_literal_boundaries.go",
+          "tests": [
+            "TestSMTStringMatchingLiteralBoundariesCoreAndRollback",
+            "TestSMTStringMatchingLiteralBoundaryExactFormulasAndBytes"
+          ]
+        },
+        {
+          "name": "process_concat_eq_type6 complete opposing literal boundaries in both orientations: nonempty common witness/native unused flag, source zero/ascending suffix-prefix overlap list, unfiltered overlap alternatives and exact length-expression order, native 0.1/0.5 priorities, loop/finite alternatives, strong/weak forms and mutual exclusion; source deliberately does not merge cut origins into commonVar",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_literal_boundaries.go",
+          "tests": [
+            "TestSMTStringOpposingLiteralBoundariesCoreAndRollback",
+            "TestSMTStringOpposingLiteralBoundaryBytesAndOverlapOrder",
+            "TestSMTStringOpposingBoundaryWitnessReuseAndUnfilteredOverlap",
+            "TestSMTStringOpposingBoundaryLoopAlternatives"
           ]
         }
       ],
@@ -140918,7 +140992,8 @@
         "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion.",
         "Concrete cut history is map[ASTHandle][]smtStringCut with native Go maps, signed levels and copy-on-higher-level membership. Project AST roots retain each reached seed/merge operand until owner Close; no C++ stack/map/allocation geometry is reproduced. Popped unreachable history maps are Go-managed, root/negative seeds and persistent witness membership/cache follow source behavior. Witness reuse refreshes enodes and basic queues without swapping reverse-key residuals. New nonempty strings have explicit empty-disequality/positive-length constraints, and the native integer flag is created despite its unused type-1 value. Local axiom roots are released forward after publication.",
         "Suffix-literal type 2 owns one nonempty String residual and the native unused integer flag in the existing concrete cache. Reverse-key reuse checks only the String membership, refreshes its enode and reasserts nonempty constraints. No -1 self-cut seed is introduced: the first allowed cut merges y then m into a new source-level frame; a suppressed overlap adds no witness cut frame. Literal crops use Go byte slices under the native predecessor range precondition; check-local AST roots survive until guarded publication and release forward.",
-        "Prefix-literal family 3 reuses the retained single-residual/integer-flag cache without an initial witness self seed. Known and unknown positive cuts merge x then n at the theory level. Fixed prefix extraction uses Go byte slices after the native equality-consistency predecessor; temporary length/guard/crop AST roots survive until publication and release forward. Unknown literal alternatives preserve len(x)=len(crop_literal) expressions rather than substituting numeral text, and enum order/preference differs from suffix family 2."
+        "Prefix-literal family 3 reuses the retained single-residual/integer-flag cache without an initial witness self seed. Known and unknown positive cuts merge x then n at the theory level. Fixed prefix extraction uses Go byte slices after the native equality-consistency predecessor; temporary length/guard/crop AST roots survive until publication and release forward. Unknown literal alternatives preserve len(x)=len(crop_literal) expressions rather than substituting numeral text, and enum order/preference differs from suffix family 2.",
+        "Literal-prefix/suffix families 4/5 introduce no witness/cut state; their borrowed-variable/literal residuals and guarded Boolean formulas remain locally rooted through publication. Opposing family 6 reuses the concrete nonempty witness/native integer-flag cache without an initial seed and, as source requires, never merges cut origins into commonVar. Ordered byte-overlap slices replace std::list directly; no C++ string/list/container implementation is ported. Every overlap alternative retains native equality/length-expression order and local AST roots release forward."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -140938,11 +141013,12 @@
         "Constant arrangements and class grouping are connected to the partial equality callback. Preserve first-operand length priority, negative/overlong bounds, structural refusals, omission of known-length consequences, native split order and strong/weak parameter behavior. Active mk_concat folds two class constants before the later both-known source branch, so that unreachable case is not manufactured. Newly created empty seeds need not be attached class constants. Full handle_equality still lacks tester dispatch, initial concat shortcuts, concat/concat step 1, parent simplification and unroll processing; production routing and FinalCheck remain incomplete.",
         "Native parent simplification and initial concat shortcuts now run at their retained equality-handler positions. Preserve attached-class evaluation rather than syntactic literal folding, both independent direct positions for repeated operands, source order of nested/grandparent cases and guarded replacement. Grandparent byte order and rebuilt operand order are explicit separate choices. Source missing-sibling length inference is unreachable with the pure recursive length reader. Full handler still lacks tester dispatch, concat/concat step 1 and unroll processing; automata/final checking and production String routing remain incomplete.",
         "The equality handler now dispatches opposite-class constants to collected unroll terms after parent simplification. Preserve source unsigned byte-length floor division, including mismatching/non-divisible text in direct necessary-consequence checks; this method does not replace regex acceptance. Empty target strings and non-to_re cores remain native no-ops. A zero/nonliteral divisor returns the source precondition error. Full unroll final checking, concat/unroll arrangements, concat/concat step 1, tester dispatch, automata and final checking remain pending; production backend routing and GiveUp are unchanged.",
-        "Step 1 now performs native overlap-aware selection across multiple concat groups, shared-group skip, cancellation/inference, guarded re-simplification and the complete variable-concat family 1 algorithm with cut histories. Literal-boundary families 4 through 6 remain unported; families 2 and 3 suffix/prefix arrangements are complete. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics.",
-        "Only the overlap assumption/core-validation producer is completed here. The variable-concat family 1 loop/cut producer is now ported; literal-boundary families 4 through 6 and the complete final checker remain unported; the family-2/3 suffix/prefix producers are complete. QF_S production routing is unchanged; simulated arrangement-conflict fixtures exercise the actual callbacks without claiming a full String runner port.",
-        "All variable-concat family 1 branches are connected to actual equality dispatch. Initial cut-frame seeds preserve source -1 levels; pop removes nonzero frames whose level is >= the resulting scope, while level zero persists. The source empty-destination merge branch reads an invalid top; valid pop erases empty entries, and reached-state precondition errors remain explicit rather than inventing an empty-stack interpretation. Remaining literal-boundary families 4 through 6, tester dispatch, unroll/automata final processing and full final checking still prevent complete legacy String routing. Runner/C++ integration checks cover the existing production engine, while these focused tests exercise the distinct partial legacy owner directly.",
+        "Step 1 now performs native overlap-aware selection across multiple concat groups, shared-group skip, cancellation/inference, guarded re-simplification and the complete variable-concat family 1 algorithm with cut histories. All six concat arrangement families are now ported; full final checking and other library/equality stages remain incomplete. FinalCheck still gives up and production QF_S routing is unchanged; focused private-owner checks do not establish complete CLI String semantics.",
+        "Only the overlap assumption/core-validation producer is completed here. The variable-concat family 1 loop/cut producer is now ported; all six concat arrangement producers are now ported, while the complete final checker remains unported. QF_S production routing is unchanged; simulated arrangement-conflict fixtures exercise the actual callbacks without claiming a full String runner port.",
+        "All variable-concat family 1 branches are connected to actual equality dispatch. Initial cut-frame seeds preserve source -1 levels; pop removes nonzero frames whose level is >= the resulting scope, while level zero persists. The source empty-destination merge branch reads an invalid top; valid pop erases empty entries, and reached-state precondition errors remain explicit rather than inventing an empty-stack interpretation. Remaining tester dispatch, unroll/automata final processing and full final checking still prevent complete legacy String routing. Runner/C++ integration checks cover the existing production engine, while these focused tests exercise the distinct partial legacy owner directly.",
         "Known type-2 cropping relies on the retained new_eq_check length-consistency predecessor to reject deltas exceeding the literal; direct invalid extraction states return the existing domain/precondition error rather than executing an invalid unsigned/signed C++ extract. The actual-core oversized-crop regression proves refusal occurs before cache/arrangement creation. The unknown positive-cut branch has no added strict length inequalities: its nonempty witness supplies the native restriction. All byte positions 0..len(literal) are considered in source order, with original-string alignment at priority 0.5 and other feasible branches at 0.1. Complete legacy String routing/final checking remain pending.",
-        "Prefix family 3 is connected to actual equality dispatch. Its known alignment honors StrongArrangements unlike family 2; when positive-cut feasibility fails, native negation is commented out and no new refusal is introduced. Literal-prefix splits precede the residual cut, full-prefix alignment gets priority 0.5, and other options 0.1. A native predecessor regression rejects a negative inferred crop before cache/arrangement construction. Families 4-6, tester dispatch, unroll/automata final processing and final checking remain pending; production QF_S routing is unchanged and passing existing production runner comparisons does not establish complete legacy String behavior."
+        "Prefix family 3 is connected to actual equality dispatch. Its known alignment honors StrongArrangements unlike family 2; when positive-cut feasibility fails, native negation is commented out and no new refusal is introduced. Literal-prefix splits precede the residual cut, full-prefix alignment gets priority 0.5, and other options 0.1. A native predecessor regression rejects a negative inferred crop before cache/arrangement construction. Tester dispatch, unroll/automata final processing and final checking remain pending; production QF_S routing is unchanged and passing existing production runner comparisons does not establish complete legacy String behavior.",
+        "All six active simplify_concat_equality arrangement families are implemented and connected. Family 6 includes every matching literal overlap in source order without a feasibility filter; even an impossible hypothetical crop remains in the branch list, and only the normal core constraints eliminate it. The positive-gap branch records no cut origins, preserving native behavior instead of generalizing families 1-3. Full legacy String remains partial because tester dispatch, additional unroll processing, library/conversion operations, automata final checks and full final checking remain incomplete. Production QF_S routing is unchanged and existing runner/C++ comparisons do not prove full legacy String behavior."
       ]
     },
     {
@@ -252078,7 +252154,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 703.402,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated 4e157d484b690a7d00a10cddc48980906fd0d088, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior containment, regex, concat/constant, parent folding, literal-core unroll processing, new true-equality propagation and the retained theory-aware strategy-6 queue/hint/lifecycle/display port and corrected source audit. Excludes subsequent concat-pair cancellation/known-length quick paths, child-length inference and the theory assumption/unsat-core validation integration, which have separate focused/native/debug evidence. The later variable-concat family 1 arrangements, cut histories and overlap-aware pair selection also have separate focused/integration evidence only. The subsequent family-2 literal-suffix arrangements likewise have focused/native/debug integration evidence only. Later family-3 literal-prefix arrangements are also excluded from this full-suite checkpoint. The known ALL unconstrained containment sat-versus-unknown case remains pending. Full String equality/final checking and production backend routing remain incomplete."
+    "scope_warning": "Independently verified exact clean isolated 4e157d484b690a7d00a10cddc48980906fd0d088, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes prior containment, regex, concat/constant, parent folding, literal-core unroll processing, new true-equality propagation and the retained theory-aware strategy-6 queue/hint/lifecycle/display port and corrected source audit. Excludes subsequent concat-pair cancellation/known-length quick paths, child-length inference and the theory assumption/unsat-core validation integration, which have separate focused/native/debug evidence. The later variable-concat family 1 arrangements, cut histories and overlap-aware pair selection also have separate focused/integration evidence only. The subsequent family-2 literal-suffix arrangements likewise have focused/native/debug integration evidence only. Later family-3 literal-prefix arrangements are also excluded from this full-suite checkpoint. Subsequent families 4-6 literal-boundary arrangements are likewise excluded. The known ALL unconstrained containment sat-versus-unknown case remains pending. Full String equality/final checking and production backend routing remain incomplete."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

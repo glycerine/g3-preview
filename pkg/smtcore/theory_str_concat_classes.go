@@ -162,8 +162,7 @@ func (t *SMTStringTheory) handleConstantEqualityStages(left, right ast.ASTHandle
 	if err := t.simplifyStringConcatGroups(l, r); err != nil {
 		return err
 	}
-	// Step 2 follows the quick paths and concat arrangement families 1-3.
-	// Literal-boundary families 4 through 6 remain pending.
+	// Source step 2 follows the quick paths and all six concat arrangements.
 	if len(l.constants) != 0 {
 		for _, concat := range r.concats {
 			if err := t.solveConcatConstant(concat, l.constants[0]); err != nil {

@@ -2805,6 +2805,7 @@
         "theory_str_cuts.go",
         "theory_str_equality_lengths.go",
         "theory_str_equality_values.go",
+        "theory_str_literal_boundaries.go",
         "theory_str_model.go",
         "theory_str_nfa.go",
         "theory_str_overlap.go",

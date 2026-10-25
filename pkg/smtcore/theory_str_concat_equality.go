@@ -1,5 +1,5 @@
 // Source: src/smt/theory_str.cpp infer_len_concat_arg,
-// infer_len_concat_equality and the quick paths of simplify_concat_equality.
+// infer_len_concat_equality and the active simplify_concat_equality dispatch.
 package smtcore
 
 import (
@@ -309,6 +309,14 @@ func (t *SMTStringTheory) simplifyStringConcatEquality(left, right ast.ASTHandle
 	if literals == [4]bool{true, false, false, false} || literals == [4]bool{false, false, true, false} {
 		return t.arrangeLiteralPrefixConcats(newLeft, newRight)
 	}
-	// Literal-boundary arrangement families 4 through 6 remain pending.
+	if literals == [4]bool{true, false, true, false} {
+		return t.arrangeMatchingLiteralBoundaries(newLeft, newRight, false)
+	}
+	if literals == [4]bool{false, true, false, true} {
+		return t.arrangeMatchingLiteralBoundaries(newLeft, newRight, true)
+	}
+	if literals == [4]bool{true, false, false, true} || literals == [4]bool{false, true, true, false} {
+		return t.arrangeOpposingLiteralBoundaries(newLeft, newRight)
+	}
 	return nil
 }
