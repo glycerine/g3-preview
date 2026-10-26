@@ -26,6 +26,7 @@ type smtLRAAssignment struct {
 type smtLRAFrontendScope struct {
 	bounds, assignments, head, underspecified int
 	termBounds                                int
+	assumptions, assumptionHead               int
 	unassigned                                []uint32
 	notHandled                                ast.ASTHandle
 }
@@ -55,6 +56,10 @@ type SMTLRATheory struct {
 	termBoundTrail                    []smtLRATermBoundChange
 	fixedVariables                    map[smtLRAFixedKey]SMTTheoryVar
 	fixedEqualities                   uint64
+	assumeCandidates                  []smtArithmeticEqualityCandidate
+	assumeHead                        int
+	modelValues                       map[uint32]*big.Rat
+	modelOwner                        *smtLRAModelOwner
 	unassigned                        []uint32
 	assignments                       []smtLRAAssignment
 	assignmentHead                    int
@@ -608,6 +613,7 @@ func (t *SMTLRATheory) Propagate() error {
 		t.boundChecks = nil
 		return nil
 	}
+	t.modelValues = nil // Source make_feasible clears cached rational values.
 	status, err := t.numeric.makeFeasible()
 	if err != nil {
 		return err
@@ -638,7 +644,7 @@ func (t *SMTLRATheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
-	t.scopes = append(t.scopes, smtLRAFrontendScope{bounds: len(t.boundTrail), assignments: len(t.assignments), head: t.assignmentHead, underspecified: len(t.underspecified), termBounds: len(t.termBoundTrail), notHandled: t.notHandled, unassigned: append([]uint32(nil), t.unassigned...)})
+	t.scopes = append(t.scopes, smtLRAFrontendScope{bounds: len(t.boundTrail), assignments: len(t.assignments), head: t.assignmentHead, underspecified: len(t.underspecified), termBounds: len(t.termBoundTrail), assumptions: len(t.assumeCandidates), assumptionHead: t.assumeHead, notHandled: t.notHandled, unassigned: append([]uint32(nil), t.unassigned...)})
 	if err := t.equalityAdapter.PushScope(); err != nil {
 		return err
 	}
@@ -674,6 +680,8 @@ func (t *SMTLRATheory) PopScopes(n uint32) error {
 	t.scopes = t.scopes[:level]
 	t.newBounds = nil // Native user-push contract flushes pending parent axioms first.
 	t.boundChecks = nil
+	t.assumeCandidates = t.assumeCandidates[:scope.assumptions]
+	t.assumeHead = scope.assumptionHead
 	for len(t.termBoundTrail) > scope.termBounds {
 		i := len(t.termBoundTrail) - 1
 		entry := t.termBoundTrail[i]
@@ -736,6 +744,9 @@ func (t *SMTLRATheory) Close() error {
 	t.upperTerms = nil
 	t.termBoundTrail = nil
 	t.fixedVariables = nil
+	t.assumeCandidates = nil
+	t.modelValues = nil
+	t.modelOwner = nil
 	t.unassigned = nil
 	t.assignments = nil
 	t.scopes = nil

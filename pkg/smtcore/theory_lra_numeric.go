@@ -414,25 +414,15 @@ func (s *smtLRANumeric) maximize(v SMTTheoryVar) (result SMTArithmeticObjectiveV
 // the actual strict-bound delta. Term values are reconstructed in LAR order.
 // Returned values own their math/big storage and survive the next solver call.
 func (s *smtLRANumeric) modelValues(vars []SMTTheoryVar) (result map[SMTTheoryVar]*big.Rat, err error) {
-	if err = s.ready(); err != nil {
+	columns, err := s.modelColumnValues()
+	if err != nil {
 		return nil, err
 	}
-	s.model = lp.NewLARRationalModel(s.manager)
 	defer func() {
 		if err != nil {
 			s.stopped = true
 		}
 	}()
-	if err = s.solver.GetModel(s.model); err != nil {
-		return nil, err
-	}
-	columns := make(map[uint32]*big.Rat)
-	for j, value := range s.model.Values {
-		columns[j], err = s.rational(value)
-		if err != nil {
-			return nil, err
-		}
-	}
 	result = make(map[SMTTheoryVar]*big.Rat)
 	for _, v := range vars {
 		value := new(big.Rat)
@@ -463,11 +453,34 @@ func (s *smtLRANumeric) modelValues(vars []SMTTheoryVar) (result map[SMTTheoryVa
 			}
 		}
 	}
+	return result, nil
+}
+
+func (s *smtLRANumeric) modelColumnValues() (columns map[uint32]*big.Rat, err error) {
+	if err = s.ready(); err != nil {
+		return nil, err
+	}
+	s.model = lp.NewLARRationalModel(s.manager)
+	defer func() {
+		if err != nil {
+			s.stopped = true
+		}
+	}()
+	if err = s.solver.GetModel(s.model); err != nil {
+		return nil, err
+	}
+	columns = make(map[uint32]*big.Rat)
+	for j, value := range s.model.Values {
+		columns[j], err = s.rational(value)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if err = s.model.Close(); err != nil {
 		return nil, err
 	}
 	s.model = nil
-	return result, nil
+	return columns, nil
 }
 
 func (s *smtLRANumeric) infeasibilityEvidence() (result []smtLRAEvidence, err error) {
