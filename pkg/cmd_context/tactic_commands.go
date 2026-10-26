@@ -23,6 +23,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -251,6 +252,11 @@ func (c *Context) CheckSatUsing(selected tactic.Tactic, options *uparams.ParamsR
 	if selected == nil {
 		return lbool.Undef, fmt.Errorf("check-sat-using needs a tactic argument")
 	}
+	watch, err := stopwatch.NewScopedWatch(&c.watch, true)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	defer func() { err = errors.Join(err, watch.Close()) }()
 	state, err := c.parameters.State()
 	if err != nil {
 		return lbool.Undef, err

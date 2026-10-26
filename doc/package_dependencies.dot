@@ -149,6 +149,7 @@ digraph packages {
   "cmd_context" -> "util/numeral";
   "cmd_context" -> "util/params";
   "cmd_context" -> "util/statistics";
+  "cmd_context" -> "util/stopwatch";
   "cmd_context" -> "util/symbol";
   "cmd_context" -> "util/text";
   "cmd_context" -> "util/z3exception";

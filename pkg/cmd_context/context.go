@@ -17,6 +17,7 @@ import (
 	"github.com/glycerine/g3/pkg/tactic/portfolio"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 type declaration struct {
@@ -59,6 +60,7 @@ type Context struct {
 	PrintSuccess, GlobalDeclarations bool
 	checked                          bool
 	status                           lbool.LBool
+	watch                            stopwatch.Stopwatch
 	owned                            *contextServices
 	closed                           bool
 	initializationError              error
@@ -646,15 +648,20 @@ func (c *Context) restoreAssertions(size int) error {
 	return nil
 }
 
-func (c *Context) CheckSat(assumptions []ast.ASTHandle) (lbool.LBool, error) {
+func (c *Context) CheckSat(assumptions []ast.ASTHandle) (status lbool.LBool, err error) {
 	if _, err := c.Manager(); err != nil {
 		return lbool.Undef, err
 	}
+	watch, err := stopwatch.NewScopedWatch(&c.watch, true)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	defer func() { err = errors.Join(err, watch.Close()) }()
 	c.checked = false
 	if err := c.clearCheckSatResult(); err != nil {
 		return lbool.Undef, err
 	}
-	status, err := c.solver.CheckSat(assumptions)
+	status, err = c.solver.CheckSat(assumptions)
 	if err == nil {
 		c.status, c.checked = status, true
 	}

@@ -11,6 +11,8 @@ func TestSMTGrobnerDependenciesOwnLiteralPolarityAndConsumerLifetime(t *testing.
 	m, cfg := smtModelGeneratorFixture(t)
 	s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
 	astTestMust(t, err)
+	// Exercise the retained legacy tableau algorithm explicitly.
+	smtDisableAutoConfig(t, s)
 	t.Cleanup(func() { astTestMust(t, s.Close()) })
 	s.kernel.preprocess = false
 	family, err := m.ArithmeticFamilyID()

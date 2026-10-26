@@ -31,7 +31,13 @@ func (k *SMTKernel) setupSimpleLogicPolicy(useStaticFeatures bool) (result error
 	}
 	k.smtParams.state.RelevancyLvl = 0
 	k.smtParams.preprocess.state.NNFCNF = false
-	return k.applySimpleSetupPolicy()
+	if err := k.applySimpleSetupPolicy(); err != nil {
+		return err
+	}
+	if k.setupLogic == "QF_UFLRA" {
+		return k.installRealLRA()
+	}
+	return nil
 }
 
 func (k *SMTKernel) applySimpleSetupPolicy() error {

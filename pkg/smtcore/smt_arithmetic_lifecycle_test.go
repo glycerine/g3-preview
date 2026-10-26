@@ -11,6 +11,8 @@ import (
 
 func smtArithmeticLifecycleKind(theory SMTTheoryInternalizer) string {
 	switch value := theory.(type) {
+	case *SMTLRATheory:
+		return "lra"
 	case *SMTLinearArithmeticTheory:
 		if value.infinite {
 			return "infinite-simplex"
@@ -45,7 +47,7 @@ func TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels(t *testing.T) 
 		{"mixed-simplex", "ALL", 2, false, true},
 		{"infinite-simplex", "ALL", 5, false, true},
 		{"integer-simplex", "QF_LIA", 2, true, true},
-		{"real-simplex", "QF_LRA", 2, true, false},
+		{"lra", "QF_LRA", 2, true, false},
 		{"mixed-graph", "ALL", 1, false, true},
 		{"real-graph", "QF_RDL", 2, true, false},
 		{"dense", "ALL", 3, false, true},

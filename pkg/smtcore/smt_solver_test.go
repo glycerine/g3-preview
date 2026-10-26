@@ -1334,7 +1334,7 @@ func TestSMTSolverCollectsAndResetsLinearArithmeticStatistics(t *testing.T) {
 	astTestMust(t, s.CollectStatistics(stats))
 	found := false
 	for index := 0; index < stats.Size(); index++ {
-		if stats.Key(index) == "arith add rows" {
+		if stats.Key(index) == "arith-rows" {
 			found = stats.IsUint(index) && stats.UintValue(index) != 0
 		}
 	}
@@ -1343,7 +1343,7 @@ func TestSMTSolverCollectsAndResetsLinearArithmeticStatistics(t *testing.T) {
 	}
 	var beforeReset uint32
 	for i := 0; i < stats.Size(); i++ {
-		if stats.Key(i) == "arith add rows" {
+		if stats.Key(i) == "arith-rows" {
 			beforeReset = stats.UintValue(i)
 		}
 	}
@@ -1352,7 +1352,7 @@ func TestSMTSolverCollectsAndResetsLinearArithmeticStatistics(t *testing.T) {
 	astTestMust(t, s.CollectStatistics(stats))
 	found = false
 	for index := 0; index < stats.Size(); index++ {
-		if stats.Key(index) == "arith add rows" {
+		if stats.Key(index) == "arith-rows" {
 			found = stats.IsUint(index) && stats.UintValue(index) == beforeReset
 		}
 	}
@@ -1641,6 +1641,8 @@ func TestSMTSolverLinearArithmeticSquareNonnegative(t *testing.T) {
 			astTestMust(t, err)
 			s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
 			astTestMust(t, err)
+			// Retain the legacy nonlinear tableau as the explicit test target.
+			smtDisableAutoConfig(t, s)
 			t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
 			zero, err := m.ArithmeticRealNumeralText("0")
 			astTestMust(t, err)
@@ -1698,6 +1700,8 @@ func TestSMTSolverLinearArithmeticEvaluatesFixedPolynomial(t *testing.T) {
 			astTestMust(t, err)
 			s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
 			astTestMust(t, err)
+			// Retain the legacy nonlinear tableau as the explicit test target.
+			smtDisableAutoConfig(t, s)
 			t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
 			two, err := m.ArithmeticRealNumeralText("2")
 			astTestMust(t, err)
@@ -1754,6 +1758,8 @@ func TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals(t *testing.T) {
 			astTestMust(t, err)
 			s, err := NewSMTSolver(m, nil, "QF_LRA", SMTSolverConfig{Params: params})
 			astTestMust(t, err)
+			// Retain the legacy nonlinear tableau as the explicit test target.
+			smtDisableAutoConfig(t, s)
 			t.Cleanup(func() { astTestMust(t, s.Close()); astTestMust(t, params.Close()) })
 			two, err := m.ArithmeticRealNumeralText("2")
 			astTestMust(t, err)

@@ -84,6 +84,7 @@ type SMTKernel struct {
 	setupLogic               string
 	sequenceSetupPlaceholder SMTTheoryInternalizer
 	copiedArithmeticPlugin   bool
+	pendingSetupLRA          *SMTLRATheory
 	copiedArithmeticOwner    *SMTArithParams
 	copiedArithmeticConfig   SMTArithState
 	copiedBVOwner            *SMTBVParams
@@ -1270,6 +1271,13 @@ func (k *SMTKernel) Close() error {
 			result = errors.Join(result, err)
 		} else {
 			k.preprocessor = nil
+		}
+	}
+	if k.pendingSetupLRA != nil {
+		if err := k.pendingSetupLRA.Close(); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			k.pendingSetupLRA = nil
 		}
 	}
 	result = errors.Join(result, k.internalizer.Close())

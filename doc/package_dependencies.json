@@ -921,6 +921,7 @@
         "util/numeral",
         "util/params",
         "util/statistics",
+        "util/stopwatch",
         "util/symbol",
         "util/text",
         "util/z3exception"

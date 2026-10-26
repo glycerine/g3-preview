@@ -28,6 +28,10 @@ func TestSMTSharedArithmeticFixedRowsScopedProofs(t *testing.T) {
 					}
 					s, err := NewSMTSolver(m, nil, logic, SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
 					astTestMust(t, err)
+					// Explicit legacy algorithm target; QF real automatic setup now uses LAR.
+					if logic == "QF_LRA" || logic == "QF_UFLRA" {
+						smtDisableAutoConfig(t, s)
+					}
 					t.Cleanup(func() { astTestMust(t, s.Close()) })
 					s.kernel.preprocess = false
 					family, err := m.ArithmeticFamilyID()

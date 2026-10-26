@@ -23,6 +23,11 @@ func TestSMTArithmeticSharedEqualitySplitsScopedProofsAndModels(t *testing.T) {
 				s, err := NewSMTSolver(m, nil, logic, SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
 				astTestMust(t, err)
 				t.Cleanup(func() { astTestMust(t, s.Close()) })
+				// This test exercises the old tableau assignment-mutation
+				// algorithm directly, including its raw two-sided bounds.
+				if !integer {
+					smtDisableAutoConfig(t, s)
+				}
 				s.kernel.preprocess = false
 				astTestMust(t, s.SetProduceModels(true))
 				family, err := m.ArithmeticFamilyID()

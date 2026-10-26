@@ -39768,7 +39768,13 @@
         "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
         "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
         "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
-        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
+        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_simple.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -39792,7 +39798,16 @@
         "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
         "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
         "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
-        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap"
+        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "conditionals": [
         {
@@ -39986,19 +40001,22 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
-        }
+        },
+        {"name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
         "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment.",
         "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed.",
         "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added.",
-        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget."
+        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
         "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
         "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes.",
         "The current Go shell owns its AST manager. External-manager reinitialization and a user-command registry remain outside these increments. Both reset and reset-assertions are dispatched. The default reset-assertions branch performs the owning full reset; the native extension-command parser has a separately recorded fresh-sort-initialization quirk, and strict comparisons exercise explicit empty-check initialization. Whole context/parser/command-unit completion is not claimed.",
-        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser."
+        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {
@@ -40016,7 +40034,15 @@
         "pkg/parsers/smt2/commands.go",
         "pkg/parsers/smt2/expressions.go",
         "pkg/parsers/smt2/commands_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_simple.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -40024,7 +40050,16 @@
         "TestSMT2CommandsRejectMalformedInputBeforeEffects",
         "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
         "TestSMTLibRunnerProofScript",
-        "TestCommandContextNamedCoreAndProof"
+        "TestCommandContextNamedCoreAndProof",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "conditionals": [
         {
@@ -40069,10 +40104,15 @@
           "status": "unported",
           "go_target": null,
           "tests": []
-        }
+        },
+        {"name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
+      ],
+      "deviations": [
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
+      ]
     },
     {
       "path": "src/cmd_context/check_logic.cpp",
@@ -40574,7 +40614,12 @@
         "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
         "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
         "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
-        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
+        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_simple.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -40650,7 +40695,16 @@
         "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
         "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
         "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
-        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap"
+        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "conditionals": [
         {
@@ -41407,7 +41461,8 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
-        }
+        },
+        {"name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
         "The command context owns its lazily created AST manager and SMTSolver, original assertion and optional core-tag ASTRefs, function/sort declaration trails and local params. Standalone sessions own and close the borrowed solver-service graph after context resources are released.",
@@ -41416,7 +41471,8 @@
         "The context borrows the current io.Writer. Its strategic SAT child resolves that writer through the owning context at emission time, including subsequent parser invocations; closing the context does not close the writer.",
         "Model() acquires an independent result reference only for a current SAT/UNKNOWN check with model production enabled. UNKNOWN without a candidate still returns model-is-not-available. Registered C++ oracle covers candidate get-value, scoped contradiction and pop recovery; existing command-context tests retain stale-result and acquired-model lifetime coverage.",
         "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added.",
-        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget."
+        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete.",
@@ -41424,7 +41480,8 @@
         "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
         "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes.",
         "The current Go shell owns its AST manager. External-manager reinitialization and a user-command registry remain outside these increments. Both reset and reset-assertions are dispatched. The default reset-assertions branch performs the owning full reset; the native extension-command parser has a separately recorded fresh-sort-initialization quirk, and strict comparisons exercise explicit empty-check initialization. Whole context/parser/command-unit completion is not claimed.",
-        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser."
+        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {
@@ -41487,7 +41544,13 @@
         "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
         "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
         "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
-        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
+        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_simple.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestCommandContextScopesDeclarationsAndModel",
@@ -41522,7 +41585,16 @@
         "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
         "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
         "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
-        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap"
+        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "conditionals": [
         {
@@ -41806,7 +41878,8 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
-        }
+        },
+        {"name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
         "The command context owns its lazily created AST manager and SMTSolver, original assertion and optional core-tag ASTRefs, function/sort declaration trails and local params. Standalone sessions own and close the borrowed solver-service graph after context resources are released.",
@@ -41815,7 +41888,8 @@
         "The context borrows the current io.Writer. Its strategic SAT child resolves that writer through the owning context at emission time, including subsequent parser invocations; closing the context does not close the writer.",
         "Model() acquires an independent result reference only for a current SAT/UNKNOWN check with model production enabled. UNKNOWN without a candidate still returns model-is-not-available. Registered C++ oracle covers candidate get-value, scoped contradiction and pop recovery; existing command-context tests retain stale-result and acquired-model lifetime coverage.",
         "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added.",
-        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget."
+        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete.",
@@ -41823,7 +41897,8 @@
         "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
         "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes.",
         "The current Go shell owns its AST manager. External-manager reinitialization and a user-command registry remain outside these increments. Both reset and reset-assertions are dispatched. The default reset-assertions branch performs the owning full reset; the native extension-command parser has a separately recorded fresh-sort-initialization quirk, and strict comparisons exercise explicit empty-check initialization. Whole context/parser/command-unit completion is not claimed.",
-        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser."
+        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {
@@ -91103,7 +91178,12 @@
         "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
         "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
         "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
-        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
+        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_simple.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -91165,7 +91245,16 @@
         "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
         "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
         "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
-        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap"
+        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "assertions": [
         {
@@ -92126,7 +92215,8 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
-        }
+        },
+        {"name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
         "Each parsed command holds ASTRefs for all constructed terms/sorts until the command context acquires its declaration/assertion references. Existing concrete local binding and var-shifting helpers own quantifier/let frames and are unwound on success and error.",
@@ -92135,7 +92225,8 @@
         "Quantifier metadata belongs to a concrete ASTQuantifierSpec local to its recursive grammar frame. Command-local ASTRefs retain parsed pattern terms and pattern applications until the resulting quantifier is owned by the command context. Parser option snapshots release their temporary ParamsRef owner immediately; rejected metadata unwinds the existing local-binding and command-root cleanup.",
         "The context borrows the current io.Writer. Its strategic SAT child resolves that writer through the owning context at emission time, including subsequent parser invocations; closing the context does not close the writer.",
         "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added.",
-        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget."
+        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
         "The retained Array constructor now parses all supplied sort arguments, using the final sort as range and preceding sorts as domains, matching native variadic array sorts. Empty/unary constructors are rejected before installing the declaration. Two multidimensional store/read scope scripts, with proofs disabled/enabled, now run through the public parser and compare against C++; strict runner agreement is 130.",
@@ -92147,7 +92238,8 @@
         "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
         "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes.",
         "The current Go shell owns its AST manager. External-manager reinitialization and a user-command registry remain outside these increments. Both reset and reset-assertions are dispatched. The default reset-assertions branch performs the owning full reset; the native extension-command parser has a separately recorded fresh-sort-initialization quirk, and strict comparisons exercise explicit empty-check initialization. Whole context/parser/command-unit completion is not claimed.",
-        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser."
+        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {
@@ -125376,7 +125468,14 @@
         "pkg/smtcore/theory_arith_grobner.go",
         "pkg/smtcore/theory_arith_nonlinear.go",
         "pkg/smtcore/theory_arith_epsilon.go",
-        "pkg/smtcore/smt_arithmetic_lifecycle.go"
+        "pkg/smtcore/smt_arithmetic_lifecycle.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestSMTArraySharedRolesAndScopedInterfaceEqualities",
@@ -125455,7 +125554,16 @@
         "TestSMTInfiniteArithmeticSharedModelDeltaSkipsInfinity",
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
         "TestSMTLibRunnerScripts/basic_infinite_arithmetic.smt2",
-        "TestSMTLibRunnerCPPReference/basic_infinite_arithmetic.smt2"
+        "TestSMTLibRunnerCPPReference/basic_infinite_arithmetic.smt2",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "assertions": [
         {
@@ -125906,7 +126014,8 @@
             "TestSMTQuantifiedLogicSetupProfilesAndConstructorCaches"
           ]
         },
-        {"name": "Retained inf_ext integration through the existing concrete mixed arithmetic tableau: mode5 setup and fresh-plugin copy selection; owned nonstandard lower-bound construction/name/complement; full infinity/rational/epsilon bound normalization, row transport, shared-value equality keys and rational-only polynomial guards; native model projection and refine_epsilon infinity skip. Scope-limited transport credit, not complete arithmetic or higher optimizer coverage.", "status": "ported", "go_targets": ["pkg/smtcore/theory_arith_linear.go", "pkg/smtcore/theory_arith_objective_bound.go", "pkg/smtcore/theory_arith_assume_eq.go", "pkg/smtcore/theory_arith_mutation.go", "pkg/smtcore/theory_arith_fixed_bounds.go", "pkg/smtcore/theory_arith_max_min.go", "pkg/smtcore/theory_arith_grobner.go", "pkg/smtcore/theory_arith_nonlinear.go", "pkg/smtcore/theory_arith_epsilon.go", "pkg/smtcore/smt_arithmetic_lifecycle.go", "pkg/smtcore/smt_setup_basic_arithmetic.go", "pkg/smtcore/theory_arith_infinite_test.go", "pkg/cmd/g3/test_vectors/basic_infinite_arithmetic.smt2"], "tests": ["TestSMTInfiniteArithmeticConfiguredSolverModelAndPop", "TestSMTInfiniteArithmeticThresholdNameComplementAndCopies", "TestSMTInfiniteArithmeticMaximizeKeepsAllCoordinatesAndPop", "TestSMTInfiniteArithmeticEqualityDoesNotProjectInfinity", "TestSMTInfiniteArithmeticCompoundBoundAndRationalRounding", "TestSMTInfiniteArithmeticSharedModelDeltaSkipsInfinity", "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels", "TestSMTLibRunnerScripts/basic_infinite_arithmetic.smt2", "TestSMTLibRunnerCPPReference/basic_infinite_arithmetic.smt2"]}
+        {"name": "Retained inf_ext integration through the existing concrete mixed arithmetic tableau: mode5 setup and fresh-plugin copy selection; owned nonstandard lower-bound construction/name/complement; full infinity/rational/epsilon bound normalization, row transport, shared-value equality keys and rational-only polynomial guards; native model projection and refine_epsilon infinity skip. Scope-limited transport credit, not complete arithmetic or higher optimizer coverage.", "status": "ported", "go_targets": ["pkg/smtcore/theory_arith_linear.go", "pkg/smtcore/theory_arith_objective_bound.go", "pkg/smtcore/theory_arith_assume_eq.go", "pkg/smtcore/theory_arith_mutation.go", "pkg/smtcore/theory_arith_fixed_bounds.go", "pkg/smtcore/theory_arith_max_min.go", "pkg/smtcore/theory_arith_grobner.go", "pkg/smtcore/theory_arith_nonlinear.go", "pkg/smtcore/theory_arith_epsilon.go", "pkg/smtcore/smt_arithmetic_lifecycle.go", "pkg/smtcore/smt_setup_basic_arithmetic.go", "pkg/smtcore/theory_arith_infinite_test.go", "pkg/cmd/g3/test_vectors/basic_infinite_arithmetic.smt2"], "tests": ["TestSMTInfiniteArithmeticConfiguredSolverModelAndPop", "TestSMTInfiniteArithmeticThresholdNameComplementAndCopies", "TestSMTInfiniteArithmeticMaximizeKeepsAllCoordinatesAndPop", "TestSMTInfiniteArithmeticEqualityDoesNotProjectInfinity", "TestSMTInfiniteArithmeticCompoundBoundAndRationalRounding", "TestSMTInfiniteArithmeticSharedModelDeltaSkipsInfinity", "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels", "TestSMTLibRunnerScripts/basic_infinite_arithmetic.smt2", "TestSMTLibRunnerCPPReference/basic_infinite_arithmetic.smt2"]},
+        {"name": "Source setup_r_arith selection for automatic QF_LRA/QF_UFLRA at first setup/check after logic parameters, including independent copied-plugin preservation and failure-owned candidate retirement.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
         "Basic setup releases its temporary feature collector on every exit and replaces only an unused arithmetic owner before scope/theory setup. A pre-existing disabled checkpoint can be replaced after a parameter update. Mixed graph model delta and numeral types come from the existing concrete graph and AST owner. Initialized direct-internalizer column specializations remain stable.",
@@ -125926,7 +126035,8 @@
         "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners.",
         "Initial QF_S profile constructs the real String owner from the parent SMTStrParams member, including its existing borrowed nested kernel and standard teardown. No Sequence proxy represents this String profile.",
         "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced.",
-        "The existing concrete mixed tableau now selects its inf_ext specialization with an explicit constructor flag. Nonstandard atom thresholds, returned bound values, linear-form arithmetic and fixed-point substitutions own every rational coordinate. Scope removal restores numeric bounds while retaining feasible assignment seeds. Solver copying preserves the selected infinite specialization even when target parameters request another mode; previously acquired models retain independent ownership."
+        "The existing concrete mixed tableau now selects its inf_ext specialization with an explicit constructor flag. Nonstandard atom thresholds, returned bound values, linear-form arithmetic and fixed-point substitutions own every rational coordinate. Scope removal restores numeric bounds while retaining feasible assignment seeds. Solver copying preserves the selected infinite specialization even when target parameters request another mode; previously acquired models retain independent ownership.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",
@@ -125951,7 +126061,8 @@
         "Supersede the old QF_S Sequence/integer routing for initial logic/automatic setup with native String/mixed arithmetic. Five direct profile cases verify generic selector independence and borrowed ownership for enabled auto_config, plus disabled-auto-config default seq. A new CLI free-model/scoped contradiction/recovery script matches prebuilt C++. Generic setup_seq_str and pre-setup option changes are now implemented at the deferred boundary; source units remain partial for broader setup and copy-path work. Verified 559706f8 predates these routing changes.",
         "Generic setup_seq_str selection now reads current options and asserted-formula features at the first push/check boundary. auto selects Sequence for non-String sequences and String otherwise; z3str3/seq are explicit. QF_S and QF_BVRE profiles override the generic selector only while auto_config is enabled. setup_unknown(st) specialized dispatch is respected before generic-selector validation. Only eager Go placeholders can be replaced; explicit native-style installed plugins are preserved. Setup stays permanent across option updates and scope pops. Initial/deferred routing is covered, while broader setup profiles and concrete plugin-copy paths remain partial.",
         "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths.",
-        "This supersedes the earlier disabled-mode5 foundation note: AS_OPTINF now selects the actual three-component backend. Focused nonstandard point/maximize/complement/scope/model tests and a prebuilt-C++ mixed integer/real/nonlinear SMT-LIB vector verify this integration. Native mk_gt and mk_value intentionally use rational/epsilon projections; models are not claimed to be finite witnesses for arbitrary opaque infinite bounds. Rational-only shortcut guards avoid inventing polynomial equalities from infinite values. Source integer floor conversion clears infinity. Whole-unit status, higher optimizer orchestration, source completeness and the known dense strict-model limitation remain open; no CLI maximize/minimize is claimed."
+        "This supersedes the earlier disabled-mode5 foundation note: AS_OPTINF now selects the actual three-component backend. Focused nonstandard point/maximize/complement/scope/model tests and a prebuilt-C++ mixed integer/real/nonlinear SMT-LIB vector verify this integration. Native mk_gt and mk_value intentionally use rational/epsilon projections; models are not claimed to be finite witnesses for arbitrary opaque infinite bounds. Rational-only shortcut guards avoid inventing polynomial equalities from infinite values. Source integer floor conversion clears infinity. Whole-unit status, higher optimizer orchestration, source completeness and the known dense strict-model limitation remain open; no CLI maximize/minimize is claimed.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {
@@ -126014,7 +126125,14 @@
         "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
         "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
         "pkg/smtcore/smt_sequence_lifecycle.go",
-        "pkg/smtcore/smt_sequence_lifecycle_test.go"
+        "pkg/smtcore/smt_sequence_lifecycle_test.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
@@ -126067,7 +126185,16 @@
         "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
         "TestSMTGenericSelectorRespectsAutomaticSpecializedDispatch",
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
-        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "conditionals": [
         {
@@ -126416,7 +126543,8 @@
             "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
             "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
           ]
-        }
+        },
+        {"name": "Source setup_r_arith selection for automatic QF_LRA/QF_UFLRA at first setup/check after logic parameters, including independent copied-plugin preservation and failure-owned candidate retirement.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
         "Basic setup releases its temporary feature collector on every exit and replaces only an unused arithmetic owner before scope/theory setup. A pre-existing disabled checkpoint can be replaced after a parameter update. Mixed graph model delta and numeral types come from the existing concrete graph and AST owner. Initialized direct-internalizer column specializations remain stable.",
@@ -126433,7 +126561,8 @@
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
         "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
         "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners.",
-        "Initial QF_S profile constructs the real String owner from the parent SMTStrParams member, including its existing borrowed nested kernel and standard teardown. No Sequence proxy represents this String profile."
+        "Initial QF_S profile constructs the real String owner from the parent SMTStrParams member, including its existing borrowed nested kernel and standard teardown. No Sequence proxy represents this String profile.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
         "Arithmetic mode 4 now registers the dedicated UTVPI paired-graph theory. Constructor-only int_only remains false; the retained rdl_ext instance checks dynamic Int-variable parity. Mode 5 AS_OPTINF and remaining automatic unknown-logic setup are still incomplete. Six UTVPI scripts bring strict C++ comparisons to 118; a separate explicit nonincremental strategy-gap test is not counted as agreement.",
@@ -126454,7 +126583,8 @@
         "Earlier profile tests entered feature setup through ordinary CheckSat. They now explicitly use the fresh setup_and_check entry before later incremental checks; expectations for backend selection and parameter owners are unchanged. New regressions independently require logic-only policy for ordinary zero-assumption checks and static policy for fresh no-assumption tactics.",
         "Supersede the old QF_S Sequence/integer routing for initial logic/automatic setup with native String/mixed arithmetic. Five direct profile cases verify generic selector independence and borrowed ownership for enabled auto_config, plus disabled-auto-config default seq. A new CLI free-model/scoped contradiction/recovery script matches prebuilt C++. Generic setup_seq_str and pre-setup option changes are now implemented at the deferred boundary; source units remain partial for broader setup and copy-path work. Verified 559706f8 predates these routing changes.",
         "Generic setup_seq_str selection now reads current options and asserted-formula features at the first push/check boundary. auto selects Sequence for non-String sequences and String otherwise; z3str3/seq are explicit. QF_S and QF_BVRE profiles override the generic selector only while auto_config is enabled. setup_unknown(st) specialized dispatch is respected before generic-selector validation. Only eager Go placeholders can be replaced; explicit native-style installed plugins are preserved. Setup stays permanent across option updates and scope pops. Initial/deferred routing is covered, while broader setup profiles and concrete plugin-copy paths remain partial.",
-        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {
@@ -137866,7 +137996,16 @@
         "pkg/smtcore/theory_lra_statistics.go",
         "pkg/smtcore/theory_lra_statistics_test.go",
         "pkg/smtcore/theory_lra_objective.go",
-        "pkg/smtcore/theory_lra_objective_test.go"
+        "pkg/smtcore/theory_lra_objective_test.go",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_simple.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -137961,7 +138100,16 @@
         "TestSMTLRAObjectiveLowerBoundReconstructionAndBooleanReuse",
         "TestSMTLRAObjectiveLowerBoundActualConstraintsAndDomains",
         "TestSMTLRAObjectivePhysicalRefusalAndOwnerCleanup",
-        "TestSMTLRAObjectiveMappedRayAndConstant"
+        "TestSMTLRAObjectiveMappedRayAndConstant",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "conditionals": [
         {
@@ -138143,7 +138291,8 @@
         {"name": "Retained context::get_value and LRA cached numeral callback connected to quick_checker::canonize via its managed context, sort-family theory dispatch and per-query AST value roots.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_model.go", "pkg/smtcore/smt_theory.go", "pkg/smtcore/smt_quick_checker.go", "pkg/smtcore/smt_quantifier_manager.go", "pkg/smtcore/theory_lra_direct_value_test.go"], "tests": ["TestSMTLRADirectValueEligibilityAndSortDispatch", "TestSMTLRADirectValueIntegerAndStoppedOwnerGuards", "TestSMTLRADirectValueManagedQuickChecker", "TestSMTLRADirectValueQuickCheckerRootsEveryArgument"]},
         {"name": "Retained LRA init_solver LP parameter forwarding through context m_params and module lp; source mk_fresh integration creates independent concrete LRA/LAR owners reading destination LP settings.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra.go", "pkg/smtcore/smt_internalizer_state.go", "pkg/smtcore/smt_kernel.go", "pkg/smtcore/smt_arithmetic_lifecycle.go", "pkg/smtcore/theory_lra_lifecycle_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRALPSettingsLocalGlobalAndFrozenInitialization", "TestSMTLRALPSettingsRejectInvalidStrategyAndRetireHelper", "TestSMTLRALPFreshCopyUsesDestinationSettingsAndIndependentNumerics", "TestSMTLRALPInitializationAllocationRefusalCleanup", "TestSMTLRALPSettingsNativeOracle"]},
         {"name": "Retained LRA collect_statistics and get_name: exact native counter names/order/uint32 width; cumulative inequality rows, conflicts, disequalities and completed basic propagation; make_feasible LP sampling/maxima; existing solver statistics interface integration.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_statistics.go", "pkg/smtcore/theory_lra_numeric.go", "pkg/smtcore/theory_lra_propagation.go", "pkg/smtcore/theory_lra.go", "pkg/smtcore/theory_lra_statistics_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRAStatisticsActualRowsScopesAndSearchLifetime", "TestSMTLRAStatisticsBasicVersusLPAndEqualityCallbacks", "TestSMTLRAStatisticsUnsignedWidthAndGuards", "TestSMTLRAStatisticsSolverCollectionAndResetNoOp", "TestSMTLRAStatisticsNativeOracle"]},
-        {"name": "Retained LRA theory_opt callbacks add_objective/value/maximize/mk_gt/mk_obj/mk_ge: actual LAR local maximization, exact epsilon/integer blockers, typed objective reconstruction and filtered/scoped Boolean lower-bound registration.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_objective.go", "pkg/smtcore/theory_lra_objective_test.go"], "tests": ["TestSMTLRAObjectiveStrictValueAndSourceBlocker", "TestSMTLRAObjectiveRetainsLocalImprovementAndScope", "TestSMTLRAObjectiveUnmappedAndUnsupportedRegistration", "TestSMTLRAObjectiveBlockerRoundingAndEpsilon", "TestSMTLRAObjectiveLowerBoundReconstructionAndBooleanReuse", "TestSMTLRAObjectiveLowerBoundActualConstraintsAndDomains", "TestSMTLRAObjectivePhysicalRefusalAndOwnerCleanup", "TestSMTLRAObjectiveMappedRayAndConstant"]}
+        {"name": "Retained LRA theory_opt callbacks add_objective/value/maximize/mk_gt/mk_obj/mk_ge: actual LAR local maximization, exact epsilon/integer blockers, typed objective reconstruction and filtered/scoped Boolean lower-bound registration.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_objective.go", "pkg/smtcore/theory_lra_objective_test.go"], "tests": ["TestSMTLRAObjectiveStrictValueAndSourceBlocker", "TestSMTLRAObjectiveRetainsLocalImprovementAndScope", "TestSMTLRAObjectiveUnmappedAndUnsupportedRegistration", "TestSMTLRAObjectiveBlockerRoundingAndEpsilon", "TestSMTLRAObjectiveLowerBoundReconstructionAndBooleanReuse", "TestSMTLRAObjectiveLowerBoundActualConstraintsAndDomains", "TestSMTLRAObjectivePhysicalRefusalAndOwnerCleanup", "TestSMTLRAObjectiveMappedRayAndConstant"]},
+        {"name": "Source setup_r_arith selection for automatic QF_LRA/QF_UFLRA at first setup/check after logic parameters, including independent copied-plugin preservation and failure-owned candidate retirement.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
         "SMTLinearArithmeticTheory owns its exact simplex solver, linear definitions, atoms, assertion and scope trails, equality adapter and statistics; it borrows context enodes and AST handles through SMTTheoryBase.",
@@ -138159,7 +138308,8 @@
         "The quantifier manager binds its quick checker to the existing internalizer, which it borrows for the manager lifetime. The typed optional direct-value callback returns an AST expression handle; canonize roots each returned value before querying another argument or rewriting, and clearQuery retires those roots alongside rewritten expressions. Standalone quick-checker SetValue remains available; managed queries use live theory dispatch. LRA reuses the owned Go rational cache and does not initialize a model for this query. Failed numeric owners are refused.",
         "The internalizer borrows the kernel context-parameter reference while the kernel remains alive. A lexical LPParams helper acquires its lp module owner before numerical construction, reads simplex strategy and pivoted-row mode after LAR construction, and closes on success/failure. A refused helper cleanup stays reachable from the theory and is retried by Close before numerical/rational owners. Any failed initialization stops the partial numeric owner. A failed private rational-manager constructor can return a partial integer manager as the error with no rational owner; LRA retains that concrete IntegerManager and closes it before the shared service, including the tagged debug allocator frontiers. Fresh copies own distinct private numeral managers and LAR solvers, borrow only the existing source arithmetic parameter state and read LP settings from destination context/module services. Allocation refusal samples exercise partial construction and final child-owner retirement.",
         "Statistics retain scalar unsigned counts only. Collection borrows the numerical/equality owners and appends native uint32 contributions to the caller-owned Statistics container; zero contributions stay absent. No model/numeral reference or additional solver owner is created. LP settings statistics are copied into the numeric frontend only at make_feasible, preserving source sampling and lifetime. Existing wider private counters project modulo2^32 at collection instead of becoming double-valued statistics.",
-        "Concrete smtLRAAxiomCall roots temporary coefficient/numeral/product expressions. A final blocker or strict NOT result is returned unrooted for immediate caller pinning and owns its arguments; it is never destroyed by retiring its lexical argument roots. The Boolean internalizer owns registered bound bases; the filter owns comparison declarations. Failed lexical cleanup moves roots to pendingAxiomRoots until theory Close. As existing InternalizeAtom, typed bound ownership is published before fallible bound-axiom work and refused work is queued in newBounds. Failed numeric string conversion stops its owner. Eight physical reference-budget frontiers verify refusal/success and zero explicit AST references after context/filter/caller cleanup."
+        "Concrete smtLRAAxiomCall roots temporary coefficient/numeral/product expressions. A final blocker or strict NOT result is returned unrooted for immediate caller pinning and owns its arguments; it is never destroyed by retiring its lexical argument roots. The Boolean internalizer owns registered bound bases; the filter owns comparison declarations. Failed lexical cleanup moves roots to pendingAxiomRoots until theory Close. As existing InternalizeAtom, typed bound ownership is published before fallible bound-axiom work and refused work is queued in newBounds. Failed numeric string conversion stops its owner. Eight physical reference-budget frontiers verify refusal/success and zero explicit AST references after context/filter/caller cleanup.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
         "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open.",
@@ -138175,7 +138325,8 @@
         "Four concrete regressions cover unavailable proper columns, source term-before-model zero insertion and persistent term caching, fresh proper/term values after explicit invalidation, uninterpreted Real applications dispatched by sort family, unattached/missing-theory/nil boundaries, exact fractional-Int refusal, stopped owner guard, managed quick-checker proof of x+1=3 at x=2 versus an actual queued/materialized counterexample for x+1=4, and distinct explicit roots for both values and the rewritten application with retirement at query cleanup. No synthesized zero is returned for an unavailable proper column and no model initialization is inserted. C++ validate_eq_in_model appears only in declarations/definitions across src, with no retained invocation; its unused LRA override is not ported under the retained-consumer rule. This supersedes its earlier pending-work listing. Source statuses/audit flags remain unchanged; quick-checker units retain their existing ported status while LRA/context remain partial. Public LRA setup selection, LP parameter forwarding, statistics/copy/reset, objective AST callbacks and remaining source/integration audit are still open.",
         "Four new Go regressions plus a prebuilt-C++ oracle cover all four strategies, defaults/module/local/wrong-kind fallback precedence, both pivot modes, initialized settings remaining unchanged after parameter updates, invalid enum refusal, registration rollback/stopped-owner guards, nine physical constructor allocation samples including the two tagged partial-integer-owner cleanup regressions, fresh translated LRA identity and zero copied variables, destination LP overrides, source Close independence and translated scoped SAT/UNSAT/SAT. The installed source LRA is explicit in the lifecycle fixture because public setup still selects the older backend; the fixture marks source setup complete solely so actual copy_plugins/Translate sees that installed plugin. The destination copied plugin survives its normal setup and replays actual assertions. Prebuilt C++ checks all four LP modes and actual LU factorization statistics, omitting model requests covered by the separate known post-pop model-limitation oracle. Invalid native enum states become Go domain errors; standalone internalizer fixtures without parameter services retain source defaults. Source units and context remain partial; all status/audit/API flags and public routing remain unchanged. Source statistics/reset, objective AST callbacks and remaining setup/source/Bool-normalization integration audit remain pending.",
         "Four Go regressions plus a prebuilt-C++ statistics oracle cover actual coupled rows and a child numerical conflict, cumulative counts surviving pop and init_search, separate search conflict thresholds, LP sampling boundaries, maximum rows/columns, zero/unwritten counters, actual basic versus LP propagation and fixed/disequality/equality-adapter callbacks, source uint32 wraparound, nil guards, solver CollectStatistics and the intentional kernel ResetStatistics no-op without changing the numerical value. Stable C++ counters independently match the direct Go four-bound/child-conflict/pop case; tableau iteration counts and arbitrary model choices are not compared. The source plateau counter has no retained writer and remains zero. add_eq_constraint/add_def_constraint are lazy-only and not ported; immediate arith-rows counts actual inequality source publication. Source reset_eh has no retained context caller across src, so no unused reset adapter is added; this supersedes earlier pending-reset listings. Source statuses/audit/API flags remain unchanged, public LRA selection remains unchanged, and objective AST callbacks plus remaining source/setup/Bool-normalization integration audit remain open.",
-        "Eight Go regressions exercise strict actual LAR objective values and owned outputs, successive local improvements8->18->20 with GT blockers, strict child20-3epsilon with GE blocker and pop recovery, absent-index and actual mapped unbounded branches, opaque nonlinear registration without the old backend IsLinear gate, integer blocker rounding across negative/fractional values and epsilon signs, coefficient/constant reconstruction, filter/Boolean deduplication and scoped retirement, actual nonstrict/strict bound assignments, constant objectives, input domains and physical AST refusal cleanup. Existing prebuilt-C++ numeric/strict/coupled optimization oracles are invoked directly by the new AST callback tests and independently verify final source values and scopes. Intermediate points depend on compiler/column order; do not conflate this AST fixture8->18->20 with the numeric fixture17->20, and do not replace the retained outer optimizer loop with an eager local loop. The retained opt_solver caller initializes has_shared=false, and bounded LRA leaves it unchanged; the Go callback returns false without inventing a shared-variable scan. Positive epsilon lower thresholds negate a <= atom; nonpositive epsilon uses >=. Invalid infinity/fractional-Int or unmapped source preconditions become Go domain errors. The API returns borrowed AST handles under existing Go conventions. Whole source statuses/audit/API flags and public setup remain unchanged. Source/public-setup/Bool-normalization and whole-smtcore audit, plus higher optimizer/CLI/API integration, remain open; no complete engine or optimizer claim is made."
+        "Eight Go regressions exercise strict actual LAR objective values and owned outputs, successive local improvements8->18->20 with GT blockers, strict child20-3epsilon with GE blocker and pop recovery, absent-index and actual mapped unbounded branches, opaque nonlinear registration without the old backend IsLinear gate, integer blocker rounding across negative/fractional values and epsilon signs, coefficient/constant reconstruction, filter/Boolean deduplication and scoped retirement, actual nonstrict/strict bound assignments, constant objectives, input domains and physical AST refusal cleanup. Existing prebuilt-C++ numeric/strict/coupled optimization oracles are invoked directly by the new AST callback tests and independently verify final source values and scopes. Intermediate points depend on compiler/column order; do not conflate this AST fixture8->18->20 with the numeric fixture17->20, and do not replace the retained outer optimizer loop with an eager local loop. The retained opt_solver caller initializes has_shared=false, and bounded LRA leaves it unchanged; the Go callback returns false without inventing a shared-variable scan. Positive epsilon lower thresholds negate a <= atom; nonpositive epsilon uses >=. Invalid infinity/fractional-Int or unmapped source preconditions become Go domain errors. The API returns borrowed AST handles under existing Go conventions. Whole source statuses/audit/API flags and public setup remain unchanged. Source/public-setup/Bool-normalization and whole-smtcore audit, plus higher optimizer/CLI/API integration, remain open; no complete engine or optimizer claim is made.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {
@@ -138208,7 +138359,16 @@
         "pkg/smtcore/theory_lra_statistics.go",
         "pkg/smtcore/theory_lra_statistics_test.go",
         "pkg/smtcore/theory_lra_objective.go",
-        "pkg/smtcore/theory_lra_objective_test.go"
+        "pkg/smtcore/theory_lra_objective_test.go",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_simple.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -138301,7 +138461,16 @@
         "TestSMTLRAObjectiveLowerBoundReconstructionAndBooleanReuse",
         "TestSMTLRAObjectiveLowerBoundActualConstraintsAndDomains",
         "TestSMTLRAObjectivePhysicalRefusalAndOwnerCleanup",
-        "TestSMTLRAObjectiveMappedRayAndConstant"
+        "TestSMTLRAObjectiveMappedRayAndConstant",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -138333,7 +138502,8 @@
         {"name": "Retained context::get_value and LRA cached numeral callback connected to quick_checker::canonize via its managed context, sort-family theory dispatch and per-query AST value roots.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_model.go", "pkg/smtcore/smt_theory.go", "pkg/smtcore/smt_quick_checker.go", "pkg/smtcore/smt_quantifier_manager.go", "pkg/smtcore/theory_lra_direct_value_test.go"], "tests": ["TestSMTLRADirectValueEligibilityAndSortDispatch", "TestSMTLRADirectValueIntegerAndStoppedOwnerGuards", "TestSMTLRADirectValueManagedQuickChecker", "TestSMTLRADirectValueQuickCheckerRootsEveryArgument"]},
         {"name": "Retained LRA init_solver LP parameter forwarding through context m_params and module lp; source mk_fresh integration creates independent concrete LRA/LAR owners reading destination LP settings.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra.go", "pkg/smtcore/smt_internalizer_state.go", "pkg/smtcore/smt_kernel.go", "pkg/smtcore/smt_arithmetic_lifecycle.go", "pkg/smtcore/theory_lra_lifecycle_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRALPSettingsLocalGlobalAndFrozenInitialization", "TestSMTLRALPSettingsRejectInvalidStrategyAndRetireHelper", "TestSMTLRALPFreshCopyUsesDestinationSettingsAndIndependentNumerics", "TestSMTLRALPInitializationAllocationRefusalCleanup", "TestSMTLRALPSettingsNativeOracle"]},
         {"name": "Retained LRA collect_statistics and get_name: exact native counter names/order/uint32 width; cumulative inequality rows, conflicts, disequalities and completed basic propagation; make_feasible LP sampling/maxima; existing solver statistics interface integration.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_statistics.go", "pkg/smtcore/theory_lra_numeric.go", "pkg/smtcore/theory_lra_propagation.go", "pkg/smtcore/theory_lra.go", "pkg/smtcore/theory_lra_statistics_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRAStatisticsActualRowsScopesAndSearchLifetime", "TestSMTLRAStatisticsBasicVersusLPAndEqualityCallbacks", "TestSMTLRAStatisticsUnsignedWidthAndGuards", "TestSMTLRAStatisticsSolverCollectionAndResetNoOp", "TestSMTLRAStatisticsNativeOracle"]},
-        {"name": "Retained LRA theory_opt callbacks add_objective/value/maximize/mk_gt/mk_obj/mk_ge: actual LAR local maximization, exact epsilon/integer blockers, typed objective reconstruction and filtered/scoped Boolean lower-bound registration.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_objective.go", "pkg/smtcore/theory_lra_objective_test.go"], "tests": ["TestSMTLRAObjectiveStrictValueAndSourceBlocker", "TestSMTLRAObjectiveRetainsLocalImprovementAndScope", "TestSMTLRAObjectiveUnmappedAndUnsupportedRegistration", "TestSMTLRAObjectiveBlockerRoundingAndEpsilon", "TestSMTLRAObjectiveLowerBoundReconstructionAndBooleanReuse", "TestSMTLRAObjectiveLowerBoundActualConstraintsAndDomains", "TestSMTLRAObjectivePhysicalRefusalAndOwnerCleanup", "TestSMTLRAObjectiveMappedRayAndConstant"]}
+        {"name": "Retained LRA theory_opt callbacks add_objective/value/maximize/mk_gt/mk_obj/mk_ge: actual LAR local maximization, exact epsilon/integer blockers, typed objective reconstruction and filtered/scoped Boolean lower-bound registration.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_objective.go", "pkg/smtcore/theory_lra_objective_test.go"], "tests": ["TestSMTLRAObjectiveStrictValueAndSourceBlocker", "TestSMTLRAObjectiveRetainsLocalImprovementAndScope", "TestSMTLRAObjectiveUnmappedAndUnsupportedRegistration", "TestSMTLRAObjectiveBlockerRoundingAndEpsilon", "TestSMTLRAObjectiveLowerBoundReconstructionAndBooleanReuse", "TestSMTLRAObjectiveLowerBoundActualConstraintsAndDomains", "TestSMTLRAObjectivePhysicalRefusalAndOwnerCleanup", "TestSMTLRAObjectiveMappedRayAndConstant"]},
+        {"name": "Source setup_r_arith selection for automatic QF_LRA/QF_UFLRA at first setup/check after logic parameters, including independent copied-plugin preservation and failure-owned candidate retirement.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
         "The concrete Go theory owns its solver state and borrows the registered arithmetic family and SMT context.",
@@ -138349,7 +138519,8 @@
         "The quantifier manager binds its quick checker to the existing internalizer, which it borrows for the manager lifetime. The typed optional direct-value callback returns an AST expression handle; canonize roots each returned value before querying another argument or rewriting, and clearQuery retires those roots alongside rewritten expressions. Standalone quick-checker SetValue remains available; managed queries use live theory dispatch. LRA reuses the owned Go rational cache and does not initialize a model for this query. Failed numeric owners are refused.",
         "The internalizer borrows the kernel context-parameter reference while the kernel remains alive. A lexical LPParams helper acquires its lp module owner before numerical construction, reads simplex strategy and pivoted-row mode after LAR construction, and closes on success/failure. A refused helper cleanup stays reachable from the theory and is retried by Close before numerical/rational owners. Any failed initialization stops the partial numeric owner. A failed private rational-manager constructor can return a partial integer manager as the error with no rational owner; LRA retains that concrete IntegerManager and closes it before the shared service, including the tagged debug allocator frontiers. Fresh copies own distinct private numeral managers and LAR solvers, borrow only the existing source arithmetic parameter state and read LP settings from destination context/module services. Allocation refusal samples exercise partial construction and final child-owner retirement.",
         "Statistics retain scalar unsigned counts only. Collection borrows the numerical/equality owners and appends native uint32 contributions to the caller-owned Statistics container; zero contributions stay absent. No model/numeral reference or additional solver owner is created. LP settings statistics are copied into the numeric frontend only at make_feasible, preserving source sampling and lifetime. Existing wider private counters project modulo2^32 at collection instead of becoming double-valued statistics.",
-        "Concrete smtLRAAxiomCall roots temporary coefficient/numeral/product expressions. A final blocker or strict NOT result is returned unrooted for immediate caller pinning and owns its arguments; it is never destroyed by retiring its lexical argument roots. The Boolean internalizer owns registered bound bases; the filter owns comparison declarations. Failed lexical cleanup moves roots to pendingAxiomRoots until theory Close. As existing InternalizeAtom, typed bound ownership is published before fallible bound-axiom work and refused work is queued in newBounds. Failed numeric string conversion stops its owner. Eight physical reference-budget frontiers verify refusal/success and zero explicit AST references after context/filter/caller cleanup."
+        "Concrete smtLRAAxiomCall roots temporary coefficient/numeral/product expressions. A final blocker or strict NOT result is returned unrooted for immediate caller pinning and owns its arguments; it is never destroyed by retiring its lexical argument roots. The Boolean internalizer owns registered bound bases; the filter owns comparison declarations. Failed lexical cleanup moves roots to pendingAxiomRoots until theory Close. As existing InternalizeAtom, typed bound ownership is published before fallible bound-axiom work and refused work is queued in newBounds. Failed numeric string conversion stops its owner. Eight physical reference-budget frontiers verify refusal/success and zero explicit AST references after context/filter/caller cleanup.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
         "The retained setup selects the shared exact Go linear solver for QF_LRA and QF_UFLRA.",
@@ -138365,7 +138536,8 @@
         "Four concrete regressions cover unavailable proper columns, source term-before-model zero insertion and persistent term caching, fresh proper/term values after explicit invalidation, uninterpreted Real applications dispatched by sort family, unattached/missing-theory/nil boundaries, exact fractional-Int refusal, stopped owner guard, managed quick-checker proof of x+1=3 at x=2 versus an actual queued/materialized counterexample for x+1=4, and distinct explicit roots for both values and the rewritten application with retirement at query cleanup. No synthesized zero is returned for an unavailable proper column and no model initialization is inserted. C++ validate_eq_in_model appears only in declarations/definitions across src, with no retained invocation; its unused LRA override is not ported under the retained-consumer rule. This supersedes its earlier pending-work listing. Source statuses/audit flags remain unchanged; quick-checker units retain their existing ported status while LRA/context remain partial. Public LRA setup selection, LP parameter forwarding, statistics/copy/reset, objective AST callbacks and remaining source/integration audit are still open.",
         "Four new Go regressions plus a prebuilt-C++ oracle cover all four strategies, defaults/module/local/wrong-kind fallback precedence, both pivot modes, initialized settings remaining unchanged after parameter updates, invalid enum refusal, registration rollback/stopped-owner guards, nine physical constructor allocation samples including the two tagged partial-integer-owner cleanup regressions, fresh translated LRA identity and zero copied variables, destination LP overrides, source Close independence and translated scoped SAT/UNSAT/SAT. The installed source LRA is explicit in the lifecycle fixture because public setup still selects the older backend; the fixture marks source setup complete solely so actual copy_plugins/Translate sees that installed plugin. The destination copied plugin survives its normal setup and replays actual assertions. Prebuilt C++ checks all four LP modes and actual LU factorization statistics, omitting model requests covered by the separate known post-pop model-limitation oracle. Invalid native enum states become Go domain errors; standalone internalizer fixtures without parameter services retain source defaults. Source units and context remain partial; all status/audit/API flags and public routing remain unchanged. Source statistics/reset, objective AST callbacks and remaining setup/source/Bool-normalization integration audit remain pending.",
         "Four Go regressions plus a prebuilt-C++ statistics oracle cover actual coupled rows and a child numerical conflict, cumulative counts surviving pop and init_search, separate search conflict thresholds, LP sampling boundaries, maximum rows/columns, zero/unwritten counters, actual basic versus LP propagation and fixed/disequality/equality-adapter callbacks, source uint32 wraparound, nil guards, solver CollectStatistics and the intentional kernel ResetStatistics no-op without changing the numerical value. Stable C++ counters independently match the direct Go four-bound/child-conflict/pop case; tableau iteration counts and arbitrary model choices are not compared. The source plateau counter has no retained writer and remains zero. add_eq_constraint/add_def_constraint are lazy-only and not ported; immediate arith-rows counts actual inequality source publication. Source reset_eh has no retained context caller across src, so no unused reset adapter is added; this supersedes earlier pending-reset listings. Source statuses/audit/API flags remain unchanged, public LRA selection remains unchanged, and objective AST callbacks plus remaining source/setup/Bool-normalization integration audit remain open.",
-        "Eight Go regressions exercise strict actual LAR objective values and owned outputs, successive local improvements8->18->20 with GT blockers, strict child20-3epsilon with GE blocker and pop recovery, absent-index and actual mapped unbounded branches, opaque nonlinear registration without the old backend IsLinear gate, integer blocker rounding across negative/fractional values and epsilon signs, coefficient/constant reconstruction, filter/Boolean deduplication and scoped retirement, actual nonstrict/strict bound assignments, constant objectives, input domains and physical AST refusal cleanup. Existing prebuilt-C++ numeric/strict/coupled optimization oracles are invoked directly by the new AST callback tests and independently verify final source values and scopes. Intermediate points depend on compiler/column order; do not conflate this AST fixture8->18->20 with the numeric fixture17->20, and do not replace the retained outer optimizer loop with an eager local loop. The retained opt_solver caller initializes has_shared=false, and bounded LRA leaves it unchanged; the Go callback returns false without inventing a shared-variable scan. Positive epsilon lower thresholds negate a <= atom; nonpositive epsilon uses >=. Invalid infinity/fractional-Int or unmapped source preconditions become Go domain errors. The API returns borrowed AST handles under existing Go conventions. Whole source statuses/audit/API flags and public setup remain unchanged. Source/public-setup/Bool-normalization and whole-smtcore audit, plus higher optimizer/CLI/API integration, remain open; no complete engine or optimizer claim is made."
+        "Eight Go regressions exercise strict actual LAR objective values and owned outputs, successive local improvements8->18->20 with GT blockers, strict child20-3epsilon with GE blocker and pop recovery, absent-index and actual mapped unbounded branches, opaque nonlinear registration without the old backend IsLinear gate, integer blocker rounding across negative/fractional values and epsilon signs, coefficient/constant reconstruction, filter/Boolean deduplication and scoped retirement, actual nonstrict/strict bound assignments, constant objectives, input domains and physical AST refusal cleanup. Existing prebuilt-C++ numeric/strict/coupled optimization oracles are invoked directly by the new AST callback tests and independently verify final source values and scopes. Intermediate points depend on compiler/column order; do not conflate this AST fixture8->18->20 with the numeric fixture17->20, and do not replace the retained outer optimizer loop with an eager local loop. The retained opt_solver caller initializes has_shared=false, and bounded LRA leaves it unchanged; the Go callback returns false without inventing a shared-variable scan. Positive epsilon lower thresholds negate a <= atom; nonpositive epsilon uses >=. Invalid infinity/fractional-Int or unmapped source preconditions become Go domain errors. The API returns borrowed AST handles under existing Go conventions. Whole source statuses/audit/API flags and public setup remain unchanged. Source/public-setup/Bool-normalization and whole-smtcore audit, plus higher optimizer/CLI/API integration, remain open; no complete engine or optimizer claim is made.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {
@@ -240790,14 +240962,33 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/statistics/statistics.go"
+        "pkg/util/statistics/statistics.go",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_simple.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestContributionsCopyResetAndRawAccess",
         "TestRenderingAggregationOrderingAndShadow",
         "TestUint64Threshold",
         "TestMemoryStatisticsSourceCounterDomains",
-        "TestMemoryStatisticsReadsSharedSourceProcess"
+        "TestMemoryStatisticsReadsSharedSourceProcess",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "assertions": [
         {
@@ -240867,13 +241058,16 @@
             "TestMemoryStatisticsSourceCounterDomains",
             "TestMemoryStatisticsReadsSharedSourceProcess"
           ]
-        }
+        },
+        {"name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
-        "Go strings own key spellings and typed slices own contributions; copying appends values and reset retains reusable slice capacity. No borrowed C strings, arena regions, allocation budget, manual vector capacity, or mutex is part of this single-goroutine value container."
+        "Go strings own key spellings and typed slices own contributions; copying appends values and reset retains reusable slice capacity. No borrowed C strings, arena regions, allocation budget, manual vector capacity, or mutex is part of this single-goroutine value container.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
-        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Memory statistics read the explicit shared ProcessAccounting source counters; unrelated Go heap metrics are not substituted."
+        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Memory statistics read the explicit shared ProcessAccounting source counters; unrelated Go heap metrics are not substituted.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {
@@ -240882,14 +241076,33 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/statistics/statistics.go"
+        "pkg/util/statistics/statistics.go",
+        "pkg/smtcore/smt_setup_real.go",
+        "pkg/smtcore/smt_setup_simple.go",
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/reason_unknown.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/smtcore/smt_setup_lra_backend_test.go",
+        "pkg/cmd_context/statistics_test.go",
+        "pkg/cmd/g3/lra_backend_test.go"
       ],
       "tests": [
         "TestContributionsCopyResetAndRawAccess",
         "TestRenderingAggregationOrderingAndShadow",
         "TestUint64Threshold",
         "TestMemoryStatisticsSourceCounterDomains",
-        "TestMemoryStatisticsReadsSharedSourceProcess"
+        "TestMemoryStatisticsReadsSharedSourceProcess",
+        "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+        "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+        "TestSMTLRAPublicSetupProofAndTrackedConflict",
+        "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+        "TestCommandContextStatisticsWriterAndWatch",
+        "TestSMTLibRunnerConcreteLRASmoke",
+        "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+        "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+        "TestSMTLibRunnerConcreteLRADefaultSelection"
       ],
       "conditionals": [
         {
@@ -240947,13 +241160,16 @@
             "TestMemoryStatisticsSourceCounterDomains",
             "TestMemoryStatisticsReadsSharedSourceProcess"
           ]
-        }
+        },
+        {"name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
       ],
       "ownership": [
-        "Go strings own key spellings and typed slices own contributions; copying appends values and reset retains reusable slice capacity. No borrowed C strings, arena regions, allocation budget, manual vector capacity, or mutex is part of this single-goroutine value container."
+        "Go strings own key spellings and typed slices own contributions; copying appends values and reset retains reusable slice capacity. No borrowed C strings, arena regions, allocation budget, manual vector capacity, or mutex is part of this single-goroutine value container.",
+        "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created."
       ],
       "deviations": [
-        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Memory statistics read the explicit shared ProcessAccounting source counters; unrelated Go heap metrics are not substituted."
+        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Memory statistics read the explicit shared ProcessAccounting source counters; unrelated Go heap metrics are not substituted.",
+        "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage."
       ]
     },
     {

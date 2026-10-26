@@ -119,5 +119,41 @@ func (k *SMTKernel) setupRealLogicPolicy(useStaticFeatures bool) (result error) 
 		}
 		arithmetic.SmallLemmaSize = 32
 	}
-	return k.applyArithmeticSetup(smt, arithmetic, preprocess)
+	if err := k.applyArithmeticSetup(smt, arithmetic, preprocess); err != nil {
+		return err
+	}
+	return k.installRealLRA()
+}
+
+// Source setup_r_arith installs theory_lra after the logic's parameter changes.
+// Constructor placeholders remain unused until this first setup boundary.
+func (k *SMTKernel) installRealLRA() (result error) {
+	if k.pendingSetupLRA != nil {
+		return ast.ErrASTDomain // Retire a refused candidate before retrying setup.
+	}
+	family, err := k.manager.ArithmeticFamilyID()
+	if err != nil {
+		return err
+	}
+	if _, installed := k.internalizer.theories[family].(*SMTLRATheory); installed {
+		return nil
+	}
+	theory, err := NewSMTLRATheory(family)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if result != nil {
+			k.pendingSetupLRA = theory
+			cleanup := theory.Close()
+			if cleanup == nil {
+				k.pendingSetupLRA = nil
+			}
+			result = errors.Join(result, cleanup)
+		}
+	}()
+	if err = theory.ConfigureArithmetic(k.arithState); err != nil {
+		return err
+	}
+	return k.replaceUnusedSetupArithmetic(theory)
 }

@@ -354,10 +354,15 @@ func (p *commandParser) command() (bool, error) {
 		if err = p.requireEnd(); err != nil {
 			return false, err
 		}
-		if key != ":reason-unknown" {
+		switch key {
+		case ":all-statistics":
+			err = p.context.WriteStatistics(p.out)
+		case ":reason-unknown":
+			err = p.context.WriteReasonUnknown(p.out)
+		default:
 			return false, fmt.Errorf("unsupported information attribute %s", key)
 		}
-		if err = p.context.WriteReasonUnknown(p.out); err != nil {
+		if err != nil {
 			return false, err
 		}
 		success = false

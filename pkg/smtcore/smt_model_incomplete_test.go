@@ -13,7 +13,10 @@ func TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp(t *testin
 	params, err := config.Context.NewValue()
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, config.Context.Del(&params)) })
-	key := "preprocess"
+	key := "auto_config"
+	astTestMust(t, config.Context.SetBoolName(&params, &key, false))
+	// Exercise the retained mixed-tableau incomplete-model round explicitly.
+	key = "preprocess"
 	astTestMust(t, config.Context.SetBoolName(&params, &key, false))
 	key = "compact"
 	astTestMust(t, config.Context.SetBoolName(&params, &key, false))
