@@ -415,6 +415,7 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	setDouble("dack.gc_inv_decay", 0.75)
 	setUInt("relevancy", 0)
 	setBool("mbqi", true)
+	setBool("mbqi.trace", true)
 	setString("mbqi.id", "before.")
 	setUInt("mbqi.max_cexs", 2)
 	setUInt("mbqi.max_iterations", 3)
@@ -432,7 +433,7 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	}
 	quantifiers := internalizer.quantifierManager
 	if quantifiers == nil || !quantifiers.mbqi || quantifiers.mbqiID != "before." || quantifiers.modelChecker == nil ||
-		quantifiers.modelChecker.initialMaxCexs != 2 || quantifiers.modelChecker.maxIterations != 3 {
+		!quantifiers.modelChecker.trace || quantifiers.modelChecker.initialMaxCexs != 2 || quantifiers.modelChecker.maxIterations != 3 {
 		t.Fatal("constructor did not install MBQI parameters")
 	}
 	maintenance := internalizer.clauseMaintenance
@@ -448,6 +449,7 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 	setDouble("dack.gc_inv_decay", 0.5)
 	setUInt("relevancy", 2)
 	setBool("mbqi", false)
+	setBool("mbqi.trace", false)
 	setString("mbqi.id", "after.")
 	setUInt("mbqi.max_cexs", 5)
 	setUInt("mbqi.max_iterations", 7)
@@ -457,13 +459,20 @@ func TestSMTSolverInstallsAndUpdatesRetainedSMTParameters(t *testing.T) {
 		manager.schedule.factor != 0.5 || manager.pairs.decay != 0.5 {
 		t.Fatal("parameter update replaced or failed to update dynamic-Ack state")
 	}
-	if quantifiers != internalizer.quantifierManager || quantifiers.mbqi || quantifiers.mbqiID != "after." || quantifiers.modelChecker != nil {
+	if quantifiers != internalizer.quantifierManager || quantifiers.mbqi || quantifiers.mbqiTrace || quantifiers.mbqiID != "after." || quantifiers.modelChecker != nil {
 		t.Fatal("parameter update failed to disable or update MBQI state")
 	}
 	setBool("mbqi", true)
+	setBool("mbqi.trace", true)
 	astTestMust(t, solver.UpdateParams(&local))
-	if !quantifiers.mbqi || quantifiers.modelChecker == nil || quantifiers.modelChecker.initialMaxCexs != 5 || quantifiers.modelChecker.maxIterations != 7 || quantifiers.modelChecker.auxiliary == nil || quantifiers.modelChecker.modelFinder != quantifiers.modelFinder {
+	if !quantifiers.mbqi || quantifiers.modelChecker == nil || !quantifiers.modelChecker.trace || quantifiers.modelChecker.initialMaxCexs != 5 || quantifiers.modelChecker.maxIterations != 7 || quantifiers.modelChecker.auxiliary == nil || quantifiers.modelChecker.modelFinder != quantifiers.modelFinder {
 		t.Fatal("parameter update failed to recreate MBQI checker")
+	}
+	checker := quantifiers.modelChecker
+	setBool("mbqi.trace", false)
+	astTestMust(t, solver.UpdateParams(&local))
+	if quantifiers.modelChecker != checker || checker.trace {
+		t.Fatal("live trace update replaced checker or kept stale trace setting")
 	}
 }
 

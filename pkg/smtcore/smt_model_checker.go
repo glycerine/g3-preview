@@ -28,6 +28,7 @@ type SMTModelChecker struct {
 	maxIterations    uint32
 	iteration        uint32
 	exhausted        bool
+	trace            bool
 	valueTerms       map[ast.ASTHandle]ast.ASTHandle
 	auxiliary        smtAuxiliarySolverFactory
 	auxiliaryContext *SMTSolver
@@ -745,10 +746,15 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 	}
 	if c.iteration >= c.maxIterations {
 		c.exhausted = true
-		return false, nil
+		return false, c.reportIterationLimit()
 	}
 	if err := model.Compress(); err != nil {
 		return false, err
+	}
+	if c.trace {
+		if err := writeMBQIDiagnostic("(smt.mbqi \"started\")\n"); err != nil {
+			return false, err
+		}
 	}
 	if err := c.initAuxiliaryContext(); err != nil {
 		return false, err
@@ -757,53 +763,78 @@ func (c *SMTModelChecker) Check(model *protomodel.ProtoModel, quantifiers []ast.
 	if len(quantifiers) != 0 {
 		c.iteration++
 	}
-	found, err := c.checkQuantifiers(model, quantifiers, false)
+	failures, err := c.checkQuantifiers(model, quantifiers, false)
 	if err != nil {
 		return false, err
 	}
 	c.maxCexs += c.initialMaxCexs
-	if found || c.exhausted {
-		return false, nil
-	}
-	valid, err := c.validateGroundAssignments(model)
-	if err != nil {
-		return false, err
-	}
-	if !valid {
-		_, err := c.checkQuantifiers(model, quantifiers, true)
-		return false, err
-	}
-	if err := model.Cleanup(); err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-func (c *SMTModelChecker) checkQuantifiers(md *protomodel.ProtoModel, quantifiers []ast.ASTHandle, strict bool) (found bool, err error) {
-	for _, q := range quantifiers {
-		recursive, err := c.manager.IsRecursiveFunctionDefinition(q)
+	if failures == 0 && !c.exhausted {
+		valid, err := c.validateGroundAssignments(model)
 		if err != nil {
 			return false, err
+		}
+		if !valid {
+			strictFailures, err := c.checkQuantifiers(model, quantifiers, true)
+			if err != nil {
+				return false, err
+			}
+			failures = 1 + strictFailures
+		}
+	}
+	if failures == 0 && !c.exhausted {
+		if err := model.Cleanup(); err != nil {
+			return false, err
+		}
+	}
+	if c.trace {
+		if err := c.reportResult(failures); err != nil {
+			return false, err
+		}
+	}
+	return failures == 0 && !c.exhausted, nil
+}
+
+func (c *SMTModelChecker) checkQuantifiers(md *protomodel.ProtoModel, quantifiers []ast.ASTHandle, strict bool) (failures uint32, err error) {
+	for _, q := range quantifiers {
+		if err = c.reportQuantifier("checking", q, true); err != nil {
+			return 0, err
+		}
+		recursive, err := c.manager.IsRecursiveFunctionDefinition(q)
+		if err != nil {
+			return 0, err
 		}
 		if recursive {
 			satisfied, err := c.checkRecursiveFunction(md, q, strict)
 			if err != nil {
-				return false, err
+				return 0, err
 			}
-			found = found || !satisfied
+			if !satisfied {
+				failures++
+			}
 			continue
 		}
 		remaining := c.maxCexs
 		if remaining == 0 {
 			remaining = 1
 		}
+		// Preserve the aggregate give-up flag while counting the outcome of
+		// this quantifier independently, as native check_quantifiers does.
+		previouslyExhausted := c.exhausted
+		c.exhausted = false
 		added, err := c.checkQuantifier(md, q, &remaining)
+		incomplete := c.exhausted
+		c.exhausted = previouslyExhausted || incomplete
 		if err != nil {
-			return false, err
+			return 0, err
 		}
-		found = found || added
+		if added || incomplete {
+			failures++
+			if err = c.reportQuantifier("failed", q, false); err != nil {
+				return 0, err
+			}
+		}
 	}
-	return found, nil
+	return failures, nil
 }
 
 func (c *SMTModelChecker) Close() error {

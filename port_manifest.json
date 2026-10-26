@@ -115377,7 +115377,9 @@
         "pkg/smtcore/smt_sequence_lifecycle_test.go",
         "pkg/smtcore/smt_model_generator.go",
         "pkg/smtcore/smt_model_incomplete_test.go",
-        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
+        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
+        "pkg/smtcore/smt_solver_test.go",
+        "pkg/cmd/g3/mbqi_diagnostics_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -115546,7 +115548,9 @@
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
         "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
         "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
-        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
+        "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
+        "TestSMTLibRunnerMBQITraceParameterUpdatesCPPReference"
       ],
       "conditionals": [
         {
@@ -117280,6 +117284,19 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
           ]
+        },
+        {
+          "name": "Preserve shared MBQI trace parameter through checker construction, live context refresh/recreation and quantified-logic setup; no new search or logic-selection behavior",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_solver_test.go",
+            "pkg/cmd/g3/mbqi_diagnostics_test.go"
+          ],
+          "tests": [
+            "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
+            "TestSMTLibRunnerMBQITraceParameterUpdatesCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -117300,7 +117317,8 @@
         "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion.",
         "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service.",
         "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
-        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit."
+        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit.",
+        "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -121218,7 +121236,11 @@
         "pkg/smtcore/smt_sequence_lifecycle.go",
         "pkg/smtcore/smt_sequence_lifecycle_test.go",
         "pkg/smtcore/smt_model_checker_skolem_test.go",
-        "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
+        "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2",
+        "pkg/smtcore/smt_model_checker_diagnostics.go",
+        "pkg/smtcore/smt_model_checker_diagnostics_test.go",
+        "pkg/cmd/g3/mbqi_diagnostics_test.go",
+        "pkg/cmd/g3/test_vectors/mbqi_trace_parameter_updates.smt2"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -121264,7 +121286,10 @@
         "TestSMTModelCheckerBooleanSkolemsAvoidCartesianEnumeration",
         "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
         "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
-        "TestSMTModelCheckerFiniteSkolemAllocationFrontiers"
+        "TestSMTModelCheckerFiniteSkolemAllocationFrontiers",
+        "TestSMTModelCheckerDiagnosticOutcomesAndGuards",
+        "TestSMTModelCheckerIncompleteQuantifierDoesNotCountLaterSuccessAsFailure",
+        "TestSMTLibRunnerMBQITraceParameterUpdatesCPPReference"
       ],
       "assertions": [
         {
@@ -121598,6 +121623,26 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "MBQI process diagnostics only: parameter-selected start, named checking, failure and final failure-count/success messages; independent verbosity-1 iteration-limit, verbosity-5 failed-quantifier and verbosity-100 restart messages (smt_model_checker.cpp:362-455,467-470)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_diagnostics.go",
+            "pkg/smtcore/smt_model_checker_diagnostics_test.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/cmd/g3/mbqi_diagnostics_test.go",
+            "pkg/cmd/g3/test_vectors/mbqi_trace_parameter_updates.smt2",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTModelCheckerDiagnosticOutcomesAndGuards",
+            "TestSMTModelCheckerIncompleteQuantifierDoesNotCountLaterSuccessAsFailure",
+            "TestSMTLibRunnerMBQITraceParameterUpdatesCPPReference",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -121605,7 +121650,8 @@
         "auxiliaryCounterexamples registers cleanup for the actual VarSubstitution owner before checking member-construction errors; quantified UFNIA allocation frontiers verify release of partial reducer storage as well as successful auxiliary solving.",
         "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close.",
         "SMTModelChecker owns one cached auxiliary solver after successful initialization. Each counterexample query pushes/pops its own scope even on error. Factory construction copies the persistent parameter snapshot and concrete retained plugins, closes partial owners on failure and freezes context parameters across parent updates/searches. Source arithmetic/BV/full-array parameter references retain their concrete owner semantics; no source assertions, enodes or theory instances are shared. Checker close destroys the auxiliary before parent parameter/services close.",
-        "Each auxiliary query owns fresh Skolem references, negated-body/clause references and finite-universe equality prefixes until scoped assertions take ownership. Query pop removes universe/instantiation restrictions and blocking clauses. Failed restriction allocation releases its prefix and leaves a reusable clean auxiliary scope. Production never enumerates a Cartesian product; existing standalone typed callers without an auxiliary factory retain their explicit model-enumeration contract, and the explicit no-model-finder auxiliary test retains unrestricted multi-witness enumeration. The saved complete model holds its own reference across the later restricted check, including UNKNOWN; that branch stops enumeration and uses the saved witness rather than marking the candidate exhausted."
+        "Each auxiliary query owns fresh Skolem references, negated-body/clause references and finite-universe equality prefixes until scoped assertions take ownership. Query pop removes universe/instantiation restrictions and blocking clauses. Failed restriction allocation releases its prefix and leaves a reusable clean auxiliary scope. Production never enumerates a Cartesian product; existing standalone typed callers without an auxiliary factory retain their explicit model-enumeration contract, and the explicit no-model-finder auxiliary test retains unrestricted multi-witness enumeration. The saved complete model holds its own reference across the later restricted check, including UNKNOWN; that branch stops enumeration and uses the saved witness rather than marking the candidate exhausted.",
+        "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced."
       ],
       "deviations": [
         "Production checks now use the native cached auxiliary context for every bound variable, including Booleans and frozen finite universes. Fresh creation is innermost-first with declaration-ordered vectors; finite universe membership is asserted as disjunctions before the negated candidate body. Model-finder restrictions/inverse recovery include all original positions; the native second check and single complete-witness fallback are retained even when no restriction clause was added. Scoped queries retain current frozen fparams, concrete plugin copying, blocking and delayed instance ownership. Standalone typed checkers without an auxiliary factory still enumerate an explicitly supplied model for their existing Go callers; the explicit no-model-finder auxiliary test retains unrestricted collection. Broader class/diagnostic/consumer audits remain incomplete.",
@@ -121651,7 +121697,9 @@
         "pkg/smtcore/smt_sequence_lifecycle.go",
         "pkg/smtcore/smt_sequence_lifecycle_test.go",
         "pkg/smtcore/smt_model_checker_skolem_test.go",
-        "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
+        "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2",
+        "pkg/smtcore/smt_model_checker_diagnostics.go",
+        "pkg/smtcore/smt_model_checker_diagnostics_test.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -121693,7 +121741,9 @@
         "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
         "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
         "TestSMTModelCheckerFiniteSkolemAllocationFrontiers",
-        "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse"
+        "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+        "TestSMTModelCheckerDiagnosticOutcomesAndGuards",
+        "TestSMTModelCheckerIncompleteQuantifierDoesNotCountLaterSuccessAsFailure"
       ],
       "conditionals": [
         {
@@ -121866,13 +121916,27 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "MBQI process diagnostics only: parameter-selected start, named checking, failure and final failure-count/success messages; independent verbosity-1 iteration-limit, verbosity-5 failed-quantifier and verbosity-100 restart messages (smt_model_checker.cpp:362-455,467-470)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_diagnostics.go",
+            "pkg/smtcore/smt_model_checker_diagnostics_test.go"
+          ],
+          "tests": [
+            "TestSMTModelCheckerDiagnosticOutcomesAndGuards",
+            "TestSMTModelCheckerIncompleteQuantifierDoesNotCountLaterSuccessAsFailure"
+          ]
         }
       ],
       "ownership": [
         "The Go checker has explicit borrowed state and registry pointers and no region-allocated flexible-array instances; ordinary slices carry pinned expression bindings; enodes are recovered only at restart.",
         "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close.",
         "SMTModelChecker owns one cached auxiliary solver after successful initialization. Each counterexample query pushes/pops its own scope even on error. Factory construction copies the persistent parameter snapshot and concrete retained plugins, closes partial owners on failure and freezes context parameters across parent updates/searches. Source arithmetic/BV/full-array parameter references retain their concrete owner semantics; no source assertions, enodes or theory instances are shared. Checker close destroys the auxiliary before parent parameter/services close.",
-        "Each auxiliary query owns fresh Skolem references, negated-body/clause references and finite-universe equality prefixes until scoped assertions take ownership. Query pop removes universe/instantiation restrictions and blocking clauses. Failed restriction allocation releases its prefix and leaves a reusable clean auxiliary scope. Production never enumerates a Cartesian product; existing standalone typed callers without an auxiliary factory retain their explicit model-enumeration contract, and the explicit no-model-finder auxiliary test retains unrestricted multi-witness enumeration. The saved complete model holds its own reference across the later restricted check, including UNKNOWN; that branch stops enumeration and uses the saved witness rather than marking the candidate exhausted."
+        "Each auxiliary query owns fresh Skolem references, negated-body/clause references and finite-universe equality prefixes until scoped assertions take ownership. Query pop removes universe/instantiation restrictions and blocking clauses. Failed restriction allocation releases its prefix and leaves a reusable clean auxiliary scope. Production never enumerates a Cartesian product; existing standalone typed callers without an auxiliary factory retain their explicit model-enumeration contract, and the explicit no-model-finder auxiliary test retains unrestricted multi-witness enumeration. The saved complete model holds its own reference across the later restricted check, including UNKNOWN; that branch stops enumeration and uses the saved witness rather than marking the candidate exhausted.",
+        "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced."
       ],
       "deviations": [
         "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded.",
@@ -123406,7 +123470,9 @@
         "pkg/parsers/smt2/recursive_functions_test.go",
         "pkg/smtcore/smt_recursive_functions.go",
         "pkg/smtcore/smt_recursive_functions_test.go",
-        "pkg/smtcore/smt_candidate_validation.go"
+        "pkg/smtcore/smt_candidate_validation.go",
+        "pkg/smtcore/smt_solver_test.go",
+        "pkg/cmd/g3/mbqi_diagnostics_test.go"
       ],
       "tests": [
         "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
@@ -123456,7 +123522,8 @@
         "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
         "TestSMTRecursiveModelPublicationAllocationFrontiers",
         "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestSMTLibRunnerMBQITraceParameterUpdatesCPPReference"
       ],
       "assertions": [
         {
@@ -123693,7 +123760,7 @@
         {
           "name": "reserved recursive-definition assignment installs only the first function trigger, excluding the secondary body trigger while preserving ordinary eager/lazy partitions",
           "status": "ported",
-        "go_target": "pkg/smtcore/smt_quantifier_manager.go",
+          "go_target": "pkg/smtcore/smt_quantifier_manager.go",
           "go_targets": [
             "pkg/ast/ast_recursive_definition.go",
             "pkg/ast/rewriter/rewriter_engine.go",
@@ -123726,6 +123793,19 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "Preserve shared MBQI trace parameter through checker construction, live context refresh/recreation and quantified-logic setup; no new search or logic-selection behavior",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_solver_test.go",
+            "pkg/cmd/g3/mbqi_diagnostics_test.go"
+          ],
+          "tests": [
+            "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
+            "TestSMTLibRunnerMBQITraceParameterUpdatesCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -123733,7 +123813,8 @@
         "Quantifier activity borrows the shared relevance query and retains the true-assignment guard. quantified_model_relevancy.smt2 disables E-matching and filtering, checks identity-function model values, and rejects a scoped conflicting ground fact. Reverting the activity predicate makes Go incorrectly return SAT for that conflict.",
         "The quantifier manager stores an integer cursor into the internalizer-owned enode stack and saves it alongside activation scopes. Pop restores the cursor before removed enodes can be reused; the manager borrows nodes during notification and creates no extra AST or enode owner.",
         "Parameter updates mutate concrete manager and queue scalar views in place. Existing fingerprints, deferred entries, instantiated trails, enode cursors and cost-expression ASTRefs retain their owners and lifetimes.",
-        "Quantifier-manager construction closes a returned partial cached substitution before propagating its error. A half-built VarSubstitution remains owned through its actual Close boundary."
+        "Quantifier-manager construction closes a returned partial cached substitution before propagating its error. A half-built VarSubstitution remains owned through its actual Close boundary.",
+        "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced."
       ],
       "deviations": [
         "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Finite MBQI uses a concrete Go model checker, honors mbqi.id prefixes, and resets and grows the source counterexample and iteration limits on each search. Auxiliary-solver checking and full model-finder adjustment remain open.",
@@ -125170,6 +125251,17 @@
             "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
             "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
           ]
+        },
+        {
+          "name": "Preserve shared MBQI trace parameter through checker construction, live context refresh/recreation and quantified-logic setup; no new search or logic-selection behavior",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_setup_quantified.go",
+            "pkg/smtcore/smt_setup_quantified_test.go"
+          ],
+          "tests": [
+            "TestSMTQuantifiedLogicSetupProfilesAndConstructorCaches"
+          ]
         }
       ],
       "ownership": [
@@ -125188,7 +125280,8 @@
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
         "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
         "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners.",
-        "Initial QF_S profile constructs the real String owner from the parent SMTStrParams member, including its existing borrowed nested kernel and standard teardown. No Sequence proxy represents this String profile."
+        "Initial QF_S profile constructs the real String owner from the parent SMTStrParams member, including its existing borrowed nested kernel and standard teardown. No Sequence proxy represents this String profile.",
+        "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced."
       ],
       "deviations": [
         "Shared-array interface splitting now follows the retained nested-array and foreign-parent consumers. Relevant array roots used as arrays plus indices/values, or in another theory/UF/quantifier, produce relevant same-sort equality decisions without arithmetic true-first bias. Existing relevant or known-disequal pairs are skipped; scope pop removes child equalities while split counters remain cumulative. LazyIEq/Delay are consumed from the actual backend owner after logic setup, including the AUFLIRA four-call schedule and bounded progress. A strict nested-array scope vector raises Go/C++ agreement to 128. Store/read delayed worklists and other controls remain partial.",

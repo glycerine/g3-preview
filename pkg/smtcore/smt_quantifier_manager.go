@@ -49,6 +49,7 @@ type SMTQuantifierManager struct {
 	lazyQuick                   bool
 	mbqi                        bool
 	mbqiID                      string
+	mbqiTrace                   bool
 	closed                      bool
 }
 
@@ -66,6 +67,7 @@ type SMTQuantifierManagerConfig struct {
 	MaxIterations               uint32
 	ForceTemplate               uint32
 	MBQIID                      string
+	MBQITrace                   bool
 	CandidateModel              func() (*SMTModelGenerator, error)
 }
 
@@ -116,13 +118,14 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 		lazyInstantiation:           config.LazyInstantiation,
 		promoteUnsat:                config.PromoteUnsat, ematching: config.Ematching,
 		quickUnsat: config.QuickUnsat, quickNotSat: config.QuickNotSat, lazyQuick: config.LazyQuick,
-		mbqi: config.MBQI, mbqiID: config.MBQIID, candidateModel: config.CandidateModel,
+		mbqi: config.MBQI, mbqiID: config.MBQIID, mbqiTrace: config.MBQITrace, candidateModel: config.CandidateModel,
 	}
 	if config.MBQI {
 		result.modelChecker, err = NewSMTModelChecker(state, config.MaxCexs)
 		if err != nil {
 			return nil, errors.Join(err, modelFinder.Close(), substitute.Close())
 		}
+		result.modelChecker.trace = config.MBQITrace
 		if err = result.modelChecker.ConfigureLifecycle(config.MaxCexs, config.MaxIterations); err != nil {
 			return nil, errors.Join(err, result.modelChecker.Close(), modelFinder.Close(), substitute.Close())
 		}
@@ -162,6 +165,9 @@ func (q *SMTQuantifierManager) UpdateMBQI(enabled bool, identifier string, maxCe
 			return err
 		}
 		q.modelChecker = nil
+	}
+	if q.modelChecker != nil {
+		q.modelChecker.trace = q.mbqiTrace
 	}
 	q.mbqi = enabled
 	q.mbqiID = identifier

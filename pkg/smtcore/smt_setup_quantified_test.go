@@ -35,6 +35,8 @@ func TestSMTQuantifiedLogicSetupProfilesAndConstructorCaches(t *testing.T) {
 			t.Cleanup(func() { astTestMust(t, cfg.Context.Del(&params)) })
 			name := "mbqi"
 			astTestMust(t, cfg.Context.SetBoolName(&params, &name, false))
+			name = "mbqi.trace"
+			astTestMust(t, cfg.Context.SetBoolName(&params, &name, true))
 			name = "qi.eager_threshold"
 			astTestMust(t, cfg.Context.SetDoubleName(&params, &name, 66))
 			name = "qi.lazy_threshold"
@@ -85,7 +87,7 @@ func TestSMTQuantifiedLogicSetupProfilesAndConstructorCaches(t *testing.T) {
 				astTestMust(t, k.setupAssertedBounds(true))
 			}
 			qi := k.smtParams.qi.state
-			if qi.EagerThreshold != tc.eager || qi.LazyThreshold != 20 || qi.QuickChecker != 1 || !qi.MBQI || !manager.mbqi || manager.modelChecker == nil || !manager.quickUnsat || manager.quickNotSat || manager.registry.schedule.lazyThreshold != 20 {
+			if qi.EagerThreshold != tc.eager || qi.LazyThreshold != 20 || qi.QuickChecker != 1 || !qi.MBQI || !manager.mbqi || manager.modelChecker == nil || !manager.modelChecker.trace || !manager.quickUnsat || manager.quickNotSat || manager.registry.schedule.lazyThreshold != 20 {
 				t.Fatal("quantifier owner and live manager controls diverged", qi)
 			}
 			if manager.registry.schedule.eagerThreshold != 66 || manager.registry.costs != costs || manager.builder.costs != costs {

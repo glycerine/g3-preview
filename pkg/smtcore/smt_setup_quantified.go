@@ -81,6 +81,7 @@ func (k *SMTKernel) setupQuantifiedLogicPolicy(useStaticFeatures bool) (result e
 		if err != nil {
 			return err
 		}
+		manager.mbqiTrace = qi.Trace
 		if err = manager.UpdateMBQI(qi.MBQI, identifier, qi.MaxCexs, qi.MaxIterations, qi.ForceTemplate); err != nil {
 			return err
 		}

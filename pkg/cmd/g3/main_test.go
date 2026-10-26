@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"mbqi_trace_parameter_updates.smt2":            "sat\nsat\nsat\n",
 	"mbqi_boolean_skolem_budget.smt2":              "unsat\n",
 	"disabled_arithmetic_numeral_models.smt2":      "sat\n((p true))\nunknown\n(((f 3.0) (not (= 3.0 Real!val!1)))\n ((f 4.0) (not (= 4.0 Real!val!1))))\nunsat\nunknown\n(((f 3.0) (not (= 3.0 Real!val!1)))\n ((f 4.0) (not (= 4.0 Real!val!1))))\nsat\n((p true))\n",
 	"integer_fractional_candidate.smt2":            "unknown\n((x 0)\n (y 0))\nunknown\n((x (- 1))\n (y (- 1)))\nsat\n((x 1)\n (y 1))\n",
@@ -851,7 +852,9 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 				cmd = exec.CommandContext(referenceContext, reference, "-in")
 			}
 			cmd.Stdin = bytes.NewReader(script)
-			cppOutput, err := cmd.CombinedOutput()
+			var cppDiagnostics bytes.Buffer
+			cmd.Stderr = &cppDiagnostics
+			cppOutput, err := cmd.Output()
 			if referenceContext != nil && referenceContext.Err() == context.DeadlineExceeded {
 				// The old reference eagerly evaluates a dead recursive OR branch
 				// in Boolean model interpretations. Keep the full native oracle,
@@ -863,7 +866,7 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 				return
 			}
 			if err != nil {
-				t.Fatal("C++ reference", err, string(cppOutput))
+				t.Fatal("C++ reference", err, string(cppOutput), cppDiagnostics.String())
 			}
 			if debugRefusal {
 				if canonicalOutput(string(cppOutput)) != canonicalOutput(scriptResults[name]) {
@@ -872,7 +875,7 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 				return
 			}
 			if canonicalReferenceOutput(name, goOutput.String()) != canonicalReferenceOutput(name, string(cppOutput)) {
-				t.Fatalf("Go/C++ mismatch\nGo:\n%s\nC++:\n%s", goOutput.String(), cppOutput)
+				t.Fatalf("Go/C++ mismatch\nGo:\n%s\nC++:\n%s\nC++ diagnostics:\n%s", goOutput.String(), cppOutput, cppDiagnostics.String())
 			}
 		})
 	}

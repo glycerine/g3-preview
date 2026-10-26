@@ -105,6 +105,9 @@ func (c *SMTModelChecker) Restart() (result error) {
 	if err := c.open(); err != nil {
 		return err
 	}
+	if err := c.reportRestart(); err != nil {
+		return err
+	}
 	previousGeneration := c.state.generation
 	defer func() { c.state.generation = previousGeneration }()
 	for _, instance := range c.newInstances {

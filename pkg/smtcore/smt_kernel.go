@@ -400,6 +400,7 @@ func (k *SMTKernel) configureQuantifiers(full *SMTParams, state SMTParamsState, 
 		MaxIterations:               qi.MaxIterations,
 		ForceTemplate:               qi.ForceTemplate,
 		MBQIID:                      mbqiID,
+		MBQITrace:                   qi.Trace,
 		CandidateModel:              k.buildCandidateModelGenerator,
 	})
 	return err
@@ -508,6 +509,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	k.bvState = bitVector
 	if k.internalizer.quantifierManager != nil {
 		manager := k.internalizer.quantifierManager
+		manager.mbqiTrace = quantifiers.Trace
 		if err = manager.UpdateMBQI(quantifiers.MBQI, mbqiID, quantifiers.MaxCexs, quantifiers.MaxIterations, quantifiers.ForceTemplate); err != nil {
 			return err
 		}
