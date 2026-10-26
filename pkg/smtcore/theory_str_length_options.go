@@ -15,6 +15,7 @@ type smtStringTesterState struct {
 	valueIndicators   map[ast.ASTHandle]map[int32][]smtStringScopedIndicator
 	valueRanges       map[ast.ASTHandle][]int32
 	valueLiterals     map[string]ast.ASTHandle
+	valueSubjects     map[ast.ASTHandle]ast.ASTHandle
 }
 
 type smtStringScopedIndicator struct {
@@ -27,6 +28,7 @@ func newStringTesterState() smtStringTesterState {
 		lengthIndicators: make(map[ast.ASTHandle][]ast.ASTHandle), lengthLiterals: make(map[int32]ast.ASTHandle),
 		valueIndicators: make(map[ast.ASTHandle]map[int32][]smtStringScopedIndicator),
 		valueRanges:     make(map[ast.ASTHandle][]int32), valueLiterals: make(map[string]ast.ASTHandle),
+		valueSubjects: make(map[ast.ASTHandle]ast.ASTHandle),
 	}
 }
 
