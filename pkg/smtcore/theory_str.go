@@ -15,6 +15,7 @@ import (
 type SMTStringTheory struct {
 	regexExpressionSolver *smtStringExpressionSolver
 	regexStage            smtStringRegexStageState
+	testers               smtStringTesterState
 
 	*SMTTheoryBase
 	parameterOwner      *SMTStrParams
@@ -99,6 +100,7 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	t.regexNFACache = make(map[ast.ASTHandle]*smtStringNFA)
 	t.regexLastLower = make(map[ast.ASTHandle]*big.Int)
 	t.regexStage = newStringRegexStageState()
+	t.testers = newStringTesterState()
 	t.stringChars = make(map[ast.ASTHandle][]ast.ASTHandle)
 	t.concatBreakFlags = make(map[[2]ast.ASTHandle]ast.ASTHandle)
 	t.cutHistory = make(map[ast.ASTHandle][]smtStringCut)
@@ -422,6 +424,7 @@ func (t *SMTStringTheory) Close() (result error) {
 	t.regexLastLower = nil
 	t.stringChars = nil
 	t.regexStage = smtStringRegexStageState{}
+	t.testers = smtStringTesterState{}
 	t.regexMemberships, t.regexTermsByString = nil, nil
 	t.concatBreakFlags = nil
 	t.cutHistory, t.arrangementVars = nil, nil
