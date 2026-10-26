@@ -162,6 +162,7 @@ func (t *SMTLinearArithmeticTheory) setArithmeticConflict(antecedents *smtArithm
 		_ = owner.Release(t.state.manager)
 		return err
 	}
+	t.state.ownedJustifications = append(t.state.ownedJustifications, owner)
 	t.state.inconsistent = true
 	t.state.conflict = wrapped
 	t.state.conflictLiteral = SMTNullLiteral

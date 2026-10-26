@@ -116,6 +116,7 @@ func (s *SMTInternalizerState) SetTheoryConflict(theory SMTTheoryID, literals []
 		_ = justification.Release(s.manager)
 		return err
 	}
+	s.ownedJustifications = append(s.ownedJustifications, justification)
 	s.inconsistent = true
 	s.conflict = wrapped
 	s.conflictLiteral = SMTNullLiteral

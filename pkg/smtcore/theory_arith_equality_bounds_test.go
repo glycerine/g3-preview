@@ -180,6 +180,9 @@ func TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs(t *testing.T) {
 							t.Fatal("conflict lost equality or arithmetic provenance", premises)
 						}
 						astTestMust(t, state.PopScopes(1))
+						if len(extended.Parameters()) != 0 {
+							t.Fatal("arithmetic equality-conflict parameters survived backtracking")
+						}
 						if len(theory.equalityBounds) != 0 || len(theory.pendingBounds) != 0 || len(theory.derivedBounds) != 0 || state.inconsistent || left.root == right.root {
 							t.Fatal("equality bounds survived their logical scope")
 						}

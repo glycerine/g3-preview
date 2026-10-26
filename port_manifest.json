@@ -115408,7 +115408,10 @@
         "pkg/smtcore/smt_model_incomplete_test.go",
         "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
         "pkg/smtcore/smt_solver_test.go",
-        "pkg/cmd/g3/mbqi_diagnostics_test.go"
+        "pkg/cmd/g3/mbqi_diagnostics_test.go",
+        "pkg/smtcore/theory_arith_equality_bounds.go",
+        "pkg/smtcore/smt_theory_conflict_lifetime_test.go",
+        "pkg/smtcore/theory_arith_equality_bounds_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -115579,7 +115582,10 @@
         "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
         "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
-        "TestSMTLibRunnerMBQITraceParameterUpdatesCPPReference"
+        "TestSMTLibRunnerMBQITraceParameterUpdatesCPPReference",
+        "TestSMTTheoryConflictParametersFollowNestedScopeLifetime",
+        "TestSMTTheoryConflictRejectsPartialParameterCopies",
+        "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs"
       ],
       "conditionals": [
         {
@@ -117326,6 +117332,21 @@
             "TestSMTSolverInstallsAndUpdatesRetainedSMTParameters",
             "TestSMTLibRunnerMBQITraceParameterUpdatesCPPReference"
           ]
+        },
+        {
+          "name": "Retained simple and equality-premise arithmetic conflict parameter destruction: register completed conflict justifications in the existing logical-scope owner list, preserve outer/first conflicts across nested scopes, release copied parameter prefixes on rejected construction, and release owned coefficients at pop (context.h:869-875; context.cpp:1932,2043-2062,2410,2891; theory_arith_core.h:3096-3100)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_boolean_propagation.go",
+            "pkg/smtcore/theory_arith_equality_bounds.go",
+            "pkg/smtcore/smt_theory_conflict_lifetime_test.go",
+            "pkg/smtcore/theory_arith_equality_bounds_test.go"
+          ],
+          "tests": [
+            "TestSMTTheoryConflictParametersFollowNestedScopeLifetime",
+            "TestSMTTheoryConflictRejectsPartialParameterCopies",
+            "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs"
+          ]
         }
       ],
       "ownership": [
@@ -117347,7 +117368,8 @@
         "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service.",
         "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
         "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit.",
-        "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced."
+        "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced.",
+        "SetTheoryConflict and arithmetic equality-conflict publication now register completed parameter-owning justifications with ownedJustifications before exposing the conflict. The existing scope limit and reverse pop destruction release copied parameters before enodes are unregistered. Caller-owned parameters may be released immediately after successful publication; an outer conflict stays live through a nested push/pop, and an already-inconsistent report does not construct or register a replacement. Failed parameter-copy prefixes are released and no conflict is published. No allocator behavior or generic adapter is introduced."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -117483,7 +117505,10 @@
         "pkg/smtcore/smt_model_generator.go",
         "pkg/smtcore/smt_model_incomplete_test.go",
         "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
-        "pkg/smtcore/smt_internalizer_state_test.go"
+        "pkg/smtcore/smt_internalizer_state_test.go",
+        "pkg/smtcore/theory_arith_equality_bounds.go",
+        "pkg/smtcore/smt_theory_conflict_lifetime_test.go",
+        "pkg/smtcore/theory_arith_equality_bounds_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -117608,7 +117633,10 @@
         "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
         "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
-        "TestSMTInternalizerNegatedReservedTruthLiterals"
+        "TestSMTInternalizerNegatedReservedTruthLiterals",
+        "TestSMTTheoryConflictParametersFollowNestedScopeLifetime",
+        "TestSMTTheoryConflictRejectsPartialParameterCopies",
+        "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs"
       ],
       "conditionals": [
         {
@@ -118356,6 +118384,21 @@
             "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
             "TestSMTMBQICounterexamplesPublishAfterForcedBaseRestart"
           ]
+        },
+        {
+          "name": "Retained simple and equality-premise arithmetic conflict parameter destruction: register completed conflict justifications in the existing logical-scope owner list, preserve outer/first conflicts across nested scopes, release copied parameter prefixes on rejected construction, and release owned coefficients at pop (context.h:869-875; context.cpp:1932,2043-2062,2410,2891; theory_arith_core.h:3096-3100)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_boolean_propagation.go",
+            "pkg/smtcore/theory_arith_equality_bounds.go",
+            "pkg/smtcore/smt_theory_conflict_lifetime_test.go",
+            "pkg/smtcore/theory_arith_equality_bounds_test.go"
+          ],
+          "tests": [
+            "TestSMTTheoryConflictParametersFollowNestedScopeLifetime",
+            "TestSMTTheoryConflictRejectsPartialParameterCopies",
+            "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs"
+          ]
         }
       ],
       "ownership": [
@@ -118377,7 +118420,8 @@
         "The concrete aggressive String tester consumer reuses the actual internalizer Boolean data for a just-internalized equality. Phase hints own no AST or context resources and do not assign the Boolean variable or change its true-first flag.",
         "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
         "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit.",
-        "Reserved truth negation adds no Boolean variables, enodes or AST owners. It preserves the source reserved-literal representation at the Go table boundary; direct tests cover both literal lookup and assertion conflict behavior, and MBQI restart/candidate-publication regressions cover the reached auxiliary consumer."
+        "Reserved truth negation adds no Boolean variables, enodes or AST owners. It preserves the source reserved-literal representation at the Go table boundary; direct tests cover both literal lookup and assertion conflict behavior, and MBQI restart/candidate-publication regressions cover the reached auxiliary consumer.",
+        "SetTheoryConflict and arithmetic equality-conflict publication now register completed parameter-owning justifications with ownedJustifications before exposing the conflict. The existing scope limit and reverse pop destruction release copied parameters before enodes are unregistered. Caller-owned parameters may be released immediately after successful publication; an outer conflict stays live through a nested push/pop, and an already-inconsistent report does not construct or register a replacement. Failed parameter-copy prefixes are released and no conflict is published. No allocator behavior or generic adapter is introduced."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
@@ -128391,7 +128435,9 @@
         "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2",
         "pkg/smtcore/theory_arith_bounds.go",
         "pkg/smtcore/theory_arith_candidate_test.go",
-        "pkg/cmd/g3/test_vectors/integer_fractional_candidate.smt2"
+        "pkg/cmd/g3/test_vectors/integer_fractional_candidate.smt2",
+        "pkg/smtcore/smt_boolean_propagation.go",
+        "pkg/smtcore/smt_theory_conflict_lifetime_test.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
@@ -128452,7 +128498,9 @@
         "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
         "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient",
-        "TestSMTArithmeticCandidateFloorsFractionalIntegers"
+        "TestSMTArithmeticCandidateFloorsFractionalIntegers",
+        "TestSMTTheoryConflictParametersFollowNestedScopeLifetime",
+        "TestSMTTheoryConflictRejectsPartialParameterCopies"
       ],
       "conditionals": [
         {
@@ -129561,6 +129609,21 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained simple and equality-premise arithmetic conflict parameter destruction: register completed conflict justifications in the existing logical-scope owner list, preserve outer/first conflicts across nested scopes, release copied parameter prefixes on rejected construction, and release owned coefficients at pop (context.h:869-875; context.cpp:1932,2043-2062,2410,2891; theory_arith_core.h:3096-3100)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_boolean_propagation.go",
+            "pkg/smtcore/theory_arith_equality_bounds.go",
+            "pkg/smtcore/smt_theory_conflict_lifetime_test.go",
+            "pkg/smtcore/theory_arith_equality_bounds_test.go"
+          ],
+          "tests": [
+            "TestSMTTheoryConflictParametersFollowNestedScopeLifetime",
+            "TestSMTTheoryConflictRejectsPartialParameterCopies",
+            "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs"
+          ]
         }
       ],
       "ownership": [
@@ -129573,7 +129636,8 @@
         "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
         "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery.",
         "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving.",
-        "ModelValue applies the existing concrete exact-rational floor helper to its newly computed candidate rational before constructing the owning expression-wrapper procedure. No integer numeral constructor guard is weakened and no simplex assignment or solver status is changed. Actual arith.ignore_int searches plus C++ CLI comparisons exercise positive/negative half candidates and integral SAT recovery through scopes."
+        "ModelValue applies the existing concrete exact-rational floor helper to its newly computed candidate rational before constructing the owning expression-wrapper procedure. No integer numeral constructor guard is weakened and no simplex assignment or solver status is changed. Actual arith.ignore_int searches plus C++ CLI comparisons exercise positive/negative half candidates and integral SAT recovery through scopes.",
+        "SetTheoryConflict and arithmetic equality-conflict publication now register completed parameter-owning justifications with ownedJustifications before exposing the conflict. The existing scope limit and reverse pop destruction release copied parameters before enodes are unregistered. Caller-owned parameters may be released immediately after successful publication; an outer conflict stays live through a nested push/pop, and an already-inconsistent report does not construct or register a replacement. Failed parameter-copy prefixes are released and no conflict is published. No allocator behavior or generic adapter is introduced."
       ],
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
