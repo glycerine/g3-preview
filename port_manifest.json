@@ -255590,14 +255590,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "96f06918e9b434f8e2c62cd02d5b73efe85fb935",
+    "commit": "5dfaaf114efa218a4d1f1f870baf82ed406c11bb",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-26T03:58:35.016540+00:00",
-    "completed_utc": "2026-10-26T04:12:11.410218+00:00",
+    "started_utc": "2026-10-26T04:58:51.221638+00:00",
+    "completed_utc": "2026-10-26T05:12:36.080784+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-96f06918.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-96f06918.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-96f06918.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-5dfaaf11.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-5dfaaf11.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-5dfaaf11.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -255613,9 +255613,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 688.892,
+    "lp_seconds": 697.694,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated 96f06918e9b434f8e2c62cd02d5b73efe85fb935, unchanged at start/end/verification, all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons enabled and insdict v0.14.6. Includes merged Craig interpolation APIs/proof corrections, initial/deferred String/Sequence selection, copied String/Sequence concrete backends/parameter lifetimes, symbolic negative-star empty solutions, arithmetic definition replay, interpolation body ownership, and native command-context generic parameter/success-response updates. Complete affected native and checked/debug/trace checks also pass. This is test coverage, not a claim of full smtcore or higher-engine source completion; remaining setup/copy/method/consumer work, model-generator traversal/candidate-entry audit, default tactic portfolio and recorded ALL sequence parity work remain incomplete."
+    "scope_warning": "Independently verified exact clean isolated 5dfaaf114efa218a4d1f1f870baf82ed406c11bb, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes merged Craig interpolation corrections, model dependency traversal/sort caching, incomplete-theory candidate entry preservation/model availability, native arithmetic final-check ordering, exact epsilon quotient, fractional Int candidate flooring, and Boolean publication phases. It excludes the later47304534 disabled-theory numeral/fallback increment; that newer code separately passes complete affected native/checked-debug-trace suites and all additional production-consumer checks. Current root 473045340d3a3364240808c1e00a01801b589b04 has pkg differences from this snapshot, so this checkpoint is not represented as a full-suite run of the newer tree. Broad smtcore/higher-engine source completion remains unproven."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
