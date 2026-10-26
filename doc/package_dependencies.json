@@ -2775,6 +2775,7 @@
         "theory_lra_fixed.go",
         "theory_lra_model.go",
         "theory_lra_numeric.go",
+        "theory_lra_objective.go",
         "theory_lra_operator_axioms.go",
         "theory_lra_propagation.go",
         "theory_lra_shared.go",
