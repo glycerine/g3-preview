@@ -1035,22 +1035,32 @@ func (k *SMTKernel) buildGeneratedModel() error {
 			return err
 		}
 	}
-	fail := func(cause error) error { return errors.Join(cause, generator.Close()) }
+	generated, err := k.finalizeGeneratedModel(generator)
+	if err != nil {
+		return err
+	}
+	k.generated = generated
+	return nil
+}
+
+// finalizeGeneratedModel consumes the generator and returns one model
+// reference for the kernel, without changing the currently published model.
+func (k *SMTKernel) finalizeGeneratedModel(generator *SMTModelGenerator) (*model.Model, error) {
+	fail := func(cause error) (*model.Model, error) { return nil, errors.Join(cause, generator.Close()) }
 	generated, err := generator.FinalModel()
 	if err != nil {
 		return fail(err)
 	}
 	if err = k.addRecursiveFunctionsToModel(generated.Core()); err != nil {
-		return errors.Join(err, generated.Close(), generator.Close())
+		return nil, errors.Join(err, generated.Close(), generator.Close())
 	}
 	if err = generator.Close(); err != nil {
-		return errors.Join(err, generated.Close())
+		return nil, errors.Join(err, generated.Close())
 	}
 	if err = generated.Core().IncRef(); err != nil {
-		return errors.Join(err, generated.Close())
+		return nil, errors.Join(err, generated.Close())
 	}
-	k.generated = generated
-	return nil
+	return generated, nil
 }
 
 func (k *SMTKernel) clearGeneratedModel() error {

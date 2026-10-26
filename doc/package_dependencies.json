@@ -2660,6 +2660,7 @@
         "smt_model_finder_macro_sets.go",
         "smt_model_finder_quantifier_set.go",
         "smt_model_generator.go",
+        "smt_model_update.go",
         "smt_model_value.go",
         "smt_pb_lifecycle.go",
         "smt_qi_cost.go",
