@@ -1,4 +1,4 @@
-// Source: src/util/lp/lar_solver.h:1309-1318,1332-1337,1359-1362;
+// Source: src/util/lp/lar_solver.h:1309-1337,1359-1362;
 // column_namer.h:73-97.
 package lp
 
@@ -139,6 +139,104 @@ func (w *lpLARConstraintFlushWriter) Write(p []byte) (int, error) { return w.out
 func (w *lpLARConstraintFlushWriter) Flush() error {
 	w.flush++
 	return w.err
+}
+
+func lpLARDisplayListFixture(t *testing.T, h *lpPairHarness) *LARSolver {
+	t.Helper()
+	s, err := NewLARSolver(h.m)
+	h.must(err)
+	_, err = s.AddVar(17)
+	h.must(err)
+	_, err = s.AddVarBound(0, LConstraintGE, &h.pair("-7/3", "0").X)
+	h.must(err)
+	_, err = s.AddVarBound(0, LConstraintLT, &h.pair("11/2", "0").X)
+	h.must(err)
+	_, err = s.AddTerm([]RationalSparseEntry{{Index: 0, Value: h.pair("-1", "0").X}}, &h.pair("5/2", "0").X)
+	h.must(err)
+	_, err = s.AddTerm([]RationalSparseEntry{{Index: 0, Value: h.pair("3", "0").X}}, &h.pair("0", "0").X)
+	h.must(err)
+	// print_terms uses current terms, whereas print_implied_bound deliberately
+	// uses OriginalTerms. Distinguish them without changing either term's shape.
+	h.must(s.Terms[0].SetValue(&h.pair("99", "0").X))
+	return s
+}
+
+func TestLARDisplayListsOrderAndFlushes(t *testing.T) {
+	h := newLPPairHarness(t)
+	s := lpLARDisplayListFixture(t, h)
+	out := &lpLARConstraintFlushWriter{}
+	h.must(s.PrintConstraints(out))
+	h.must(s.PrintTerms(out))
+	want := "v17 >= -7/3\nv17 < 11/2\n99 +  - v17\n3v17\n"
+	if out.output.String() != want || out.flush != 2 {
+		t.Fatal("ordered source lists", out.output.String(), out.flush)
+	}
+	if s.validationCoefficients != nil || s.rationalWork != nil {
+		t.Fatal("successful display retained lexical owners")
+	}
+	h.must(s.Close())
+	lpExactVectorNamedCensus(t, h, nil)
+}
+
+func TestLARDisplayListsEveryWriterPrefix(t *testing.T) {
+	for _, terms := range []bool{false, true} {
+		want := "v17 >= -7/3\nv17 < 11/2\n"
+		if terms {
+			want = "99 +  - v17\n3v17\n"
+		}
+		for cut := 0; cut < len(want); cut++ {
+			h := newLPPairHarness(t)
+			s := lpLARDisplayListFixture(t, h)
+			out := &larConstraintPrefixWriter{remaining: cut, err: io.ErrClosedPipe}
+			var err error
+			if terms {
+				err = s.PrintTerms(out)
+			} else {
+				err = s.PrintConstraints(out)
+			}
+			if !errors.Is(err, io.ErrClosedPipe) || !s.stopped {
+				t.Fatal("writer refusal", terms, cut, err, s.stopped)
+			}
+			// The shared writer retains exactly the accepted output prefix.
+			if out.output.String() != want[:cut] {
+				t.Fatal("refusal prefix", terms, cut, out.output.String(), want[:cut])
+			}
+			h.must(s.Close())
+			lpExactVectorNamedCensus(t, h, nil)
+		}
+	}
+}
+
+func TestLARDisplayListsEmptyAndFlushRefusal(t *testing.T) {
+	for _, terms := range []bool{false, true} {
+		h := newLPPairHarness(t)
+		s, err := NewLARSolver(h.m)
+		h.must(err)
+		out := &lpLARConstraintFlushWriter{}
+		h.must(s.PrintConstraints(out))
+		h.must(s.PrintTerms(out))
+		if out.output.Len() != 0 || out.flush != 0 {
+			t.Fatal("empty lists produced output")
+		}
+		if terms {
+			err = s.PrintTerms(nil)
+		} else {
+			err = s.PrintConstraints(nil)
+		}
+		if !errors.Is(err, ErrBounds) || !s.stopped {
+			t.Fatal("nil writer", terms, err)
+		}
+		h.must(s.Close())
+		lpExactVectorNamedCensus(t, h, nil)
+	}
+	h := newLPPairHarness(t)
+	s := lpLARDisplayListFixture(t, h)
+	out := &lpLARConstraintFlushWriter{err: io.ErrClosedPipe}
+	if err := s.PrintConstraints(out); !errors.Is(err, io.ErrClosedPipe) || out.output.String() != "v17 >= -7/3\n" || out.flush != 1 {
+		t.Fatal("first endl refusal", err, out.output.String(), out.flush)
+	}
+	h.must(s.Close())
+	lpExactVectorNamedCensus(t, h, nil)
 }
 
 func TestLARConstraintDisplayReachedPrefixes(t *testing.T) {

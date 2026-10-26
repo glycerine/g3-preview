@@ -1,4 +1,4 @@
-// Source: src/util/lp/lar_solver.h:1309-1318,1332-1337,1359-1362;
+// Source: src/util/lp/lar_solver.h:1309-1337,1359-1362;
 // column_namer.h:73-97; lar_constraints.h:35-45.
 package lp
 
@@ -20,6 +20,45 @@ func writeConstraintText(out io.Writer, text string) error {
 func flushConstraintOutput(out io.Writer) error {
 	if f, ok := out.(interface{ Flush() error }); ok {
 		return f.Flush()
+	}
+	return nil
+}
+
+// PrintConstraints is lar_solver::print_constraints. Each constraint retains
+// print_constraint's endl flush, including the last constraint.
+func (s *LARSolver) PrintConstraints(out io.Writer) (err error) {
+	if err = s.ready(); err != nil {
+		return err
+	}
+	defer func() { s.stopped = err != nil }()
+	if out == nil {
+		return ErrBounds
+	}
+	for _, constraint := range s.Constraints {
+		if err = s.WriteConstraint(constraint, out); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// PrintTerms is lar_solver::print_terms. It prints current terms in publication
+// order; unlike print_constraints, its added newlines do not flush the writer.
+func (s *LARSolver) PrintTerms(out io.Writer) (err error) {
+	if err = s.ready(); err != nil {
+		return err
+	}
+	defer func() { s.stopped = err != nil }()
+	if out == nil {
+		return ErrBounds
+	}
+	for _, term := range s.Terms {
+		if err = s.PrintTerm(term, out); err != nil {
+			return err
+		}
+		if err = writeConstraintText(out, "\n"); err != nil {
+			return err
+		}
 	}
 	return nil
 }

@@ -193718,7 +193718,10 @@
         "TestLARImpliedDisplayEveryOutputPrefix",
         "TestLARImpliedDisplayPhysicalOwnership",
         "TestLARImpliedDisplayReachedGuards",
-        "TestLARImpliedDisplayPreservesOlderComparison"
+        "TestLARImpliedDisplayPreservesOlderComparison",
+        "TestLARDisplayListsOrderAndFlushes",
+        "TestLARDisplayListsEveryWriterPrefix",
+        "TestLARDisplayListsEmptyAndFlushRefusal"
       ],
       "conditionals": [
         {
@@ -194473,6 +194476,16 @@
             "TestLARImpliedDisplayReachedGuards",
             "TestLARImpliedDisplayPreservesOlderComparison"
           ]
+        },
+        {
+          "name": "print_constraints / print_terms (1319-1330): retained theory_lra::display prerequisite, current term publication order and constraint endl flushes",
+          "status": "ported",
+          "go_target": "pkg/util/lp/lar_constraint_display.go",
+          "tests": [
+            "TestLARDisplayListsOrderAndFlushes",
+            "TestLARDisplayListsEveryWriterPrefix",
+            "TestLARDisplayListsEmptyAndFlushRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -194499,7 +194512,8 @@
         "Objective costs vector copies retain their own input receipts; external objective coefficients and output remain alive through solver cleanup. Negated basic-cost scratch belongs to the outer solver and survives stopped primal reduced-cost children until Core.Close. Direct weighted products and output accumulation use parent receipts; Core.Solve/validators remain child-owned. Strategy restoration and cost cleanup occur only after ordinary child return, preserving reached errors and older caller comparison identity.",
         "Bound-query value copies belong to outer exact receipts. Caller outputs outlive solver cleanup after interrupted copies; witness precedes numerical copying and strictness publishes only after the sign predicate succeeds. Older caller comparison state is neither adopted nor consumed.",
         "AddConstraint executable body reads no expression, kind or RHS and owns no input copy or matrix/constraint publication. Debug source assertion becomes ErrAssertion with stopped-owner transport. Native returns0 and permits later operations; disabled normalization code is not implemented or credited.",
-        "Driver column lists are native detached uint32 slices in heading order, including materialized terms. Iteration count borrows the existing unsigned primal counter; neither query owns numeral data."
+        "Driver column lists are native detached uint32 slices in heading order, including materialized terms. Iteration count borrows the existing unsigned primal counter; neither query owns numeral data.",
+        "Aggregate diagnostics borrow published constraints/current terms and delegate coefficient and numeral temporaries to existing solver owners. Writer refusal stops the solver and leaves interrupted lexical children reachable by Close; aggregate term newlines do not flush."
       ],
       "deviations": [
         "Bound/witness state, actual model/core construction and variable/term/bound registration, tableau/prepared-pivot row analysis, exact pivot calculation and per-row calculate/substitute/analyze dispatch are implemented. Whole-model scopes, full propagation scheduling, explanations and optimization remain incomplete. The source term-offset assertion/lookup inconsistency is preserved.",
