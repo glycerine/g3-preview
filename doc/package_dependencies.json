@@ -2825,6 +2825,7 @@
         "theory_str_index.go",
         "theory_str_length_options.go",
         "theory_str_literal_boundaries.go",
+        "theory_str_literal_unroll_assignment.go",
         "theory_str_model.go",
         "theory_str_nfa.go",
         "theory_str_overlap.go",
