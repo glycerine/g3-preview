@@ -253997,14 +253997,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "08e95d4b0bce97cd0871404e0aac5df6270aa368",
+    "commit": "bfca545739fdffc5a7e732afe0203163299e090b",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-25T23:31:38.419491+00:00",
-    "completed_utc": "2026-10-25T23:45:16.283896+00:00",
+    "started_utc": "2026-10-26T00:31:53.934816+00:00",
+    "completed_utc": "2026-10-26T00:45:35.484294+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-08e95d4b.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-08e95d4b.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-08e95d4b.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-bfca5457.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-bfca5457.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-bfca5457.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -254020,9 +254020,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 691.374,
+    "lp_seconds": 697.186,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated 08e95d4b0bce97cd0871404e0aac5df6270aa368, unchanged at start/end/verification, with prebuilt C++ comparisons enabled and insdict v0.14.6 selected. Includes dependency/constant/length backpropagation, regex lengths, complexity and mixed-arithmetic bound readers, nested String expression kernel, concrete owned automaton products, finite paths and complete retained regex-stage FinalCheck dispatch through 08e95d4b. Excludes subsequent assigned-variable completion/conversion/path gates and free-variable tester-selection work, which have separate focused and affected-suite evidence. Known ALL unconstrained containment sat-versus-unknown remains pending. Remaining legacy String free-variable length/value testers and unroll/final-check suffix, and production routing remain incomplete."
+    "scope_warning": "Independently verified exact clean isolated bfca545739fdffc5a7e732afe0203163299e090b, unchanged at start/end/verification, all 95 packages exactly once (88 tested, 7 without tests), with prebuilt C++ comparisons enabled and insdict v0.14.6. Includes complete retained regex stage, assigned-variable completion/conversion/path gates, free-variable representative ordering, three-wide length-option generator, tester creation and byte encodings, 32-candidate value-option generator and free-value controller through bfca5457. Excludes subsequent sequential and binary length/value controllers and scope rollback, which have separate focused and native/checked affected-suite evidence. Known ALL unconstrained containment sat-versus-unknown remains pending. Equality callback wiring and remaining legacy String free-variable/unroll FinalCheck dispatch, and production routing, remain incomplete."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
