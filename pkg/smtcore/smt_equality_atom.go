@@ -26,7 +26,7 @@ func (s *SMTInternalizerState) mkEqualityAtom(left, right ast.ASTHandle) (ast.AS
 		return ast.ASTHandle{}, err
 	}
 	switch s.theories[family].(type) {
-	case *SMTLinearArithmeticTheory, *SMTRealDiffTheory, *SMTDenseDiffTheory, *SMTUTVPITheory:
+	case *SMTLinearArithmeticTheory, *SMTLRATheory, *SMTRealDiffTheory, *SMTDenseDiffTheory, *SMTUTVPITheory:
 		_, _, leftNumeral, err := m.ArithmeticNumeralText(left)
 		if err != nil {
 			return ast.ASTHandle{}, err

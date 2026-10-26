@@ -27,6 +27,7 @@ type smtLRAFrontendScope struct {
 	bounds, assignments, head, underspecified int
 	termBounds                                int
 	assumptions, assumptionHead               int
+	axiomRefs                                 int
 	unassigned                                []uint32
 	notHandled                                ast.ASTHandle
 }
@@ -60,6 +61,8 @@ type SMTLRATheory struct {
 	assumeHead                        int
 	modelValues                       map[uint32]*big.Rat
 	modelOwner                        *smtLRAModelOwner
+	axiomManager                      *ast.ASTManager
+	axiomRefs, pendingAxiomRoots      []ast.ASTRef
 	unassigned                        []uint32
 	assignments                       []smtLRAAssignment
 	assignmentHead                    int
@@ -91,6 +94,7 @@ func (t *SMTLRATheory) Initialize(s *SMTInternalizerState) error {
 	if err := t.SMTTheoryBase.Initialize(s); err != nil {
 		return err
 	}
+	t.axiomManager = s.manager
 	var err error
 	t.numerals, err = s.manager.NumeralService().NewPrivateRationalManager()
 	if err != nil {
@@ -107,9 +111,9 @@ func (t *SMTLRATheory) ConfigureArithmetic(config SMTArithState) error {
 	if t == nil || t.closed || t.equalityAdapter == nil {
 		return ast.ErrASTHandle
 	}
-	if config.LazyAdapter || config.AddBinaryBounds {
-		// Neither setting reaches LRA in retained setup: lazy has no writer,
-		// while the binary-bound writer selects the QF_RDL backend.
+	if config.LazyAdapter || config.AddBinaryBounds || config.EnumConstMod {
+		// Lazy/constant-mod enumeration have no retained writer; the
+		// binary-bound writer selects the QF_RDL backend.
 		return ast.ErrASTDomain
 	}
 	t.config = config
@@ -644,7 +648,7 @@ func (t *SMTLRATheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
-	t.scopes = append(t.scopes, smtLRAFrontendScope{bounds: len(t.boundTrail), assignments: len(t.assignments), head: t.assignmentHead, underspecified: len(t.underspecified), termBounds: len(t.termBoundTrail), assumptions: len(t.assumeCandidates), assumptionHead: t.assumeHead, notHandled: t.notHandled, unassigned: append([]uint32(nil), t.unassigned...)})
+	t.scopes = append(t.scopes, smtLRAFrontendScope{bounds: len(t.boundTrail), assignments: len(t.assignments), head: t.assignmentHead, underspecified: len(t.underspecified), termBounds: len(t.termBoundTrail), assumptions: len(t.assumeCandidates), assumptionHead: t.assumeHead, axiomRefs: len(t.axiomRefs), notHandled: t.notHandled, unassigned: append([]uint32(nil), t.unassigned...)})
 	if err := t.equalityAdapter.PushScope(); err != nil {
 		return err
 	}
@@ -662,6 +666,13 @@ func (t *SMTLRATheory) PopScopes(n uint32) error {
 	}
 	level := len(t.scopes) - int(n)
 	scope := t.scopes[level]
+	for len(t.axiomRefs) > scope.axiomRefs {
+		i := len(t.axiomRefs) - 1
+		if err := t.axiomManager.DelRef(&t.axiomRefs[i]); err != nil {
+			return err
+		}
+		t.axiomRefs = t.axiomRefs[:i]
+	}
 	for i := len(t.boundTrail); i > scope.bounds; i-- {
 		v := t.boundTrail[i-1]
 		last := len(t.bounds[v]) - 1
@@ -709,6 +720,15 @@ func (t *SMTLRATheory) Close() error {
 	// already be unavailable to ordinary calls while Close is retried.
 	t.closed = true
 	t.state = nil
+	for _, refs := range []*[]ast.ASTRef{&t.pendingAxiomRoots, &t.axiomRefs} {
+		for len(*refs) > 0 {
+			i := len(*refs) - 1
+			if err := t.axiomManager.DelRef(&(*refs)[i]); err != nil {
+				return err
+			}
+			*refs = (*refs)[:i]
+		}
+	}
 	if t.propagator != nil {
 		if err := t.propagator.Close(); err != nil {
 			return err
