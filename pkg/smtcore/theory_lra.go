@@ -1,0 +1,658 @@
+// Source: retained immediate-registration path in src/smt/theory_lra.cpp.
+// The constructor-only m_delay_constraints flag has no retained writer.
+package smtcore
+
+import (
+	"math/big"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/lp"
+	"github.com/glycerine/g3/pkg/util/numeral"
+)
+
+type smtLRABound struct {
+	boolean  int32
+	variable SMTTheoryVar
+	value    big.Rat
+	upper    bool
+}
+
+type smtLRAAssignment struct {
+	boolean int32
+	truth   bool
+}
+
+type smtLRAFrontendScope struct {
+	bounds, assignments, head, underspecified int
+	unassigned                                []uint32
+	notHandled                                ast.ASTHandle
+}
+
+type smtLRAResourceLimit struct{ manager *ast.ASTManager }
+
+func (l smtLRAResourceLimit) CancelFlag() (bool, error) { return l.manager.Canceled() }
+
+// SMTLRATheory is the concrete frontend for the retained LAR-backed theory.
+// Setup integration remains open. FinalCheck deliberately gives up until the
+// remaining equality/propagation/model-combination callbacks are connected.
+type SMTLRATheory struct {
+	*SMTTheoryBase
+	numeric         *smtLRANumeric
+	numerals        *numeral.RationalManager
+	config          SMTArithState
+	equalityAdapter *smtArithmeticEqualityAdapter
+	bounds          [][]*smtLRABound
+	boundByBoolean  map[int32]*smtLRABound
+	boundTrail      []SMTTheoryVar
+	unassigned      []uint32
+	assignments     []smtLRAAssignment
+	assignmentHead  int
+	scopes          []smtLRAFrontendScope
+	notHandled      ast.ASTHandle
+	underspecified  []ast.ASTHandle
+	closed          bool
+}
+
+var _ SMTTheoryInternalizer = (*SMTLRATheory)(nil)
+
+func NewSMTLRATheory(family ast.FamilyID) (*SMTLRATheory, error) {
+	base, err := NewSMTTheoryBase(family)
+	if err != nil {
+		return nil, err
+	}
+	adapter, err := newSMTArithmeticEqualityAdapter(base)
+	if err != nil {
+		return nil, err
+	}
+	return &SMTLRATheory{SMTTheoryBase: base, equalityAdapter: adapter,
+		config:         SMTArithState{Reflect: true, BoundProp: 2, PropagateEqs: true, PropagationThreshold: ^uint32(0)},
+		boundByBoolean: make(map[int32]*smtLRABound)}, nil
+}
+
+func (t *SMTLRATheory) Initialize(s *SMTInternalizerState) error {
+	if t == nil || t.closed || t.SMTTheoryBase == nil {
+		return ast.ErrASTHandle
+	}
+	if err := t.SMTTheoryBase.Initialize(s); err != nil {
+		return err
+	}
+	var err error
+	t.numerals, err = s.manager.NumeralService().NewPrivateRationalManager()
+	if err != nil {
+		return err
+	}
+	t.numeric, err = newSMTLRANumeric(t.numerals, smtLRANumericConfig{
+		strategy: lp.StrategyTableauRows, pivotedRows: true,
+		boundPropagation: t.config.BoundProp != 0, limit: smtLRAResourceLimit{s.manager},
+	})
+	return err
+}
+
+func (t *SMTLRATheory) ConfigureArithmetic(config SMTArithState) error {
+	if t == nil || t.closed || t.equalityAdapter == nil {
+		return ast.ErrASTHandle
+	}
+	t.config = config
+	t.equalityAdapter.lazy = config.LazyAdapter
+	if t.numeric != nil {
+		t.numeric.solver.Settings.BoundPropagation = config.BoundProp != 0
+	}
+	return nil
+}
+
+func (t *SMTLRATheory) operation(h ast.ASTHandle) (int32, bool, error) {
+	kind, err := t.state.manager.GetKind(h)
+	if err != nil || kind != ast.ASTApp {
+		return 0, false, err
+	}
+	family, err := t.state.manager.GetFamilyID(h)
+	if err != nil || family != t.FamilyID() {
+		return 0, false, err
+	}
+	op, err := t.state.manager.GetDeclKind(h)
+	return op, err == nil, err
+}
+
+func (t *SMTLRATheory) numeral(h ast.ASTHandle) (*big.Rat, bool, error) {
+	text, _, matched, err := t.state.manager.ArithmeticNumeralText(h)
+	if err != nil || !matched {
+		return nil, false, err
+	}
+	value, ok := new(big.Rat).SetString(text)
+	if !ok {
+		return nil, false, ast.ErrASTDomain
+	}
+	return value, true, nil
+}
+
+func (t *SMTLRATheory) underspecifiedTerm(h ast.ASTHandle) (bool, error) {
+	op, own, err := t.operation(h)
+	return own && (op == smtArithOpDiv || op == smtArithOpIDiv || op == smtArithOpRem || op == smtArithOpMod), err
+}
+
+func (t *SMTLRATheory) foundNotHandled(h ast.ASTHandle) error {
+	t.notHandled = h
+	u, err := t.underspecifiedTerm(h)
+	if err == nil && u {
+		t.underspecified = append(t.underspecified, h)
+	}
+	return err
+}
+
+func (t *SMTLRATheory) reflect(h ast.ASTHandle) (bool, error) {
+	if t.config.Reflect {
+		return true, nil
+	}
+	return t.underspecifiedTerm(h)
+}
+
+func (t *SMTLRATheory) internalizeArguments(h ast.ASTHandle) error {
+	reflect, err := t.reflect(h)
+	if err != nil || !reflect {
+		return err
+	}
+	count, err := t.state.manager.GetNumArgs(h)
+	if err != nil {
+		return err
+	}
+	for i := uint32(0); i < count; i++ {
+		arg, err := t.state.manager.GetArg(h, i)
+		if err != nil {
+			return err
+		}
+		if t.state.context.enodes[arg] == nil {
+			if err = t.state.Internalize(arg, false); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (t *SMTLRATheory) mkEnode(h ast.ASTHandle) (*SMTEnode, error) {
+	if node := t.state.context.enodes[h]; node != nil {
+		return node, nil
+	}
+	reflect, err := t.reflect(h)
+	if err != nil {
+		return nil, err
+	}
+	op, own, err := t.operation(h)
+	if err != nil {
+		return nil, err
+	}
+	return t.state.MkEnode(h, !reflect, false, !(own && (op == smtArithOpAdd || op == smtArithOpMul)))
+}
+
+func (t *SMTLRATheory) mkVar(h ast.ASTHandle) (SMTTheoryVar, error) {
+	if t.state.context.enodes[h] == nil {
+		if err := t.state.Internalize(h, false); err != nil {
+			return SMTNullTheoryVar, err
+		}
+	}
+	node := t.state.context.enodes[h]
+	if node == nil {
+		return SMTNullTheoryVar, ast.ErrASTDomain
+	}
+	if t.IsAttachedToVariable(node) {
+		return node.TheoryVar(t.FamilyID()), nil
+	}
+	v, err := t.SMTTheoryBase.CreateVariable(node)
+	if err != nil {
+		return SMTNullTheoryVar, err
+	}
+	for len(t.bounds) <= int(v) {
+		t.bounds = append(t.bounds, nil)
+		t.unassigned = append(t.unassigned, 0)
+	}
+	return v, nil
+}
+
+type smtLRALinearization struct {
+	terms         []ast.ASTHandle
+	coefficients  []big.Rat
+	variables     []SMTTheoryVar
+	constant      big.Rat
+	toInternalize []ast.ASTHandle
+}
+
+func (s *smtLRALinearization) push(h ast.ASTHandle, coefficient *big.Rat) {
+	s.terms = append(s.terms, h)
+	s.coefficients = append(s.coefficients, *new(big.Rat).Set(coefficient))
+}
+
+func (s *smtLRALinearization) setBack(index int) {
+	last := len(s.terms) - 1
+	if index == last {
+		return
+	}
+	s.terms[index] = s.terms[last]
+	s.coefficients[index].Set(&s.coefficients[last])
+	s.terms = s.terms[:last]
+	s.coefficients = s.coefficients[:last]
+}
+
+// Source linearize's producer-order work stack, including swap-with-last
+// removal. Constant compaction precedes variable coefficient compaction.
+func (t *SMTLRATheory) linearize(term ast.ASTHandle) (smtLRALinearization, error) {
+	var st smtLRALinearization
+	st.push(term, big.NewRat(1, 1))
+	for index := 0; index < len(st.terms); {
+		h := st.terms[index]
+		st.toInternalize = append(st.toInternalize, h)
+		op, own, err := t.operation(h)
+		if err != nil {
+			return st, err
+		}
+		count, err := t.state.manager.GetNumArgs(h)
+		if err != nil {
+			return st, err
+		}
+		arg := func(i uint32) (ast.ASTHandle, error) { return t.state.manager.GetArg(h, i) }
+		switch {
+		case own && op == smtArithOpAdd:
+			coefficient := new(big.Rat).Set(&st.coefficients[index])
+			for i := uint32(0); i < count; i++ {
+				a, e := arg(i)
+				if e != nil {
+					return st, e
+				}
+				st.push(a, coefficient)
+			}
+			st.setBack(index)
+		case own && op == smtArithOpSub:
+			if count == 0 {
+				return st, ast.ErrASTDomain
+			}
+			first, e := arg(0)
+			if e != nil {
+				return st, e
+			}
+			st.terms[index] = first
+			negative := new(big.Rat).Neg(&st.coefficients[index])
+			for i := uint32(1); i < count; i++ {
+				a, e := arg(i)
+				if e != nil {
+					return st, e
+				}
+				st.push(a, negative)
+			}
+		case own && op == smtArithOpUMinus:
+			if count != 1 {
+				return st, ast.ErrASTDomain
+			}
+			first, e := arg(0)
+			if e != nil {
+				return st, e
+			}
+			st.terms[index] = first
+			st.coefficients[index].Neg(&st.coefficients[index])
+		case own && op == smtArithOpNum:
+			r, matched, e := t.numeral(h)
+			if e != nil {
+				return st, e
+			}
+			if !matched {
+				return st, ast.ErrASTDomain
+			}
+			st.constant.Add(&st.constant, new(big.Rat).Mul(&st.coefficients[index], r))
+			index++
+		default:
+			if own && op == smtArithOpMul && count == 2 {
+				first, e := arg(0)
+				if e != nil {
+					return st, e
+				}
+				second, e := arg(1)
+				if e != nil {
+					return st, e
+				}
+				// Native is_numeral has a single do/while(false) pass. Its
+				// unary-minus/to_real branches continue out of the loop and
+				// return false; only an actual numeral scales a product here.
+				coefficient, matched, e := t.numeral(first)
+				if e != nil {
+					return st, e
+				}
+				factor, numeral := second, first
+				if !matched {
+					coefficient, matched, e = t.numeral(second)
+					factor, numeral = first, second
+					if e != nil {
+						return st, e
+					}
+				}
+				if matched {
+					st.coefficients[index].Mul(&st.coefficients[index], coefficient)
+					st.terms[index] = factor
+					st.toInternalize = append(st.toInternalize, numeral)
+					continue
+				}
+			}
+			if own {
+				division := false
+				if op == smtArithOpDiv && count == 2 {
+					denominator, e := arg(1)
+					if e != nil {
+						return st, e
+					}
+					_, division, err = t.numeral(denominator)
+					if err != nil {
+						return st, err
+					}
+				}
+				if !division {
+					if err = t.foundNotHandled(h); err != nil {
+						return st, err
+					}
+				}
+				if err = t.internalizeArguments(h); err != nil {
+					return st, err
+				}
+				if _, err = t.mkEnode(h); err != nil {
+					return st, err
+				}
+			} else {
+				if err = t.internalizeArguments(h); err != nil {
+					return st, err
+				}
+				sort, e := t.state.manager.GetSort(h)
+				if e != nil {
+					return st, e
+				}
+				family, e := t.state.manager.GetFamilyID(sort)
+				if e != nil {
+					return st, e
+				}
+				if family == t.FamilyID() {
+					kind, e := t.state.manager.GetDeclKind(sort)
+					if e != nil {
+						return st, e
+					}
+					if kind == 1 {
+						if e = t.foundNotHandled(h); e != nil {
+							return st, e
+						}
+					}
+				}
+			}
+			v, e := t.mkVar(h)
+			if e != nil {
+				return st, e
+			}
+			st.coefficients[len(st.variables)].Set(&st.coefficients[index])
+			st.variables = append(st.variables, v)
+			index++
+		}
+	}
+	for i := len(st.toInternalize); i > 0; i-- {
+		if _, err := t.mkEnode(st.toInternalize[i-1]); err != nil {
+			return st, err
+		}
+	}
+	return st, nil
+}
+
+func (t *SMTLRATheory) internalizeDef(term ast.ASTHandle) (SMTTheoryVar, error) {
+	st, err := t.linearize(term)
+	if err != nil {
+		return SMTNullTheoryVar, err
+	}
+	if st.constant.Sign() == 0 && len(st.variables) == 1 && st.coefficients[0].Cmp(big.NewRat(1, 1)) == 0 {
+		return st.variables[0], nil
+	}
+	v, err := t.mkVar(term)
+	if err != nil {
+		return SMTNullTheoryVar, err
+	}
+	coefficients := make([]smtLRACoefficient, len(st.variables))
+	for i, w := range st.variables {
+		coefficients[i].variable = w
+		coefficients[i].value.Set(&st.coefficients[i])
+	}
+	_, err = t.numeric.addTerm(v, coefficients, &st.constant)
+	return v, err
+}
+
+func (t *SMTLRATheory) InternalizeTerm(term ast.ASTHandle) (bool, error) {
+	if _, err := t.State(); err != nil {
+		return false, err
+	}
+	if node := t.state.context.enodes[term]; node != nil && t.IsAttachedToVariable(node) {
+		return true, nil
+	}
+	_, err := t.internalizeDef(term)
+	return err == nil, err
+}
+
+func (t *SMTLRATheory) InternalizeAtom(atom ast.ASTHandle, _ bool) (bool, error) {
+	if _, err := t.State(); err != nil {
+		return false, err
+	}
+	bv, err := t.state.MkBoolVar(atom)
+	if err != nil {
+		return false, err
+	}
+	if err = t.state.SetVariableTheory(bv, t.FamilyID()); err != nil {
+		return false, err
+	}
+	op, own, err := t.operation(atom)
+	if err != nil {
+		return false, err
+	}
+	if !own || op != smtArithOpLE && op != smtArithOpGE {
+		return true, t.foundNotHandled(atom)
+	}
+	lhs, err := t.state.manager.GetArg(atom, 0)
+	if err != nil {
+		return false, err
+	}
+	rhs, err := t.state.manager.GetArg(atom, 1)
+	if err != nil {
+		return false, err
+	}
+	r, matched, err := t.numeral(rhs)
+	if err != nil {
+		return false, err
+	}
+	kind, err := t.state.manager.GetKind(lhs)
+	if err != nil {
+		return false, err
+	}
+	if !matched || kind != ast.ASTApp {
+		return true, t.foundNotHandled(atom)
+	}
+	v, err := t.internalizeDef(lhs)
+	if err != nil {
+		return false, err
+	}
+	b := &smtLRABound{boolean: bv, variable: v, upper: op == smtArithOpLE}
+	b.value.Set(r)
+	t.bounds[v] = append(t.bounds[v], b)
+	t.unassigned[v]++
+	t.boundTrail = append(t.boundTrail, v)
+	t.boundByBoolean[bv] = b
+	// Source immediate/delayed bound axioms are connected in the next stage.
+	return true, nil
+}
+
+// LRA does not override native apply_sort_cnstr; foreign terms acquire a
+// variable only when the LRA linearizer reaches mk_var.
+func (t *SMTLRATheory) ApplySortConstraint(_ *SMTEnode, _ ast.ASTHandle) error {
+	_, err := t.State()
+	return err
+}
+
+func (t *SMTLRATheory) InternalizeEquality(h ast.ASTHandle, _ int32) error {
+	if _, err := t.State(); err != nil {
+		return err
+	}
+	// The equality-to-normalized-bound frontend is still open. Keep this
+	// component explicitly inconclusive until its source adapter is attached.
+	return t.foundNotHandled(h)
+}
+func (t *SMTLRATheory) NewEquality(left, right SMTTheoryVar) error {
+	if _, err := t.State(); err != nil {
+		return err
+	}
+	return t.equalityAdapter.MkAxioms(left, right)
+}
+func (t *SMTLRATheory) NewDisequality(left, right SMTTheoryVar) error {
+	if _, err := t.State(); err != nil {
+		return err
+	}
+	return t.equalityAdapter.MkAxioms(left, right)
+}
+func (t *SMTLRATheory) InitializeSearch() error {
+	if _, err := t.State(); err != nil {
+		return err
+	}
+	return t.equalityAdapter.InitializeSearch()
+}
+func (t *SMTLRATheory) Restart() error {
+	if _, err := t.State(); err != nil {
+		return err
+	}
+	return t.equalityAdapter.Restart()
+}
+
+func (t *SMTLRATheory) Assign(bv int32, truth bool) error {
+	if _, err := t.State(); err != nil {
+		return err
+	}
+	if t.boundByBoolean[bv] == nil {
+		return ast.ErrASTDomain
+	}
+	t.assignments = append(t.assignments, smtLRAAssignment{bv, truth})
+	return nil
+}
+func (t *SMTLRATheory) CanPropagate() bool {
+	return t != nil && !t.closed && t.assignmentHead < len(t.assignments)
+}
+func (t *SMTLRATheory) Propagate() error {
+	if _, err := t.State(); err != nil {
+		return err
+	}
+	if !t.CanPropagate() {
+		return nil
+	}
+	for t.assignmentHead < len(t.assignments) && !t.state.inconsistent {
+		a := t.assignments[t.assignmentHead]
+		b := t.boundByBoolean[a.boolean]
+		if b == nil {
+			return ast.ErrASTDomain
+		}
+		if _, err := t.numeric.assertBound(b.variable, a.boolean, &b.value, b.upper, a.truth); err != nil {
+			return err
+		}
+		t.assignmentHead++
+	}
+	if t.state.inconsistent {
+		return nil
+	}
+	status, err := t.numeric.makeFeasible()
+	if err != nil {
+		return err
+	}
+	if status == lbool.False {
+		evidence, err := t.numeric.infeasibilityEvidence()
+		if err != nil {
+			return err
+		}
+		var core []SMTLiteral
+		for _, e := range evidence {
+			core = append(core, e.literal)
+		}
+		return t.state.SetTheoryConflict(t.FamilyID(), core)
+	}
+	return nil
+}
+
+func (t *SMTLRATheory) FinalCheck() (SMTFinalCheckStatus, error) {
+	if _, err := t.State(); err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	// No public setup route selects this partial frontend. A direct client
+	// cannot obtain SAT before model combination and source callbacks exist.
+	return SMTFinalCheckGiveUp, nil
+}
+
+func (t *SMTLRATheory) PushScope() error {
+	if err := t.SMTTheoryBase.PushScope(); err != nil {
+		return err
+	}
+	t.scopes = append(t.scopes, smtLRAFrontendScope{bounds: len(t.boundTrail), assignments: len(t.assignments), head: t.assignmentHead, underspecified: len(t.underspecified), notHandled: t.notHandled, unassigned: append([]uint32(nil), t.unassigned...)})
+	if err := t.equalityAdapter.PushScope(); err != nil {
+		return err
+	}
+	return t.numeric.push()
+}
+func (t *SMTLRATheory) PopScopes(n uint32) error {
+	if _, err := t.State(); err != nil {
+		return err
+	}
+	if n == 0 {
+		return nil
+	}
+	if int(n) > len(t.scopes) {
+		return ast.ErrASTDomain
+	}
+	level := len(t.scopes) - int(n)
+	scope := t.scopes[level]
+	for i := len(t.boundTrail); i > scope.bounds; i-- {
+		v := t.boundTrail[i-1]
+		last := len(t.bounds[v]) - 1
+		b := t.bounds[v][last]
+		delete(t.boundByBoolean, b.boolean)
+		t.bounds[v][last] = nil
+		t.bounds[v] = t.bounds[v][:last]
+	}
+	t.boundTrail = t.boundTrail[:scope.bounds]
+	t.assignments = t.assignments[:scope.assignments]
+	t.assignmentHead = scope.head
+	t.notHandled = scope.notHandled
+	t.underspecified = t.underspecified[:scope.underspecified]
+	copy(t.unassigned, scope.unassigned)
+	clear(t.unassigned[len(scope.unassigned):])
+	t.scopes = t.scopes[:level]
+	if err := t.numeric.pop(n); err != nil {
+		return err
+	}
+	if err := t.equalityAdapter.PopScopes(n); err != nil {
+		return err
+	}
+	return t.SMTTheoryBase.PopScopes(n)
+}
+
+func (t *SMTLRATheory) Close() error {
+	if t == nil {
+		return nil
+	}
+	// A refused child cleanup still owns its state, but the frontend must
+	// already be unavailable to ordinary calls while Close is retried.
+	t.closed = true
+	t.state = nil
+	if t.numeric != nil {
+		if err := t.numeric.Close(); err != nil {
+			return err
+		}
+		t.numeric = nil
+	}
+	if t.numerals != nil {
+		if err := t.numerals.CloseChecked(); err != nil {
+			return err
+		}
+		t.numerals = nil
+	}
+	t.variables = nil
+	t.limits = nil
+	t.bounds = nil
+	t.boundByBoolean = nil
+	t.boundTrail = nil
+	t.unassigned = nil
+	t.assignments = nil
+	t.scopes = nil
+	t.underspecified = nil
+	return nil
+}
