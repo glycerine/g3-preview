@@ -117435,7 +117435,8 @@
         "pkg/smtcore/smt_sequence_lifecycle_test.go",
         "pkg/smtcore/smt_model_generator.go",
         "pkg/smtcore/smt_model_incomplete_test.go",
-        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
+        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
+        "pkg/smtcore/smt_internalizer_state_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -117559,7 +117560,8 @@
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
         "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
         "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
-        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
+        "TestSMTInternalizerNegatedReservedTruthLiterals"
       ],
       "conditionals": [
         {
@@ -118290,6 +118292,23 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
           ]
+        },
+        {
+          "name": "get_literal reserved truth-variable representation (smt_internalizer.cpp:990-1008): negated true/false map directly to reserved false/true literals when Go omits ordinary boolVar entries for constants; raw auxiliary tautologies and contradictions remain valid without enabling preprocessing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer_state.go",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_internalizer_state_test.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_publication_test.go",
+            "pkg/smtcore/smt_model_checker_instances_test.go"
+          ],
+          "tests": [
+            "TestSMTInternalizerNegatedReservedTruthLiterals",
+            "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+            "TestSMTMBQICounterexamplesPublishAfterForcedBaseRestart"
+          ]
         }
       ],
       "ownership": [
@@ -118310,7 +118329,8 @@
         "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service.",
         "The concrete aggressive String tester consumer reuses the actual internalizer Boolean data for a just-internalized equality. Phase hints own no AST or context resources and do not assign the Boolean variable or change its true-first flag.",
         "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
-        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit."
+        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit.",
+        "Reserved truth negation adds no Boolean variables, enodes or AST owners. It preserves the source reserved-literal representation at the Go table boundary; direct tests cover both literal lookup and assertion conflict behavior, and MBQI restart/candidate-publication regressions cover the reached auxiliary consumer."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
@@ -119535,7 +119555,11 @@
         "pkg/smtcore/smt_theory_test.go",
         "pkg/smtcore/smt_theory_aware_branching.go",
         "pkg/smtcore/smt_theory_aware_branching_test.go",
-        "pkg/smtcore/smt_search.go"
+        "pkg/smtcore/smt_search.go",
+        "pkg/smtcore/smt_internalizer_state_test.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_publication_test.go",
+        "pkg/smtcore/smt_model_checker_instances_test.go"
       ],
       "tests": [
         "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
@@ -119592,7 +119616,10 @@
         "TestSMTTheoryAwareDeletedSlotPriorityAndRandomSelection",
         "TestSMTTheoryAwareInfoIsNoopForOtherStrategies",
         "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
-        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
+        "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice",
+        "TestSMTInternalizerNegatedReservedTruthLiterals",
+        "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+        "TestSMTMBQICounterexamplesPublishAfterForcedBaseRestart"
       ],
       "conditionals": [
         {
@@ -120220,6 +120247,23 @@
           "tests": [
             "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice"
           ]
+        },
+        {
+          "name": "get_literal reserved truth-variable representation (smt_internalizer.cpp:990-1008): negated true/false map directly to reserved false/true literals when Go omits ordinary boolVar entries for constants; raw auxiliary tautologies and contradictions remain valid without enabling preprocessing",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_internalizer_state.go",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_internalizer_state_test.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_publication_test.go",
+            "pkg/smtcore/smt_model_checker_instances_test.go"
+          ],
+          "tests": [
+            "TestSMTInternalizerNegatedReservedTruthLiterals",
+            "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
+            "TestSMTMBQICounterexamplesPublishAfterForcedBaseRestart"
+          ]
         }
       ],
       "ownership": [
@@ -120227,7 +120271,8 @@
         "SMTInternalizerState owns references for registered Boolean expressions, enode owners, and retained clause proofs; it owns its congruence table, variable arrays, watch lists, scopes, clauses, assignment and theory-variable trails, registered theory order, and pending congruence records, and borrows the checker context, registered theory plugins, and optional relevancy propagator and quantifier registry.",
         "Unit-resolution antecedents and sequence equality evidence borrow scoped literals/enodes owned by the internalizer. Propagated empty equalities retain original dependencies; guessed model characters are not used as conflict evidence.",
         "New true-equality assignment occurs after enode registration/stack ownership, preserving equality justification operands through scope rollback. The theory callback fixture now uses distinct terms as native eq_propagation_justification requires, retaining its callback and scope checks.",
-        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap."
+        "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap.",
+        "Reserved truth negation adds no Boolean variables, enodes or AST owners. It preserves the source reserved-literal representation at the Go table boundary; direct tests cover both literal lookup and assertion conflict behavior, and MBQI restart/candidate-publication regressions cover the reached auxiliary consumer."
       ],
       "deviations": [
         "Array extensionality now consumes its source Boolean option at initial registration and live parameter updates. Boolean array select/default atoms explicitly retain the source enode flag even in gate context, fixing missing mp-iff antecedents during finite-domain extensionality conflicts. Five strict C++ scripts cover enabled/disabled startup, live false/true/false updates with scope recovery, proof-enabled checks and the QF_AX simple-profile route, raising strict runner agreement to 124. Simple/full backend selection, fresh-plugin ownership and remaining source parameter/worklist fidelity are still incomplete.",
@@ -121171,7 +121216,9 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_model_checker_auxiliary_test.go",
         "pkg/smtcore/smt_sequence_lifecycle.go",
-        "pkg/smtcore/smt_sequence_lifecycle_test.go"
+        "pkg/smtcore/smt_sequence_lifecycle_test.go",
+        "pkg/smtcore/smt_model_checker_skolem_test.go",
+        "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -121213,7 +121260,11 @@
         "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
         "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
-        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
+        "TestSMTModelCheckerBooleanSkolemsAvoidCartesianEnumeration",
+        "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
+        "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
+        "TestSMTModelCheckerFiniteSkolemAllocationFrontiers"
       ],
       "assertions": [
         {
@@ -121524,16 +121575,40 @@
             "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
             "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
           ]
+        },
+        {
+          "name": "assert_neg_q_m/restrict_to_universe/check production path (smt_model_checker.cpp:87-132,256-312): Skolemize every Boolean/finite/infinite variable in native fresh-creation order, assert frozen-universe disjunctions, apply model-finder restrictions/inverses to all original variables, block all Skolems and preserve complete-witness fallback; preserve the saved complete witness when restricted checking returns UNKNOWN",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_skolem_test.go",
+            "pkg/smtcore/smt_model_checker_auxiliary_test.go",
+            "pkg/smtcore/smt_model_checker_inverse_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
+          ],
+          "tests": [
+            "TestSMTModelCheckerBooleanSkolemsAvoidCartesianEnumeration",
+            "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
+            "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
+            "TestSMTModelCheckerFiniteSkolemAllocationFrontiers",
+            "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
+            "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "SMTModelChecker borrows the internalizer, registry and candidate proto-model. Temporary instantiated, evaluated and Skolem expressions are held by checked AST references and released after the auxiliary solver closes; acquired counterexample models are explicitly released.",
         "auxiliaryCounterexamples registers cleanup for the actual VarSubstitution owner before checking member-construction errors; quantified UFNIA allocation frontiers verify release of partial reducer storage as well as successful auxiliary solving.",
         "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close.",
-        "SMTModelChecker owns one cached auxiliary solver after successful initialization. Each counterexample query pushes/pops its own scope even on error. Factory construction copies the persistent parameter snapshot and concrete retained plugins, closes partial owners on failure and freezes context parameters across parent updates/searches. Source arithmetic/BV/full-array parameter references retain their concrete owner semantics; no source assertions, enodes or theory instances are shared. Checker close destroys the auxiliary before parent parameter/services close."
+        "SMTModelChecker owns one cached auxiliary solver after successful initialization. Each counterexample query pushes/pops its own scope even on error. Factory construction copies the persistent parameter snapshot and concrete retained plugins, closes partial owners on failure and freezes context parameters across parent updates/searches. Source arithmetic/BV/full-array parameter references retain their concrete owner semantics; no source assertions, enodes or theory instances are shared. Checker close destroys the auxiliary before parent parameter/services close.",
+        "Each auxiliary query owns fresh Skolem references, negated-body/clause references and finite-universe equality prefixes until scoped assertions take ownership. Query pop removes universe/instantiation restrictions and blocking clauses. Failed restriction allocation releases its prefix and leaves a reusable clean auxiliary scope. Production never enumerates a Cartesian product; existing standalone typed callers without an auxiliary factory retain their explicit model-enumeration contract, and the explicit no-model-finder auxiliary test retains unrestricted multi-witness enumeration. The saved complete model holds its own reference across the later restricted check, including UNKNOWN; that branch stops enumeration and uses the saved witness rather than marking the candidate exhausted."
       ],
       "deviations": [
-        "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in the cached auxiliary context using the source empty logic, frozen fparams snapshot, zero relevancy, activity-based branching and concrete retained plugin copies. Each query is scoped with push/pop. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; new instance expressions are pinned until restart, then surviving quantifiers and reinternalized bindings enter the ordinary registry queue; duplicate filtering occurs at that source publication boundary. Recursive-function checking now consumes the reserved marker emitted by the command context; the remaining class/diagnostic audit is separate.",
+        "Production checks now use the native cached auxiliary context for every bound variable, including Booleans and frozen finite universes. Fresh creation is innermost-first with declaration-ordered vectors; finite universe membership is asserted as disjunctions before the negated candidate body. Model-finder restrictions/inverse recovery include all original positions; the native second check and single complete-witness fallback are retained even when no restriction clause was added. Scoped queries retain current frozen fparams, concrete plugin copying, blocking and delayed instance ownership. Standalone typed checkers without an auxiliary factory still enumerate an explicitly supplied model for their existing Go callers; the explicit no-model-finder auxiliary test retains unrestricted collection. Broader class/diagnostic/consumer audits remain incomplete.",
         "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded.",
         "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
@@ -121574,7 +121649,9 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/smt_model_checker_auxiliary_test.go",
         "pkg/smtcore/smt_sequence_lifecycle.go",
-        "pkg/smtcore/smt_sequence_lifecycle_test.go"
+        "pkg/smtcore/smt_sequence_lifecycle_test.go",
+        "pkg/smtcore/smt_model_checker_skolem_test.go",
+        "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -121611,7 +121688,12 @@
         "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
         "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
-        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
+        "TestSMTModelCheckerBooleanSkolemsAvoidCartesianEnumeration",
+        "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
+        "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
+        "TestSMTModelCheckerFiniteSkolemAllocationFrontiers",
+        "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse"
       ],
       "conditionals": [
         {
@@ -121761,12 +121843,36 @@
             "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
             "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
           ]
+        },
+        {
+          "name": "assert_neg_q_m/restrict_to_universe/check production path (smt_model_checker.cpp:87-132,256-312): Skolemize every Boolean/finite/infinite variable in native fresh-creation order, assert frozen-universe disjunctions, apply model-finder restrictions/inverses to all original variables, block all Skolems and preserve complete-witness fallback; preserve the saved complete witness when restricted checking returns UNKNOWN",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_skolem_test.go",
+            "pkg/smtcore/smt_model_checker_auxiliary_test.go",
+            "pkg/smtcore/smt_model_checker_inverse_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
+          ],
+          "tests": [
+            "TestSMTModelCheckerBooleanSkolemsAvoidCartesianEnumeration",
+            "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
+            "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
+            "TestSMTModelCheckerFiniteSkolemAllocationFrontiers",
+            "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
+            "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The Go checker has explicit borrowed state and registry pointers and no region-allocated flexible-array instances; ordinary slices carry pinned expression bindings; enodes are recovered only at restart.",
         "SMTModelChecker owns checked AST pins for every captured binding and quantifier until successful restart/reset/close. Capture publishes only complete owners and releases failed prefixes. The pending list survives decision-scope pop without borrowing obsolete enodes; restart reinternalizes expressions at the captured generation and restores the prior native generation field. Failed restart prefixes remain owned until retry/reset/close.",
-        "SMTModelChecker owns one cached auxiliary solver after successful initialization. Each counterexample query pushes/pops its own scope even on error. Factory construction copies the persistent parameter snapshot and concrete retained plugins, closes partial owners on failure and freezes context parameters across parent updates/searches. Source arithmetic/BV/full-array parameter references retain their concrete owner semantics; no source assertions, enodes or theory instances are shared. Checker close destroys the auxiliary before parent parameter/services close."
+        "SMTModelChecker owns one cached auxiliary solver after successful initialization. Each counterexample query pushes/pops its own scope even on error. Factory construction copies the persistent parameter snapshot and concrete retained plugins, closes partial owners on failure and freezes context parameters across parent updates/searches. Source arithmetic/BV/full-array parameter references retain their concrete owner semantics; no source assertions, enodes or theory instances are shared. Checker close destroys the auxiliary before parent parameter/services close.",
+        "Each auxiliary query owns fresh Skolem references, negated-body/clause references and finite-universe equality prefixes until scoped assertions take ownership. Query pop removes universe/instantiation restrictions and blocking clauses. Failed restriction allocation releases its prefix and leaves a reusable clean auxiliary scope. Production never enumerates a Cartesian product; existing standalone typed callers without an auxiliary factory retain their explicit model-enumeration contract, and the explicit no-model-finder auxiliary test retains unrestricted multi-witness enumeration. The saved complete model holds its own reference across the later restricted check, including UNKNOWN; that branch stops enumeration and uses the saved witness rather than marking the candidate exhausted."
       ],
       "deviations": [
         "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded.",
@@ -121823,7 +121929,13 @@
         "pkg/smtcore/smt_model_finder_hint_greedy.go",
         "pkg/smtcore/smt_model_finder_hint_greedy_test.go",
         "pkg/smtcore/smt_model_finder_hint_trace.go",
-        "pkg/smtcore/smt_internalizer_state.go"
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_skolem_test.go",
+        "pkg/smtcore/smt_model_checker_auxiliary_test.go",
+        "pkg/smtcore/smt_model_checker_inverse_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
       ],
       "tests": [
         "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle",
@@ -121866,7 +121978,15 @@
         "TestModelFinderHintDefinitionCycleFixedPointAndAnnotations",
         "TestModelFinderHintPreprocessIndexesAndResidueCandidates",
         "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit",
-        "TestSMTModelFinderAUFArithmeticWitnessUsesStableNumeral"
+        "TestSMTModelFinderAUFArithmeticWitnessUsesStableNumeral",
+        "TestSMTModelCheckerBooleanSkolemsAvoidCartesianEnumeration",
+        "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
+        "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
+        "TestSMTModelCheckerFiniteSkolemAllocationFrontiers",
+        "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
+        "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "assertions": [
         {
@@ -122543,11 +122663,35 @@
             "TestSMTModelFinderAUFSelectIndexesUseModelFunctionAndRelevantParents",
             "TestSMTModelFinderAUFSelectNestedArrayParents"
           ]
+        },
+        {
+          "name": "restrict_sks_to_inst_set/get_inv retained checker consumer (smt_model_finder.cpp:3382-3440): include finite/Boolean positions in Skolem restrictions and inverse recovery, attempt native second check even with no restriction clause, and use one saved complete witness if inverse recovery fails; preserve the saved complete witness when restricted checking returns UNKNOWN",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_skolem_test.go",
+            "pkg/smtcore/smt_model_checker_auxiliary_test.go",
+            "pkg/smtcore/smt_model_checker_inverse_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
+          ],
+          "tests": [
+            "TestSMTModelCheckerBooleanSkolemsAvoidCartesianEnumeration",
+            "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
+            "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
+            "TestSMTModelCheckerFiniteSkolemAllocationFrontiers",
+            "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
+            "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "The scoped sets borrow quantifier handles; the satisfied-set undo callback clears the corresponding quantifier_info choice before each reverse set edit.",
-        "Model finding and model generation share the internalizer's concrete mode-aware relevancy query. Disabled filtering includes internalized unmarked quantifiers, function applications, same-sort equality terms, ground arrays and nested select parents. The active quantifier assignment still must be true. Enabled filtering and standalone read-side fixtures preserve their marked view. Tests switch modes, retain original argument generations despite equivalence roots, verify array index positions, and check that replacing a model closes prior instantiation sets."
+        "Model finding and model generation share the internalizer's concrete mode-aware relevancy query. Disabled filtering includes internalized unmarked quantifiers, function applications, same-sort equality terms, ground arrays and nested select parents. The active quantifier assignment still must be true. Enabled filtering and standalone read-side fixtures preserve their marked view. Tests switch modes, retain original argument generations despite equivalence roots, verify array index positions, and check that replacing a model closes prior instantiation sets.",
+        "Each auxiliary query owns fresh Skolem references, negated-body/clause references and finite-universe equality prefixes until scoped assertions take ownership. Query pop removes universe/instantiation restrictions and blocking clauses. Failed restriction allocation releases its prefix and leaves a reusable clean auxiliary scope. Production never enumerates a Cartesian product; existing standalone typed callers without an auxiliary factory retain their explicit model-enumeration contract, and the explicit no-model-finder auxiliary test retains unrestricted multi-witness enumeration. The saved complete model holds its own reference across the later restricted check, including UNKNOWN; that branch stops enumeration and uses the saved witness rather than marking the candidate exhausted."
       ],
       "deviations": [
         "Go arithmetic-witness refinement: when the chosen witness evaluates to a public numeral provably distinct from all exceptions and avoided fallbacks, the instantiation set retains the numeral rather than the reassignable auxiliary constant. This preserves its value when an instance enters the context and avoids regenerating symbolic counterexamples on every candidate. Colliding and nonnumeric witnesses retain the source symbolic-witness/deferred-constraint path. Covered by TestSMTModelFinderAUFArithmeticWitnessUsesStableNumeral and the integer MBQI solver regressions.",
@@ -122562,11 +122706,25 @@
       "go_targets": [
         "pkg/smtcore/smt_model_finder.go",
         "pkg/smtcore/smt_model_finder_instantiation_set.go",
-        "pkg/smtcore/smt_quantifier_manager.go"
+        "pkg/smtcore/smt_quantifier_manager.go",
+        "pkg/smtcore/smt_model_checker.go",
+        "pkg/smtcore/smt_model_checker_skolem_test.go",
+        "pkg/smtcore/smt_model_checker_auxiliary_test.go",
+        "pkg/smtcore/smt_model_checker_inverse_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
       ],
       "tests": [
-        "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle"
-        ,"TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals"
+        "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle",
+        "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals",
+        "TestSMTModelCheckerBooleanSkolemsAvoidCartesianEnumeration",
+        "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
+        "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
+        "TestSMTModelCheckerFiniteSkolemAllocationFrontiers",
+        "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
+        "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -122596,10 +122754,34 @@
           "tests": [
             "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals"
           ]
+        },
+        {
+          "name": "restrict_sks_to_inst_set/get_inv retained checker consumer (smt_model_finder.cpp:3382-3440): include finite/Boolean positions in Skolem restrictions and inverse recovery, attempt native second check even with no restriction clause, and use one saved complete witness if inverse recovery fails; preserve the saved complete witness when restricted checking returns UNKNOWN",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_checker.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_skolem_test.go",
+            "pkg/smtcore/smt_model_checker_auxiliary_test.go",
+            "pkg/smtcore/smt_model_checker_inverse_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/mbqi_boolean_skolem_budget.smt2"
+          ],
+          "tests": [
+            "TestSMTModelCheckerBooleanSkolemsAvoidCartesianEnumeration",
+            "TestSMTModelCheckerMissingInverseUsesOneCompleteCounterexample",
+            "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
+            "TestSMTModelCheckerFiniteSkolemAllocationFrontiers",
+            "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
+            "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "SMTModelFinder borrows the AST manager and internalizer state. It owns flattened-quantifier references, macro candidate references, instantiation-term/inverse references, dependency references and deferred witness-constraint references. Scope rollback closes each quantifier's owned analysis; restart transfers witness constraints into internalizer ownership."
+        "SMTModelFinder borrows the AST manager and internalizer state. It owns flattened-quantifier references, macro candidate references, instantiation-term/inverse references, dependency references and deferred witness-constraint references. Scope rollback closes each quantifier's owned analysis; restart transfers witness constraints into internalizer ownership.",
+        "Each auxiliary query owns fresh Skolem references, negated-body/clause references and finite-universe equality prefixes until scoped assertions take ownership. Query pop removes universe/instantiation restrictions and blocking clauses. Failed restriction allocation releases its prefix and leaves a reusable clean auxiliary scope. Production never enumerates a Cartesian product; existing standalone typed callers without an auxiliary factory retain their explicit model-enumeration contract, and the explicit no-model-finder auxiliary test retains unrestricted multi-witness enumeration. The saved complete model holds its own reference across the later restricted check, including UNKNOWN; that branch stops enumeration and uses the saved witness rather than marking the candidate exhausted."
       ],
       "deviations": [
         "The live lifecycle includes flattened analysis, macro publication, AUF graph fixing and projections, inverse recovery and deferred witness constraints. The enclosing source-surface and ownership completeness audit remains open."

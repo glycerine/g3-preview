@@ -503,6 +503,13 @@ func (s *SMTInternalizerState) Literal(expression ast.ASTHandle) (SMTLiteral, er
 			if err != nil {
 				return SMTNullLiteral, err
 			}
+			// Reserved truth literals have no ordinary boolVar table entry.
+			if s.manager.IsTrue(child) {
+				return SMTFalseLiteral, nil
+			}
+			if s.manager.IsFalse(child) {
+				return SMTTrueLiteral, nil
+			}
 			variable, found := s.boolVar[child]
 			if !found {
 				return SMTNullLiteral, ast.ErrASTDomain

@@ -97,10 +97,10 @@ func smtAuxiliaryQueryFixture(t *testing.T) (*ast.ASTManager, *SMTModelChecker, 
 }
 
 func TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes(t *testing.T) {
-	_, c, proto, q, zero := smtAuxiliaryQueryFixture(t)
+	_, c, proto, q, _ := smtAuxiliaryQueryFixture(t)
 	for i := 0; i < 3; i++ {
 		remaining := uint32(1)
-		found, err := c.auxiliaryCounterexamples(proto, q, []ast.ASTHandle{zero}, []bool{false}, &remaining)
+		found, err := c.auxiliaryCounterexamples(proto, q, &remaining)
 		astTestMust(t, err)
 		if found || c.Exhausted() {
 			t.Fatal("valid identity produced a counterexample")
@@ -119,7 +119,7 @@ func TestSMTModelCheckerAuxiliaryAllocationFrontiers(t *testing.T) {
 		succeeded := false
 		for stop := int64(0); stop < 512 && !succeeded; stop++ {
 			t.Run(fmt.Sprint(query, "/", stop), func(t *testing.T) {
-				m, c, proto, q, zero := smtAuxiliaryQueryFixture(t)
+				m, c, proto, q, _ := smtAuxiliaryQueryFixture(t)
 				if query {
 					astTestMust(t, c.initAuxiliaryContext())
 				}
@@ -127,7 +127,7 @@ func TestSMTModelCheckerAuxiliaryAllocationFrontiers(t *testing.T) {
 				var err error
 				if query {
 					remaining := uint32(1)
-					_, err = c.auxiliaryCounterexamples(proto, q, []ast.ASTHandle{zero}, []bool{false}, &remaining)
+					_, err = c.auxiliaryCounterexamples(proto, q, &remaining)
 				} else {
 					err = c.initAuxiliaryContext()
 				}
@@ -149,7 +149,7 @@ func TestSMTModelCheckerAuxiliaryAllocationFrontiers(t *testing.T) {
 				}
 				if err != nil {
 					remaining := uint32(1)
-					found, retryErr := c.auxiliaryCounterexamples(proto, q, []ast.ASTHandle{zero}, []bool{false}, &remaining)
+					found, retryErr := c.auxiliaryCounterexamples(proto, q, &remaining)
 					astTestMust(t, retryErr)
 					if found || c.Exhausted() {
 						t.Fatal("stopped auxiliary could not retry")

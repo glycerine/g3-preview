@@ -1,5 +1,5 @@
-// Source: src/smt/smt_model_checker.cpp finite-universe counterexample
-// discovery and delayed instance publication.
+// Source: src/smt/smt_model_checker.cpp auxiliary counterexample discovery
+// and delayed instance publication.
 package smtcore
 
 import (
@@ -14,8 +14,8 @@ import (
 
 type smtAuxiliarySolverFactory func() (*SMTSolver, error)
 
-// SMTModelChecker checks universal quantifiers over finite proto-model
-// universes and uses a fresh SMT solver for infinite domains. Counterexamples
+// SMTModelChecker checks universal quantifiers using a cached auxiliary SMT
+// solver with Skolem constants and finite-universe restrictions. Counterexamples
 // retain expression bindings until restart, when they enter the ordinary
 // quantifier queue at the restored base scope.
 type SMTModelChecker struct {
@@ -192,7 +192,42 @@ func (c *SMTModelChecker) addFiniteCounterexample(quantifier ast.ASTHandle, valu
 	return !c.exhausted && err == nil, err
 }
 
-func (c *SMTModelChecker) addAuxiliaryBlockingClause(auxiliary *SMTSolver, skolems, values []ast.ASTHandle, finite []bool) (result error) {
+func (c *SMTModelChecker) restrictSkolemToUniverse(auxiliary *SMTSolver, skolem ast.ASTHandle, universe []ast.ASTHandle) (result error) {
+	if len(universe) == 0 {
+		return ast.ErrASTDomain
+	}
+	equalities := make([]ast.ASTHandle, 0, len(universe))
+	refs := make([]ast.ASTRef, 0, len(universe))
+	defer func() {
+		for i := len(refs) - 1; i >= 0; i-- {
+			result = errors.Join(result, c.manager.DelRef(&refs[i]))
+		}
+	}()
+	for _, value := range universe {
+		equal, err := c.manager.MkEq(skolem, value)
+		if err != nil {
+			return err
+		}
+		ref, err := c.manager.NewRef(equal)
+		if err != nil {
+			return err
+		}
+		refs = append(refs, ref)
+		equalities = append(equalities, equal)
+	}
+	clause, err := c.manager.MkOrArgs(equalities)
+	if err != nil {
+		return err
+	}
+	clauseRef, err := c.manager.NewRef(clause)
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, c.manager.DelRef(&clauseRef)) }()
+	return auxiliary.Assert(clause)
+}
+
+func (c *SMTModelChecker) addAuxiliaryBlockingClause(auxiliary *SMTSolver, skolems, values []ast.ASTHandle) (result error) {
 	disequalities := make([]ast.ASTHandle, 0, len(skolems))
 	refs := make([]ast.ASTRef, 0, len(skolems))
 	defer func() {
@@ -201,7 +236,7 @@ func (c *SMTModelChecker) addAuxiliaryBlockingClause(auxiliary *SMTSolver, skole
 		}
 	}()
 	for i, skolem := range skolems {
-		if finite[i] || skolem.IsNull() || values[i].IsNull() {
+		if skolem.IsNull() || values[i].IsNull() {
 			continue
 		}
 		equal, err := c.manager.MkEq(skolem, values[i])
@@ -226,10 +261,15 @@ func (c *SMTModelChecker) addAuxiliaryBlockingClause(auxiliary *SMTSolver, skole
 	if err != nil {
 		return err
 	}
+	clauseRef, err := c.manager.NewRef(clause)
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, c.manager.DelRef(&clauseRef)) }()
 	return auxiliary.Assert(clause)
 }
 
-func (c *SMTModelChecker) addInstantiationSetRestrictions(auxiliary *SMTSolver, quantifier ast.ASTHandle, skolems []ast.ASTHandle, finite []bool) (asserted bool, result error) {
+func (c *SMTModelChecker) addInstantiationSetRestrictions(auxiliary *SMTSolver, quantifier ast.ASTHandle, skolems []ast.ASTHandle) (asserted bool, result error) {
 	if c.modelFinder == nil {
 		return false, nil
 	}
@@ -241,7 +281,7 @@ func (c *SMTModelChecker) addInstantiationSetRestrictions(auxiliary *SMTSolver, 
 		return false, ast.ErrASTDomain
 	}
 	for i, skolem := range skolems[:count] {
-		if finite[i] || skolem.IsNull() {
+		if skolem.IsNull() {
 			continue
 		}
 		values, err := c.modelFinder.InstantiationValues(quantifier, uint32(i))
@@ -273,7 +313,12 @@ func (c *SMTModelChecker) addInstantiationSetRestrictions(auxiliary *SMTSolver, 
 		}
 		clause, err := c.manager.MkOrArgs(equalities)
 		if err == nil {
-			err = auxiliary.Assert(clause)
+			var clauseRef ast.ASTRef
+			clauseRef, err = c.manager.NewRef(clause)
+			if err == nil {
+				err = auxiliary.Assert(clause)
+				err = errors.Join(err, c.manager.DelRef(&clauseRef))
+			}
 		}
 		for j := range refs {
 			err = errors.Join(err, c.manager.DelRef(&refs[j]))
@@ -344,7 +389,7 @@ func (c *SMTModelChecker) auxiliaryBindings(cex *coremodel.ModelCore, quantifier
 	return raw, bindings, inverseOK, generation, nil
 }
 
-func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel, quantifier ast.ASTHandle, values []ast.ASTHandle, finite []bool, remaining *uint32) (found bool, result error) {
+func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel, quantifier ast.ASTHandle, remaining *uint32) (found bool, result error) {
 	if c.auxiliary == nil {
 		return false, nil
 	}
@@ -368,7 +413,12 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 	if err != nil {
 		return false, err
 	}
-	skolems := append([]ast.ASTHandle(nil), values...)
+	count, err := c.manager.GetNumDeclarations(flat)
+	if err != nil {
+		return false, err
+	}
+	values := make([]ast.ASTHandle, count)
+	skolems := make([]ast.ASTHandle, count)
 	skolemDecls := make([]ast.ASTHandle, len(skolems))
 	skolemRefs := make([]ast.ASTRef, 0, len(skolems))
 	defer func() {
@@ -376,10 +426,9 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 			result = errors.Join(result, c.manager.DelRef(&skolemRefs[i]))
 		}
 	}()
-	for i := range skolems {
-		if finite[i] {
-			continue
-		}
+	// Native creates the innermost variable's fresh constant first while
+	// retaining declaration order in the Skolem/substitution vectors.
+	for i := len(skolems) - 1; i >= 0; i-- {
 		sort, e := c.manager.GetDeclarationSort(flat, uint32(i))
 		if e != nil {
 			return false, e
@@ -423,6 +472,11 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 	if err != nil {
 		return false, err
 	}
+	negatedRef, err := c.manager.NewRef(negated)
+	if err != nil {
+		return false, err
+	}
+	defer func() { result = errors.Join(result, c.manager.DelRef(&negatedRef)) }()
 	if err = c.initAuxiliaryContext(); err != nil {
 		return false, err
 	}
@@ -431,6 +485,26 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 		return false, err
 	}
 	defer func() { result = errors.Join(result, auxiliary.PopCore(1)) }()
+	for i := len(skolems) - 1; i >= 0; i-- {
+		skolem := skolems[i]
+		sort, e := c.manager.GetDeclarationSort(flat, uint32(i))
+		if e != nil {
+			return false, e
+		}
+		finite, e := model.IsFinite(sort)
+		if e != nil {
+			return false, e
+		}
+		if finite {
+			universe, e := model.KnownUniverse(sort)
+			if e != nil {
+				return false, e
+			}
+			if e = c.restrictSkolemToUniverse(auxiliary, skolem, universe); e != nil {
+				return false, e
+			}
+		}
+	}
 	if err = auxiliary.Assert(negated); err != nil {
 		return false, err
 	}
@@ -453,15 +527,18 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 		return false, ast.ErrASTPending
 	}
 	defer func() { result = errors.Join(result, complete.DecRef()) }()
-	restricted, err := c.addInstantiationSetRestrictions(auxiliary, quantifier, skolems, finite)
+	restricted, err := c.addInstantiationSetRestrictions(auxiliary, quantifier, skolems)
 	if err != nil {
 		return false, err
 	}
+	// Native attempts inverse recovery even when no instantiation-set clause
+	// was added, then falls back to the saved complete counterexample.
+	useInverse := c.modelFinder != nil
 	first := complete
 	for *remaining != 0 {
 		cex := first
 		first = nil
-		if restricted || cex == nil {
+		if useInverse || restricted || cex == nil {
 			status, err = auxiliary.CheckSat(nil)
 			if err != nil {
 				return false, err
@@ -470,8 +547,9 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 				break
 			}
 			if status != lbool.True {
-				c.exhausted = true
-				return found, nil
+				// The complete query already supplied a valid witness. Native
+				// stops restricted enumeration and can still use that witness.
+				break
 			}
 			cex, err = auxiliary.AcquireModel()
 			if err != nil {
@@ -481,14 +559,14 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 				return false, ast.ErrASTPending
 			}
 		}
-		raw, bindings, inverseOK, generation, err := c.auxiliaryBindings(cex, quantifier, values, skolemDecls, restricted)
+		raw, bindings, inverseOK, generation, err := c.auxiliaryBindings(cex, quantifier, values, skolemDecls, useInverse)
 		if err != nil {
 			if cex != complete {
 				err = errors.Join(err, cex.DecRef())
 			}
 			return false, err
 		}
-		if restricted && !inverseOK {
+		if useInverse && !inverseOK {
 			if cex != complete {
 				if err = cex.DecRef(); err != nil {
 					return false, err
@@ -496,7 +574,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 			}
 			break
 		}
-		inserted, err := c.enqueueCounterexample(quantifier, bindings, restricted, generation)
+		inserted, err := c.enqueueCounterexample(quantifier, bindings, useInverse, generation)
 		if err != nil {
 			if cex != complete {
 				err = errors.Join(err, cex.DecRef())
@@ -510,7 +588,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 			*remaining--
 		}
 		if *remaining != 0 {
-			if err = c.addAuxiliaryBlockingClause(auxiliary, skolems, raw, finite); err != nil {
+			if err = c.addAuxiliaryBlockingClause(auxiliary, skolems, raw); err != nil {
 				if cex != complete {
 					err = errors.Join(err, cex.DecRef())
 				}
@@ -526,7 +604,7 @@ func (c *SMTModelChecker) auxiliaryCounterexamples(model *protomodel.ProtoModel,
 			break
 		}
 	}
-	if restricted && !found && *remaining != 0 {
+	if useInverse && !found && *remaining != 0 {
 		_, bindings, _, _, err := c.auxiliaryBindings(complete, quantifier, values, skolemDecls, false)
 		if err != nil {
 			return false, err
@@ -554,32 +632,19 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 	if err != nil {
 		return false, err
 	}
-	universes := make([][]ast.ASTHandle, count)
-	finite := make([]bool, count)
-	boolean, err := c.manager.MkBoolSort()
-	if err != nil {
-		return false, err
+	if c.auxiliary != nil {
+		return c.auxiliaryCounterexamples(model, quantifier, remaining)
 	}
-	hasInfinite := false
+	// Standalone typed callers can check a supplied model without a solver.
+	universes := make([][]ast.ASTHandle, count)
 	for i := uint32(0); i < count; i++ {
 		sort, err := c.manager.GetDeclarationSort(flat, i)
 		if err != nil {
 			return false, err
 		}
-		finite[i] = sort == boolean
-		if !finite[i] {
-			finite[i], err = model.IsFinite(sort)
-			if err != nil {
-				return false, err
-			}
-		}
-		if finite[i] || c.auxiliary == nil {
-			universes[i], err = c.universe(model, sort)
-			if err != nil {
-				return false, err
-			}
-		} else {
-			hasInfinite = true
+		universes[i], err = c.universe(model, sort)
+		if err != nil {
+			return false, err
 		}
 	}
 	values := make([]ast.ASTHandle, count)
@@ -592,23 +657,12 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 			return nil
 		}
 		if index < count {
-			if !finite[index] && c.auxiliary != nil {
-				return visit(index + 1)
-			}
 			for _, value := range universes[index] {
 				values[index] = value
 				if err := visit(index + 1); err != nil || *remaining == 0 {
 					return err
 				}
 			}
-			return nil
-		}
-		if hasInfinite {
-			inserted, err := c.auxiliaryCounterexamples(model, quantifier, values, finite, remaining)
-			if err != nil {
-				return err
-			}
-			found = found || inserted
 			return nil
 		}
 		instance, err := c.manager.NewRef(ast.ASTHandle{})
@@ -659,7 +713,7 @@ func (c *SMTModelChecker) checkQuantifier(model *protomodel.ProtoModel, quantifi
 	if err = visit(0); err != nil {
 		return false, err
 	}
-	if found && !hasInfinite && !restricted && *remaining != 0 {
+	if found && !restricted && *remaining != 0 {
 		// No restricted witness exists. Recover the entire complete witness
 		// from the candidate context, as in source check's complete_cex path.
 		_, err = c.addCounterexample(quantifier, complete)

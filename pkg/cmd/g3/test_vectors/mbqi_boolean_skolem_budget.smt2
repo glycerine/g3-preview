@@ -1,0 +1,6 @@
+(set-option :auto_config false)
+(set-option :smt.ematching false)
+(set-option :rlimit 50000)
+(set-logic ALL)
+(assert (forall ((b0 Bool) (b1 Bool) (b2 Bool) (b3 Bool) (b4 Bool) (b5 Bool) (b6 Bool) (b7 Bool) (b8 Bool) (b9 Bool) (b10 Bool) (b11 Bool) (b12 Bool) (b13 Bool) (b14 Bool) (b15 Bool) (b16 Bool) (b17 Bool) (b18 Bool) (b19 Bool) (b20 Bool) (b21 Bool)) (or (not b0) (not b1) (not b2) (not b3) (not b4) (not b5) (not b6) (not b7) (not b8) (not b9) (not b10) (not b11) (not b12) (not b13) (not b14) (not b15) (not b16) (not b17) (not b18) (not b19) (not b20) (not b21))))
+(check-sat-using smt)

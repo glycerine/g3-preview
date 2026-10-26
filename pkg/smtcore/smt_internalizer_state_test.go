@@ -1,11 +1,45 @@
 package smtcore
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+func TestSMTInternalizerNegatedReservedTruthLiterals(t *testing.T) {
+	for _, truth := range []bool{false, true} {
+		t.Run(fmt.Sprint(truth), func(t *testing.T) {
+			m := astTestManager(t)
+			_, _, state := smtInternalizerFixture(t, m, nil)
+			constant, err := m.MkFalse()
+			if truth {
+				constant, err = m.MkTrue()
+			}
+			astTestMust(t, err)
+			negated, err := m.MkNot(constant)
+			astTestMust(t, err)
+			ref, err := m.NewRef(negated)
+			astTestMust(t, err)
+			defer func() { astTestMust(t, m.DelRef(&ref)) }()
+			astTestMust(t, state.Internalize(negated, true))
+			literal, err := state.Literal(negated)
+			astTestMust(t, err)
+			want := SMTTrueLiteral
+			if truth {
+				want = SMTFalseLiteral
+			}
+			if literal != want {
+				t.Fatal("reserved negation literal", literal, want)
+			}
+			astTestMust(t, state.Assert(negated, ast.ASTHandle{}, 0))
+			if state.Inconsistent() != truth {
+				t.Fatal("reserved assertion conflict", state.Inconsistent(), truth)
+			}
+		})
+	}
+}
 
 func TestSMTInternalizerBooleanVariablesLiteralsAssignmentsAndScopes(t *testing.T) {
 	m := astTestManager(t)
