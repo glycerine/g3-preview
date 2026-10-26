@@ -2729,6 +2729,7 @@
         "theory_arith_nonlinear.go",
         "theory_arith_nonlinear_branch.go",
         "theory_arith_nonlinear_strategy.go",
+        "theory_arith_objective.go",
         "theory_arith_pending_bounds.go",
         "theory_arith_shared.go",
         "theory_arith_tableau.go",

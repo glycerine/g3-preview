@@ -127678,7 +127678,13 @@
         "pkg/smtcore/theory_arith_epsilon_test.go",
         "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2",
         "pkg/smtcore/theory_arith_candidate_test.go",
-        "pkg/cmd/g3/test_vectors/integer_fractional_candidate.smt2"
+        "pkg/cmd/g3/test_vectors/integer_fractional_candidate.smt2",
+        "pkg/smtcore/theory_arith_objective.go",
+        "pkg/smtcore/theory_arith_objective_test.go",
+        "pkg/smtcore/theory_arith_objective_reference_test.go",
+        "pkg/smtcore/test_vectors/arithmetic_objective_real.smt2",
+        "pkg/smtcore/test_vectors/arithmetic_objective_integer.smt2",
+        "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -127714,7 +127720,15 @@
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
         "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient",
         "TestSMTArithmeticSharedEpsilonPreservesDistinctValues",
-        "TestSMTArithmeticCandidateFloorsFractionalIntegers"
+        "TestSMTArithmeticCandidateFloorsFractionalIntegers",
+        "TestSMTArithmeticObjectiveBoundedAndStrict",
+        "TestSMTArithmeticObjectivePivotsDerivedBoundsAndPop",
+        "TestSMTArithmeticObjectiveUnboundedAndAtBound",
+        "TestSMTArithmeticObjectiveSharedAndNonlinearGuards",
+        "TestSMTArithmeticObjectiveBlockerIntegerCeilAndRealCast",
+        "TestSMTArithmeticObjectiveIntegerGainsAndCancellation",
+        "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
+        "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
       ],
       "conditionals": [
         {
@@ -127987,6 +128001,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Concrete theory_arith add_objective/value/maximize/mk_gt callbacks (theory_arith_aux.h:1040-1112; theory_arith.h:1080-1094; theory_opt.h:30-32), reached by opt_solver.cpp:229,343,362 and optsmt.cpp:474: internalize before nonlinear refusal, exact finite/infinitesimal/infinite objective values, native tableau integer-gain optimization, best-effort/at-bound/unbounded results, weighted scoped optimum bounds, sharing/nonlinear revalidation flags and sort-sensitive improvement blockers",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_objective.go",
+            "pkg/smtcore/theory_arith_objective_test.go",
+            "pkg/smtcore/theory_arith_objective_reference_test.go",
+            "pkg/smtcore/test_vectors/arithmetic_objective_real.smt2",
+            "pkg/smtcore/test_vectors/arithmetic_objective_integer.smt2",
+            "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2"
+          ],
+          "tests": [
+            "TestSMTArithmeticObjectiveBoundedAndStrict",
+            "TestSMTArithmeticObjectivePivotsDerivedBoundsAndPop",
+            "TestSMTArithmeticObjectiveUnboundedAndAtBound",
+            "TestSMTArithmeticObjectiveSharedAndNonlinearGuards",
+            "TestSMTArithmeticObjectiveBlockerIntegerCeilAndRealCast",
+            "TestSMTArithmeticObjectiveIntegerGainsAndCancellation",
+            "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
+            "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
+          ]
         }
       ],
       "ownership": [
@@ -127995,14 +128031,16 @@
         "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
         "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery.",
         "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving.",
-        "ModelValue applies the existing concrete exact-rational floor helper to its newly computed candidate rational before constructing the owning expression-wrapper procedure. No integer numeral constructor guard is weakened and no simplex assignment or solver status is changed. Actual arith.ignore_int searches plus C++ CLI comparisons exercise positive/negative half candidates and integral SAT recovery through scopes."
+        "ModelValue applies the existing concrete exact-rational floor helper to its newly computed candidate rational before constructing the owning expression-wrapper procedure. No integer numeral constructor guard is weakened and no simplex assignment or solver status is changed. Actual arith.ignore_int searches plus C++ CLI comparisons exercise positive/negative half candidates and integral SAT recovery through scopes.",
+        "The concrete arithmetic callbacks borrow the active theory/context/manager and feasible current tableau. Returned finite rational and epsilon components are copied from the tableau; positive infinity is the concrete unbounded maximization result. The returned blocker is a borrowed AST handle whose retaining caller must pin it. Optimum bounds retain existing weighted dependency records through pending/derived scope storage. Objective theory variables have existing scope lifetimes; popped/invalid variables and invalid sorts use the Go domain guard. No AST model cache, universal optimizer interface or duplicate tableau owner is introduced."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial.",
-        "Native internalize_numeral initializes exact bounds/value immediately and native linear definitions enter the live tableau. The Go replay now detects newly created columns and definitions even without Boolean arithmetic assertions. Counts describe the successfully replayed tableau; pop rebuilds and synchronizes them. A deterministic old-code regression exposed numeral7 becoming0 in a sequence model. Positive/negative/rational numerals, later constant definitions and repeated scopes now publish exact values; the Seq Int CLI model satisfies its asserted equality against C++. No model-output rewriting or numeral-only patch bypass is used."
+        "Native internalize_numeral initializes exact bounds/value immediately and native linear definitions enter the live tableau. The Go replay now detects newly created columns and definitions even without Boolean arithmetic assertions. Counts describe the successfully replayed tableau; pop rebuilds and synchronizes them. A deterministic old-code regression exposed numeral7 becoming0 in a sequence model. Positive/negative/rational numerals, later constant definitions and repeated scopes now publish exact values; the Seq Int CLI model satisfies its asserted equality against C++. No model-output rewriting or numeral-only patch bypass is used.",
+        "This bounded callback port follows the original theory_arith implementation, not the separate theory_lra LP specialization. Direct real SMT solver tests check optimum improvement blockers are UNSAT and pop restores SAT. Three prebuilt C++ optimization-shell scripts independently check the same strict epsilon coefficient, integer optimum, coupled rational optimum and scope recovery; these vectors are not registered as supported Go CLI maximize commands. Only lexical whitespace is canonicalized in the native output oracle. Whole arithmetic/optimization completion remains unproven."
       ]
     },
     {
@@ -128041,7 +128079,13 @@
         "pkg/smtcore/theory_arith_nonlinear_strategy.go",
         "pkg/smtcore/theory_arith_pending_bounds.go",
         "pkg/smtcore/theory_arith_pending_bounds_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/theory_arith_objective.go",
+        "pkg/smtcore/theory_arith_objective_test.go",
+        "pkg/smtcore/theory_arith_objective_reference_test.go",
+        "pkg/smtcore/test_vectors/arithmetic_objective_real.smt2",
+        "pkg/smtcore/test_vectors/arithmetic_objective_integer.smt2",
+        "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -128079,7 +128123,15 @@
         "TestArithmeticMaxMinExplanationPreservesStrictEndpoint",
         "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTArithmeticObjectiveBoundedAndStrict",
+        "TestSMTArithmeticObjectivePivotsDerivedBoundsAndPop",
+        "TestSMTArithmeticObjectiveUnboundedAndAtBound",
+        "TestSMTArithmeticObjectiveSharedAndNonlinearGuards",
+        "TestSMTArithmeticObjectiveBlockerIntegerCeilAndRealCast",
+        "TestSMTArithmeticObjectiveIntegerGainsAndCancellation",
+        "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
+        "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
       ],
       "conditionals": [
         {
@@ -128635,19 +128687,43 @@
             "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
             "TestSMTSharedOptimizationBoundsWaitForPropagationAndRewindScopes"
           ]
+        },
+        {
+          "name": "Concrete theory_arith add_objective/value/maximize/mk_gt callbacks (theory_arith_aux.h:1040-1112; theory_arith.h:1080-1094; theory_opt.h:30-32), reached by opt_solver.cpp:229,343,362 and optsmt.cpp:474: internalize before nonlinear refusal, exact finite/infinitesimal/infinite objective values, native tableau integer-gain optimization, best-effort/at-bound/unbounded results, weighted scoped optimum bounds, sharing/nonlinear revalidation flags and sort-sensitive improvement blockers",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_objective.go",
+            "pkg/smtcore/theory_arith_objective_test.go",
+            "pkg/smtcore/theory_arith_objective_reference_test.go",
+            "pkg/smtcore/test_vectors/arithmetic_objective_real.smt2",
+            "pkg/smtcore/test_vectors/arithmetic_objective_integer.smt2",
+            "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2"
+          ],
+          "tests": [
+            "TestSMTArithmeticObjectiveBoundedAndStrict",
+            "TestSMTArithmeticObjectivePivotsDerivedBoundsAndPop",
+            "TestSMTArithmeticObjectiveUnboundedAndAtBound",
+            "TestSMTArithmeticObjectiveSharedAndNonlinearGuards",
+            "TestSMTArithmeticObjectiveBlockerIntegerCeilAndRealCast",
+            "TestSMTArithmeticObjectiveIntegerGainsAndCancellation",
+            "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
+            "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
+          ]
         }
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
-        "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop."
+        "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop.",
+        "The concrete arithmetic callbacks borrow the active theory/context/manager and feasible current tableau. Returned finite rational and epsilon components are copied from the tableau; positive infinity is the concrete unbounded maximization result. The returned blocker is a borrowed AST handle whose retaining caller must pin it. Optimum bounds retain existing weighted dependency records through pending/derived scope storage. Objective theory variables have existing scope lifetimes; popped/invalid variables and invalid sorts use the Go domain guard. No AST model cache, universal optimizer interface or duplicate tableau owner is introduced."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
-        "The retained nonlinear max/min path uses a temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. Integer-column gain and sharing guards are retained. The maintain_integrality=true optimization-engine path remains unported; this is not a claim to complete optimization support.",
+        "The retained nonlinear max/min path and concrete arithmetic optimization callbacks use the same temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. The arithmetic callback now reaches the source maintain_integrality=true path over a feasible checked assignment, using existing integer-column gain guards and shared-column tracking. Higher opt_solver/optsmt orchestration, model-cache invalidation/revalidation and SMT-LIB optimization command integration remain unported; complete optimization support is not claimed.",
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
-        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial."
+        "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
+        "This bounded callback port follows the original theory_arith implementation, not the separate theory_lra LP specialization. Direct real SMT solver tests check optimum improvement blockers are UNSAT and pop restores SAT. Three prebuilt C++ optimization-shell scripts independently check the same strict epsilon coefficient, integer optimum, coupled rational optimum and scope recovery; these vectors are not registered as supported Go CLI maximize commands. Only lexical whitespace is canonicalized in the native output oracle. Whole arithmetic/optimization completion remains unproven."
       ]
     },
     {
@@ -137536,10 +137612,24 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/theory_opt.go"
+        "pkg/smtcore/theory_opt.go",
+        "pkg/smtcore/theory_arith_objective.go",
+        "pkg/smtcore/theory_arith_objective_test.go",
+        "pkg/smtcore/theory_arith_objective_reference_test.go",
+        "pkg/smtcore/test_vectors/arithmetic_objective_real.smt2",
+        "pkg/smtcore/test_vectors/arithmetic_objective_integer.smt2",
+        "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2"
       ],
       "tests": [
-        "TestSMTTheoryOptimizationLinearAndNumeralRecognition"
+        "TestSMTTheoryOptimizationLinearAndNumeralRecognition",
+        "TestSMTArithmeticObjectiveBoundedAndStrict",
+        "TestSMTArithmeticObjectivePivotsDerivedBoundsAndPop",
+        "TestSMTArithmeticObjectiveUnboundedAndAtBound",
+        "TestSMTArithmeticObjectiveSharedAndNonlinearGuards",
+        "TestSMTArithmeticObjectiveBlockerIntegerCeilAndRealCast",
+        "TestSMTArithmeticObjectiveIntegerGainsAndCancellation",
+        "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
+        "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
       ],
       "conditionals": [
         {
@@ -137567,13 +137657,37 @@
           "status": "reference_only",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "Concrete theory_arith add_objective/value/maximize/mk_gt callbacks (theory_arith_aux.h:1040-1112; theory_arith.h:1080-1094; theory_opt.h:30-32), reached by opt_solver.cpp:229,343,362 and optsmt.cpp:474: internalize before nonlinear refusal, exact finite/infinitesimal/infinite objective values, native tableau integer-gain optimization, best-effort/at-bound/unbounded results, weighted scoped optimum bounds, sharing/nonlinear revalidation flags and sort-sensitive improvement blockers",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_objective.go",
+            "pkg/smtcore/theory_arith_objective_test.go",
+            "pkg/smtcore/theory_arith_objective_reference_test.go",
+            "pkg/smtcore/test_vectors/arithmetic_objective_real.smt2",
+            "pkg/smtcore/test_vectors/arithmetic_objective_integer.smt2",
+            "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2"
+          ],
+          "tests": [
+            "TestSMTArithmeticObjectiveBoundedAndStrict",
+            "TestSMTArithmeticObjectivePivotsDerivedBoundsAndPop",
+            "TestSMTArithmeticObjectiveUnboundedAndAtBound",
+            "TestSMTArithmeticObjectiveSharedAndNonlinearGuards",
+            "TestSMTArithmeticObjectiveBlockerIntegerCeilAndRealCast",
+            "TestSMTArithmeticObjectiveIntegerGainsAndCancellation",
+            "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
+            "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
+          ]
         }
       ],
       "ownership": [
-        "The helper borrows expressions; its Go work stack and visited map are call-local owners."
+        "The helper borrows expressions; its Go work stack and visited map are call-local owners.",
+        "The concrete arithmetic callbacks borrow the active theory/context/manager and feasible current tableau. Returned finite rational and epsilon components are copied from the tableau; positive infinity is the concrete unbounded maximization result. The returned blocker is a borrowed AST handle whose retaining caller must pin it. Optimum bounds retain existing weighted dependency records through pending/derived scope storage. Objective theory variables have existing scope lifetimes; popped/invalid variables and invalid sorts use the Go domain guard. No AST model cache, universal optimizer interface or duplicate tableau owner is introduced."
       ],
       "deviations": [
-        "The abstract value, maximize and add_objective declarations have no retained Go consumer. Per the retained-instantiation rule, no speculative universal optimizer interface is added."
+        "The abstract virtual declarations remain represented by concrete SMTLinearArithmeticTheory callbacks for the live theory_arith specialization. Retained C++ opt_solver/optsmt consumers are explicitly audited; the higher Go optimization shell and its update_model(has_shared) revalidation remain open. No unused universal Go optimizer interface is added.",
+        "This bounded callback port follows the original theory_arith implementation, not the separate theory_lra LP specialization. Direct real SMT solver tests check optimum improvement blockers are UNSAT and pop restores SAT. Three prebuilt C++ optimization-shell scripts independently check the same strict epsilon coefficient, integer optimum, coupled rational optimum and scope recovery; these vectors are not registered as supported Go CLI maximize commands. Only lexical whitespace is canonicalized in the native output oracle. Whole arithmetic/optimization completion remains unproven."
       ]
     },
     {
