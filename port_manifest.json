@@ -137332,8 +137332,9 @@
         "pkg/smtcore/theory_seq_noncontains_test.go",
         "pkg/cmd/g3/test_vectors/pending_seq_negative_contains_canonize_scopes.smt2",
         "pkg/cmd/g3/test_vectors/pending_seq_negative_contains_canonize_scopes.expected_cpp",
-        "pkg/cmd/g3/test_vectors/pending_seq_negative_symbolic_mixed.smt2",
-        "pkg/cmd/g3/test_vectors/pending_seq_negative_symbolic_mixed.expected_cpp"
+        "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.smt2",
+        "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.expected_cpp",
+        "pkg/smtcore/theory_seq_empty_solution_test.go"
       ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
@@ -137435,7 +137436,8 @@
         "TestSMTSequenceNonContainsCanonicalConstantsSkipQueue",
         "TestSMTSequenceNonContainsCanonicalSolutionEvidenceAndRollback",
         "TestSMTSequenceNonContainsUnresolvedQueuePreventsDone",
-        "TestSMTSequenceCanonicalConditionalScope"
+        "TestSMTSequenceCanonicalConditionalScope",
+        "TestSMTSequenceEmptyWordSolutionsSurviveSuppressedCallback"
       ],
       "conditionals": [
         {
@@ -138608,6 +138610,20 @@
             "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches",
             "TestSMTSequenceNonContainsCanonicalSolutionEvidenceAndRollback"
           ]
+        },
+        {
+          "name": "simplify_eq/solve_unit_eq: singleton variable equals empty records its scoped solution before theory equality propagation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_solve.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_empty_solution_test.go",
+            "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceEmptyWordSolutionsSurviveSuppressedCallback",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -138619,7 +138635,8 @@
         "Sequence equality assumptions own the original equality and a separate rewritten result through ASTRef, so rewriting cannot retire arguments before enode adoption. Prefix candidates retain temporary refs through conflict reconstruction. The sequence theory lazily owns its private default TheoryRewriter plus parameter context/catalog/global service and closes them in reverse order; the kernel preprocessor with assertion substitutions is not borrowed.",
         "Prefix cursors contain only equation IDs and offsets; their integer erase trails follow native pop_branch scope removal. Canonical residual replacements receive fresh monotonic equation IDs while owning their AST vectors through the existing scoped queue. Candidate expressions retain temporary ASTRef roots through equality rewriting and exhaustion conflict reconstruction.",
         "The scoped length set owns one ASTRef per registered sequence expression; equality-class expansion and relevant length callbacks deduplicate registrations, and child pop releases only child entries. Length applications retain their existing core and arithmetic owners without acquiring sequence theory variables. Boolean relation atoms retain assignment callback ownership without sequence theory-variable attachments.",
-        "Canonical sequence expansion retains every rebuilt child until its parent adopts it, returns an owned result through private theory rewriting, and carries scoped solution and conditional literal/enode premises. Negative-containment records retain ASTRefs through canonical replacement/disjunction splitting; swap removal releases only the retired record, while scope snapshots keep parent expressions and dependencies alive. No persistent expansion cache can reuse a popped conditional decision."
+        "Canonical sequence expansion retains every rebuilt child until its parent adopts it, returns an owned result through private theory rewriting, and carries scoped solution and conditional literal/enode premises. Negative-containment records retain ASTRefs through canonical replacement/disjunction splitting; swap removal releases only the retired record, while scope snapshots keep parent expressions and dependencies alive. No persistent expansion cache can reuse a popped conditional decision.",
+        "Empty-side word solving records each variable-to-empty solution with the original dependency before propagating the equality. The core intentionally suppresses callbacks to the originating theory. Repeated scope-pop tests require both the solution entry and core equality to roll back; already-merged equalities still retain the solution-map update."
       ],
       "deviations": [
         "Concrete Go maps replace obj_map and pair hash tables. Dependency joins use an immutable concrete assumption DAG and iterative stable linearization rather than the native scoped_dependency_manager template.",
@@ -138639,7 +138656,7 @@
         "Audited native assign_eh compile guards: the active false-prefix path is add_prefix2prefix (#if 0 disables propagate_not_prefix), and the active false-suffix path is propagate_not_suffix (#if 1 disables the recursive first/last alternative). Removed the inactive prefix-mismatch adapter and recursive suffix helper. Prefix tail predicates are now exposed only after nonempty-container and equal-head decisions, with available empty/mismatch phases, guarded continuation and repeated final-check retries. Actual phase/relevance activation counts as search work, while unchanged retries do not. Positive relation witnesses are created only on true assignment; false assignment never exposes them. An old test that assumed implicit first/last suffix axioms was replaced with a retained-path absence/satisfiability check, the witness fixture now covers only the active suffix variant, and internal length fixtures explicitly demand lengths. Earlier combined method credits are corrected to partial where they included inactive/general canonization paths. Go non-containment boundary/tail compatibility consequences remain, while the source active canonizes/solve_nc audit is still open.",
         "Connected the active native negative-containment queue reducer: constants retire, changed canonical formulas replace records, negative equalities propagate with theory explanations, disjunctions split and swap-replaced slots are revisited. A pending queue now prevents is_solved/Done, replacing the former concrete-string-only check. Canonicalization expands the retained structural relation/concat/unit/index operands, source ITE decision/egraph branches and guarded nonnegative integer conversions before the private substitution-free rewriter. Native persistent expansion-cache/replay bookkeeping and broader source integration remain partial. Equation simplification now runs before negative-containment reduction, and a genuinely new solution-map insertion counts as kernel work even if its enodes were already merged. Existing Go compatibility boundary/tail consequences are still present: removing them exposed unknown results in existing satisfiable and implicit-tail fixtures; they are not newly credited as native assign_eh behavior.",
         "Saved pending_seq_negative_contains_canonize_scopes.smt2 with exact clean-exit prebuilt C++ output. Its constrained concat/prefix/numeral scopes and model invariants agree, but C++ ALL/theory_seq returns unknown in the two unconstrained outer scopes while Go compatibility search returns sat. This known differential remains pending, unregistered and uncredited as passing. Source setup_QF_S selects unported theory_str, whereas Go currently routes QF_S through SMTSequenceTheory; the QF_S native sat observation cannot establish theory_seq behavior. The routing gap and full removal of the compatibility path remain open.",
-        "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. No new sequence algorithm credit is added. A genuine generic mixed-arithmetic gap is preserved in pending_seq_negative_symbolic_mixed.smt2: ALL/auto_config=false exits cleanly as sat in C++ and unknown in Go. Adjacent expected_cpp and /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json retain exact output/commands; the pending case is unregistered with no passing credit. Earlier ALL negative-containment parity also remains pending; source units stay partial."
+        "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. No new sequence algorithm credit is added. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Earlier ALL negative-containment parity remains pending; source units stay partial."
       ]
     },
     {
@@ -138693,8 +138710,9 @@
         "pkg/smtcore/theory_seq_noncontains_test.go",
         "pkg/cmd/g3/test_vectors/pending_seq_negative_contains_canonize_scopes.smt2",
         "pkg/cmd/g3/test_vectors/pending_seq_negative_contains_canonize_scopes.expected_cpp",
-        "pkg/cmd/g3/test_vectors/pending_seq_negative_symbolic_mixed.smt2",
-        "pkg/cmd/g3/test_vectors/pending_seq_negative_symbolic_mixed.expected_cpp"
+        "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.smt2",
+        "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.expected_cpp",
+        "pkg/smtcore/theory_seq_empty_solution_test.go"
       ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
@@ -138753,7 +138771,8 @@
         "TestSMTSequenceNonContainsCanonicalConstantsSkipQueue",
         "TestSMTSequenceNonContainsCanonicalSolutionEvidenceAndRollback",
         "TestSMTSequenceNonContainsUnresolvedQueuePreventsDone",
-        "TestSMTSequenceCanonicalConditionalScope"
+        "TestSMTSequenceCanonicalConditionalScope",
+        "TestSMTSequenceEmptyWordSolutionsSurviveSuppressedCallback"
       ],
       "conditionals": [
         {
@@ -139315,6 +139334,20 @@
             "TestSMTSequenceTheoryNonContainsExcludesBoundaryMatches",
             "TestSMTSequenceNonContainsCanonicalSolutionEvidenceAndRollback"
           ]
+        },
+        {
+          "name": "simplify_eq/solve_unit_eq: singleton variable equals empty records its scoped solution before theory equality propagation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_seq_solve.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_empty_solution_test.go",
+            "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceEmptyWordSolutionsSurviveSuppressedCallback",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -139325,7 +139358,8 @@
         "Sequence equality assumptions own the original equality and a separate rewritten result through ASTRef, so rewriting cannot retire arguments before enode adoption. Prefix candidates retain temporary refs through conflict reconstruction. The sequence theory lazily owns its private default TheoryRewriter plus parameter context/catalog/global service and closes them in reverse order; the kernel preprocessor with assertion substitutions is not borrowed.",
         "Prefix cursors contain only equation IDs and offsets; their integer erase trails follow native pop_branch scope removal. Canonical residual replacements receive fresh monotonic equation IDs while owning their AST vectors through the existing scoped queue. Candidate expressions retain temporary ASTRef roots through equality rewriting and exhaustion conflict reconstruction.",
         "The scoped length set owns one ASTRef per registered sequence expression; equality-class expansion and relevant length callbacks deduplicate registrations, and child pop releases only child entries. Length applications retain their existing core and arithmetic owners without acquiring sequence theory variables. Boolean relation atoms retain assignment callback ownership without sequence theory-variable attachments.",
-        "Canonical sequence expansion retains every rebuilt child until its parent adopts it, returns an owned result through private theory rewriting, and carries scoped solution and conditional literal/enode premises. Negative-containment records retain ASTRefs through canonical replacement/disjunction splitting; swap removal releases only the retired record, while scope snapshots keep parent expressions and dependencies alive. No persistent expansion cache can reuse a popped conditional decision."
+        "Canonical sequence expansion retains every rebuilt child until its parent adopts it, returns an owned result through private theory rewriting, and carries scoped solution and conditional literal/enode premises. Negative-containment records retain ASTRefs through canonical replacement/disjunction splitting; swap removal releases only the retired record, while scope snapshots keep parent expressions and dependencies alive. No persistent expansion cache can reuse a popped conditional decision.",
+        "Empty-side word solving records each variable-to-empty solution with the original dependency before propagating the equality. The core intentionally suppresses callbacks to the originating theory. Repeated scope-pop tests require both the solution entry and core equality to roll back; already-merged equalities still retain the solution-map update."
       ],
       "deviations": [
         "Go slices and maps replace scoped native vectors and hash tables; source-private templates are represented only for the live sequence instantiation.",
@@ -139342,7 +139376,7 @@
         "Audited native assign_eh compile guards: the active false-prefix path is add_prefix2prefix (#if 0 disables propagate_not_prefix), and the active false-suffix path is propagate_not_suffix (#if 1 disables the recursive first/last alternative). Removed the inactive prefix-mismatch adapter and recursive suffix helper. Prefix tail predicates are now exposed only after nonempty-container and equal-head decisions, with available empty/mismatch phases, guarded continuation and repeated final-check retries. Actual phase/relevance activation counts as search work, while unchanged retries do not. Positive relation witnesses are created only on true assignment; false assignment never exposes them. An old test that assumed implicit first/last suffix axioms was replaced with a retained-path absence/satisfiability check, the witness fixture now covers only the active suffix variant, and internal length fixtures explicitly demand lengths. Earlier combined method credits are corrected to partial where they included inactive/general canonization paths. Go non-containment boundary/tail compatibility consequences remain, while the source active canonizes/solve_nc audit is still open.",
         "Connected the active native negative-containment queue reducer: constants retire, changed canonical formulas replace records, negative equalities propagate with theory explanations, disjunctions split and swap-replaced slots are revisited. A pending queue now prevents is_solved/Done, replacing the former concrete-string-only check. Canonicalization expands the retained structural relation/concat/unit/index operands, source ITE decision/egraph branches and guarded nonnegative integer conversions before the private substitution-free rewriter. Native persistent expansion-cache/replay bookkeeping and broader source integration remain partial. Equation simplification now runs before negative-containment reduction, and a genuinely new solution-map insertion counts as kernel work even if its enodes were already merged. Existing Go compatibility boundary/tail consequences are still present: removing them exposed unknown results in existing satisfiable and implicit-tail fixtures; they are not newly credited as native assign_eh behavior.",
         "Saved pending_seq_negative_contains_canonize_scopes.smt2 with exact clean-exit prebuilt C++ output. Its constrained concat/prefix/numeral scopes and model invariants agree, but C++ ALL/theory_seq returns unknown in the two unconstrained outer scopes while Go compatibility search returns sat. This known differential remains pending, unregistered and uncredited as passing. Source setup_QF_S selects unported theory_str, whereas Go currently routes QF_S through SMTSequenceTheory; the QF_S native sat observation cannot establish theory_seq behavior. The routing gap and full removal of the compatibility path remain open.",
-        "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. No new sequence algorithm credit is added. A genuine generic mixed-arithmetic gap is preserved in pending_seq_negative_symbolic_mixed.smt2: ALL/auto_config=false exits cleanly as sat in C++ and unknown in Go. Adjacent expected_cpp and /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json retain exact output/commands; the pending case is unregistered with no passing credit. Earlier ALL negative-containment parity also remains pending; source units stay partial."
+        "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. No new sequence algorithm credit is added. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Earlier ALL negative-containment parity remains pending; source units stay partial."
       ]
     },
     {

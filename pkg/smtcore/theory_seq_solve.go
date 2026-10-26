@@ -689,9 +689,18 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 				if makeErr != nil {
 					return false, makeErr
 				}
-				changed, makeErr := t.propagateWordEquality(part, empty, dependency)
+				// Like simplify_eq/solve_unit_eq, record a sequence variable's
+				// solution before propagating its equality. The core suppresses
+				// equality callbacks to the originating theory.
+				changed, makeErr := t.solveUnitWord([]ast.ASTHandle{part}, nil, dependency)
 				if makeErr != nil {
 					return false, makeErr
+				}
+				if !changed {
+					changed, makeErr = t.propagateWordEquality(part, empty, dependency)
+					if makeErr != nil {
+						return false, makeErr
+					}
 				}
 				progress = progress || changed
 				if state.Inconsistent() {
