@@ -9,8 +9,9 @@ import (
 )
 
 type smtStringTesterState struct {
-	lengthIndicators map[ast.ASTHandle][]ast.ASTHandle
-	lengthLiterals   map[int32]ast.ASTHandle
+	lengthID, valueID int32
+	lengthIndicators  map[ast.ASTHandle][]ast.ASTHandle
+	lengthLiterals    map[int32]ast.ASTHandle
 }
 
 func newStringTesterState() smtStringTesterState {
