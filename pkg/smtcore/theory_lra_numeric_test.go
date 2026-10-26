@@ -1,6 +1,7 @@
 package smtcore
 
 import (
+	"errors"
 	"fmt"
 	"math/big"
 	"testing"
@@ -8,8 +9,80 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/lp"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func TestSMTLRANumericFixedBoundQueryRefusalCleanup(t *testing.T) {
+	refusals, successes := 0, 0
+	for _, allowance := range []int64{-1, 0, 1, 2, 5, 12, 32} {
+		t.Run(fmt.Sprint(allowance), func(t *testing.T) {
+			budget := arena.NewBudget(8 << 20)
+			m, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: numeral.IntegerConfig{
+				Cells: arena.Config{PageSize: 4, Budget: budget}, Words: arena.VectorConfig{PageSize: 32, Descriptors: arena.Config{PageSize: 4, Budget: budget}},
+			}, Synchronized: true})
+			astTestMust(t, err)
+			s, err := newSMTLRANumeric(m, smtLRANumericConfig{strategy: lp.StrategyTableauRows})
+			astTestMust(t, err)
+			var padding []numeral.Rational
+			t.Cleanup(func() {
+				budget.FailAfter(-1)
+				astTestMust(t, s.Close())
+				for i := range padding {
+					astTestMust(t, m.Del(&padding[i]))
+				}
+				lraNumericManagerCensus(t, m)
+				astTestMust(t, m.CloseChecked())
+				if budget.Used() != 0 {
+					t.Fatal("fixed query retained private budget", budget.Used())
+				}
+			})
+			ten := new(big.Int).Exp(big.NewInt(10), big.NewInt(300), nil)
+			value := new(big.Rat).SetFrac(new(big.Int).Add(ten, big.NewInt(13)), new(big.Int).Add(new(big.Int).Quo(ten, big.NewInt(10)), big.NewInt(7)))
+			ci, err := s.assertBound(0, 101, value, false, true)
+			astTestMust(t, err)
+			index, _ := s.index(0)
+			for i := 0; i < 64; i++ {
+				stats := m.Z.Cells.Stats()
+				if stats.Slots-stats.Live-stats.Retired <= 1 {
+					break
+				}
+				v := numeral.NewRational()
+				astTestMust(t, m.SetInt64(&v, 1<<60))
+				padding = append(padding, v)
+			}
+			stats := m.Z.Cells.Stats()
+			if stats.Slots-stats.Live-stats.Retired > 1 {
+				t.Fatal("failed to reach cold numeric copy frontier", stats)
+			}
+			budget.FailAfter(allowance)
+			witness, found, err := s.hasRationalBound(index, true, value)
+			budget.FailAfter(-1)
+			if err != nil {
+				var failure umemory.Failure
+				memout := errors.As(err, &failure) && failure.Kind == umemory.FailureMemout && failure.ErrorCode() == 101 && allowance >= 0 && budget.Used() < budget.Limit()
+				if !errors.Is(err, arena.ErrInjectedFailure) && !memout {
+					t.Fatal(err)
+				}
+				refusals++
+				if len(s.pending) == 0 {
+					t.Fatal("refused bound output lost its owner")
+				}
+				if _, _, next := s.hasRationalBound(index, true, value); next != lp.ErrExactVectorPending {
+					t.Fatal("stopped bound query was reused", next)
+				}
+			} else {
+				successes++
+				if !found || witness != ci {
+					t.Fatal("fixed bound query lost exact value or witness", found, witness, ci)
+				}
+			}
+		})
+	}
+	if refusals == 0 || successes == 0 {
+		t.Fatal("fixed query samples require refusal and success", refusals, successes)
+	}
+}
 
 func lraNumericFixture(t *testing.T, strategy lp.SimplexStrategy) *smtLRANumeric {
 	t.Helper()

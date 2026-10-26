@@ -272,6 +272,31 @@ func (s *smtLRANumeric) makeFeasible() (lbool.LBool, error) {
 	}
 }
 
+// Source has_bound queries proper columns through LAR; terms have their own
+// frontend directory. A refused output copy stays owned until LAR closes.
+func (s *smtLRANumeric) hasRationalBound(index uint32, lower bool, expected *big.Rat) (witness uint32, found bool, err error) {
+	if err = s.ready(); err != nil {
+		return smtLRANoIndex, false, err
+	}
+	values := []numeral.Rational{numeral.NewRational()}
+	defer func() { err = s.finish(values, err) }()
+	strict := false
+	witness = smtLRANoIndex
+	if lower {
+		found, err = s.solver.HasLowerBound(index, &witness, &values[0], &strict)
+	} else {
+		found, err = s.solver.HasUpperBound(index, &witness, &values[0], &strict)
+	}
+	if err != nil || !found || strict {
+		return witness, false, err
+	}
+	value, err := s.rational(&values[0])
+	if err != nil {
+		return witness, false, err
+	}
+	return witness, value.Cmp(expected) == 0, nil
+}
+
 func (s *smtLRANumeric) rational(value *numeral.Rational) (*big.Rat, error) {
 	text, err := s.manager.String(value)
 	if err != nil {

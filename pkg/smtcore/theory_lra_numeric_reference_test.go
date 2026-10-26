@@ -137,3 +137,39 @@ func TestSMTLRALPPropagationNativeOracle(t *testing.T) {
 		t.Fatal("native row propagation oracle", text, "want", expected)
 	}
 }
+
+func TestSMTLRAFixedEqualityNativeOracle(t *testing.T) {
+	reference := os.Getenv("G3_CPP_REFERENCE")
+	if reference == "" {
+		t.Skip("G3_CPP_REFERENCE is not set")
+	}
+	script, err := os.ReadFile("test_vectors/lra_fixed_equality.smt2")
+	astTestMust(t, err)
+	cmd := exec.Command(reference, "-in")
+	cmd.Stdin = bytes.NewReader(script)
+	var out, diagnostics bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &out, &diagnostics
+	if err = cmd.Run(); err != nil || diagnostics.Len() != 0 {
+		t.Fatal(err, out.String(), diagnostics.String())
+	}
+	text := out.String()
+	start := strings.Index(text, "(:")
+	if start < 0 {
+		t.Fatal("missing fixed-equality statistics", text)
+	}
+	end := strings.IndexByte(text[start:], ')')
+	if end < 0 {
+		t.Fatal("unterminated fixed-equality statistics", text)
+	}
+	end += start + 1
+	if !regexp.MustCompile(`:arith-fixed-eqs\s+[1-9][0-9]*`).MatchString(text[start:end]) {
+		t.Fatal("C++ did not exercise LRA fixed-equality propagation", text)
+	}
+	text = text[:start] + text[end:]
+	spaces := strings.NewReplacer("(", " ( ", ")", " ) ")
+	canonical := func(s string) string { return strings.Join(strings.Fields(spaces.Replace(s)), " ") }
+	expected := "unsat sat (((= x y) true) ((= (f x) (f y)) true))"
+	if canonical(text) != canonical(expected) {
+		t.Fatal("native fixed-equality/congruence oracle", text, "want", expected)
+	}
+}

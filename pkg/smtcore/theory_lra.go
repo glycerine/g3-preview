@@ -25,6 +25,7 @@ type smtLRAAssignment struct {
 
 type smtLRAFrontendScope struct {
 	bounds, assignments, head, underspecified int
+	termBounds                                int
 	unassigned                                []uint32
 	notHandled                                ast.ASTHandle
 }
@@ -50,6 +51,10 @@ type SMTLRATheory struct {
 	propagator                        *lp.LARBoundPropagator
 	basicPropagations, lpPropagations uint64
 	conflictCount                     uint32
+	lowerTerms, upperTerms            []smtLRAConstraintBound
+	termBoundTrail                    []smtLRATermBoundChange
+	fixedVariables                    map[smtLRAFixedKey]SMTTheoryVar
+	fixedEqualities                   uint64
 	unassigned                        []uint32
 	assignments                       []smtLRAAssignment
 	assignmentHead                    int
@@ -69,6 +74,7 @@ func NewSMTLRATheory(family ast.FamilyID) (*SMTLRATheory, error) {
 	t := &SMTLRATheory{SMTTheoryBase: base,
 		config:         SMTArithState{Reflect: true, BoundProp: 2, PropagateEqs: true, SmallLemmaSize: 16, PropagationThreshold: ^uint32(0)},
 		boundByBoolean: make(map[int32]*smtLRABound)}
+	t.fixedVariables = make(map[smtLRAFixedKey]SMTTheoryVar)
 	t.equalityAdapter = newSMTLRAEqualityAdapter(t)
 	return t, nil
 }
@@ -419,6 +425,17 @@ func (t *SMTLRATheory) internalizeDef(term ast.ASTHandle) (SMTTheoryVar, error) 
 		coefficients[i].value.Set(&st.coefficients[i])
 	}
 	_, err = t.numeric.addTerm(v, coefficients, &st.constant)
+	if err == nil {
+		if value, number, e := t.numeral(term); e != nil {
+			return v, e
+		} else if number {
+			key, e := t.fixedKey(v, value)
+			if e != nil {
+				return v, e
+			}
+			t.fixedVariables[key] = v
+		}
+	}
 	return v, err
 }
 
@@ -577,7 +594,12 @@ func (t *SMTLRATheory) Propagate() error {
 			return ast.ErrASTDomain
 		}
 		t.boundChecks = append(t.boundChecks, a.boolean)
-		if _, err := t.numeric.assertBound(b.variable, a.boolean, &b.value, b.upper, a.truth); err != nil {
+		ci, err := t.numeric.assertBound(b.variable, a.boolean, &b.value, b.upper, a.truth)
+		if err != nil {
+			return err
+		}
+		if err = t.propagateFixedBounds(b, ci, a.truth); err != nil {
+			t.numeric.stopped = true
 			return err
 		}
 		t.assignmentHead++
@@ -616,7 +638,7 @@ func (t *SMTLRATheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
-	t.scopes = append(t.scopes, smtLRAFrontendScope{bounds: len(t.boundTrail), assignments: len(t.assignments), head: t.assignmentHead, underspecified: len(t.underspecified), notHandled: t.notHandled, unassigned: append([]uint32(nil), t.unassigned...)})
+	t.scopes = append(t.scopes, smtLRAFrontendScope{bounds: len(t.boundTrail), assignments: len(t.assignments), head: t.assignmentHead, underspecified: len(t.underspecified), termBounds: len(t.termBoundTrail), notHandled: t.notHandled, unassigned: append([]uint32(nil), t.unassigned...)})
 	if err := t.equalityAdapter.PushScope(); err != nil {
 		return err
 	}
@@ -652,6 +674,16 @@ func (t *SMTLRATheory) PopScopes(n uint32) error {
 	t.scopes = t.scopes[:level]
 	t.newBounds = nil // Native user-push contract flushes pending parent axioms first.
 	t.boundChecks = nil
+	for len(t.termBoundTrail) > scope.termBounds {
+		i := len(t.termBoundTrail) - 1
+		entry := t.termBoundTrail[i]
+		bounds := t.upperTerms
+		if entry.lower {
+			bounds = t.lowerTerms
+		}
+		bounds[entry.index] = entry.previous
+		t.termBoundTrail = t.termBoundTrail[:i]
+	}
 	if err := t.numeric.pop(n); err != nil {
 		return err
 	}
@@ -700,6 +732,10 @@ func (t *SMTLRATheory) Close() error {
 	t.boundTrail = nil
 	t.newBounds = nil
 	t.boundChecks = nil
+	t.lowerTerms = nil
+	t.upperTerms = nil
+	t.termBoundTrail = nil
+	t.fixedVariables = nil
 	t.unassigned = nil
 	t.assignments = nil
 	t.scopes = nil
