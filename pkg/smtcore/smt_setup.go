@@ -119,7 +119,7 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 		if err != nil {
 			return err
 		}
-		if logic == "QF_RDL" && kernel.smtState.AutoConfig {
+		if logic == "QF_S" || logic == "QF_RDL" && kernel.smtState.AutoConfig {
 			theory, theoryErr := NewSMTMixedLinearArithmeticTheory(family)
 			if theoryErr != nil {
 				return theoryErr
@@ -222,12 +222,28 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 		if err != nil {
 			return err
 		}
-		theory, theoryErr := NewSMTSequenceTheory(family)
-		if theoryErr != nil {
-			return theoryErr
-		}
-		if err = kernel.RegisterTheory(theory); err != nil {
-			return err
+		if logic == "QF_S" && kernel.smtState.AutoConfig {
+			// Native setup_QF_S installs theory_str unconditionally, even
+			// when the generic string_solver setting requests seq/auto.
+			// Disabled auto_config uses CFG_BASIC's generic sequence path.
+			if kernel.smtParams == nil {
+				return ast.ErrASTDomain
+			}
+			theory, theoryErr := NewSMTStringTheory(family, &kernel.smtParams.str)
+			if theoryErr != nil {
+				return theoryErr
+			}
+			if err = kernel.RegisterTheory(theory); err != nil {
+				return err
+			}
+		} else {
+			theory, theoryErr := NewSMTSequenceTheory(family)
+			if theoryErr != nil {
+				return theoryErr
+			}
+			if err = kernel.RegisterTheory(theory); err != nil {
+				return err
+			}
 		}
 	}
 	if smtLogicUsesDatatypes(logic) {

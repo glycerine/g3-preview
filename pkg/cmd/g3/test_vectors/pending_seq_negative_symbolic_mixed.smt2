@@ -1,0 +1,6 @@
+(set-logic ALL)
+(set-option :auto_config false)
+(declare-const c (_ BitVec 8))
+(declare-const x (Seq (_ BitVec 8)))
+(assert (not (seq.in.re x (re.* (seq.to.re (seq.unit c))))))
+(check-sat)
