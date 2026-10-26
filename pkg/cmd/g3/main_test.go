@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"integer_fractional_candidate.smt2":            "unknown\n((x 0)\n (y 0))\nunknown\n((x (- 1))\n (y (- 1)))\nsat\n((x 1)\n (y 1))\n",
 	"real_interval_epsilon.smt2":                   "sat\n((x (/ 1.0 2.0)))\nsat\n((x (/ 1.0 4.0)))\nunsat\nsat\n((x (/ 1.0 4.0)))\nsat\n((x (/ 1.0 2.0)))\n",
 	"incomplete_theory_candidate_model.smt2":       "unknown\n(((f a) true)\n ((f b) false)\n ((f 1.0) false))\nunsat\nunknown\n(((f a) true)\n ((f b) false)\n ((f 1.0) false))\n",
 	"global_option_success_updates.smt2":           "success\nsuccess\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsat\n",

@@ -1991,6 +1991,11 @@ func (t *SMTLinearArithmeticTheory) ModelValue(node *SMTEnode, generator *SMTMod
 	if err != nil {
 		return nil, err
 	}
+	// Native mk_value floors fractional Int candidates when incomplete
+	// arithmetic (including arith.ignore_int) leaves a nonintegral assignment.
+	if kind == 1 && !rational.IsInt() {
+		rational.SetInt(smtRatFloor(rational))
+	}
 	numeral, err := state.manager.ArithmeticNumeralRat(rational, kind == 1)
 	if err != nil {
 		return nil, err

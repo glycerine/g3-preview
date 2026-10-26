@@ -126967,7 +126967,9 @@
         "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
         "pkg/smtcore/theory_arith_epsilon.go",
         "pkg/smtcore/theory_arith_epsilon_test.go",
-        "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2"
+        "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2",
+        "pkg/smtcore/theory_arith_candidate_test.go",
+        "pkg/cmd/g3/test_vectors/integer_fractional_candidate.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -127002,7 +127004,8 @@
         "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
         "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient",
-        "TestSMTArithmeticSharedEpsilonPreservesDistinctValues"
+        "TestSMTArithmeticSharedEpsilonPreservesDistinctValues",
+        "TestSMTArithmeticCandidateFloorsFractionalIntegers"
       ],
       "conditionals": [
         {
@@ -127258,6 +127261,23 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_value fractional integer candidate truncation (theory_arith_core.h:3259-3276): floor nonintegral Int model values left by incomplete arithmetic before integer numeral creation; preserve Real rationals and already-integral assignments, including negative floor semantics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_bounds.go",
+            "pkg/smtcore/theory_arith_candidate_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/integer_fractional_candidate.smt2"
+          ],
+          "tests": [
+            "TestSMTArithmeticCandidateFloorsFractionalIntegers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -127265,7 +127285,8 @@
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
         "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
         "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery.",
-        "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving."
+        "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving.",
+        "ModelValue applies the existing concrete exact-rational floor helper to its newly computed candidate rational before constructing the owning expression-wrapper procedure. No integer numeral constructor guard is weakened and no simplex assignment or solver status is changed. Actual arith.ignore_int searches plus C++ CLI comparisons exercise positive/negative half candidates and integral SAT recovery through scopes."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
@@ -127985,7 +128006,10 @@
         "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
         "pkg/smtcore/smt_model_incomplete_test.go",
         "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
-        "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2"
+        "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2",
+        "pkg/smtcore/theory_arith_bounds.go",
+        "pkg/smtcore/theory_arith_candidate_test.go",
+        "pkg/cmd/g3/test_vectors/integer_fractional_candidate.smt2"
       ],
       "tests": [
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
@@ -128045,7 +128069,8 @@
         "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints",
         "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
-        "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient"
+        "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient",
+        "TestSMTArithmeticCandidateFloorsFractionalIntegers"
       ],
       "conditionals": [
         {
@@ -129137,6 +129162,23 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_value fractional integer candidate truncation (theory_arith_core.h:3259-3276): floor nonintegral Int model values left by incomplete arithmetic before integer numeral creation; preserve Real rationals and already-integral assignments, including negative floor semantics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_bounds.go",
+            "pkg/smtcore/theory_arith_candidate_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/integer_fractional_candidate.smt2"
+          ],
+          "tests": [
+            "TestSMTArithmeticCandidateFloorsFractionalIntegers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -129148,7 +129190,8 @@
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
         "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
         "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery.",
-        "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving."
+        "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving.",
+        "ModelValue applies the existing concrete exact-rational floor helper to its newly computed candidate rational before constructing the owning expression-wrapper procedure. No integer numeral constructor guard is weakened and no simplex assignment or solver status is changed. Actual arith.ignore_int searches plus C++ CLI comparisons exercise positive/negative half candidates and integral SAT recovery through scopes."
       ],
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
