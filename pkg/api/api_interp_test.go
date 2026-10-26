@@ -261,15 +261,12 @@ func TestInterpolationContextErrorsAndIsolation(t *testing.T) {
 	if !errors.Is(err, ErrInterpolationUnknown) {
 		t.Fatal("UNKNOWN", err)
 	}
-	copyContext := *f.c
-	if _, err := copyContext.MkInterpolant(p); err == nil {
-		t.Fatal("accepted copied context")
-	}
 	c, err := NewInterpolationContext()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err = c.Close(); err != nil {
+	copyContext := *c
+	if err = copyContext.Close(); err != nil {
 		t.Fatal(err)
 	}
 	if err = c.Close(); err != nil {
@@ -277,5 +274,15 @@ func TestInterpolationContextErrorsAndIsolation(t *testing.T) {
 	}
 	if _, err = c.ComputeInterpolant(p); err == nil {
 		t.Fatal("accepted closed context")
+	}
+	if c.budget.Used() != 0 {
+		t.Fatal("copied context did not release its shared state")
+	}
+	var zero InterpolationContext
+	if err := zero.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := zero.Manager(); err == nil {
+		t.Fatal("accepted uninitialized context")
 	}
 }

@@ -28,8 +28,12 @@ var (
 // using Manager and Terms, and pin intermediate handles with ASTManager.NewRef
 // when they must survive other operations. Markers and computed interpolants
 // are retained by this context until Close, matching goivy's context lifetime.
+// Copies share the same private state; closing any copy closes that state.
 type InterpolationContext struct {
-	self        *InterpolationContext
+	*interpolationState
+}
+
+type interpolationState struct {
 	budget      *arena.Budget
 	symbols     *symbol.Manager
 	numerals    *numeral.RationalService
@@ -49,8 +53,7 @@ type InterpolationContext struct {
 // Z3_mk_interpolation_context: proof and model production are enabled from
 // construction. No state or symbol cache is shared with other contexts.
 func NewInterpolationContext() (result *InterpolationContext, resultErr error) {
-	c := &InterpolationContext{budget: arena.NewBudget(1 << 40)}
-	c.self = c
+	c := &InterpolationContext{interpolationState: &interpolationState{budget: arena.NewBudget(1 << 40)}}
 	defer func() {
 		if resultErr != nil {
 			resultErr = errors.Join(resultErr, c.Close())
@@ -104,7 +107,7 @@ func NewInterpolationContext() (result *InterpolationContext, resultErr error) {
 }
 
 func (c *InterpolationContext) open() error {
-	if c == nil || c.self != c || c.closed {
+	if c == nil || c.interpolationState == nil || c.closed {
 		return ast.ErrASTHandle
 	}
 	return nil
@@ -222,11 +225,8 @@ func (c *InterpolationContext) ComputeInterpolant(pattern ast.ASTHandle) (result
 // Close releases results, ASTs and private services in dependency order.
 // Caller-owned ASTRefs and solvers must be released before closing the context.
 func (c *InterpolationContext) Close() (result error) {
-	if c == nil {
+	if c == nil || c.interpolationState == nil {
 		return nil
-	}
-	if c.self != c {
-		return ast.ErrASTHandle
 	}
 	if c.closed {
 		return nil
