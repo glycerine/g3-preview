@@ -257212,14 +257212,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "a736ccc113dd3393a65ac8c6ce2382e69309f45a",
+    "commit": "47591cc673e3e3be89e00389f1981ee7d67e5024",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-26T21:39:33.160560+00:00",
-    "completed_utc": "2026-10-26T21:44:49.614270+00:00",
+    "started_utc": "2026-10-26T22:41:37.865435+00:00",
+    "completed_utc": "2026-10-26T22:46:52.383380+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-a736ccc1.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-a736ccc1.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-a736ccc1.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-47591cc6.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-47591cc6.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-47591cc6.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -257235,9 +257235,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 186.692,
+    "lp_seconds": 186.634,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated a736ccc113dd3393a65ac8c6ce2382e69309f45a, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes concrete LRA numerical/frontend owners, equality/bound axioms, basic/LP propagation, search thresholds, fixed equalities, shared candidates and model callbacks througha736ccc1. The default LP suite intentionally skips53 exhaustive cases, which remain available with -short; all of those cases passed in the preceding unguarded e9906db6 checkpoint. LRA Relevant axioms, full final-check/setup and remaining callbacks stay open; no complete specialized LRA or higher optimizer is claimed. The separate extra assertion-build polynomial timeout and documented source model/local-optimization limitations remain explicit. Root pkg and graph match the snapshot at recording."
+    "scope_warning": "Independently verified clean isolated 47591cc673e3e3be89e00389f1981ee7d67e5024, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes all audited LRA increments through47591cc6: actual numerical/frontend owners, equality/bound/operator axioms, basic/LP propagation, search thresholds, fixed/shared equalities, generated/direct model values, immediate final check, managed quick-checker value integration, LP parameter forwarding and concrete fresh-copy lifecycle with tagged constructor-error owner cleanup. Public setup remains unchanged; source statistics and objective AST callbacks plus retained-source/setup/Bool-normalization audits remain open. No complete specialized LRA, smtcore or higher-engine claim. The default LP suite intentionally skips53 exhaustive cases, available with -short and previously passed in the unguarded e9906db6 checkpoint. The separate extra tagged polynomial timeout and documented C++ post-pop/dense strict-model and local-optimization limitations remain explicit. Root pkg and graph match the snapshot at recording."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
