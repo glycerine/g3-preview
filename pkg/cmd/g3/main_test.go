@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"reset_session.smt2":                           "success\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsuccess\nsuccess\nsuccess\nsat\n(((> x 4) true))\nsuccess\nsuccess\nunsat\n(bound impossible)\nsuccess\nsat\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsuccess\nsuccess\nsat\n((answer 1))\n",
 	"difference_shortcut_cores_real.smt2":          "sat\nsat\nunsat\n(full chain3 strict_close)\nsat\nunsat\n(weak_close near chain0 chain3)\nsat\n",
 	"difference_shortcut_cores_int.smt2":           "sat\nsat\nunsat\n(full chain3 strict_close)\nsat\nunsat\n(weak_close near chain0 chain3)\nsat\n",
 	"mbqi_trace_parameter_updates.smt2":            "sat\nsat\nsat\n",
@@ -1007,7 +1008,7 @@ func canonicalOutput(text string) string {
 }
 
 func TestSMTLibRunnerProofScript(t *testing.T) {
-	for _, name := range []string{"proof.smt2", "assertion_conflict_proof.smt2", "check_phase_repeated_proof.smt2", "recursive_sum_proof.smt2", "datatype_constructor_conflict_proof.smt2", "string_literal_proof.smt2", "datatype_cycle_proof.smt2", "datatype_update_equality_proof.smt2", "datatype_metadata_proof.smt2", "closest_theory_variables_proof.smt2", "pb_native_watches_proof.smt2", "pb_simplex_proof.smt2"} {
+	for _, name := range []string{"reset_proof_sessions.smt2", "proof.smt2", "assertion_conflict_proof.smt2", "check_phase_repeated_proof.smt2", "recursive_sum_proof.smt2", "datatype_constructor_conflict_proof.smt2", "string_literal_proof.smt2", "datatype_cycle_proof.smt2", "datatype_update_equality_proof.smt2", "datatype_metadata_proof.smt2", "closest_theory_variables_proof.smt2", "pb_native_watches_proof.smt2", "pb_simplex_proof.smt2"} {
 		t.Run(name, func(t *testing.T) { testSMTLibProofScript(t, name) })
 	}
 }
@@ -1025,6 +1026,9 @@ func testSMTLibProofScript(t *testing.T, name string) {
 	if !strings.HasPrefix(out.String(), "unsat\n") || !strings.Contains(out.String(), "(asserted") || !strings.Contains(out.String(), "false)") {
 		t.Fatal("missing proof output", out.String())
 	}
+	if name == "reset_proof_sessions.smt2" && !completeResetProofSessions(out.String()) {
+		t.Fatal("reset lost one of the two complete proof sessions", out.String())
+	}
 	if name == "string_literal_proof.smt2" && !strings.Contains(out.String(), `"quoted""text"`) {
 		t.Fatal("proof lost its source quoted string literal", out.String())
 	}
@@ -1035,10 +1039,26 @@ func testSMTLibProofScript(t *testing.T, name string) {
 		if err != nil || !strings.HasPrefix(string(value), "unsat\n") || !strings.Contains(string(value), "(asserted") || !strings.Contains(string(value), "false)") {
 			t.Fatal("C++ proof output", string(value), err)
 		}
+		if name == "reset_proof_sessions.smt2" && !completeResetProofSessions(string(value)) {
+			t.Fatal("C++ reset lost one of the two complete proof sessions", string(value))
+		}
 		if name == "string_literal_proof.smt2" && !strings.Contains(string(value), `"quoted""text"`) {
 			t.Fatal("C++ proof lost its source quoted string literal", string(value))
 		}
 	}
+}
+
+func completeResetProofSessions(output string) bool {
+	sections := strings.Split(output, "unsat\n")
+	if len(sections) != 3 || sections[0] != "" {
+		return false
+	}
+	for _, proof := range sections[1:] {
+		if !strings.Contains(proof, "(asserted") || !strings.Contains(proof, "false)") {
+			return false
+		}
+	}
+	return true
 }
 
 // The retained C++ backend gives up on the unbounded satisfiable scopes in

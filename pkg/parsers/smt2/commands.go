@@ -412,6 +412,31 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		success = false
+	case "reset":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		// Release parser-owned roots and its manager-bound shifter before
+		// cmd_context::reset destroys the old AST manager.
+		if err = p.clearCommand(); err != nil {
+			return false, err
+		}
+		if p.shifter != nil {
+			if err = p.shifter.Close(); err != nil {
+				return false, err
+			}
+			p.shifter = nil
+		}
+		p.manager = nil
+		if err = p.context.Reset(); err != nil {
+			return false, err
+		}
+		if p.context.PrintSuccess {
+			if _, err = fmt.Fprintln(p.out, "success"); err != nil {
+				return false, err
+			}
+		}
+		return false, p.advance()
 	case "exit":
 		if err = p.requireEnd(); err != nil {
 			return false, err

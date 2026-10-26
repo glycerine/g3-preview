@@ -673,13 +673,19 @@ func (c *Context) WriteModel(out io.Writer) (result error) {
 	return err
 }
 
-func (c *Context) Close() error {
-	if c == nil {
-		return nil
+// Reset follows cmd_context::reset(false) for this owning command context.
+// Session options, output and parameter services survive; the AST manager is
+// rebuilt lazily after all old-manager consumers have been released.
+func (c *Context) Reset() error {
+	if err := c.valid(); err != nil {
+		return err
 	}
-	if c.closed {
-		return nil
-	}
+	return c.resetManagerState()
+}
+
+// Also used by Close, including partial context construction where valid()
+// cannot succeed yet. Parameter services belong to the enclosing context.
+func (c *Context) resetManagerState() error {
 	if err := c.clearTacticResult(); err != nil {
 		return err
 	}
@@ -704,6 +710,27 @@ func (c *Context) Close() error {
 			return err
 		}
 		c.manager = nil
+	}
+
+	clear(c.builtins)
+	c.logicChecker.Reset()
+	c.logic = ""
+	c.scopes = nil
+	c.checked = false
+	c.status = lbool.Undef
+	c.initializationError = nil
+	return nil
+}
+
+func (c *Context) Close() error {
+	if c == nil {
+		return nil
+	}
+	if c.closed {
+		return nil
+	}
+	if err := c.resetManagerState(); err != nil {
+		return err
 	}
 	if c.parameters != nil {
 		if err := c.parameters.Close(); err != nil {
