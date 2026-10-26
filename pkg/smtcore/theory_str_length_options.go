@@ -9,23 +9,24 @@ import (
 )
 
 type smtStringTesterState struct {
-	lengthID, valueID int32
-	lengthIndicators  map[ast.ASTHandle][]ast.ASTHandle
-	lengthLiterals    map[int32]ast.ASTHandle
-	lengthCounts      map[ast.ASTHandle]uint32
-	lengthSubjects    map[ast.ASTHandle]ast.ASTHandle
-	valueIndicators   map[ast.ASTHandle]map[int32][]smtStringScopedIndicator
-	valueRanges       map[ast.ASTHandle][]int32
-	valueLiterals     map[string]ast.ASTHandle
-	valueSubjects     map[ast.ASTHandle]ast.ASTHandle
-	binaryStacks      map[ast.ASTHandle][]ast.ASTHandle
-	binaryBounds      map[ast.ASTHandle]*smtStringBinaryBounds
-	binaryStart       map[ast.ASTHandle]ast.ASTHandle
-	binaryHigh        map[ast.ASTHandle]ast.ASTHandle
-	binaryLow         map[ast.ASTHandle]ast.ASTHandle
-	binaryTrail       []smtStringBinaryTrail
-	unrollHistories   map[ast.ASTHandle][]*smtStringUnrollHistory
-	unrollDefinitions map[ast.ASTHandle]ast.ASTHandle
+	lengthID, valueID       int32
+	lengthIndicators        map[ast.ASTHandle][]ast.ASTHandle
+	lengthLiterals          map[int32]ast.ASTHandle
+	lengthCounts            map[ast.ASTHandle]uint32
+	lengthSubjects          map[ast.ASTHandle]ast.ASTHandle
+	valueIndicators         map[ast.ASTHandle]map[int32][]smtStringScopedIndicator
+	valueRanges             map[ast.ASTHandle][]int32
+	valueLiterals           map[string]ast.ASTHandle
+	valueSubjects           map[ast.ASTHandle]ast.ASTHandle
+	binaryStacks            map[ast.ASTHandle][]ast.ASTHandle
+	binaryBounds            map[ast.ASTHandle]*smtStringBinaryBounds
+	binaryStart             map[ast.ASTHandle]ast.ASTHandle
+	binaryHigh              map[ast.ASTHandle]ast.ASTHandle
+	binaryLow               map[ast.ASTHandle]ast.ASTHandle
+	binaryTrail             []smtStringBinaryTrail
+	unrollHistories         map[ast.ASTHandle][]*smtStringUnrollHistory
+	unrollDefinitions       map[ast.ASTHandle]ast.ASTHandle
+	concatUnrollDefinitions map[[2]ast.ASTHandle]ast.ASTHandle
 }
 
 type smtStringScopedIndicator struct {
@@ -42,8 +43,9 @@ func newStringTesterState() smtStringTesterState {
 		valueSubjects: make(map[ast.ASTHandle]ast.ASTHandle),
 		binaryStacks:  make(map[ast.ASTHandle][]ast.ASTHandle), binaryBounds: make(map[ast.ASTHandle]*smtStringBinaryBounds),
 		binaryStart: make(map[ast.ASTHandle]ast.ASTHandle), binaryHigh: make(map[ast.ASTHandle]ast.ASTHandle), binaryLow: make(map[ast.ASTHandle]ast.ASTHandle),
-		unrollHistories:   make(map[ast.ASTHandle][]*smtStringUnrollHistory),
-		unrollDefinitions: make(map[ast.ASTHandle]ast.ASTHandle),
+		unrollHistories:         make(map[ast.ASTHandle][]*smtStringUnrollHistory),
+		unrollDefinitions:       make(map[ast.ASTHandle]ast.ASTHandle),
+		concatUnrollDefinitions: make(map[[2]ast.ASTHandle]ast.ASTHandle),
 	}
 }
 
