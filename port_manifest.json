@@ -115545,7 +115545,8 @@
         "TestSMTStringFreeKernelModelAndCPPReference",
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
         "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
-        "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry"
+        "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
       ],
       "conditionals": [
         {
@@ -117276,7 +117277,8 @@
           "tests": [
             "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
             "TestSMTLibRunnerScripts",
-            "TestSMTLibRunnerCPPReference"
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
           ]
         }
       ],
@@ -117297,7 +117299,8 @@
         "Context owns a persistent concrete integer heap borrowing the activity vector and typed priority map. Creation, deletion, activity increase and unassignment update membership/ordering. Heap storage closes with the context; priority entries survive Boolean-slot deletion as native code does. Default strategies do not allocate this heap.",
         "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion.",
         "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service.",
-        "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged."
+        "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
+        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -117329,7 +117332,7 @@
         "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter.",
         "The kernel records the exact eager constructor sequence placeholder. Deferred setup may replace only that unused plugin, keeping registry order and closing its owners; explicitly registered String/Sequence plugins are preserved as in native register_plugin. Existing concrete String kernel model/oracle fixtures verify preservation. This does not claim all plugin-copy lifecycle work complete.",
         "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths.",
-        "The duplicate-entry guard is source-faithful and does not establish full incomplete-arithmetic model parity. A separately recorded symbolic-power candidate with opposite Boolean UF results yields different argument assignments between native and Go; it remains unregistered, with exact evidence in /mnt/oldrog/tmp/g3-model-incomplete/final-differential.json. Remaining arithmetic final-check/model assignment audit is open; no status promotion is inferred."
+        "The previously recorded opposite-valued symbolic-power candidate mismatch is resolved by preserving native arithmetic final_check_core ordering: finish the integer/shared-equality/nonlinear round before unsupported-operation give-up. The expanded registered candidate-model CLI script now queries f(a)=true, f(b)=false and a distinct fixed argument across scopes, exactly matching C++. Direct generator fixtures independently verify THEORY-only duplicate suppression and unchanged complete/conflict-limit/quantifier insertion/debug behavior. Full remaining arithmetic and model assembly audits are still open; no source status promotion."
       ]
     },
     {
@@ -117555,7 +117558,8 @@
         "TestSMTStringFreeKernelModelAndCPPReference",
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
         "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
-        "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry"
+        "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
       ],
       "conditionals": [
         {
@@ -118283,7 +118287,8 @@
           "tests": [
             "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
             "TestSMTLibRunnerScripts",
-            "TestSMTLibRunnerCPPReference"
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
           ]
         }
       ],
@@ -118304,7 +118309,8 @@
         "Check-local assumptions are native typed slices plus owning AST refs, copied external-first and retained through post-pop validation, with forward cleanup on every return. The String overlap term has one replaceable owned ASTRef released before the earlier-declared m_trail; repeated checks use fresh native sequence skolems. Native internal_variable_set/scope-level bookkeeping has no removal in theory_str.cpp/.h: witness reuse must preserve membership across pops and refresh enodes, rather than inventing scope-based deletion.",
         "Configured SMT internalizers borrow their kernel SMTParams, matching context::m_fparams. String initialization owns a distinct nested kernel that borrows the same manager/full parameter owner and has a fresh empty local params_ref. Public solver construction/copies still own their normal parameter clone. Every constructor failure and nested close preserves borrowed parameters; child query scopes always pop after a successful push, including assertion/check errors and unknown results. String destroys the nested expression solver before its earlier declaration-order AST trail; parent kernel closes its parameter owner after theory destruction. Bare internalizer fixtures without a configured kernel have no symbolic solver service.",
         "The concrete aggressive String tester consumer reuses the actual internalizer Boolean data for a just-internalized equality. Phase hints own no AST or context resources and do not assign the Boolean variable or change its true-first flag.",
-        "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged."
+        "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
+        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
@@ -118322,7 +118328,7 @@
         "Added a concrete retained String consumer of existing phase-cache fields, verified together with actual equality internalization, relevance and branch-priority services. This does not add an unused generic phase adapter or change context source-unit completion status.",
         "The kernel records the exact eager constructor sequence placeholder. Deferred setup may replace only that unused plugin, keeping registry order and closing its owners; explicitly registered String/Sequence plugins are preserved as in native register_plugin. Existing concrete String kernel model/oracle fixtures verify preservation. This does not claim all plugin-copy lifecycle work complete.",
         "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths.",
-        "The duplicate-entry guard is source-faithful and does not establish full incomplete-arithmetic model parity. A separately recorded symbolic-power candidate with opposite Boolean UF results yields different argument assignments between native and Go; it remains unregistered, with exact evidence in /mnt/oldrog/tmp/g3-model-incomplete/final-differential.json. Remaining arithmetic final-check/model assignment audit is open; no status promotion is inferred."
+        "The previously recorded opposite-valued symbolic-power candidate mismatch is resolved by preserving native arithmetic final_check_core ordering: finish the integer/shared-equality/nonlinear round before unsupported-operation give-up. The expanded registered candidate-model CLI script now queries f(a)=true, f(b)=false and a distinct fixed argument across scopes, exactly matching C++. Direct generator fixtures independently verify THEORY-only duplicate suppression and unchanged complete/conflict-limit/quantifier insertion/debug behavior. Full remaining arithmetic and model assembly audits are still open; no source status promotion."
       ]
     },
     {
@@ -122651,7 +122657,8 @@
         "TestSMTModelTraversalUsesNativeDependencyStackOrder",
         "TestSMTModelTraversalSharesImplicitSortDependencies",
         "TestSMTModelTraversalRechecksDependenciesOnlyInSourceDebug",
-        "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry"
+        "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
       ],
       "assertions": [
         {
@@ -122894,7 +122901,8 @@
           "tests": [
             "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
             "TestSMTLibRunnerScripts",
-            "TestSMTLibRunnerCPPReference"
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
           ]
         }
       ],
@@ -122903,12 +122911,13 @@
         "Model-generation relevance queries borrow the active internalizer relevancy service so disabled filtering includes every internalized expression even when the marked map is empty. Context-only fixtures without a service retain their explicitly marked view. The regression checks arithmetic argument separation, optional unused Boolean publication and evaluation of the generated UF interpretation in relevancy modes 0 and 2. The integer_uf_model_relevancy.smt2 C++ comparison evaluates model disequalities before and after a scope pop, catching omitted interpretations that SAT-only comparisons miss.",
         "The mode-aware relevancy helper now lives on SMTInternalizerState and is shared with model finding; model-value and function publication retain their previously verified behavior.",
         "The per-sort implicit-dependency set, source colors and iterative work stack are local to one topological traversal. Fresh placeholders and enodes remain borrowed; no recursive Go call stack or persistent sort cache is retained.",
-        "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged."
+        "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
+        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit."
       ],
       "deviations": [
         "The source iterative traversal, last-pushed-first order, shared per-sort implicit-dependency cache and source-debug-only second child visit are preserved. True dependency cycles retain the Go ast.ErrASTDomain guard for invalid input rather than reaching native missing-value assertions during construction.",
         "Model initialization is independent of per-enode value construction, matching the source virtual init_model/build_models distinction. A PB initializer registers its live factory although it has no ModelValue implementation; Boolean roots retain assignment wrappers and no unused PB value-procedure adapter is added.",
-        "The duplicate-entry guard is source-faithful and does not establish full incomplete-arithmetic model parity. A separately recorded symbolic-power candidate with opposite Boolean UF results yields different argument assignments between native and Go; it remains unregistered, with exact evidence in /mnt/oldrog/tmp/g3-model-incomplete/final-differential.json. Remaining arithmetic final-check/model assignment audit is open; no status promotion is inferred."
+        "The previously recorded opposite-valued symbolic-power candidate mismatch is resolved by preserving native arithmetic final_check_core ordering: finish the integer/shared-equality/nonlinear round before unsupported-operation give-up. The expanded registered candidate-model CLI script now queries f(a)=true, f(b)=false and a distinct fixed argument across scopes, exactly matching C++. Direct generator fixtures independently verify THEORY-only duplicate suppression and unchanged complete/conflict-limit/quantifier insertion/debug behavior. Full remaining arithmetic and model assembly audits are still open; no source status promotion."
       ]
     },
     {
@@ -122956,7 +122965,8 @@
         "TestSMTModelTraversalRechecksDependenciesOnlyInSourceDebug",
         "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
       ],
       "conditionals": [
         {
@@ -123075,18 +123085,20 @@
           "tests": [
             "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
             "TestSMTLibRunnerScripts",
-            "TestSMTLibRunnerCPPReference"
+            "TestSMTLibRunnerCPPReference",
+            "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
           ]
         }
       ],
       "ownership": [
         "Model-value procedures and dependencies borrow AST handles, enodes and generator-owned fresh placeholders. The future generator owns and pins the referenced AST values and sorts, matching the source m_asts owner.",
         "The per-sort implicit-dependency set, source colors and iterative work stack are local to one topological traversal. Fresh placeholders and enodes remain borrowed; no recursive Go call stack or persistent sort cache is retained.",
-        "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged."
+        "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
+        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit."
       ],
       "deviations": [
         "The source tagged dependency union is represented by explicit Go fields and checked accessors. Invalid assertion domains return ast.ErrASTDomain.",
-        "The duplicate-entry guard is source-faithful and does not establish full incomplete-arithmetic model parity. A separately recorded symbolic-power candidate with opposite Boolean UF results yields different argument assignments between native and Go; it remains unregistered, with exact evidence in /mnt/oldrog/tmp/g3-model-incomplete/final-differential.json. Remaining arithmetic final-check/model assignment audit is open; no status promotion is inferred."
+        "The previously recorded opposite-valued symbolic-power candidate mismatch is resolved by preserving native arithmetic final_check_core ordering: finish the integer/shared-equality/nonlinear round before unsupported-operation give-up. The expanded registered candidate-model CLI script now queries f(a)=true, f(b)=false and a distinct fixed argument across scopes, exactly matching C++. Direct generator fixtures independently verify THEORY-only duplicate suppression and unchanged complete/conflict-limit/quantifier insertion/debug behavior. Full remaining arithmetic and model assembly audits are still open; no source status promotion."
       ]
     },
     {
@@ -126949,7 +126961,10 @@
         "pkg/smtcore/theory_str_arithmetic_bounds.go",
         "pkg/smtcore/theory_str_arithmetic_bounds_test.go",
         "pkg/smtcore/theory_arith_definition_replay_test.go",
-        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
+        "pkg/smtcore/theory_arith_final_check.go",
+        "pkg/smtcore/smt_model_incomplete_test.go",
+        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -126981,7 +126996,8 @@
         "TestSMTStringArithmeticBoundsAssignmentAndScope",
         "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
         "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints",
-        "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms"
+        "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
       ],
       "conditionals": [
         {
@@ -127202,12 +127218,30 @@
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
           ]
+        },
+        {
+          "name": "final_check_core unsupported-operation guard (theory_arith_core.h:1423-1497): run complete rotating feasibility/shared-equality/nonlinear stages, preserve CONTINUE and accumulated GIVEUP, then turn terminal DONE into GIVEUP for unsupported operators; keep shared assignment mutation before incompleteness",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_final_check.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_final_check.go",
+            "pkg/smtcore/smt_model_incomplete_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
+          ],
+          "tests": [
+            "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
-        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation."
+        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
+        "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
@@ -127924,7 +127958,9 @@
         "pkg/smtcore/theory_str_arithmetic_bounds.go",
         "pkg/smtcore/theory_str_arithmetic_bounds_test.go",
         "pkg/smtcore/theory_arith_definition_replay_test.go",
-        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
+        "pkg/smtcore/smt_model_incomplete_test.go",
+        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
       ],
       "tests": [
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
@@ -127982,7 +128018,8 @@
         "TestSMTStringArithmeticBoundsAssignmentAndScope",
         "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
         "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints",
-        "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms"
+        "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
       ],
       "conditionals": [
         {
@@ -129039,6 +129076,23 @@
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
           ]
+        },
+        {
+          "name": "final_check_core unsupported-operation guard (theory_arith_core.h:1423-1497): run complete rotating feasibility/shared-equality/nonlinear stages, preserve CONTINUE and accumulated GIVEUP, then turn terminal DONE into GIVEUP for unsupported operators; keep shared assignment mutation before incompleteness",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_final_check.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_final_check.go",
+            "pkg/smtcore/smt_model_incomplete_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
+          ],
+          "tests": [
+            "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -129048,7 +129102,8 @@
         "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop.",
         "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial.",
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
-        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation."
+        "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
+        "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery."
       ],
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",

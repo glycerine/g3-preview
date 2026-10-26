@@ -1,13 +1,14 @@
 package smtcore
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-func TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry(t *testing.T) {
+func TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp(t *testing.T) {
 	m, config := smtModelGeneratorFixture(t)
 	params, err := config.Context.NewValue()
 	astTestMust(t, err)
@@ -41,8 +42,8 @@ func TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry(t *testing.T) {
 		}
 		astTestMust(t, s.Assert(application))
 	}
-	// Symbolic exponentiation makes the actual arithmetic theory incomplete
-	// before it mutates shared assignments or assumes their equalities.
+	// Symbolic exponentiation is unsupported, but native still completes its
+	// feasibility/equality/nonlinear round before reporting incompleteness.
 	power, err := m.MkArithmeticPower(arguments[0], arguments[1])
 	astTestMust(t, err)
 	application, err := m.MkApp(f, []ast.ASTHandle{power})
@@ -73,24 +74,108 @@ func TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry(t *testing.T) {
 	defer func() { astTestMust(t, generated.DecRef()) }()
 	interpretation, err := generated.FunctionInterpretation(f)
 	astTestMust(t, err)
-	if interpretation == nil || interpretation.NumEntries() != 2 {
-		t.Fatal("duplicate candidate function entries", interpretation)
+	if interpretation == nil {
+		t.Fatal("missing candidate function interpretation")
 	}
-	first, err := interpretation.FindEntry([]ast.ASTHandle{zero})
-	astTestMust(t, err)
-	second, err := interpretation.FindEntry([]ast.ASTHandle{one})
-	astTestMust(t, err)
-	if first == nil || second == nil {
-		t.Fatal("missing distinct candidate arguments")
+	var values [2]ast.ASTHandle
+	for index, argument := range arguments {
+		declaration, err := m.GetDecl(argument)
+		astTestMust(t, err)
+		values[index], err = generated.ConstantInterpretation(declaration)
+		astTestMust(t, err)
+		entry, err := interpretation.FindEntry([]ast.ASTHandle{values[index]})
+		astTestMust(t, err)
+		if entry == nil {
+			t.Fatal("missing candidate argument", index)
+		}
+		value, err := entry.Result()
+		astTestMust(t, err)
+		if (index == 0 && !m.IsTrue(value)) || (index == 1 && !m.IsFalse(value)) {
+			t.Fatal("unsupported operation bypassed shared assignment separation", index, value)
+		}
 	}
-	value, err := first.Result()
-	astTestMust(t, err)
-	if !m.IsTrue(value) {
-		t.Fatal("duplicate replaced the first result")
+	if values[0] == values[1] {
+		t.Fatal("opposite function results have equal candidate arguments")
 	}
-	value, err = second.Result()
-	astTestMust(t, err)
-	if !m.IsFalse(value) {
-		t.Fatal("distinct argument entry lost")
+}
+
+// Exercise mk_func_interps independently of arithmetic's choice of candidate
+// assignments. These concrete wrapper procedures deliberately give distinct
+// congruence roots the same model argument, as permitted for incomplete theories.
+func TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry(t *testing.T) {
+	for _, failure := range []SMTFailure{SMTFailureTheory, SMTFailureOK, SMTFailureConflictLimit, SMTFailureQuantifiers} {
+		t.Run(failure.String(), func(t *testing.T) {
+			m, config := smtModelGeneratorFixture(t)
+			context, _, state := smtInternalizerFixture(t, m, nil)
+			boolean, err := m.MkBoolSort()
+			astTestMust(t, err)
+			yes, err := m.MkTrue()
+			astTestMust(t, err)
+			no, err := m.MkFalse()
+			astTestMust(t, err)
+			f, err := m.MkFuncDecl(astTestSymbol(t, m, "duplicate-function"), []ast.ASTHandle{boolean}, boolean, ast.ASTFuncDeclInfo{})
+			astTestMust(t, err)
+			var roots []*SMTEnode
+			procedures := make(map[*SMTEnode]SMTModelValueProcedure)
+			for index, name := range []string{"duplicate-a", "duplicate-b", "distinct-c"} {
+				argument, err := m.MkConst(astTestSymbol(t, m, name), boolean)
+				astTestMust(t, err)
+				argNode, err := state.MkEnode(argument, false, false, true)
+				astTestMust(t, err)
+				application, err := m.MkApp(f, []ast.ASTHandle{argument})
+				astTestMust(t, err)
+				node, err := state.MkEnode(application, false, false, true)
+				astTestMust(t, err)
+				astTestMust(t, context.SetRelevant(application, true))
+				argValue, result := no, no
+				if index == 0 {
+					result = yes
+				}
+				if index == 2 {
+					argValue = yes
+				}
+				procedures[argNode], err = NewSMTExpressionValueProcedure(argValue)
+				astTestMust(t, err)
+				procedures[node], err = NewSMTExpressionValueProcedure(result)
+				astTestMust(t, err)
+				roots = append(roots, argNode, node)
+			}
+			g, err := NewSMTModelGenerator(m)
+			astTestMust(t, err)
+			t.Cleanup(func() { astTestMust(t, g.Close()) })
+			astTestMust(t, g.SetContext(context))
+			g.searchFailure = failure
+			astTestMust(t, g.InitializeModel(config))
+			astTestMust(t, g.BuildValues(roots, procedures))
+			err = g.publishFunctionInterpretations(state)
+			if ast.ASTSourceDebug && failure != SMTFailureTheory {
+				if !errors.Is(err, ast.ErrASTDomain) {
+					t.Fatal("non-theory duplicate assertion", err)
+				}
+				return
+			}
+			astTestMust(t, err)
+			interpretation, err := g.model.Core().FunctionInterpretation(f)
+			astTestMust(t, err)
+			want := uint32(3)
+			if failure == SMTFailureTheory {
+				want = 2
+			}
+			if interpretation == nil || interpretation.NumEntries() != want {
+				t.Fatal("candidate entry count", interpretation, want)
+			}
+			for index, arg := range []ast.ASTHandle{no, yes} {
+				entry, err := interpretation.FindEntry([]ast.ASTHandle{arg})
+				astTestMust(t, err)
+				if entry == nil {
+					t.Fatal("missing candidate argument", index)
+				}
+				value, err := entry.Result()
+				astTestMust(t, err)
+				if (index == 0 && !m.IsTrue(value)) || (index == 1 && !m.IsFalse(value)) {
+					t.Fatal("first result or distinct entry lost", index, value)
+				}
+			}
+		})
 	}
 }

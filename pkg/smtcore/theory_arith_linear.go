@@ -1455,9 +1455,6 @@ func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		}
 		return SMTFinalCheckContinue, nil
 	}
-	if t.unsupported {
-		return SMTFinalCheckGiveUp, nil
-	}
 	if progress, err := t.propagateFixedSharedValues(); err != nil {
 		return SMTFinalCheckGiveUp, err
 	} else if progress {

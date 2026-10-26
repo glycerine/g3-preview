@@ -206,6 +206,11 @@ func (t *SMTLinearArithmeticTheory) finalCheckArithmeticCore() (SMTFinalCheckSta
 			result = status
 		}
 		if t.finalCheckIndex == start {
+			// Native reports unsupported operations only after the full round;
+			// feasibility and shared equalities may still make progress first.
+			if result == SMTFinalCheckDone && t.unsupported {
+				return SMTFinalCheckGiveUp, nil
+			}
 			return result, nil
 		}
 	}
