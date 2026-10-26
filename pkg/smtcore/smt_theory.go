@@ -37,6 +37,35 @@ type SMTTheoryInternalizer interface {
 	PopScopes(uint32) error
 }
 
+// SMTTheoryDirectValue is theory::get_value, used by the quick checker before
+// rewriting applications. The caller must root a returned expression before
+// allocating further AST nodes. An unavailable value is not a zero numeral.
+type SMTTheoryDirectValue interface {
+	GetTheoryValue(*SMTEnode) (ast.ASTHandle, bool, error)
+}
+
+// GetTheoryValue dispatches by the node's sort family, as context::get_value.
+func (s *SMTInternalizerState) GetTheoryValue(node *SMTEnode) (ast.ASTHandle, bool, error) {
+	if err := s.open(); err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if node == nil || node.manager != s.manager || s.context.enodes[node.owner] != node {
+		return ast.ASTHandle{}, false, ast.ErrASTDomain
+	}
+	sort, err := s.manager.GetSort(node.owner)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	family, err := s.manager.GetFamilyID(sort)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if theory, ok := s.theories[family].(SMTTheoryDirectValue); ok {
+		return theory.GetTheoryValue(node)
+	}
+	return ast.ASTHandle{}, false, nil
+}
+
 type SMTTheoryBase struct {
 	family    ast.FamilyID
 	state     *SMTInternalizerState

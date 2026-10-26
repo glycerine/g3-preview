@@ -24,6 +24,7 @@ type smtQuickCheckKey struct {
 // the current congruence classes and assignments.
 type SMTQuickChecker struct {
 	context    *SMTCheckerContext
+	state      *SMTInternalizerState
 	rewriter   *rewriter.TheoryRewriter
 	registry   *SMTQuantifierRegistry
 	values     map[*SMTEnode]ast.ASTHandle
@@ -289,7 +290,20 @@ func (q *SMTQuickChecker) canonize(expression ast.ASTHandle) (ast.ASTHandle, err
 	}
 	for index, node := range argumentNodes {
 		if node != nil {
-			if value, present := q.values[node.root]; present {
+			value, present := q.values[node.root]
+			if q.state != nil {
+				var err error
+				value, present, err = q.state.GetTheoryValue(node)
+				if err != nil {
+					return ast.ASTHandle{}, err
+				}
+			}
+			if present {
+				ref, err := q.context.manager.NewRef(value)
+				if err != nil {
+					return ast.ASTHandle{}, err
+				}
+				q.newExprs = append(q.newExprs, ref)
 				arguments[index] = value
 			}
 		}

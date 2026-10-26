@@ -17,6 +17,39 @@ type smtLRAModelOwner struct {
 }
 
 var _ SMTModelValueTheory = (*SMTLRATheory)(nil)
+var _ SMTTheoryDirectValue = (*SMTLRATheory)(nil)
+
+// GetTheoryValue preserves the source cache eligibility test; it does not
+// initialize a model or read fresh LP values on behalf of the quick checker.
+func (t *SMTLRATheory) GetTheoryValue(node *SMTEnode) (ast.ASTHandle, bool, error) {
+	s, err := t.State()
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if node == nil || node.manager != s.manager {
+		return ast.ASTHandle{}, false, ast.ErrASTDomain
+	}
+	if err = t.numeric.ready(); err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	if !t.IsAttachedToVariable(node) || !t.canGetModelValue(node.TheoryVar(t.FamilyID())) {
+		return ast.ASTHandle{}, false, nil
+	}
+	value, err := t.cachedModelValue(node.TheoryVar(t.FamilyID()))
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	sort, err := s.manager.GetSort(node.owner)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	kind, err := s.manager.GetDeclKind(sort)
+	if err != nil {
+		return ast.ASTHandle{}, false, err
+	}
+	expression, err := s.manager.ArithmeticNumeralRat(value, kind == 1)
+	return expression, err == nil, err
+}
 
 func (t *SMTLRATheory) canGetModelValue(v SMTTheoryVar) bool {
 	index, ok := t.numeric.index(v)

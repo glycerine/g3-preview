@@ -86,6 +86,7 @@ func NewSMTQuantifierManager(state *SMTInternalizerState, rw *rewriter.TheoryRew
 	if err != nil {
 		return nil, err
 	}
+	quick.state = state
 	substitute, err := NewSMTCachedVarSubstitution(state.manager)
 	if err != nil {
 		if substitute != nil {
