@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
 
@@ -106,6 +107,7 @@ type SMTInternalizerState struct {
 	manager                    *ast.ASTManager
 	theoryRewriter             *rewriter.TheoryRewriter // borrowed from the kernel
 	smtParams                  *SMTParams               // borrowed context::m_fparams
+	contextParams              *uparams.ParamsRef       // borrowed context::m_params
 	context                    *SMTCheckerContext
 	congruence                 *SMTCongruenceTable
 	quantifiers                *SMTQuantifierRegistry

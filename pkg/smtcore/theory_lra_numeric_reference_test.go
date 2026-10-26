@@ -285,3 +285,42 @@ func TestSMTLRAFinalCheckNativeOracle(t *testing.T) {
 		t.Fatal("native final-check model/scope oracle", text, "want", expected)
 	}
 }
+
+func TestSMTLRALPSettingsNativeOracle(t *testing.T) {
+	reference := os.Getenv("G3_CPP_REFERENCE")
+	if reference == "" {
+		t.Skip("G3_CPP_REFERENCE is not set")
+	}
+	script, err := os.ReadFile("test_vectors/lra_final_check.smt2")
+	astTestMust(t, err)
+	var lines [][]byte
+	for _, line := range bytes.Split(script, []byte{'\n'}) {
+		// The separate final-check oracle records the prebuilt post-pop model
+		// limitation. This probe compares search/status with each LP strategy.
+		if !bytes.HasPrefix(line, []byte("(get-value")) {
+			lines = append(lines, line)
+		}
+	}
+	for _, strategy := range []string{"0", "1", "2", "3"} {
+		t.Run(strategy, func(t *testing.T) {
+			cmd := exec.Command(reference, "-in", "lp.simplex_strategy="+strategy, "lp.bprop_on_pivoted_rows=false")
+			cmd.Stdin = bytes.NewReader(bytes.Join(lines, []byte{'\n'}))
+			var out, diagnostics bytes.Buffer
+			cmd.Stdout, cmd.Stderr = &out, &diagnostics
+			if err = cmd.Run(); err != nil || diagnostics.Len() != 0 {
+				t.Fatal(err, out.String(), diagnostics.String())
+			}
+			text := out.String()
+			start := strings.Index(text, "(:")
+			if start < 0 || strings.Join(strings.Fields(text[:start]), " ") != "sat unsat sat" {
+				t.Fatal("configured native LP search/scope oracle", text)
+			}
+			if !regexp.MustCompile(`:arith-make-feasible\s+[1-9][0-9]*`).MatchString(text[start:]) {
+				t.Fatal("reference did not exercise LRA", text)
+			}
+			if strategy == "2" && !regexp.MustCompile(`:arith-factorizations\s+[1-9][0-9]*`).MatchString(text[start:]) {
+				t.Fatal("reference did not exercise LU strategy", text)
+			}
+		})
+	}
+}

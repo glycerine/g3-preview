@@ -289,6 +289,7 @@ func (k *SMTKernel) configurePreprocessingParams(context *uparams.ParamsContext,
 	k.smtParams = full
 	k.smtParamsBorrowed = borrowSource
 	k.internalizer.smtParams = full
+	k.internalizer.contextParams = &k.assertedParams
 	k.patternInference, err = pattern.NewInferenceRewriterWithOptions(k.manager, patternOptions)
 	if err != nil {
 		return err

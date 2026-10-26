@@ -26,6 +26,8 @@ func (k *SMTKernel) copyArithmeticPlugin(source *SMTKernel) error {
 		owner = &source.smtParams.arith
 	}
 	switch previous := old.(type) {
+	case *SMTLRATheory:
+		theory, err = NewSMTLRATheory(family)
 	case *SMTLinearArithmeticTheory:
 		if previous.infinite {
 			theory, err = NewSMTInfiniteArithmeticTheory(family)

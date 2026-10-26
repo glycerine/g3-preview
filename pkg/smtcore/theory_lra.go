@@ -3,6 +3,7 @@
 package smtcore
 
 import (
+	"errors"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -41,7 +42,9 @@ func (l smtLRAResourceLimit) CancelFlag() (bool, error) { return l.manager.Cance
 type SMTLRATheory struct {
 	*SMTTheoryBase
 	numeric                           *smtLRANumeric
+	initParams                        *lp.LPParams
 	numerals                          *numeral.RationalManager
+	constructorInteger                *numeral.IntegerManager
 	config                            SMTArithState
 	equalityAdapter                   *smtLRAEqualityAdapter
 	bounds                            [][]*smtLRABound
@@ -86,24 +89,67 @@ func NewSMTLRATheory(family ast.FamilyID) (*SMTLRATheory, error) {
 	return t, nil
 }
 
-func (t *SMTLRATheory) Initialize(s *SMTInternalizerState) error {
+func (t *SMTLRATheory) Initialize(s *SMTInternalizerState) (result error) {
 	if t == nil || t.closed || t.SMTTheoryBase == nil {
 		return ast.ErrASTHandle
 	}
 	if err := t.SMTTheoryBase.Initialize(s); err != nil {
 		return err
 	}
+	defer func() {
+		if result != nil && t.numeric != nil {
+			t.numeric.stopped = true
+		}
+	}()
 	t.axiomManager = s.manager
 	var err error
 	t.numerals, err = s.manager.NumeralService().NewPrivateRationalManager()
 	if err != nil {
+		// NewRationalManager can fail before publishing a rational owner.
+		// Its error then carries the partial integer manager's physical roots.
+		errors.As(err, &t.constructorInteger)
 		return err
+	}
+	if s.smtParams != nil && s.contextParams != nil {
+		t.initParams, err = lp.NewLPParams(s.smtParams.Context, s.contextParams, s.smtParams.Globals, s.manager.Budget())
+		// Even a failed helper constructor can own a module reference. Keep
+		// a refused destructor reachable until theory Close is retried.
+		defer func() { result = errors.Join(result, t.closeInitParams()) }()
+		if err != nil {
+			return err
+		}
 	}
 	t.numeric, err = newSMTLRANumeric(t.numerals, smtLRANumericConfig{
 		strategy: lp.StrategyTableauRows, pivotedRows: true,
 		boundPropagation: t.propagationEnabled(), limit: smtLRAResourceLimit{s.manager},
 	})
-	return err
+	if err != nil || t.initParams == nil {
+		return err
+	}
+	strategy, err := t.initParams.SimplexStrategy()
+	if err != nil {
+		return err
+	}
+	if strategy > uint32(lp.StrategyUndecided) {
+		return ast.ErrASTDomain
+	}
+	t.numeric.solver.Settings.SimplexStrategy = lp.SimplexStrategy(strategy)
+	pivoted, err := t.initParams.BpropOnPivotedRows()
+	if err != nil {
+		return err
+	}
+	t.numeric.solver.SetPropagateBoundsOnPivotedRowsMode(pivoted)
+	return nil
+}
+
+func (t *SMTLRATheory) closeInitParams() error {
+	if t.initParams != nil {
+		if err := t.initParams.Close(); err != nil {
+			return err
+		}
+		t.initParams = nil
+	}
+	return nil
 }
 
 func (t *SMTLRATheory) ConfigureArithmetic(config SMTArithState) error {
@@ -749,6 +795,15 @@ func (t *SMTLRATheory) Close() error {
 	// already be unavailable to ordinary calls while Close is retried.
 	t.closed = true
 	t.state = nil
+	if err := t.closeInitParams(); err != nil {
+		return err
+	}
+	if t.constructorInteger != nil {
+		if err := t.constructorInteger.CloseChecked(); err != nil {
+			return err
+		}
+		t.constructorInteger = nil
+	}
 	for _, refs := range []*[]ast.ASTRef{&t.pendingAxiomRoots, &t.axiomRefs} {
 		for len(*refs) > 0 {
 			i := len(*refs) - 1
