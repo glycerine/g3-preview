@@ -46,6 +46,7 @@ type Context struct {
 	manager                          *ast.ASTManager
 	solver                           solver.Solver
 	tacticResult                     *solver.SimpleCheckSatResult
+	retainedSolverResult             solver.Solver
 	logic                            string
 	functions                        map[string][]ast.ASTHandle
 	sorts                            map[string]ast.ASTHandle
@@ -325,9 +326,21 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 	if err = c.initBuiltins(); err != nil {
 		return nil, err
 	}
+	if err = c.mkSolver(m); err != nil {
+		return nil, err
+	}
+	if err = c.logicChecker.SetLogic(m, c.logic); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// mkSolver mirrors the shell factory step independently of manager creation.
+func (c *Context) mkSolver(m *ast.ASTManager) error {
+	var err error
 	var proofs, models, cores bool
 	if err = c.parameters.GetSolverParams(m, &c.params, &proofs, &models, &cores); err != nil {
-		return nil, err
+		return err
 	}
 	switch c.logic {
 	case "UFNIA":
@@ -366,15 +379,12 @@ func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 		}
 	}
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if err = c.solver.SetProduceModels(models); err != nil {
-		return nil, err
+		return err
 	}
-	if err = c.logicChecker.SetLogic(m, c.logic); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return nil
 }
 
 func (c *Context) DeclareSort(name string) (ast.ASTHandle, error) {
@@ -494,6 +504,10 @@ func (c *Context) Assert(formula ast.ASTHandle, name string) (result error) {
 	if err = c.logicChecker.CheckExpression(formula); err != nil {
 		return err
 	}
+	c.checked = false
+	if err = c.clearCheckSatResult(); err != nil {
+		return err
+	}
 	ref, err := m.NewRef(formula)
 	if err != nil {
 		return err
@@ -536,6 +550,10 @@ func (c *Context) Push(count uint32) error {
 	if count == 0 {
 		return c.valid()
 	}
+	c.checked = false
+	if err := c.clearCheckSatResult(); err != nil {
+		return err
+	}
 	if _, err := c.Manager(); err != nil {
 		return err
 	}
@@ -551,6 +569,10 @@ func (c *Context) Push(count uint32) error {
 
 func (c *Context) Pop(count uint32) error {
 	if err := c.valid(); err != nil {
+		return err
+	}
+	c.checked = false
+	if err := c.clearCheckSatResult(); err != nil {
 		return err
 	}
 	if uint64(count) > uint64(len(c.scopes)) {
@@ -629,7 +651,7 @@ func (c *Context) CheckSat(assumptions []ast.ASTHandle) (lbool.LBool, error) {
 		return lbool.Undef, err
 	}
 	c.checked = false
-	if err := c.clearTacticResult(); err != nil {
+	if err := c.clearCheckSatResult(); err != nil {
 		return lbool.Undef, err
 	}
 	status, err := c.solver.CheckSat(assumptions)
@@ -673,6 +695,50 @@ func (c *Context) WriteModel(out io.Writer) (result error) {
 	return err
 }
 
+// ResetAssertions follows cmd_context::reset_assertions. With global
+// declarations disabled, source performs a complete owning-session reset.
+// Otherwise the declaration world and scope stack survive solver recreation.
+func (c *Context) ResetAssertions() error {
+	if err := c.valid(); err != nil {
+		return err
+	}
+	if !c.GlobalDeclarations {
+		return c.Reset()
+	}
+	// Source m_check_sat_result owns its previous solver independently of the
+	// replacement m_solver. Keep that result live until normal invalidation.
+	if !c.checked {
+		if err := c.clearCheckSatResult(); err != nil {
+			return err
+		}
+	}
+	if c.solver != nil {
+		if c.checked && c.tacticResult == nil && c.retainedSolverResult == nil {
+			c.retainedSolverResult = c.solver
+		} else if err := c.solver.Close(); err != nil {
+			return err
+		}
+		c.solver = nil
+		if err := c.mkSolver(c.manager); err != nil {
+			c.initializationError = err
+			return err
+		}
+	}
+	if err := c.restoreAssertions(0); err != nil {
+		return err
+	}
+	for i := range c.scopes {
+		c.scopes[i].assertions = 0
+		if c.solver != nil {
+			if err := c.solver.Push(); err != nil {
+				c.initializationError = err
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 // Reset follows cmd_context::reset(false) for this owning command context.
 // Session options, output and parameter services survive; the AST manager is
 // rebuilt lazily after all old-manager consumers have been released.
@@ -686,7 +752,7 @@ func (c *Context) Reset() error {
 // Also used by Close, including partial context construction where valid()
 // cannot succeed yet. Parameter services belong to the enclosing context.
 func (c *Context) resetManagerState() error {
-	if err := c.clearTacticResult(); err != nil {
+	if err := c.clearCheckSatResult(); err != nil {
 		return err
 	}
 	if c.solver != nil {

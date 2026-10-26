@@ -39759,7 +39759,16 @@
         "pkg/cmd/g3/test_vectors/global_option_success_updates.smt2",
         "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.smt2",
         "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.expected_cpp",
-        "pkg/cmd/g3/test_vectors/reset_session.smt2"
+        "pkg/cmd/g3/test_vectors/reset_session.smt2",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/reset_assertions_test.go",
+        "pkg/parsers/smt2/commands_reset_assertions_test.go",
+        "pkg/cmd/g3/reset_assertions_proof_test.go",
+        "pkg/cmd/g3/reset_assertions_reference_test.go",
+        "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
+        "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
+        "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
+        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -39775,7 +39784,15 @@
         "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments",
         "TestCommandContextReasonUnknownStateAndEscaping",
         "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
-        "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig"
+        "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig",
+        "TestCommandContextResetAssertionsPreservesWorldScopesAndResult",
+        "TestCommandContextResetAssertionsResultInvalidation",
+        "TestCommandContextResetAssertionsDefaultDropsSession",
+        "TestCommandContextResetAssertionsConstructorRefusalKeepsResult",
+        "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
+        "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
+        "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
+        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap"
       ],
       "conditionals": [
         {
@@ -39939,17 +39956,49 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "reset_assertions and mk_solver: default implicit full owning reset; global-declarations solver recreation with declarations/macros/manager/scope depth preserved, assertion limits zeroed and prior check_sat_result owner kept across repeated resets until source assertion/push/pop/check/full-reset invalidation (cmd_context.cpp:1560-1579,1823-1834,1293,1321,1426)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/reset_assertions_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_reset_assertions_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/reset_assertions_proof_test.go",
+            "pkg/cmd/g3/reset_assertions_reference_test.go",
+            "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
+            "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
+            "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
+            "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
+          ],
+          "tests": [
+            "TestCommandContextResetAssertionsPreservesWorldScopesAndResult",
+            "TestCommandContextResetAssertionsResultInvalidation",
+            "TestCommandContextResetAssertionsDefaultDropsSession",
+            "TestCommandContextResetAssertionsConstructorRefusalKeepsResult",
+            "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
+            "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
+            "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
+            "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment.",
         "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed.",
-        "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added."
+        "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added.",
+        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget."
       ],
       "deviations": [
         "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
         "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes.",
-        "This increment specializes reset to the existing owning Go command context; it does not add unused external-manager reinitialization, user-command registry state or reset-assertions. Unsupported reset-assertions remains a separate retained command integration task. Whole context/parser/command-unit completion is not claimed."
+        "The current Go shell owns its AST manager. External-manager reinitialization and a user-command registry remain outside these increments. Both reset and reset-assertions are dispatched. The default reset-assertions branch performs the owning full reset; the native extension-command parser has a separately recorded fresh-sort-initialization quirk, and strict comparisons exercise explicit empty-check initialization. Whole context/parser/command-unit completion is not claimed.",
+        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser."
       ]
     },
     {
@@ -40517,7 +40566,15 @@
         "pkg/cmd_context/reset_test.go",
         "pkg/parsers/smt2/commands_reset_test.go",
         "pkg/cmd/g3/test_vectors/reset_session.smt2",
-        "pkg/cmd/g3/test_vectors/reset_proof_sessions.smt2"
+        "pkg/cmd/g3/test_vectors/reset_proof_sessions.smt2",
+        "pkg/cmd_context/reset_assertions_test.go",
+        "pkg/parsers/smt2/commands_reset_assertions_test.go",
+        "pkg/cmd/g3/reset_assertions_proof_test.go",
+        "pkg/cmd/g3/reset_assertions_reference_test.go",
+        "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
+        "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
+        "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
+        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -40585,7 +40642,15 @@
         "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig",
         "TestCommandContextResetRebuildsSessionAndPreservesOptions",
         "TestCommandContextResetClearsInitializationRefusal",
-        "TestSMT2ResetDropsManagerBoundParserOwners"
+        "TestSMT2ResetDropsManagerBoundParserOwners",
+        "TestCommandContextResetAssertionsPreservesWorldScopesAndResult",
+        "TestCommandContextResetAssertionsResultInvalidation",
+        "TestCommandContextResetAssertionsDefaultDropsSession",
+        "TestCommandContextResetAssertionsConstructorRefusalKeepsResult",
+        "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
+        "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
+        "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
+        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap"
       ],
       "conditionals": [
         {
@@ -41312,6 +41377,36 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "reset_assertions and mk_solver: default implicit full owning reset; global-declarations solver recreation with declarations/macros/manager/scope depth preserved, assertion limits zeroed and prior check_sat_result owner kept across repeated resets until source assertion/push/pop/check/full-reset invalidation (cmd_context.cpp:1560-1579,1823-1834,1293,1321,1426)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/reset_assertions_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_reset_assertions_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/reset_assertions_proof_test.go",
+            "pkg/cmd/g3/reset_assertions_reference_test.go",
+            "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
+            "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
+            "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
+            "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
+          ],
+          "tests": [
+            "TestCommandContextResetAssertionsPreservesWorldScopesAndResult",
+            "TestCommandContextResetAssertionsResultInvalidation",
+            "TestCommandContextResetAssertionsDefaultDropsSession",
+            "TestCommandContextResetAssertionsConstructorRefusalKeepsResult",
+            "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
+            "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
+            "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
+            "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -41320,14 +41415,16 @@
         "Macro declarations own body and parameter-sort ASTRefs; caller-owned application result references survive temporary substitution cleanup and scoped definition removal.",
         "The context borrows the current io.Writer. Its strategic SAT child resolves that writer through the owning context at emission time, including subsequent parser invocations; closing the context does not close the writer.",
         "Model() acquires an independent result reference only for a current SAT/UNKNOWN check with model production enabled. UNKNOWN without a candidate still returns model-is-not-available. Registered C++ oracle covers candidate get-value, scoped contradiction and pop recovery; existing command-context tests retain stale-result and acquired-model lifetime coverage.",
-        "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added."
+        "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added.",
+        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget."
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete.",
         "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
         "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
         "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes.",
-        "This increment specializes reset to the existing owning Go command context; it does not add unused external-manager reinitialization, user-command registry state or reset-assertions. Unsupported reset-assertions remains a separate retained command integration task. Whole context/parser/command-unit completion is not claimed."
+        "The current Go shell owns its AST manager. External-manager reinitialization and a user-command registry remain outside these increments. Both reset and reset-assertions are dispatched. The default reset-assertions branch performs the owning full reset; the native extension-command parser has a separately recorded fresh-sort-initialization quirk, and strict comparisons exercise explicit empty-check initialization. Whole context/parser/command-unit completion is not claimed.",
+        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser."
       ]
     },
     {
@@ -41381,7 +41478,16 @@
         "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.smt2",
         "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.expected_cpp",
         "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
-        "pkg/cmd_context/reset_test.go"
+        "pkg/cmd_context/reset_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/reset_assertions_test.go",
+        "pkg/parsers/smt2/commands_reset_assertions_test.go",
+        "pkg/cmd/g3/reset_assertions_proof_test.go",
+        "pkg/cmd/g3/reset_assertions_reference_test.go",
+        "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
+        "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
+        "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
+        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
       ],
       "tests": [
         "TestCommandContextScopesDeclarationsAndModel",
@@ -41408,7 +41514,15 @@
         "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
         "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig",
         "TestCommandContextResetRebuildsSessionAndPreservesOptions",
-        "TestCommandContextResetClearsInitializationRefusal"
+        "TestCommandContextResetClearsInitializationRefusal",
+        "TestCommandContextResetAssertionsPreservesWorldScopesAndResult",
+        "TestCommandContextResetAssertionsResultInvalidation",
+        "TestCommandContextResetAssertionsDefaultDropsSession",
+        "TestCommandContextResetAssertionsConstructorRefusalKeepsResult",
+        "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
+        "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
+        "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
+        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap"
       ],
       "conditionals": [
         {
@@ -41662,6 +41776,36 @@
             "TestCommandContextResetRebuildsSessionAndPreservesOptions",
             "TestCommandContextResetClearsInitializationRefusal"
           ]
+        },
+        {
+          "name": "reset_assertions and mk_solver: default implicit full owning reset; global-declarations solver recreation with declarations/macros/manager/scope depth preserved, assertion limits zeroed and prior check_sat_result owner kept across repeated resets until source assertion/push/pop/check/full-reset invalidation (cmd_context.cpp:1560-1579,1823-1834,1293,1321,1426)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/reset_assertions_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_reset_assertions_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/reset_assertions_proof_test.go",
+            "pkg/cmd/g3/reset_assertions_reference_test.go",
+            "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
+            "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
+            "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
+            "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
+          ],
+          "tests": [
+            "TestCommandContextResetAssertionsPreservesWorldScopesAndResult",
+            "TestCommandContextResetAssertionsResultInvalidation",
+            "TestCommandContextResetAssertionsDefaultDropsSession",
+            "TestCommandContextResetAssertionsConstructorRefusalKeepsResult",
+            "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
+            "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
+            "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
+            "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -41670,14 +41814,16 @@
         "Macro declarations own body and parameter-sort ASTRefs; caller-owned application result references survive temporary substitution cleanup and scoped definition removal.",
         "The context borrows the current io.Writer. Its strategic SAT child resolves that writer through the owning context at emission time, including subsequent parser invocations; closing the context does not close the writer.",
         "Model() acquires an independent result reference only for a current SAT/UNKNOWN check with model production enabled. UNKNOWN without a candidate still returns model-is-not-available. Registered C++ oracle covers candidate get-value, scoped contradiction and pop recovery; existing command-context tests retain stale-result and acquired-model lifetime coverage.",
-        "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added."
+        "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added.",
+        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget."
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete.",
         "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
         "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
         "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes.",
-        "This increment specializes reset to the existing owning Go command context; it does not add unused external-manager reinitialization, user-command registry state or reset-assertions. Unsupported reset-assertions remains a separate retained command integration task. Whole context/parser/command-unit completion is not claimed."
+        "The current Go shell owns its AST manager. External-manager reinitialization and a user-command registry remain outside these increments. Both reset and reset-assertions are dispatched. The default reset-assertions branch performs the owning full reset; the native extension-command parser has a separately recorded fresh-sort-initialization quirk, and strict comparisons exercise explicit empty-check initialization. Whole context/parser/command-unit completion is not claimed.",
+        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser."
       ]
     },
     {
@@ -90907,7 +91053,15 @@
         "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.expected_cpp",
         "pkg/parsers/smt2/commands_reset_test.go",
         "pkg/cmd/g3/test_vectors/reset_session.smt2",
-        "pkg/cmd/g3/test_vectors/reset_proof_sessions.smt2"
+        "pkg/cmd/g3/test_vectors/reset_proof_sessions.smt2",
+        "pkg/cmd_context/reset_assertions_test.go",
+        "pkg/parsers/smt2/commands_reset_assertions_test.go",
+        "pkg/cmd/g3/reset_assertions_proof_test.go",
+        "pkg/cmd/g3/reset_assertions_reference_test.go",
+        "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
+        "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
+        "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
+        "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -90961,7 +91115,15 @@
         "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig",
         "TestSMT2ResetInvalidSyntaxPreservesSession",
         "TestSMT2ResetDropsManagerBoundParserOwners",
-        "TestSMT2ResetPrintsSuccessBeforeNextScannerRefusal"
+        "TestSMT2ResetPrintsSuccessBeforeNextScannerRefusal",
+        "TestCommandContextResetAssertionsPreservesWorldScopesAndResult",
+        "TestCommandContextResetAssertionsResultInvalidation",
+        "TestCommandContextResetAssertionsDefaultDropsSession",
+        "TestCommandContextResetAssertionsConstructorRefusalKeepsResult",
+        "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
+        "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
+        "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
+        "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap"
       ],
       "assertions": [
         {
@@ -91892,6 +92054,36 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTLibRunnerProofScript"
           ]
+        },
+        {
+          "name": "reset-assertions extension-command dispatch, source argument diagnostics and owning-parser cache cleanup; strict native initialization route and separately retained legacy fresh-sort lookup discrepancy (smt2parser.cpp:2809-2847; basic_cmds.cpp:278)",
+          "status": "partial",
+          "go_targets": [
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd_context/reset_assertions_test.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/commands_reset_assertions_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/reset_assertions_proof_test.go",
+            "pkg/cmd/g3/reset_assertions_reference_test.go",
+            "pkg/cmd/g3/test_vectors/reset_assertions_global.smt2",
+            "pkg/cmd/g3/test_vectors/reset_assertions_default.smt2",
+            "pkg/cmd/g3/test_vectors/reset_assertions_proofs.smt2",
+            "pkg/cmd/g3/test_vectors/pending_reset_assertions_native_sort_init.smt2"
+          ],
+          "tests": [
+            "TestCommandContextResetAssertionsPreservesWorldScopesAndResult",
+            "TestCommandContextResetAssertionsResultInvalidation",
+            "TestCommandContextResetAssertionsDefaultDropsSession",
+            "TestCommandContextResetAssertionsConstructorRefusalKeepsResult",
+            "TestCommandContextResetAssertionsColdContextKeepsSourceLogicPolicy",
+            "TestSMT2ResetAssertionsSyntaxAndParserLifetimes",
+            "TestSMTLibRunnerResetAssertionsPreservesProofResultsCPPReference",
+            "TestSMTLibRunnerResetAssertionsNativeSortInitializationGap",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -91900,7 +92092,8 @@
         "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed.",
         "Quantifier metadata belongs to a concrete ASTQuantifierSpec local to its recursive grammar frame. Command-local ASTRefs retain parsed pattern terms and pattern applications until the resulting quantifier is owned by the command context. Parser option snapshots release their temporary ParamsRef owner immediately; rejected metadata unwinds the existing local-binding and command-root cleanup.",
         "The context borrows the current io.Writer. Its strategic SAT child resolves that writer through the owning context at emission time, including subsequent parser invocations; closing the context does not close the writer.",
-        "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added."
+        "The owning shell resets manager consumers before manager teardown. Parser-owned references/local bindings and its VarShifter are released while the old manager is live; parser caches are detached and recreated lazily. Context options, parameter references, process services and output transport remain owned/borrowed by the existing session, and Close shares only the manager-state teardown before closing the enclosing services. Tests release the complete session to zero budget, preserve the first scanner error after a completed reset, and recover from cached manager-construction refusal. No generic manager translation or external-manager adapter is added.",
+        "Global-declaration reset keeps the previous checked solver result alive through a concrete retainedSolverResult owner, or preserves the existing independent tactic result, while constructing a fresh active solver over the same AST manager. Normal source invalidation closes the retained owner, including zero/invalid pop, assertion, push, subsequent check and full teardown. Repeated resets retain one prior result, not a chain of unused solver instances. Scoped assertion limits are reset before future pop; parser ownership is discarded only for the full-reset mode. Constructor refusal keeps the old check result available and the full reset recovers the existing initialization-error guard. Session fixtures and parser tests verify final zero budget."
       ],
       "deviations": [
         "The retained Array constructor now parses all supplied sort arguments, using the final sort as range and preceding sorts as domains, matching native variadic array sorts. Empty/unary constructors are rejected before installing the declaration. Two multidimensional store/read scope scripts, with proofs disabled/enabled, now run through the public parser and compare against C++; strict runner agreement is 130.",
@@ -91911,7 +92104,8 @@
         "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
         "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
         "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes.",
-        "This increment specializes reset to the existing owning Go command context; it does not add unused external-manager reinitialization, user-command registry state or reset-assertions. Unsupported reset-assertions remains a separate retained command integration task. Whole context/parser/command-unit completion is not claimed."
+        "The current Go shell owns its AST manager. External-manager reinitialization and a user-command registry remain outside these increments. Both reset and reset-assertions are dispatched. The default reset-assertions branch performs the owning full reset; the native extension-command parser has a separately recorded fresh-sort-initialization quirk, and strict comparisons exercise explicit empty-check initialization. Whole context/parser/command-unit completion is not claimed.",
+        "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser."
       ]
     },
     {

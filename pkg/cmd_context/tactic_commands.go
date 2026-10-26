@@ -172,12 +172,18 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 	}
 }
 
-func (c *Context) clearTacticResult() error {
+func (c *Context) clearCheckSatResult() error {
 	if c.tacticResult != nil {
 		if err := c.tacticResult.Close(); err != nil {
 			return err
 		}
 		c.tacticResult = nil
+	}
+	if c.retainedSolverResult != nil {
+		if err := c.retainedSolverResult.Close(); err != nil {
+			return err
+		}
+		c.retainedSolverResult = nil
 	}
 	return nil
 }
@@ -185,6 +191,9 @@ func (c *Context) clearTacticResult() error {
 func (c *Context) checkSatResult() solver.CheckSatResult {
 	if c.tacticResult != nil {
 		return c.tacticResult
+	}
+	if c.retainedSolverResult != nil {
+		return c.retainedSolverResult
 	}
 	return c.solver
 }
@@ -282,7 +291,7 @@ func (c *Context) CheckSatUsing(selected tactic.Tactic, options *uparams.ParamsR
 		return lbool.Undef, err
 	}
 	c.checked = false
-	if err = c.clearTacticResult(); err != nil {
+	if err = c.clearCheckSatResult(); err != nil {
 		return lbool.Undef, err
 	}
 	c.tacticResult, err = solver.NewSimpleCheckSatResult(m)

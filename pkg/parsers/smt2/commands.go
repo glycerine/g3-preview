@@ -412,23 +412,33 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		success = false
-	case "reset":
-		if err = p.requireEnd(); err != nil {
-			return false, err
+	case "reset", "reset-assertions":
+		if p.token != RightParenToken {
+			if name == "reset" {
+				return false, fmt.Errorf("invalid reset command, ')' expected")
+			}
+			return false, fmt.Errorf("invalid command, too many arguments")
 		}
 		// Release parser-owned roots and its manager-bound shifter before
 		// cmd_context::reset destroys the old AST manager.
 		if err = p.clearCommand(); err != nil {
 			return false, err
 		}
-		if p.shifter != nil {
-			if err = p.shifter.Close(); err != nil {
-				return false, err
+		if name == "reset" || !p.context.GlobalDeclarations {
+			if p.shifter != nil {
+				if err = p.shifter.Close(); err != nil {
+					return false, err
+				}
+				p.shifter = nil
 			}
-			p.shifter = nil
+			p.manager = nil
 		}
-		p.manager = nil
-		if err = p.context.Reset(); err != nil {
+		if name == "reset" {
+			err = p.context.Reset()
+		} else {
+			err = p.context.ResetAssertions()
+		}
+		if err != nil {
 			return false, err
 		}
 		if p.context.PrintSuccess {

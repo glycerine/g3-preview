@@ -338,6 +338,8 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"reset_assertions_default.smt2":                "success\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsuccess\nsat\n((x 3))\n",
+	"reset_assertions_global.smt2":                 "sat\n((x 7)\n (y 5)\n ((twice x) 14))\n((x 7)\n (y 5)\n ((twice x) 14))\n((x 7))\nsat\n((x 0)\n (y 0)\n ((twice x) 0))\nsat\n((x 3)\n (y 4)\n ((twice x) 6))\nunsat\n(contradiction)\n(contradiction)\nsat\n((x 0)\n (y 0)\n ((twice x) 0))\n",
 	"reset_session.smt2":                           "success\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsuccess\nsuccess\nsuccess\nsat\n(((> x 4) true))\nsuccess\nsuccess\nunsat\n(bound impossible)\nsuccess\nsat\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsuccess\nsuccess\nsat\n((answer 1))\n",
 	"difference_shortcut_cores_real.smt2":          "sat\nsat\nunsat\n(full chain3 strict_close)\nsat\nunsat\n(weak_close near chain0 chain3)\nsat\n",
 	"difference_shortcut_cores_int.smt2":           "sat\nsat\nunsat\n(full chain3 strict_close)\nsat\nunsat\n(weak_close near chain0 chain3)\nsat\n",
