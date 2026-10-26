@@ -139367,7 +139367,9 @@
         "pkg/smtcore/theory_str_tester_variables.go",
         "pkg/smtcore/theory_str_tester_variables_test.go",
         "pkg/smtcore/theory_str_value_encoding.go",
-        "pkg/smtcore/theory_str_value_encoding_test.go"
+        "pkg/smtcore/theory_str_value_encoding_test.go",
+        "pkg/smtcore/theory_str_value_options.go",
+        "pkg/smtcore/theory_str_value_options_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139558,7 +139560,11 @@
         "TestSMTStringTesterNamesRolesAndOwnership",
         "TestSMTStringTesterFormattingFailurePreservesCounters",
         "TestSMTStringValueEncodingCompleteByteAndTwoByteSpaces",
-        "TestSMTStringValueEncodingRejectsInvalidProducerState"
+        "TestSMTStringValueEncodingRejectsInvalidProducerState",
+        "TestSMTStringValueOptionsWindowsGuardsAndCoverage",
+        "TestSMTStringValueOptionsEmptyAndInvalidHistory",
+        "TestSMTStringValueOptionsCachePhasesAndSelfGuard",
+        "TestSMTStringValueOptionsTwoByteCarryBoundary"
       ],
       "conditionals": [
         {
@@ -141205,6 +141211,17 @@
             "TestSMTStringValueEncodingCompleteByteAndTwoByteSpaces",
             "TestSMTStringValueEncodingRejectsInvalidProducerState"
           ]
+        },
+        {
+          "name": "gen_val_options: 32-word base-255 enumeration batches, last-encoding state, numeric selector/word equivalences, coverage-dependent more choice, aggressive cached phases, optional value literal cache and selected-length/all-previous-more guard with self exclusion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_value_options.go",
+          "tests": [
+            "TestSMTStringValueOptionsWindowsGuardsAndCoverage",
+            "TestSMTStringValueOptionsEmptyAndInvalidHistory",
+            "TestSMTStringValueOptionsCachePhasesAndSelfGuard",
+            "TestSMTStringValueOptionsTwoByteCarryBoundary"
+          ]
         }
       ],
       "ownership": [
@@ -141242,7 +141259,8 @@
         "Assigned final checking borrows dependency-analysis handles and private String union-find classes; the collected free-variable slice owns no AST roots. Conversion agreement retains its existing callback-owned formula roots, scope-tracked agreement membership and dynamic append-aware conversion vector traversal. Assigned regex completeness reads scoped path membership without inventing model values or allocating unused decoy variables. Existing String model factories/procedures build assigned byte values after actual grounded kernel completion.",
         "Free-variable ordering borrows candidate/private-class AST handles, stores concrete temporary Go sets/slices and returns a borrowed visitation slice. Missing standalone enodes are internalized exactly at the source check; no invented variable registration, AST candidate values, generic assumption adapter or input-length cache is added. Private-class deduplication and direct representative-parent inspection remain separate; standalone unknown lengths retain the source aloneVars[-1] specialization.",
         "Length-option generation returns a caller-owned ASTRef while preserving native direct lifetime-trail roots for known-length and first-window formulas; later guarded formulas receive no extra direct root. Concrete int32 numeric-label cache entries borrow explicitly retained roots and history entries borrow existing indicator roots. Cache misses preserve the native insertion-before-extra-trail-root order; hits reuse handles without another direct root. Local formula roots release forward. Internal-variable membership remains lifetime-persistent across scope pops as in current source; prior guards use that actual membership. No unused case-split vector or universal callback/template adapter is added, but its live equality internalizations remain.",
-        "Tester variables preserve both direct lifetime-trail roots from mk_str_var and the creator, retain lifetime role membership across scope pops and initialize independent counters on Fresh. Value encoding reads borrowed concrete digit slices and returns independently owned Go bytes/slices; overflow resets the output. Project SMT2 formatting uses a budgeted stream closed on all exits; no C++ stringstream/STL port or universal template adapter is introduced."
+        "Tester variables preserve both direct lifetime-trail roots from mk_str_var and the creator, retain lifetime role membership across scope pops and initialize independent counters on Fresh. Value encoding reads borrowed concrete digit slices and returns independently owned Go bytes/slices; overflow resets the output. Project SMT2 formatting uses a budgeted stream closed on all exits; no C++ stringstream/STL port or universal template adapter is introduced.",
+        "Value-option history stores concrete scoped indicator entries, independently copied final digit vectors and explicitly lifetime-rooted optional String literals. Cache hits add no extra direct root; returned value formulas have only caller-owned ASTRef ownership. Local formula roots release forward. Previous value guards intentionally do not filter lifetime internal-variable membership, unlike length guards, and skip entries equal to the current tester. Fresh initializes empty maps; Close releases existing lifetime roots and zeroes tester state."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141285,7 +141303,8 @@
         "Actual FinalCheck now continues after the regex stage into the full source free-variable scan and the no-free-variables conversion/path-completeness branch. It can return native Done for fully assigned cases, including a Boolean-only parent with a registered String owner and a grounded legacy String model; cases requiring free-variable testers still GiveUp pending that suffix. Five regressions cover all-variable versus dependency-root scanning, private constants and excluded roles, positive/negative/undefined assigned-regex path gates, disabled automata mode, complete ordered conversion traversal including later errors after earlier progress, unknown zero-split continuation and stable agreements, and actual kernel/model byte preservation. The ASCII grounded result/model is compared directly with the prebuilt C++ z3str3 backend when G3_CPP_REFERENCE is set; NUL/high bytes have independent Go byte checks. Updated older blanket-incomplete expectations for newly supported grounded cases; fixtures intended to test unresolved variables now perform their real set_up_axioms registration. Remaining free-variable selection/tester/unroll algorithms and production QF_S routing are unchanged. Source units remain partial.",
         "The process_free_var selection prefix and get_var_in_eqc are directly verified, preserving role asymmetry (regex candidates excluded here, internal candidates not independently filtered), dependency-count irrelevance, registered-private-class deduplication, direct-parent rather than whole-class concat checks, known-length priority, missing-enode internalization and unreachable String-sort length-registration behavior. Native unordered sets use existing deterministic Go handle order; only the actually produced aloneVars[-1] group is represented. This prefix is ready for the remaining length/value tester generator and is not yet wired into the unfinished free-variable dispatch; it does not establish complete tester generation or legacy String solving. Production routing and source unit statuses remain unchanged.",
         "The fixed-width length-option generator is directly verified against independent selector/length truth tables for three successive windows and guarded replays, a known length above uint64, actual arithmetic atom registration, all small/large/more branch priorities, aggressive relevance and cached true/false phases without assignment or try-true-first, cache-hit ownership and post-pop prior-indicator guards. Known length is checked before window preconditions; invalid unknown-length tries and undefined native signed multiplication overflow become Go domain errors. This routine is ready for the still-unported tester creator/control loop and is not yet connected to the incomplete free-variable generation branch. Production routing and source unit statuses remain unchanged.",
-        "Tester creation and value encoding are directly verified by exact quoted subject names, independent/shared counters, role/queue/scope/root ownership, Fresh reset, pre-counter formatting failure, all 255 one-byte and 65025 two-byte words, empty-word exhaustion, high bytes, carry order, nonaliasing and invalid producer state. Specialize to the actually retained length-plus-one zero-sentinel vectors and active NUL-free alphabet; invalid states become Go domain errors. These prerequisites are not yet wired into unfinished value-option generation/free-variable dispatch. String source units remain partial; production routing and the latest full native checkpoint are unchanged."
+        "Tester creation and value encoding are directly verified by exact quoted subject names, independent/shared counters, role/queue/scope/root ownership, Fresh reset, pre-counter formatting failure, all 255 one-byte and 65025 two-byte words, empty-word exhaustion, high bytes, carry order, nonaliasing and invalid producer state. Specialize to the actually retained length-plus-one zero-sentinel vectors and active NUL-free alphabet; invalid states become Go domain errors. These prerequisites are not yet wired into unfinished value-option generation/free-variable dispatch. String source units remain partial; production routing and the latest full native checkpoint are unchanged.",
+        "The 32-candidate value-option generator is directly verified across all eight one-byte batches including the shortened exhaustive last batch, empty-word coverage, two-byte carry at ordinals 254/255, exact selected-length and prior-more guard truth tables, scope/membership asymmetry, self exclusion, ordinary noninternalization versus aggressive relevant cached phases, absence of invented branch priorities, fast-cache hit reference counts and Fresh reset. Parse actual retained decimal length labels with Go strconv; invalid labels, undefined native signed overflow, missing producer history and reentry after full coverage become domain errors. This generator remains a prerequisite for unfinished gen_free_var_options and free-variable/unroll dispatch; legacy String source units remain partial and production routing/full checkpoint are unchanged."
       ]
     },
     {
@@ -141386,7 +141405,9 @@
         "pkg/smtcore/theory_str_tester_variables.go",
         "pkg/smtcore/theory_str_tester_variables_test.go",
         "pkg/smtcore/theory_str_value_encoding.go",
-        "pkg/smtcore/theory_str_value_encoding_test.go"
+        "pkg/smtcore/theory_str_value_encoding_test.go",
+        "pkg/smtcore/theory_str_value_options.go",
+        "pkg/smtcore/theory_str_value_options_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -141578,7 +141599,11 @@
         "TestSMTStringTesterNamesRolesAndOwnership",
         "TestSMTStringTesterFormattingFailurePreservesCounters",
         "TestSMTStringValueEncodingCompleteByteAndTwoByteSpaces",
-        "TestSMTStringValueEncodingRejectsInvalidProducerState"
+        "TestSMTStringValueEncodingRejectsInvalidProducerState",
+        "TestSMTStringValueOptionsWindowsGuardsAndCoverage",
+        "TestSMTStringValueOptionsEmptyAndInvalidHistory",
+        "TestSMTStringValueOptionsCachePhasesAndSelfGuard",
+        "TestSMTStringValueOptionsTwoByteCarryBoundary"
       ],
       "conditionals": [
         {
@@ -142543,6 +142568,17 @@
             "TestSMTStringValueEncodingCompleteByteAndTwoByteSpaces",
             "TestSMTStringValueEncodingRejectsInvalidProducerState"
           ]
+        },
+        {
+          "name": "gen_val_options: 32-word base-255 enumeration batches, last-encoding state, numeric selector/word equivalences, coverage-dependent more choice, aggressive cached phases, optional value literal cache and selected-length/all-previous-more guard with self exclusion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_value_options.go",
+          "tests": [
+            "TestSMTStringValueOptionsWindowsGuardsAndCoverage",
+            "TestSMTStringValueOptionsEmptyAndInvalidHistory",
+            "TestSMTStringValueOptionsCachePhasesAndSelfGuard",
+            "TestSMTStringValueOptionsTwoByteCarryBoundary"
+          ]
         }
       ],
       "ownership": [
@@ -142581,7 +142617,8 @@
         "Assigned final checking borrows dependency-analysis handles and private String union-find classes; the collected free-variable slice owns no AST roots. Conversion agreement retains its existing callback-owned formula roots, scope-tracked agreement membership and dynamic append-aware conversion vector traversal. Assigned regex completeness reads scoped path membership without inventing model values or allocating unused decoy variables. Existing String model factories/procedures build assigned byte values after actual grounded kernel completion.",
         "Free-variable ordering borrows candidate/private-class AST handles, stores concrete temporary Go sets/slices and returns a borrowed visitation slice. Missing standalone enodes are internalized exactly at the source check; no invented variable registration, AST candidate values, generic assumption adapter or input-length cache is added. Private-class deduplication and direct representative-parent inspection remain separate; standalone unknown lengths retain the source aloneVars[-1] specialization.",
         "Length-option generation returns a caller-owned ASTRef while preserving native direct lifetime-trail roots for known-length and first-window formulas; later guarded formulas receive no extra direct root. Concrete int32 numeric-label cache entries borrow explicitly retained roots and history entries borrow existing indicator roots. Cache misses preserve the native insertion-before-extra-trail-root order; hits reuse handles without another direct root. Local formula roots release forward. Internal-variable membership remains lifetime-persistent across scope pops as in current source; prior guards use that actual membership. No unused case-split vector or universal callback/template adapter is added, but its live equality internalizations remain.",
-        "Tester variables preserve both direct lifetime-trail roots from mk_str_var and the creator, retain lifetime role membership across scope pops and initialize independent counters on Fresh. Value encoding reads borrowed concrete digit slices and returns independently owned Go bytes/slices; overflow resets the output. Project SMT2 formatting uses a budgeted stream closed on all exits; no C++ stringstream/STL port or universal template adapter is introduced."
+        "Tester variables preserve both direct lifetime-trail roots from mk_str_var and the creator, retain lifetime role membership across scope pops and initialize independent counters on Fresh. Value encoding reads borrowed concrete digit slices and returns independently owned Go bytes/slices; overflow resets the output. Project SMT2 formatting uses a budgeted stream closed on all exits; no C++ stringstream/STL port or universal template adapter is introduced.",
+        "Value-option history stores concrete scoped indicator entries, independently copied final digit vectors and explicitly lifetime-rooted optional String literals. Cache hits add no extra direct root; returned value formulas have only caller-owned ASTRef ownership. Local formula roots release forward. Previous value guards intentionally do not filter lifetime internal-variable membership, unlike length guards, and skip entries equal to the current tester. Fresh initializes empty maps; Close releases existing lifetime roots and zeroes tester state."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -142625,7 +142662,8 @@
         "Actual FinalCheck now continues after the regex stage into the full source free-variable scan and the no-free-variables conversion/path-completeness branch. It can return native Done for fully assigned cases, including a Boolean-only parent with a registered String owner and a grounded legacy String model; cases requiring free-variable testers still GiveUp pending that suffix. Five regressions cover all-variable versus dependency-root scanning, private constants and excluded roles, positive/negative/undefined assigned-regex path gates, disabled automata mode, complete ordered conversion traversal including later errors after earlier progress, unknown zero-split continuation and stable agreements, and actual kernel/model byte preservation. The ASCII grounded result/model is compared directly with the prebuilt C++ z3str3 backend when G3_CPP_REFERENCE is set; NUL/high bytes have independent Go byte checks. Updated older blanket-incomplete expectations for newly supported grounded cases; fixtures intended to test unresolved variables now perform their real set_up_axioms registration. Remaining free-variable selection/tester/unroll algorithms and production QF_S routing are unchanged. Source units remain partial.",
         "The process_free_var selection prefix and get_var_in_eqc are directly verified, preserving role asymmetry (regex candidates excluded here, internal candidates not independently filtered), dependency-count irrelevance, registered-private-class deduplication, direct-parent rather than whole-class concat checks, known-length priority, missing-enode internalization and unreachable String-sort length-registration behavior. Native unordered sets use existing deterministic Go handle order; only the actually produced aloneVars[-1] group is represented. This prefix is ready for the remaining length/value tester generator and is not yet wired into the unfinished free-variable dispatch; it does not establish complete tester generation or legacy String solving. Production routing and source unit statuses remain unchanged.",
         "The fixed-width length-option generator is directly verified against independent selector/length truth tables for three successive windows and guarded replays, a known length above uint64, actual arithmetic atom registration, all small/large/more branch priorities, aggressive relevance and cached true/false phases without assignment or try-true-first, cache-hit ownership and post-pop prior-indicator guards. Known length is checked before window preconditions; invalid unknown-length tries and undefined native signed multiplication overflow become Go domain errors. This routine is ready for the still-unported tester creator/control loop and is not yet connected to the incomplete free-variable generation branch. Production routing and source unit statuses remain unchanged.",
-        "Tester creation and value encoding are directly verified by exact quoted subject names, independent/shared counters, role/queue/scope/root ownership, Fresh reset, pre-counter formatting failure, all 255 one-byte and 65025 two-byte words, empty-word exhaustion, high bytes, carry order, nonaliasing and invalid producer state. Specialize to the actually retained length-plus-one zero-sentinel vectors and active NUL-free alphabet; invalid states become Go domain errors. These prerequisites are not yet wired into unfinished value-option generation/free-variable dispatch. String source units remain partial; production routing and the latest full native checkpoint are unchanged."
+        "Tester creation and value encoding are directly verified by exact quoted subject names, independent/shared counters, role/queue/scope/root ownership, Fresh reset, pre-counter formatting failure, all 255 one-byte and 65025 two-byte words, empty-word exhaustion, high bytes, carry order, nonaliasing and invalid producer state. Specialize to the actually retained length-plus-one zero-sentinel vectors and active NUL-free alphabet; invalid states become Go domain errors. These prerequisites are not yet wired into unfinished value-option generation/free-variable dispatch. String source units remain partial; production routing and the latest full native checkpoint are unchanged.",
+        "The 32-candidate value-option generator is directly verified across all eight one-byte batches including the shortened exhaustive last batch, empty-word coverage, two-byte carry at ordinals 254/255, exact selected-length and prior-more guard truth tables, scope/membership asymmetry, self exclusion, ordinary noninternalization versus aggressive relevant cached phases, absence of invented branch priorities, fast-cache hit reference counts and Fresh reset. Parse actual retained decimal length labels with Go strconv; invalid labels, undefined native signed overflow, missing producer history and reentry after full coverage become domain errors. This generator remains a prerequisite for unfinished gen_free_var_options and free-variable/unroll dispatch; legacy String source units remain partial and production routing/full checkpoint are unchanged."
       ]
     },
     {

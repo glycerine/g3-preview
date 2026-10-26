@@ -12,10 +12,22 @@ type smtStringTesterState struct {
 	lengthID, valueID int32
 	lengthIndicators  map[ast.ASTHandle][]ast.ASTHandle
 	lengthLiterals    map[int32]ast.ASTHandle
+	valueIndicators   map[ast.ASTHandle]map[int32][]smtStringScopedIndicator
+	valueRanges       map[ast.ASTHandle][]int32
+	valueLiterals     map[string]ast.ASTHandle
+}
+
+type smtStringScopedIndicator struct {
+	level    uint32
+	variable ast.ASTHandle
 }
 
 func newStringTesterState() smtStringTesterState {
-	return smtStringTesterState{lengthIndicators: make(map[ast.ASTHandle][]ast.ASTHandle), lengthLiterals: make(map[int32]ast.ASTHandle)}
+	return smtStringTesterState{
+		lengthIndicators: make(map[ast.ASTHandle][]ast.ASTHandle), lengthLiterals: make(map[int32]ast.ASTHandle),
+		valueIndicators: make(map[ast.ASTHandle]map[int32][]smtStringScopedIndicator),
+		valueRanges:     make(map[ast.ASTHandle][]int32), valueLiterals: make(map[string]ast.ASTHandle),
+	}
 }
 
 func (t *SMTStringTheory) forceStringTesterPhase(left, right ast.ASTHandle, phase bool) error {
