@@ -644,10 +644,17 @@ func (c *Context) Model() (*model.ModelCore, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !c.checked || c.status != lbool.True || !state.Model {
+	if !c.checked || c.status != lbool.True && c.status != lbool.Undef || !state.Model {
 		return nil, fmt.Errorf("model is not available")
 	}
-	return c.checkSatResult().AcquireModel()
+	value, err := c.checkSatResult().AcquireModel()
+	if err != nil {
+		return nil, err
+	}
+	if value == nil {
+		return nil, fmt.Errorf("model is not available")
+	}
+	return value, nil
 }
 
 func (c *Context) WriteModel(out io.Writer) (result error) {

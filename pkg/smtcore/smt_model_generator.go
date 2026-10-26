@@ -12,14 +12,15 @@ import (
 )
 
 type SMTModelGenerator struct {
-	manager    *ast.ASTManager
-	context    *SMTCheckerContext
-	model      *protomodel.ProtoModel
-	extraFresh []*SMTExtraFreshValue
-	rootValues map[*SMTEnode]ast.ASTHandle
-	refs       []ast.ASTRef
-	freshIndex uint32
-	closed     bool
+	manager       *ast.ASTManager
+	context       *SMTCheckerContext
+	model         *protomodel.ProtoModel
+	extraFresh    []*SMTExtraFreshValue
+	rootValues    map[*SMTEnode]ast.ASTHandle
+	searchFailure SMTFailure // Active kernel's failure when building this candidate.
+	refs          []ast.ASTRef
+	freshIndex    uint32
+	closed        bool
 }
 
 func NewSMTModelGenerator(manager *ast.ASTManager) (*SMTModelGenerator, error) {
@@ -468,6 +469,17 @@ func (g *SMTModelGenerator) publishFunctionInterpretations(state *SMTInternalize
 			if err = g.model.Core().RegisterFunction(node.declaration, interpretation); err != nil {
 				_ = interpretation.Close()
 				return err
+			}
+		}
+		if g.searchFailure == SMTFailureTheory {
+			// An incomplete theory can assign identical argument values to
+			// distinct congruence roots. Native keeps the first such entry.
+			entry, err := interpretation.FindEntry(arguments)
+			if err != nil {
+				return err
+			}
+			if entry != nil {
+				continue
 			}
 		}
 		if err = interpretation.InsertNewEntry(arguments, result); err != nil {

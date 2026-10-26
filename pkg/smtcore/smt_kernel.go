@@ -419,6 +419,7 @@ func (k *SMTKernel) buildCandidateModelGenerator() (*SMTModelGenerator, error) {
 	if err = generator.SetContext(k.checker); err != nil {
 		return fail(err)
 	}
+	generator.searchFailure = k.lastFailure
 	if err = generator.InitializeModel(k.modelConfig); err != nil {
 		return fail(err)
 	}
