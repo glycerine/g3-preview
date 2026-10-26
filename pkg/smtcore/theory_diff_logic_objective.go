@@ -411,5 +411,8 @@ func (t *SMTIntegerDiffTheory) diffObjectiveInequality(v SMTTheoryVar, value sim
 	return m.MkFamilyApp(t.FamilyID(), op, nil, []ast.ASTHandle{expression, numeral})
 }
 func (t *SMTRealDiffTheory) MakeObjectiveLowerBound(_ *tactic.FilterModelConverter, v SMTTheoryVar, value simplex.Infinitesimal) (ast.ASTHandle, error) {
+	if value.Infinity.Sign() != 0 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
 	return t.diffObjectiveInequality(v, value, false)
 }

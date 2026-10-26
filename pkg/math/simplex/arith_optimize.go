@@ -43,10 +43,10 @@ type arithmeticOptimizer struct {
 }
 
 func arithmeticMinusOne(value *Infinitesimal) bool {
-	return value.Main.Cmp(big.NewRat(-1, 1)) == 0 && value.Epsilon.Sign() == 0
+	return value.Infinity.Sign() == 0 && value.Main.Cmp(big.NewRat(-1, 1)) == 0 && value.Epsilon.Sign() == 0
 }
 func arithmeticInteger(value *Infinitesimal) bool {
-	return value.Main.IsInt() && value.Epsilon.Sign() == 0
+	return value.IsRational() && value.Main.IsInt()
 }
 func arithmeticSafeGain(min, max *Infinitesimal) bool {
 	return arithmeticMinusOne(max) || min.Cmp(max) <= 0
@@ -68,6 +68,7 @@ func arithmeticNormalizeGain(divisor *big.Rat, gain *Infinitesimal) {
 	quotient := gain.Clone()
 	quotient.Quo(divisor)
 	gain.Main.Mul(new(big.Rat).SetInt(arithmeticFloor(&quotient)), divisor)
+	gain.Infinity.SetInt64(0)
 	gain.Epsilon.SetInt64(0)
 }
 
@@ -123,6 +124,7 @@ func (o *arithmeticOptimizer) updateGains(increase bool, base uint32, coefficien
 		}
 		if !arithmeticInteger(max) {
 			max.Main.SetInt(arithmeticFloor(max))
+			max.Infinity.SetInt64(0)
 			max.Epsilon.SetInt64(0)
 			arithmeticNormalizeGain(&min.Main, max)
 		}
@@ -132,6 +134,7 @@ func (o *arithmeticOptimizer) updateGains(increase bool, base uint32, coefficien
 	}
 	if o.config.IntegerColumns[base] {
 		available.Main.SetInt(arithmeticFloor(&available))
+		available.Infinity.SetInt64(0)
 		available.Epsilon.SetInt64(0)
 		arithmeticNormalizeGain(&min.Main, &available)
 	}

@@ -10,12 +10,19 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-// Infinitesimal is the exact a+b*epsilon numeral used for bounds and values.
-// Comparison is lexicographic in Main and Epsilon.
-type Infinitesimal struct{ Main, Epsilon big.Rat }
+// Infinitesimal is the exact c*infinity+a+b*epsilon value. Infinity is zero
+// for the existing mpz/mpq consumers; the retained arithmetic inf_ext
+// specialization uses all three rational components, ordered lexicographically.
+type Infinitesimal struct{ Infinity, Main, Epsilon big.Rat }
 
 func NewInfinitesimal(main, epsilon *big.Rat) Infinitesimal {
+	return NewInfiniteInfinitesimal(nil, main, epsilon)
+}
+func NewInfiniteInfinitesimal(infinity, main, epsilon *big.Rat) Infinitesimal {
 	var r Infinitesimal
+	if infinity != nil {
+		r.Infinity.Set(infinity)
+	}
 	if main != nil {
 		r.Main.Set(main)
 	}
@@ -25,42 +32,75 @@ func NewInfinitesimal(main, epsilon *big.Rat) Infinitesimal {
 	return r
 }
 func RationalInfinitesimal(v *big.Rat) Infinitesimal { return NewInfinitesimal(v, nil) }
-func (a *Infinitesimal) Set(b *Infinitesimal)        { a.Main.Set(&b.Main); a.Epsilon.Set(&b.Epsilon) }
-func (a *Infinitesimal) Clone() Infinitesimal        { return NewInfinitesimal(&a.Main, &a.Epsilon) }
+func (a *Infinitesimal) Set(b *Infinitesimal) {
+	a.Infinity.Set(&b.Infinity)
+	a.Main.Set(&b.Main)
+	a.Epsilon.Set(&b.Epsilon)
+}
+func (a *Infinitesimal) Clone() Infinitesimal {
+	return NewInfiniteInfinitesimal(&a.Infinity, &a.Main, &a.Epsilon)
+}
 func (a *Infinitesimal) Add(b *Infinitesimal) {
+	a.Infinity.Add(&a.Infinity, &b.Infinity)
 	a.Main.Add(&a.Main, &b.Main)
 	a.Epsilon.Add(&a.Epsilon, &b.Epsilon)
 }
 func (a *Infinitesimal) Sub(b *Infinitesimal) {
+	a.Infinity.Sub(&a.Infinity, &b.Infinity)
 	a.Main.Sub(&a.Main, &b.Main)
 	a.Epsilon.Sub(&a.Epsilon, &b.Epsilon)
 }
-func (a *Infinitesimal) Neg()           { a.Main.Neg(&a.Main); a.Epsilon.Neg(&a.Epsilon) }
-func (a *Infinitesimal) Mul(q *big.Rat) { a.Main.Mul(&a.Main, q); a.Epsilon.Mul(&a.Epsilon, q) }
-func (a *Infinitesimal) Quo(q *big.Rat) { a.Main.Quo(&a.Main, q); a.Epsilon.Quo(&a.Epsilon, q) }
+func (a *Infinitesimal) Neg() {
+	a.Infinity.Neg(&a.Infinity)
+	a.Main.Neg(&a.Main)
+	a.Epsilon.Neg(&a.Epsilon)
+}
+func (a *Infinitesimal) Mul(q *big.Rat) {
+	a.Infinity.Mul(&a.Infinity, q)
+	a.Main.Mul(&a.Main, q)
+	a.Epsilon.Mul(&a.Epsilon, q)
+}
+func (a *Infinitesimal) Quo(q *big.Rat) {
+	a.Infinity.Quo(&a.Infinity, q)
+	a.Main.Quo(&a.Main, q)
+	a.Epsilon.Quo(&a.Epsilon, q)
+}
 func (a *Infinitesimal) Sign() int {
+	if n := a.Infinity.Sign(); n != 0 {
+		return n
+	}
 	if n := a.Main.Sign(); n != 0 {
 		return n
 	}
 	return a.Epsilon.Sign()
 }
 func (a *Infinitesimal) Cmp(b *Infinitesimal) int {
+	if n := a.Infinity.Cmp(&b.Infinity); n != 0 {
+		return n
+	}
 	if n := a.Main.Cmp(&b.Main); n != 0 {
 		return n
 	}
 	return a.Epsilon.Cmp(&b.Epsilon)
 }
-func (a *Infinitesimal) IsZero() bool { return a.Main.Sign() == 0 && a.Epsilon.Sign() == 0 }
+func (a *Infinitesimal) IsZero() bool {
+	return a.Infinity.Sign() == 0 && a.Main.Sign() == 0 && a.Epsilon.Sign() == 0
+}
+func (a *Infinitesimal) IsRational() bool { return a.Infinity.Sign() == 0 && a.Epsilon.Sign() == 0 }
 func (a *Infinitesimal) Abs() {
 	if a.Sign() < 0 {
 		a.Neg()
 	}
 }
 func (a *Infinitesimal) String() string {
-	if a.Epsilon.Sign() == 0 {
-		return a.Main.RatString()
+	text := a.Main.RatString()
+	if a.Epsilon.Sign() != 0 {
+		text += "+" + a.Epsilon.RatString() + "*epsilon"
 	}
-	return a.Main.RatString() + "+" + a.Epsilon.RatString() + "*epsilon"
+	if a.Infinity.Sign() != 0 {
+		text = a.Infinity.RatString() + "*infinity+" + text
+	}
+	return text
 }
 
 type variableInfo struct {

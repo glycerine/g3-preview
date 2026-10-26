@@ -131,6 +131,7 @@ func (s *Solver) ArithmeticRandomUpdate(variable uint32, integers map[uint32]boo
 				integer = arithmeticCeil(value)
 			}
 			value.Main.SetInt(integer)
+			value.Infinity.SetInt64(0)
 			value.Epsilon.SetInt64(0)
 			value.Quo(&interval.Multiple)
 			integer = arithmeticFloor(value)

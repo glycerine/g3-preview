@@ -81,7 +81,7 @@ func (s *Solver) ArithmeticGomory(row Row, integers map[uint32]bool) (cut Arithm
 		return cut, false, err
 	}
 	for _, entry := range entries {
-		if entry.Variable != base && ((!s.atLower(entry.Variable) && !s.atUpper(entry.Variable)) || s.vars[entry.Variable].value.Epsilon.Sign() != 0) {
+		if entry.Variable != base && ((!s.atLower(entry.Variable) && !s.atUpper(entry.Variable)) || !s.vars[entry.Variable].value.IsRational()) {
 			return cut, false, nil
 		}
 	}

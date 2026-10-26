@@ -40,6 +40,9 @@ func (t *SMTDenseDiffTheory) ObjectiveValue(v SMTTheoryVar) (SMTArithmeticObject
 	return SMTArithmeticObjectiveValue{Finite: value}, nil
 }
 func (t *SMTDenseDiffTheory) MakeObjectiveLowerBound(_ *tactic.FilterModelConverter, v SMTTheoryVar, value simplex.Infinitesimal) (ast.ASTHandle, error) {
+	if value.Infinity.Sign() != 0 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
 	return t.syntax.diffObjectiveInequality(v, value, false)
 }
 

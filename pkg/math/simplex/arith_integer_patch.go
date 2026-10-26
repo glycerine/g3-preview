@@ -34,6 +34,7 @@ func (s *Solver) PatchArithmeticIntegerValues(integers map[uint32]bool) (bool, e
 				integer = arithmeticCeil(bound)
 			}
 			bound.Main.SetInt(integer)
+			bound.Infinity.SetInt64(0)
 			bound.Epsilon.SetInt64(0)
 			bound.Quo(&interval.Multiple)
 			integer = arithmeticFloor(bound)

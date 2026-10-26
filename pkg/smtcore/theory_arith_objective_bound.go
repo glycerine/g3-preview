@@ -19,6 +19,9 @@ func (t *SMTLinearArithmeticTheory) MakeObjectiveLowerBound(filter *tactic.Filte
 	if err != nil {
 		return result, err
 	}
+	if value.Infinity.Sign() != 0 {
+		return result, ast.ErrASTDomain
+	}
 	if filter == nil {
 		return result, ast.ErrASTHandle
 	}

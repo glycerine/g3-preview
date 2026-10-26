@@ -46,7 +46,7 @@ func (s *Solver) arithmeticGCDRow(row Row, integers map[uint32]bool, explanation
 			lower := &s.vars[column].lower
 			// Source fixed columns have rational values. Guard the invariant
 			// for callers of the concrete Go infinitesimal tableau.
-			if lower.Epsilon.Sign() != 0 {
+			if !lower.IsRational() {
 				return ArithmeticGCDPass, nil
 			}
 			constant.Add(&constant, new(big.Rat).Mul(coefficient, &lower.Main))

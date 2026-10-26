@@ -287,3 +287,28 @@ func TestSMTObjectiveLowerBoundRejectsImproperSupremum(t *testing.T) {
 		t.Fatal("positive infinitesimal above strict supremum was accepted", status)
 	}
 }
+
+func TestSMTFiniteObjectiveBoundRejectsInfinityCoordinate(t *testing.T) {
+	value := simplex.NewInfiniteInfinitesimal(big.NewRat(2, 3), big.NewRat(1, 1), big.NewRat(-1, 1))
+	f := newArithmeticObjectiveFixture(t, false)
+	x := f.variable("finite-rejects-infinity")
+	v := f.objective(x)
+	filter := objectiveBoundFilter(t, f.m)
+	if _, err := f.a.MakeObjectiveLowerBound(filter, v, value); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("finite mi_ext bound silently projected infinity", err)
+	}
+	d := newDiffObjectiveFixture(t, false)
+	y := d.variable("sparse-rejects-infinity")
+	w, err := d.r.AddObjective(y)
+	astTestMust(t, err)
+	if _, err = d.r.MakeObjectiveLowerBound(nil, w, value); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("finite sparse bound silently projected infinity", err)
+	}
+	dense := newDenseObjectiveFixture(t, false)
+	z := dense.variable("dense-rejects-infinity")
+	q, err := dense.d.AddObjective(z)
+	astTestMust(t, err)
+	if _, err = dense.d.MakeObjectiveLowerBound(nil, q, value); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("finite dense bound silently projected infinity", err)
+	}
+}
