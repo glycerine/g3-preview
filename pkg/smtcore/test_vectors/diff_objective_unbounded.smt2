@@ -1,0 +1,8 @@
+(set-option :auto_config false)
+(set-option :smt.arith.solver 1)
+(set-logic QF_LRA)
+(declare-const x Real)
+(assert (> x 0))
+(maximize x)
+(check-sat)
+(get-objectives)

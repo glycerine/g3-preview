@@ -41,6 +41,7 @@ type SMTIntegerDiffTheory struct {
 	nonDifference   bool
 	addBinaryBounds bool
 	equalityAdapter *smtArithmeticEqualityAdapter
+	optimization    smtDiffOptimization
 }
 
 func (t *SMTIntegerDiffTheory) ConfigureArithmetic(config SMTArithState) error {
@@ -673,8 +674,12 @@ func (t *SMTIntegerDiffTheory) PopScopes(count uint32) error {
 	if err := t.equalityAdapter.PopScopes(count); err != nil {
 		return err
 	}
+	oldEdges := t.graph.NumEdges()
 	if err := t.graph.Pop(count); err != nil {
 		return err
+	}
+	if oldEdges != t.graph.NumEdges() {
+		t.optimization.resetSimplex()
 	}
 	return t.SMTTheoryBase.PopScopes(count)
 }

@@ -222,9 +222,9 @@ func (s *Solver) updateValue(v uint32, delta *Infinitesimal) {
 	s.updateValueCore(v, delta)
 	for _, r := range s.matrix.ColumnRows(v) {
 		base := s.rowBase[r.id]
-		if base == v {
-			continue
-		}
+		// Source update_value also visits a basic variable's own row.
+		// Its opposite contribution cancels the initial delta, preserving
+		// the canonical equation when a caller seeds a basic variable.
 		coeff, _ := s.matrix.coefficient(r, v)
 		d := delta.Clone()
 		d.Mul(coeff)

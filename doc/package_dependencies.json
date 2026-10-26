@@ -2763,6 +2763,7 @@
         "theory_dense_diff_logic.go",
         "theory_diff_logic_conflict.go",
         "theory_diff_logic_integer.go",
+        "theory_diff_logic_objective.go",
         "theory_diff_logic_real.go",
         "theory_dl.go",
         "theory_dummy.go",

@@ -71803,7 +71803,9 @@
         "pkg/smtcore/theory_arith_cluster.go",
         "pkg/smtcore/theory_arith_cluster_test.go",
         "pkg/math/simplex/statistics_test.go",
-        "pkg/smtcore/theory_arith_linear.go"
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/math/simplex/basic_seed_test.go",
+        "pkg/smtcore/theory_diff_logic_objective_test.go"
       ],
       "tests": [
         "TestArithmeticRowConflictPreservesEqualityPremises",
@@ -71815,7 +71817,9 @@
         "TestSimplexDeleteBaseAndNonbasicRows",
         "TestSimplexRetainedSourceFeasibilityCases",
         "TestSMTNonlinearClusterInequalityRowsScopedProofs",
-        "TestSimplexStatisticsUnsignedWrapPreservesPivotAndWitness"
+        "TestSimplexStatisticsUnsignedWrapPreservesPivotAndWitness",
+        "TestSimplexBasicSeedPreservesCanonicalRow",
+        "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows"
       ],
       "conditionals": [
         {
@@ -71862,7 +71866,8 @@
           "tests": [
             "TestSMTNonlinearClusterInequalityRowsScopedProofs"
           ]
-        }
+        },
+        {"name": "Corrective source set_value/update_value canonical-row fidelity (simplex_def.h:248-253,418-440): include a basic column self-row so its opposite contribution cancels the initial seed delta; nonbasic seeds still propagate exact rational/epsilon movement through dependent bases", "status": "ported", "go_targets": ["pkg/math/simplex/simplex.go", "pkg/math/simplex/basic_seed_test.go", "pkg/smtcore/theory_diff_logic_objective_test.go"], "tests": ["TestSimplexBasicSeedPreservesCanonicalRow", "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows"]}
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters."
@@ -71870,7 +71875,8 @@
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "Solver is the concrete retained exact tableau API. Go errors replace assertion-only invalid-handle behavior, and Stats replaces the source statistics accumulator adapter.",
-        "Source unsigned pivot, infeasible and check counters use uint32 and wrap during actual feasibility/pivot operations. The arithmetic consumer widens only after source-width wrapping; PB collection retains source width."
+        "Source unsigned pivot, infeasible and check counters use uint32 and wrap during actual feasibility/pivot operations. The arithmetic consumer widens only after source-width wrapping; PB collection retains source width.",
+        "The difference-logic cached simplex bridge exposed a skipped self-row in the earlier Go updateValue. That skip reported the correct new objective3 but produced graph assignment-1 after tightening x<=7 to x<=3. Removing the skip follows the native update_value loop and restores the canonical row and graph witness3. An old-simplex overlay reproduces both the direct basic-seed failure and the incremental-model failure. No source-unit status change or wholesale re-audit is claimed."
       ]
     },
     {
@@ -71885,7 +71891,9 @@
         "pkg/math/simplex/simplex.go",
         "pkg/math/simplex/simplex_test.go",
         "pkg/math/simplex/statistics_test.go",
-        "pkg/smtcore/theory_arith_linear.go"
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/math/simplex/basic_seed_test.go",
+        "pkg/smtcore/theory_diff_logic_objective_test.go"
       ],
       "tests": [
         "TestArithmeticRowConflictPreservesEqualityPremises",
@@ -71895,7 +71903,9 @@
         "TestSimplexMinimizeBoundedAndUnbounded",
         "TestSimplexDeleteBaseAndNonbasicRows",
         "TestSimplexRetainedSourceFeasibilityCases",
-        "TestSimplexStatisticsUnsignedWrapPreservesPivotAndWitness"
+        "TestSimplexStatisticsUnsignedWrapPreservesPivotAndWitness",
+        "TestSimplexBasicSeedPreservesCanonicalRow",
+        "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows"
       ],
       "conditionals": [
         {
@@ -72120,7 +72130,8 @@
             "TestSimplexRetainedSourceFeasibilityCases",
             "TestSimplexDeleteBaseAndNonbasicRows"
           ]
-        }
+        },
+        {"name": "Corrective source set_value/update_value canonical-row fidelity (simplex_def.h:248-253,418-440): include a basic column self-row so its opposite contribution cancels the initial seed delta; nonbasic seeds still propagate exact rational/epsilon movement through dependent bases", "status": "ported", "go_targets": ["pkg/math/simplex/simplex.go", "pkg/math/simplex/basic_seed_test.go", "pkg/smtcore/theory_diff_logic_objective_test.go"], "tests": ["TestSimplexBasicSeedPreservesCanonicalRow", "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows"]}
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters."
@@ -72128,7 +72139,8 @@
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "The source default pivot strategy is the smallest-variable strategy, implemented deterministically with a Go map plus sorted selection. The dormant greatest/least-error strategies and random tie choice are not reached by retained consumers.",
-        "Source unsigned pivot, infeasible and check counters use uint32 and wrap during actual feasibility/pivot operations. The arithmetic consumer widens only after source-width wrapping; PB collection retains source width."
+        "Source unsigned pivot, infeasible and check counters use uint32 and wrap during actual feasibility/pivot operations. The arithmetic consumer widens only after source-width wrapping; PB collection retains source width.",
+        "The difference-logic cached simplex bridge exposed a skipped self-row in the earlier Go updateValue. That skip reported the correct new objective3 but produced graph assignment-1 after tightening x<=7 to x<=3. Removing the skip follows the native update_value loop and restores the canonical row and graph witness3. An old-simplex overlay reproduces both the direct basic-seed failure and the incremental-model failure. No source-unit status change or wholesale re-audit is claimed."
       ]
     },
     {
@@ -136369,7 +136381,8 @@
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/theory_diff_logic_integer.go",
-        "pkg/smtcore/theory_diff_logic_real.go"
+        "pkg/smtcore/theory_diff_logic_real.go",
+        "pkg/smtcore/theory_diff_logic_objective.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -136379,7 +136392,17 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTIntegerDiffTheoryAssignmentsAndNegativeCycleConflict",
-        "TestSMTRealDiffTheoryStrictCycleConflict"
+        "TestSMTRealDiffTheoryStrictCycleConflict",
+        "TestSMTDiffObjectiveBoundsBlockersAndRepeatedPop",
+        "TestSMTDiffObjectiveWeightedCoreAndConstants",
+        "TestSMTDiffObjectiveStrictRealAndUnbounded",
+        "TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies",
+        "TestSMTDiffObjectiveConfiguredSolverPublishesModelAndBlocks",
+        "TestSMTDiffObjectiveResourceStopPreservesNativeInfinityConvention",
+        "TestSMTDiffObjectiveCoreOwnsScopedExpressions",
+        "TestSMTDiffObjectiveNegativeAndReversedDifferenceBlockers",
+        "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows",
+        "TestSMTDiffObjectiveNativeOptimizationCaller"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -136424,17 +136447,20 @@
         {
           "name": "Small-integer sidl_ext and srdl_ext template instantiations",
           "status": "unported"
-        }
+        },
+        {"name": "Retained arbitrary-precision idl_ext/rdl_ext optimization: add_objective/internalize_objective ordered concrete terms and source numeral accumulator; graph-node/edge/objective simplex indices; incremental update_simplex rows and active upper bounds; value, maximize, strict/nonstrict mk_ineq/mk_gt/mk_ge, exact epsilon and finite model delta; owned objective cores, graph-edge-pop cache invalidation and manager resource limit (theory_diff_logic_def.h:1079-1404; pop_scope_eh:345-349)", "status": "ported", "go_targets": ["pkg/smtcore/theory_diff_logic_objective.go", "pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"], "tests": ["TestSMTDiffObjectiveBoundsBlockersAndRepeatedPop", "TestSMTDiffObjectiveWeightedCoreAndConstants", "TestSMTDiffObjectiveStrictRealAndUnbounded", "TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies", "TestSMTDiffObjectiveConfiguredSolverPublishesModelAndBlocks", "TestSMTDiffObjectiveResourceStopPreservesNativeInfinityConvention", "TestSMTDiffObjectiveCoreOwnsScopedExpressions", "TestSMTDiffObjectiveNegativeAndReversedDifferenceBlockers", "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows", "TestSMTDiffObjectiveNativeOptimizationCaller"]}
       ],
       "ownership": [
         "Basic setup releases its temporary feature collector on every exit and replaces only an unused arithmetic owner before scope/theory setup. A pre-existing disabled checkpoint can be replaced after a parameter update. Mixed graph model delta and numeral types come from the existing concrete graph and AST owner. Initialized direct-internalizer column specializations remain stable.",
-        "Go uses separate concrete theory types for retained integer and real instantiations; each owns its graph and scoped assertion state."
+        "Go uses separate concrete theory types for retained integer and real instantiations; each owns its graph and scoped assertion state.",
+        "Objective terms and constants use concrete Go values with copied big.Rat coefficients. The persistent simplex borrows the manager resource limit. Saved row-core ASTs each own one reference independent of Boolean scopes; a scoped bound remains valid with exactly one core reference after pop and becomes invalid after the core owner closes. Removed graph edges invalidate cached simplex rows as source does. SMT state teardown invokes the concrete theory Close; repeated Close releases no additional AST references. Model-refresh integration preserves independently acquired older models."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "Explicit basic arithmetic modes 0/1/2/3 now select the retained backend at the first boundary. Mixed graph integer complements subtract one, real complements subtract epsilon, and Int model values are checked before publication. C++ rejects the observed mixed candidate with a fractional Int value; Go reports UNKNOWN before constructing that invalid numeral. Six exact mode/model/scope scripts bring strict C++ comparisons to 112. UTVPI, AS_OPTINF, other basic plugin routing and full unknown-logic automatic classification remain incomplete.",
-        "The retained consumers select arbitrary-precision integer and real difference logic. Unreached small-integer template variants and unrelated simplex explicit instantiations are not represented by universal adapters."
+        "The retained consumers select arbitrary-precision integer and real difference logic. Unreached small-integer template variants and unrelated simplex explicit instantiations are not represented by universal adapters.",
+        "This bounded callback increment preserves source quirks: numeral accumulation is not scaled by the recursive multiplier, value() indexes graph assignment by objective index, and mk_ineq does not subtract the objective constant. All objectives are registered before maximization in the retained consumer, reserving the initial simplex slots. Graphs remain concrete integer-rational and real-infinitesimal instantiations; no generic optimizer adapter or small-number template is added. The prebuilt C++ strict-real optimizer reaches opt_solver.cpp:396-397/434 unhandled-RDL warning because its mk_ge dispatch requires zero epsilon; the reference test checks the exact diagnostic and optimum rather than suppressing stderr. Higher optimizer selection/orchestration, dense/LRA/AS_OPTINF callbacks and Go CLI maximize/minimize wiring remain open; whole difference-logic completion is not claimed."
       ]
     },
     {
@@ -136460,7 +136486,8 @@
         "pkg/smtcore/theory_diff_logic_conflict_test.go",
         "pkg/smtcore/theory_utvpi.go",
         "pkg/cmd/g3/test_vectors/difference_shortcut_cores_real.smt2",
-        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2"
+        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2",
+        "pkg/smtcore/theory_diff_logic_objective.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -136485,7 +136512,17 @@
         "TestSMTSolverRealDifferenceEqualityAdapter",
         "TestSMTDifferenceGraphShortcutsPreserveStrictConflict",
         "TestSMTDifferenceContextShortcutConflictProof",
-        "TestSMTDifferenceConflictParameterAllocationFrontiers"
+        "TestSMTDifferenceConflictParameterAllocationFrontiers",
+        "TestSMTDiffObjectiveBoundsBlockersAndRepeatedPop",
+        "TestSMTDiffObjectiveWeightedCoreAndConstants",
+        "TestSMTDiffObjectiveStrictRealAndUnbounded",
+        "TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies",
+        "TestSMTDiffObjectiveConfiguredSolverPublishesModelAndBlocks",
+        "TestSMTDiffObjectiveResourceStopPreservesNativeInfinityConvention",
+        "TestSMTDiffObjectiveCoreOwnsScopedExpressions",
+        "TestSMTDiffObjectiveNegativeAndReversedDifferenceBlockers",
+        "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows",
+        "TestSMTDiffObjectiveNativeOptimizationCaller"
       ],
       "conditionals": [
         {
@@ -136583,18 +136620,21 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
-        }
+        },
+        {"name": "Retained arbitrary-precision idl_ext/rdl_ext optimization: add_objective/internalize_objective ordered concrete terms and source numeral accumulator; graph-node/edge/objective simplex indices; incremental update_simplex rows and active upper bounds; value, maximize, strict/nonstrict mk_ineq/mk_gt/mk_ge, exact epsilon and finite model delta; owned objective cores, graph-edge-pop cache invalidation and manager resource limit (theory_diff_logic_def.h:1079-1404; pop_scope_eh:345-349)", "status": "ported", "go_targets": ["pkg/smtcore/theory_diff_logic_objective.go", "pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"], "tests": ["TestSMTDiffObjectiveBoundsBlockersAndRepeatedPop", "TestSMTDiffObjectiveWeightedCoreAndConstants", "TestSMTDiffObjectiveStrictRealAndUnbounded", "TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies", "TestSMTDiffObjectiveConfiguredSolverPublishesModelAndBlocks", "TestSMTDiffObjectiveResourceStopPreservesNativeInfinityConvention", "TestSMTDiffObjectiveCoreOwnsScopedExpressions", "TestSMTDiffObjectiveNegativeAndReversedDifferenceBlockers", "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows", "TestSMTDiffObjectiveNativeOptimizationCaller"]}
       ],
       "ownership": [
         "Basic setup releases its temporary feature collector on every exit and replaces only an unused arithmetic owner before scope/theory setup. A pre-existing disabled checkpoint can be replaced after a parameter update. Mixed graph model delta and numeral types come from the existing concrete graph and AST owner. Initialized direct-internalizer column specializations remain stable.",
         "Each theory owns its concrete rational or infinitesimal-rational graph, atom and assertion slices, Boolean-variable index map, and scope snapshots. It borrows the initialized SMTInternalizerState and enodes through SMTTheoryBase; graph explanations borrow immutable SMTLiteral values.",
-        "The shared cycle helper borrows graph edges and copies each infinitesimal potential; it never mutates graph-owned weights, parent links or enabled state. Difference-logic and UTVPI conflict justifications enter the existing scoped ownedJustifications list only after complete construction. Temporary original Farkas parameters are released on every exit; copied parameters live through proof use and are released on scope pop. The allocation-frontier test checks prefix cleanup and retry without publishing a partial conflict."
+        "The shared cycle helper borrows graph edges and copies each infinitesimal potential; it never mutates graph-owned weights, parent links or enabled state. Difference-logic and UTVPI conflict justifications enter the existing scoped ownedJustifications list only after complete construction. Temporary original Farkas parameters are released on every exit; copied parameters live through proof use and are released on scope pop. The allocation-frontier test checks prefix cleanup and retry without publishing a partial conflict.",
+        "Objective terms and constants use concrete Go values with copied big.Rat coefficients. The persistent simplex borrows the manager resource limit. Saved row-core ASTs each own one reference independent of Boolean scopes; a scoped bound remains valid with exactly one core reference after pop and becomes invalid after the core owner closes. Removed graph edges invalidate cached simplex rows as source does. SMT state teardown invokes the concrete theory Close; repeated Close releases no additional AST references. Model-refresh integration preserves independently acquired older models."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "Explicit basic arithmetic modes 0/1/2/3 now select the retained backend at the first boundary. Mixed graph integer complements subtract one, real complements subtract epsilon, and Int model values are checked before publication. C++ rejects the observed mixed candidate with a fractional Int value; Go reports UNKNOWN before constructing that invalid numeral. Six exact mode/model/scope scripts bring strict C++ comparisons to 112. UTVPI, AS_OPTINF, other basic plugin routing and full unknown-logic automatic classification remain incomplete.",
-        "The retained arbitrary-precision integer and real instantiations are present. Go slices and maps replace source vectors and u_map, and unsupported arithmetic is recorded for a give-up final check. Both specializations share only arithmetic syntax decomposition; their graph and search state remain concrete and separate."
+        "The retained arbitrary-precision integer and real instantiations are present. Go slices and maps replace source vectors and u_map, and unsupported arithmetic is recorded for a give-up final check. Both specializations share only arithmetic syntax decomposition; their graph and search state remain concrete and separate.",
+        "This bounded callback increment preserves source quirks: numeral accumulation is not scaled by the recursive multiplier, value() indexes graph assignment by objective index, and mk_ineq does not subtract the objective constant. All objectives are registered before maximization in the retained consumer, reserving the initial simplex slots. Graphs remain concrete integer-rational and real-infinitesimal instantiations; no generic optimizer adapter or small-number template is added. The prebuilt C++ strict-real optimizer reaches opt_solver.cpp:396-397/434 unhandled-RDL warning because its mk_ge dispatch requires zero epsilon; the reference test checks the exact diagnostic and optimum rather than suppressing stderr. Higher optimizer selection/orchestration, dense/LRA/AS_OPTINF callbacks and Go CLI maximize/minimize wiring remain open; whole difference-logic completion is not claimed."
       ]
     },
     {
@@ -136620,7 +136660,8 @@
         "pkg/smtcore/theory_diff_logic_conflict_test.go",
         "pkg/smtcore/theory_utvpi.go",
         "pkg/cmd/g3/test_vectors/difference_shortcut_cores_real.smt2",
-        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2"
+        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2",
+        "pkg/smtcore/theory_diff_logic_objective.go"
       ],
       "tests": [
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
@@ -136642,7 +136683,17 @@
         "TestSMTSolverPublishesStrictRealDifferenceModel",
         "TestSMTSolverRealDifferenceEqualityAdapter",
         "TestSMTDifferenceContextShortcutConflictProof",
-        "TestSMTDifferenceConflictParameterAllocationFrontiers"
+        "TestSMTDifferenceConflictParameterAllocationFrontiers",
+        "TestSMTDiffObjectiveBoundsBlockersAndRepeatedPop",
+        "TestSMTDiffObjectiveWeightedCoreAndConstants",
+        "TestSMTDiffObjectiveStrictRealAndUnbounded",
+        "TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies",
+        "TestSMTDiffObjectiveConfiguredSolverPublishesModelAndBlocks",
+        "TestSMTDiffObjectiveResourceStopPreservesNativeInfinityConvention",
+        "TestSMTDiffObjectiveCoreOwnsScopedExpressions",
+        "TestSMTDiffObjectiveNegativeAndReversedDifferenceBlockers",
+        "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows",
+        "TestSMTDiffObjectiveNativeOptimizationCaller"
       ],
       "conditionals": [
         {
@@ -136857,16 +136908,19 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
-        }
+        },
+        {"name": "Retained arbitrary-precision idl_ext/rdl_ext optimization: add_objective/internalize_objective ordered concrete terms and source numeral accumulator; graph-node/edge/objective simplex indices; incremental update_simplex rows and active upper bounds; value, maximize, strict/nonstrict mk_ineq/mk_gt/mk_ge, exact epsilon and finite model delta; owned objective cores, graph-edge-pop cache invalidation and manager resource limit (theory_diff_logic_def.h:1079-1404; pop_scope_eh:345-349)", "status": "ported", "go_targets": ["pkg/smtcore/theory_diff_logic_objective.go", "pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"], "tests": ["TestSMTDiffObjectiveBoundsBlockersAndRepeatedPop", "TestSMTDiffObjectiveWeightedCoreAndConstants", "TestSMTDiffObjectiveStrictRealAndUnbounded", "TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies", "TestSMTDiffObjectiveConfiguredSolverPublishesModelAndBlocks", "TestSMTDiffObjectiveResourceStopPreservesNativeInfinityConvention", "TestSMTDiffObjectiveCoreOwnsScopedExpressions", "TestSMTDiffObjectiveNegativeAndReversedDifferenceBlockers", "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows", "TestSMTDiffObjectiveNativeOptimizationCaller"]}
       ],
       "ownership": [
         "Basic setup releases its temporary feature collector on every exit and replaces only an unused arithmetic owner before scope/theory setup. A pre-existing disabled checkpoint can be replaced after a parameter update. Mixed graph model delta and numeral types come from the existing concrete graph and AST owner. Initialized direct-internalizer column specializations remain stable.",
         "Negative-cycle conflicts copy their literal antecedents into an SMT theory justification. Scoped graph activation, atoms, assertions, variables and incompleteness state roll back with the SMT context.",
-        "The shared cycle helper borrows graph edges and copies each infinitesimal potential; it never mutates graph-owned weights, parent links or enabled state. Difference-logic and UTVPI conflict justifications enter the existing scoped ownedJustifications list only after complete construction. Temporary original Farkas parameters are released on every exit; copied parameters live through proof use and are released on scope pop. The allocation-frontier test checks prefix cleanup and retry without publishing a partial conflict."
+        "The shared cycle helper borrows graph edges and copies each infinitesimal potential; it never mutates graph-owned weights, parent links or enabled state. Difference-logic and UTVPI conflict justifications enter the existing scoped ownedJustifications list only after complete construction. Temporary original Farkas parameters are released on every exit; copied parameters live through proof use and are released on scope pop. The allocation-frontier test checks prefix cleanup and retry without publishing a partial conflict.",
+        "Objective terms and constants use concrete Go values with copied big.Rat coefficients. The persistent simplex borrows the manager resource limit. Saved row-core ASTs each own one reference independent of Boolean scopes; a scoped bound remains valid with exactly one core reference after pop and becomes invalid after the core owner closes. Removed graph edges invalidate cached simplex rows as source does. SMT state teardown invokes the concrete theory Close; repeated Close releases no additional AST references. Model-refresh integration preserves independently acquired older models."
       ],
       "deviations": [
         "Explicit basic arithmetic modes 0/1/2/3 now select the retained backend at the first boundary. Mixed graph integer complements subtract one, real complements subtract epsilon, and Int model values are checked before publication. C++ rejects the observed mixed candidate with a fractional Int value; Go reports UNKNOWN before constructing that invalid numeral. Six exact mode/model/scope scripts bring strict C++ comparisons to 112. UTVPI, AS_OPTINF, other basic plugin routing and full unknown-logic automatic classification remain incomplete.",
-        "The concrete port accepts arbitrary-precision integer and real difference logic. Real strict complements use a lexicographic rational/epsilon pair and model generation selects a finite positive delta that preserves every enabled edge. Source assertion-only invalid domains return checked Go errors."
+        "The concrete port accepts arbitrary-precision integer and real difference logic. Real strict complements use a lexicographic rational/epsilon pair and model generation selects a finite positive delta that preserves every enabled edge. Source assertion-only invalid domains return checked Go errors.",
+        "This bounded callback increment preserves source quirks: numeral accumulation is not scaled by the recursive multiplier, value() indexes graph assignment by objective index, and mk_ineq does not subtract the objective constant. All objectives are registered before maximization in the retained consumer, reserving the initial simplex slots. Graphs remain concrete integer-rational and real-infinitesimal instantiations; no generic optimizer adapter or small-number template is added. The prebuilt C++ strict-real optimizer reaches opt_solver.cpp:396-397/434 unhandled-RDL warning because its mk_ge dispatch requires zero epsilon; the reference test checks the exact diagnostic and optimum rather than suppressing stderr. Higher optimizer selection/orchestration, dense/LRA/AS_OPTINF callbacks and Go CLI maximize/minimize wiring remain open; whole difference-logic completion is not claimed."
       ]
     },
     {
