@@ -49,6 +49,7 @@ type SMTLRATheory struct {
 	boundChecks                       []int32
 	propagator                        *lp.LARBoundPropagator
 	basicPropagations, lpPropagations uint64
+	conflictCount                     uint32
 	unassigned                        []uint32
 	assignments                       []smtLRAAssignment
 	assignmentHead                    int
@@ -86,7 +87,7 @@ func (t *SMTLRATheory) Initialize(s *SMTInternalizerState) error {
 	}
 	t.numeric, err = newSMTLRANumeric(t.numerals, smtLRANumericConfig{
 		strategy: lp.StrategyTableauRows, pivotedRows: true,
-		boundPropagation: t.config.BoundProp != 0, limit: smtLRAResourceLimit{s.manager},
+		boundPropagation: t.propagationEnabled(), limit: smtLRAResourceLimit{s.manager},
 	})
 	return err
 }
@@ -102,7 +103,7 @@ func (t *SMTLRATheory) ConfigureArithmetic(config SMTArithState) error {
 	}
 	t.config = config
 	if t.numeric != nil {
-		t.numeric.solver.Settings.BoundPropagation = config.BoundProp != 0
+		t.numeric.solver.Settings.BoundPropagation = t.propagationEnabled()
 	}
 	return nil
 }
@@ -527,7 +528,11 @@ func (t *SMTLRATheory) InitializeSearch() error {
 	if _, err := t.State(); err != nil {
 		return err
 	}
-	return t.equalityAdapter.InitializeSearch()
+	if err := t.equalityAdapter.InitializeSearch(); err != nil {
+		return err
+	}
+	t.conflictCount = 0
+	return nil
 }
 func (t *SMTLRATheory) Restart() error {
 	if _, err := t.State(); err != nil {

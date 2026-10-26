@@ -16,6 +16,7 @@ func (t *SMTLRATheory) setLRAConflict() error {
 	if err != nil {
 		return err
 	}
+	t.conflictCount++ // Search-wide count: restored by init_search, not by pop.
 	var core []SMTLiteral
 	for _, e := range evidence {
 		core = append(core, e.literal)
@@ -90,8 +91,12 @@ func (p *smtLRABoundPropagation) Consume(_ *numeral.Rational, witness uint32) er
 	return nil
 }
 
+func (t *SMTLRATheory) propagationEnabled() bool {
+	return t.config.BoundProp != 0 && t.conflictCount < t.config.PropagationThreshold
+}
+
 func (t *SMTLRATheory) propagateLPBounds() (err error) {
-	if t.config.BoundProp == 0 {
+	if !t.propagationEnabled() {
 		return nil
 	}
 	defer func() {
@@ -190,7 +195,7 @@ func (t *SMTLRATheory) propagateBasicBounds() error {
 }
 
 func (t *SMTLRATheory) propagateBasicBound(b *smtLRABound, truth bool) (result error) {
-	if t.config.BoundProp == 0 || len(t.bounds[b.variable]) == 1 || t.unassigned[b.variable] == 0 {
+	if !t.propagationEnabled() || len(t.bounds[b.variable]) == 1 || t.unassigned[b.variable] == 0 {
 		return nil
 	}
 	findLower := truth != b.upper

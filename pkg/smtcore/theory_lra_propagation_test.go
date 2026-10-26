@@ -297,6 +297,69 @@ func TestSMTLRALPPropagationDisabledRetainsRows(t *testing.T) {
 	}
 }
 
+func TestSMTLRAPropagationConflictThresholdSurvivesPop(t *testing.T) {
+	f := newLRAFrontendFixture(t, true)
+	target := prepareLRALPPropagation(t, f)
+	config := f.a.config
+	config.PropagationThreshold = 1
+	astTestMust(t, f.a.ConfigureArithmetic(config))
+	astTestMust(t, f.s.PushScope())
+	x, err := f.m.GetArg(target, 0)
+	astTestMust(t, err)
+	f.assert(f.app(smtArithOpGE, x, f.number(0)), false)
+	f.propagate(false)
+	if f.a.conflictCount != 1 {
+		t.Fatal("LRA conflict was not counted", f.a.conflictCount)
+	}
+	astTestMust(t, f.s.PopScopes(1))
+	if f.a.conflictCount != 1 {
+		t.Fatal("source conflict count was incorrectly scoped")
+	}
+	astTestMust(t, f.a.propagateLPBounds())
+	lit, err := f.s.Literal(target)
+	astTestMust(t, err)
+	value, err := f.s.Assignment(lit)
+	astTestMust(t, err)
+	if value != lbool.Undef || f.a.lpPropagations != 0 {
+		t.Fatal("conflict threshold failed to disable LP propagation", value)
+	}
+	astTestMust(t, f.a.InitializeSearch())
+	if f.a.conflictCount != 0 {
+		t.Fatal("new source search did not reset conflict threshold")
+	}
+	astTestMust(t, f.a.propagateLPBounds())
+	value, err = f.s.Assignment(lit)
+	astTestMust(t, err)
+	if value != lbool.True {
+		t.Fatal("new search lost touched rows", value)
+	}
+}
+
+func TestSMTLRAPropagationZeroThresholdDisablesBasicAndLP(t *testing.T) {
+	f := newLRAFrontendFixture(t, true)
+	target := prepareLRALPPropagation(t, f)
+	x, err := f.m.GetArg(target, 0)
+	astTestMust(t, err)
+	strong := f.app(smtArithOpGE, x, f.number(4))
+	astTestMust(t, f.s.Internalize(strong, true))
+	config := f.a.config
+	config.PropagationThreshold = 0
+	astTestMust(t, f.a.ConfigureArithmetic(config))
+	if f.a.numeric.solver.Settings.BoundPropagation {
+		t.Fatal("initial LP setting ignored zero propagation threshold")
+	}
+	astTestMust(t, f.a.propagateLPBounds())
+	bv, _ := f.s.BoolVar(strong)
+	astTestMust(t, f.a.propagateBasicBound(f.a.boundByBoolean[bv], true))
+	lit, err := f.s.Literal(target)
+	astTestMust(t, err)
+	value, err := f.s.Assignment(lit)
+	astTestMust(t, err)
+	if value != lbool.Undef || f.a.basicPropagations != 0 || f.a.lpPropagations != 0 {
+		t.Fatal("zero threshold did not disable both propagation paths")
+	}
+}
+
 func TestSMTLRALPPropagationAllocationCleanup(t *testing.T) {
 	refusals, successes := 0, 0
 	for _, stop := range []int64{-1, 0, 1, 2, 5, 12, 32} {
