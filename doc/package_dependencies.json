@@ -2778,6 +2778,7 @@
         "theory_lra_operator_axioms.go",
         "theory_lra_propagation.go",
         "theory_lra_shared.go",
+        "theory_lra_statistics.go",
         "theory_opt.go",
         "theory_pb.go",
         "theory_pb_compile.go",

@@ -55,6 +55,7 @@ type SMTLRATheory struct {
 	propagator                        *lp.LARBoundPropagator
 	basicPropagations, lpPropagations uint64
 	conflictCount                     uint32
+	statistics                        smtLRAStatistics
 	lowerTerms, upperTerms            []smtLRAConstraintBound
 	termBoundTrail                    []smtLRATermBoundChange
 	fixedVariables                    map[smtLRAFixedKey]SMTTheoryVar
@@ -593,6 +594,7 @@ func (t *SMTLRATheory) NewDisequality(left, right SMTTheoryVar) error {
 	if _, err := t.State(); err != nil {
 		return err
 	}
+	t.statistics.disequalities++
 	return t.equalityAdapter.MkAxioms(left, right)
 }
 func (t *SMTLRATheory) InitializeSearch() error {

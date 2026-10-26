@@ -324,3 +324,41 @@ func TestSMTLRALPSettingsNativeOracle(t *testing.T) {
 		})
 	}
 }
+
+func TestSMTLRAStatisticsNativeOracle(t *testing.T) {
+	reference := os.Getenv("G3_CPP_REFERENCE")
+	if reference == "" {
+		t.Skip("G3_CPP_REFERENCE is not set")
+	}
+	script, err := os.ReadFile("test_vectors/lra_final_check.smt2")
+	astTestMust(t, err)
+	var lines [][]byte
+	for _, line := range bytes.Split(script, []byte{'\n'}) {
+		if !bytes.HasPrefix(line, []byte("(get-value")) {
+			lines = append(lines, line)
+		}
+	}
+	cmd := exec.Command(reference, "-in")
+	cmd.Stdin = bytes.NewReader(bytes.Join(lines, []byte{'\n'}))
+	var out, diagnostics bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &out, &diagnostics
+	if err = cmd.Run(); err != nil || diagnostics.Len() != 0 {
+		t.Fatal(err, out.String(), diagnostics.String())
+	}
+	text := out.String()
+	start := strings.Index(text, "(:")
+	if start < 0 || strings.Join(strings.Fields(text[:start]), " ") != "sat unsat sat" {
+		t.Fatal("native statistics search oracle", text)
+	}
+	// Match the direct Go four-bound/child-conflict/pop regression, without
+	// depending on incidental tableau iteration counts or model choices.
+	for key, want := range map[string]string{"arith-lower": "3", "arith-upper": "2", "arith-rows": "5", "arith-conflicts": "1", "arith-make-feasible": "2", "arith-max-columns": "3", "arith-max-rows": "1"} {
+		got := regexp.MustCompile(`:` + key + `\s+([0-9]+)\b`).FindStringSubmatch(text[start:])
+		if len(got) != 2 || got[1] != want {
+			t.Fatal("native cumulative statistic", key, got, want, text)
+		}
+	}
+	if strings.Contains(text[start:], ":arith-plateau-iterations") {
+		t.Fatal("unwritten source counter appeared", text)
+	}
+}

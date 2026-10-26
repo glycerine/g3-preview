@@ -47,6 +47,7 @@ type smtLRANumeric struct {
 	inequalities []SMTLiteral
 	assertLower  uint64
 	assertUpper  uint64
+	statistics   smtLRANumericStatistics
 	// Failed LAR calls may retain borrowed operands in their cleanup state.
 	// Release these only after closing the solver that borrowed them.
 	pending     []numeral.Rational
@@ -250,6 +251,7 @@ func (s *smtLRANumeric) assertBound(v SMTTheoryVar, bv int32, value *big.Rat, up
 		s.inequalities = append(s.inequalities, SMTNullLiteral)
 	}
 	s.inequalities[ci] = NewSMTLiteral(bv, !truth)
+	s.statistics.rows++
 	return ci, nil
 }
 
@@ -257,11 +259,21 @@ func (s *smtLRANumeric) makeFeasible() (lbool.LBool, error) {
 	if err := s.ready(); err != nil {
 		return lbool.Undef, err
 	}
+	s.statistics.makeFeasible++
+	if n := s.solver.Core.RA.ColumnCount(); n > s.statistics.maxColumns {
+		s.statistics.maxColumns = n
+	}
+	if n := s.solver.Core.RA.RowCount(); n > s.statistics.maxRows {
+		s.statistics.maxRows = n
+	}
 	status, err := s.solver.FindFeasibleSolution()
 	if err != nil {
 		s.stopped = true
 		return lbool.Undef, err
 	}
+	s.statistics.iterations = s.solver.Settings.Stats.TotalIterations
+	s.statistics.factorizations = s.solver.Settings.Stats.Factorizations
+	s.statistics.pivots = s.solver.Settings.Stats.NeedToSolveInf
 	switch status {
 	case lp.StatusFeasible, lp.StatusOptimal:
 		return lbool.True, nil

@@ -17,6 +17,7 @@ func (t *SMTLRATheory) setLRAConflict() error {
 		return err
 	}
 	t.conflictCount++ // Search-wide count: restored by init_search, not by pop.
+	t.statistics.conflicts++
 	var core []SMTLiteral
 	for _, e := range evidence {
 		core = append(core, e.literal)
@@ -239,7 +240,11 @@ func (t *SMTLRATheory) propagateBasicBound(b *smtLRABound, truth bool) (result e
 	}
 	// Preserve the source quirk: m_core contains lit2, not lit1. In the
 	// small-lemma path this creates a tautology, not a new implication.
-	return t.assignLRABound(literal, []SMTLiteral{literal}, parameters)
+	if err = t.assignLRABound(literal, []SMTLiteral{literal}, parameters); err != nil {
+		return err
+	}
+	t.statistics.boundsPropagations++
+	return nil
 }
 
 func (t *SMTLRATheory) assignLRABound(literal SMTLiteral, core []SMTLiteral, parameters []ast.ASTParameter) error {
