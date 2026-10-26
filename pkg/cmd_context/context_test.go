@@ -7,6 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	_ "github.com/glycerine/g3/pkg/engine"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func contextMust(t *testing.T, err error) {
@@ -66,6 +67,56 @@ func TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver(t *testin
 	}
 	if err := c.SetUIntOption("smt.unported_uint_option", 1); err == nil {
 		t.Fatal("unknown unsigned option accepted")
+	}
+}
+
+func TestCommandContextGenericBooleanValuePreservesCatalogSymbolType(t *testing.T) {
+	c := contextFixture(t)
+	contextMust(t, c.SetBoolOption("smt.string_solver", true))
+	module, err := c.config.Globals.SourceGetModuleName("smt")
+	contextMust(t, err)
+	defer func() { contextMust(t, c.config.Params.Del(&module)) }()
+	key := "string_solver"
+	value, err := c.config.Params.GetSymbolName(&module, &key, symbol.Symbol{})
+	contextMust(t, err)
+	text, _, err := c.config.Params.SymbolsField.BareString(value)
+	contextMust(t, err)
+	shadow, err := c.config.Params.ContainsName(&c.params, &key)
+	contextMust(t, err)
+	if text != "true" || shadow {
+		t.Fatal("generic Boolean spelling lost its catalog type or created a local shadow", text, shadow)
+	}
+	contextMust(t, c.SetSymbolOption("smt.string_solver", "seq"))
+	status, err := c.CheckSat(nil)
+	contextMust(t, err)
+	if status != lbool.True {
+		t.Fatal("generic selector recovery", status)
+	}
+}
+
+func TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig(t *testing.T) {
+	c := contextFixture(t)
+	contextMust(t, c.SetBoolOption("auto_config", false))
+	state, err := c.parameters.State()
+	contextMust(t, err)
+	if state.AutoConfig {
+		t.Fatal("generic update did not refresh context parameters")
+	}
+	_, err = c.Manager()
+	contextMust(t, err)
+	contextMust(t, c.SetBoolOption("auto_config", true))
+	state, err = c.parameters.State()
+	contextMust(t, err)
+	key := "auto_config"
+	local, err := c.config.Params.GetBoolName(&c.params, &key, true)
+	contextMust(t, err)
+	if !state.AutoConfig || local {
+		t.Fatal("global update changed an existing disabled local solver parameter", state.AutoConfig, local)
+	}
+	status, err := c.CheckSat(nil)
+	contextMust(t, err)
+	if status != lbool.True {
+		t.Fatal("updated context", status)
 	}
 }
 

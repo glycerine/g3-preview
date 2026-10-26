@@ -199,8 +199,8 @@ func (c *Context) SetBoolOption(name string, value bool) error {
 	case "produce_unsat_cores":
 		name = "unsat_core"
 	}
-	if name == "proof" || name == "model" || name == "unsat_core" || name == "smtlib2_compliant" {
-		if c.manager != nil && (name == "proof" || name == "unsat_core" || name == "smtlib2_compliant") {
+	if name == "proof" || name == "model" || name == "unsat_core" {
+		if c.manager != nil && (name == "proof" || name == "unsat_core") {
 			return fmt.Errorf("option value cannot be modified after initialization")
 		}
 		text := strconv.FormatBool(value)
@@ -211,7 +211,7 @@ func (c *Context) SetBoolOption(name string, value bool) error {
 		if err := c.config.Globals.SourceSetName(name, strconv.FormatBool(value)); err != nil {
 			return err
 		}
-		name = strings.TrimPrefix(name, "smt.")
+		return c.globalParametersUpdated()
 	}
 	if err := c.config.Params.SetBoolName(&c.params, &name, value); err != nil {
 		return err
@@ -248,6 +248,7 @@ func (c *Context) SetUIntOption(name string, value uint32) error {
 		}
 		// Preserve the catalog's type. An integer token can also supply a
 		// Double parameter; a local UInt shadow would hide that typed value.
+		return c.globalParametersUpdated()
 	}
 	if c.solver != nil {
 		return c.solver.UpdateParams(&c.params)
@@ -266,10 +267,35 @@ func (c *Context) SetSymbolOption(name, value string) error {
 	if err := c.config.Globals.SourceSetName(name, value); err != nil {
 		return err
 	}
-	if c.solver != nil {
-		return c.solver.UpdateParams(&c.params)
+	return c.globalParametersUpdated()
+}
+
+// Source cmd_context::global_params_updated. Generic option values retain
+// their catalog types in gparams. Only the disabled context auto_config flag
+// is copied into the solver's local update, as in the native command context.
+func (c *Context) globalParametersUpdated() (result error) {
+	if err := c.parameters.UpdateGlobal(); err != nil {
+		return err
 	}
-	return nil
+	state, err := c.parameters.State()
+	if err != nil {
+		return err
+	}
+	if state.SMTLib2Compliant {
+		c.PrintSuccess = true
+	}
+	if c.solver == nil {
+		return nil
+	}
+	params := c.config.Params.EmptyValue()
+	defer func() { result = errors.Join(result, c.config.Params.Del(&params)) }()
+	if !state.AutoConfig {
+		name := "auto_config"
+		if err := c.config.Params.SetBoolName(&params, &name, false); err != nil {
+			return err
+		}
+	}
+	return c.solver.UpdateParams(&params)
 }
 
 func (c *Context) Manager() (manager *ast.ASTManager, result error) {

@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"global_option_success_updates.smt2":           "success\nsuccess\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsat\n",
 	"qfs_legacy_string_free_models.smt2":           "sat\n(((= s \"\") false))\nsat\n(((str.len s) 3))\nunsat\nsat\n((s \"abc\"))\nsat\n(((= s \"\") false))\n",
 	"generic_string_z3str3_free_models.smt2":       "sat\n(((= s \"\") false))\nsat\n(((str.len s) 3))\nunsat\nsat\n((s \"abc\"))\nsat\n(((= s \"\") false))\n",
 	"generic_string_auto_free_models.smt2":         "sat\n(((= s \"\") false))\nsat\n(((str.len s) 3))\nunsat\nsat\n((s \"abc\"))\nsat\n(((= s \"\") false))\n",

@@ -39737,7 +39737,10 @@
         "pkg/cmd_context/reason_unknown_test.go",
         "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
         "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
-        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
+        "pkg/cmd/g3/test_vectors/global_option_success_updates.smt2",
+        "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.smt2",
+        "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.expected_cpp"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -39751,7 +39754,9 @@
         "TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver",
         "TestSMT2UnsignedOptionsAndLiveRelevancyUpdates",
         "TestSMT2UnsignedOptionsRejectRangeAndTrailingArguments",
-        "TestCommandContextReasonUnknownStateAndEscaping"
+        "TestCommandContextReasonUnknownStateAndEscaping",
+        "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
+        "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig"
       ],
       "conditionals": [
         {
@@ -39887,6 +39892,17 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "generic set-option/context global_params_updated retained context and solver branch: typed catalog values, context refresh, compliant success enable and disabled local auto_config retention; optimizer/environment option side effects remain outside this increment",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
+            "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -39894,7 +39910,8 @@
         "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed."
       ],
       "deviations": [
-        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment."
+        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
+        "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes."
       ]
     },
     {
@@ -40454,7 +40471,10 @@
         "pkg/cmd_context/datatype_builtins_test.go",
         "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
         "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
-        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
+        "pkg/cmd/g3/test_vectors/global_option_success_updates.smt2",
+        "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.smt2",
+        "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.expected_cpp"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -40517,7 +40537,9 @@
         "TestSMTLibRunnerProofScript",
         "TestSMTDatatypeLazyPolicyAndFinalCheckWithoutInputRecognizer",
         "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
-        "TestCommandContextDatatypeBuiltinVisibility"
+        "TestCommandContextDatatypeBuiltinVisibility",
+        "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
+        "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig"
       ],
       "conditionals": [
         {
@@ -41195,6 +41217,17 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "generic set-option/context global_params_updated retained context and solver branch: typed catalog values, context refresh, compliant success enable and disabled local auto_config retention; optimizer/environment option side effects remain outside this increment",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
+            "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -41206,7 +41239,8 @@
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete.",
         "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
-        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment."
+        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
+        "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes."
       ]
     },
     {
@@ -41255,7 +41289,10 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
         "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
-        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
+        "pkg/cmd/g3/test_vectors/global_option_success_updates.smt2",
+        "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.smt2",
+        "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.expected_cpp"
       ],
       "tests": [
         "TestCommandContextScopesDeclarationsAndModel",
@@ -41278,7 +41315,9 @@
         "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
         "TestSMTRecursiveModelPublicationAllocationFrontiers",
         "TestSMTRecursiveCheckerStrictFallbackAndGroundModelValidation",
-        "TestSMTLibRunnerProofScript"
+        "TestSMTLibRunnerProofScript",
+        "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
+        "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig"
       ],
       "conditionals": [
         {
@@ -41491,6 +41530,17 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "generic set-option/context global_params_updated retained context and solver branch: typed catalog values, context refresh, compliant success enable and disabled local auto_config retention; optimizer/environment option side effects remain outside this increment",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
+            "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -41502,7 +41552,8 @@
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete.",
         "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
-        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment."
+        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
+        "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes."
       ]
     },
     {
@@ -90726,7 +90777,10 @@
         "pkg/cmd/g3/test_vectors/datatype_boolean_fields_scopes.smt2",
         "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
         "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
-        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
+        "pkg/cmd/g3/test_vectors/global_option_success_updates.smt2",
+        "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.smt2",
+        "pkg/cmd/g3/test_vectors/pending_default_portfolio_option_error.expected_cpp"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -90775,7 +90829,9 @@
         "TestSMTLibRunnerProofScript",
         "TestSMT2OptionalScopeCountsAndNestedRollback",
         "TestSMT2ScopeCommandsPreserveSourceMutationBeforeTrailingError",
-        "TestSMT2InvalidScopeCountsRefuseBeforeMutation"
+        "TestSMT2InvalidScopeCountsRefuseBeforeMutation",
+        "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
+        "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig"
       ],
       "assertions": [
         {
@@ -91672,6 +91728,17 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "generic set-option/context global_params_updated retained context and solver branch: typed catalog values, context refresh, compliant success enable and disabled local auto_config retention; optimizer/environment option side effects remain outside this increment",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/context.go",
+          "tests": [
+            "TestCommandContextGenericBooleanValuePreservesCatalogSymbolType",
+            "TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -91688,7 +91755,8 @@
         "Explicit quantified patterns now reach E-matching through the SMT-LIB runner. Validation warnings use the process diagnostic warning service, invalid patterns follow ignore_bad_patterns, and ignored user patterns are consumed as S-expressions. Full legacy qualified unary-pattern and constant-pattern discard variants, expression labels, unknown-attribute warning/recovery and other parser grammar branches remain partial. The runner now has 92 strict C++ comparisons plus the separately documented C++ live-relevancy model defect regression.",
         "The new datatype C++ comparison exposed rejection of valid (push)/(pop). Scope counts now default to one only at a closing parenthesis. Invalid counts refuse before mutation; valid counts mutate the context before a trailing-token error, matching source control flow. Nested rollback and failed-command success suppression are tested with print-success enabled. Existing Go scanner error formatting is retained; broader parser work remains partial.",
         "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
-        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment."
+        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",
+        "Generic Boolean/unsigned/symbol options now use the native context/solver global_params_updated branch after catalog publication. Refresh ContextParams from root gparams, enable print_success when compliant, and update an existing solver with only the disabled context auto_config override. Do not write a generic Boolean local shadow: true/false may be a Symbol-valued parameter spelling. smtlib2_compliant follows the generic catalog path and may change after manager creation; print_success remains sticky when compliance turns off, matching source. A registered CLI vector exactly matches prebuilt C++ success/SAT output and existing regressions verify types, ownership and local-vs-global auto_config. Complete env_params process effects and m_opt update remain pending. Generic command contexts still use the direct SMT fallback where native builds the default tactic portfolio; pending_default_portfolio_option_error retains the real ordinary-check unknown-versus-error difference without passing credit or fabricated unknown conversion. No source-unit completion status changes."
       ]
     },
     {
@@ -140820,7 +140888,7 @@
           ]
         },
         {
-          "name": "distinct theory_str owner construction, active default initialize_charset ordering, parameter-borrowed mk_string(zstring) lifetime cache and cache-access count, mk_fresh fresh mutable state; remaining constructor/nested regex-solver setup is not yet ported",
+          "name": "theory_str owner/charset/cache construction and fresh copied state, with concrete init/nested regex-solver ownership now implemented; remaining complete member/diagnostic lifecycle audit is open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str.go",
           "tests": [
@@ -140838,7 +140906,7 @@
           ]
         },
         {
-          "name": "source private m_find equivalence-class merge and scoped variable rollback, basicTodo filtering by enode introduction level, source lifetime cache retention and forward m_trail release; value/length pair checking now precedes the merge; remaining handle_equality stages and other pop/propagation queues stay unported",
+          "name": "private m_find equivalence-class merge, scoped variables/basic filtering and lifetime roots are implemented; all equality stages are connected, while the complete scope/diagnostic consumer audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str.go",
           "tests": [
@@ -140896,7 +140964,7 @@
           ]
         },
         {
-          "name": "set_up_axioms/init_search_eh assertion traversal and supported basic/concat/prefix/suffix/Contains propagation worklists; source fresh-witness reentrant basic work and lifetime deduplication; remaining library/equality/persisted/replay queues are still unported",
+          "name": "set_up_axioms/init_search_eh traversal and live basic/concat/library/delayed/persisted propagation queues are implemented, including reentrant work; m_str_eq_todo has no retained producer; complete boundary/diagnostic source audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_setup.go",
           "tests": [
@@ -140936,7 +141004,7 @@
           ]
         },
         {
-          "name": "new_eq_check value/length pair loop across the two private classes runs before new_eq_eh merges them; structural rejection publishes an unconditional disequality, length rejection retains observed length equalities, and private merge still occurs after handler conflict as source requires; other handle_equality/new_eq_check stages remain open",
+          "name": "new_eq_check implements pre-merge value/length pair checks, containment stages and legacy regex dispatch; source concat-length assertion arm is separately classified unreachable under recursive length reads; diagnostic/consumer audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_equality_values.go",
           "tests": [
@@ -140945,7 +141013,7 @@
           ]
         },
         {
-          "name": "get_const_str_asts_in_node/check_contain_by_eqc_val and constant-value stage of check_contain_in_new_eq: prospective class constant checks preserve both argument equalities and mandatory concat literal guards before private merging; nonconstant substring and relation-pair stages remain pending",
+          "name": "containment equality checking implements constant values, mandatory concat literals, nonconstant substring and indexed relation-pair stages before private merging; complete ordering/diagnostic consumer audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_containment.go",
           "tests": [
@@ -141028,7 +141096,7 @@
           ]
         },
         {
-          "name": "handle_equality zero-length coherence, equality-implies-length, class grouping and concat/constant step 2 before private merge; other stages remain pending",
+          "name": "handle_equality connects zero-length/length-equality coherence, class grouping, all six concat arrangements, concat/constant solving, post-constant parents and unroll dispatch; complete source consumer/diagnostic audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_concat_classes.go",
           "tests": [
@@ -141080,7 +141148,7 @@
           ]
         },
         {
-          "name": "handle_equality initial concat value/parent dispatch and shared-operand/private-class shortcuts precede consistency; post-constant parent dispatch is connected, while tester dispatch, concat/concat arrangements and unroll processing remain pending",
+          "name": "handle_equality connects initial parent/shared-operand/private-class shortcuts, tester callbacks, concat-pair arrangements and unroll processing in source order; complete source-only path/diagnostic audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_parents.go",
           "tests": [
@@ -142155,7 +142223,8 @@
         "Three regressions independently enumerate zero/positive split equivalences and count/word/boundary assignments with exact fresh order and actual residual constructors, verify two roots on build versus one added assertion root on scope-pop replay without new witnesses and Fresh reset, and confirm unconditional range boundary assertion plus ordered nonsymmetric cache identity. This completes concat/unroll processing as a callable retained routine; the remaining free-variable/unroll FinalCheck dispatcher is still pending. Source statuses, production routing and verified full checkpoint remain unchanged.",
         "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged.",
         "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial.",
-        "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete."
+        "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete.",
+        "Read-only continuation audit reconciles stale partial-method descriptions with existing constructor/nested solver, copied-owner, equality/tester/concat/unroll, containment and propagation implementations. No method status is promoted: complete declaration/consumer/trace/diagnostic/lifetime audit remains open. Native private m_str_eq_todo has only its emptiness test, consumer/reset and reset_eh reset in theory_str.cpp/.h, with no retained producer; no unused equality queue is added. Existing ALL negative-containment parity remains pending. This description reconciliation is not new algorithm or whole-unit completion credit."
       ]
     },
     {
@@ -142561,7 +142630,7 @@
           ]
         },
         {
-          "name": "distinct theory_str owner construction, active default initialize_charset ordering, parameter-borrowed mk_string(zstring) lifetime cache and cache-access count, mk_fresh fresh mutable state; remaining constructor/nested regex-solver setup is not yet ported",
+          "name": "theory_str owner/charset/cache construction and fresh copied state, with concrete init/nested regex-solver ownership now implemented; remaining complete member/diagnostic lifecycle audit is open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str.go",
           "tests": [
@@ -142579,7 +142648,7 @@
           ]
         },
         {
-          "name": "source private m_find equivalence-class merge and scoped variable rollback, basicTodo filtering by enode introduction level, source lifetime cache retention and forward m_trail release; value/length pair checking now precedes the merge; remaining handle_equality stages and other pop/propagation queues stay unported",
+          "name": "private m_find equivalence-class merge, scoped variables/basic filtering and lifetime roots are implemented; all equality stages are connected, while the complete scope/diagnostic consumer audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str.go",
           "tests": [
@@ -142637,7 +142706,7 @@
           ]
         },
         {
-          "name": "set_up_axioms/init_search_eh assertion traversal and supported basic/concat/prefix/suffix/Contains propagation worklists; source fresh-witness reentrant basic work and lifetime deduplication; remaining library/equality/persisted/replay queues are still unported",
+          "name": "set_up_axioms/init_search_eh traversal and live basic/concat/library/delayed/persisted propagation queues are implemented, including reentrant work; m_str_eq_todo has no retained producer; complete boundary/diagnostic source audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_setup.go",
           "tests": [
@@ -142677,7 +142746,7 @@
           ]
         },
         {
-          "name": "new_eq_check value/length pair loop across the two private classes runs before new_eq_eh merges them; structural rejection publishes an unconditional disequality, length rejection retains observed length equalities, and private merge still occurs after handler conflict as source requires; other handle_equality/new_eq_check stages remain open",
+          "name": "new_eq_check implements pre-merge value/length pair checks, containment stages and legacy regex dispatch; source concat-length assertion arm is separately classified unreachable under recursive length reads; diagnostic/consumer audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_equality_values.go",
           "tests": [
@@ -142686,7 +142755,7 @@
           ]
         },
         {
-          "name": "get_const_str_asts_in_node/check_contain_by_eqc_val and constant-value stage of check_contain_in_new_eq: prospective class constant checks preserve both argument equalities and mandatory concat literal guards before private merging; nonconstant substring and relation-pair stages remain pending",
+          "name": "containment equality checking implements constant values, mandatory concat literals, nonconstant substring and indexed relation-pair stages before private merging; complete ordering/diagnostic consumer audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_containment.go",
           "tests": [
@@ -142769,7 +142838,7 @@
           ]
         },
         {
-          "name": "handle_equality zero-length coherence, equality-implies-length, class grouping and concat/constant step 2 before private merge; other stages remain pending",
+          "name": "handle_equality connects zero-length/length-equality coherence, class grouping, all six concat arrangements, concat/constant solving, post-constant parents and unroll dispatch; complete source consumer/diagnostic audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_concat_classes.go",
           "tests": [
@@ -142821,7 +142890,7 @@
           ]
         },
         {
-          "name": "handle_equality initial concat value/parent dispatch and shared-operand/private-class shortcuts precede consistency; post-constant parent dispatch is connected, while tester dispatch, concat/concat arrangements and unroll processing remain pending",
+          "name": "handle_equality connects initial parent/shared-operand/private-class shortcuts, tester callbacks, concat-pair arrangements and unroll processing in source order; complete source-only path/diagnostic audit remains open",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_str_parents.go",
           "tests": [
@@ -143898,7 +143967,8 @@
         "Three regressions independently enumerate zero/positive split equivalences and count/word/boundary assignments with exact fresh order and actual residual constructors, verify two roots on build versus one added assertion root on scope-pop replay without new witnesses and Fresh reset, and confirm unconditional range boundary assertion plus ordered nonsymmetric cache identity. This completes concat/unroll processing as a callable retained routine; the remaining free-variable/unroll FinalCheck dispatcher is still pending. Source statuses, production routing and verified full checkpoint remain unchanged.",
         "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged.",
         "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial.",
-        "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete."
+        "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete.",
+        "Read-only continuation audit reconciles stale partial-method descriptions with existing constructor/nested solver, copied-owner, equality/tester/concat/unroll, containment and propagation implementations. No method status is promoted: complete declaration/consumer/trace/diagnostic/lifetime audit remains open. Native private m_str_eq_todo has only its emptiness test, consumer/reset and reset_eh reset in theory_str.cpp/.h, with no retained producer; no unused equality queue is added. Existing ALL negative-containment parity remains pending. This description reconciliation is not new algorithm or whole-unit completion credit."
       ]
     },
     {
