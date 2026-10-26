@@ -283,12 +283,36 @@ func (t *SMTStringTheory) NewEquality(left, right SMTTheoryVar) error {
 	if left < 0 || right < 0 || uint32(left) >= t.find.GetNumVars() || uint32(right) >= t.find.GetNumVars() {
 		return ast.ErrASTDomain
 	}
-	// Native handle_equality runs before merging. Initial concat shortcuts,
-	// consistency, coherence, grouping, concat cancellation/length quick
-	// paths, all six concat arrangements, constant, parent and literal-
-	// unroll stages are connected; remaining unroll/tester processing and
-	// final checking remain open.
 	lhs, rhs := t.variables[left].Owner(), t.variables[right].Owner()
+	if err := t.handleStringEquality(lhs, rhs); err != nil {
+		return err
+	}
+	// Native new_eq_eh merges only after handle_equality completes.
+	t.find.Merge(uint32(left), uint32(right))
+	return nil
+}
+
+func (t *SMTStringTheory) handleStringEquality(lhs, rhs ast.ASTHandle) error {
+	m := t.state.manager
+	stringSort, err := m.MkFamilySort(t.FamilyID(), 2, nil)
+	if err != nil {
+		return err
+	}
+	for _, term := range []ast.ASTHandle{lhs, rhs} {
+		sort, err := m.GetSort(term)
+		if err != nil {
+			return err
+		}
+		if sort != stringSort {
+			return nil
+		}
+	}
+	for _, pair := range [][2]ast.ASTHandle{{lhs, rhs}, {rhs, lhs}} {
+		handled, err := t.attemptStringFreeVariable(pair[0], pair[1])
+		if err != nil || handled {
+			return err
+		}
+	}
 	shortcut, err := t.stringConcatEqualityShortcut(lhs, rhs)
 	if err != nil {
 		return err
@@ -304,7 +328,6 @@ func (t *SMTStringTheory) NewEquality(left, right SMTTheoryVar) error {
 			}
 		}
 	}
-	t.find.Merge(uint32(left), uint32(right))
 	return nil
 }
 
