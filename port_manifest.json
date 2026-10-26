@@ -256826,14 +256826,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "e9906db62e74d81ce64898ec5a563f558213b0ca",
+    "commit": "feecb67195c1a8d35a2c80b8d8111dd694116d29",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-26T18:27:42.361872+00:00",
-    "completed_utc": "2026-10-26T18:41:19.100940+00:00",
+    "started_utc": "2026-10-26T19:28:02.018507+00:00",
+    "completed_utc": "2026-10-26T19:33:17.444505+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-e9906db6.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-e9906db6.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-e9906db6.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-feecb671.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-feecb671.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-feecb671.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -256849,9 +256849,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 687.954,
+    "lp_seconds": 186.268,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated e9906db62e74d81ce64898ec5a563f558213b0ca, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes retained-consumer deletion9829378f, three-component tableau foundation19e01ff1 and actual inf_ext mode5 integratione9906db6. Interpolation and API tests pass without an additional interpolation implementation change. Native model projection for opaque infinite bounds and the documented dense strict-model source limitation remain explicit; this checkpoint proves tests passed, not complete smtcore or higher optimizer correctness. Root production and graph match the snapshot at recording. Subsequent LP test-only slow guards are excluded from this exact full checkpoint and separately verified; the unguarded slow cases all passed here."
+    "scope_warning": "Independently verified exact clean isolated feecb67195c1a8d35a2c80b8d8111dd694116d29, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes a4104bbc LP slow-test selection and feecb671 concrete retained LRA numerical foundation. The default LP suite intentionally skips53 exhaustive cases, which remain available with -short; all of those cases passed in the preceding unguarded e9906db6 checkpoint. LRA AST/event/setup integration remains open; no complete specialized LRA or higher optimizer is claimed. The separate extra assertion-build polynomial timeout and documented source model/local-optimization limitations remain explicit. Root pkg and graph match the snapshot at recording."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
