@@ -137694,13 +137694,20 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_arith_linear.go"
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/theory_lra_numeric.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
         "TestSMTSolverPublishesStrictLinearRealModel",
         "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
-        "TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals"
+        "TestSMTSolverLinearArithmeticPropagatesPolynomialIntervals",
+        "TestSMTLRANumericOrderedCancellationAndRegistration",
+        "TestSMTLRANumericStrictOptimizationModelsAndScopeRecovery",
+        "TestSMTLRANumericConflictEvidenceAndReusedConstraintIndex",
+        "TestSMTLRANumericUnboundedAndConstantTerm",
+        "TestSMTLRANumericInterruptedRegistrationCleanup",
+        "TestSMTLRANumericCoupledRowsStrictOptimumAndConflict"
       ],
       "conditionals": [
         {
@@ -137869,13 +137876,16 @@
           "status": "unported",
           "go_target": null,
           "tests": []
-        }
+        },
+        {"name": "Concrete LRA numerical owner for retained imp::get_var_index/init_left_side/internalize_def term registration, assert_bound direction/complement and inequality provenance, get_ivalue/finite model reconstruction, make_feasible status mapping, maximize_term coefficient/constant transport and numeric scope mapping. Calls the existing util/lp LARSolver, not math/simplex algorithms. AST/internalizer/event callbacks and setup replacement are still open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_numeric.go", "pkg/smtcore/theory_lra_numeric_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go", "pkg/smtcore/test_vectors/lra_numeric_objective.smt2", "pkg/smtcore/test_vectors/lra_numeric_coupled.smt2"], "tests": ["TestSMTLRANumericOrderedCancellationAndRegistration", "TestSMTLRANumericStrictOptimizationModelsAndScopeRecovery", "TestSMTLRANumericConflictEvidenceAndReusedConstraintIndex", "TestSMTLRANumericUnboundedAndConstantTerm", "TestSMTLRANumericInterruptedRegistrationCleanup", "TestSMTLRANumericCoupledRowsStrictOptimumAndConflict"]}
       ],
       "ownership": [
-        "SMTLinearArithmeticTheory owns its exact simplex solver, linear definitions, atoms, assertion and scope trails, equality adapter and statistics; it borrows context enodes and AST handles through SMTTheoryBase."
+        "SMTLinearArithmeticTheory owns its exact simplex solver, linear definitions, atoms, assertion and scope trails, equality adapter and statistics; it borrows context enodes and AST handles through SMTTheoryBase.",
+        "The new concrete LRA numeric owner borrows its RationalManager and owns a LARSolver plus variable/term reverse maps, scope trails and inequality provenance. Numeric operands are copied into the actual LAR owner before lexical release; interrupted operands survive until its solver closes. Partial constructors return their owner with the error. Interrupted model/explanation outputs close before the solver they may borrow, while retained scalar operands close afterward. Seven sampled allocator allowances include a successful 300-digit coefficient case, stopped-prefix rejection, checked release and a live numeric-cell census after ordinary close; no exhaustive slow ownership sweep was added."
       ],
       "deviations": [
-        "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open."
+        "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open.",
+        "Existing platform_replacement records describe the currently selected shared linear-theory substitute; they do not certify the specialized retained LRA algorithm. This increment ports its concrete numerical side without selecting it in setup yet. C++ reference statistics identify the real LRA backend and exact strict objective/scoping/model checks agree. The raw LAR maximize callback can expose an intermediate local bound because it preserves the preceding OPTIMAL status; Go tests preserve the source behavior instead of injecting a new inner solve loop. The C++ higher optsmt consumer visibly repeats lower bounds 8,18,20 to obtain the global coupled optimum. AST linearization, event/propagation/equality/conflict integration, source mk_obj/mk_gt/mk_ge callbacks, context copying and setup selection remain open. The public optimization interface remains unported in this unit until those context callbacks are connected; whole-unit status and audit flags are unchanged."
       ]
     },
     {
@@ -137884,11 +137894,18 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/smtcore/theory_arith_linear.go"
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/theory_lra_numeric.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
-        "TestSMTSolverPublishesStrictLinearRealModel"
+        "TestSMTSolverPublishesStrictLinearRealModel",
+        "TestSMTLRANumericOrderedCancellationAndRegistration",
+        "TestSMTLRANumericStrictOptimizationModelsAndScopeRecovery",
+        "TestSMTLRANumericConflictEvidenceAndReusedConstraintIndex",
+        "TestSMTLRANumericUnboundedAndConstantTerm",
+        "TestSMTLRANumericInterruptedRegistrationCleanup",
+        "TestSMTLRANumericCoupledRowsStrictOptimumAndConflict"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -137907,13 +137924,16 @@
           "status": "unported",
           "go_target": null,
           "tests": []
-        }
+        },
+        {"name": "Concrete LRA numerical owner for retained imp::get_var_index/init_left_side/internalize_def term registration, assert_bound direction/complement and inequality provenance, get_ivalue/finite model reconstruction, make_feasible status mapping, maximize_term coefficient/constant transport and numeric scope mapping. Calls the existing util/lp LARSolver, not math/simplex algorithms. AST/internalizer/event callbacks and setup replacement are still open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_numeric.go", "pkg/smtcore/theory_lra_numeric_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go", "pkg/smtcore/test_vectors/lra_numeric_objective.smt2", "pkg/smtcore/test_vectors/lra_numeric_coupled.smt2"], "tests": ["TestSMTLRANumericOrderedCancellationAndRegistration", "TestSMTLRANumericStrictOptimizationModelsAndScopeRecovery", "TestSMTLRANumericConflictEvidenceAndReusedConstraintIndex", "TestSMTLRANumericUnboundedAndConstantTerm", "TestSMTLRANumericInterruptedRegistrationCleanup", "TestSMTLRANumericCoupledRowsStrictOptimumAndConflict"]}
       ],
       "ownership": [
-        "The concrete Go theory owns its solver state and borrows the registered arithmetic family and SMT context."
+        "The concrete Go theory owns its solver state and borrows the registered arithmetic family and SMT context.",
+        "The new concrete LRA numeric owner borrows its RationalManager and owns a LARSolver plus variable/term reverse maps, scope trails and inequality provenance. Numeric operands are copied into the actual LAR owner before lexical release; interrupted operands survive until its solver closes. Partial constructors return their owner with the error. Interrupted model/explanation outputs close before the solver they may borrow, while retained scalar operands close afterward. Seven sampled allocator allowances include a successful 300-digit coefficient case, stopped-prefix rejection, checked release and a live numeric-cell census after ordinary close; no exhaustive slow ownership sweep was added."
       ],
       "deviations": [
-        "The retained setup selects the shared exact Go linear solver for QF_LRA and QF_UFLRA."
+        "The retained setup selects the shared exact Go linear solver for QF_LRA and QF_UFLRA.",
+        "Existing platform_replacement records describe the currently selected shared linear-theory substitute; they do not certify the specialized retained LRA algorithm. This increment ports its concrete numerical side without selecting it in setup yet. C++ reference statistics identify the real LRA backend and exact strict objective/scoping/model checks agree. The raw LAR maximize callback can expose an intermediate local bound because it preserves the preceding OPTIMAL status; Go tests preserve the source behavior instead of injecting a new inner solve loop. The C++ higher optsmt consumer visibly repeats lower bounds 8,18,20 to obtain the global coupled optimum. AST linearization, event/propagation/equality/conflict integration, source mk_obj/mk_gt/mk_ge callbacks, context copying and setup selection remain open. The public optimization interface remains unported in this unit until those context callbacks are connected; whole-unit status and audit flags are unchanged."
       ]
     },
     {

@@ -2769,6 +2769,7 @@
         "theory_dl.go",
         "theory_dummy.go",
         "theory_fpa.go",
+        "theory_lra_numeric.go",
         "theory_opt.go",
         "theory_pb.go",
         "theory_pb_compile.go",
