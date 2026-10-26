@@ -139387,7 +139387,9 @@
         "pkg/smtcore/theory_str_regex_unroll_assignment.go",
         "pkg/smtcore/theory_str_regex_unroll_assignment_test.go",
         "pkg/smtcore/theory_str_concat_unroll.go",
-        "pkg/smtcore/theory_str_concat_unroll_test.go"
+        "pkg/smtcore/theory_str_concat_unroll_test.go",
+        "pkg/smtcore/theory_str_final_free.go",
+        "pkg/smtcore/theory_str_final_free_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139621,7 +139623,12 @@
         "TestSMTStringRegexUnrollNegativeLogicalBoundPrecedesCache",
         "TestSMTStringConcatUnrollSplitTruthAndFreshOrder",
         "TestSMTStringConcatUnrollCacheScopeRootsAndFresh",
-        "TestSMTStringConcatUnrollRangeBoundaryAssertionAndCacheIdentity"
+        "TestSMTStringConcatUnrollRangeBoundaryAssertionAndCacheIdentity",
+        "TestSMTStringFreeFinalCheckCreatesAndReplaysActualTesters",
+        "TestSMTStringFreeDispatchPrivateUnrollRouting",
+        "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
+        "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness",
+        "TestSMTStringFreeKernelModelAndCPPReference"
       ],
       "conditionals": [
         {
@@ -141514,6 +141521,48 @@
             "TestSMTStringConcatUnrollCacheScopeRootsAndFresh",
             "TestSMTStringConcatUnrollRangeBoundaryAssertionAndCacheIdentity"
           ]
+        },
+        {
+          "name": "final_check_eh free-variable/unroll suffix: remove private-unroll-bounded variables, collect concat/unroll relations through actual core enode cycles, preserve argument boundedness and unconditional collected-argument removal, process concat/unrolls before ordinary assignment, then literal/general removed-variable assignment and native Continue",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_final_free.go",
+          "tests": [
+            "TestSMTStringFreeFinalCheckCreatesAndReplaysActualTesters",
+            "TestSMTStringFreeDispatchPrivateUnrollRouting",
+            "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
+            "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness"
+          ]
+        },
+        {
+          "name": "process_free_var retained tester-emission loops: existing representative/leaf/standalone order invokes configured length/value generators and actual assertion wrapper, permitting null returned formulas because callees may assert directly",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_final_free.go",
+          "tests": [
+            "TestSMTStringFreeFinalCheckCreatesAndReplaysActualTesters",
+            "TestSMTStringFreeKernelModelAndCPPReference"
+          ]
+        },
+        {
+          "name": "final_check_eh retained full control flow: dependency analysis, constants/length backpropagation, actual regex stage without disabled early return, assigned conversion/path gates or full free-variable/unroll assignment; previously unfinished unassigned cases now execute native tester work and Continue",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str.go",
+          "tests": [
+            "TestSMTStringFreeFinalCheckCreatesAndReplaysActualTesters",
+            "TestSMTStringFreeDispatchPrivateUnrollRouting",
+            "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
+            "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness",
+            "TestSMTStringFreeKernelModelAndCPPReference",
+            "TestSMTStringRegexStageFinalCheckRunsWithoutInventedContinue"
+          ]
+        },
+        {
+          "name": "final_check_eh !testAssign alternative is source-disabled by local true; opt_VerifyFinalCheckProgress is constructor-false with no retained setter, so omit dead no-progress exception instead of inventing a GiveUp or progress test",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_final_free.go",
+          "tests": [
+            "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
+            "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness"
+          ]
         }
       ],
       "ownership": [
@@ -141560,7 +141609,8 @@
         "Unroll history groups own sorted unique exact-member key slices and tester slices, borrowing lifetime-rooted AST handles. Ordinary creator retains one direct variable root; repeated scope registration is idempotent. Assignment formulas and conditional wrapper formulas each preserve their distinct source explicit lifetime roots in addition to the returned caller root. Local roots release forward; nested returned roots are transferred to the local frame then closed even on errors. History role filtering uses internal_unrollTest_vars rather than ordinary internal membership and remains lifetime-persistent across real scope pops. Fresh/Close initialize/clear concrete history state; no generic set/map/template adapter is added.",
         "Literal-unroll compatibility owns temporary sorted unique exact-member handles and Go byte strings, borrowing existing unroll AST ownership. Temporary equality premises release forward; compatible results transfer the actual conditional generator caller root, while incompatible implications have only caller-owned ASTRef ownership and no extra direct lifetime root. The private-class collector returns borrowed handles, retaining last-constant cycle behavior. Go strings.Repeat replaces standard-library concatenation plumbing; project GCD/LCM control flow remains subtraction based.",
         "Unroll construction returns a borrowed explicitly retained term, then asserts its actual definition before returning. Recursive reduction appends only emitted premises to caller-owned concrete expr_ref_vector replacement; each recursion owns/releases temporary operands forward. Range output goes directly through assertAxiom and bypasses theory String cache, preserving NUL/high bytes. General unroll definitions borrow lifetime-rooted keys/results and retain both the explicit trail root and assertion root on every build/cache replay. Cache insertion precedes those roots as in source; Fresh/Close initialize/clear concrete maps. Completed prefix effects remain after later reduction errors; caller premise owners release acquired roots.",
-        "Concat/unroll definitions borrow ordered AST pair keys and cached formula handles held by existing lifetime roots. Cache misses create the native five word/two count witnesses and retain the complete formula before insertion; every call asserts, but cache hits add no additional explicit trail root. Constructor and immediate range effects retain their own roots before the final definition. Local positive/zero premise vectors and temporary operand roots release forward. Persistent cache survives real scope pop; Fresh/Close initialize/clear the concrete map."
+        "Concat/unroll definitions borrow ordered AST pair keys and cached formula handles held by existing lifetime roots. Cache misses create the native five word/two count witnesses and retain the complete formula before insertion; every call asserts, but cache hits add no additional explicit trail root. Constructor and immediate range effects retain their own roots before the final definition. Local positive/zero premise vectors and temporary operand roots release forward. Persistent cache survives real scope pop; Fresh/Close initialize/clear the concrete map.",
+        "The final free-variable stage mutates only its current dependency-analysis free map, owns temporary concrete relation/set maps and borrows existing AST handles. Private String classes and core enode cycles remain distinct. Generator return roots are consumed by the actual assertion wrapper and close on failures; null roots are legal. Lifetime tester/definition caches retain their established roots and scope behavior. No unused generic map/set adapter or inactive alternative assignment loop is introduced."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141612,7 +141662,8 @@
         "Four regressions independently enumerate numeric/more/junk choices versus repeat words and independently substituted lengths across two windows for ASCII and NUL/high-byte cores; verify ordinary noninternalization, exact tester name/single direct root/counters/scope, aggressive relevance/cached phases without assignment, first unassigned formula replay and exact-set key reuse, actual unroll-role equality handling, assigned-more guard and assigned-concrete fallthrough, actual scope-pop refresh, role-based erasure and Fresh reset. Use Go strings.Repeat for retained nonnegative repeat counts. Preserve target-width unsigned byte-length products and signed mk_int conversion; undefined native signed negation/window overflow becomes a domain error. Fixed step two is proven by constructor/no setters; unreachable post-return premise mutation is omitted. Literal-core LCM compatibility, general regex/unroll assignment and free-variable/unroll FinalCheck dispatch remain pending. Source statuses, production routing and verified checkpoint are unchanged.",
         "Four regressions verify common periods across unequal/two/three core byte lengths and NUL/high-byte strings through actual conditional assignment formulas, incompatible guarded-empty implication truth and root ownership without tester creation, exact private-class to_re classification including symbolic/empty cores while excluding star cores and observing scope rollback, source LCM values and signed overflow guard, and native empty/symbolic division-state refusal without fabricated histories. Native empty-set, empty-core and nonliteral-to_re division-by-zero states become Go domain errors; the collector still preserves source classification. Remaining general-regex reduction/unroll assignment, concat/unroll processing and free-variable/unroll FinalCheck dispatch are pending. Source-unit statuses, production routing and the verified full native checkpoint are unchanged.",
         "Eight regressions verify independent count/word/length constructor truth, exact union/concat/literal premise shapes and languages with actual typed witnesses, all 256 byte candidates for reversed/NUL/high-byte ranges with no appended premise or String-cache access, star constructor effects, unsupported-right-child preservation of completed union/range effects, exhaustive one-step zero/positive unfolding truth, input-set deduplication and fresh order, repeated two-root cache replay after actual scope pop, Fresh reset and a logical negative bound taking precedence over an existing cache after scope rollback. Native unrecognized operators become Go domain errors without broader regex expansion. Source raw-byte zstring(unsigned ch, ascii) construction is represented by Go one-byte strings. General regex assignment is implemented but awaits concat/unroll processing and complete free-variable/unroll FinalCheck wiring. Source statuses, production routing and verified full checkpoint are unchanged.",
-        "Three regressions independently enumerate zero/positive split equivalences and count/word/boundary assignments with exact fresh order and actual residual constructors, verify two roots on build versus one added assertion root on scope-pop replay without new witnesses and Fresh reset, and confirm unconditional range boundary assertion plus ordered nonsymmetric cache identity. This completes concat/unroll processing as a callable retained routine; the remaining free-variable/unroll FinalCheck dispatcher is still pending. Source statuses, production routing and verified full checkpoint remain unchanged."
+        "Three regressions independently enumerate zero/positive split equivalences and count/word/boundary assignments with exact fresh order and actual residual constructors, verify two roots on build versus one added assertion root on scope-pop replay without new witnesses and Fresh reset, and confirm unconditional range boundary assertion plus ordered nonsymmetric cache identity. This completes concat/unroll processing as a callable retained routine; the remaining free-variable/unroll FinalCheck dispatcher is still pending. Source statuses, production routing and verified full checkpoint remain unchanged.",
+        "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged."
       ]
     },
     {
@@ -141733,7 +141784,9 @@
         "pkg/smtcore/theory_str_regex_unroll_assignment.go",
         "pkg/smtcore/theory_str_regex_unroll_assignment_test.go",
         "pkg/smtcore/theory_str_concat_unroll.go",
-        "pkg/smtcore/theory_str_concat_unroll_test.go"
+        "pkg/smtcore/theory_str_concat_unroll_test.go",
+        "pkg/smtcore/theory_str_final_free.go",
+        "pkg/smtcore/theory_str_final_free_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -141968,7 +142021,12 @@
         "TestSMTStringRegexUnrollNegativeLogicalBoundPrecedesCache",
         "TestSMTStringConcatUnrollSplitTruthAndFreshOrder",
         "TestSMTStringConcatUnrollCacheScopeRootsAndFresh",
-        "TestSMTStringConcatUnrollRangeBoundaryAssertionAndCacheIdentity"
+        "TestSMTStringConcatUnrollRangeBoundaryAssertionAndCacheIdentity",
+        "TestSMTStringFreeFinalCheckCreatesAndReplaysActualTesters",
+        "TestSMTStringFreeDispatchPrivateUnrollRouting",
+        "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
+        "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness",
+        "TestSMTStringFreeKernelModelAndCPPReference"
       ],
       "conditionals": [
         {
@@ -143179,6 +143237,48 @@
             "TestSMTStringConcatUnrollCacheScopeRootsAndFresh",
             "TestSMTStringConcatUnrollRangeBoundaryAssertionAndCacheIdentity"
           ]
+        },
+        {
+          "name": "final_check_eh free-variable/unroll suffix: remove private-unroll-bounded variables, collect concat/unroll relations through actual core enode cycles, preserve argument boundedness and unconditional collected-argument removal, process concat/unrolls before ordinary assignment, then literal/general removed-variable assignment and native Continue",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_final_free.go",
+          "tests": [
+            "TestSMTStringFreeFinalCheckCreatesAndReplaysActualTesters",
+            "TestSMTStringFreeDispatchPrivateUnrollRouting",
+            "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
+            "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness"
+          ]
+        },
+        {
+          "name": "process_free_var retained tester-emission loops: existing representative/leaf/standalone order invokes configured length/value generators and actual assertion wrapper, permitting null returned formulas because callees may assert directly",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_final_free.go",
+          "tests": [
+            "TestSMTStringFreeFinalCheckCreatesAndReplaysActualTesters",
+            "TestSMTStringFreeKernelModelAndCPPReference"
+          ]
+        },
+        {
+          "name": "final_check_eh retained full control flow: dependency analysis, constants/length backpropagation, actual regex stage without disabled early return, assigned conversion/path gates or full free-variable/unroll assignment; previously unfinished unassigned cases now execute native tester work and Continue",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str.go",
+          "tests": [
+            "TestSMTStringFreeFinalCheckCreatesAndReplaysActualTesters",
+            "TestSMTStringFreeDispatchPrivateUnrollRouting",
+            "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
+            "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness",
+            "TestSMTStringFreeKernelModelAndCPPReference",
+            "TestSMTStringRegexStageFinalCheckRunsWithoutInventedContinue"
+          ]
+        },
+        {
+          "name": "final_check_eh !testAssign alternative is source-disabled by local true; opt_VerifyFinalCheckProgress is constructor-false with no retained setter, so omit dead no-progress exception instead of inventing a GiveUp or progress test",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_final_free.go",
+          "tests": [
+            "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
+            "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness"
+          ]
         }
       ],
       "ownership": [
@@ -143226,7 +143326,8 @@
         "Unroll history groups own sorted unique exact-member key slices and tester slices, borrowing lifetime-rooted AST handles. Ordinary creator retains one direct variable root; repeated scope registration is idempotent. Assignment formulas and conditional wrapper formulas each preserve their distinct source explicit lifetime roots in addition to the returned caller root. Local roots release forward; nested returned roots are transferred to the local frame then closed even on errors. History role filtering uses internal_unrollTest_vars rather than ordinary internal membership and remains lifetime-persistent across real scope pops. Fresh/Close initialize/clear concrete history state; no generic set/map/template adapter is added.",
         "Literal-unroll compatibility owns temporary sorted unique exact-member handles and Go byte strings, borrowing existing unroll AST ownership. Temporary equality premises release forward; compatible results transfer the actual conditional generator caller root, while incompatible implications have only caller-owned ASTRef ownership and no extra direct lifetime root. The private-class collector returns borrowed handles, retaining last-constant cycle behavior. Go strings.Repeat replaces standard-library concatenation plumbing; project GCD/LCM control flow remains subtraction based.",
         "Unroll construction returns a borrowed explicitly retained term, then asserts its actual definition before returning. Recursive reduction appends only emitted premises to caller-owned concrete expr_ref_vector replacement; each recursion owns/releases temporary operands forward. Range output goes directly through assertAxiom and bypasses theory String cache, preserving NUL/high bytes. General unroll definitions borrow lifetime-rooted keys/results and retain both the explicit trail root and assertion root on every build/cache replay. Cache insertion precedes those roots as in source; Fresh/Close initialize/clear concrete maps. Completed prefix effects remain after later reduction errors; caller premise owners release acquired roots.",
-        "Concat/unroll definitions borrow ordered AST pair keys and cached formula handles held by existing lifetime roots. Cache misses create the native five word/two count witnesses and retain the complete formula before insertion; every call asserts, but cache hits add no additional explicit trail root. Constructor and immediate range effects retain their own roots before the final definition. Local positive/zero premise vectors and temporary operand roots release forward. Persistent cache survives real scope pop; Fresh/Close initialize/clear the concrete map."
+        "Concat/unroll definitions borrow ordered AST pair keys and cached formula handles held by existing lifetime roots. Cache misses create the native five word/two count witnesses and retain the complete formula before insertion; every call asserts, but cache hits add no additional explicit trail root. Constructor and immediate range effects retain their own roots before the final definition. Local positive/zero premise vectors and temporary operand roots release forward. Persistent cache survives real scope pop; Fresh/Close initialize/clear the concrete map.",
+        "The final free-variable stage mutates only its current dependency-analysis free map, owns temporary concrete relation/set maps and borrows existing AST handles. Private String classes and core enode cycles remain distinct. Generator return roots are consumed by the actual assertion wrapper and close on failures; null roots are legal. Lifetime tester/definition caches retain their established roots and scope behavior. No unused generic map/set adapter or inactive alternative assignment loop is introduced."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -143279,7 +143380,8 @@
         "Four regressions independently enumerate numeric/more/junk choices versus repeat words and independently substituted lengths across two windows for ASCII and NUL/high-byte cores; verify ordinary noninternalization, exact tester name/single direct root/counters/scope, aggressive relevance/cached phases without assignment, first unassigned formula replay and exact-set key reuse, actual unroll-role equality handling, assigned-more guard and assigned-concrete fallthrough, actual scope-pop refresh, role-based erasure and Fresh reset. Use Go strings.Repeat for retained nonnegative repeat counts. Preserve target-width unsigned byte-length products and signed mk_int conversion; undefined native signed negation/window overflow becomes a domain error. Fixed step two is proven by constructor/no setters; unreachable post-return premise mutation is omitted. Literal-core LCM compatibility, general regex/unroll assignment and free-variable/unroll FinalCheck dispatch remain pending. Source statuses, production routing and verified checkpoint are unchanged.",
         "Four regressions verify common periods across unequal/two/three core byte lengths and NUL/high-byte strings through actual conditional assignment formulas, incompatible guarded-empty implication truth and root ownership without tester creation, exact private-class to_re classification including symbolic/empty cores while excluding star cores and observing scope rollback, source LCM values and signed overflow guard, and native empty/symbolic division-state refusal without fabricated histories. Native empty-set, empty-core and nonliteral-to_re division-by-zero states become Go domain errors; the collector still preserves source classification. Remaining general-regex reduction/unroll assignment, concat/unroll processing and free-variable/unroll FinalCheck dispatch are pending. Source-unit statuses, production routing and the verified full native checkpoint are unchanged.",
         "Eight regressions verify independent count/word/length constructor truth, exact union/concat/literal premise shapes and languages with actual typed witnesses, all 256 byte candidates for reversed/NUL/high-byte ranges with no appended premise or String-cache access, star constructor effects, unsupported-right-child preservation of completed union/range effects, exhaustive one-step zero/positive unfolding truth, input-set deduplication and fresh order, repeated two-root cache replay after actual scope pop, Fresh reset and a logical negative bound taking precedence over an existing cache after scope rollback. Native unrecognized operators become Go domain errors without broader regex expansion. Source raw-byte zstring(unsigned ch, ascii) construction is represented by Go one-byte strings. General regex assignment is implemented but awaits concat/unroll processing and complete free-variable/unroll FinalCheck wiring. Source statuses, production routing and verified full checkpoint are unchanged.",
-        "Three regressions independently enumerate zero/positive split equivalences and count/word/boundary assignments with exact fresh order and actual residual constructors, verify two roots on build versus one added assertion root on scope-pop replay without new witnesses and Fresh reset, and confirm unconditional range boundary assertion plus ordered nonsymmetric cache identity. This completes concat/unroll processing as a callable retained routine; the remaining free-variable/unroll FinalCheck dispatcher is still pending. Source statuses, production routing and verified full checkpoint remain unchanged."
+        "Three regressions independently enumerate zero/positive split equivalences and count/word/boundary assignments with exact fresh order and actual residual constructors, verify two roots on build versus one added assertion root on scope-pop replay without new witnesses and Fresh reset, and confirm unconditional range boundary assertion plus ordered nonsymmetric cache identity. This completes concat/unroll processing as a callable retained routine; the remaining free-variable/unroll FinalCheck dispatcher is still pending. Source statuses, production routing and verified full checkpoint remain unchanged.",
+        "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged."
       ]
     },
     {

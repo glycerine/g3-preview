@@ -392,12 +392,10 @@ func (t *SMTStringTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if len(free) == 0 {
 		return t.finalCheckAssignedStrings()
 	}
-	// Native deferred consistency/progress flags are initialized false and
-	// never assigned. Scope diagnostics are trace-only. The reached prefix
-	// above preserves analysis -> constants -> lengths -> regex automata.
-	// The regex stage has no live early return. The remaining free-variable
-	// tester/unroll branch is incomplete, so this case cannot report SAT.
-	return SMTFinalCheckGiveUp, nil
+	if err := t.assignStringFreeVariables(analysis); err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	return SMTFinalCheckContinue, nil
 }
 
 func (t *SMTStringTheory) Close() (result error) {

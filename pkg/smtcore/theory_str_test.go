@@ -73,8 +73,8 @@ func TestSMTStringTheoryTypedAttachmentAndAlphabet(t *testing.T) {
 		t.Fatal("NUL entered the source 255-character search alphabet")
 	}
 	astTestMust(t, theory.setUpAxioms(x))
-	if status, err := theory.FinalCheck(); err != nil || status != SMTFinalCheckGiveUp {
-		t.Fatal("unfinished string constraints were reported complete", status, err)
+	if status, err := theory.FinalCheck(); err != nil || status != SMTFinalCheckContinue {
+		t.Fatal("unassigned String variable did not continue into tester assignment", status, err)
 	}
 }
 

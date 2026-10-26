@@ -2820,6 +2820,7 @@
         "theory_str_expression_solver.go",
         "theory_str_extract.go",
         "theory_str_final_assigned.go",
+        "theory_str_final_free.go",
         "theory_str_free_value_options.go",
         "theory_str_free_variable_order.go",
         "theory_str_grounded.go",

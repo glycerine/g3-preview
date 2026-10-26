@@ -141,7 +141,7 @@ func TestSMTStringSearchSetupBorrowsKernelAssertions(t *testing.T) {
 	if theory.CanPropagate() {
 		t.Fatal("repeated search left pending supported relation axioms")
 	}
-	if status, err := theory.FinalCheck(); err != nil || status != SMTFinalCheckGiveUp {
-		t.Fatal("partial relation setup reported native final-check completion", status, err)
+	if status, err := theory.FinalCheck(); err != nil || status != SMTFinalCheckContinue {
+		t.Fatal("unassigned relation variables did not continue into tester assignment", status, err)
 	}
 }

@@ -329,8 +329,8 @@ func TestSMTStringRegexStageFinalCheckRunsWithoutInventedContinue(t *testing.T) 
 		status, err := theory.FinalCheck()
 		astTestMust(t, err)
 		if theory.regexStage.automata[regex] != nil {
-			if status != SMTFinalCheckGiveUp {
-				t.Fatal("regex_axiom_add activated the commented-out native return or claimed SAT", status)
+			if status != SMTFinalCheckContinue || len(theory.testers.lengthIndicators[word]) == 0 {
+				t.Fatal("regex stage did not reach actual free-variable tester work before continuation", status)
 			}
 			return
 		}
