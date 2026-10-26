@@ -19,14 +19,15 @@ import (
 )
 
 type smtLinearForm struct {
-	constant, infinitesimal big.Rat
-	terms                   map[uint32]*big.Rat
+	infinity, constant, infinitesimal big.Rat
+	terms                             map[uint32]*big.Rat
 }
 
 func newSMTLinearForm() smtLinearForm { return smtLinearForm{terms: make(map[uint32]*big.Rat)} }
 
 func (f *smtLinearForm) clone() smtLinearForm {
 	result := newSMTLinearForm()
+	result.infinity.Set(&f.infinity)
 	result.constant.Set(&f.constant)
 	result.infinitesimal.Set(&f.infinitesimal)
 	for variable, coefficient := range f.terms {
@@ -50,6 +51,7 @@ func (f *smtLinearForm) addTerm(variable uint32, coefficient *big.Rat) {
 }
 
 func (f *smtLinearForm) add(other *smtLinearForm) {
+	f.infinity.Add(&f.infinity, &other.infinity)
 	f.constant.Add(&f.constant, &other.constant)
 	f.infinitesimal.Add(&f.infinitesimal, &other.infinitesimal)
 	for variable, coefficient := range other.terms {
@@ -58,6 +60,7 @@ func (f *smtLinearForm) add(other *smtLinearForm) {
 }
 
 func (f *smtLinearForm) scale(coefficient *big.Rat) {
+	f.infinity.Mul(&f.infinity, coefficient)
 	f.constant.Mul(&f.constant, coefficient)
 	f.infinitesimal.Mul(&f.infinitesimal, coefficient)
 	for variable, value := range f.terms {
@@ -163,6 +166,7 @@ type SMTLinearArithmeticTheory struct {
 	unsupported         bool
 	integer             bool
 	mixed               bool
+	infinite            bool
 	integerColumns      map[uint32]bool
 	castTerms           map[ast.ASTHandle]bool
 	castTermTrail       []ast.ASTHandle
@@ -198,6 +202,17 @@ func NewSMTMixedLinearArithmeticTheory(family ast.FamilyID) (*SMTLinearArithmeti
 	t, err := newSMTLinearArithmeticTheory(family, false)
 	if err == nil {
 		t.mixed = true
+	}
+	return t, err
+}
+
+// NewSMTInfiniteArithmeticTheory is the retained inf_ext specialization.
+// It uses the same rational-coefficient tableau with full infinity/main/epsilon
+// values; finite specializations continue to require zero infinity.
+func NewSMTInfiniteArithmeticTheory(family ast.FamilyID) (*SMTLinearArithmeticTheory, error) {
+	t, err := NewSMTMixedLinearArithmeticTheory(family)
+	if err == nil {
+		t.infinite = true
 	}
 	return t, err
 }
@@ -788,6 +803,7 @@ func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (low
 			epsilon = newSMTArithmeticValue(big.NewRat(1, 1), nil)
 		}
 		_ = atom.native.assign(truth, &epsilon)
+		value.Infinity.Set(&atom.native.value.infinity)
 		value.Main.Sub(&atom.native.value.rational, &atom.nativeOffset)
 		value.Epsilon.Set(&atom.native.value.infinitesimal)
 		return atom.native.kind == smtArithmeticLowerBound, value
@@ -842,6 +858,10 @@ func smtLinearFormsOpposite(first, second *smtLinearForm) bool {
 		return false
 	}
 	var constant big.Rat
+	constant.Neg(&second.infinity)
+	if first.infinity.Cmp(&constant) != 0 {
+		return false
+	}
 	constant.Neg(&second.constant)
 	if first.constant.Cmp(&constant) != 0 {
 		return false
@@ -864,7 +884,7 @@ func smtLinearFormsOpposite(first, second *smtLinearForm) bool {
 }
 
 func smtLinearFormsEqual(first, second *smtLinearForm) bool {
-	if first == nil || second == nil || len(first.terms) != len(second.terms) || first.constant.Cmp(&second.constant) != 0 || first.infinitesimal.Cmp(&second.infinitesimal) != 0 {
+	if first == nil || second == nil || len(first.terms) != len(second.terms) || first.infinity.Cmp(&second.infinity) != 0 || first.constant.Cmp(&second.constant) != 0 || first.infinitesimal.Cmp(&second.infinitesimal) != 0 {
 		return false
 	}
 	for variable, coefficient := range first.terms {
@@ -939,6 +959,7 @@ func smtLinearNormalizedLE(atom *smtLinearArithmeticAtom, assertion smtIntegerDi
 	if atom.native != nil {
 		lower, value := smtLinearAtomBound(atom, assertion.truth, atom.boundAxiom.integral)
 		form := atom.form.clone()
+		form.infinity.Neg(&value.Infinity)
 		form.constant.Neg(&value.Main)
 		form.infinitesimal.Neg(&value.Epsilon)
 		if lower {
@@ -971,7 +992,7 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 		if !firstOK {
 			continue
 		}
-		if firstForm.constant.Sign() != 0 || firstForm.infinitesimal.Sign() != 0 || len(firstForm.terms) != 2 {
+		if firstForm.infinity.Sign() != 0 || firstForm.constant.Sign() != 0 || firstForm.infinitesimal.Sign() != 0 || len(firstForm.terms) != 2 {
 			continue
 		}
 		for _, secondAssertion := range t.assertions[firstIndex+1:] {
@@ -1023,7 +1044,7 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 				continue
 			}
 			for variable, coefficient := range firstForm.terms {
-				value := simplex.NewInfinitesimal(new(big.Rat).Neg(&firstForm.constant), new(big.Rat).Neg(&firstForm.infinitesimal))
+				value := simplex.NewInfiniteInfinitesimal(new(big.Rat).Neg(&firstForm.infinity), new(big.Rat).Neg(&firstForm.constant), new(big.Rat).Neg(&firstForm.infinitesimal))
 				value.Quo(coefficient)
 				fixed = append(fixed, fixedVariable{variable: variable, value: value, literals: []SMTLiteral{
 					smtLinearAssertionLiteral(firstAtom, firstAssertion),
@@ -1071,6 +1092,8 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 					continue
 				}
 				var contribution big.Rat
+				contribution.Mul(coefficient, &value.value.Infinity)
+				remaining.infinity.Add(&remaining.infinity, &contribution)
 				contribution.Mul(coefficient, &value.value.Main)
 				remaining.constant.Add(&remaining.constant, &contribution)
 				contribution.Mul(coefficient, &value.value.Epsilon)
@@ -1078,7 +1101,7 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 				delete(remaining.terms, value.variable)
 				literals = append(literals, value.literals...)
 			}
-			if remaining.constant.Sign() != 0 || remaining.infinitesimal.Sign() != 0 || len(remaining.terms) != 2 {
+			if remaining.infinity.Sign() != 0 || remaining.constant.Sign() != 0 || remaining.infinitesimal.Sign() != 0 || len(remaining.terms) != 2 {
 				continue
 			}
 			variables := make([]uint32, 0, 2)
@@ -1355,7 +1378,7 @@ func (t *SMTLinearArithmeticTheory) fractionalVariable(solver *simplex.Solver) (
 			continue
 		}
 		value := solver.Value(variable)
-		if value.Epsilon.Sign() != 0 || !value.Main.IsInt() {
+		if !value.IsRational() || !value.Main.IsInt() {
 			return variable, value, true
 		}
 	}
@@ -1530,7 +1553,7 @@ func (t *SMTLinearArithmeticTheory) fixedLinearAssignments() map[uint32]smtFixed
 	for firstIndex, firstAssertion := range t.assertions {
 		firstAtom := &t.atoms[firstAssertion.atom]
 		firstForm, firstOK := smtLinearNormalizedLE(firstAtom, firstAssertion)
-		if !firstOK || firstForm.infinitesimal.Sign() != 0 || len(firstForm.terms) != 1 {
+		if !firstOK || firstForm.infinity.Sign() != 0 || firstForm.infinitesimal.Sign() != 0 || len(firstForm.terms) != 1 {
 			continue
 		}
 		for _, secondAssertion := range t.assertions[firstIndex+1:] {
@@ -1652,6 +1675,9 @@ func (t *SMTLinearArithmeticTheory) linearVariableIntervals() (*smtPolynomialInt
 		}
 		if atom.native != nil {
 			lower, value := smtLinearAtomBound(atom, assertion.truth, t.integralAtom(atom))
+			if value.Infinity.Sign() != 0 {
+				continue
+			}
 			for variable, coefficient := range atom.form.terms {
 				value.Quo(coefficient)
 				lower = lower == (coefficient.Sign() > 0)

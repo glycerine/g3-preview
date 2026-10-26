@@ -5,7 +5,7 @@ import "errors"
 
 // Basic setup collects arithmetic features even on the logic-only first-push
 // path. Difference, dense, UTVPI and disabled modes select their concrete
-// retained implementations; AS_OPTINF remains a separate unfinished backend.
+// retained implementations, including the full three-component inf_ext.
 // Constructor-only int_only/fixnum flags have no retained writers and stay false.
 func (k *SMTKernel) setupBasicArithmetic() (result error) {
 	features, err := k.setupStaticFeatures(true)
@@ -35,7 +35,7 @@ func (k *SMTKernel) setupBasicArithmetic() (result error) {
 		arithmetic.Eq2Ineq = true
 		theory, err = NewSMTUTVPITheory(family)
 	case 5:
-		return nil // Retained AS_OPTINF selection remains incomplete.
+		theory, err = NewSMTInfiniteArithmeticTheory(family)
 	default:
 		if existing, ok := k.internalizer.theories[family].(*SMTLinearArithmeticTheory); ok {
 			// Direct internalizer clients may have already created columns.

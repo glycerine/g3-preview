@@ -8,8 +8,8 @@ type smtArithmeticEqualityCandidate struct {
 }
 
 type smtArithmeticSharedValueKey struct {
-	sort          ast.ASTHandle
-	main, epsilon string
+	sort                    ast.ASTHandle
+	infinity, main, epsilon string
 }
 
 func (t *SMTLinearArithmeticTheory) delayedAssumeEqualities() (bool, error) {
@@ -66,7 +66,7 @@ func (t *SMTLinearArithmeticTheory) assumeSharedEqualities() (bool, error) {
 			return false, err
 		}
 		value := t.solver.Value(column)
-		k := smtArithmeticSharedValueKey{sort, value.Main.RatString(), value.Epsilon.RatString()}
+		k := smtArithmeticSharedValueKey{sort, value.Infinity.RatString(), value.Main.RatString(), value.Epsilon.RatString()}
 		other, found := values[k]
 		if !found {
 			values[k] = SMTTheoryVar(variable)

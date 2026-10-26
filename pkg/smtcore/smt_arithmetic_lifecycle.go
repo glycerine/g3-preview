@@ -27,7 +27,9 @@ func (k *SMTKernel) copyArithmeticPlugin(source *SMTKernel) error {
 	}
 	switch previous := old.(type) {
 	case *SMTLinearArithmeticTheory:
-		if previous.mixed {
+		if previous.infinite {
+			theory, err = NewSMTInfiniteArithmeticTheory(family)
+		} else if previous.mixed {
 			theory, err = NewSMTMixedLinearArithmeticTheory(family)
 		} else if previous.integer {
 			theory, err = NewSMTLinearIntegerArithmeticTheory(family)

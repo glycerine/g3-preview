@@ -1,4 +1,4 @@
-// Source: src/smt/theory_arith_aux.h:1120-1143 mk_ge, instantiated for mi_ext.
+// Source: src/smt/theory_arith_aux.h:1120-1143 mk_ge, instantiated for mi_ext and inf_ext.
 package smtcore
 
 import (
@@ -19,7 +19,7 @@ func (t *SMTLinearArithmeticTheory) MakeObjectiveLowerBound(filter *tactic.Filte
 	if err != nil {
 		return result, err
 	}
-	if value.Infinity.Sign() != 0 {
+	if value.Infinity.Sign() != 0 && !t.infinite {
 		return result, ast.ErrASTDomain
 	}
 	if filter == nil {
@@ -30,19 +30,7 @@ func (t *SMTLinearArithmeticTheory) MakeObjectiveLowerBound(filter *tactic.Filte
 		return result, err
 	}
 	var name bytes.Buffer
-	if value.Epsilon.Sign() == 0 {
-		name.WriteString(value.Main.RatString())
-	} else {
-		name.WriteByte('(')
-		name.WriteString(value.Main.RatString())
-		if value.Epsilon.Sign() < 0 {
-			name.WriteString(" -e*")
-		} else {
-			name.WriteString(" +e*")
-		}
-		name.WriteString(new(big.Rat).Abs(&value.Epsilon).RatString())
-		name.WriteByte(')')
-	}
+	name.WriteString(smtArithmeticBoundName(value))
 	name.WriteString(" <= ")
 	printer, err := ast.NewSimpleASTPrinterContext(s.manager, &name, &name)
 	if err != nil {
@@ -86,6 +74,7 @@ func (t *SMTLinearArithmeticTheory) MakeObjectiveLowerBound(filter *tactic.Filte
 		return ast.ASTHandle{}, err
 	}
 	threshold := newSMTArithmeticValue(&value.Main, &value.Epsilon)
+	threshold.infinity.Set(&value.Infinity)
 	native, err := newSMTArithmeticAtom(bv, variable, &threshold, smtArithmeticLowerAtom)
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -113,4 +102,29 @@ func (t *SMTLinearArithmeticTheory) MakeObjectiveLowerBound(filter *tactic.Filte
 		return ast.ASTHandle{}, err
 	}
 	return result, nil
+}
+
+// Source inf_eps_rational<inf_rational>::to_string and inf_rational::to_string.
+func smtArithmeticBoundName(value simplex.Infinitesimal) string {
+	finite := value.Main.RatString()
+	if value.Epsilon.Sign() != 0 {
+		sign := " +e*"
+		if value.Epsilon.Sign() < 0 {
+			sign = " -e*"
+		}
+		finite = "(" + finite + sign + new(big.Rat).Abs(&value.Epsilon).RatString() + ")"
+	}
+	if value.Infinity.Sign() == 0 {
+		return finite
+	}
+	infinity := value.Infinity.RatString() + "*oo"
+	if value.Infinity.Cmp(big.NewRat(1, 1)) == 0 {
+		infinity = "oo"
+	} else if value.Infinity.Cmp(big.NewRat(-1, 1)) == 0 {
+		infinity = "-oo"
+	}
+	if value.Main.Sign() == 0 && value.Epsilon.Sign() == 0 {
+		return infinity
+	}
+	return "(" + infinity + " + " + finite + ")"
 }

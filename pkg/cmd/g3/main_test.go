@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"basic_infinite_arithmetic.smt2":               "sat\n(((>= i 0) true)\n ((<= i 2) true)\n ((> r 0) true)\n ((< r (/ 1.0 3.0)) true)\n ((distinct (f r) (f (/ 1.0 2.0))) true))\nunsat\n(real_conflict)\nsat\nunsat\n(integer_conflict)\nsat\nsat\n(((= (* r r) (/ 1.0 16.0)) true))\nsat\n",
 	"reset_assertions_default.smt2":                "success\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsuccess\nsat\n((x 3))\n",
 	"reset_assertions_global.smt2":                 "sat\n((x 7)\n (y 5)\n ((twice x) 14))\n((x 7)\n (y 5)\n ((twice x) 14))\n((x 7))\nsat\n((x 0)\n (y 0)\n ((twice x) 0))\nsat\n((x 3)\n (y 4)\n ((twice x) 6))\nunsat\n(contradiction)\n(contradiction)\nsat\n((x 0)\n (y 0)\n ((twice x) 0))\n",
 	"reset_session.smt2":                           "success\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsuccess\nsuccess\nsuccess\nsat\n(((> x 4) true))\nsuccess\nsuccess\nunsat\n(bound impossible)\nsuccess\nsat\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsuccess\nsuccess\nsat\n((answer 1))\n",

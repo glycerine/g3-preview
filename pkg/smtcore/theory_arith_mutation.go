@@ -38,7 +38,7 @@ func (t *SMTLinearArithmeticTheory) mutateArithmeticAssignment() error {
 			return err
 		}
 		value := t.solver.Value(column)
-		key := smtArithmeticSharedValueKey{sort, value.Main.RatString(), value.Epsilon.RatString()}
+		key := smtArithmeticSharedValueKey{sort, value.Infinity.RatString(), value.Main.RatString(), value.Epsilon.RatString()}
 		other, found := values[key]
 		if !found {
 			values[key] = SMTTheoryVar(variable)

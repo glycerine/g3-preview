@@ -184,12 +184,16 @@ func (t *SMTLinearArithmeticTheory) nonlinearColumnInterval(solver *simplex.Solv
 	if lower, ok := solver.Lower(column); ok {
 		result.lower = smtFiniteExtended(&lower.Main)
 		result.lowerOpen = lower.Epsilon.Sign() > 0
-		result.lowerDep = manager.Leaf(&smtArithmeticBound{variable: SMTTheoryVar(column), kind: smtArithmeticLowerBound, value: newSMTArithmeticValue(&lower.Main, &lower.Epsilon), replayExplanation: smtArithmeticCopyBoundExplanation(solver, column, true)})
+		value := newSMTArithmeticValue(&lower.Main, &lower.Epsilon)
+		value.infinity.Set(&lower.Infinity)
+		result.lowerDep = manager.Leaf(&smtArithmeticBound{variable: SMTTheoryVar(column), kind: smtArithmeticLowerBound, value: value, replayExplanation: smtArithmeticCopyBoundExplanation(solver, column, true)})
 	}
 	if upper, ok := solver.Upper(column); ok {
 		result.upper = smtFiniteExtended(&upper.Main)
 		result.upperOpen = upper.Epsilon.Sign() < 0
-		result.upperDep = manager.Leaf(&smtArithmeticBound{variable: SMTTheoryVar(column), kind: smtArithmeticUpperBound, value: newSMTArithmeticValue(&upper.Main, &upper.Epsilon), replayExplanation: smtArithmeticCopyBoundExplanation(solver, column, false)})
+		value := newSMTArithmeticValue(&upper.Main, &upper.Epsilon)
+		value.infinity.Set(&upper.Infinity)
+		result.upperDep = manager.Leaf(&smtArithmeticBound{variable: SMTTheoryVar(column), kind: smtArithmeticUpperBound, value: value, replayExplanation: smtArithmeticCopyBoundExplanation(solver, column, false)})
 	}
 	return result, nil
 }

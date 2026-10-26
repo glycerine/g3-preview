@@ -163,6 +163,7 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex
 					// Linear row arithmetic operates on inf_numeral, preserving the
 					// coefficient and sign of epsilon. Rational interval projection can
 					// strengthen a bound such as 5-epsilon to 5 and invent an equality.
+					bound.Infinity.Add(&bound.Infinity, new(big.Rat).Mul(coefficient, &endpoint.Infinity))
 					bound.Main.Add(&bound.Main, new(big.Rat).Mul(coefficient, &endpoint.Main))
 					bound.Epsilon.Add(&bound.Epsilon, new(big.Rat).Mul(coefficient, &endpoint.Epsilon))
 					uses = append(uses, simplex.ArithmeticBoundUse{Column: other.Variable, Lower: useLower, Coefficient: *coefficient})
@@ -177,6 +178,7 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex
 					} else if !lower && bound.Main.IsInt() && bound.Epsilon.Sign() < 0 {
 						integer.Sub(integer, big.NewInt(1))
 					}
+					bound.Infinity.SetInt64(0)
 					bound.Main.SetInt(integer)
 					bound.Epsilon.SetInt64(0)
 				}

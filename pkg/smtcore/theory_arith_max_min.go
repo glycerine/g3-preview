@@ -19,6 +19,7 @@ func (t *SMTLinearArithmeticTheory) normalizeOptimizedBound(column uint32, lower
 	} else if !lower && bound.Main.IsInt() && bound.Epsilon.Sign() < 0 {
 		integer.Sub(integer, big.NewInt(1))
 	}
+	bound.Infinity.SetInt64(0)
 	bound.Main.SetInt(integer)
 	bound.Epsilon.SetInt64(0)
 	return bound

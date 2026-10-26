@@ -16,7 +16,7 @@ import (
 func smtFixedSimplexColumn(solver *simplex.Solver, column uint32) (*big.Rat, bool) {
 	lower, hasLower := solver.Lower(column)
 	upper, hasUpper := solver.Upper(column)
-	if !hasLower || !hasUpper || lower.Epsilon.Sign() != 0 || upper.Epsilon.Sign() != 0 || lower.Main.Cmp(&upper.Main) != 0 {
+	if !hasLower || !hasUpper || !lower.IsRational() || !upper.IsRational() || lower.Main.Cmp(&upper.Main) != 0 {
 		return nil, false
 	}
 	return new(big.Rat).Set(&lower.Main), true
@@ -70,7 +70,7 @@ func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *
 func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver *simplex.Solver, aliases map[uint32]ast.ASTHandle, form *smtLinearForm, dependencies *smtGrobnerDependencies, premises ...SMTLiteral) (err error) {
 	// Grobner rows have rational coefficients. A nonstandard fixed point
 	// cannot be projected to its rational part as an asserted equation.
-	if form.infinitesimal.Sign() != 0 {
+	if form.infinity.Sign() != 0 || form.infinitesimal.Sign() != 0 {
 		return nil
 	}
 	monomials := make([]*grobner.Monomial, 0, len(form.terms)+1)

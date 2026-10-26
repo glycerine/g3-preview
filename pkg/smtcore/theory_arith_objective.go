@@ -9,8 +9,9 @@ import (
 )
 
 // SMTArithmeticObjectiveValue is the concrete result of the arithmetic
-// maximizer: positive infinity, or a rational plus an infinitesimal. Finite
-// values own their big.Rat components and must be cloned before mutation.
+// maximizer: an unbounded sentinel, or an exact tableau point. For inf_ext,
+// Finite also retains the point's infinity coefficient; it must not be reduced
+// to Unbounded. All big.Rat components are owned and cloned before mutation.
 type SMTArithmeticObjectiveValue struct {
 	Unbounded bool
 	Finite    simplex.Infinitesimal

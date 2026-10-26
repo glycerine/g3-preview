@@ -437,7 +437,7 @@ func (t *SMTDenseDiffTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		if err != nil {
 			return SMTFinalCheckGiveUp, err
 		}
-		key := smtArithmeticSharedValueKey{sort, t.values[v].rational.RatString(), t.values[v].infinitesimal.RatString()}
+		key := smtArithmeticSharedValueKey{sort, "0", t.values[v].rational.RatString(), t.values[v].infinitesimal.RatString()}
 		if other := values[key]; other != nil && other.root != node.root {
 			progress, err := t.state.assumeEquality(other, node)
 			if err != nil {

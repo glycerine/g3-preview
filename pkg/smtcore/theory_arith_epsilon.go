@@ -31,6 +31,9 @@ func (t *SMTLinearArithmeticTheory) refineModelDelta() error {
 		refine := false
 		for _, column := range shared {
 			inf := t.solver.Value(column)
+			if inf.Infinity.Sign() != 0 {
+				continue
+			}
 			value := new(big.Rat).Mul(&inf.Epsilon, &t.delta)
 			value.Add(value, &inf.Main)
 			key := value.RatString()
