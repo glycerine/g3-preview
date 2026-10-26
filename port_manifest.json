@@ -139373,7 +139373,9 @@
         "pkg/smtcore/theory_str_free_value_options.go",
         "pkg/smtcore/theory_str_free_value_options_test.go",
         "pkg/smtcore/theory_str_sequential_options.go",
-        "pkg/smtcore/theory_str_sequential_options_test.go"
+        "pkg/smtcore/theory_str_sequential_options_test.go",
+        "pkg/smtcore/theory_str_binary_options.go",
+        "pkg/smtcore/theory_str_binary_options_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139577,7 +139579,13 @@
         "TestSMTStringSequentialOptionsConcreteCallbackAndPrivateValue",
         "TestSMTStringSequentialOptionsInactiveResetAndScopeRefresh",
         "TestSMTStringSequentialOptionsPreviousFallbackAndNativeGuard",
-        "TestSMTStringSequentialOptionsRegexSubtermBlocksValues"
+        "TestSMTStringSequentialOptionsRegexSubtermBlocksValues",
+        "TestSMTStringBinaryCaseSplitTruthAndLiteralSideEffects",
+        "TestSMTStringBinaryWindowsExpansionAndImmutableBounds",
+        "TestSMTStringBinaryScopeRollbackAndPersistentTesterReuse",
+        "TestSMTStringBinaryNegativeMidpointAndConcreteValue",
+        "TestSMTStringBinaryKnownBigLengthAndDispatchGuards",
+        "TestSMTStringBinaryCachedSuccessorAllowsBigUpdatedWindow"
       ],
       "conditionals": [
         {
@@ -141266,6 +141274,52 @@
           "tests": [
             "TestSMTStringSequentialOptionsRegexSubtermBlocksValues"
           ]
+        },
+        {
+          "name": "binary_search_case_split: less/more/decimal selectors equivalent to integral length bounds, disjunction and all live Boolean internalization/literal lookups from the otherwise unused case-split vector",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryCaseSplitTruthAndLiteralSideEffects"
+          ]
+        },
+        {
+          "name": "binary_search_length_test and binary_search_info::calculate_midpoint: active-stack private value/premerge callback precedence, integer floor midpoint, high/low cached tester reuse, window doubling, known arbitrary-precision initial length, negative midpoint refusal and concrete value enumeration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryWindowsExpansionAndImmutableBounds",
+            "TestSMTStringBinaryScopeRollbackAndPersistentTesterReuse",
+            "TestSMTStringBinaryNegativeMidpointAndConcreteValue",
+            "TestSMTStringBinaryKnownBigLengthAndDispatchGuards",
+            "TestSMTStringBinaryCachedSuccessorAllowsBigUpdatedWindow"
+          ]
+        },
+        {
+          "name": "gen_len_val_options_for_free_var dispatch: actual borrowed UseBinarySearch selects binary_search_length_test or the complete retained sequential length/value branch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryKnownBigLengthAndDispatchGuards"
+          ]
+        },
+        {
+          "name": "binary_search_trail and insert_obj_map<theory_str, expr, binary_search_info>: paired reverse scope undo erases current bounds then pops active tester stack; persistent start/high/low caches and formula roots remain lifetime-owned",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryScopeRollbackAndPersistentTesterReuse",
+            "TestSMTStringBinaryCachedSuccessorAllowsBigUpdatedWindow"
+          ]
+        },
+        {
+          "name": "binary_search_length_test if(false) high/low stuck-midpoint handling branches: source-disabled, preserve ordinary midpoint calculation including negative windows instead of inventing repairs",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryWindowsExpansionAndImmutableBounds",
+            "TestSMTStringBinaryNegativeMidpointAndConcreteValue"
+          ]
         }
       ],
       "ownership": [
@@ -141306,7 +141360,8 @@
         "Tester variables preserve both direct lifetime-trail roots from mk_str_var and the creator, retain lifetime role membership across scope pops and initialize independent counters on Fresh. Value encoding reads borrowed concrete digit slices and returns independently owned Go bytes/slices; overflow resets the output. Project SMT2 formatting uses a budgeted stream closed on all exits; no C++ stringstream/STL port or universal template adapter is introduced.",
         "Value-option history stores concrete scoped indicator entries, independently copied final digit vectors and explicitly lifetime-rooted optional String literals. Cache hits add no extra direct root; returned value formulas have only caller-owned ASTRef ownership. Local formula roots release forward. Previous value guards intentionally do not filter lifetime internal-variable membership, unlike length guards, and skip entries equal to the current tester. Fresh initializes empty maps; Close releases existing lifetime roots and zeroes tester state.",
         "Free-value controller returns the caller-owned first/successor formula root or a zero root when no separate formula is produced. Replay roots are released immediately after actual assertAxiom obtains its lifetime root, including on failure. Scoped history and reverse subject entries borrow the existing doubly rooted tester variables. Refresh reuses existing variables/enodes and basic queues; no new root or tester is invented for assigned entries. Inactive history is appended to without clearing or compacting, preserving source indices.",
-        "Sequential controller returns the existing generators caller-owned ASTRef and uses borrowed lifetime-rooted indicator histories/reverse subject handles plus uint32 source counts. Reset updates count before creation, clears old length history after successful creation and leaves reverse cache entries alive. Refresh preserves actual enode/basic-queue side effects after scope pop; inactive history is not compacted during scans. Recursive term checks reuse actual sameStringClass behavior and inspect live regex registry entries in deterministic word/key order. Missing required prior EQC values become Go errors at the source NOT_IMPLEMENTED_YET guard."
+        "Sequential controller returns the existing generators caller-owned ASTRef and uses borrowed lifetime-rooted indicator histories/reverse subject handles plus uint32 source counts. Reset updates count before creation, clears old length history after successful creation and leaves reverse cache entries alive. Refresh preserves actual enode/basic-queue side effects after scope pop; inactive history is not compacted during scans. Recursive term checks reuse actual sameStringClass behavior and inspect live regex registry entries in deterministic word/key order. Missing required prior EQC values become Go errors at the source NOT_IMPLEMENTED_YET guard.",
+        "Binary search owns immutable independently allocated integer windows, borrowing lifetime-rooted AST keys. Active stack/bounds pairs unwind in reverse at the native trail-pop position; bounds insertion undo erases and never restores an earlier value. Starting/high/low tester caches persist across scope pops and Fresh clears all mutable maps/trails. Fresh tester construction retains native additional refresh, including queue side effects. Case-split helper returns only a caller root; initial/next driver formulas additionally enter the lifetime trail, while negative-midpoint guards do not. Local roots release forward, caller temporaries close on errors, and no generic trail/template adapter is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141352,7 +141407,8 @@
         "Tester creation and value encoding are directly verified by exact quoted subject names, independent/shared counters, role/queue/scope/root ownership, Fresh reset, pre-counter formatting failure, all 255 one-byte and 65025 two-byte words, empty-word exhaustion, high bytes, carry order, nonaliasing and invalid producer state. Specialize to the actually retained length-plus-one zero-sentinel vectors and active NUL-free alphabet; invalid states become Go domain errors. These prerequisites are not yet wired into unfinished value-option generation/free-variable dispatch. String source units remain partial; production routing and the latest full native checkpoint are unchanged.",
         "The 32-candidate value-option generator is directly verified across all eight one-byte batches including the shortened exhaustive last batch, empty-word coverage, two-byte carry at ordinals 254/255, exact selected-length and prior-more guard truth tables, scope/membership asymmetry, self exclusion, ordinary noninternalization versus aggressive relevant cached phases, absence of invented branch priorities, fast-cache hit reference counts and Fresh reset. Parse actual retained decimal length labels with Go strconv; invalid labels, undefined native signed overflow, missing producer history and reentry after full coverage become domain errors. This generator remains a prerequisite for unfinished gen_free_var_options and free-variable/unroll dispatch; legacy String source units remain partial and production routing/full checkpoint are unchanged.",
         "The free-value controller is directly verified for first creation, exact reverse/scoped registration, ordered unassigned replay, assigned private-class skip, callback stop, more successor creation/reuse, actual enode scope-pop refresh with lifetime-persistent membership and the source inactive-history append/index asymmetry. A missing more callback reaches a native out-of-range/default-empty encoding read after registration; Go preserves completed registration/replay side effects and returns a domain error rather than correcting the native index. Invalid nondecimal/overflow length producer states also return domain errors. Remaining sequential/binary length controllers, equality callback wiring and free-variable/unroll FinalCheck dispatch remain incomplete; production routing and source statuses are unchanged.",
-        "The sequential length/value controller branch is directly checked for first registration, same-indicator refresh, source-order callback precedence, more-window advancement, assigned private values overriding callback text, concrete premerge callback values without forced equality merge, scope-pop refresh, inactive-history reset versus missing-count reset, prior callback fallback and native guard failure, and direct/nested/private-alias/unrelated/disabled regex constraints including false membership. This ports the complete !UseBinarySearch branch and its recursive helper; binary-search dispatch, equality callback wiring and free-variable/unroll FinalCheck integration remain pending. Existing source-unit statuses, production QF_S routing and latest verified full native checkpoint are unchanged."
+        "The sequential length/value controller branch is directly checked for first registration, same-indicator refresh, source-order callback precedence, more-window advancement, assigned private values overriding callback text, concrete premerge callback values without forced equality merge, scope-pop refresh, inactive-history reset versus missing-count reset, prior callback fallback and native guard failure, and direct/nested/private-alias/unrelated/disabled regex constraints including false membership. This ports the complete !UseBinarySearch branch and its recursive helper; binary-search dispatch, equality callback wiring and free-variable/unroll FinalCheck integration remain pending. Existing source-unit statuses, production QF_S routing and latest verified full native checkpoint are unchanged.",
+        "Six direct binary-search regressions cover negative/zero/ordinary/above-uint64 case-split truth tables, live Boolean literal registration, exact successive upper windows and doubling, immutable previous bounds, driver versus helper roots, real nested scope rollback and persistent starting/high/low tester reuse, negative floor and nonnegative-length refusal, actual concrete value enumeration with private-value precedence and native binary omission of the sequential regex guard, configured dispatch and initial naming before known-length override, Fresh reset, undefined callback guards and fresh midpoint int32 assertions. A cached successor is explicitly reused after a later known length above uint64: only fresh tester naming requires int32, preserving source placement of that guard. Retained bounds remain integral, represented by Go big.Int with floor division. Unreachable native callback states and fresh out-of-int32 midpoint assertions become Go domain errors. Equality callback wiring and free-variable/unroll FinalCheck integration remain incomplete; source units and production routing remain unchanged."
       ]
     },
     {
@@ -141459,7 +141515,9 @@
         "pkg/smtcore/theory_str_free_value_options.go",
         "pkg/smtcore/theory_str_free_value_options_test.go",
         "pkg/smtcore/theory_str_sequential_options.go",
-        "pkg/smtcore/theory_str_sequential_options_test.go"
+        "pkg/smtcore/theory_str_sequential_options_test.go",
+        "pkg/smtcore/theory_str_binary_options.go",
+        "pkg/smtcore/theory_str_binary_options_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -141664,7 +141722,13 @@
         "TestSMTStringSequentialOptionsConcreteCallbackAndPrivateValue",
         "TestSMTStringSequentialOptionsInactiveResetAndScopeRefresh",
         "TestSMTStringSequentialOptionsPreviousFallbackAndNativeGuard",
-        "TestSMTStringSequentialOptionsRegexSubtermBlocksValues"
+        "TestSMTStringSequentialOptionsRegexSubtermBlocksValues",
+        "TestSMTStringBinaryCaseSplitTruthAndLiteralSideEffects",
+        "TestSMTStringBinaryWindowsExpansionAndImmutableBounds",
+        "TestSMTStringBinaryScopeRollbackAndPersistentTesterReuse",
+        "TestSMTStringBinaryNegativeMidpointAndConcreteValue",
+        "TestSMTStringBinaryKnownBigLengthAndDispatchGuards",
+        "TestSMTStringBinaryCachedSuccessorAllowsBigUpdatedWindow"
       ],
       "conditionals": [
         {
@@ -142671,6 +142735,52 @@
           "tests": [
             "TestSMTStringSequentialOptionsRegexSubtermBlocksValues"
           ]
+        },
+        {
+          "name": "binary_search_case_split: less/more/decimal selectors equivalent to integral length bounds, disjunction and all live Boolean internalization/literal lookups from the otherwise unused case-split vector",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryCaseSplitTruthAndLiteralSideEffects"
+          ]
+        },
+        {
+          "name": "binary_search_length_test and binary_search_info::calculate_midpoint: active-stack private value/premerge callback precedence, integer floor midpoint, high/low cached tester reuse, window doubling, known arbitrary-precision initial length, negative midpoint refusal and concrete value enumeration",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryWindowsExpansionAndImmutableBounds",
+            "TestSMTStringBinaryScopeRollbackAndPersistentTesterReuse",
+            "TestSMTStringBinaryNegativeMidpointAndConcreteValue",
+            "TestSMTStringBinaryKnownBigLengthAndDispatchGuards",
+            "TestSMTStringBinaryCachedSuccessorAllowsBigUpdatedWindow"
+          ]
+        },
+        {
+          "name": "gen_len_val_options_for_free_var dispatch: actual borrowed UseBinarySearch selects binary_search_length_test or the complete retained sequential length/value branch",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryKnownBigLengthAndDispatchGuards"
+          ]
+        },
+        {
+          "name": "binary_search_trail and insert_obj_map<theory_str, expr, binary_search_info>: paired reverse scope undo erases current bounds then pops active tester stack; persistent start/high/low caches and formula roots remain lifetime-owned",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryScopeRollbackAndPersistentTesterReuse",
+            "TestSMTStringBinaryCachedSuccessorAllowsBigUpdatedWindow"
+          ]
+        },
+        {
+          "name": "binary_search_length_test if(false) high/low stuck-midpoint handling branches: source-disabled, preserve ordinary midpoint calculation including negative windows instead of inventing repairs",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryWindowsExpansionAndImmutableBounds",
+            "TestSMTStringBinaryNegativeMidpointAndConcreteValue"
+          ]
         }
       ],
       "ownership": [
@@ -142712,7 +142822,8 @@
         "Tester variables preserve both direct lifetime-trail roots from mk_str_var and the creator, retain lifetime role membership across scope pops and initialize independent counters on Fresh. Value encoding reads borrowed concrete digit slices and returns independently owned Go bytes/slices; overflow resets the output. Project SMT2 formatting uses a budgeted stream closed on all exits; no C++ stringstream/STL port or universal template adapter is introduced.",
         "Value-option history stores concrete scoped indicator entries, independently copied final digit vectors and explicitly lifetime-rooted optional String literals. Cache hits add no extra direct root; returned value formulas have only caller-owned ASTRef ownership. Local formula roots release forward. Previous value guards intentionally do not filter lifetime internal-variable membership, unlike length guards, and skip entries equal to the current tester. Fresh initializes empty maps; Close releases existing lifetime roots and zeroes tester state.",
         "Free-value controller returns the caller-owned first/successor formula root or a zero root when no separate formula is produced. Replay roots are released immediately after actual assertAxiom obtains its lifetime root, including on failure. Scoped history and reverse subject entries borrow the existing doubly rooted tester variables. Refresh reuses existing variables/enodes and basic queues; no new root or tester is invented for assigned entries. Inactive history is appended to without clearing or compacting, preserving source indices.",
-        "Sequential controller returns the existing generators caller-owned ASTRef and uses borrowed lifetime-rooted indicator histories/reverse subject handles plus uint32 source counts. Reset updates count before creation, clears old length history after successful creation and leaves reverse cache entries alive. Refresh preserves actual enode/basic-queue side effects after scope pop; inactive history is not compacted during scans. Recursive term checks reuse actual sameStringClass behavior and inspect live regex registry entries in deterministic word/key order. Missing required prior EQC values become Go errors at the source NOT_IMPLEMENTED_YET guard."
+        "Sequential controller returns the existing generators caller-owned ASTRef and uses borrowed lifetime-rooted indicator histories/reverse subject handles plus uint32 source counts. Reset updates count before creation, clears old length history after successful creation and leaves reverse cache entries alive. Refresh preserves actual enode/basic-queue side effects after scope pop; inactive history is not compacted during scans. Recursive term checks reuse actual sameStringClass behavior and inspect live regex registry entries in deterministic word/key order. Missing required prior EQC values become Go errors at the source NOT_IMPLEMENTED_YET guard.",
+        "Binary search owns immutable independently allocated integer windows, borrowing lifetime-rooted AST keys. Active stack/bounds pairs unwind in reverse at the native trail-pop position; bounds insertion undo erases and never restores an earlier value. Starting/high/low tester caches persist across scope pops and Fresh clears all mutable maps/trails. Fresh tester construction retains native additional refresh, including queue side effects. Case-split helper returns only a caller root; initial/next driver formulas additionally enter the lifetime trail, while negative-midpoint guards do not. Local roots release forward, caller temporaries close on errors, and no generic trail/template adapter is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -142759,7 +142870,8 @@
         "Tester creation and value encoding are directly verified by exact quoted subject names, independent/shared counters, role/queue/scope/root ownership, Fresh reset, pre-counter formatting failure, all 255 one-byte and 65025 two-byte words, empty-word exhaustion, high bytes, carry order, nonaliasing and invalid producer state. Specialize to the actually retained length-plus-one zero-sentinel vectors and active NUL-free alphabet; invalid states become Go domain errors. These prerequisites are not yet wired into unfinished value-option generation/free-variable dispatch. String source units remain partial; production routing and the latest full native checkpoint are unchanged.",
         "The 32-candidate value-option generator is directly verified across all eight one-byte batches including the shortened exhaustive last batch, empty-word coverage, two-byte carry at ordinals 254/255, exact selected-length and prior-more guard truth tables, scope/membership asymmetry, self exclusion, ordinary noninternalization versus aggressive relevant cached phases, absence of invented branch priorities, fast-cache hit reference counts and Fresh reset. Parse actual retained decimal length labels with Go strconv; invalid labels, undefined native signed overflow, missing producer history and reentry after full coverage become domain errors. This generator remains a prerequisite for unfinished gen_free_var_options and free-variable/unroll dispatch; legacy String source units remain partial and production routing/full checkpoint are unchanged.",
         "The free-value controller is directly verified for first creation, exact reverse/scoped registration, ordered unassigned replay, assigned private-class skip, callback stop, more successor creation/reuse, actual enode scope-pop refresh with lifetime-persistent membership and the source inactive-history append/index asymmetry. A missing more callback reaches a native out-of-range/default-empty encoding read after registration; Go preserves completed registration/replay side effects and returns a domain error rather than correcting the native index. Invalid nondecimal/overflow length producer states also return domain errors. Remaining sequential/binary length controllers, equality callback wiring and free-variable/unroll FinalCheck dispatch remain incomplete; production routing and source statuses are unchanged.",
-        "The sequential length/value controller branch is directly checked for first registration, same-indicator refresh, source-order callback precedence, more-window advancement, assigned private values overriding callback text, concrete premerge callback values without forced equality merge, scope-pop refresh, inactive-history reset versus missing-count reset, prior callback fallback and native guard failure, and direct/nested/private-alias/unrelated/disabled regex constraints including false membership. This ports the complete !UseBinarySearch branch and its recursive helper; binary-search dispatch, equality callback wiring and free-variable/unroll FinalCheck integration remain pending. Existing source-unit statuses, production QF_S routing and latest verified full native checkpoint are unchanged."
+        "The sequential length/value controller branch is directly checked for first registration, same-indicator refresh, source-order callback precedence, more-window advancement, assigned private values overriding callback text, concrete premerge callback values without forced equality merge, scope-pop refresh, inactive-history reset versus missing-count reset, prior callback fallback and native guard failure, and direct/nested/private-alias/unrelated/disabled regex constraints including false membership. This ports the complete !UseBinarySearch branch and its recursive helper; binary-search dispatch, equality callback wiring and free-variable/unroll FinalCheck integration remain pending. Existing source-unit statuses, production QF_S routing and latest verified full native checkpoint are unchanged.",
+        "Six direct binary-search regressions cover negative/zero/ordinary/above-uint64 case-split truth tables, live Boolean literal registration, exact successive upper windows and doubling, immutable previous bounds, driver versus helper roots, real nested scope rollback and persistent starting/high/low tester reuse, negative floor and nonnegative-length refusal, actual concrete value enumeration with private-value precedence and native binary omission of the sequential regex guard, configured dispatch and initial naming before known-length override, Fresh reset, undefined callback guards and fresh midpoint int32 assertions. A cached successor is explicitly reused after a later known length above uint64: only fresh tester naming requires int32, preserving source placement of that guard. Retained bounds remain integral, represented by Go big.Int with floor division. Unreachable native callback states and fresh out-of-int32 midpoint assertions become Go domain errors. Equality callback wiring and free-variable/unroll FinalCheck integration remain incomplete; source units and production routing remain unchanged."
       ]
     },
     {
@@ -243995,12 +244107,16 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/backtrack/trail.go",
-        "pkg/util/backtrack/trail_test.go"
+        "pkg/util/backtrack/trail_test.go",
+        "pkg/smtcore/theory_str_binary_options.go",
+        "pkg/smtcore/theory_str_binary_options_test.go"
       ],
       "tests": [
         "TestTrailStackReverseUndoAcrossScopesAndLevelZero",
         "TestTrailStackClosureReplacementsForTypedTemplateTrails",
-        "TestUndoTrailStackPrefixAndTrailErrors"
+        "TestUndoTrailStackPrefixAndTrailErrors",
+        "TestSMTStringBinaryScopeRollbackAndPersistentTesterReuse",
+        "TestSMTStringBinaryCachedSuccessorAllowsBigUpdatedWindow"
       ],
       "conditionals": [
         {
@@ -244059,14 +244175,25 @@
             "TestTrailStackReverseUndoAcrossScopesAndLevelZero",
             "TestUndoTrailStackPrefixAndTrailErrors"
           ]
+        },
+        {
+          "name": "retained insert_obj_map<theory_str, expr, binary_search_info> undo paired with binary_search_trail: erase active bounds, then pop the associated word stack; do not restore overwritten values or erase persistent tester caches",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_str_binary_options.go",
+          "tests": [
+            "TestSMTStringBinaryScopeRollbackAndPersistentTesterReuse",
+            "TestSMTStringBinaryCachedSuccessorAllowsBigUpdatedWindow"
+          ]
         }
       ],
       "ownership": [
-        "TrailStack owns its retained Trail interface values and scope indices. TrailFunc closures retain their concrete captured state through ordinary Go reachability until reverse undo clears the corresponding interface slots."
+        "TrailStack owns its retained Trail interface values and scope indices. TrailFunc closures retain their concrete captured state through ordinary Go reachability until reverse undo clears the corresponding interface slots.",
+        "The concrete String binary-search scope record borrows existing doubly rooted tester/word AST handles and stores a level with each bounds-insert/stack-push pair. Undo erases bounds before popping the stack and clears the Go trail slot. Window integers use independently owned immutable big.Int values; persistent starting/high/low tester caches survive pops. No universal insert_obj_map callback or unused template adapter is introduced."
       ],
       "deviations": [
         "TrailFunc closures replace the source's templated trail subclasses without Go generics. Each concrete consumer captures its typed old value, vector, map, object or reference operation directly; constructor-specific preconditions remain at that concrete capture site.",
-        "The source region exists only to allocate heterogeneous C++ trail objects. Go garbage collection owns closure storage, so TrailStack has no get_region allocator API. ErrTrailNil and ErrTrailScopes replace null dereference, old-size assertion and scope-count assertion failures. Context arguments are captured by closures instead of being threaded through a generic Ctx template parameter."
+        "The source region exists only to allocate heterogeneous C++ trail objects. Go garbage collection owns closure storage, so TrailStack has no get_region allocator API. ErrTrailNil and ErrTrailScopes replace null dereference, old-size assertion and scope-count assertion failures. Context arguments are captured by closures instead of being threaded through a generic Ctx template parameter.",
+        "Only the actual retained String binary-search bounds-map instantiation is represented, using concrete Go maps/slices and paired reverse scope records. Actual scope-pop/cache-reuse and cached-successor large-window regressions verify this consumer. Existing general trail port status is unchanged; no source STL internals are ported."
       ]
     },
     {

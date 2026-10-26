@@ -341,6 +341,7 @@ func (t *SMTStringTheory) PopScopes(count uint32) error {
 	if err := t.popStringRegexStage(); err != nil {
 		return err
 	}
+	t.popStringBinaryTests()
 	if err := t.findTrail.PopScope(count); err != nil {
 		return err
 	}

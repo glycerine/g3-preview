@@ -2804,6 +2804,7 @@
         "theory_str_automaton_paths.go",
         "theory_str_axioms.go",
         "theory_str_backpropagation.go",
+        "theory_str_binary_options.go",
         "theory_str_concat_classes.go",
         "theory_str_concat_constant.go",
         "theory_str_concat_equality.go",
