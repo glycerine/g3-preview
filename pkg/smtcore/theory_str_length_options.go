@@ -25,6 +25,7 @@ type smtStringTesterState struct {
 	binaryLow         map[ast.ASTHandle]ast.ASTHandle
 	binaryTrail       []smtStringBinaryTrail
 	unrollHistories   map[ast.ASTHandle][]*smtStringUnrollHistory
+	unrollDefinitions map[ast.ASTHandle]ast.ASTHandle
 }
 
 type smtStringScopedIndicator struct {
@@ -41,7 +42,8 @@ func newStringTesterState() smtStringTesterState {
 		valueSubjects: make(map[ast.ASTHandle]ast.ASTHandle),
 		binaryStacks:  make(map[ast.ASTHandle][]ast.ASTHandle), binaryBounds: make(map[ast.ASTHandle]*smtStringBinaryBounds),
 		binaryStart: make(map[ast.ASTHandle]ast.ASTHandle), binaryHigh: make(map[ast.ASTHandle]ast.ASTHandle), binaryLow: make(map[ast.ASTHandle]ast.ASTHandle),
-		unrollHistories: make(map[ast.ASTHandle][]*smtStringUnrollHistory),
+		unrollHistories:   make(map[ast.ASTHandle][]*smtStringUnrollHistory),
+		unrollDefinitions: make(map[ast.ASTHandle]ast.ASTHandle),
 	}
 }
 
