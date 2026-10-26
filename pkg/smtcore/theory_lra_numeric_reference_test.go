@@ -245,3 +245,43 @@ func TestSMTLRAOperatorDivisionNativeOracle(t *testing.T) {
 		t.Fatal("native division semantics/scope oracle", text, "want", expected)
 	}
 }
+
+func TestSMTLRAFinalCheckNativeOracle(t *testing.T) {
+	reference := os.Getenv("G3_CPP_REFERENCE")
+	if reference == "" {
+		t.Skip("G3_CPP_REFERENCE is not set")
+	}
+	script, err := os.ReadFile("test_vectors/lra_final_check.smt2")
+	astTestMust(t, err)
+	cmd := exec.Command(reference, "-in")
+	cmd.Stdin = bytes.NewReader(script)
+	var out, diagnostics bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &out, &diagnostics
+	if err = cmd.Run(); err != nil || diagnostics.Len() != 0 {
+		t.Fatal(err, out.String(), diagnostics.String())
+	}
+	text := out.String()
+	start := strings.Index(text, "(:")
+	if start < 0 {
+		t.Fatal("missing LRA statistics", text)
+	}
+	end := strings.IndexByte(text[start:], ')')
+	if end < 0 {
+		t.Fatal("unterminated LRA statistics", text)
+	}
+	end += start + 1
+	if !regexp.MustCompile(`:arith-make-feasible\s+[1-9][0-9]*`).MatchString(text[start:end]) {
+		t.Fatal("reference did not exercise LRA", text)
+	}
+	text = text[:start] + text[end:]
+	spaces := strings.NewReplacer("(", " ( ", ")", " ) ")
+	canonical := func(s string) string { return strings.Join(strings.Fields(spaces.Replace(s)), " ") }
+	// The prebuilt 4.7.1 reference returns a stale, infeasible model after
+	// pop (x=2,y=3, violating y<=2). Characterize that source limitation
+	// explicitly. The Go kernel test independently requires every retained
+	// inequality to hold both before and after pop; it must not copy this bug.
+	expected := "sat (((>= x 0) true) ((<= x 4) true) ((<= y 2) true) ((>= (+ x y) 5) true)) unsat sat (((>= x 0) true) ((<= x 4) true) ((<= y 2) false) ((>= (+ x y) 5) true))"
+	if canonical(text) != canonical(expected) {
+		t.Fatal("native final-check model/scope oracle", text, "want", expected)
+	}
+}

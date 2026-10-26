@@ -37,8 +37,7 @@ type smtLRAResourceLimit struct{ manager *ast.ASTManager }
 func (l smtLRAResourceLimit) CancelFlag() (bool, error) { return l.manager.Canceled() }
 
 // SMTLRATheory is the concrete frontend for the retained LAR-backed theory.
-// Setup integration remains open. FinalCheck deliberately gives up until the
-// remaining propagation/model-combination callbacks are connected.
+// Setup integration remains open while the remaining source callbacks are ported.
 type SMTLRATheory struct {
 	*SMTTheoryBase
 	numeric                           *smtLRANumeric
@@ -639,9 +638,39 @@ func (t *SMTLRATheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if _, err := t.State(); err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
-	// No public setup route selects this partial frontend. A direct client
-	// cannot obtain SAT before model combination and source callbacks exist.
-	return SMTFinalCheckGiveUp, nil
+	if err := t.numeric.ready(); err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	status := lbool.True
+	if t.numeric.solver.Bounds.Status.Value != lp.StatusOptimal {
+		t.modelValues = nil // Source make_feasible invalidates the rational model.
+		var err error
+		status, err = t.numeric.makeFeasible()
+		if err != nil {
+			return SMTFinalCheckGiveUp, err
+		}
+	}
+	switch status {
+	case lbool.True:
+		if progress, err := t.delayedAssumeEqualities(); err != nil || progress {
+			return SMTFinalCheckContinue, err
+		}
+		if progress, err := t.assumeSharedEqualities(); err != nil || progress {
+			return SMTFinalCheckContinue, err
+		}
+		if !t.notHandled.IsNull() {
+			return SMTFinalCheckGiveUp, nil
+		}
+		return SMTFinalCheckDone, nil
+	case lbool.False:
+		return SMTFinalCheckContinue, t.setLRAConflict()
+	default:
+		canceled, err := t.state.manager.Canceled()
+		if canceled {
+			return SMTFinalCheckContinue, err
+		}
+		return SMTFinalCheckGiveUp, err
+	}
 }
 
 func (t *SMTLRATheory) PushScope() error {

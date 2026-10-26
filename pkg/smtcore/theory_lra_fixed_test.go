@@ -282,7 +282,7 @@ func TestSMTLRAFixedEqualityConfigurationAndStrictness(t *testing.T) {
 	}
 	status, err := f.a.FinalCheck()
 	astTestMust(t, err)
-	if status != SMTFinalCheckGiveUp {
-		t.Fatal("partial LRA claimed completion")
+	if status != SMTFinalCheckDone {
+		t.Fatal("feasible strict real bound did not finish", status)
 	}
 }

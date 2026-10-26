@@ -157,8 +157,8 @@ func TestSMTLRAFrontendBooleanBoundsConflictAndScopeReplay(t *testing.T) {
 	}
 	status, err := f.a.FinalCheck()
 	astTestMust(t, err)
-	if status != SMTFinalCheckGiveUp {
-		t.Fatal("partial frontend must stay inconclusive")
+	if status != SMTFinalCheckDone {
+		t.Fatal("feasible parent retained a popped unsupported term", status)
 	}
 }
 
