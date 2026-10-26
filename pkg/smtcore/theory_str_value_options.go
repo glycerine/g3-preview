@@ -54,7 +54,7 @@ func (t *SMTStringTheory) generateStringValueOptions(variable, lengthIndicator, 
 	}
 	options := SMTStrState{}
 	if t.parameterOwner != nil {
-		options, err = t.parameterOwner.State()
+		options, err = t.stringParameterState()
 		if err != nil {
 			return output, err
 		}

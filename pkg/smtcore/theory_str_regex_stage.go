@@ -370,7 +370,7 @@ func (t *SMTStringTheory) runStringRegexAutomataStage() (added bool, result erro
 	}
 	options := SMTStrState{RegexAutomataDifficultyThreshold: 1000, RegexAutomataIntersectionDifficultyThreshold: 1000, RegexAutomataFailedAutomatonThreshold: 10, RegexAutomataFailedIntersectionThreshold: 10, RegexAutomataLengthAttemptThreshold: 10}
 	if t.parameterOwner != nil {
-		options, err = t.parameterOwner.State()
+		options, err = t.stringParameterState()
 		if err != nil {
 			return false, err
 		}

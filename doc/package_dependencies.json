@@ -2672,6 +2672,7 @@
         "smt_relevant_expr.go",
         "smt_restart.go",
         "smt_search.go",
+        "smt_sequence_lifecycle.go",
         "smt_setup.go",
         "smt_setup_array.go",
         "smt_setup_basic_arithmetic.go",

@@ -175,54 +175,7 @@ func (k *SMTKernel) setupSequenceBackend(useStaticFeatures bool) (result error) 
 	} else if _, ok := old.(*SMTSequenceTheory); ok {
 		return nil
 	}
-	position := -1
-	if old != nil {
-		switch previous := old.(type) {
-		case *SMTSequenceTheory:
-			if previous.NumVariables() != 0 {
-				return ast.ErrASTDomain
-			}
-		case *SMTStringTheory:
-			if previous.NumVariables() != 0 || len(previous.refs) != 0 {
-				return ast.ErrASTDomain
-			}
-		default:
-			return ast.ErrASTDomain
-		}
-		if len(s.scopes) != 0 || s.theoriesSetup {
-			return ast.ErrASTDomain
-		}
-		for index, theory := range s.theoryOrder {
-			if theory == old {
-				position = index
-				break
-			}
-		}
-		if position < 0 {
-			return ast.ErrASTDomain
-		}
-	}
-	var theory SMTTheoryInternalizer
-	if legacy {
-		theory, err = NewSMTStringTheory(family, &k.smtParams.str)
-	} else {
-		theory, err = NewSMTSequenceTheory(family)
-	}
-	if err != nil {
-		return err
-	}
-	if old == nil {
-		return k.RegisterTheory(theory)
-	}
-	if err = theory.Initialize(s); err != nil {
-		return errors.Join(err, theory.(interface{ Close() error }).Close())
-	}
-	if err = old.(interface{ Close() error }).Close(); err != nil {
-		return errors.Join(err, theory.(interface{ Close() error }).Close())
-	}
-	s.theories[family], s.theoryOrder[position] = theory, theory
-	k.sequenceSetupPlaceholder = nil
-	return nil
+	return k.installFreshSequencePlugin(legacy, &k.smtParams.str, false)
 }
 
 func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic string) error {

@@ -43,7 +43,7 @@ func (t *SMTStringTheory) generateStringUnrollAssignment(word ast.ASTHandle, cor
 	options := SMTStrState{}
 	if t.parameterOwner != nil {
 		var err error
-		options, err = t.parameterOwner.State()
+		options, err = t.stringParameterState()
 		if err != nil {
 			return output, err
 		}

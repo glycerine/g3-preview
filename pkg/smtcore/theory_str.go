@@ -65,14 +65,20 @@ type SMTStringTheory struct {
 	nonemptyID          uint32
 	loopDetected        bool
 	closed              bool
+
+	borrowedParameterOwner bool
 }
 
 func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStringTheory, error) {
+	return newSMTStringTheory(family, parameters, false)
+}
+
+func newSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams, borrowed bool) (*SMTStringTheory, error) {
 	base, err := NewSMTTheoryBase(family)
 	if err != nil {
 		return nil, err
 	}
-	if parameters != nil {
+	if parameters != nil && !(borrowed && parameters.closed && parameters.self == parameters) {
 		if _, err = parameters.State(); err != nil {
 			return nil, err
 		}
@@ -82,7 +88,7 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	if err != nil {
 		return nil, err
 	}
-	t := &SMTStringTheory{SMTTheoryBase: base, parameterOwner: parameters, find: find, findTrail: context.GetTrailStack(), strings: make(map[string]ast.ASTHandle), charsetLookup: make(map[byte]int)}
+	t := &SMTStringTheory{SMTTheoryBase: base, parameterOwner: parameters, borrowedParameterOwner: borrowed, find: find, findTrail: context.GetTrailStack(), strings: make(map[string]ast.ASTHandle), charsetLookup: make(map[byte]int)}
 	t.concatCache = make(map[[2]ast.ASTHandle]ast.ASTHandle)
 	t.variableSet = make(map[ast.ASTHandle]struct{})
 	t.internalVariables = make(map[ast.ASTHandle]struct{})
@@ -119,6 +125,16 @@ func NewSMTStringTheory(family ast.FamilyID, parameters *SMTStrParams) (*SMTStri
 	return t, nil
 }
 
+// A copied native String plugin borrows the original String parameter
+// member. Its scalar values remain retained by this Go reference after the
+// original owner closes; the destination owns its own nested solver services.
+func (t *SMTStringTheory) stringParameterState() (SMTStrState, error) {
+	if t.borrowedParameterOwner && t.parameterOwner != nil && t.parameterOwner.closed && t.parameterOwner.self == t.parameterOwner {
+		return t.parameterOwner.state, nil
+	}
+	return t.parameterOwner.State()
+}
+
 func (t *SMTStringTheory) retain(expression ast.ASTHandle) error {
 	ref, err := t.state.manager.NewRef(expression)
 	if err != nil {
@@ -138,7 +154,7 @@ func (t *SMTStringTheory) stringLiteral(text string) (ast.ASTHandle, error) {
 	}
 	cache := true
 	if t.parameterOwner != nil {
-		parameters, err := t.parameterOwner.State()
+		parameters, err := t.stringParameterState()
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
@@ -458,7 +474,7 @@ func (t *SMTStringTheory) Fresh() (*SMTStringTheory, error) {
 	if t == nil || t.closed {
 		return nil, ast.ErrASTHandle
 	}
-	return NewSMTStringTheory(t.FamilyID(), t.parameterOwner)
+	return newSMTStringTheory(t.FamilyID(), t.parameterOwner, t.borrowedParameterOwner)
 }
 
 var _ SMTTheoryInternalizer = (*SMTStringTheory)(nil)

@@ -60,7 +60,7 @@ func (t *SMTStringTheory) arrangeLiteralSuffixConcats(left, right ast.ASTHandle)
 	}
 	parameters := SMTStrState{StrongArrangements: true, OverlapTheoryAwarePriority: -0.1}
 	if t.parameterOwner != nil {
-		parameters, err = t.parameterOwner.State()
+		parameters, err = t.stringParameterState()
 		if err != nil {
 			return err
 		}

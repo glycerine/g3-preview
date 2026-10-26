@@ -41,7 +41,7 @@ func (t *SMTStringTheory) moreStringValueTests(tester ast.ASTHandle, value strin
 	} // Native operator[] requires a registered producer.
 	binary := false
 	if t.parameterOwner != nil {
-		options, err := t.parameterOwner.State()
+		options, err := t.stringParameterState()
 		if err != nil {
 			return err
 		}

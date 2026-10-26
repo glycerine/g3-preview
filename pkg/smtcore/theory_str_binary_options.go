@@ -209,7 +209,7 @@ func (t *SMTStringTheory) generateStringBinaryLengthOptions(word, callback ast.A
 		t.testers.binaryStacks[word] = nil
 		upper := uint32(64)
 		if t.parameterOwner != nil {
-			options, err := t.parameterOwner.State()
+			options, err := t.stringParameterState()
 			if err != nil {
 				return output, err
 			}
@@ -258,7 +258,7 @@ func (t *SMTStringTheory) generateStringBinaryLengthOptions(word, callback ast.A
 
 func (t *SMTStringTheory) generateStringLengthValueOptions(word, callback ast.ASTHandle, callbackValue string) (ast.ASTRef, error) {
 	if t.parameterOwner != nil {
-		options, err := t.parameterOwner.State()
+		options, err := t.stringParameterState()
 		if err != nil {
 			return ast.ASTRef{}, err
 		}

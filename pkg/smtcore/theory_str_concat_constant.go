@@ -350,7 +350,7 @@ func (t *SMTStringTheory) solveConcatArrangements(equality, a, b ast.ASTHandle, 
 	}
 	strong := true
 	if t.parameterOwner != nil {
-		parameters, err := t.parameterOwner.State()
+		parameters, err := t.stringParameterState()
 		if err != nil {
 			return err
 		}

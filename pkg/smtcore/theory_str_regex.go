@@ -15,7 +15,7 @@ func (t *SMTStringTheory) regexAutomataEnabled() (bool, error) {
 	if t.parameterOwner == nil {
 		return true, nil
 	}
-	parameters, err := t.parameterOwner.State()
+	parameters, err := t.stringParameterState()
 	return parameters.RegexAutomata, err
 }
 

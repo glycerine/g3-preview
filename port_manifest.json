@@ -115238,7 +115238,9 @@
         "pkg/smtcore/theory_str_expression_solver.go",
         "pkg/smtcore/theory_str_expression_solver_test.go",
         "pkg/smtcore/smt_setup.go",
-        "pkg/smtcore/smt_setup_string_test.go"
+        "pkg/smtcore/smt_setup_string_test.go",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -115403,7 +115405,9 @@
         "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards",
         "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
         "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
-        "TestSMTStringFreeKernelModelAndCPPReference"
+        "TestSMTStringFreeKernelModelAndCPPReference",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "conditionals": [
         {
@@ -117110,6 +117114,15 @@
             "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
             "TestSMTStringFreeKernelModelAndCPPReference"
           ]
+        },
+        {
+          "name": "copy_plugins retained String/Sequence cases through solver translate and model_checker auxiliary mk_fresh, preserving native installed-plugin precedence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -117158,7 +117171,8 @@
         "Both native TheoryCaseSplit modes are connected to retained String arrangements. This helper enforces at most one literal, with the arrangement disjunction supplied by its caller. Source duplicate registration assertion is retained in debug builds. Whole context/String completion is not claimed.",
         "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements.",
         "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter.",
-        "The kernel records the exact eager constructor sequence placeholder. Deferred setup may replace only that unused plugin, keeping registry order and closing its owners; explicitly registered String/Sequence plugins are preserved as in native register_plugin. Existing concrete String kernel model/oracle fixtures verify preservation. This does not claim all plugin-copy lifecycle work complete."
+        "The kernel records the exact eager constructor sequence placeholder. Deferred setup may replace only that unused plugin, keeping registry order and closing its owners; explicitly registered String/Sequence plugins are preserved as in native register_plugin. Existing concrete String kernel model/oracle fixtures verify preservation. This does not claim all plugin-copy lifecycle work complete.",
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
     },
     {
@@ -117256,7 +117270,9 @@
         "pkg/smtcore/theory_str_length_options.go",
         "pkg/smtcore/theory_str_length_options_test.go",
         "pkg/smtcore/smt_setup.go",
-        "pkg/smtcore/smt_setup_string_test.go"
+        "pkg/smtcore/smt_setup_string_test.go",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -117376,7 +117392,9 @@
         "TestSMTStringLengthOptionsPrioritiesAggressivePhasesAndLiteralCache",
         "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
         "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
-        "TestSMTStringFreeKernelModelAndCPPReference"
+        "TestSMTStringFreeKernelModelAndCPPReference",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "conditionals": [
         {
@@ -118080,6 +118098,15 @@
             "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
             "TestSMTStringFreeKernelModelAndCPPReference"
           ]
+        },
+        {
+          "name": "copy_plugins retained String/Sequence cases through solver translate and model_checker auxiliary mk_fresh, preserving native installed-plugin precedence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -118114,7 +118141,8 @@
         "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements.",
         "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter.",
         "Added a concrete retained String consumer of existing phase-cache fields, verified together with actual equality internalization, relevance and branch-priority services. This does not add an unused generic phase adapter or change context source-unit completion status.",
-        "The kernel records the exact eager constructor sequence placeholder. Deferred setup may replace only that unused plugin, keeping registry order and closing its owners; explicitly registered String/Sequence plugins are preserved as in native register_plugin. Existing concrete String kernel model/oracle fixtures verify preservation. This does not claim all plugin-copy lifecycle work complete."
+        "The kernel records the exact eager constructor sequence placeholder. Deferred setup may replace only that unused plugin, keeping registry order and closing its owners; explicitly registered String/Sequence plugins are preserved as in native register_plugin. Existing concrete String kernel model/oracle fixtures verify preservation. This does not claim all plugin-copy lifecycle work complete.",
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
     },
     {
@@ -120955,7 +120983,9 @@
         "pkg/smtcore/smt_recursive_functions_test.go",
         "pkg/smtcore/smt_candidate_validation.go",
         "pkg/smtcore/smt_solver.go",
-        "pkg/smtcore/smt_model_checker_auxiliary_test.go"
+        "pkg/smtcore/smt_model_checker_auxiliary_test.go",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -120995,7 +121025,9 @@
         "TestSMTModelCheckerValidatesGroundModelWithNoActiveQuantifiers",
         "TestSMTModelCheckerAuxiliarySnapshotAndConcretePlugins",
         "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
-        "TestSMTModelCheckerAuxiliaryAllocationFrontiers"
+        "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "assertions": [
         {
@@ -121297,6 +121329,15 @@
             "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
             "TestSMTModelCheckerAuxiliaryAllocationFrontiers"
           ]
+        },
+        {
+          "name": "copy_plugins retained String/Sequence cases through solver translate and model_checker auxiliary mk_fresh, preserving native installed-plugin precedence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -121307,7 +121348,8 @@
       ],
       "deviations": [
         "The concrete checker enumerates Boolean and finite proto-model universes directly, while infinite-domain bindings are Skolemized and solved in the cached auxiliary context using the source empty logic, frozen fparams snapshot, zero relevancy, activity-based branching and concrete retained plugin copies. Each query is scoped with push/pop. Finite positions in mixed quantifiers are enumerated before each auxiliary query instead of asserted as disjunctions. Blocking clauses enumerate distinct auxiliary models up to m_max_cexs. Populated model-finder inverse maps restrict Skolem values and replace matching auxiliary values with retained context terms; an unrestricted complete model is retained as the source fallback when restrictions yield no instance. It preserves source search reset, iteration exhaustion, and cumulative m_max_cexs growth; new instance expressions are pinned until restart, then surviving quantifiers and reinternalized bindings enter the ordinary registry queue; duplicate filtering occurs at that source publication boundary. Recursive-function checking now consumes the reserved marker emitted by the command context; the remaining class/diagnostic audit is separate.",
-        "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded."
+        "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded.",
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
     },
     {
@@ -121344,7 +121386,9 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_model_checker_lifecycle_test.go",
         "pkg/smtcore/smt_solver.go",
-        "pkg/smtcore/smt_model_checker_auxiliary_test.go"
+        "pkg/smtcore/smt_model_checker_auxiliary_test.go",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
@@ -121379,7 +121423,9 @@
         "TestSMTModelCheckerResidualQuantifierDoesNotValidateCandidate",
         "TestSMTModelCheckerAuxiliarySnapshotAndConcretePlugins",
         "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
-        "TestSMTModelCheckerAuxiliaryAllocationFrontiers"
+        "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "conditionals": [
         {
@@ -121520,6 +121566,15 @@
             "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
             "TestSMTModelCheckerAuxiliaryAllocationFrontiers"
           ]
+        },
+        {
+          "name": "copy_plugins retained String/Sequence cases through solver translate and model_checker auxiliary mk_fresh, preserving native installed-plugin precedence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -121528,7 +121583,8 @@
         "SMTModelChecker owns one cached auxiliary solver after successful initialization. Each counterexample query pushes/pops its own scope even on error. Factory construction copies the persistent parameter snapshot and concrete retained plugins, closes partial owners on failure and freezes context parameters across parent updates/searches. Source arithmetic/BV/full-array parameter references retain their concrete owner semantics; no source assertions, enodes or theory instances are shared. Checker close destroys the auxiliary before parent parameter/services close."
       ],
       "deviations": [
-        "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded."
+        "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded.",
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
     },
     {
@@ -124072,7 +124128,9 @@
         "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2",
         "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
         "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
-        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTArraySharedRolesAndScopedInterfaceEqualities",
@@ -124140,7 +124198,9 @@
         "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic",
         "TestSMTGenericSequenceBackendUsesUpdatedOptionsAndFeatures",
         "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
-        "TestSMTGenericSelectorRespectsAutomaticSpecializedDispatch"
+        "TestSMTGenericSelectorRespectsAutomaticSpecializedDispatch",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "assertions": [
         {
@@ -124567,6 +124627,15 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "copy_plugins retained String/Sequence cases through solver translate and model_checker auxiliary mk_fresh, preserving native installed-plugin precedence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -124608,7 +124677,8 @@
         "Earlier profile tests entered feature setup through ordinary CheckSat. They now explicitly use the fresh setup_and_check entry before later incremental checks; expectations for backend selection and parameter owners are unchanged. New regressions independently require logic-only policy for ordinary zero-assumption checks and static policy for fresh no-assumption tactics.",
         "Negative-containment source audit confirmed setup_QF_S registers theory_str plus mixed integer arithmetic (smt_setup.cpp:725-728), while generic setup_seq_str selects theory_seq/theory_str according to string_solver/static features. Go still registers SMTSequenceTheory for QF_S; theory_str.cpp/.h have partial helper/owner ports but no selectable native constraint backend. A QF_S sat observation therefore does not verify generic ALL/theory_seq canonical containment. The saved pending_seq_negative_contains_canonize_scopes.smt2 captures the remaining ALL unconstrained-scope sat-versus-unknown difference. No routing implementation is credited by this audit.",
         "Supersede the old QF_S Sequence/integer routing for initial logic/automatic setup with native String/mixed arithmetic. Five direct profile cases verify generic selector independence and borrowed ownership for enabled auto_config, plus disabled-auto-config default seq. A new CLI free-model/scoped contradiction/recovery script matches prebuilt C++. Generic setup_seq_str and pre-setup option changes are now implemented at the deferred boundary; source units remain partial for broader setup and copy-path work. Verified 559706f8 predates these routing changes.",
-        "Generic setup_seq_str selection now reads current options and asserted-formula features at the first push/check boundary. auto selects Sequence for non-String sequences and String otherwise; z3str3/seq are explicit. QF_S and QF_BVRE profiles override the generic selector only while auto_config is enabled. setup_unknown(st) specialized dispatch is respected before generic-selector validation. Only eager Go placeholders can be replaced; explicit native-style installed plugins are preserved. Setup stays permanent across option updates and scope pops. Initial/deferred routing is covered, while broader setup profiles and concrete plugin-copy paths remain partial."
+        "Generic setup_seq_str selection now reads current options and asserted-formula features at the first push/check boundary. auto selects Sequence for non-String sequences and String otherwise; z3str3/seq are explicit. QF_S and QF_BVRE profiles override the generic selector only while auto_config is enabled. setup_unknown(st) specialized dispatch is respected before generic-selector validation. Only eager Go placeholders can be replaced; explicit native-style installed plugins are preserved. Setup stays permanent across option updates and scope pops. Initial/deferred routing is covered, while broader setup profiles and concrete plugin-copy paths remain partial.",
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
     },
     {
@@ -124669,7 +124739,9 @@
         "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2",
         "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
         "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
-        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
@@ -124720,7 +124792,9 @@
         "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic",
         "TestSMTGenericSequenceBackendUsesUpdatedOptionsAndFeatures",
         "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
-        "TestSMTGenericSelectorRespectsAutomaticSpecializedDispatch"
+        "TestSMTGenericSelectorRespectsAutomaticSpecializedDispatch",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "conditionals": [
         {
@@ -125057,6 +125131,15 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "copy_plugins retained String/Sequence cases through solver translate and model_checker auxiliary mk_fresh, preserving native installed-plugin precedence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -125094,7 +125177,8 @@
         "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
         "Earlier profile tests entered feature setup through ordinary CheckSat. They now explicitly use the fresh setup_and_check entry before later incremental checks; expectations for backend selection and parameter owners are unchanged. New regressions independently require logic-only policy for ordinary zero-assumption checks and static policy for fresh no-assumption tactics.",
         "Supersede the old QF_S Sequence/integer routing for initial logic/automatic setup with native String/mixed arithmetic. Five direct profile cases verify generic selector independence and borrowed ownership for enabled auto_config, plus disabled-auto-config default seq. A new CLI free-model/scoped contradiction/recovery script matches prebuilt C++. Generic setup_seq_str and pre-setup option changes are now implemented at the deferred boundary; source units remain partial for broader setup and copy-path work. Verified 559706f8 predates these routing changes.",
-        "Generic setup_seq_str selection now reads current options and asserted-formula features at the first push/check boundary. auto selects Sequence for non-String sequences and String otherwise; z3str3/seq are explicit. QF_S and QF_BVRE profiles override the generic selector only while auto_config is enabled. setup_unknown(st) specialized dispatch is respected before generic-selector validation. Only eager Go placeholders can be replaced; explicit native-style installed plugins are preserved. Setup stays permanent across option updates and scope pops. Initial/deferred routing is covered, while broader setup profiles and concrete plugin-copy paths remain partial."
+        "Generic setup_seq_str selection now reads current options and asserted-formula features at the first push/check boundary. auto selects Sequence for non-String sequences and String otherwise; z3str3/seq are explicit. QF_S and QF_BVRE profiles override the generic selector only while auto_config is enabled. setup_unknown(st) specialized dispatch is respected before generic-selector validation. Only eager Go placeholders can be replaced; explicit native-style installed plugins are preserved. Setup stays permanent across option updates and scope pops. Initial/deferred routing is covered, while broader setup profiles and concrete plugin-copy paths remain partial.",
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
     },
     {
@@ -125119,7 +125203,9 @@
         "pkg/smtcore/smt_assumptions.go",
         "pkg/smtcore/smt_tactic_impl.go",
         "pkg/smtcore/smt_setup_check_test.go",
-        "pkg/cmd/g3/main_test.go"
+        "pkg/cmd/g3/main_test.go",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -125148,7 +125234,9 @@
         "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
         "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "assertions": [
         {
@@ -125326,6 +125414,15 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "copy_plugins retained String/Sequence cases through solver translate and model_checker auxiliary mk_fresh, preserving native installed-plugin precedence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -125339,7 +125436,8 @@
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "Unavailable kernel result facilities return empty ordinary result fields or an explicit domain error; they are not simulated by a universal adapter.",
-        "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas. The earlier claim that reconstruction from destination settings replaces retained plugin copying was incorrect: an installed concrete source plugin survives destination setup, even when the destination arithmetic mode differs. Retained arithmetic types now preserve this behavior; other theory families remain incomplete, so this unit is partial. The source MUS branch is unreachable because m_minimizing_core is initialized false and is set true only inside that branch; the live pattern-extension policies are ported."
+        "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas. The earlier claim that reconstruction from destination settings replaces retained plugin copying was incorrect: an installed concrete source plugin survives destination setup, even when the destination arithmetic mode differs. Retained arithmetic types now preserve this behavior; other theory families remain incomplete, so this unit is partial. The source MUS branch is unreachable because m_minimizing_core is initialized false and is set true only inside that branch; the live pattern-extension policies are ported.",
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
     },
     {
@@ -125348,10 +125446,14 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/smt_solver.go"
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go"
       ],
       "tests": [
-        "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
+        "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "conditionals": [
         {
@@ -125373,13 +125475,23 @@
           "tests": [
             "TestSMTSolverFactoryAndUnsupportedKernelPrerequisites"
           ]
+        },
+        {
+          "name": "copy_plugins retained String/Sequence cases through solver translate and model_checker auxiliary mk_fresh, preserving native installed-plugin precedence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
         "The concrete Go constructor returns an owning solver value; the factory owns no process services and closes independently."
       ],
       "deviations": [
-        "The Go constructor takes SMTSolverConfig so the parameter context and optional quantifier registry are explicit borrowed services."
+        "The Go constructor takes SMTSolverConfig so the parameter context and optional quantifier registry are explicit borrowed services.",
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
     },
     {
@@ -137503,7 +137615,10 @@
         "pkg/cmd/g3/test_vectors/pending_seq_negative_contains_canonize_scopes.expected_cpp",
         "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.smt2",
         "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.expected_cpp",
-        "pkg/smtcore/theory_seq_empty_solution_test.go"
+        "pkg/smtcore/theory_seq_empty_solution_test.go",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go",
+        "pkg/smtcore/smt_solver.go"
       ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
@@ -137606,7 +137721,9 @@
         "TestSMTSequenceNonContainsCanonicalSolutionEvidenceAndRollback",
         "TestSMTSequenceNonContainsUnresolvedQueuePreventsDone",
         "TestSMTSequenceCanonicalConditionalScope",
-        "TestSMTSequenceEmptyWordSolutionsSurviveSuppressedCallback"
+        "TestSMTSequenceEmptyWordSolutionsSurviveSuppressedCallback",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "conditionals": [
         {
@@ -138793,6 +138910,15 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_fresh concrete Sequence construction for translation and model-checker auxiliary contexts with fresh scoped state",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -138825,7 +138951,8 @@
         "Audited native assign_eh compile guards: the active false-prefix path is add_prefix2prefix (#if 0 disables propagate_not_prefix), and the active false-suffix path is propagate_not_suffix (#if 1 disables the recursive first/last alternative). Removed the inactive prefix-mismatch adapter and recursive suffix helper. Prefix tail predicates are now exposed only after nonempty-container and equal-head decisions, with available empty/mismatch phases, guarded continuation and repeated final-check retries. Actual phase/relevance activation counts as search work, while unchanged retries do not. Positive relation witnesses are created only on true assignment; false assignment never exposes them. An old test that assumed implicit first/last suffix axioms was replaced with a retained-path absence/satisfiability check, the witness fixture now covers only the active suffix variant, and internal length fixtures explicitly demand lengths. Earlier combined method credits are corrected to partial where they included inactive/general canonization paths. Go non-containment boundary/tail compatibility consequences remain, while the source active canonizes/solve_nc audit is still open.",
         "Connected the active native negative-containment queue reducer: constants retire, changed canonical formulas replace records, negative equalities propagate with theory explanations, disjunctions split and swap-replaced slots are revisited. A pending queue now prevents is_solved/Done, replacing the former concrete-string-only check. Canonicalization expands the retained structural relation/concat/unit/index operands, source ITE decision/egraph branches and guarded nonnegative integer conversions before the private substitution-free rewriter. Native persistent expansion-cache/replay bookkeeping and broader source integration remain partial. Equation simplification now runs before negative-containment reduction, and a genuinely new solution-map insertion counts as kernel work even if its enodes were already merged. Existing Go compatibility boundary/tail consequences are still present: removing them exposed unknown results in existing satisfiable and implicit-tail fixtures; they are not newly credited as native assign_eh behavior.",
         "Saved pending_seq_negative_contains_canonize_scopes.smt2 with exact clean-exit prebuilt C++ output. Its constrained concat/prefix/numeral scopes and model invariants agree, but C++ ALL/theory_seq returns unknown in the two unconstrained outer scopes while Go compatibility search returns sat. This known differential remains pending, unregistered and uncredited as passing. Source setup_QF_S selects unported theory_str, whereas Go currently routes QF_S through SMTSequenceTheory; the QF_S native sat observation cannot establish theory_seq behavior. The routing gap and full removal of the compatibility path remain open.",
-        "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. No new sequence algorithm credit is added. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Earlier ALL negative-containment parity remains pending; source units stay partial."
+        "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. No new sequence algorithm credit is added. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Earlier ALL negative-containment parity remains pending; source units stay partial.",
+        "Context copies now install a new concrete SMTSequenceTheory rather than reselecting the algorithm from destination String options. Unconfigured eager placeholders remain uninstalled and use destination setup; actual copied/explicit plugins survive pre-setup chained copies. The source header mk_fresh requires no parameter borrow. Models and child conflict/pop recovery cover same/cross-manager translation; other Sequence algorithm and parity work remains partial."
       ]
     },
     {
@@ -138881,7 +139008,10 @@
         "pkg/cmd/g3/test_vectors/pending_seq_negative_contains_canonize_scopes.expected_cpp",
         "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.smt2",
         "pkg/cmd/g3/test_vectors/seq_negative_symbolic_mixed.expected_cpp",
-        "pkg/smtcore/theory_seq_empty_solution_test.go"
+        "pkg/smtcore/theory_seq_empty_solution_test.go",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go",
+        "pkg/smtcore/smt_solver.go"
       ],
       "tests": [
         "TestSMTSequenceSolutionMapDependenciesOverwriteAndScopes",
@@ -138941,7 +139071,9 @@
         "TestSMTSequenceNonContainsCanonicalSolutionEvidenceAndRollback",
         "TestSMTSequenceNonContainsUnresolvedQueuePreventsDone",
         "TestSMTSequenceCanonicalConditionalScope",
-        "TestSMTSequenceEmptyWordSolutionsSurviveSuppressedCallback"
+        "TestSMTSequenceEmptyWordSolutionsSurviveSuppressedCallback",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "conditionals": [
         {
@@ -139517,6 +139649,15 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_fresh concrete Sequence construction for translation and model-checker auxiliary contexts with fresh scoped state",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -139545,7 +139686,8 @@
         "Audited native assign_eh compile guards: the active false-prefix path is add_prefix2prefix (#if 0 disables propagate_not_prefix), and the active false-suffix path is propagate_not_suffix (#if 1 disables the recursive first/last alternative). Removed the inactive prefix-mismatch adapter and recursive suffix helper. Prefix tail predicates are now exposed only after nonempty-container and equal-head decisions, with available empty/mismatch phases, guarded continuation and repeated final-check retries. Actual phase/relevance activation counts as search work, while unchanged retries do not. Positive relation witnesses are created only on true assignment; false assignment never exposes them. An old test that assumed implicit first/last suffix axioms was replaced with a retained-path absence/satisfiability check, the witness fixture now covers only the active suffix variant, and internal length fixtures explicitly demand lengths. Earlier combined method credits are corrected to partial where they included inactive/general canonization paths. Go non-containment boundary/tail compatibility consequences remain, while the source active canonizes/solve_nc audit is still open.",
         "Connected the active native negative-containment queue reducer: constants retire, changed canonical formulas replace records, negative equalities propagate with theory explanations, disjunctions split and swap-replaced slots are revisited. A pending queue now prevents is_solved/Done, replacing the former concrete-string-only check. Canonicalization expands the retained structural relation/concat/unit/index operands, source ITE decision/egraph branches and guarded nonnegative integer conversions before the private substitution-free rewriter. Native persistent expansion-cache/replay bookkeeping and broader source integration remain partial. Equation simplification now runs before negative-containment reduction, and a genuinely new solution-map insertion counts as kernel work even if its enodes were already merged. Existing Go compatibility boundary/tail consequences are still present: removing them exposed unknown results in existing satisfiable and implicit-tail fixtures; they are not newly credited as native assign_eh behavior.",
         "Saved pending_seq_negative_contains_canonize_scopes.smt2 with exact clean-exit prebuilt C++ output. Its constrained concat/prefix/numeral scopes and model invariants agree, but C++ ALL/theory_seq returns unknown in the two unconstrained outer scopes while Go compatibility search returns sat. This known differential remains pending, unregistered and uncredited as passing. Source setup_QF_S selects unported theory_str, whereas Go currently routes QF_S through SMTSequenceTheory; the QF_S native sat observation cannot establish theory_seq behavior. The routing gap and full removal of the compatibility path remain open.",
-        "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. No new sequence algorithm credit is added. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Earlier ALL negative-containment parity remains pending; source units stay partial."
+        "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. No new sequence algorithm credit is added. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Earlier ALL negative-containment parity remains pending; source units stay partial.",
+        "Context copies now install a new concrete SMTSequenceTheory rather than reselecting the algorithm from destination String options. Unconfigured eager placeholders remain uninstalled and use destination setup; actual copied/explicit plugins survive pre-setup chained copies. The source header mk_fresh requires no parameter borrow. Models and child conflict/pop recovery cover same/cross-manager translation; other Sequence algorithm and parity work remains partial."
       ]
     },
     {
@@ -139717,7 +139859,10 @@
         "pkg/smtcore/theory_str_final_free_test.go",
         "pkg/smtcore/smt_setup.go",
         "pkg/smtcore/smt_setup_string_test.go",
-        "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2"
+        "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go",
+        "pkg/smtcore/smt_solver.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139957,7 +140102,9 @@
         "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
         "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness",
         "TestSMTStringFreeKernelModelAndCPPReference",
-        "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic"
+        "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "conditionals": [
         {
@@ -141892,6 +142039,18 @@
             "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
             "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness"
           ]
+        },
+        {
+          "name": "mk_fresh String concrete copied-plugin construction: fresh state, original String parameter member, destination nested-solver fparams and chained owning lifetime",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/theory_str.go"
+          ],
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -141940,7 +142099,8 @@
         "Unroll construction returns a borrowed explicitly retained term, then asserts its actual definition before returning. Recursive reduction appends only emitted premises to caller-owned concrete expr_ref_vector replacement; each recursion owns/releases temporary operands forward. Range output goes directly through assertAxiom and bypasses theory String cache, preserving NUL/high bytes. General unroll definitions borrow lifetime-rooted keys/results and retain both the explicit trail root and assertion root on every build/cache replay. Cache insertion precedes those roots as in source; Fresh/Close initialize/clear concrete maps. Completed prefix effects remain after later reduction errors; caller premise owners release acquired roots.",
         "Concat/unroll definitions borrow ordered AST pair keys and cached formula handles held by existing lifetime roots. Cache misses create the native five word/two count witnesses and retain the complete formula before insertion; every call asserts, but cache hits add no additional explicit trail root. Constructor and immediate range effects retain their own roots before the final definition. Local positive/zero premise vectors and temporary operand roots release forward. Persistent cache survives real scope pop; Fresh/Close initialize/clear the concrete map.",
         "The final free-variable stage mutates only its current dependency-analysis free map, owns temporary concrete relation/set maps and borrows existing AST handles. Private String classes and core enode cycles remain distinct. Generator return roots are consumed by the actual assertion wrapper and close on failures; null roots are legal. Lifetime tester/definition caches retain their established roots and scope behavior. No unused generic map/set adapter or inactive alternative assignment loop is introduced.",
-        "Initial production QF_S logic/automatic setup now constructs the actual String owner from parent parameters with mixed arithmetic. Existing nested borrowed-parameter and teardown lifetimes apply; disabled-auto-config default seq remains generic."
+        "Initial production QF_S logic/automatic setup now constructs the actual String owner from parent parameters with mixed arithmetic. Existing nested borrowed-parameter and teardown lifetimes apply; disabled-auto-config default seq remains generic.",
+        "Copied String theory borrows its original scalar String parameter member, retains independent destination AST roots and owns its own nested solver. Chained copies preserve the same owner after source closure; destination nested queries, models and scope recovery are verified. Copy-aware scalar retention does not reopen or destroy original parameter services."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141994,7 +142154,8 @@
         "Eight regressions verify independent count/word/length constructor truth, exact union/concat/literal premise shapes and languages with actual typed witnesses, all 256 byte candidates for reversed/NUL/high-byte ranges with no appended premise or String-cache access, star constructor effects, unsupported-right-child preservation of completed union/range effects, exhaustive one-step zero/positive unfolding truth, input-set deduplication and fresh order, repeated two-root cache replay after actual scope pop, Fresh reset and a logical negative bound taking precedence over an existing cache after scope rollback. Native unrecognized operators become Go domain errors without broader regex expansion. Source raw-byte zstring(unsigned ch, ascii) construction is represented by Go one-byte strings. General regex assignment is implemented but awaits concat/unroll processing and complete free-variable/unroll FinalCheck wiring. Source statuses, production routing and verified full checkpoint are unchanged.",
         "Three regressions independently enumerate zero/positive split equivalences and count/word/boundary assignments with exact fresh order and actual residual constructors, verify two roots on build versus one added assertion root on scope-pop replay without new witnesses and Fresh reset, and confirm unconditional range boundary assertion plus ordered nonsymmetric cache identity. This completes concat/unroll processing as a callable retained routine; the remaining free-variable/unroll FinalCheck dispatcher is still pending. Source statuses, production routing and verified full checkpoint remain unchanged.",
         "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged.",
-        "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial."
+        "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial.",
+        "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete."
       ]
     },
     {
@@ -142120,7 +142281,10 @@
         "pkg/smtcore/theory_str_final_free_test.go",
         "pkg/smtcore/smt_setup.go",
         "pkg/smtcore/smt_setup_string_test.go",
-        "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2"
+        "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2",
+        "pkg/smtcore/smt_sequence_lifecycle.go",
+        "pkg/smtcore/smt_sequence_lifecycle_test.go",
+        "pkg/smtcore/smt_solver.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -142361,7 +142525,9 @@
         "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
         "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness",
         "TestSMTStringFreeKernelModelAndCPPReference",
-        "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic"
+        "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic",
+        "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
       ],
       "conditionals": [
         {
@@ -143614,6 +143780,18 @@
             "TestSMTStringFreeDispatchUsesCoreCyclesAndRemovesSkippedArguments",
             "TestSMTStringFreeDispatchNestedConcatAndLiteralBoundedness"
           ]
+        },
+        {
+          "name": "mk_fresh String concrete copied-plugin construction: fresh state, original String parameter member, destination nested-solver fparams and chained owning lifetime",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_sequence_lifecycle.go",
+          "go_targets": [
+            "pkg/smtcore/theory_str.go"
+          ],
+          "tests": [
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+          ]
         }
       ],
       "ownership": [
@@ -143663,7 +143841,8 @@
         "Unroll construction returns a borrowed explicitly retained term, then asserts its actual definition before returning. Recursive reduction appends only emitted premises to caller-owned concrete expr_ref_vector replacement; each recursion owns/releases temporary operands forward. Range output goes directly through assertAxiom and bypasses theory String cache, preserving NUL/high bytes. General unroll definitions borrow lifetime-rooted keys/results and retain both the explicit trail root and assertion root on every build/cache replay. Cache insertion precedes those roots as in source; Fresh/Close initialize/clear concrete maps. Completed prefix effects remain after later reduction errors; caller premise owners release acquired roots.",
         "Concat/unroll definitions borrow ordered AST pair keys and cached formula handles held by existing lifetime roots. Cache misses create the native five word/two count witnesses and retain the complete formula before insertion; every call asserts, but cache hits add no additional explicit trail root. Constructor and immediate range effects retain their own roots before the final definition. Local positive/zero premise vectors and temporary operand roots release forward. Persistent cache survives real scope pop; Fresh/Close initialize/clear the concrete map.",
         "The final free-variable stage mutates only its current dependency-analysis free map, owns temporary concrete relation/set maps and borrows existing AST handles. Private String classes and core enode cycles remain distinct. Generator return roots are consumed by the actual assertion wrapper and close on failures; null roots are legal. Lifetime tester/definition caches retain their established roots and scope behavior. No unused generic map/set adapter or inactive alternative assignment loop is introduced.",
-        "Initial production QF_S logic/automatic setup now constructs the actual String owner from parent parameters with mixed arithmetic. Existing nested borrowed-parameter and teardown lifetimes apply; disabled-auto-config default seq remains generic."
+        "Initial production QF_S logic/automatic setup now constructs the actual String owner from parent parameters with mixed arithmetic. Existing nested borrowed-parameter and teardown lifetimes apply; disabled-auto-config default seq remains generic.",
+        "Copied String theory borrows its original scalar String parameter member, retains independent destination AST roots and owns its own nested solver. Chained copies preserve the same owner after source closure; destination nested queries, models and scope recovery are verified. Copy-aware scalar retention does not reopen or destroy original parameter services."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -143718,7 +143897,8 @@
         "Eight regressions verify independent count/word/length constructor truth, exact union/concat/literal premise shapes and languages with actual typed witnesses, all 256 byte candidates for reversed/NUL/high-byte ranges with no appended premise or String-cache access, star constructor effects, unsupported-right-child preservation of completed union/range effects, exhaustive one-step zero/positive unfolding truth, input-set deduplication and fresh order, repeated two-root cache replay after actual scope pop, Fresh reset and a logical negative bound taking precedence over an existing cache after scope rollback. Native unrecognized operators become Go domain errors without broader regex expansion. Source raw-byte zstring(unsigned ch, ascii) construction is represented by Go one-byte strings. General regex assignment is implemented but awaits concat/unroll processing and complete free-variable/unroll FinalCheck wiring. Source statuses, production routing and verified full checkpoint are unchanged.",
         "Three regressions independently enumerate zero/positive split equivalences and count/word/boundary assignments with exact fresh order and actual residual constructors, verify two roots on build versus one added assertion root on scope-pop replay without new witnesses and Fresh reset, and confirm unconditional range boundary assertion plus ordered nonsymmetric cache identity. This completes concat/unroll processing as a callable retained routine; the remaining free-variable/unroll FinalCheck dispatcher is still pending. Source statuses, production routing and verified full checkpoint remain unchanged.",
         "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged.",
-        "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial."
+        "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial.",
+        "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete."
       ]
     },
     {

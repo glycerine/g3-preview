@@ -113,7 +113,7 @@ func (t *SMTStringTheory) arrangeMatchingLiteralBoundaries(left, right ast.ASTHa
 	}
 	strong := true
 	if t.parameterOwner != nil {
-		parameters, err := t.parameterOwner.State()
+		parameters, err := t.stringParameterState()
 		if err != nil {
 			return err
 		}
@@ -166,7 +166,7 @@ func (t *SMTStringTheory) arrangeOpposingLiteralBoundaries(left, right ast.ASTHa
 	}
 	parameters := SMTStrState{StrongArrangements: true, OverlapTheoryAwarePriority: -0.1}
 	if t.parameterOwner != nil {
-		parameters, err = t.parameterOwner.State()
+		parameters, err = t.stringParameterState()
 		if err != nil {
 			return err
 		}
