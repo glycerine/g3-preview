@@ -122629,7 +122629,9 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_model_incomplete_test.go",
         "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
-        "pkg/smtcore/smt_model_boolean_order_test.go"
+        "pkg/smtcore/smt_model_boolean_order_test.go",
+        "pkg/smtcore/smt_model_fallback_test.go",
+        "pkg/cmd/g3/test_vectors/disabled_arithmetic_numeral_models.smt2"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -122660,7 +122662,8 @@
         "TestSMTModelTraversalRechecksDependenciesOnlyInSourceDebug",
         "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
-        "TestSMTModelGeneratorBooleanPublicationPhases"
+        "TestSMTModelGeneratorBooleanPublicationPhases",
+        "TestSMTModelGeneratorFallbackPreservesOnlyModelValues"
       ],
       "assertions": [
         {
@@ -122921,6 +122924,23 @@
             "TestSMTModelGeneratorPublishesBooleanConstant",
             "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse"
           ]
+        },
+        {
+          "name": "mk_model_value (smt_model_generator.cpp:127-140): fallback for a missing/non-model-building theory preserves only built-in AST model values; ordinary unique numerals receive fresh unsupported-sort model values through the existing proto-model factory fallback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_generator.go",
+            "pkg/smtcore/smt_model_fallback_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/disabled_arithmetic_numeral_models.smt2"
+          ],
+          "tests": [
+            "TestSMTModelGeneratorFallbackPreservesOnlyModelValues",
+            "TestSMTModelGeneratorRegistersExistingModelValues",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -122930,7 +122950,8 @@
         "The per-sort implicit-dependency set, source colors and iterative work stack are local to one topological traversal. Fresh placeholders and enodes remain borrowed; no recursive Go call stack or persistent sort cache is retained.",
         "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
         "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit.",
-        "Boolean assignment and enode-constant publication are distinct ordered passes over borrowed context state. Theory initializer callbacks run before Boolean publication, value-procedure callbacks observe the assigned Boolean model, and later enode-backed declarations overwrite theory-written interpretations through normal proto-model ownership. Boolean variables without enodes are not republished in the later pass."
+        "Boolean assignment and enode-constant publication are distinct ordered passes over borrowed context state. Theory initializer callbacks run before Boolean publication, value-procedure callbacks observe the assigned Boolean model, and later enode-backed declarations overwrite theory-written interpretations through normal proto-model ownership. Boolean variables without enodes are not republished in the later pass.",
+        "Fallback procedures borrow existing built-in model values or own newly registered/pinned fresh values through normal generator construction. Unsupported arithmetic sorts use the existing proto-model user factory; numeric unique values are not mistaken for built-in model-value constants. The exact CLI oracle checks residual candidate expressions as well as UNKNOWN and scope recovery."
       ],
       "deviations": [
         "The source iterative traversal, last-pushed-first order, shared per-sort implicit-dependency cache and source-debug-only second child visit are preserved. True dependency cycles retain the Go ast.ErrASTDomain guard for invalid input rather than reaching native missing-value assertions during construction.",
@@ -122958,7 +122979,9 @@
         "pkg/smtcore/smt_model_incomplete_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
-        "pkg/smtcore/smt_model_boolean_order_test.go"
+        "pkg/smtcore/smt_model_boolean_order_test.go",
+        "pkg/smtcore/smt_model_fallback_test.go",
+        "pkg/cmd/g3/test_vectors/disabled_arithmetic_numeral_models.smt2"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -122986,7 +123009,8 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
-        "TestSMTModelGeneratorBooleanPublicationPhases"
+        "TestSMTModelGeneratorBooleanPublicationPhases",
+        "TestSMTModelGeneratorFallbackPreservesOnlyModelValues"
       ],
       "conditionals": [
         {
@@ -123123,6 +123147,23 @@
             "TestSMTModelGeneratorPublishesBooleanConstant",
             "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse"
           ]
+        },
+        {
+          "name": "mk_model_value (smt_model_generator.cpp:127-140): fallback for a missing/non-model-building theory preserves only built-in AST model values; ordinary unique numerals receive fresh unsupported-sort model values through the existing proto-model factory fallback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_generator.go",
+            "pkg/smtcore/smt_model_fallback_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/disabled_arithmetic_numeral_models.smt2"
+          ],
+          "tests": [
+            "TestSMTModelGeneratorFallbackPreservesOnlyModelValues",
+            "TestSMTModelGeneratorRegistersExistingModelValues",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -123130,7 +123171,8 @@
         "The per-sort implicit-dependency set, source colors and iterative work stack are local to one topological traversal. Fresh placeholders and enodes remain borrowed; no recursive Go call stack or persistent sort cache is retained.",
         "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
         "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit.",
-        "Boolean assignment and enode-constant publication are distinct ordered passes over borrowed context state. Theory initializer callbacks run before Boolean publication, value-procedure callbacks observe the assigned Boolean model, and later enode-backed declarations overwrite theory-written interpretations through normal proto-model ownership. Boolean variables without enodes are not republished in the later pass."
+        "Boolean assignment and enode-constant publication are distinct ordered passes over borrowed context state. Theory initializer callbacks run before Boolean publication, value-procedure callbacks observe the assigned Boolean model, and later enode-backed declarations overwrite theory-written interpretations through normal proto-model ownership. Boolean variables without enodes are not republished in the later pass.",
+        "Fallback procedures borrow existing built-in model values or own newly registered/pinned fresh values through normal generator construction. Unsupported arithmetic sorts use the existing proto-model user factory; numeric unique values are not mistaken for built-in model-value constants. The exact CLI oracle checks residual candidate expressions as well as UNKNOWN and scope recovery."
       ],
       "deviations": [
         "The source tagged dependency union is represented by explicit Go fields and checked accessors. Invalid assertion domains return ast.ErrASTDomain.",
@@ -136027,12 +136069,18 @@
       "go_targets": [
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
-        "pkg/smtcore/theory_dummy.go"
+        "pkg/smtcore/theory_dummy.go",
+        "pkg/smtcore/theory_dummy_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/disabled_arithmetic_numeral_models.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
         "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
-        "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh"
+        "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh",
+        "TestSMTDummyTheoryNumeralsTriggerScopedIncompleteness",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -136044,10 +136092,27 @@
           "tests": [
             "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh"
           ]
+        },
+        {
+          "name": "internalize_term (theory_dummy.cpp:46-49): every reached term, including unique integer/real numerals, sets the scoped unsupported marker before declining internalization; no numeral exemption",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dummy.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dummy.go",
+            "pkg/smtcore/theory_dummy_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/disabled_arithmetic_numeral_models.smt2"
+          ],
+          "tests": [
+            "TestSMTDummyTheoryNumeralsTriggerScopedIncompleteness",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "The dummy theory owns its Go name and scoped Boolean snapshots while borrowing its initialized SMT state through SMTTheoryBase."
+        "The dummy theory owns its Go name and scoped Boolean snapshots while borrowing its initialized SMT state through SMTTheoryBase.",
+        "Numeral callbacks use the same scoped Boolean unsupported marker as all other terms. Repeated internalization and scope pop restore the normal give-up/done lifecycle; no AST or value ownership is added."
       ],
       "deviations": [
         "Native Go scope snapshots replace the source value_trail entry; unreachable equality and disequality callbacks return a checked domain error."
@@ -136059,10 +136124,16 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/theory_dummy.go"
+        "pkg/smtcore/theory_dummy.go",
+        "pkg/smtcore/theory_dummy_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/disabled_arithmetic_numeral_models.smt2"
       ],
       "tests": [
-        "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh"
+        "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh",
+        "TestSMTDummyTheoryNumeralsTriggerScopedIncompleteness",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -136096,10 +136167,27 @@
           "tests": [
             "TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh"
           ]
+        },
+        {
+          "name": "internalize_term (theory_dummy.cpp:46-49): every reached term, including unique integer/real numerals, sets the scoped unsupported marker before declining internalization; no numeral exemption",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dummy.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dummy.go",
+            "pkg/smtcore/theory_dummy_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/disabled_arithmetic_numeral_models.smt2"
+          ],
+          "tests": [
+            "TestSMTDummyTheoryNumeralsTriggerScopedIncompleteness",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Fresh returns an independent uninitialized dummy owner with the same copied name and borrowed family identifier."
+        "Fresh returns an independent uninitialized dummy owner with the same copied name and borrowed family identifier.",
+        "Numeral callbacks use the same scoped Boolean unsupported marker as all other terms. Repeated internalization and scope pop restore the normal give-up/done lifecycle; no AST or value ownership is added."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",

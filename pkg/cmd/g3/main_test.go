@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"disabled_arithmetic_numeral_models.smt2":      "sat\n((p true))\nunknown\n(((f 3.0) (not (= 3.0 Real!val!1)))\n ((f 4.0) (not (= 4.0 Real!val!1))))\nunsat\nunknown\n(((f 3.0) (not (= 3.0 Real!val!1)))\n ((f 4.0) (not (= 4.0 Real!val!1))))\nsat\n((p true))\n",
 	"integer_fractional_candidate.smt2":            "unknown\n((x 0)\n (y 0))\nunknown\n((x (- 1))\n (y (- 1)))\nsat\n((x 1)\n (y 1))\n",
 	"real_interval_epsilon.smt2":                   "sat\n((x (/ 1.0 2.0)))\nsat\n((x (/ 1.0 4.0)))\nunsat\nsat\n((x (/ 1.0 4.0)))\nsat\n((x (/ 1.0 2.0)))\n",
 	"incomplete_theory_candidate_model.smt2":       "unknown\n(((f a) true)\n ((f b) false)\n ((f 1.0) false))\nunsat\nunknown\n(((f a) true)\n ((f b) false)\n ((f 1.0) false))\n",

@@ -35,18 +35,7 @@ func (t *SMTDummyTheory) InternalizeAtom(ast.ASTHandle, bool) (bool, error) {
 	return false, t.foundTheoryExpression()
 }
 
-func (t *SMTDummyTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
-	if expression.IsNull() {
-		return false, t.foundTheoryExpression()
-	}
-	state, err := t.State()
-	if err != nil {
-		return false, err
-	}
-	value, err := state.manager.IsUniqueValue(expression)
-	if err != nil || value {
-		return false, err
-	}
+func (t *SMTDummyTheory) InternalizeTerm(ast.ASTHandle) (bool, error) {
 	return false, t.foundTheoryExpression()
 }
 

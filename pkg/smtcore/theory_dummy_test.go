@@ -2,10 +2,46 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
+
+func TestSMTDummyTheoryNumeralsTriggerScopedIncompleteness(t *testing.T) {
+	for _, integer := range []bool{false, true} {
+		t.Run(fmt.Sprint(integer), func(t *testing.T) {
+			m := astTestManager(t)
+			family, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			dummy, err := NewSMTDummyTheory(family, "no arithmetic")
+			astTestMust(t, err)
+			_, _, state := smtInternalizerFixture(t, m, nil)
+			astTestMust(t, state.RegisterTheory(dummy))
+			value, err := m.ArithmeticRealNumeralText("3")
+			if integer {
+				value, err = m.ArithmeticIntegerNumeralText("3")
+			}
+			astTestMust(t, err)
+			for repeat := 0; repeat < 2; repeat++ {
+				astTestMust(t, state.PushScope())
+				astTestMust(t, state.Internalize(value, false))
+				astTestMust(t, state.Internalize(value, false))
+				status, err := dummy.FinalCheck()
+				astTestMust(t, err)
+				if status != SMTFinalCheckGiveUp {
+					t.Fatal("numeral escaped disabled theory", status)
+				}
+				astTestMust(t, state.PopScopes(1))
+				status, err = dummy.FinalCheck()
+				astTestMust(t, err)
+				if status != SMTFinalCheckDone {
+					t.Fatal("numeral incompleteness survived pop", status)
+				}
+			}
+		})
+	}
+}
 
 func TestSMTDummyTheoryTracksExpressionsScopesResetAndFresh(t *testing.T) {
 	m := astTestManager(t)

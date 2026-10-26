@@ -270,23 +270,23 @@ func (g *SMTModelGenerator) discoverValueProcedures(state *SMTInternalizerState)
 					return nil, nil, familyErr
 				}
 			} else {
-				unique, uniqueErr := g.manager.IsUniqueValue(node.owner)
-				if uniqueErr != nil {
-					return nil, nil, uniqueErr
+				modelValue, valueErr := g.manager.IsModelValue(node.owner)
+				if valueErr != nil {
+					return nil, nil, valueErr
 				}
 				value := node.owner
-				if !unique {
-					value, uniqueErr = g.model.FreshValue(sort)
-					if uniqueErr != nil || value.IsNull() {
-						if uniqueErr != nil {
-							return nil, nil, uniqueErr
+				if !modelValue {
+					value, valueErr = g.model.FreshValue(sort)
+					if valueErr != nil || value.IsNull() {
+						if valueErr != nil {
+							return nil, nil, valueErr
 						}
 						return nil, nil, ast.ErrASTDomain
 					}
 				}
-				procedure, uniqueErr = NewSMTExpressionValueProcedure(value)
-				if uniqueErr != nil {
-					return nil, nil, uniqueErr
+				procedure, valueErr = NewSMTExpressionValueProcedure(value)
+				if valueErr != nil {
+					return nil, nil, valueErr
 				}
 			}
 		}
