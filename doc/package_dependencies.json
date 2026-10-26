@@ -2846,6 +2846,7 @@
         "theory_str_tester_callbacks.go",
         "theory_str_tester_variables.go",
         "theory_str_unroll.go",
+        "theory_str_unroll_options.go",
         "theory_str_value_encoding.go",
         "theory_str_value_options.go",
         "theory_utvpi.go",

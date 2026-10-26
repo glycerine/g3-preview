@@ -139377,7 +139377,9 @@
         "pkg/smtcore/theory_str_binary_options.go",
         "pkg/smtcore/theory_str_binary_options_test.go",
         "pkg/smtcore/theory_str_tester_callbacks.go",
-        "pkg/smtcore/theory_str_tester_callbacks_test.go"
+        "pkg/smtcore/theory_str_tester_callbacks_test.go",
+        "pkg/smtcore/theory_str_unroll_options.go",
+        "pkg/smtcore/theory_str_unroll_options_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -139592,7 +139594,11 @@
         "TestSMTStringTesterCallbacksUseActualBooleanEqualityPropagation",
         "TestSMTStringTesterAttemptRolesAndSortGate",
         "TestSMTStringTesterBinaryCallbackAsymmetriesAndGuards",
-        "TestSMTStringTesterValueCallbackUsesInactiveAssignedLength"
+        "TestSMTStringTesterValueCallbackUsesInactiveAssignedLength",
+        "TestSMTStringUnrollAssignmentWindowsWordsAndLengths",
+        "TestSMTStringUnrollTesterOwnershipAndAggressivePhases",
+        "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression",
+        "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
       ],
       "conditionals": [
         {
@@ -141359,6 +141365,54 @@
             "TestSMTStringTesterAttemptRolesAndSortGate",
             "TestSMTStringTesterBinaryCallbackAsymmetriesAndGuards"
           ]
+        },
+        {
+          "name": "mk_unroll_test_var: ordinary unrollTest String skolem with internal-unroll role and idempotent scoped registration; preserve a single direct lifetime root rather than length/value creators extra root",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringUnrollTesterOwnershipAndAggressivePhases",
+            "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
+          ]
+        },
+        {
+          "name": "gen_unroll_assign: numeric repeat choices, independent word and length equivalences, more length-bound equivalence, disjunction, aggressive relevant cached phases and explicit formula lifetime root",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringUnrollAssignmentWindowsWordsAndLengths",
+            "TestSMTStringUnrollTesterOwnershipAndAggressivePhases",
+            "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression"
+          ]
+        },
+        {
+          "name": "gen_unroll_conditional_options: exact unroll-set identity history, internal-unroll-role filtering, tester creation/refresh, first unassigned window replay and immediate return, assigned-more premises and assigned-concrete fallthrough into a new fixed-width window",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression",
+            "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
+          ]
+        },
+        {
+          "name": "get_unrolled_string retained nonnegative repetition counts: use Go strings.Repeat over raw bytes; concrete history keys replace obj_map<expr, map<set<expr*>, ptr_vector<expr>>> with owned sorted unique member slices and tester slices",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringUnrollAssignmentWindowsWordsAndLengths",
+            "TestSMTStringUnrollTesterOwnershipAndAggressivePhases",
+            "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression",
+            "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
+          ]
+        },
+        {
+          "name": "gen_unroll_conditional_options premise append after immediate return in unassigned-tester branch is source-unreachable; opt_LCMUnrollStep is constructor-fixed at two with no retained setter",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression",
+            "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
+          ]
         }
       ],
       "ownership": [
@@ -141401,7 +141455,8 @@
         "Free-value controller returns the caller-owned first/successor formula root or a zero root when no separate formula is produced. Replay roots are released immediately after actual assertAxiom obtains its lifetime root, including on failure. Scoped history and reverse subject entries borrow the existing doubly rooted tester variables. Refresh reuses existing variables/enodes and basic queues; no new root or tester is invented for assigned entries. Inactive history is appended to without clearing or compacting, preserving source indices.",
         "Sequential controller returns the existing generators caller-owned ASTRef and uses borrowed lifetime-rooted indicator histories/reverse subject handles plus uint32 source counts. Reset updates count before creation, clears old length history after successful creation and leaves reverse cache entries alive. Refresh preserves actual enode/basic-queue side effects after scope pop; inactive history is not compacted during scans. Recursive term checks reuse actual sameStringClass behavior and inspect live regex registry entries in deterministic word/key order. Missing required prior EQC values become Go errors at the source NOT_IMPLEMENTED_YET guard.",
         "Binary search owns immutable independently allocated integer windows, borrowing lifetime-rooted AST keys. Active stack/bounds pairs unwind in reverse at the native trail-pop position; bounds insertion undo erases and never restores an earlier value. Starting/high/low tester caches persist across scope pops and Fresh clears all mutable maps/trails. Fresh tester construction retains native additional refresh, including queue side effects. Case-split helper returns only a caller root; initial/next driver formulas additionally enter the lifetime trail, while negative-midpoint guards do not. Local roots release forward, caller temporaries close on errors, and no generic trail/template adapter is added.",
-        "Tester callback wrappers consume each returned caller-owned formula root after actual assertAxiom obtains its own lifetime root; zero roots are skipped and temporary roots close on all failures. Reverse subject/history handles borrow existing tester lifetime ownership. NewEquality runs exact String-sort gating and ordered attempts before normal concat/consistency stages, merging private classes only after the handler succeeds. Callback text is passed before private merge rather than manufacturing an assigned private value."
+        "Tester callback wrappers consume each returned caller-owned formula root after actual assertAxiom obtains its own lifetime root; zero roots are skipped and temporary roots close on all failures. Reverse subject/history handles borrow existing tester lifetime ownership. NewEquality runs exact String-sort gating and ordered attempts before normal concat/consistency stages, merging private classes only after the handler succeeds. Callback text is passed before private merge rather than manufacturing an assigned private value.",
+        "Unroll history groups own sorted unique exact-member key slices and tester slices, borrowing lifetime-rooted AST handles. Ordinary creator retains one direct variable root; repeated scope registration is idempotent. Assignment formulas and conditional wrapper formulas each preserve their distinct source explicit lifetime roots in addition to the returned caller root. Local roots release forward; nested returned roots are transferred to the local frame then closed even on errors. History role filtering uses internal_unrollTest_vars rather than ordinary internal membership and remains lifetime-persistent across real scope pops. Fresh/Close initialize/clear concrete history state; no generic set/map/template adapter is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -141449,7 +141504,8 @@
         "The free-value controller is directly verified for first creation, exact reverse/scoped registration, ordered unassigned replay, assigned private-class skip, callback stop, more successor creation/reuse, actual enode scope-pop refresh with lifetime-persistent membership and the source inactive-history append/index asymmetry. A missing more callback reaches a native out-of-range/default-empty encoding read after registration; Go preserves completed registration/replay side effects and returns a domain error rather than correcting the native index. Invalid nondecimal/overflow length producer states also return domain errors. Remaining sequential/binary length controllers, equality callback wiring and free-variable/unroll FinalCheck dispatch remain incomplete; production routing and source statuses are unchanged.",
         "The sequential length/value controller branch is directly checked for first registration, same-indicator refresh, source-order callback precedence, more-window advancement, assigned private values overriding callback text, concrete premerge callback values without forced equality merge, scope-pop refresh, inactive-history reset versus missing-count reset, prior callback fallback and native guard failure, and direct/nested/private-alias/unrelated/disabled regex constraints including false membership. This ports the complete !UseBinarySearch branch and its recursive helper; binary-search dispatch, equality callback wiring and free-variable/unroll FinalCheck integration remain pending. Existing source-unit statuses, production QF_S routing and latest verified full native checkpoint are unchanged.",
         "Six direct binary-search regressions cover negative/zero/ordinary/above-uint64 case-split truth tables, live Boolean literal registration, exact successive upper windows and doubling, immutable previous bounds, driver versus helper roots, real nested scope rollback and persistent starting/high/low tester reuse, negative floor and nonnegative-length refusal, actual concrete value enumeration with private-value precedence and native binary omission of the sequential regex guard, configured dispatch and initial naming before known-length override, Fresh reset, undefined callback guards and fresh midpoint int32 assertions. A cached successor is explicitly reused after a later known length above uint64: only fresh tester naming requires int32, preserving source placement of that guard. Retained bounds remain integral, represented by Go big.Int with floor division. Unreachable native callback states and fresh out-of-int32 midpoint assertions become Go domain errors. Equality callback wiring and free-variable/unroll FinalCheck integration remain incomplete; source units and production routing remain unchanged.",
-        "Five callback regressions verify both equality orientations, premerge more/concrete length and value transitions, post-handler private merge, actual Boolean literal assignment/core equality propagation producing new batches, length-role consumption without reverse registration, concrete-value versus more callbacks, nonliteral counterpart behavior, unconditional unroll role and exact non-String sort gate. Binary tests preserve absent sequential reverse entries, actual assigned top-of-stack selection, unknown-top warning/no assertion and native missing/nonconcrete guards. Invalid missing registered value producers become domain errors. Tester callbacks are now wired into actual NewEquality; unfinished free-variable/unroll FinalCheck dispatch and production QF_S routing remain unchanged. Source units remain partial. Additional boundaries directly verify inactive assigned sequential length selection without membership filtering and failure propagation without a private EQC merge."
+        "Five callback regressions verify both equality orientations, premerge more/concrete length and value transitions, post-handler private merge, actual Boolean literal assignment/core equality propagation producing new batches, length-role consumption without reverse registration, concrete-value versus more callbacks, nonliteral counterpart behavior, unconditional unroll role and exact non-String sort gate. Binary tests preserve absent sequential reverse entries, actual assigned top-of-stack selection, unknown-top warning/no assertion and native missing/nonconcrete guards. Invalid missing registered value producers become domain errors. Tester callbacks are now wired into actual NewEquality; unfinished free-variable/unroll FinalCheck dispatch and production QF_S routing remain unchanged. Source units remain partial. Additional boundaries directly verify inactive assigned sequential length selection without membership filtering and failure propagation without a private EQC merge.",
+        "Four regressions independently enumerate numeric/more/junk choices versus repeat words and independently substituted lengths across two windows for ASCII and NUL/high-byte cores; verify ordinary noninternalization, exact tester name/single direct root/counters/scope, aggressive relevance/cached phases without assignment, first unassigned formula replay and exact-set key reuse, actual unroll-role equality handling, assigned-more guard and assigned-concrete fallthrough, actual scope-pop refresh, role-based erasure and Fresh reset. Use Go strings.Repeat for retained nonnegative repeat counts. Preserve target-width unsigned byte-length products and signed mk_int conversion; undefined native signed negation/window overflow becomes a domain error. Fixed step two is proven by constructor/no setters; unreachable post-return premise mutation is omitted. Literal-core LCM compatibility, general regex/unroll assignment and free-variable/unroll FinalCheck dispatch remain pending. Source statuses, production routing and verified checkpoint are unchanged."
       ]
     },
     {
@@ -141560,7 +141616,9 @@
         "pkg/smtcore/theory_str_binary_options.go",
         "pkg/smtcore/theory_str_binary_options_test.go",
         "pkg/smtcore/theory_str_tester_callbacks.go",
-        "pkg/smtcore/theory_str_tester_callbacks_test.go"
+        "pkg/smtcore/theory_str_tester_callbacks_test.go",
+        "pkg/smtcore/theory_str_unroll_options.go",
+        "pkg/smtcore/theory_str_unroll_options_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -141776,7 +141834,11 @@
         "TestSMTStringTesterCallbacksUseActualBooleanEqualityPropagation",
         "TestSMTStringTesterAttemptRolesAndSortGate",
         "TestSMTStringTesterBinaryCallbackAsymmetriesAndGuards",
-        "TestSMTStringTesterValueCallbackUsesInactiveAssignedLength"
+        "TestSMTStringTesterValueCallbackUsesInactiveAssignedLength",
+        "TestSMTStringUnrollAssignmentWindowsWordsAndLengths",
+        "TestSMTStringUnrollTesterOwnershipAndAggressivePhases",
+        "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression",
+        "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
       ],
       "conditionals": [
         {
@@ -142861,6 +142923,54 @@
             "TestSMTStringTesterAttemptRolesAndSortGate",
             "TestSMTStringTesterBinaryCallbackAsymmetriesAndGuards"
           ]
+        },
+        {
+          "name": "mk_unroll_test_var: ordinary unrollTest String skolem with internal-unroll role and idempotent scoped registration; preserve a single direct lifetime root rather than length/value creators extra root",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringUnrollTesterOwnershipAndAggressivePhases",
+            "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
+          ]
+        },
+        {
+          "name": "gen_unroll_assign: numeric repeat choices, independent word and length equivalences, more length-bound equivalence, disjunction, aggressive relevant cached phases and explicit formula lifetime root",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringUnrollAssignmentWindowsWordsAndLengths",
+            "TestSMTStringUnrollTesterOwnershipAndAggressivePhases",
+            "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression"
+          ]
+        },
+        {
+          "name": "gen_unroll_conditional_options: exact unroll-set identity history, internal-unroll-role filtering, tester creation/refresh, first unassigned window replay and immediate return, assigned-more premises and assigned-concrete fallthrough into a new fixed-width window",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression",
+            "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
+          ]
+        },
+        {
+          "name": "get_unrolled_string retained nonnegative repetition counts: use Go strings.Repeat over raw bytes; concrete history keys replace obj_map<expr, map<set<expr*>, ptr_vector<expr>>> with owned sorted unique member slices and tester slices",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringUnrollAssignmentWindowsWordsAndLengths",
+            "TestSMTStringUnrollTesterOwnershipAndAggressivePhases",
+            "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression",
+            "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
+          ]
+        },
+        {
+          "name": "gen_unroll_conditional_options premise append after immediate return in unassigned-tester branch is source-unreachable; opt_LCMUnrollStep is constructor-fixed at two with no retained setter",
+          "status": "reference_only",
+          "go_target": "pkg/smtcore/theory_str_unroll_options.go",
+          "tests": [
+            "TestSMTStringConditionalUnrollReplayMoreAndConcreteProgression",
+            "TestSMTStringConditionalUnrollScopeRoleFilterAndFresh"
+          ]
         }
       ],
       "ownership": [
@@ -142904,7 +143014,8 @@
         "Free-value controller returns the caller-owned first/successor formula root or a zero root when no separate formula is produced. Replay roots are released immediately after actual assertAxiom obtains its lifetime root, including on failure. Scoped history and reverse subject entries borrow the existing doubly rooted tester variables. Refresh reuses existing variables/enodes and basic queues; no new root or tester is invented for assigned entries. Inactive history is appended to without clearing or compacting, preserving source indices.",
         "Sequential controller returns the existing generators caller-owned ASTRef and uses borrowed lifetime-rooted indicator histories/reverse subject handles plus uint32 source counts. Reset updates count before creation, clears old length history after successful creation and leaves reverse cache entries alive. Refresh preserves actual enode/basic-queue side effects after scope pop; inactive history is not compacted during scans. Recursive term checks reuse actual sameStringClass behavior and inspect live regex registry entries in deterministic word/key order. Missing required prior EQC values become Go errors at the source NOT_IMPLEMENTED_YET guard.",
         "Binary search owns immutable independently allocated integer windows, borrowing lifetime-rooted AST keys. Active stack/bounds pairs unwind in reverse at the native trail-pop position; bounds insertion undo erases and never restores an earlier value. Starting/high/low tester caches persist across scope pops and Fresh clears all mutable maps/trails. Fresh tester construction retains native additional refresh, including queue side effects. Case-split helper returns only a caller root; initial/next driver formulas additionally enter the lifetime trail, while negative-midpoint guards do not. Local roots release forward, caller temporaries close on errors, and no generic trail/template adapter is added.",
-        "Tester callback wrappers consume each returned caller-owned formula root after actual assertAxiom obtains its own lifetime root; zero roots are skipped and temporary roots close on all failures. Reverse subject/history handles borrow existing tester lifetime ownership. NewEquality runs exact String-sort gating and ordered attempts before normal concat/consistency stages, merging private classes only after the handler succeeds. Callback text is passed before private merge rather than manufacturing an assigned private value."
+        "Tester callback wrappers consume each returned caller-owned formula root after actual assertAxiom obtains its own lifetime root; zero roots are skipped and temporary roots close on all failures. Reverse subject/history handles borrow existing tester lifetime ownership. NewEquality runs exact String-sort gating and ordered attempts before normal concat/consistency stages, merging private classes only after the handler succeeds. Callback text is passed before private merge rather than manufacturing an assigned private value.",
+        "Unroll history groups own sorted unique exact-member key slices and tester slices, borrowing lifetime-rooted AST handles. Ordinary creator retains one direct variable root; repeated scope registration is idempotent. Assignment formulas and conditional wrapper formulas each preserve their distinct source explicit lifetime roots in addition to the returned caller root. Local roots release forward; nested returned roots are transferred to the local frame then closed even on errors. History role filtering uses internal_unrollTest_vars rather than ordinary internal membership and remains lifetime-persistent across real scope pops. Fresh/Close initialize/clear concrete history state; no generic set/map/template adapter is added."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -142953,7 +143064,8 @@
         "The free-value controller is directly verified for first creation, exact reverse/scoped registration, ordered unassigned replay, assigned private-class skip, callback stop, more successor creation/reuse, actual enode scope-pop refresh with lifetime-persistent membership and the source inactive-history append/index asymmetry. A missing more callback reaches a native out-of-range/default-empty encoding read after registration; Go preserves completed registration/replay side effects and returns a domain error rather than correcting the native index. Invalid nondecimal/overflow length producer states also return domain errors. Remaining sequential/binary length controllers, equality callback wiring and free-variable/unroll FinalCheck dispatch remain incomplete; production routing and source statuses are unchanged.",
         "The sequential length/value controller branch is directly checked for first registration, same-indicator refresh, source-order callback precedence, more-window advancement, assigned private values overriding callback text, concrete premerge callback values without forced equality merge, scope-pop refresh, inactive-history reset versus missing-count reset, prior callback fallback and native guard failure, and direct/nested/private-alias/unrelated/disabled regex constraints including false membership. This ports the complete !UseBinarySearch branch and its recursive helper; binary-search dispatch, equality callback wiring and free-variable/unroll FinalCheck integration remain pending. Existing source-unit statuses, production QF_S routing and latest verified full native checkpoint are unchanged.",
         "Six direct binary-search regressions cover negative/zero/ordinary/above-uint64 case-split truth tables, live Boolean literal registration, exact successive upper windows and doubling, immutable previous bounds, driver versus helper roots, real nested scope rollback and persistent starting/high/low tester reuse, negative floor and nonnegative-length refusal, actual concrete value enumeration with private-value precedence and native binary omission of the sequential regex guard, configured dispatch and initial naming before known-length override, Fresh reset, undefined callback guards and fresh midpoint int32 assertions. A cached successor is explicitly reused after a later known length above uint64: only fresh tester naming requires int32, preserving source placement of that guard. Retained bounds remain integral, represented by Go big.Int with floor division. Unreachable native callback states and fresh out-of-int32 midpoint assertions become Go domain errors. Equality callback wiring and free-variable/unroll FinalCheck integration remain incomplete; source units and production routing remain unchanged.",
-        "Five callback regressions verify both equality orientations, premerge more/concrete length and value transitions, post-handler private merge, actual Boolean literal assignment/core equality propagation producing new batches, length-role consumption without reverse registration, concrete-value versus more callbacks, nonliteral counterpart behavior, unconditional unroll role and exact non-String sort gate. Binary tests preserve absent sequential reverse entries, actual assigned top-of-stack selection, unknown-top warning/no assertion and native missing/nonconcrete guards. Invalid missing registered value producers become domain errors. Tester callbacks are now wired into actual NewEquality; unfinished free-variable/unroll FinalCheck dispatch and production QF_S routing remain unchanged. Source units remain partial. Additional boundaries directly verify inactive assigned sequential length selection without membership filtering and failure propagation without a private EQC merge."
+        "Five callback regressions verify both equality orientations, premerge more/concrete length and value transitions, post-handler private merge, actual Boolean literal assignment/core equality propagation producing new batches, length-role consumption without reverse registration, concrete-value versus more callbacks, nonliteral counterpart behavior, unconditional unroll role and exact non-String sort gate. Binary tests preserve absent sequential reverse entries, actual assigned top-of-stack selection, unknown-top warning/no assertion and native missing/nonconcrete guards. Invalid missing registered value producers become domain errors. Tester callbacks are now wired into actual NewEquality; unfinished free-variable/unroll FinalCheck dispatch and production QF_S routing remain unchanged. Source units remain partial. Additional boundaries directly verify inactive assigned sequential length selection without membership filtering and failure propagation without a private EQC merge.",
+        "Four regressions independently enumerate numeric/more/junk choices versus repeat words and independently substituted lengths across two windows for ASCII and NUL/high-byte cores; verify ordinary noninternalization, exact tester name/single direct root/counters/scope, aggressive relevance/cached phases without assignment, first unassigned formula replay and exact-set key reuse, actual unroll-role equality handling, assigned-more guard and assigned-concrete fallthrough, actual scope-pop refresh, role-based erasure and Fresh reset. Use Go strings.Repeat for retained nonnegative repeat counts. Preserve target-width unsigned byte-length products and signed mk_int conversion; undefined native signed negation/window overflow becomes a domain error. Fixed step two is proven by constructor/no setters; unreachable post-return premise mutation is omitted. Literal-core LCM compatibility, general regex/unroll assignment and free-variable/unroll FinalCheck dispatch remain pending. Source statuses, production routing and verified checkpoint are unchanged."
       ]
     },
     {
