@@ -2838,6 +2838,7 @@
         "theory_str_regex_stage_state.go",
         "theory_str_relations.go",
         "theory_str_replace.go",
+        "theory_str_sequential_options.go",
         "theory_str_setup.go",
         "theory_str_suffix_arrangements.go",
         "theory_str_terms.go",
