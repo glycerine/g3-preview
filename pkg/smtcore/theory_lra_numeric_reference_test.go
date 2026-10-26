@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -97,5 +98,42 @@ func TestSMTLRAEqualityNativeScopeOracle(t *testing.T) {
 	expected := "sat unsat sat sat (((>= x 2) true) ((= y 1) true) ((= (+ x (* (- 1) x) y) y) true)) sat"
 	if canonical(out.String()) != canonical(expected) {
 		t.Fatal("native LRA equality/scope oracle", out.String(), "want", expected)
+	}
+}
+
+func TestSMTLRALPPropagationNativeOracle(t *testing.T) {
+	reference := os.Getenv("G3_CPP_REFERENCE")
+	if reference == "" {
+		t.Skip("G3_CPP_REFERENCE is not set")
+	}
+	script, err := os.ReadFile("test_vectors/lra_row_propagation.smt2")
+	astTestMust(t, err)
+	cmd := exec.Command(reference, "-in")
+	cmd.Stdin = bytes.NewReader(script)
+	var out, diagnostics bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &out, &diagnostics
+	if err = cmd.Run(); err != nil || diagnostics.Len() != 0 {
+		t.Fatal(err, out.String(), diagnostics.String())
+	}
+	text := out.String()
+	start := strings.Index(text, "(:arith-")
+	if start < 0 {
+		t.Fatal("missing LRA statistics", text)
+	}
+	end := strings.IndexByte(text[start:], ')')
+	if end < 0 {
+		t.Fatal("unterminated LRA statistics", text)
+	}
+	end += start + 1
+	statistics := text[start:end]
+	if !regexp.MustCompile(`:arith-bound-propagations-lp\s+[1-9][0-9]*`).MatchString(statistics) {
+		t.Fatal("native oracle did not exercise LP propagation", statistics)
+	}
+	text = text[:start] + text[end:]
+	spaces := strings.NewReplacer("(", " ( ", ")", " ) ")
+	canonical := func(s string) string { return strings.Join(strings.Fields(spaces.Replace(s)), " ") }
+	expected := "sat (((>= x 3) true) ((>= (+ x y) 5) true) ((<= y 2) true)) sat (((> x 3) true)) unsat sat sat"
+	if canonical(text) != canonical(expected) {
+		t.Fatal("native row propagation oracle", text, "want", expected)
 	}
 }

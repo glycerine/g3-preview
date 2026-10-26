@@ -38,21 +38,24 @@ func (l smtLRAResourceLimit) CancelFlag() (bool, error) { return l.manager.Cance
 // remaining propagation/model-combination callbacks are connected.
 type SMTLRATheory struct {
 	*SMTTheoryBase
-	numeric         *smtLRANumeric
-	numerals        *numeral.RationalManager
-	config          SMTArithState
-	equalityAdapter *smtLRAEqualityAdapter
-	bounds          [][]*smtLRABound
-	boundByBoolean  map[int32]*smtLRABound
-	boundTrail      []SMTTheoryVar
-	newBounds       []*smtLRABound
-	unassigned      []uint32
-	assignments     []smtLRAAssignment
-	assignmentHead  int
-	scopes          []smtLRAFrontendScope
-	notHandled      ast.ASTHandle
-	underspecified  []ast.ASTHandle
-	closed          bool
+	numeric                           *smtLRANumeric
+	numerals                          *numeral.RationalManager
+	config                            SMTArithState
+	equalityAdapter                   *smtLRAEqualityAdapter
+	bounds                            [][]*smtLRABound
+	boundByBoolean                    map[int32]*smtLRABound
+	boundTrail                        []SMTTheoryVar
+	newBounds                         []*smtLRABound
+	boundChecks                       []int32
+	propagator                        *lp.LARBoundPropagator
+	basicPropagations, lpPropagations uint64
+	unassigned                        []uint32
+	assignments                       []smtLRAAssignment
+	assignmentHead                    int
+	scopes                            []smtLRAFrontendScope
+	notHandled                        ast.ASTHandle
+	underspecified                    []ast.ASTHandle
+	closed                            bool
 }
 
 var _ SMTTheoryInternalizer = (*SMTLRATheory)(nil)
@@ -63,7 +66,7 @@ func NewSMTLRATheory(family ast.FamilyID) (*SMTLRATheory, error) {
 		return nil, err
 	}
 	t := &SMTLRATheory{SMTTheoryBase: base,
-		config:         SMTArithState{Reflect: true, BoundProp: 2, PropagateEqs: true, PropagationThreshold: ^uint32(0)},
+		config:         SMTArithState{Reflect: true, BoundProp: 2, PropagateEqs: true, SmallLemmaSize: 16, PropagationThreshold: ^uint32(0)},
 		boundByBoolean: make(map[int32]*smtLRABound)}
 	t.equalityAdapter = newSMTLRAEqualityAdapter(t)
 	return t, nil
@@ -550,6 +553,12 @@ func (t *SMTLRATheory) Propagate() error {
 	if _, err := t.State(); err != nil {
 		return err
 	}
+	if err := t.numeric.ready(); err != nil {
+		return err
+	}
+	if t.propagator != nil {
+		return lp.ErrExactVectorPending
+	}
 	if err := t.flushBoundAxioms(); err != nil {
 		return err
 	}
@@ -562,12 +571,14 @@ func (t *SMTLRATheory) Propagate() error {
 		if b == nil {
 			return ast.ErrASTDomain
 		}
+		t.boundChecks = append(t.boundChecks, a.boolean)
 		if _, err := t.numeric.assertBound(b.variable, a.boolean, &b.value, b.upper, a.truth); err != nil {
 			return err
 		}
 		t.assignmentHead++
 	}
 	if t.state.inconsistent {
+		t.boundChecks = nil
 		return nil
 	}
 	status, err := t.numeric.makeFeasible()
@@ -575,15 +586,14 @@ func (t *SMTLRATheory) Propagate() error {
 		return err
 	}
 	if status == lbool.False {
-		evidence, err := t.numeric.infeasibilityEvidence()
-		if err != nil {
+		return t.setLRAConflict()
+	}
+	if status == lbool.True {
+		if err := t.propagateBasicBounds(); err != nil {
+			t.numeric.stopped = true
 			return err
 		}
-		var core []SMTLiteral
-		for _, e := range evidence {
-			core = append(core, e.literal)
-		}
-		return t.state.SetTheoryConflict(t.FamilyID(), core)
+		return t.propagateLPBounds()
 	}
 	return nil
 }
@@ -636,6 +646,7 @@ func (t *SMTLRATheory) PopScopes(n uint32) error {
 	clear(t.unassigned[len(scope.unassigned):])
 	t.scopes = t.scopes[:level]
 	t.newBounds = nil // Native user-push contract flushes pending parent axioms first.
+	t.boundChecks = nil
 	if err := t.numeric.pop(n); err != nil {
 		return err
 	}
@@ -653,6 +664,12 @@ func (t *SMTLRATheory) Close() error {
 	// already be unavailable to ordinary calls while Close is retried.
 	t.closed = true
 	t.state = nil
+	if t.propagator != nil {
+		if err := t.propagator.Close(); err != nil {
+			return err
+		}
+		t.propagator = nil
+	}
 	if t.numeric != nil {
 		if err := t.numeric.Close(); err != nil {
 			return err
@@ -677,6 +694,7 @@ func (t *SMTLRATheory) Close() error {
 	t.boundByBoolean = nil
 	t.boundTrail = nil
 	t.newBounds = nil
+	t.boundChecks = nil
 	t.unassigned = nil
 	t.assignments = nil
 	t.scopes = nil
