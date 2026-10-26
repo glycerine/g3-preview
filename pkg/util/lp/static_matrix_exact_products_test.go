@@ -222,6 +222,9 @@ func TestLPExactStaticProductsLiteralAliasesAndCopies(t *testing.T) {
 }
 
 func TestLPExactStaticProductsAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"dense", "indexed", "add", "dot-row", "dot-column", "dot-pair", "min-row", "max-row", "min-column", "max-column"} {
 		failures, successes, comparisons, publishedX := 0, 0, 0, 0
 		for ordinal := int64(0); ordinal < 300; ordinal++ {

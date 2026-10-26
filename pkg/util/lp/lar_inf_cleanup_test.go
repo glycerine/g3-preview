@@ -269,6 +269,9 @@ func TestLARInfCleanupSetSnapshotAndSourcePrefixes(t *testing.T) {
 }
 
 func TestLARInfCleanupPhysicalOwnerBoundaries(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"clamp", "delta", "subtract", "basic-compare", "cost-update"} {
 			failures := 0

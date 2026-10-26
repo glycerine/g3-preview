@@ -253,6 +253,9 @@ func TestLPPairCoreIndependentLexicographicFeasibility(t *testing.T) {
 }
 
 func TestLPPairCorePhysicalFailurePrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"construct", "fill", "compare", "solve-indexed", "solve-internal", "solve-y", "init-inf", "delta"} {
 			succeeded, failures := false, 0

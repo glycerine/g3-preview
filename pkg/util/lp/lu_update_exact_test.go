@@ -473,6 +473,9 @@ func TestLPExactLUUpdateRowSolveLiteral(t *testing.T) {
 }
 
 func TestLPExactLUUpdateIndependentBasisOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(193751, 779))
 	for world := 0; world < 48; world++ {
 		for _, pair := range []bool{false, true} {

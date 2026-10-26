@@ -226,6 +226,9 @@ func TestLPExactEtaLiteralSparseAndBoundsPrefixes(t *testing.T) {
 }
 
 func TestLPExactEtaAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"set", "append", "divide-column", "left", "right", "sparse-left", "sparse-right", "pair-left", "left-large-pivot", "right-large-pivot", "sparse-left-large-pivot", "sparse-right-large-pivot", "pair-large-pivot", "sparse-left-zero-dest"} {
 			failures, successes := 0, 0

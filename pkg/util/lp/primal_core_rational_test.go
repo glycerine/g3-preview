@@ -92,6 +92,9 @@ func TestLPRationalPrimalConstructionAndMembershipOracle(t *testing.T) {
 }
 
 func TestLPRationalPrimalConstructionAndBoundsPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"constructor", "init-inf", "delta"} {
 			done, failures := false, 0

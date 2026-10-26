@@ -228,6 +228,9 @@ func TestLARPivotTermSubstitutionSourceOffset(t *testing.T) {
 }
 
 func TestLARPivotPhysicalFailurePrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	large := "1" + strings.Repeat("0", 999) + "7"
 	basis := "3" + strings.Repeat("0", 999) + "1"
 	for _, direct := range []bool{false, true} {

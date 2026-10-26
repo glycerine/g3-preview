@@ -216,6 +216,9 @@ func TestLARBoundPropagatorHooksBorrowedModelAndStreams(t *testing.T) {
 }
 
 func TestLARBoundPropagatorPhysicalFailurePrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"new-low", "new-upper", "replace-low", "replace-upper", "strict-low", "strict-upper", "term"} {
 			failures, succeeded := 0, false

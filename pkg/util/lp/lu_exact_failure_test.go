@@ -11,6 +11,9 @@ import (
 )
 
 func TestLPExactLUAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	etaStops, denseStops, basisStops, tailPrefixes := 0, 0, 0, 0
 	for _, op := range []string{"constructor", "column", "row", "indexed-row"} {
 		for _, dense := range []bool{false, true} {

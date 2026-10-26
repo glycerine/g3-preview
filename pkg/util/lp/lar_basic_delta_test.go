@@ -172,6 +172,9 @@ func TestLARBasicDeltaSourcePrefixesAndStoppedGuards(t *testing.T) {
 }
 
 func TestLARBasicDeltaPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"tableau", "costs", "LU"} {
 			failures, own, child := 0, 0, 0

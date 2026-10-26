@@ -334,6 +334,9 @@ func TestLPPairPriorityQueueExactLifetimeAndPrefixContracts(t *testing.T) {
 }
 
 func TestLPRationalPriorityQueueAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"new", "decrease", "increase", "dequeue"} {
 			failures, successes, lexicalStops := 0, 0, 0
@@ -461,6 +464,9 @@ func TestLPRationalPriorityQueueOlderComparisonIdentity(t *testing.T) {
 }
 
 func TestLPPairPriorityQueueAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"new", "decrease", "increase", "dequeue"} {
 			failures, successes, lexicalStops := 0, 0, 0

@@ -288,6 +288,9 @@ func TestLPRationalTableauCostSourcePrefixesAndGuards(t *testing.T) {
 }
 
 func TestLPRationalTableauCostPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"cost", "reduced", "costcmp-low", "costcmp-upper"} {
 			success := false

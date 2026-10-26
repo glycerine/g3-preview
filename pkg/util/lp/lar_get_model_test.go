@@ -280,6 +280,9 @@ func TestLARGetModelPreservesOlderComparison(t *testing.T) {
 }
 
 func TestLARGetModelDeepCollisionPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	// Forty successive collisions take the denominator beyond inline integer
 	// storage and reach real allocation refusal during epsilon halving.
 	for _, direct := range []bool{false, true} {

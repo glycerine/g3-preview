@@ -306,6 +306,9 @@ func TestLPExactBasisDispatchIndependentPairOracle(t *testing.T) {
 }
 
 func TestLPExactBasisDispatchPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"free", "low-positive", "low-negative", "upper-positive", "upper-negative", "boxed-positive", "boxed-negative", "feasible-positive", "feasible-negative"} {
 		for _, direct := range []bool{false, true} {
 			success, failures, own, child := false, 0, 0, 0

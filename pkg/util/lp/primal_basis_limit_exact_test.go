@@ -157,6 +157,9 @@ func TestLPExactBasisLimitIndependentPairOracle(t *testing.T) {
 }
 
 func TestLPExactBasisLimitPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"upper-negative", "boxed-positive", "boxed-negative", "feasible-positive", "feasible-negative"} {
 		for _, direct := range []bool{false, true} {
 			success, failures, own, child, comparisonStops := false, 0, 0, 0, 0

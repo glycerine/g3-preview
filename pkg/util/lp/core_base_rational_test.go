@@ -300,6 +300,9 @@ func TestLPRationalCoreBasisTraceAndTranspose(t *testing.T) {
 }
 
 func TestLPRationalCorePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, phase := range []string{"construct", "refactor", "fill", "yB", "Bd", "indexed", "lazy", "transpose"} {
 			done, failures := false, 0

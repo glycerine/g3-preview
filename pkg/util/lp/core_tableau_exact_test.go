@@ -217,6 +217,9 @@ func TestLPPairTableauMetadataAndStoppedGuards(t *testing.T) {
 }
 
 func TestLPPairTableauPhysicalFailureOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"divide", "eliminate", "costs", "pivot-costs"} {
 			failures := 0

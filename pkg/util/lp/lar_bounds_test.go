@@ -230,6 +230,9 @@ func TestLARBoundsSourceConflictPublication(t *testing.T) {
 }
 
 func TestLARBoundsPhysicalUpdateRefusals(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, typ := range []ColumnType{ColumnFree, ColumnLowBound, ColumnUpperBound, ColumnBoxed, ColumnFixed} {
 			for _, kind := range []LConstraintKind{LConstraintLE, LConstraintGE, LConstraintEQ} {

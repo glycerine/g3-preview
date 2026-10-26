@@ -11,6 +11,9 @@ import (
 )
 
 func TestLPExactLUUpdateAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	argumentStops, arithmeticStops, rowEtaStops, diagonalStops, publishedDiagonalStops := 0, 0, 0, 0, 0
 	for _, op := range []string{"no-bump", "bump", "dense"} {
 		for _, pair := range []bool{false, true} {

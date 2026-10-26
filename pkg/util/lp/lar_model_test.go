@@ -252,6 +252,9 @@ func TestLARModelNestedTableauAndRowPropagation(t *testing.T) {
 }
 
 func TestLARModelPhysicalFailurePrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	beforeBound, afterBound := 0, 0
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"term-undecided", "term-tableau-zero", "term-tableau-value", "term-bound-mapped", "term-bound-unmapped", "var-bound"} {

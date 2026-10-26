@@ -213,6 +213,9 @@ func TestLPSparseEtaConstructionLiteralColumns(t *testing.T) {
 }
 
 func TestLPExactSparseEtaConstructionAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, campaign := range []string{"diagonal-first", "lower-first", "diagonal-first-direct", "lower-first-direct"} {
 		t.Run(campaign, func(t *testing.T) {
 			failures, successes, matrixStops, etaStops, divisionStops := 0, 0, 0, 0, 0

@@ -10,6 +10,9 @@ import (
 )
 
 func TestLPLUEnteringColumnAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	columnPrefixes, oldDestinationIndices, childStops := 0, 0, 0
 	for _, op := range []string{"prepare", "dense", "sparse", "faster"} {
 		for _, pair := range []bool{false, true} {

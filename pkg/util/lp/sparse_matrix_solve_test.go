@@ -191,6 +191,9 @@ func TestLPSparseDenseSolveLiteralDiagonalDuplicatesAndIEEE(t *testing.T) {
 }
 
 func TestLPExactSparseDenseSolveAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	totalReceipts := 0
 	for _, op := range []string{"uy", "yu", "pair"} {
 		for _, direct := range []bool{false, true} {

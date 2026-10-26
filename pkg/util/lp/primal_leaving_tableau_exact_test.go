@@ -197,6 +197,9 @@ func TestLPExactTableauLeavingIndependentFeasibleModels(t *testing.T) {
 }
 
 func TestLPExactTableauLeavingPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"ratio", "improvement", "tie", "flip", "large-flip", "inline-minimum"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

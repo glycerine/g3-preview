@@ -178,6 +178,9 @@ func lpExactRowEtaCheckFaultSuccess(t *testing.T, h *lpPairHarness, op string, e
 }
 
 func TestLPExactRowEtaAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"append", "left", "right", "sparse-left", "sparse-right", "pair-left", "left-large-source", "right-large-source", "sparse-left-large-source", "sparse-right-large-source", "pair-large-source", "sparse-left-zero-pivot", "sparse-right-zero-dest", "sparse-left-cancel"} {
 			failures, successes, publishedStops := 0, 0, 0

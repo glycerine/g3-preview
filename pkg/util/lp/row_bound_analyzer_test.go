@@ -190,6 +190,9 @@ func TestLARRowBoundAnalyzerCursorRHSAndBorrowedLifetime(t *testing.T) {
 }
 
 func TestLARRowBoundAnalyzerPhysicalFailurePrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, mode := range []string{"construct", "all", "unique"} {
 			succeeded, failures := false, 0

@@ -398,6 +398,9 @@ func TestLPSparsePivotBoundsAndPublicationPrefixes(t *testing.T) {
 }
 
 func TestLPExactSparsePivotAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, campaign := range []string{"max", "prepare", "choose", "max-direct", "prepare-direct", "choose-direct"} {
 		op := strings.TrimSuffix(campaign, "-direct")
 		failures, successes, receipts, prefixes := 0, 0, 0, 0

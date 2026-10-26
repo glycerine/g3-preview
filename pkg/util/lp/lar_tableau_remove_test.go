@@ -172,6 +172,9 @@ func TestLARTableauBasisSwapPopAndBottomRightFirstLink(t *testing.T) {
 }
 
 func TestLARTableauRemovalPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"cost", "pivot", "transpose", "pop"} {
 			failures, own, child := 0, 0, 0

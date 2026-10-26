@@ -487,6 +487,9 @@ func lpCallScalarBoundOperation(m *RationalPrimalCoreSolver, op string, d, theta
 }
 
 func TestLPRationalPrimalBoundPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	ops := []string{"harris", "flip", "minimum", "inf-positive", "inf-negative", "inf-low", "upper-negative", "boxed-positive", "boxed-negative", "feasible-positive", "feasible-negative", "dispatch-positive", "dispatch-negative", "dispatch-free"}
 	for _, direct := range []bool{false, true} {
 		for _, op := range ops {

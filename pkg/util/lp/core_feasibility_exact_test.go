@@ -242,6 +242,9 @@ func TestLPPairMakeFeasibleMetadataAndStoppedGuards(t *testing.T) {
 }
 
 func TestLPPairMakeFeasiblePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"low", "upper", "fixed"} {
 			failures, expressions := 0, 0
@@ -440,6 +443,9 @@ func TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal(t *testing.T) {
 }
 
 func TestLPPairMakeFeasibleComparisonBeforeDeltaPublication(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, kind := range []ColumnType{ColumnUpperBound, ColumnBoxed} {
 			failures, comparisons := 0, 0

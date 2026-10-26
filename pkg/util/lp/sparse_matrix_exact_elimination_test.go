@@ -317,6 +317,9 @@ func TestLPExactSparseLiteralDivisionAndPivot(t *testing.T) {
 }
 
 func TestLPExactSparseMutationAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	totalReceipts := 0
 	for _, campaign := range []string{"add", "remove-col", "remove-row", "remove-both", "divide", "pivot-new", "pivot-existing", "pivot-cancel", "divide-direct", "remove-both-direct", "pivot-existing-direct"} {
 		op := strings.TrimSuffix(campaign, "-direct")
