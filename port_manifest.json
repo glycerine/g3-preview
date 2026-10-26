@@ -256657,14 +256657,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "c189d32c788bcd9fd19c81eaf91ea0017e654e30",
+    "commit": "ac94e992dd463cc361d263cc9442815e8386eb36",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-26T16:19:38.341337+00:00",
-    "completed_utc": "2026-10-26T16:33:10.805980+00:00",
+    "started_utc": "2026-10-26T17:19:49.419926+00:00",
+    "completed_utc": "2026-10-26T17:33:57.505217+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-c189d32c.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-c189d32c.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-c189d32c.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-ac94e992.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-ac94e992.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-ac94e992.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -256680,9 +256680,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 685.661,
+    "lp_seconds": 720.029,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified exact clean isolated c189d32c788bcd9fd19c81eaf91ea0017e654e30, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes the earlier model refresh and objective callbacks plus nonstandard mi_ext lower bounds, immediate/deferred bound axioms, Farkas parameter scope ownership and the shared-model false-UNSAT fix preserving epsilon in row deductions. Interpolation passes native and combined checked/debug/trace; no new interpolation defect was reproduced. Root pkg and graph content match the tested snapshot. Green tests do not establish complete smtcore or higher-engine source coverage; optimizer orchestration and mode5 remain open."
+    "scope_warning": "Independently verified exact clean isolated ac94e992dd463cc361d263cc9442815e8386eb36, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes e4b82b22 sparse optimization/canonical simplex seed correction and ac94e992 dense optimization/retained model publication. Known source dense strict optimization drops epsilon and can publish an invalid strict witness; its explicit C++ diagnostic/model limitation is tested and remains open. This checkpoint proves the tests passed, not complete smtcore or higher-engine correctness. Root pkg and graph content match the snapshot at recording. A subsequent retained-consumer correction will remove unreachable standalone integer-only optimizer methods and is excluded from this checkpoint until separately verified."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
