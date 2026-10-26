@@ -188,6 +188,16 @@ func (s *SMTInternalizerState) addClauseKindWithJustificationAndDeleteHandler(li
 	}
 	s.statistics.NumMkLits += uint32(len(kept))
 	if len(kept) == 0 {
+		// A clause simplified to false still has a derivation. Preserve the
+		// resolved proof just as for a unit clause; an axiom conflict here
+		// would turn the final refutation into an open hypothesis of false.
+		if justification == nil && !proof.IsNull() {
+			owner, err := NewSMTJustificationProofWrapper(s.manager, proof, false)
+			if err != nil {
+				return err
+			}
+			justification = owner
+		}
 		conflict := NewSMTBooleanAxiom()
 		if justification != nil {
 			wrapped, err := NewSMTBooleanJustification(justification)

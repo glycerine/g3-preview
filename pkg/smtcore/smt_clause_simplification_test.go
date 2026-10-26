@@ -6,6 +6,41 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
+// Source: src/smt/smt_internalizer.cpp context::mk_clause case 0 retains j
+// as the conflict justification, including after auxiliary simplification.
+func TestSMTEmptyClauseRetainsResolvedProof(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
+	_, _, state := smtInternalizerFixture(t, m, nil)
+	p := smtRelevancyBool(t, m, "empty-proof-p")
+	notP, err := m.MkNot(p)
+	astTestMust(t, err)
+	positive, err := m.MkProofAsserted(p)
+	astTestMust(t, err)
+	negative, err := m.MkProofAsserted(notP)
+	astTestMust(t, err)
+	proof, err := m.MkProofUnitResolution([]ast.ASTHandle{positive, negative})
+	astTestMust(t, err)
+	astTestMust(t, state.addClause(nil, false, proof))
+	conflict, found := state.Conflict()
+	if !found || conflict.Kind() != SMTBooleanJustificationObject {
+		t.Fatal("empty clause lost its proof justification")
+	}
+	resolver, err := NewSMTConflictResolver(state)
+	astTestMust(t, err)
+	defer func() { astTestMust(t, resolver.Close()) }()
+	resolution, err := resolver.Resolve(conflict, state.ConflictLiteral(), state.scopeLevel)
+	astTestMust(t, err)
+	if resolution.Resolved {
+		t.Fatal("base conflict unexpectedly resolved")
+	}
+	retained, err := resolver.LemmaProof()
+	astTestMust(t, err)
+	if retained != proof {
+		t.Fatal("refutation replaced by an open hypothesis")
+	}
+}
+
 func TestSMTClauseSimplificationDropsFalseTailLiteral(t *testing.T) {
 	m := astTestManager(t)
 	_, _, state := smtInternalizerFixture(t, m, nil)

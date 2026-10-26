@@ -16,6 +16,37 @@ higher-level `goivy.Solver`/`Translator` bridge. The replacement backend under
 the final API is adapted behind an adapter instead of matching type names
 one-for-one.
 
+## Native g3 Interpolation API (2026-10-25)
+
+`github.com/glycerine/g3/pkg/api` now exposes `NewInterpolationContext`,
+`InterpolationContext.MkInterpolant`, and
+`InterpolationContext.ComputeInterpolant`. The context owns private symbols,
+ASTs, proof-enabled SMT solver services, and reconstruction model evaluators.
+`Manager()` and `Terms()` borrow the AST manager and typed interpolation term
+helpers for construction and inspection. Pin intermediate handles with
+`ASTManager.NewRef` and release those references before closing the context.
+Markers and computed results are retained until context close.
+
+The binary pattern is `And(MkInterpolant(A), B)`: result zero is implied by A
+and inconsistent with B. Nested and branching patterns return results in marker
+traversal order. Computation uses a fresh solver each time. SAT and UNKNOWN
+return `ErrInterpolationSAT` and `ErrInterpolationUnknown`, respectively;
+unsupported proofs/theories propagate interpolation errors. The lower-level
+`pkg/interp.SolveTree` retains the status/model-producing interface.
+
+Native integration tests exercise Boolean, EUF, linear integer arithmetic,
+integer divisibility, private-symbol elimination, arrays including
+extensionality, quantified input, and tree interpolation. Checks establish
+implication, inconsistency, permitted vocabulary, repeated-call isolation, and
+service cleanup. They also cover the empty-clause proof-retention fix required
+for quantified array extensionality.
+
+Goivy's current `smt` package still uses its C-backed Z3 expression types.
+These g3 entry points supply its interpolation operations but do not switch
+that package's backend or replace its general context/AST bridge. Connecting
+`Z3ToFormulaNoVars` requires the broader native SMT adapter described below;
+the original goivy tests have been reproduced against native g3 ASTs here.
+
 ## Low-Level SMT Surface
 
 The low-level client surface is context-owned:
