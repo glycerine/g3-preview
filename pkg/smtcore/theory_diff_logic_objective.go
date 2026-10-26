@@ -37,7 +37,7 @@ func (o *smtDiffOptimization) node(v int32) uint32 {
 	return uint32(len(o.objectives)) + 2*uint32(v) + 1
 }
 func (o *smtDiffOptimization) edge(e int) uint32 { return uint32(len(o.objectives)) + 2*uint32(e) }
-func (t *SMTIntegerDiffTheory) Close() (result error) {
+func (t *SMTIntegerDiffTheory) closeDiffOptimization() (result error) {
 	if t == nil {
 		return nil
 	}
@@ -55,11 +55,18 @@ func (t *SMTIntegerDiffTheory) Close() (result error) {
 	return result
 }
 
-// The compiler is shared only by the concrete integer and real difference
-// graphs. Internalization dispatches to the registered concrete sort owner.
+// The compiler serves the live real/mixed sparse and dense difference
+// backends. Internalization dispatches to the concrete sort owner.
 // The retained optimizer registers all objectives before maximization; their
 // count reserves the initial simplex indices, as in the source bridge.
-func (t *SMTIntegerDiffTheory) AddObjective(term ast.ASTHandle) (SMTTheoryVar, error) {
+func (t *SMTRealDiffTheory) Close() error {
+	if t == nil {
+		return nil
+	}
+	return t.SMTIntegerDiffTheory.closeDiffOptimization()
+}
+
+func (t *SMTRealDiffTheory) AddObjective(term ast.ASTHandle) (SMTTheoryVar, error) {
 	return t.addDiffObjective(term, nil)
 }
 
@@ -191,40 +198,6 @@ func (o *smtDiffOptimization) addObjectiveRows() error {
 	}
 	return nil
 }
-func (t *SMTIntegerDiffTheory) updateObjectiveSimplex() error {
-	o := &t.optimization
-	if o.solver == nil {
-		o.solver = simplex.NewSolver(&o.manager.Limit)
-	}
-	for i := range t.graph.assignment {
-		o.solver.SetValue(o.node(int32(i)), simplex.RationalInfinitesimal(&t.graph.assignment[i]))
-	}
-	zero := simplex.Infinitesimal{}
-	if err := o.solver.SetLower(o.node(int32(t.zero)), zero); err != nil {
-		return err
-	}
-	if err := o.solver.SetUpper(o.node(int32(t.zero)), zero); err != nil {
-		return err
-	}
-	for i := o.edges; i < len(t.graph.edges); i++ {
-		e := &t.graph.edges[i]
-		if _, err := o.solver.AddIntegerRow(o.edge(i), []uint32{o.node(e.target), o.node(e.source), o.edge(i)}, []big.Int{*big.NewInt(1), *big.NewInt(-1), *big.NewInt(-1)}); err != nil {
-			return err
-		}
-	}
-	o.edges = len(t.graph.edges)
-	for i := range t.graph.edges {
-		e := &t.graph.edges[i]
-		if e.enabled {
-			if err := o.solver.SetUpper(o.edge(i), simplex.RationalInfinitesimal(&e.weight)); err != nil {
-				return err
-			}
-		} else {
-			o.solver.UnsetUpper(o.edge(i))
-		}
-	}
-	return o.addObjectiveRows()
-}
 func (t *SMTRealDiffTheory) updateObjectiveSimplex() error {
 	o := &t.optimization
 	if o.solver == nil {
@@ -261,22 +234,6 @@ func (t *SMTRealDiffTheory) updateObjectiveSimplex() error {
 	return o.addObjectiveRows()
 }
 
-func (t *SMTIntegerDiffTheory) ObjectiveValue(v SMTTheoryVar) (SMTArithmeticObjectiveValue, error) {
-	objective, err := t.diffObjective(v)
-	if err != nil {
-		return SMTArithmeticObjectiveValue{}, err
-	}
-	result := simplex.RationalInfinitesimal(&objective.constant)
-	for _, term := range objective.terms {
-		// Source value() indexes the graph by objective v, not term.variable.
-		value, err := t.graph.Assignment(int32(v))
-		if err != nil {
-			return SMTArithmeticObjectiveValue{}, err
-		}
-		result.Main.Add(&result.Main, new(big.Rat).Mul(value, &term.coefficient))
-	}
-	return SMTArithmeticObjectiveValue{Finite: result}, nil
-}
 func (t *SMTRealDiffTheory) ObjectiveValue(v SMTTheoryVar) (SMTArithmeticObjectiveValue, error) {
 	objective, err := t.diffObjective(v)
 	if err != nil {
@@ -344,40 +301,6 @@ func (t *SMTIntegerDiffTheory) saveObjectiveCore(v SMTTheoryVar, literals []SMTL
 		t.optimization.objectives[v].core = append(t.optimization.objectives[v].core, h)
 	}
 	return nil
-}
-func (t *SMTIntegerDiffTheory) MaximizeObjective(v SMTTheoryVar) (SMTArithmeticObjectiveValue, ast.ASTHandle, bool, error) {
-	objective, err := t.diffObjective(v)
-	if err != nil {
-		return SMTArithmeticObjectiveValue{}, ast.ASTHandle{}, false, err
-	}
-	if err = t.updateObjectiveSimplex(); err != nil {
-		return SMTArithmeticObjectiveValue{}, ast.ASTHandle{}, false, err
-	}
-	result, blocker, shared, err := t.minimizeObjective(v)
-	if err != nil || result.Unbounded {
-		return result, blocker, shared, err
-	}
-	entries, err := t.optimization.solver.RowEntries(t.optimization.rows[v])
-	if err != nil {
-		return result, blocker, false, err
-	}
-	var literals []SMTLiteral
-	for _, entry := range entries {
-		offset := int64(entry.Variable) - int64(len(t.optimization.objectives))
-		if offset >= 0 && offset%2 == 0 {
-			literals = append(literals, t.graph.edges[offset/2].explanation)
-		}
-	}
-	if err = t.saveObjectiveCore(v, literals); err != nil {
-		return result, blocker, false, err
-	}
-	for i := range t.graph.assignment {
-		value := t.optimization.solver.Value(t.optimization.node(int32(i)))
-		t.graph.assignment[i].Set(&value.Main)
-	}
-	blocker, err = t.diffObjectiveInequality(v, result.Finite, true)
-	result.Finite.Main.Add(&result.Finite.Main, &objective.constant)
-	return result, blocker, false, err
 }
 func (t *SMTRealDiffTheory) MaximizeObjective(v SMTTheoryVar) (SMTArithmeticObjectiveValue, ast.ASTHandle, bool, error) {
 	objective, err := t.diffObjective(v)
@@ -487,6 +410,6 @@ func (t *SMTIntegerDiffTheory) diffObjectiveInequality(v SMTTheoryVar, value sim
 	}
 	return m.MkFamilyApp(t.FamilyID(), op, nil, []ast.ASTHandle{expression, numeral})
 }
-func (t *SMTIntegerDiffTheory) MakeObjectiveLowerBound(_ *tactic.FilterModelConverter, v SMTTheoryVar, value simplex.Infinitesimal) (ast.ASTHandle, error) {
+func (t *SMTRealDiffTheory) MakeObjectiveLowerBound(_ *tactic.FilterModelConverter, v SMTTheoryVar, value simplex.Infinitesimal) (ast.ASTHandle, error) {
 	return t.diffObjectiveInequality(v, value, false)
 }

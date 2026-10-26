@@ -20,7 +20,7 @@ func (t *SMTDenseDiffTheory) Close() error {
 	if t == nil {
 		return nil
 	}
-	return t.syntax.Close()
+	return t.syntax.closeDiffOptimization()
 }
 func (t *SMTDenseDiffTheory) ObjectiveValue(v SMTTheoryVar) (SMTArithmeticObjectiveValue, error) {
 	objective, err := t.syntax.diffObjective(v)

@@ -31,16 +31,14 @@ func newDiffObjectiveFixture(t *testing.T, integer bool) *diffObjectiveFixture {
 	f := &diffObjectiveFixture{t: t, m: m, s: s, family: family, integer: integer}
 	kind := int32(0)
 	if integer {
-		f.i, err = NewSMTIntegerDiffTheory(family)
-		astTestMust(t, err)
-		astTestMust(t, s.RegisterTheory(f.i))
+		f.r, err = NewSMTMixedDiffTheory(family)
 		kind = 1
 	} else {
 		f.r, err = NewSMTRealDiffTheory(family)
-		astTestMust(t, err)
-		astTestMust(t, s.RegisterTheory(f.r))
-		f.i = f.r.SMTIntegerDiffTheory
 	}
+	astTestMust(t, err)
+	astTestMust(t, s.RegisterTheory(f.r))
+	f.i = f.r.SMTIntegerDiffTheory
 	f.sort, err = m.MkFamilySort(family, kind, nil)
 	astTestMust(t, err)
 	return f
@@ -80,11 +78,7 @@ func (f *diffObjectiveFixture) maximize(v SMTTheoryVar) (SMTArithmeticObjectiveV
 	var blocker ast.ASTHandle
 	var shared bool
 	var err error
-	if f.r != nil {
-		result, blocker, shared, err = f.r.MaximizeObjective(v)
-	} else {
-		result, blocker, shared, err = f.i.MaximizeObjective(v)
-	}
+	result, blocker, shared, err = f.r.MaximizeObjective(v)
 	astTestMust(f.t, err)
 	if shared {
 		f.t.Fatal("difference optimizer reported shared")
@@ -99,7 +93,7 @@ func TestSMTDiffObjectiveBoundsBlockersAndRepeatedPop(t *testing.T) {
 			y := f.variable("diff-objective-y")
 			sum := f.app(smtArithOpAdd, x, f.app(smtArithOpMul, f.number("-1"), y))
 			f.assert(f.app(smtArithOpLE, sum, f.number("5")))
-			v, err := f.i.AddObjective(sum)
+			v, err := f.r.AddObjective(sum)
 			astTestMust(t, err)
 			if v != 0 {
 				t.Fatal(v)
@@ -131,7 +125,7 @@ func TestSMTDiffObjectiveWeightedCoreAndConstants(t *testing.T) {
 			f.assert(f.app(smtArithOpLE, x, f.number("2")))
 			f.assert(f.app(smtArithOpLE, y, f.number("3")))
 			term := f.app(smtArithOpAdd, f.app(smtArithOpMul, f.number("2"), x), f.app(smtArithOpMul, y, f.number("3")), f.number("7"))
-			v, err := f.i.AddObjective(term)
+			v, err := f.r.AddObjective(term)
 			astTestMust(t, err)
 			value, blocker := f.maximize(v)
 			checkArithmeticObjective(t, value, "20", "0")
@@ -144,7 +138,7 @@ func TestSMTDiffObjectiveWeightedCoreAndConstants(t *testing.T) {
 			if len(core) != 2 {
 				t.Fatal("weighted core", len(core))
 			}
-			ge, err := f.i.MakeObjectiveLowerBound(nil, v, value.Finite)
+			ge, err := f.r.MakeObjectiveLowerBound(nil, v, value.Finite)
 			astTestMust(t, err)
 			ge = f.pin(ge, nil)
 			op, _, err = f.s.basicOperation(ge)
@@ -154,11 +148,7 @@ func TestSMTDiffObjectiveWeightedCoreAndConstants(t *testing.T) {
 			}
 			// value() uses the objective index as graph node in this source revision.
 			var current SMTArithmeticObjectiveValue
-			if f.r != nil {
-				current, err = f.r.ObjectiveValue(v)
-			} else {
-				current, err = f.i.ObjectiveValue(v)
-			}
+			current, err = f.r.ObjectiveValue(v)
 			astTestMust(t, err)
 			checkArithmeticObjective(t, current, "7", "0")
 		})
@@ -169,9 +159,9 @@ func TestSMTDiffObjectiveStrictRealAndUnbounded(t *testing.T) {
 	x := f.variable("diff-strict-x")
 	y := f.variable("diff-unbounded-y")
 	f.assert(f.pin(f.m.MkNot(f.app(smtArithOpGE, x, f.number("5")))))
-	v, err := f.i.AddObjective(x)
+	v, err := f.r.AddObjective(x)
 	astTestMust(t, err)
-	w, err := f.i.AddObjective(y)
+	w, err := f.r.AddObjective(y)
 	astTestMust(t, err)
 	value, blocker := f.maximize(v)
 	checkArithmeticObjective(t, value, "5", "-1")
@@ -180,7 +170,7 @@ func TestSMTDiffObjectiveStrictRealAndUnbounded(t *testing.T) {
 	if !own || op != smtArithOpGE {
 		t.Fatal("strict supremum blocker", op)
 	}
-	ge, err := f.i.MakeObjectiveLowerBound(nil, v, value.Finite)
+	ge, err := f.r.MakeObjectiveLowerBound(nil, v, value.Finite)
 	astTestMust(t, err)
 	ge = f.pin(ge, nil)
 	if len(f.i.optimization.objectives[v].core) != 1 {
@@ -200,7 +190,7 @@ func TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies(t *testing.T) {
 	f := newDiffObjectiveFixture(t, false)
 	x := f.variable("diff-compiler-x")
 	product := f.app(smtArithOpMul, f.number("2"), f.app(smtArithOpAdd, x, f.number("3")))
-	v, err := f.i.AddObjective(product)
+	v, err := f.r.AddObjective(product)
 	astTestMust(t, err)
 	o := &f.i.optimization.objectives[v]
 	if len(o.terms) != 1 || o.terms[0].coefficient.Cmp(big.NewRat(2, 1)) != 0 || o.constant.Cmp(big.NewRat(3, 1)) != 0 {
@@ -210,7 +200,7 @@ func TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies(t *testing.T) {
 	// compiler refuses arithmetic-family leaves beyond numeral/add/mul.
 	for _, h := range []ast.ASTHandle{f.app(smtArithOpUMinus, x), f.app(smtArithOpSub, x, f.number("1")), f.app(smtArithOpMul, x, x)} {
 		before := len(f.i.optimization.objectives)
-		got, err := f.i.AddObjective(h)
+		got, err := f.r.AddObjective(h)
 		astTestMust(t, err)
 		if got != SMTNullTheoryVar || len(f.i.optimization.objectives) != before {
 			t.Fatal("rejected objective was published")
@@ -228,7 +218,7 @@ func TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies(t *testing.T) {
 	if _, _, _, err := f.r.MaximizeObjective(SMTNullTheoryVar); !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal(err)
 	}
-	if _, err := f.i.MakeObjectiveLowerBound(nil, SMTNullTheoryVar, simplex.Infinitesimal{}); !errors.Is(err, ast.ErrASTDomain) {
+	if _, err := f.r.MakeObjectiveLowerBound(nil, SMTNullTheoryVar, simplex.Infinitesimal{}); !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal(err)
 	}
 }
@@ -323,7 +313,7 @@ func TestSMTDiffObjectiveResourceStopPreservesNativeInfinityConvention(t *testin
 	f := newDiffObjectiveFixture(t, false)
 	x := f.variable("diff-stop-x")
 	f.assert(f.app(smtArithOpLE, x, f.number("5")))
-	v, err := f.i.AddObjective(x)
+	v, err := f.r.AddObjective(x)
 	astTestMust(t, err)
 	f.m.Limit.Cancel()
 	value, blocker, shared, err := f.r.MaximizeObjective(v)
@@ -342,18 +332,14 @@ func TestSMTDiffObjectiveCoreOwnsScopedExpressions(t *testing.T) {
 		t.Run(fmt.Sprint(integer), func(t *testing.T) {
 			f := newDiffObjectiveFixture(t, integer)
 			x := f.variable("diff-owned-core-x")
-			v, err := f.i.AddObjective(f.app(smtArithOpMul, f.number("2"), x))
+			v, err := f.r.AddObjective(f.app(smtArithOpMul, f.number("2"), x))
 			astTestMust(t, err)
 			astTestMust(t, f.s.PushScope())
 			bound, err := f.m.MkFamilyApp(f.family, smtArithOpLE, nil, []ast.ASTHandle{x, f.number("7")})
 			astTestMust(t, err)
 			f.assert(bound)
 			var blocker ast.ASTHandle
-			if f.r != nil {
-				_, blocker, _, err = f.r.MaximizeObjective(v)
-			} else {
-				_, blocker, _, err = f.i.MaximizeObjective(v)
-			}
+			_, blocker, _, err = f.r.MaximizeObjective(v)
 			astTestMust(t, err)
 			// Retire the borrowed blocker and its conjunction so they cannot keep the
 			// original bound alive and conceal a missing core-vector reference.
@@ -372,11 +358,11 @@ func TestSMTDiffObjectiveCoreOwnsScopedExpressions(t *testing.T) {
 			if refs != 1 {
 				t.Fatal("saved core should own exactly one remaining bound reference", refs)
 			}
-			astTestMust(t, f.i.Close())
+			astTestMust(t, f.r.Close())
 			if _, err := f.m.GetKind(bound); err == nil {
 				t.Fatal("saved core declaration survived its last owner")
 			}
-			astTestMust(t, f.i.Close())
+			astTestMust(t, f.r.Close())
 		})
 	}
 }
@@ -388,9 +374,9 @@ func TestSMTDiffObjectiveNegativeAndReversedDifferenceBlockers(t *testing.T) {
 			y := f.variable("diff-negative-y")
 			minus := f.app(smtArithOpMul, f.number("-1"), x)
 			reversed := f.app(smtArithOpAdd, minus, y)
-			v, err := f.i.AddObjective(minus)
+			v, err := f.r.AddObjective(minus)
 			astTestMust(t, err)
-			w, err := f.i.AddObjective(reversed)
+			w, err := f.r.AddObjective(reversed)
 			astTestMust(t, err)
 			f.assert(f.app(smtArithOpGE, x, f.number("-2")))
 			f.assert(f.app(smtArithOpLE, y, f.number("3")))
@@ -428,7 +414,7 @@ func TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows(t *testing.T) {
 		t.Run(fmt.Sprint(integer), func(t *testing.T) {
 			f := newDiffObjectiveFixture(t, integer)
 			x := f.variable("diff-incremental-x")
-			v, err := f.i.AddObjective(x)
+			v, err := f.r.AddObjective(x)
 			astTestMust(t, err)
 			f.assert(f.app(smtArithOpLE, x, f.number("7")))
 			value, _ := f.maximize(v)
@@ -442,14 +428,9 @@ func TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows(t *testing.T) {
 			}
 			variable := f.s.context.enodes[x].TheoryVar(f.family)
 			var point *big.Rat
-			if f.r != nil {
-				a, err := f.r.realGraph.Assignment(int32(variable))
-				astTestMust(t, err)
-				point = &a.rational
-			} else {
-				point, err = f.i.graph.Assignment(int32(variable))
-				astTestMust(t, err)
-			}
+			a, err := f.r.realGraph.Assignment(int32(variable))
+			astTestMust(t, err)
+			point = &a.rational
 			if point.Cmp(big.NewRat(3, 1)) != 0 {
 				t.Fatal("incremental optimized assignment does not match its value", point)
 			}
