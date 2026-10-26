@@ -129,7 +129,6 @@ func (t *SMTLinearArithmeticTheory) propagateFixedEquality(solver *simplex.Solve
 // Derive bounds through canonical equality and comparison rows. The caller
 // owns replay and records only bounds supported by unconditional assertions.
 func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex.Solver) (bool, error) {
-	var manager smtArithmeticBoundDependencyManager
 	for column := uint32(0); column < solver.NumVariables(); column++ {
 		row, basic := solver.BasicRow(column)
 		if !basic {
@@ -143,52 +142,49 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex
 			continue
 		} // Source default max_lemma_size.
 		for _, target := range entries {
-			interval, err := newSMTOldIntervalPoint(&manager, new(big.Rat), nil, nil)
-			if err != nil {
-				return false, err
-			}
-			for _, other := range entries {
-				if other.Variable == target.Variable {
-					continue
-				}
-				value, err := t.nonlinearColumnInterval(solver, other.Variable, &manager)
-				if err != nil {
-					return false, err
-				}
-				scalar, err := newSMTOldIntervalPoint(&manager, other.Coefficient, nil, nil)
-				if err != nil {
-					return false, err
-				}
-				if err = value.mul(scalar); err != nil {
-					return false, err
-				}
-				if err = interval.add(value); err != nil {
-					return false, err
-				}
-			}
-			coefficient := new(big.Rat).Quo(big.NewRat(-1, 1), target.Coefficient)
-			scalar, err := newSMTOldIntervalPoint(&manager, coefficient, nil, nil)
-			if err != nil {
-				return false, err
-			}
-			if err = interval.mul(scalar); err != nil {
-				return false, err
-			}
-			var explanations [2]*smtArithmeticBoundExplanation
-			for i, lower := range []bool{true, false} {
+			for _, lower := range []bool{true, false} {
+				var bound simplex.Infinitesimal
 				var uses []simplex.ArithmeticBoundUse
+				finite := true
 				for _, other := range entries {
 					if other.Variable == target.Variable {
 						continue
 					}
 					coefficient := new(big.Rat).Neg(new(big.Rat).Quo(other.Coefficient, target.Coefficient))
-					uses = append(uses, simplex.ArithmeticBoundUse{Column: other.Variable, Lower: lower == (coefficient.Sign() > 0), Coefficient: *coefficient})
+					useLower := lower == (coefficient.Sign() > 0)
+					endpoint, exists := solver.Upper(other.Variable)
+					if useLower {
+						endpoint, exists = solver.Lower(other.Variable)
+					}
+					if !exists {
+						finite = false
+						break
+					}
+					// Linear row arithmetic operates on inf_numeral, preserving the
+					// coefficient and sign of epsilon. Rational interval projection can
+					// strengthen a bound such as 5-epsilon to 5 and invent an equality.
+					bound.Main.Add(&bound.Main, new(big.Rat).Mul(coefficient, &endpoint.Main))
+					bound.Epsilon.Add(&bound.Epsilon, new(big.Rat).Mul(coefficient, &endpoint.Epsilon))
+					uses = append(uses, simplex.ArithmeticBoundUse{Column: other.Variable, Lower: useLower, Coefficient: *coefficient})
 				}
-				explanations[i] = smtArithmeticWeightedBoundExplanation(solver, uses)
-			}
-			_, conflict := t.updateArithmeticBoundsWithExplanations(solver, target.Variable, interval, explanations)
-			if conflict {
-				return true, nil
+				if !finite {
+					continue
+				}
+				if t.integer || t.integerColumns[target.Variable] {
+					integer := floorSMTRational(&bound.Main)
+					if lower && (!bound.Main.IsInt() || bound.Epsilon.Sign() > 0) {
+						integer.Add(integer, big.NewInt(1))
+					} else if !lower && bound.Main.IsInt() && bound.Epsilon.Sign() < 0 {
+						integer.Sub(integer, big.NewInt(1))
+					}
+					bound.Main.SetInt(integer)
+					bound.Epsilon.SetInt64(0)
+				}
+				explanation := smtArithmeticWeightedBoundExplanation(solver, uses)
+				if _, err := smtTightenReplaySimplexBound(solver, target.Variable, lower, bound, explanation); err != nil {
+					t.recordArithmeticBoundConflict(solver, target.Variable, lower, explanation)
+					return true, nil
+				}
 			}
 		}
 	}

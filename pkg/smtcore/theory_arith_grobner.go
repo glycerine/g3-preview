@@ -68,6 +68,11 @@ func (t *SMTLinearArithmeticTheory) grobnerMonomial(gb *grobner.Solver, solver *
 }
 
 func (t *SMTLinearArithmeticTheory) assertGrobnerForm(gb *grobner.Solver, solver *simplex.Solver, aliases map[uint32]ast.ASTHandle, form *smtLinearForm, dependencies *smtGrobnerDependencies, premises ...SMTLiteral) (err error) {
+	// Grobner rows have rational coefficients. A nonstandard fixed point
+	// cannot be projected to its rational part as an asserted equation.
+	if form.infinitesimal.Sign() != 0 {
+		return nil
+	}
 	monomials := make([]*grobner.Monomial, 0, len(form.terms)+1)
 	var fixedColumns []uint32
 	defer func() {

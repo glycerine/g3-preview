@@ -79,6 +79,9 @@ func (t *SMTLinearArithmeticTheory) isIntegerExpression(expression ast.ASTHandle
 // The constant is moved to the bound. Integral coefficients on integral
 // columns make the remaining polynomial integer-valued even in a Real atom.
 func (t *SMTLinearArithmeticTheory) integralAtom(atom *smtLinearArithmeticAtom) bool {
+	if atom.native != nil {
+		return t.integer || t.integerColumns[t.simplexVariables[atom.native.variable]]
+	}
 	if t.integer {
 		return true
 	}

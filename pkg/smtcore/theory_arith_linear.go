@@ -19,8 +19,8 @@ import (
 )
 
 type smtLinearForm struct {
-	constant big.Rat
-	terms    map[uint32]*big.Rat
+	constant, infinitesimal big.Rat
+	terms                   map[uint32]*big.Rat
 }
 
 func newSMTLinearForm() smtLinearForm { return smtLinearForm{terms: make(map[uint32]*big.Rat)} }
@@ -28,6 +28,7 @@ func newSMTLinearForm() smtLinearForm { return smtLinearForm{terms: make(map[uin
 func (f *smtLinearForm) clone() smtLinearForm {
 	result := newSMTLinearForm()
 	result.constant.Set(&f.constant)
+	result.infinitesimal.Set(&f.infinitesimal)
 	for variable, coefficient := range f.terms {
 		result.terms[variable] = new(big.Rat).Set(coefficient)
 	}
@@ -50,6 +51,7 @@ func (f *smtLinearForm) addTerm(variable uint32, coefficient *big.Rat) {
 
 func (f *smtLinearForm) add(other *smtLinearForm) {
 	f.constant.Add(&f.constant, &other.constant)
+	f.infinitesimal.Add(&f.infinitesimal, &other.infinitesimal)
 	for variable, coefficient := range other.terms {
 		f.addTerm(variable, coefficient)
 	}
@@ -57,6 +59,7 @@ func (f *smtLinearForm) add(other *smtLinearForm) {
 
 func (f *smtLinearForm) scale(coefficient *big.Rat) {
 	f.constant.Mul(&f.constant, coefficient)
+	f.infinitesimal.Mul(&f.infinitesimal, coefficient)
 	for variable, value := range f.terms {
 		value.Mul(value, coefficient)
 		if value.Sign() == 0 {
@@ -66,16 +69,19 @@ func (f *smtLinearForm) scale(coefficient *big.Rat) {
 }
 
 type smtLinearArithmeticAtom struct {
-	variable  int32
-	left      ast.ASTHandle
-	right     ast.ASTHandle
-	form      smtLinearForm
-	op        int32
-	supported bool
-	nonlinear bool
-	decided   bool
-	required  bool
-	truth     bool
+	native       *smtArithmeticAtom
+	nativeOffset big.Rat
+	boundAxiom   *smtArithmeticBoundAxiomAtom
+	variable     int32
+	left         ast.ASTHandle
+	right        ast.ASTHandle
+	form         smtLinearForm
+	op           int32
+	supported    bool
+	nonlinear    bool
+	decided      bool
+	required     bool
+	truth        bool
 }
 
 type smtLinearArithmeticScope struct {
@@ -116,6 +122,7 @@ type smtLinearArithmeticStatistics struct {
 // bounds. The tableau is replayed after scope pops because math/simplex owns no
 // logical-context trail.
 type SMTLinearArithmeticTheory struct {
+	newBoundAtoms                        []int
 	ownEqualities                        []smtArithmeticOwnEquality
 	ownEqualityHead                      int
 	equalityBoundsEnabled                bool
@@ -667,6 +674,9 @@ func (t *SMTLinearArithmeticTheory) InternalizeAtom(expression ast.ASTHandle, _ 
 	if linear {
 		t.statistics.addRows++
 	}
+	if err = t.registerOrdinaryBoundAxiom(len(t.atoms) - 1); err != nil {
+		return false, err
+	}
 	return true, nil
 }
 
@@ -768,10 +778,20 @@ func (t *SMTLinearArithmeticTheory) CanPropagate() bool {
 	// Native internalize_numeral/linear rows immediately initialize their
 	// tableau values. The Go replay must also publish new columns/definitions
 	// when no Boolean arithmetic atom was asserted (for example seq.unit(7)).
-	return t != nil && (t.replayedNextSimplex != t.nextSimplex || t.replayedDefinitions != len(t.definitions) || t.assertionHead < len(t.assertions) || t.pendingBoundHead < len(t.pendingBounds) || t.ownEqualityHead < len(t.ownEqualities))
+	return t != nil && (len(t.newBoundAtoms) != 0 || t.replayedNextSimplex != t.nextSimplex || t.replayedDefinitions != len(t.definitions) || t.assertionHead < len(t.assertions) || t.pendingBoundHead < len(t.pendingBounds) || t.ownEqualityHead < len(t.ownEqualities))
 }
 
 func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (lower bool, value simplex.Infinitesimal) {
+	if atom.native != nil {
+		epsilon := newSMTArithmeticValue(nil, big.NewRat(1, 1))
+		if integer {
+			epsilon = newSMTArithmeticValue(big.NewRat(1, 1), nil)
+		}
+		_ = atom.native.assign(truth, &epsilon)
+		value.Main.Sub(&atom.native.value.rational, &atom.nativeOffset)
+		value.Epsilon.Set(&atom.native.value.infinitesimal)
+		return atom.native.kind == smtArithmeticLowerBound, value
+	}
 	value.Main.Neg(&atom.form.constant)
 	op := smtLinearEffectiveOp(atom.op, truth)
 	lower = op == smtArithOpGE || op == smtArithOpGT
@@ -826,6 +846,10 @@ func smtLinearFormsOpposite(first, second *smtLinearForm) bool {
 	if first.constant.Cmp(&constant) != 0 {
 		return false
 	}
+	constant.Neg(&second.infinitesimal)
+	if first.infinitesimal.Cmp(&constant) != 0 {
+		return false
+	}
 	for variable, coefficient := range first.terms {
 		other := second.terms[variable]
 		if other == nil {
@@ -840,7 +864,7 @@ func smtLinearFormsOpposite(first, second *smtLinearForm) bool {
 }
 
 func smtLinearFormsEqual(first, second *smtLinearForm) bool {
-	if first == nil || second == nil || len(first.terms) != len(second.terms) || first.constant.Cmp(&second.constant) != 0 {
+	if first == nil || second == nil || len(first.terms) != len(second.terms) || first.constant.Cmp(&second.constant) != 0 || first.infinitesimal.Cmp(&second.infinitesimal) != 0 {
 		return false
 	}
 	for variable, coefficient := range first.terms {
@@ -912,6 +936,16 @@ func (t *SMTLinearArithmeticTheory) propagateEqualityWithParameters(state *SMTIn
 }
 
 func smtLinearNormalizedLE(atom *smtLinearArithmeticAtom, assertion smtIntegerDiffAssertion) (smtLinearForm, bool) {
+	if atom.native != nil {
+		lower, value := smtLinearAtomBound(atom, assertion.truth, atom.boundAxiom.integral)
+		form := atom.form.clone()
+		form.constant.Neg(&value.Main)
+		form.infinitesimal.Neg(&value.Epsilon)
+		if lower {
+			form.scale(big.NewRat(-1, 1))
+		}
+		return form, true
+	}
 	op := smtLinearEffectiveOp(atom.op, assertion.truth)
 	if !atom.supported || op != smtArithOpLE && op != smtArithOpGE {
 		return smtLinearForm{}, false
@@ -937,7 +971,7 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 		if !firstOK {
 			continue
 		}
-		if firstForm.constant.Sign() != 0 || len(firstForm.terms) != 2 {
+		if firstForm.constant.Sign() != 0 || firstForm.infinitesimal.Sign() != 0 || len(firstForm.terms) != 2 {
 			continue
 		}
 		for _, secondAssertion := range t.assertions[firstIndex+1:] {
@@ -972,7 +1006,7 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 	}
 	type fixedVariable struct {
 		variable uint32
-		value    big.Rat
+		value    simplex.Infinitesimal
 		literals []SMTLiteral
 	}
 	fixed := make([]fixedVariable, 0)
@@ -989,9 +1023,8 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 				continue
 			}
 			for variable, coefficient := range firstForm.terms {
-				var value big.Rat
-				value.Neg(&firstForm.constant)
-				value.Quo(&value, coefficient)
+				value := simplex.NewInfinitesimal(new(big.Rat).Neg(&firstForm.constant), new(big.Rat).Neg(&firstForm.infinitesimal))
+				value.Quo(coefficient)
 				fixed = append(fixed, fixedVariable{variable: variable, value: value, literals: []SMTLiteral{
 					smtLinearAssertionLiteral(firstAtom, firstAssertion),
 					smtLinearAssertionLiteral(secondAtom, secondAssertion),
@@ -1038,12 +1071,14 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 					continue
 				}
 				var contribution big.Rat
-				contribution.Mul(coefficient, &value.value)
+				contribution.Mul(coefficient, &value.value.Main)
 				remaining.constant.Add(&remaining.constant, &contribution)
+				contribution.Mul(coefficient, &value.value.Epsilon)
+				remaining.infinitesimal.Add(&remaining.infinitesimal, &contribution)
 				delete(remaining.terms, value.variable)
 				literals = append(literals, value.literals...)
 			}
-			if remaining.constant.Sign() != 0 || len(remaining.terms) != 2 {
+			if remaining.constant.Sign() != 0 || remaining.infinitesimal.Sign() != 0 || len(remaining.terms) != 2 {
 				continue
 			}
 			variables := make([]uint32, 0, 2)
@@ -1332,6 +1367,9 @@ func (t *SMTLinearArithmeticTheory) Propagate() error {
 	if err != nil {
 		return err
 	}
+	if err = t.flushBoundAxioms(); err != nil {
+		return err
+	}
 	if err = t.replayOwnEqualities(); err != nil {
 		return err
 	}
@@ -1405,6 +1443,7 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 		delete(t.atomByBool, t.atoms[index-1].variable)
 	}
 	t.atoms = t.atoms[:scope.atoms]
+	t.newBoundAtoms = nil // Source pop_scope_eh clears even unflushed parent atoms.
 	t.assertions = t.assertions[:scope.assertions]
 	t.assertionHead = scope.head
 	t.unsupported = scope.unsupported
@@ -1491,7 +1530,7 @@ func (t *SMTLinearArithmeticTheory) fixedLinearAssignments() map[uint32]smtFixed
 	for firstIndex, firstAssertion := range t.assertions {
 		firstAtom := &t.atoms[firstAssertion.atom]
 		firstForm, firstOK := smtLinearNormalizedLE(firstAtom, firstAssertion)
-		if !firstOK || len(firstForm.terms) != 1 {
+		if !firstOK || firstForm.infinitesimal.Sign() != 0 || len(firstForm.terms) != 1 {
 			continue
 		}
 		for _, secondAssertion := range t.assertions[firstIndex+1:] {
@@ -1609,6 +1648,36 @@ func (t *SMTLinearArithmeticTheory) linearVariableIntervals() (*smtPolynomialInt
 	for _, assertion := range t.assertions {
 		atom := &t.atoms[assertion.atom]
 		if !atom.supported || len(atom.form.terms) != 1 {
+			continue
+		}
+		if atom.native != nil {
+			lower, value := smtLinearAtomBound(atom, assertion.truth, t.integralAtom(atom))
+			for variable, coefficient := range atom.form.terms {
+				value.Quo(coefficient)
+				lower = lower == (coefficient.Sign() > 0)
+				// A rational interval can represent ordinary strict endpoints,
+				// but cannot project a lower r-epsilon or upper r+epsilon
+				// onto r without strengthening it. Keep those endpoints in
+				// the exact tableau and omit this rational-only shortcut.
+				if lower && value.Epsilon.Sign() < 0 || !lower && value.Epsilon.Sign() > 0 {
+					continue
+				}
+				open := value.Epsilon.Sign() != 0
+				entry := bounds[variable]
+				if entry == nil {
+					entry = &endpoints{}
+					bounds[variable] = entry
+				}
+				if lower {
+					if entry.lower == nil || value.Main.Cmp(entry.lower) > 0 || value.Main.Cmp(entry.lower) == 0 && open {
+						entry.lower = new(big.Rat).Set(&value.Main)
+						entry.lowerOpen = open
+					}
+				} else if entry.upper == nil || value.Main.Cmp(entry.upper) < 0 || value.Main.Cmp(entry.upper) == 0 && open {
+					entry.upper = new(big.Rat).Set(&value.Main)
+					entry.upperOpen = open
+				}
+			}
 			continue
 		}
 		op := smtLinearEffectiveOp(atom.op, assertion.truth)

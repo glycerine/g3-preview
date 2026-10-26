@@ -115697,7 +115697,12 @@
         "pkg/smtcore/theory_arith_equality_bounds_test.go",
         "pkg/smtcore/smt_model_update.go",
         "pkg/smtcore/smt_model_update_test.go",
-        "pkg/smtcore/test_vectors/arithmetic_model_refresh.smt2"
+        "pkg/smtcore/test_vectors/arithmetic_model_refresh.smt2",
+        "pkg/smtcore/theory_arith_objective_bound.go",
+        "pkg/smtcore/theory_arith_bound_axioms.go",
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/theory_arith_grobner.go",
+        "pkg/smtcore/theory_arith_mixed.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -115878,7 +115883,9 @@
         "TestSMTUpdateModelSharedArithmeticRequestsContinuation",
         "TestSMTUpdateModelFinalCheckStatusesAndErrors",
         "TestSMTUpdateModelRequiresModelEnabledSATResult",
-        "TestSMTUpdateModelNativePublishedValues"
+        "TestSMTUpdateModelNativePublishedValues",
+        "pkg/smtcore/theory_arith_objective_bound_test.go",
+        "pkg/smtcore/theory_arith_bound_axioms_test.go"
       ],
       "conditionals": [
         {
@@ -117659,7 +117666,8 @@
             "TestSMTUpdateModelRequiresModelEnabledSATResult",
             "TestSMTUpdateModelNativePublishedValues"
           ]
-        }
+        },
+        {"name": "Parameter-bearing arithmetic bound axiom publication retains the original region justification through resolution wrappers and releases copied Farkas parameters at logical scope pop, including allocation refusal and retry.", "status": "ported", "go_targets": ["pkg/smtcore/theory_arith_objective_bound.go", "pkg/smtcore/theory_arith_bound_axioms.go", "pkg/smtcore/theory_arith_linear.go", "pkg/smtcore/theory_arith_fixed_bounds.go", "pkg/smtcore/theory_arith_grobner.go", "pkg/smtcore/theory_arith_mixed.go", "pkg/smtcore/smt_internalizer.go"], "tests": ["TestSMTObjectiveLowerBoundExistingBooleanAndDomains", "TestSMTObjectiveLowerBoundIntegralRealCastUsesUnitStep", "TestSMTObjectiveLowerBoundRecoversSharedOptimization", "TestSMTObjectiveLowerBoundThresholdAndComplement", "TestSMTObjectiveLowerBoundCompoundOffsetAndName", "TestSMTObjectiveLowerBoundSolverScopesAndModelFilter", "TestSMTObjectiveLowerBoundRejectsImproperSupremum", "TestSMTArithmeticBoundAxiomAllocationFrontiersAndRetry", "TestSMTArithmeticBoundAxiomsKindsAndIntegerAdjacency", "TestSMTArithmeticBoundAxiomsNearestNeighborsAndAxisIdentity", "TestSMTArithmeticBoundAxiomProofParametersAndScopeOwnership"]}
       ],
       "ownership": [
         "The internalizer owns assignment queue values and borrows clause pointers from its owned clause records.",
@@ -117682,7 +117690,8 @@
         "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit.",
         "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced.",
         "SetTheoryConflict and arithmetic equality-conflict publication now register completed parameter-owning justifications with ownedJustifications before exposing the conflict. The existing scope limit and reverse pop destruction release copied parameters before enodes are unregistered. Caller-owned parameters may be released immediately after successful publication; an outer conflict stays live through a nested push/pop, and an already-inconsistent report does not construct or register a replacement. Failed parameter-copy prefixes are released and no conflict is published. No allocator behavior or generic adapter is introduced.",
-        "Model refresh borrows the existing feasible theory assignment, completes a new generator/model with its own kernel reference before replacing the previous publication, and updates the concrete solver result reference only on success. Acquired old model owners retain independent interpretations. A stale accepted MBQI generator is closed instead of reused after theory assignment movement. The ordinary search builder shares only final model construction/recursive-function publication and preserves its existing accepted-candidate fast path. Allocation-frontier tests cross actual model-owner reservations through success, require unchanged old publication on refusal, retry successfully and close fixture owner graphs to zero budget."
+        "Model refresh borrows the existing feasible theory assignment, completes a new generator/model with its own kernel reference before replacing the previous publication, and updates the concrete solver result reference only on success. Acquired old model owners retain independent interpretations. A stale accepted MBQI generator is closed instead of reused after theory assignment movement. The ordinary search builder shares only final model construction/recursive-function publication and preserves its existing accepted-candidate fast path. Allocation-frontier tests cross actual model-owner reservations through success, require unchanged old publication on refusal, retry successfully and close fixture owner graphs to zero budget.",
+        "Generated bound ASTs are borrowed from the Boolean internalizer; the filter converter owns its declaration references. Stored threshold and offset rationals are copied. Numeric atoms remain registered on axiom-allocation refusal and deferred batches retry. Parameter-bearing axiom justifications have a logical-scope owner even when a clause holds a resolution wrapper. Tests verify actual cold parameter allocation refusal, recovery and zero-budget fixture teardown."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -117715,7 +117724,8 @@
         "The kernel records the exact eager constructor sequence placeholder. Deferred setup may replace only that unused plugin, keeping registry order and closing its owners; explicitly registered String/Sequence plugins are preserved as in native register_plugin. Existing concrete String kernel model/oracle fixtures verify preservation. This does not claim all plugin-copy lifecycle work complete.",
         "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths.",
         "The previously recorded opposite-valued symbolic-power candidate mismatch is resolved by preserving native arithmetic final_check_core ordering: finish the integer/shared-equality/nonlinear round before unsupported-operation give-up. The expanded registered candidate-model CLI script now queries f(a)=true, f(b)=false and a distinct fixed argument across scopes, exactly matching C++. Direct generator fixtures independently verify THEORY-only duplicate suppression and unchanged complete/conflict-limit/quantifier insertion/debug behavior. Full remaining arithmetic and model assembly audits are still open; no source status promotion.",
-        "This ports context::update_model for the retained model-enabled satisfiable optimization sequence, including actual shared-arithmetic continuation and explicit status/error propagation. The concrete Go solver bridge synchronizes its separate SimpleCheckSatResult cache; no generic optimizer adapter is added. Higher opt_solver/optsmt orchestration, nonstandard-bound assertions and SMT-LIB optimization command wiring remain open. Whole context/model/optimization completion is not claimed."
+        "This ports context::update_model for the retained model-enabled satisfiable optimization sequence, including actual shared-arithmetic continuation and explicit status/error propagation. The concrete Go solver bridge synchronizes its separate SimpleCheckSatResult cache; no generic optimizer adapter is added. Higher opt_solver/optsmt orchestration, nonstandard-bound assertions and SMT-LIB optimization command wiring remain open. Whole context/model/optimization completion is not claimed.",
+        "This increment closes the concrete nonstandard mk_ge callback and native bound-axiom subset, not all arithmetic or optimization. Rational-only equality/Grobner shortcuts do not assert equations after discarding a nonzero epsilon; linear row deductions preserve full infinitesimals. General nonnumeral RHS comparisons retain the Go numerical extension without fabricated native axis axioms. Higher opt_solver/optsmt orchestration, mode-5 optimization and SMT-LIB maximize/minimize wiring remain open. Earlier notes listing nonstandard-bound assertion as open are superseded only for this concrete callback."
       ]
     },
     {
@@ -127746,7 +127756,12 @@
         "pkg/smtcore/theory_arith_objective_reference_test.go",
         "pkg/smtcore/test_vectors/arithmetic_objective_real.smt2",
         "pkg/smtcore/test_vectors/arithmetic_objective_integer.smt2",
-        "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2"
+        "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2",
+        "pkg/smtcore/theory_arith_objective_bound.go",
+        "pkg/smtcore/theory_arith_bound_axioms.go",
+        "pkg/smtcore/theory_arith_grobner.go",
+        "pkg/smtcore/theory_arith_mixed.go",
+        "pkg/smtcore/smt_internalizer.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -127790,7 +127805,9 @@
         "TestSMTArithmeticObjectiveBlockerIntegerCeilAndRealCast",
         "TestSMTArithmeticObjectiveIntegerGainsAndCancellation",
         "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
-        "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
+        "TestSMTArithmeticObjectiveDomainsAndScopeLifetime",
+        "pkg/smtcore/theory_arith_objective_bound_test.go",
+        "pkg/smtcore/theory_arith_bound_axioms_test.go"
       ],
       "conditionals": [
         {
@@ -128085,7 +128102,8 @@
             "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
             "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
           ]
-        }
+        },
+        {"name": "mk_ge(filter_model_converter&,theory_var,inf_numeral), concrete mi_ext: exact native Boolean name/reuse guard, filtered helper declaration, full infinitesimal bound and integer unit-step complement; immediate/delayed nearest-neighbor bound axioms, integer adjacent cover, Farkas coefficients and scoped parameter ownership; exact infinitesimal row deductions during shared optimization recovery.", "status": "ported", "go_targets": ["pkg/smtcore/theory_arith_objective_bound.go", "pkg/smtcore/theory_arith_bound_axioms.go", "pkg/smtcore/theory_arith_linear.go", "pkg/smtcore/theory_arith_fixed_bounds.go", "pkg/smtcore/theory_arith_grobner.go", "pkg/smtcore/theory_arith_mixed.go", "pkg/smtcore/smt_internalizer.go"], "tests": ["TestSMTObjectiveLowerBoundExistingBooleanAndDomains", "TestSMTObjectiveLowerBoundIntegralRealCastUsesUnitStep", "TestSMTObjectiveLowerBoundRecoversSharedOptimization", "TestSMTObjectiveLowerBoundThresholdAndComplement", "TestSMTObjectiveLowerBoundCompoundOffsetAndName", "TestSMTObjectiveLowerBoundSolverScopesAndModelFilter", "TestSMTObjectiveLowerBoundRejectsImproperSupremum", "TestSMTArithmeticBoundAxiomAllocationFrontiersAndRetry", "TestSMTArithmeticBoundAxiomsKindsAndIntegerAdjacency", "TestSMTArithmeticBoundAxiomsNearestNeighborsAndAxisIdentity", "TestSMTArithmeticBoundAxiomProofParametersAndScopeOwnership"]}
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
@@ -128094,7 +128112,8 @@
         "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery.",
         "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving.",
         "ModelValue applies the existing concrete exact-rational floor helper to its newly computed candidate rational before constructing the owning expression-wrapper procedure. No integer numeral constructor guard is weakened and no simplex assignment or solver status is changed. Actual arith.ignore_int searches plus C++ CLI comparisons exercise positive/negative half candidates and integral SAT recovery through scopes.",
-        "The concrete arithmetic callbacks borrow the active theory/context/manager and feasible current tableau. Returned finite rational and epsilon components are copied from the tableau; positive infinity is the concrete unbounded maximization result. The returned blocker is a borrowed AST handle whose retaining caller must pin it. Optimum bounds retain existing weighted dependency records through pending/derived scope storage. Objective theory variables have existing scope lifetimes; popped/invalid variables and invalid sorts use the Go domain guard. No AST model cache, universal optimizer interface or duplicate tableau owner is introduced."
+        "The concrete arithmetic callbacks borrow the active theory/context/manager and feasible current tableau. Returned finite rational and epsilon components are copied from the tableau; positive infinity is the concrete unbounded maximization result. The returned blocker is a borrowed AST handle whose retaining caller must pin it. Optimum bounds retain existing weighted dependency records through pending/derived scope storage. Objective theory variables have existing scope lifetimes; popped/invalid variables and invalid sorts use the Go domain guard. No AST model cache, universal optimizer interface or duplicate tableau owner is introduced.",
+        "Generated bound ASTs are borrowed from the Boolean internalizer; the filter converter owns its declaration references. Stored threshold and offset rationals are copied. Numeric atoms remain registered on axiom-allocation refusal and deferred batches retry. Parameter-bearing axiom justifications have a logical-scope owner even when a clause holds a resolution wrapper. Tests verify actual cold parameter allocation refusal, recovery and zero-budget fixture teardown."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
@@ -128102,7 +128121,8 @@
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
         "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial.",
         "Native internalize_numeral initializes exact bounds/value immediately and native linear definitions enter the live tableau. The Go replay now detects newly created columns and definitions even without Boolean arithmetic assertions. Counts describe the successfully replayed tableau; pop rebuilds and synchronizes them. A deterministic old-code regression exposed numeral7 becoming0 in a sequence model. Positive/negative/rational numerals, later constant definitions and repeated scopes now publish exact values; the Seq Int CLI model satisfies its asserted equality against C++. No model-output rewriting or numeral-only patch bypass is used.",
-        "This bounded callback port follows the original theory_arith implementation, not the separate theory_lra LP specialization. Direct real SMT solver tests check optimum improvement blockers are UNSAT and pop restores SAT. Three prebuilt C++ optimization-shell scripts independently check the same strict epsilon coefficient, integer optimum, coupled rational optimum and scope recovery; these vectors are not registered as supported Go CLI maximize commands. Only lexical whitespace is canonicalized in the native output oracle. Whole arithmetic/optimization completion remains unproven."
+        "This bounded callback port follows the original theory_arith implementation, not the separate theory_lra LP specialization. Direct real SMT solver tests check optimum improvement blockers are UNSAT and pop restores SAT. Three prebuilt C++ optimization-shell scripts independently check the same strict epsilon coefficient, integer optimum, coupled rational optimum and scope recovery; these vectors are not registered as supported Go CLI maximize commands. Only lexical whitespace is canonicalized in the native output oracle. Whole arithmetic/optimization completion remains unproven.",
+        "This increment closes the concrete nonstandard mk_ge callback and native bound-axiom subset, not all arithmetic or optimization. Rational-only equality/Grobner shortcuts do not assert equations after discarding a nonzero epsilon; linear row deductions preserve full infinitesimals. General nonnumeral RHS comparisons retain the Go numerical extension without fabricated native axis axioms. Higher opt_solver/optsmt orchestration, mode-5 optimization and SMT-LIB maximize/minimize wiring remain open. Earlier notes listing nonstandard-bound assertion as open are superseded only for this concrete callback."
       ]
     },
     {
@@ -128147,7 +128167,13 @@
         "pkg/smtcore/theory_arith_objective_reference_test.go",
         "pkg/smtcore/test_vectors/arithmetic_objective_real.smt2",
         "pkg/smtcore/test_vectors/arithmetic_objective_integer.smt2",
-        "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2"
+        "pkg/smtcore/test_vectors/arithmetic_objective_coupled.smt2",
+        "pkg/smtcore/theory_arith_objective_bound.go",
+        "pkg/smtcore/theory_arith_bound_axioms.go",
+        "pkg/smtcore/theory_arith_linear.go",
+        "pkg/smtcore/theory_arith_grobner.go",
+        "pkg/smtcore/theory_arith_mixed.go",
+        "pkg/smtcore/smt_internalizer.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -128193,7 +128219,9 @@
         "TestSMTArithmeticObjectiveBlockerIntegerCeilAndRealCast",
         "TestSMTArithmeticObjectiveIntegerGainsAndCancellation",
         "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
-        "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
+        "TestSMTArithmeticObjectiveDomainsAndScopeLifetime",
+        "pkg/smtcore/theory_arith_objective_bound_test.go",
+        "pkg/smtcore/theory_arith_bound_axioms_test.go"
       ],
       "conditionals": [
         {
@@ -128771,12 +128799,14 @@
             "TestSMTArithmeticObjectiveSolverBlockerAndScopeRecovery",
             "TestSMTArithmeticObjectiveDomainsAndScopeLifetime"
           ]
-        }
+        },
+        {"name": "mk_ge(filter_model_converter&,theory_var,inf_numeral), concrete mi_ext: exact native Boolean name/reuse guard, filtered helper declaration, full infinitesimal bound and integer unit-step complement; immediate/delayed nearest-neighbor bound axioms, integer adjacent cover, Farkas coefficients and scoped parameter ownership; exact infinitesimal row deductions during shared optimization recovery.", "status": "ported", "go_targets": ["pkg/smtcore/theory_arith_objective_bound.go", "pkg/smtcore/theory_arith_bound_axioms.go", "pkg/smtcore/theory_arith_linear.go", "pkg/smtcore/theory_arith_fixed_bounds.go", "pkg/smtcore/theory_arith_grobner.go", "pkg/smtcore/theory_arith_mixed.go", "pkg/smtcore/smt_internalizer.go"], "tests": ["TestSMTObjectiveLowerBoundExistingBooleanAndDomains", "TestSMTObjectiveLowerBoundIntegralRealCastUsesUnitStep", "TestSMTObjectiveLowerBoundRecoversSharedOptimization", "TestSMTObjectiveLowerBoundThresholdAndComplement", "TestSMTObjectiveLowerBoundCompoundOffsetAndName", "TestSMTObjectiveLowerBoundSolverScopesAndModelFilter", "TestSMTObjectiveLowerBoundRejectsImproperSupremum", "TestSMTArithmeticBoundAxiomAllocationFrontiersAndRetry", "TestSMTArithmeticBoundAxiomsKindsAndIntegerAdjacency", "TestSMTArithmeticBoundAxiomsNearestNeighborsAndAxisIdentity", "TestSMTArithmeticBoundAxiomProofParametersAndScopeOwnership"]}
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
         "Exact optimization bounds, including shared-column optima, retain immutable owning explanations in a scoped pending queue. Consumed prefixes remain available when a child pop restores the parent propagation head. Logical tableau replay seeds retained original column values without copying temporary model bounds or their premises; nonbasic seeds are clamped to logical endpoints and basic values follow their rows. The shared_bound_queue.smt2 C++ comparison exercises a valid child assignment retained after scope pop.",
-        "The concrete arithmetic callbacks borrow the active theory/context/manager and feasible current tableau. Returned finite rational and epsilon components are copied from the tableau; positive infinity is the concrete unbounded maximization result. The returned blocker is a borrowed AST handle whose retaining caller must pin it. Optimum bounds retain existing weighted dependency records through pending/derived scope storage. Objective theory variables have existing scope lifetimes; popped/invalid variables and invalid sorts use the Go domain guard. No AST model cache, universal optimizer interface or duplicate tableau owner is introduced."
+        "The concrete arithmetic callbacks borrow the active theory/context/manager and feasible current tableau. Returned finite rational and epsilon components are copied from the tableau; positive infinity is the concrete unbounded maximization result. The returned blocker is a borrowed AST handle whose retaining caller must pin it. Optimum bounds retain existing weighted dependency records through pending/derived scope storage. Objective theory variables have existing scope lifetimes; popped/invalid variables and invalid sorts use the Go domain guard. No AST model cache, universal optimizer interface or duplicate tableau owner is introduced.",
+        "Generated bound ASTs are borrowed from the Boolean internalizer; the filter converter owns its declaration references. Stored threshold and offset rationals are copied. Numeric atoms remain registered on axiom-allocation refusal and deferred batches retry. Parameter-bearing axiom justifications have a logical-scope owner even when a clause holds a resolution wrapper. Tests verify actual cold parameter allocation refusal, recovery and zero-budget fixture teardown."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
@@ -128785,7 +128815,8 @@
         "The retained nonlinear max/min path and concrete arithmetic optimization callbacks use the same temporary canonical objective row, removed on return, with raw matrix pivot coefficients normalized for source gain formulas. The arithmetic callback now reaches the source maintain_integrality=true path over a feasible checked assignment, using existing integer-column gain guards and shared-column tracking. Higher opt_solver/optsmt orchestration, use of the newly ported concrete context/solver model refresh, and SMT-LIB optimization command integration remain unported; complete optimization support is not claimed.",
         "The retained shared-equality candidate queue now groups relevant same-sort shared arithmetic variables by both rational and infinitesimal components. Equal model values introduce preferred relevant Boolean equality case splits, never theory equality consequences. The queue and head follow arithmetic scopes, and preferred phases on existing Boolean variables are separately trailed. Auxiliary arithmetic bounds inherit the preferred phase when created. Integer and real regressions validate distinct UF arguments in returned models, inequality cycles that force equality, proofs, and repeated scope restoration. Liberal assignment mutation and the three-stage final-check scheduler are recorded below.",
         "The source freedom intervals and random assignment mutation now separate equal-valued shared terms when the current tableau permits it. Integer movement rounds open endpoints and respects the LCM of normalized integer-base coefficient denominators. Fixed basic columns are pivoted out before selecting candidate dependencies. Arithmetic final checking now rotates scoped integer-feasibility, shared-equality, and nonlinear stages; a liberal pass may change values, then a conservative pass rechecks all stages without further random mutation. Actual stage-boundary assignment changes advance the Go numeric progress generation. Tests verify unshared equality atoms are not introduced for freely separable inputs, immovable equality cycles still require interface splits, and scope restoration, integer models and proofs remain valid. The replay representation observes assignment changes at stage boundaries rather than implementing the source internal value-update trail; detailed integer feasibility and remaining nonlinear algorithms are still partial.",
-        "This bounded callback port follows the original theory_arith implementation, not the separate theory_lra LP specialization. Direct real SMT solver tests check optimum improvement blockers are UNSAT and pop restores SAT. Three prebuilt C++ optimization-shell scripts independently check the same strict epsilon coefficient, integer optimum, coupled rational optimum and scope recovery; these vectors are not registered as supported Go CLI maximize commands. Only lexical whitespace is canonicalized in the native output oracle. Whole arithmetic/optimization completion remains unproven."
+        "This bounded callback port follows the original theory_arith implementation, not the separate theory_lra LP specialization. Direct real SMT solver tests check optimum improvement blockers are UNSAT and pop restores SAT. Three prebuilt C++ optimization-shell scripts independently check the same strict epsilon coefficient, integer optimum, coupled rational optimum and scope recovery; these vectors are not registered as supported Go CLI maximize commands. Only lexical whitespace is canonicalized in the native output oracle. Whole arithmetic/optimization completion remains unproven.",
+        "This increment closes the concrete nonstandard mk_ge callback and native bound-axiom subset, not all arithmetic or optimization. Rational-only equality/Grobner shortcuts do not assert equations after discarding a nonzero epsilon; linear row deductions preserve full infinitesimals. General nonnumeral RHS comparisons retain the Go numerical extension without fabricated native axis axioms. Higher opt_solver/optsmt orchestration, mode-5 optimization and SMT-LIB maximize/minimize wiring remain open. Earlier notes listing nonstandard-bound assertion as open are superseded only for this concrete callback."
       ]
     },
     {
@@ -128858,7 +128889,10 @@
         "pkg/smtcore/theory_arith_candidate_test.go",
         "pkg/cmd/g3/test_vectors/integer_fractional_candidate.smt2",
         "pkg/smtcore/smt_boolean_propagation.go",
-        "pkg/smtcore/smt_theory_conflict_lifetime_test.go"
+        "pkg/smtcore/smt_theory_conflict_lifetime_test.go",
+        "pkg/smtcore/theory_arith_objective_bound.go",
+        "pkg/smtcore/theory_arith_bound_axioms.go",
+        "pkg/smtcore/smt_internalizer.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
@@ -128921,7 +128955,9 @@
         "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient",
         "TestSMTArithmeticCandidateFloorsFractionalIntegers",
         "TestSMTTheoryConflictParametersFollowNestedScopeLifetime",
-        "TestSMTTheoryConflictRejectsPartialParameterCopies"
+        "TestSMTTheoryConflictRejectsPartialParameterCopies",
+        "pkg/smtcore/theory_arith_objective_bound_test.go",
+        "pkg/smtcore/theory_arith_bound_axioms_test.go"
       ],
       "conditionals": [
         {
@@ -130045,7 +130081,8 @@
             "TestSMTTheoryConflictRejectsPartialParameterCopies",
             "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs"
           ]
-        }
+        },
+        {"name": "mk_ge(filter_model_converter&,theory_var,inf_numeral), concrete mi_ext: exact native Boolean name/reuse guard, filtered helper declaration, full infinitesimal bound and integer unit-step complement; immediate/delayed nearest-neighbor bound axioms, integer adjacent cover, Farkas coefficients and scoped parameter ownership; exact infinitesimal row deductions during shared optimization recovery.", "status": "ported", "go_targets": ["pkg/smtcore/theory_arith_objective_bound.go", "pkg/smtcore/theory_arith_bound_axioms.go", "pkg/smtcore/theory_arith_linear.go", "pkg/smtcore/theory_arith_fixed_bounds.go", "pkg/smtcore/theory_arith_grobner.go", "pkg/smtcore/theory_arith_mixed.go", "pkg/smtcore/smt_internalizer.go"], "tests": ["TestSMTObjectiveLowerBoundExistingBooleanAndDomains", "TestSMTObjectiveLowerBoundIntegralRealCastUsesUnitStep", "TestSMTObjectiveLowerBoundRecoversSharedOptimization", "TestSMTObjectiveLowerBoundThresholdAndComplement", "TestSMTObjectiveLowerBoundCompoundOffsetAndName", "TestSMTObjectiveLowerBoundSolverScopesAndModelFilter", "TestSMTObjectiveLowerBoundRejectsImproperSupremum", "TestSMTArithmeticBoundAxiomAllocationFrontiersAndRetry", "TestSMTArithmeticBoundAxiomsKindsAndIntegerAdjacency", "TestSMTArithmeticBoundAxiomsNearestNeighborsAndAxisIdentity", "TestSMTArithmeticBoundAxiomProofParametersAndScopeOwnership"]}
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
@@ -130058,7 +130095,8 @@
         "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery.",
         "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving.",
         "ModelValue applies the existing concrete exact-rational floor helper to its newly computed candidate rational before constructing the owning expression-wrapper procedure. No integer numeral constructor guard is weakened and no simplex assignment or solver status is changed. Actual arith.ignore_int searches plus C++ CLI comparisons exercise positive/negative half candidates and integral SAT recovery through scopes.",
-        "SetTheoryConflict and arithmetic equality-conflict publication now register completed parameter-owning justifications with ownedJustifications before exposing the conflict. The existing scope limit and reverse pop destruction release copied parameters before enodes are unregistered. Caller-owned parameters may be released immediately after successful publication; an outer conflict stays live through a nested push/pop, and an already-inconsistent report does not construct or register a replacement. Failed parameter-copy prefixes are released and no conflict is published. No allocator behavior or generic adapter is introduced."
+        "SetTheoryConflict and arithmetic equality-conflict publication now register completed parameter-owning justifications with ownedJustifications before exposing the conflict. The existing scope limit and reverse pop destruction release copied parameters before enodes are unregistered. Caller-owned parameters may be released immediately after successful publication; an outer conflict stays live through a nested push/pop, and an already-inconsistent report does not construct or register a replacement. Failed parameter-copy prefixes are released and no conflict is published. No allocator behavior or generic adapter is introduced.",
+        "Generated bound ASTs are borrowed from the Boolean internalizer; the filter converter owns its declaration references. Stored threshold and offset rationals are copied. Numeric atoms remain registered on axiom-allocation refusal and deferred batches retry. Parameter-bearing axiom justifications have a logical-scope owner even when a clause holds a resolution wrapper. Tests verify actual cold parameter allocation refusal, recovery and zero-budget fixture teardown."
       ],
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
@@ -130073,7 +130111,8 @@
         "Euclidean arithmetic bounds are now scoped alongside existing numeric replay facts. Comparison-column facts are stored by the exact logical polynomial coefficient key rather than a shifting auxiliary column ID, and replay tightens the current shared expression column. The arithmetic theory owns the source-equivalent Euclidean numeral-manager lifetime and exposes checked cleanup through the existing optional theory Close hook. Temporary model-completion point bounds are never premises for Euclidean facts.",
         "Concrete SMT arithmetic pivot selection now consumes the previously parsed strategy and Bland threshold through the shared exact tableau. Equal-error candidates use ascending variable ID instead of C++ heap traversal order; existing normal entering-variable ties also remain deterministic rather than randomized. These are heuristic ordering differences. Source tableau trace/assertion sites and other incomplete arithmetic algorithms remain scoped to this partial unit.",
         "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial.",
-        "Native internalize_numeral initializes exact bounds/value immediately and native linear definitions enter the live tableau. The Go replay now detects newly created columns and definitions even without Boolean arithmetic assertions. Counts describe the successfully replayed tableau; pop rebuilds and synchronizes them. A deterministic old-code regression exposed numeral7 becoming0 in a sequence model. Positive/negative/rational numerals, later constant definitions and repeated scopes now publish exact values; the Seq Int CLI model satisfies its asserted equality against C++. No model-output rewriting or numeral-only patch bypass is used."
+        "Native internalize_numeral initializes exact bounds/value immediately and native linear definitions enter the live tableau. The Go replay now detects newly created columns and definitions even without Boolean arithmetic assertions. Counts describe the successfully replayed tableau; pop rebuilds and synchronizes them. A deterministic old-code regression exposed numeral7 becoming0 in a sequence model. Positive/negative/rational numerals, later constant definitions and repeated scopes now publish exact values; the Seq Int CLI model satisfies its asserted equality against C++. No model-output rewriting or numeral-only patch bypass is used.",
+        "This increment closes the concrete nonstandard mk_ge callback and native bound-axiom subset, not all arithmetic or optimization. Rational-only equality/Grobner shortcuts do not assert equations after discarding a nonzero epsilon; linear row deductions preserve full infinitesimals. General nonnumeral RHS comparisons retain the Go numerical extension without fabricated native axis axioms. Higher opt_solver/optsmt orchestration, mode-5 optimization and SMT-LIB maximize/minimize wiring remain open. Earlier notes listing nonstandard-bound assertion as open are superseded only for this concrete callback."
       ]
     },
     {

@@ -373,6 +373,10 @@ func (s *SMTInternalizerState) AddLearnedClause(literals []SMTLiteral) error {
 }
 
 func (s *SMTInternalizerState) addTheoryAxiom(theory SMTTheoryID, literals []SMTLiteral) error {
+	return s.addTheoryAxiomWithParameters(theory, literals, nil)
+}
+
+func (s *SMTInternalizerState) addTheoryAxiomWithParameters(theory SMTTheoryID, literals []SMTLiteral, parameters []ast.ASTParameter) error {
 	proofs, err := s.manager.ProofsEnabled()
 	if err != nil || !proofs {
 		if err != nil {
@@ -380,18 +384,27 @@ func (s *SMTInternalizerState) addTheoryAxiom(theory SMTTheoryID, literals []SMT
 		}
 		return s.addClause(literals, false, ast.ASTHandle{})
 	}
-	justification, err := NewSMTTheoryAxiomJustification(s.manager, theory, literals, nil)
+	justification, err := NewSMTTheoryAxiomJustification(s.manager, theory, literals, parameters)
 	if err != nil {
 		return err
 	}
 	beforeClauses, beforeOwners := len(s.clauses), len(s.ownedJustifications)
-	if err = s.addClauseKindWithJustificationAndDeleteHandler(literals, false, SMTClauseAux, ast.ASTHandle{}, justification, nil); err != nil {
-		return err
-	}
+	err = s.addClauseKindWithJustificationAndDeleteHandler(literals, false, SMTClauseAux, ast.ASTHandle{}, justification, nil)
 	if len(s.clauses) == beforeClauses && len(s.ownedJustifications) == beforeOwners {
-		return justification.Release(s.manager)
+		return errors.Join(err, justification.Release(s.manager))
 	}
-	return nil
+	if len(parameters) != 0 {
+		// Parameter-bearing region justifications require their own scoped
+		// destructor, including when the clause stores a resolution wrapper.
+		registered := false
+		for _, owner := range s.ownedJustifications[beforeOwners:] {
+			registered = registered || owner == justification
+		}
+		if !registered {
+			s.ownedJustifications = append(s.ownedJustifications, justification)
+		}
+	}
+	return err
 }
 
 // AddLearnedClauseWithProof installs a conflict lemma and transfers an owned
