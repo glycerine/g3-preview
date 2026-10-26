@@ -257488,14 +257488,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "47591cc673e3e3be89e00389f1981ee7d67e5024",
+    "commit": "1bf30ee98f2e6491c029d350084f76d07698f862",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-26T22:41:37.865435+00:00",
-    "completed_utc": "2026-10-26T22:46:52.383380+00:00",
+    "started_utc": "2026-10-26T23:43:29.252928+00:00",
+    "completed_utc": "2026-10-26T23:48:47.868033+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-47591cc6.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-47591cc6.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-47591cc6.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-1bf30ee9.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-1bf30ee9.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-1bf30ee9.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -257511,9 +257511,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 186.634,
+    "lp_seconds": 189.278,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean isolated 47591cc673e3e3be89e00389f1981ee7d67e5024, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes all audited LRA increments through47591cc6: actual numerical/frontend owners, equality/bound/operator axioms, basic/LP propagation, search thresholds, fixed/shared equalities, generated/direct model values, immediate final check, managed quick-checker value integration, LP parameter forwarding and concrete fresh-copy lifecycle with tagged constructor-error owner cleanup. Public setup remains unchanged; source statistics and objective AST callbacks plus retained-source/setup/Bool-normalization audits remain open. No complete specialized LRA, smtcore or higher-engine claim. The default LP suite intentionally skips53 exhaustive cases, available with -short and previously passed in the unguarded e9906db6 checkpoint. The separate extra tagged polynomial timeout and documented C++ post-pop/dense strict-model and local-optimization limitations remain explicit. Root pkg and graph match the snapshot at recording."
+    "scope_warning": "Independently verified clean frozen 1bf30ee98f2e6491c029d350084f76d07698f862, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes LRA statistics, objective AST callbacks, public automatic QF_LRA/QF_UFLRA selection, first-check/first-push setup, SMT-LIB models/scopes/cores/shared equalities/division/UNKNOWN and all-statistics command integration. The root subsequently adds only two LP aggregate diagnostic printers and their tests (e3cdb1d0); these have focused native and actual g3checked/g3debug/g3trace validation and are excluded from this full checkpoint. No complete LRA, smtcore or higher-engine claim. Source diagnostic/validation callbacks and optimizer integration remain open. Default LP intentionally skips53 exhaustive cases, available with -short and previously passed at unguarded e9906db6. Earlier extra tagged polynomial timeout and documented C++ post-pop/dense strict-model and local-optimization limitations remain explicit."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
