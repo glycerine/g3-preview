@@ -211,6 +211,9 @@ func (g *SMTModelGenerator) discoverValueProcedures(state *SMTInternalizerState)
 	if err := g.registerExistingModelValues(state); err != nil {
 		return nil, nil, err
 	}
+	if err := g.publishBooleanInterpretations(state); err != nil {
+		return nil, nil, err
+	}
 	booleanSort, err := g.manager.MkBoolSort()
 	if err != nil {
 		return nil, nil, err
@@ -347,7 +350,7 @@ func (g *SMTModelGenerator) uninterpretedConstant(expression ast.ASTHandle) (ast
 	return declaration, err == nil, err
 }
 
-func (g *SMTModelGenerator) publishConstantInterpretations(state *SMTInternalizerState) error {
+func (g *SMTModelGenerator) publishBooleanInterpretations(state *SMTInternalizerState) error {
 	if g.model == nil {
 		return ast.ErrASTDomain
 	}
@@ -377,23 +380,19 @@ func (g *SMTModelGenerator) publishConstantInterpretations(state *SMTInternalize
 			return err
 		}
 	}
+	return nil
+}
+
+func (g *SMTModelGenerator) publishConstantInterpretations(state *SMTInternalizerState) error {
+	if g.model == nil {
+		return ast.ErrASTDomain
+	}
 	for _, node := range state.enodeStack {
 		if node == nil || !state.isRelevant(node.owner) {
 			continue
 		}
 		value := g.rootValues[node.root]
 		if value.IsNull() {
-			continue
-		}
-		sort, err := g.manager.GetSort(node.owner)
-		if err != nil {
-			return err
-		}
-		booleanSort, err := g.manager.MkBoolSort()
-		if err != nil {
-			return err
-		}
-		if sort == booleanSort {
 			continue
 		}
 		declaration, constant, err := g.uninterpretedConstant(node.owner)

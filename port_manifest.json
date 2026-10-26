@@ -122628,7 +122628,8 @@
         "pkg/smtcore/smt_model_traversal_test.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_model_incomplete_test.go",
-        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
+        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
+        "pkg/smtcore/smt_model_boolean_order_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -122658,7 +122659,8 @@
         "TestSMTModelTraversalSharesImplicitSortDependencies",
         "TestSMTModelTraversalRechecksDependenciesOnlyInSourceDebug",
         "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
-        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
+        "TestSMTModelGeneratorBooleanPublicationPhases"
       ],
       "assertions": [
         {
@@ -122904,6 +122906,21 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
           ]
+        },
+        {
+          "name": "mk_model/mk_bool_model/mk_values publication phases (smt_model_generator.cpp:65-79,375-394,523-535): initialize factories and reserve existing values, publish Boolean assignments before theory value-procedure discovery, then publish all relevant enode constants including Boolean declarations after value construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_generator.go",
+            "pkg/smtcore/smt_model_boolean_order_test.go",
+            "pkg/smtcore/smt_model_generator_test.go"
+          ],
+          "tests": [
+            "TestSMTModelGeneratorBooleanPublicationPhases",
+            "TestSMTModelGeneratorPublishesBooleanConstant",
+            "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse"
+          ]
         }
       ],
       "ownership": [
@@ -122912,7 +122929,8 @@
         "The mode-aware relevancy helper now lives on SMTInternalizerState and is shared with model finding; model-value and function publication retain their previously verified behavior.",
         "The per-sort implicit-dependency set, source colors and iterative work stack are local to one topological traversal. Fresh placeholders and enodes remain borrowed; no recursive Go call stack or persistent sort cache is retained.",
         "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
-        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit."
+        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit.",
+        "Boolean assignment and enode-constant publication are distinct ordered passes over borrowed context state. Theory initializer callbacks run before Boolean publication, value-procedure callbacks observe the assigned Boolean model, and later enode-backed declarations overwrite theory-written interpretations through normal proto-model ownership. Boolean variables without enodes are not republished in the later pass."
       ],
       "deviations": [
         "The source iterative traversal, last-pushed-first order, shared per-sort implicit-dependency cache and source-debug-only second child visit are preserved. True dependency cycles retain the Go ast.ErrASTDomain guard for invalid input rather than reaching native missing-value assertions during construction.",
@@ -122939,7 +122957,8 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_model_incomplete_test.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
+        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
+        "pkg/smtcore/smt_model_boolean_order_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -122966,7 +122985,8 @@
         "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
-        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
+        "TestSMTModelGeneratorBooleanPublicationPhases"
       ],
       "conditionals": [
         {
@@ -123088,13 +123108,29 @@
             "TestSMTLibRunnerCPPReference",
             "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
           ]
+        },
+        {
+          "name": "mk_model/mk_bool_model/mk_values publication phases (smt_model_generator.cpp:65-79,375-394,523-535): initialize factories and reserve existing values, publish Boolean assignments before theory value-procedure discovery, then publish all relevant enode constants including Boolean declarations after value construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_generator.go",
+            "pkg/smtcore/smt_model_boolean_order_test.go",
+            "pkg/smtcore/smt_model_generator_test.go"
+          ],
+          "tests": [
+            "TestSMTModelGeneratorBooleanPublicationPhases",
+            "TestSMTModelGeneratorPublishesBooleanConstant",
+            "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse"
+          ]
         }
       ],
       "ownership": [
         "Model-value procedures and dependencies borrow AST handles, enodes and generator-owned fresh placeholders. The future generator owns and pins the referenced AST values and sorts, matching the source m_asts owner.",
         "The per-sort implicit-dependency set, source colors and iterative work stack are local to one topological traversal. Fresh placeholders and enodes remain borrowed; no recursive Go call stack or persistent sort cache is retained.",
         "Candidate model generation captures the active kernel search-failure enum before initializing theory models. The first matching function entry remains owned by the proto-model; skipped duplicate tuples allocate no new entry. Ordinary complete-result insertion and source-debug duplicate assertions remain unchanged.",
-        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit."
+        "Duplicate-entry regression uses concrete expression-wrapper procedures over distinct enodes with deliberately equal model arguments, independent of arithmetic final-check assignments. A separate real symbolic-power solver regression verifies those assignments are separated before incompleteness; it does not require the former premature unsupported exit.",
+        "Boolean assignment and enode-constant publication are distinct ordered passes over borrowed context state. Theory initializer callbacks run before Boolean publication, value-procedure callbacks observe the assigned Boolean model, and later enode-backed declarations overwrite theory-written interpretations through normal proto-model ownership. Boolean variables without enodes are not republished in the later pass."
       ],
       "deviations": [
         "The source tagged dependency union is represented by explicit Go fields and checked accessors. Invalid assertion domains return ast.ErrASTDomain.",
