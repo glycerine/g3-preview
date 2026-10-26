@@ -128,7 +128,11 @@ func TestSMTLRAFrontendBooleanBoundsConflictAndScopeReplay(t *testing.T) {
 	// Push before propagation: root assignments are reached inside the child
 	// and must be replayed after the numerical scope is removed.
 	astTestMust(t, f.s.PushScope())
-	child := f.app(smtArithOpLE, x, f.number(-1))
+	// Distinct axes force a numerical contradiction; same-axis bound clauses
+	// could otherwise conflict before the root assignment reaches LAR.
+	y := f.variable("lra-scope-y")
+	f.assert(f.app(smtArithOpGE, y, f.number(0)), true)
+	child := f.app(smtArithOpLE, f.app(smtArithOpAdd, x, y), f.number(-1))
 	f.assert(child, true)
 	f.propagate(false)
 	astTestMust(t, f.s.PopScopes(1))

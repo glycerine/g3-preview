@@ -35,16 +35,17 @@ func (l smtLRAResourceLimit) CancelFlag() (bool, error) { return l.manager.Cance
 
 // SMTLRATheory is the concrete frontend for the retained LAR-backed theory.
 // Setup integration remains open. FinalCheck deliberately gives up until the
-// remaining equality/propagation/model-combination callbacks are connected.
+// remaining propagation/model-combination callbacks are connected.
 type SMTLRATheory struct {
 	*SMTTheoryBase
 	numeric         *smtLRANumeric
 	numerals        *numeral.RationalManager
 	config          SMTArithState
-	equalityAdapter *smtArithmeticEqualityAdapter
+	equalityAdapter *smtLRAEqualityAdapter
 	bounds          [][]*smtLRABound
 	boundByBoolean  map[int32]*smtLRABound
 	boundTrail      []SMTTheoryVar
+	newBounds       []*smtLRABound
 	unassigned      []uint32
 	assignments     []smtLRAAssignment
 	assignmentHead  int
@@ -61,13 +62,11 @@ func NewSMTLRATheory(family ast.FamilyID) (*SMTLRATheory, error) {
 	if err != nil {
 		return nil, err
 	}
-	adapter, err := newSMTArithmeticEqualityAdapter(base)
-	if err != nil {
-		return nil, err
-	}
-	return &SMTLRATheory{SMTTheoryBase: base, equalityAdapter: adapter,
+	t := &SMTLRATheory{SMTTheoryBase: base,
 		config:         SMTArithState{Reflect: true, BoundProp: 2, PropagateEqs: true, PropagationThreshold: ^uint32(0)},
-		boundByBoolean: make(map[int32]*smtLRABound)}, nil
+		boundByBoolean: make(map[int32]*smtLRABound)}
+	t.equalityAdapter = newSMTLRAEqualityAdapter(t)
+	return t, nil
 }
 
 func (t *SMTLRATheory) Initialize(s *SMTInternalizerState) error {
@@ -93,8 +92,12 @@ func (t *SMTLRATheory) ConfigureArithmetic(config SMTArithState) error {
 	if t == nil || t.closed || t.equalityAdapter == nil {
 		return ast.ErrASTHandle
 	}
+	if config.LazyAdapter || config.AddBinaryBounds {
+		// Neither setting reaches LRA in retained setup: lazy has no writer,
+		// while the binary-bound writer selects the QF_RDL backend.
+		return ast.ErrASTDomain
+	}
 	t.config = config
-	t.equalityAdapter.lazy = config.LazyAdapter
 	if t.numeric != nil {
 		t.numeric.solver.Settings.BoundPropagation = config.BoundProp != 0
 	}
@@ -473,7 +476,10 @@ func (t *SMTLRATheory) InternalizeAtom(atom ast.ASTHandle, _ bool) (bool, error)
 	t.unassigned[v]++
 	t.boundTrail = append(t.boundTrail, v)
 	t.boundByBoolean[bv] = b
-	// Source immediate/delayed bound axioms are connected in the next stage.
+	if err = t.mkBoundAxioms(b); err != nil {
+		t.newBounds = append(t.newBounds, b)
+		return false, err
+	}
 	return true, nil
 }
 
@@ -488,9 +494,19 @@ func (t *SMTLRATheory) InternalizeEquality(h ast.ASTHandle, _ int32) error {
 	if _, err := t.State(); err != nil {
 		return err
 	}
-	// The equality-to-normalized-bound frontend is still open. Keep this
-	// component explicitly inconclusive until its source adapter is attached.
-	return t.foundNotHandled(h)
+	left, err := t.state.manager.GetArg(h, 0)
+	if err != nil {
+		return err
+	}
+	right, err := t.state.manager.GetArg(h, 1)
+	if err != nil {
+		return err
+	}
+	n1, n2 := t.state.context.enodes[left], t.state.context.enodes[right]
+	if n1 != nil && n2 != nil && n1 != n2 && t.IsAttachedToVariable(n1) && t.IsAttachedToVariable(n2) {
+		return t.equalityAdapter.MkAxioms(n1.TheoryVar(t.FamilyID()), n2.TheoryVar(t.FamilyID()))
+	}
+	return nil
 }
 func (t *SMTLRATheory) NewEquality(left, right SMTTheoryVar) error {
 	if _, err := t.State(); err != nil {
@@ -532,6 +548,9 @@ func (t *SMTLRATheory) CanPropagate() bool {
 }
 func (t *SMTLRATheory) Propagate() error {
 	if _, err := t.State(); err != nil {
+		return err
+	}
+	if err := t.flushBoundAxioms(); err != nil {
 		return err
 	}
 	if !t.CanPropagate() {
@@ -616,6 +635,7 @@ func (t *SMTLRATheory) PopScopes(n uint32) error {
 	copy(t.unassigned, scope.unassigned)
 	clear(t.unassigned[len(scope.unassigned):])
 	t.scopes = t.scopes[:level]
+	t.newBounds = nil // Native user-push contract flushes pending parent axioms first.
 	if err := t.numeric.pop(n); err != nil {
 		return err
 	}
@@ -645,11 +665,18 @@ func (t *SMTLRATheory) Close() error {
 		}
 		t.numerals = nil
 	}
+	if t.equalityAdapter != nil {
+		if err := t.equalityAdapter.Close(); err != nil {
+			return err
+		}
+		t.equalityAdapter = nil
+	}
 	t.variables = nil
 	t.limits = nil
 	t.bounds = nil
 	t.boundByBoolean = nil
 	t.boundTrail = nil
+	t.newBounds = nil
 	t.unassigned = nil
 	t.assignments = nil
 	t.scopes = nil

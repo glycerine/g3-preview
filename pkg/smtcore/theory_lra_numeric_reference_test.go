@@ -77,3 +77,25 @@ func checkNativeLRACoupledProgression(t *testing.T) {
 		t.Fatal("native local-bound progression", diagnostics.String())
 	}
 }
+
+func TestSMTLRAEqualityNativeScopeOracle(t *testing.T) {
+	reference := os.Getenv("G3_CPP_REFERENCE")
+	if reference == "" {
+		t.Skip("G3_CPP_REFERENCE is not set")
+	}
+	script, err := os.ReadFile("test_vectors/lra_equality_scope.smt2")
+	astTestMust(t, err)
+	cmd := exec.Command(reference, "-in")
+	cmd.Stdin = bytes.NewReader(script)
+	var out, diagnostics bytes.Buffer
+	cmd.Stdout, cmd.Stderr = &out, &diagnostics
+	if err = cmd.Run(); err != nil || diagnostics.Len() != 0 {
+		t.Fatal(err, out.String(), diagnostics.String())
+	}
+	spaces := strings.NewReplacer("(", " ( ", ")", " ) ")
+	canonical := func(s string) string { return strings.Join(strings.Fields(spaces.Replace(s)), " ") }
+	expected := "sat unsat sat sat (((>= x 2) true) ((= y 1) true) ((= (+ x (* (- 1) x) y) y) true)) sat"
+	if canonical(out.String()) != canonical(expected) {
+		t.Fatal("native LRA equality/scope oracle", out.String(), "want", expected)
+	}
+}

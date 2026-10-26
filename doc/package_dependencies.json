@@ -2770,6 +2770,8 @@
         "theory_dummy.go",
         "theory_fpa.go",
         "theory_lra.go",
+        "theory_lra_bound_axioms.go",
+        "theory_lra_eq_adapter.go",
         "theory_lra_numeric.go",
         "theory_opt.go",
         "theory_pb.go",

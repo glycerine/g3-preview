@@ -107692,7 +107692,9 @@
       "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arith_eq_adapter.go",
-        "pkg/smtcore/smt_arith_eq_adapter_test.go"
+        "pkg/smtcore/smt_arith_eq_adapter_test.go",
+        "pkg/smtcore/theory_lra_bound_axioms.go",
+        "pkg/smtcore/theory_lra_eq_adapter.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
@@ -107702,7 +107704,14 @@
         "TestSMTArithmeticEqualityAdapterDefersGeneratedRelevancy",
         "TestSMTKernelAppliesArithmeticConfigurationOnTheoryRegistration",
         "TestSMTSolverLinearArithmeticEqualityAdapter",
-        "TestSMTSolverUFLinearArithmeticCongruence"
+        "TestSMTSolverUFLinearArithmeticCongruence",
+        "TestSMTLRABoundAxiomsKindsAndIntegerAdjacency",
+        "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict",
+        "TestSMTLRAEqualityRestartAndRelevancy",
+        "TestSMTLRABoundNearestNeighborsAndUnitAxis",
+        "TestSMTLRAAxiomProofOwnershipAndPhase",
+        "TestSMTLRABoundAxiomAllocationRefusalAndRetry",
+        "TestSMTLRAEqualityNativeScopeOracle"
       ],
       "assertions": [
         {
@@ -107755,13 +107764,16 @@
         {
           "name": "diagnostic display without a retained caller (src/smt/arith_eq_adapter.cpp:269-279)",
           "status": "dead_deleted"
-        }
+        },
+        {"name": "Concrete retained LRA equality triangles and bound axioms: normalized arithmetic equality/disequality callbacks, ordered scoped pair cache, true-first phase forwarding, pair relevancy, eager restart reconstruction, cached triangle-eq proof hint, immediate four-neighbor selection and deferred grouped/sorted bound publication with Farkas coefficients and integer adjacency. Complete LRA propagation/model/setup remain open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_bound_axioms.go", "pkg/smtcore/theory_lra_eq_adapter.go", "pkg/smtcore/theory_lra_axioms_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRABoundAxiomsKindsAndIntegerAdjacency", "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict", "TestSMTLRAEqualityRestartAndRelevancy", "TestSMTLRABoundNearestNeighborsAndUnitAxis", "TestSMTLRAAxiomProofOwnershipAndPhase", "TestSMTLRABoundAxiomAllocationRefusalAndRetry", "TestSMTLRAEqualityNativeScopeOracle"]}
       ],
       "ownership": [
-        "The adapter borrows its owning SMTTheoryBase and enodes, owns canonical AST-handle pairs, and removes pairs when their theory scope is popped."
+        "The adapter borrows its owning SMTTheoryBase and enodes, owns canonical AST-handle pairs, and removes pairs when their theory scope is popped.",
+        "The typed LRA equality adapter owns its cached triangle-eq parameter and temporary AST references; the context owns internalized expressions, scoped clauses and their copied proof parameters. The adapter caches ordered owner-id pairs before recursive equality internalization, removes scoped pairs at pop and recreates eager search axioms at restart. Pending bound batches remain owned after allocation refusal and can be retried; scoped Farkas parameters retire with the clause region. Tests separate plugin-owned small-numeral cache growth from proof ownership and verify that only the cached hint survives pop, then releases on Close."
       ],
       "deviations": [
-        "The adapter installs pair dependencies in the shared SMT relevancy propagator instead of allocating a polymorphic C++ relevancy callback."
+        "The adapter installs pair dependencies in the shared SMT relevancy propagator instead of allocating a polymorphic C++ relevancy callback.",
+        "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags."
       ]
     },
     {
@@ -107771,7 +107783,9 @@
       "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arith_eq_adapter.go",
-        "pkg/smtcore/smt_arith_eq_adapter_test.go"
+        "pkg/smtcore/smt_arith_eq_adapter_test.go",
+        "pkg/smtcore/theory_lra_bound_axioms.go",
+        "pkg/smtcore/theory_lra_eq_adapter.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
@@ -107780,7 +107794,14 @@
         "TestSMTArithmeticEqualityAdapterBinaryBoundsAndLazyRestart",
         "TestSMTArithmeticEqualityAdapterDefersGeneratedRelevancy",
         "TestSMTSolverLinearArithmeticEqualityAdapter",
-        "TestSMTSolverUFLinearArithmeticCongruence"
+        "TestSMTSolverUFLinearArithmeticCongruence",
+        "TestSMTLRABoundAxiomsKindsAndIntegerAdjacency",
+        "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict",
+        "TestSMTLRAEqualityRestartAndRelevancy",
+        "TestSMTLRABoundNearestNeighborsAndUnitAxis",
+        "TestSMTLRAAxiomProofOwnershipAndPhase",
+        "TestSMTLRABoundAxiomAllocationRefusalAndRetry",
+        "TestSMTLRAEqualityNativeScopeOracle"
       ],
       "conditionals": [
         {
@@ -107816,13 +107837,16 @@
         {
           "name": "debug display surface without a retained caller",
           "status": "dead_deleted"
-        }
+        },
+        {"name": "Concrete retained LRA equality triangles and bound axioms: normalized arithmetic equality/disequality callbacks, ordered scoped pair cache, true-first phase forwarding, pair relevancy, eager restart reconstruction, cached triangle-eq proof hint, immediate four-neighbor selection and deferred grouped/sorted bound publication with Farkas coefficients and integer adjacency. Complete LRA propagation/model/setup remain open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_bound_axioms.go", "pkg/smtcore/theory_lra_eq_adapter.go", "pkg/smtcore/theory_lra_axioms_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRABoundAxiomsKindsAndIntegerAdjacency", "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict", "TestSMTLRAEqualityRestartAndRelevancy", "TestSMTLRABoundNearestNeighborsAndUnitAxis", "TestSMTLRAAxiomProofOwnershipAndPhase", "TestSMTLRABoundAxiomAllocationRefusalAndRetry", "TestSMTLRAEqualityNativeScopeOracle"]}
       ],
       "ownership": [
-        "The adapter owns its Go map, insertion trail, scope limits, and counter and borrows the owner theory."
+        "The adapter owns its Go map, insertion trail, scope limits, and counter and borrows the owner theory.",
+        "The typed LRA equality adapter owns its cached triangle-eq parameter and temporary AST references; the context owns internalized expressions, scoped clauses and their copied proof parameters. The adapter caches ordered owner-id pairs before recursive equality internalization, removes scoped pairs at pop and recreates eager search axioms at restart. Pending bound batches remain owned after allocation refusal and can be retried; scoped Farkas parameters retire with the clause region. Tests separate plugin-owned small-numeral cache growth from proof ownership and verify that only the cached hint survives pop, then releases on Close."
       ],
       "deviations": [
-        "A concrete non-template adapter serves the retained integer and real difference theories."
+        "A concrete non-template adapter serves the retained integer and real difference theories.",
+        "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags."
       ]
     },
     {
@@ -137696,7 +137720,9 @@
       "go_targets": [
         "pkg/smtcore/theory_arith_linear.go",
         "pkg/smtcore/theory_lra_numeric.go",
-        "pkg/smtcore/theory_lra.go"
+        "pkg/smtcore/theory_lra.go",
+        "pkg/smtcore/theory_lra_bound_axioms.go",
+        "pkg/smtcore/theory_lra_eq_adapter.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -137714,7 +137740,14 @@
         "TestSMTLRAFrontendStrictBoxThroughActualLAR",
         "TestSMTLRAFrontendNativeNormalizationBoundaryAndNumeralWrapper",
         "TestSMTLRAFrontendSubtractionAndRightNumeralMultiplication",
-        "TestSMTLRAFrontendUnderspecifiedReflectionAndIterativeUnitTerms"
+        "TestSMTLRAFrontendUnderspecifiedReflectionAndIterativeUnitTerms",
+        "TestSMTLRABoundAxiomsKindsAndIntegerAdjacency",
+        "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict",
+        "TestSMTLRAEqualityRestartAndRelevancy",
+        "TestSMTLRABoundNearestNeighborsAndUnitAxis",
+        "TestSMTLRAAxiomProofOwnershipAndPhase",
+        "TestSMTLRABoundAxiomAllocationRefusalAndRetry",
+        "TestSMTLRAEqualityNativeScopeOracle"
       ],
       "conditionals": [
         {
@@ -137885,17 +137918,20 @@
           "tests": []
         },
         {"name": "Concrete LRA numerical owner for retained imp::get_var_index/init_left_side/internalize_def term registration, assert_bound direction/complement and inequality provenance, get_ivalue/finite model reconstruction, make_feasible status mapping, maximize_term coefficient/constant transport and numeric scope mapping. Calls the existing util/lp LARSolver, not math/simplex algorithms. AST/internalizer/event callbacks and setup replacement are still open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_numeric.go", "pkg/smtcore/theory_lra_numeric_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go", "pkg/smtcore/test_vectors/lra_numeric_objective.smt2", "pkg/smtcore/test_vectors/lra_numeric_coupled.smt2"], "tests": ["TestSMTLRANumericOrderedCancellationAndRegistration", "TestSMTLRANumericStrictOptimizationModelsAndScopeRecovery", "TestSMTLRANumericConflictEvidenceAndReusedConstraintIndex", "TestSMTLRANumericUnboundedAndConstantTerm", "TestSMTLRANumericInterruptedRegistrationCleanup", "TestSMTLRANumericCoupledRowsStrictOptimumAndConflict"]},
-        {"name": "Retained immediate AST/frontend prefix: producer-order swap-last linearization, coefficient compaction/constants and unit-variable fast path, term/slack registration onto concrete LAR, normalized <=/>= atom registration, reflection/congruence policy, queued Boolean bound assignment with numerical feasibility and inequality conflict publication, scope restoration/replay and owner cleanup. This is not the completed source propagate/final/model or public optimization interface.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra.go", "pkg/smtcore/theory_lra_test.go"], "tests": ["TestSMTLRAFrontendWorkStackCompactionAndUnitVariable", "TestSMTLRAFrontendBooleanBoundsConflictAndScopeReplay", "TestSMTLRAFrontendStrictBoxThroughActualLAR", "TestSMTLRAFrontendNativeNormalizationBoundaryAndNumeralWrapper", "TestSMTLRAFrontendSubtractionAndRightNumeralMultiplication", "TestSMTLRAFrontendUnderspecifiedReflectionAndIterativeUnitTerms"]}
+        {"name": "Retained immediate AST/frontend prefix: producer-order swap-last linearization, coefficient compaction/constants and unit-variable fast path, term/slack registration onto concrete LAR, normalized <=/>= atom registration, reflection/congruence policy, queued Boolean bound assignment with numerical feasibility and inequality conflict publication, scope restoration/replay and owner cleanup. This is not the completed source propagate/final/model or public optimization interface.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra.go", "pkg/smtcore/theory_lra_test.go"], "tests": ["TestSMTLRAFrontendWorkStackCompactionAndUnitVariable", "TestSMTLRAFrontendBooleanBoundsConflictAndScopeReplay", "TestSMTLRAFrontendStrictBoxThroughActualLAR", "TestSMTLRAFrontendNativeNormalizationBoundaryAndNumeralWrapper", "TestSMTLRAFrontendSubtractionAndRightNumeralMultiplication", "TestSMTLRAFrontendUnderspecifiedReflectionAndIterativeUnitTerms"]},
+        {"name": "Concrete retained LRA equality triangles and bound axioms: normalized arithmetic equality/disequality callbacks, ordered scoped pair cache, true-first phase forwarding, pair relevancy, eager restart reconstruction, cached triangle-eq proof hint, immediate four-neighbor selection and deferred grouped/sorted bound publication with Farkas coefficients and integer adjacency. Complete LRA propagation/model/setup remain open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_bound_axioms.go", "pkg/smtcore/theory_lra_eq_adapter.go", "pkg/smtcore/theory_lra_axioms_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRABoundAxiomsKindsAndIntegerAdjacency", "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict", "TestSMTLRAEqualityRestartAndRelevancy", "TestSMTLRABoundNearestNeighborsAndUnitAxis", "TestSMTLRAAxiomProofOwnershipAndPhase", "TestSMTLRABoundAxiomAllocationRefusalAndRetry", "TestSMTLRAEqualityNativeScopeOracle"]}
       ],
       "ownership": [
         "SMTLinearArithmeticTheory owns its exact simplex solver, linear definitions, atoms, assertion and scope trails, equality adapter and statistics; it borrows context enodes and AST handles through SMTTheoryBase.",
         "The new concrete LRA numeric owner borrows its RationalManager and owns a LARSolver plus variable/term reverse maps, scope trails and inequality provenance. Numeric operands are copied into the actual LAR owner before lexical release; interrupted operands survive until its solver closes. Partial constructors return their owner with the error. Interrupted model/explanation outputs close before the solver they may borrow, while retained scalar operands close afterward. Seven sampled allocator allowances include a successful 300-digit coefficient case, stopped-prefix rejection, checked release and a live numeric-cell census after ordinary close; no exhaustive slow ownership sweep was added.",
-        "The concrete SMTLRATheory frontend owns its numerical layer and a private unsynchronized rational manager borrowing the AST service runtime. The context owns registered Boolean expressions/enodes; compiler AST handles are borrowed during the source-ordered walk. Numeric scopes restore registrations while frontend scopes restore bounds, pending assignment head, unassigned counts and refusal/underspecified markers. A root bound first processed in a child scope is correctly replayed in the parent. Closing releases LAR before the private manager and invalidates frontend use; closed initialization/configuration is rejected."
+        "The concrete SMTLRATheory frontend owns its numerical layer and a private unsynchronized rational manager borrowing the AST service runtime. The context owns registered Boolean expressions/enodes; compiler AST handles are borrowed during the source-ordered walk. Numeric scopes restore registrations while frontend scopes restore bounds, pending assignment head, unassigned counts and refusal/underspecified markers. A root bound first processed in a child scope is correctly replayed in the parent. Closing releases LAR before the private manager and invalidates frontend use; closed initialization/configuration is rejected.",
+        "The typed LRA equality adapter owns its cached triangle-eq parameter and temporary AST references; the context owns internalized expressions, scoped clauses and their copied proof parameters. The adapter caches ordered owner-id pairs before recursive equality internalization, removes scoped pairs at pop and recreates eager search axioms at restart. Pending bound batches remain owned after allocation refusal and can be retried; scoped Farkas parameters retire with the clause region. Tests separate plugin-owned small-numeral cache growth from proof ownership and verify that only the cached hint survives pop, then releases on Close."
       ],
       "deviations": [
         "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open.",
         "Existing platform_replacement records describe the currently selected shared linear-theory substitute; they do not certify the specialized retained LRA algorithm. This increment ports its concrete numerical side without selecting it in setup yet. C++ reference statistics identify the real LRA backend and exact strict objective/scoping/model checks agree. The raw LAR maximize callback can expose an intermediate local bound because it preserves the preceding OPTIMAL status; Go tests preserve the source behavior instead of injecting a new inner solve loop. The C++ higher optsmt consumer visibly repeats lower bounds 8,18,20 to obtain the global coupled optimum. AST linearization, event/propagation/equality/conflict integration, source mk_obj/mk_gt/mk_ge callbacks, context copying and setup selection remain open. The public optimization interface remains unported in this unit until those context callbacks are connected; whole-unit status and audit flags are unchanged.",
-        "The constructor-only m_delay_constraints flag is initialized false and has no retained writer; lazy internalization, delayed-definition/equality constraint insertion and their deprecated add_constraint calls are not ported. Preserve the native one-pass is_numeral quirk: unary-minus/to_real wrappers are not recognized as scalar multipliers or normalized RHS numerals until upstream rewriting removes them. Constant-denominator division is reflected as an opaque variable without a refusal marker; variable-denominator division is recorded as unhandled/underspecified. The frontend is not selected in setup and FinalCheck remains explicitly inconclusive until normalized equality triangles, bound axioms/cheap and LP propagation, underspecified-operator axioms, shared-value model combination, model publication, LP module-parameter forwarding and objective AST callbacks are attached. Existing public optimization records remain unported and source units remain partial; this increment does not replace the current shared-theory selection or claim a usable complete LRA theory."
+        "The constructor-only m_delay_constraints flag is initialized false and has no retained writer; lazy internalization, delayed-definition/equality constraint insertion and their deprecated add_constraint calls are not ported. Preserve the native one-pass is_numeral quirk: unary-minus/to_real wrappers are not recognized as scalar multipliers or normalized RHS numerals until upstream rewriting removes them. Constant-denominator division is reflected as an opaque variable without a refusal marker; variable-denominator division is recorded as unhandled/underspecified. The frontend is not selected in setup and FinalCheck remains explicitly inconclusive until normalized equality triangles, bound axioms/cheap and LP propagation, underspecified-operator axioms, shared-value model combination, model publication, LP module-parameter forwarding and objective AST callbacks are attached. Existing public optimization records remain unported and source units remain partial; this increment does not replace the current shared-theory selection or claim a usable complete LRA theory.",
+        "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags."
       ]
     },
     {
@@ -137906,7 +137942,9 @@
       "go_targets": [
         "pkg/smtcore/theory_arith_linear.go",
         "pkg/smtcore/theory_lra_numeric.go",
-        "pkg/smtcore/theory_lra.go"
+        "pkg/smtcore/theory_lra.go",
+        "pkg/smtcore/theory_lra_bound_axioms.go",
+        "pkg/smtcore/theory_lra_eq_adapter.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -137922,7 +137960,14 @@
         "TestSMTLRAFrontendStrictBoxThroughActualLAR",
         "TestSMTLRAFrontendNativeNormalizationBoundaryAndNumeralWrapper",
         "TestSMTLRAFrontendSubtractionAndRightNumeralMultiplication",
-        "TestSMTLRAFrontendUnderspecifiedReflectionAndIterativeUnitTerms"
+        "TestSMTLRAFrontendUnderspecifiedReflectionAndIterativeUnitTerms",
+        "TestSMTLRABoundAxiomsKindsAndIntegerAdjacency",
+        "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict",
+        "TestSMTLRAEqualityRestartAndRelevancy",
+        "TestSMTLRABoundNearestNeighborsAndUnitAxis",
+        "TestSMTLRAAxiomProofOwnershipAndPhase",
+        "TestSMTLRABoundAxiomAllocationRefusalAndRetry",
+        "TestSMTLRAEqualityNativeScopeOracle"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -137943,17 +137988,20 @@
           "tests": []
         },
         {"name": "Concrete LRA numerical owner for retained imp::get_var_index/init_left_side/internalize_def term registration, assert_bound direction/complement and inequality provenance, get_ivalue/finite model reconstruction, make_feasible status mapping, maximize_term coefficient/constant transport and numeric scope mapping. Calls the existing util/lp LARSolver, not math/simplex algorithms. AST/internalizer/event callbacks and setup replacement are still open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_numeric.go", "pkg/smtcore/theory_lra_numeric_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go", "pkg/smtcore/test_vectors/lra_numeric_objective.smt2", "pkg/smtcore/test_vectors/lra_numeric_coupled.smt2"], "tests": ["TestSMTLRANumericOrderedCancellationAndRegistration", "TestSMTLRANumericStrictOptimizationModelsAndScopeRecovery", "TestSMTLRANumericConflictEvidenceAndReusedConstraintIndex", "TestSMTLRANumericUnboundedAndConstantTerm", "TestSMTLRANumericInterruptedRegistrationCleanup", "TestSMTLRANumericCoupledRowsStrictOptimumAndConflict"]},
-        {"name": "Retained immediate AST/frontend prefix: producer-order swap-last linearization, coefficient compaction/constants and unit-variable fast path, term/slack registration onto concrete LAR, normalized <=/>= atom registration, reflection/congruence policy, queued Boolean bound assignment with numerical feasibility and inequality conflict publication, scope restoration/replay and owner cleanup. This is not the completed source propagate/final/model or public optimization interface.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra.go", "pkg/smtcore/theory_lra_test.go"], "tests": ["TestSMTLRAFrontendWorkStackCompactionAndUnitVariable", "TestSMTLRAFrontendBooleanBoundsConflictAndScopeReplay", "TestSMTLRAFrontendStrictBoxThroughActualLAR", "TestSMTLRAFrontendNativeNormalizationBoundaryAndNumeralWrapper", "TestSMTLRAFrontendSubtractionAndRightNumeralMultiplication", "TestSMTLRAFrontendUnderspecifiedReflectionAndIterativeUnitTerms"]}
+        {"name": "Retained immediate AST/frontend prefix: producer-order swap-last linearization, coefficient compaction/constants and unit-variable fast path, term/slack registration onto concrete LAR, normalized <=/>= atom registration, reflection/congruence policy, queued Boolean bound assignment with numerical feasibility and inequality conflict publication, scope restoration/replay and owner cleanup. This is not the completed source propagate/final/model or public optimization interface.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra.go", "pkg/smtcore/theory_lra_test.go"], "tests": ["TestSMTLRAFrontendWorkStackCompactionAndUnitVariable", "TestSMTLRAFrontendBooleanBoundsConflictAndScopeReplay", "TestSMTLRAFrontendStrictBoxThroughActualLAR", "TestSMTLRAFrontendNativeNormalizationBoundaryAndNumeralWrapper", "TestSMTLRAFrontendSubtractionAndRightNumeralMultiplication", "TestSMTLRAFrontendUnderspecifiedReflectionAndIterativeUnitTerms"]},
+        {"name": "Concrete retained LRA equality triangles and bound axioms: normalized arithmetic equality/disequality callbacks, ordered scoped pair cache, true-first phase forwarding, pair relevancy, eager restart reconstruction, cached triangle-eq proof hint, immediate four-neighbor selection and deferred grouped/sorted bound publication with Farkas coefficients and integer adjacency. Complete LRA propagation/model/setup remain open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_bound_axioms.go", "pkg/smtcore/theory_lra_eq_adapter.go", "pkg/smtcore/theory_lra_axioms_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRABoundAxiomsKindsAndIntegerAdjacency", "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict", "TestSMTLRAEqualityRestartAndRelevancy", "TestSMTLRABoundNearestNeighborsAndUnitAxis", "TestSMTLRAAxiomProofOwnershipAndPhase", "TestSMTLRABoundAxiomAllocationRefusalAndRetry", "TestSMTLRAEqualityNativeScopeOracle"]}
       ],
       "ownership": [
         "The concrete Go theory owns its solver state and borrows the registered arithmetic family and SMT context.",
         "The new concrete LRA numeric owner borrows its RationalManager and owns a LARSolver plus variable/term reverse maps, scope trails and inequality provenance. Numeric operands are copied into the actual LAR owner before lexical release; interrupted operands survive until its solver closes. Partial constructors return their owner with the error. Interrupted model/explanation outputs close before the solver they may borrow, while retained scalar operands close afterward. Seven sampled allocator allowances include a successful 300-digit coefficient case, stopped-prefix rejection, checked release and a live numeric-cell census after ordinary close; no exhaustive slow ownership sweep was added.",
-        "The concrete SMTLRATheory frontend owns its numerical layer and a private unsynchronized rational manager borrowing the AST service runtime. The context owns registered Boolean expressions/enodes; compiler AST handles are borrowed during the source-ordered walk. Numeric scopes restore registrations while frontend scopes restore bounds, pending assignment head, unassigned counts and refusal/underspecified markers. A root bound first processed in a child scope is correctly replayed in the parent. Closing releases LAR before the private manager and invalidates frontend use; closed initialization/configuration is rejected."
+        "The concrete SMTLRATheory frontend owns its numerical layer and a private unsynchronized rational manager borrowing the AST service runtime. The context owns registered Boolean expressions/enodes; compiler AST handles are borrowed during the source-ordered walk. Numeric scopes restore registrations while frontend scopes restore bounds, pending assignment head, unassigned counts and refusal/underspecified markers. A root bound first processed in a child scope is correctly replayed in the parent. Closing releases LAR before the private manager and invalidates frontend use; closed initialization/configuration is rejected.",
+        "The typed LRA equality adapter owns its cached triangle-eq parameter and temporary AST references; the context owns internalized expressions, scoped clauses and their copied proof parameters. The adapter caches ordered owner-id pairs before recursive equality internalization, removes scoped pairs at pop and recreates eager search axioms at restart. Pending bound batches remain owned after allocation refusal and can be retried; scoped Farkas parameters retire with the clause region. Tests separate plugin-owned small-numeral cache growth from proof ownership and verify that only the cached hint survives pop, then releases on Close."
       ],
       "deviations": [
         "The retained setup selects the shared exact Go linear solver for QF_LRA and QF_UFLRA.",
         "Existing platform_replacement records describe the currently selected shared linear-theory substitute; they do not certify the specialized retained LRA algorithm. This increment ports its concrete numerical side without selecting it in setup yet. C++ reference statistics identify the real LRA backend and exact strict objective/scoping/model checks agree. The raw LAR maximize callback can expose an intermediate local bound because it preserves the preceding OPTIMAL status; Go tests preserve the source behavior instead of injecting a new inner solve loop. The C++ higher optsmt consumer visibly repeats lower bounds 8,18,20 to obtain the global coupled optimum. AST linearization, event/propagation/equality/conflict integration, source mk_obj/mk_gt/mk_ge callbacks, context copying and setup selection remain open. The public optimization interface remains unported in this unit until those context callbacks are connected; whole-unit status and audit flags are unchanged.",
-        "The constructor-only m_delay_constraints flag is initialized false and has no retained writer; lazy internalization, delayed-definition/equality constraint insertion and their deprecated add_constraint calls are not ported. Preserve the native one-pass is_numeral quirk: unary-minus/to_real wrappers are not recognized as scalar multipliers or normalized RHS numerals until upstream rewriting removes them. Constant-denominator division is reflected as an opaque variable without a refusal marker; variable-denominator division is recorded as unhandled/underspecified. The frontend is not selected in setup and FinalCheck remains explicitly inconclusive until normalized equality triangles, bound axioms/cheap and LP propagation, underspecified-operator axioms, shared-value model combination, model publication, LP module-parameter forwarding and objective AST callbacks are attached. Existing public optimization records remain unported and source units remain partial; this increment does not replace the current shared-theory selection or claim a usable complete LRA theory."
+        "The constructor-only m_delay_constraints flag is initialized false and has no retained writer; lazy internalization, delayed-definition/equality constraint insertion and their deprecated add_constraint calls are not ported. Preserve the native one-pass is_numeral quirk: unary-minus/to_real wrappers are not recognized as scalar multipliers or normalized RHS numerals until upstream rewriting removes them. Constant-denominator division is reflected as an opaque variable without a refusal marker; variable-denominator division is recorded as unhandled/underspecified. The frontend is not selected in setup and FinalCheck remains explicitly inconclusive until normalized equality triangles, bound axioms/cheap and LP propagation, underspecified-operator axioms, shared-value model combination, model publication, LP module-parameter forwarding and objective AST callbacks are attached. Existing public optimization records remain unported and source units remain partial; this increment does not replace the current shared-theory selection or claim a usable complete LRA theory.",
+        "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags."
       ]
     },
     {
