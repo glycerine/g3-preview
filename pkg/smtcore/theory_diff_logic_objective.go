@@ -60,6 +60,12 @@ func (t *SMTIntegerDiffTheory) Close() (result error) {
 // The retained optimizer registers all objectives before maximization; their
 // count reserves the initial simplex indices, as in the source bridge.
 func (t *SMTIntegerDiffTheory) AddObjective(term ast.ASTHandle) (SMTTheoryVar, error) {
+	return t.addDiffObjective(term, nil)
+}
+
+// The dense source compiler attaches an already internalized foreign enode
+// when it has no arithmetic variable. Sparse sort hooks already attach it.
+func (t *SMTIntegerDiffTheory) addDiffObjective(term ast.ASTHandle, dense *SMTDenseDiffTheory) (SMTTheoryVar, error) {
 	s, err := t.State()
 	if err != nil {
 		return SMTNullTheoryVar, err
@@ -135,6 +141,11 @@ func (t *SMTIntegerDiffTheory) AddObjective(term ast.ASTHandle) (SMTTheoryVar, e
 			return false, err
 		}
 		node := s.context.enodes[h]
+		if node != nil && !t.IsAttachedToVariable(node) && dense != nil {
+			if _, err := dense.createVariable(node); err != nil {
+				return false, err
+			}
+		}
 		if node == nil || !t.IsAttachedToVariable(node) {
 			return false, ast.ErrASTDomain
 		}

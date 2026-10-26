@@ -2761,6 +2761,7 @@
         "theory_datatype_split.go",
         "theory_datatype_trace.go",
         "theory_dense_diff_logic.go",
+        "theory_dense_diff_objective.go",
         "theory_diff_logic_conflict.go",
         "theory_diff_logic_integer.go",
         "theory_diff_logic_objective.go",

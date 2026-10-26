@@ -460,22 +460,15 @@ func (t *SMTDenseDiffTheory) InitializeModel(generator *SMTModelGenerator) error
 	if generator == nil || generator.manager != t.state.manager || generator.model == nil {
 		return ast.ErrASTDomain
 	}
-	t.values = t.matrix.assignment()
-	t.delta.SetInt64(1)
-	for _, e := range t.matrix.edges[1:] {
-		x, y := &t.values[e.target], &t.values[e.source]
-		var limit, infinitesimal big.Rat
-		limit.Add(&y.rational, &e.offset.rational)
-		infinitesimal.Add(&y.infinitesimal, &e.offset.infinitesimal)
-		if x.rational.Cmp(&limit) < 0 && x.infinitesimal.Cmp(&infinitesimal) > 0 {
-			var numerator, denominator, candidate big.Rat
-			numerator.Sub(&limit, &x.rational)
-			denominator.Sub(&x.infinitesimal, &infinitesimal)
-			candidate.Quo(&numerator, &denominator)
-			if candidate.Cmp(&t.delta) < 0 {
-				t.delta.Set(&candidate)
-			}
-		}
+	if len(t.values) != t.NumVariables() {
+		return ast.ErrASTDomain
+	}
+	factory, err := protomodel.NewArithmeticFactory(t.state.manager)
+	if err != nil {
+		return err
+	}
+	if err = generator.RegisterFactory(factory); err != nil {
+		return err
 	}
 	for v, node := range t.variables {
 		if value, numeral, err := t.syntax.numeral(node.owner); err != nil {
@@ -498,11 +491,23 @@ func (t *SMTDenseDiffTheory) InitializeModel(generator *SMTModelGenerator) error
 			}
 		}
 	}
-	factory, err := protomodel.NewArithmeticFactory(t.state.manager)
-	if err != nil {
-		return err
+	t.delta.SetInt64(1)
+	for _, e := range t.matrix.edges[1:] {
+		x, y := &t.values[e.target], &t.values[e.source]
+		var limit, infinitesimal big.Rat
+		limit.Add(&y.rational, &e.offset.rational)
+		infinitesimal.Add(&y.infinitesimal, &e.offset.infinitesimal)
+		if x.rational.Cmp(&limit) < 0 && x.infinitesimal.Cmp(&infinitesimal) > 0 {
+			var numerator, denominator, candidate big.Rat
+			numerator.Sub(&limit, &x.rational)
+			denominator.Sub(&x.infinitesimal, &infinitesimal)
+			candidate.Quo(&numerator, &denominator)
+			if candidate.Cmp(&t.delta) < 0 {
+				t.delta.Set(&candidate)
+			}
+		}
 	}
-	return generator.RegisterFactory(factory)
+	return nil
 }
 func (t *SMTDenseDiffTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
 	if node == nil || generator == nil || generator.manager != t.state.manager {

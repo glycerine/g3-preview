@@ -135871,7 +135871,9 @@
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_setup_rdl_test.go",
-        "pkg/smtcore/smt_setup_ufidl_test.go"
+        "pkg/smtcore/smt_setup_ufidl_test.go",
+        "pkg/smtcore/theory_dense_diff_objective.go",
+        "pkg/smtcore/theory_diff_logic_objective.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -135884,7 +135886,14 @@
         "TestSMTRDLSetupSelectsConcreteBackend",
         "TestSMTRDLStaticSetupRejectsWrongFeatures",
         "TestSMTUFIDLSetupProfilesAndBackends",
-        "TestSMTUFIDLStaticValidationMatchesSource"
+        "TestSMTUFIDLStaticValidationMatchesSource",
+        "TestSMTDenseObjectiveWeightedScopesAndNullCore",
+        "TestSMTDenseObjectiveStrictSourceRationalProjection",
+        "TestSMTDenseObjectiveUnboundedAndResourceStop",
+        "TestSMTDenseObjectiveSourceIndexAndCompilerDomains",
+        "TestSMTDenseObjectiveCoreOwnsScopedExpressions",
+        "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker",
+        "TestSMTDenseObjectiveNativeOptimizationCaller"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -135961,20 +135970,23 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
-        }
+        },
+        {"name": "Retained arbitrary-precision dense optimization: internalize_objective/add_objective concrete ordered terms and missing foreign-enode attachment; value, fresh edge/objective simplex tableau with manager limit, maximize and rational-only assignment projection; mk_ineq/mk_gt/mk_ge numeric/core paths and null-justification exclusion (theory_dense_diff_logic_def.h:841-1130). Model init_model(model_generator&) preserves the existing final-check/optimized assignment, registers its arithmetic factory, fixes zeros and computes epsilon in native order (823-829).", "status": "ported", "go_targets": ["pkg/smtcore/theory_dense_diff_objective.go", "pkg/smtcore/theory_dense_diff_logic.go", "pkg/smtcore/theory_diff_logic_objective.go"], "tests": ["TestSMTDenseObjectiveWeightedScopesAndNullCore", "TestSMTDenseObjectiveStrictSourceRationalProjection", "TestSMTDenseObjectiveUnboundedAndResourceStop", "TestSMTDenseObjectiveSourceIndexAndCompilerDomains", "TestSMTDenseObjectiveCoreOwnsScopedExpressions", "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker", "TestSMTDenseObjectiveNativeOptimizationCaller"]}
       ],
       "ownership": [
         "The concrete dense matrix owns its rows, edges, cell trails and scope limits. Every stored or returned infinitesimal rational copies both big.Rat components; rollback restores owned snapshots before truncating child variables and edges. The provisional model is a fresh owned value slice. No generic or callback adapter is introduced.",
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
         "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
-        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
+        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners.",
+        "Dense optimization shares only the concrete difference-objective compiler, copied big.Rat term/constant storage, inequality builder and owning expression-core vector with the sparse port. The compiler receives the concrete dense owner solely for native missing-variable attachment; no universal callback/generic optimizer adapter is introduced. Each dense maximize owns a fresh local simplex borrowing the manager limit, skips the null sentinel edge and saves only non-null justification ASTs. A popped bound has exactly one remaining core reference; the dense theory Close releases it and can repeat safely. Model refresh owns a new model while independently acquired old models remain unchanged."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
+        "This is source-fidelity callback coverage, not proof of a correct complete dense optimizer. Native quirks are explicit: objective-index assignment lookup, objective-index zero anchor, unscaled recursive numeral accumulation, no objective-constant subtraction in inequalities, has_shared=false, and rational-only assignment publication. The source explicitly leaves epsilon adjustment as TBD in maximize. The prebuilt C++ strict-real vector reports optimum5-epsilon but evaluates (< x 5) to false and emits the exact unhandled dense-mi warning from opt_solver. Go tests reproduce and record this limitation, including through configured model refresh; they do not label that strict witness valid or repair it silently. The old Go InitializeModel incorrectly recomputed its assignment, losing a non-strict optimized point; it now follows the distinct native model-generator overload. Higher optimizer orchestration, strict-model correction, LRA/AS_OPTINF backends and Go CLI optimization commands remain open. All whole-unit status flags stay partial."
       ]
     },
     {
@@ -135992,7 +136004,9 @@
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_setup_rdl_test.go",
-        "pkg/smtcore/smt_setup_ufidl_test.go"
+        "pkg/smtcore/smt_setup_ufidl_test.go",
+        "pkg/smtcore/theory_dense_diff_objective.go",
+        "pkg/smtcore/theory_diff_logic_objective.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -136005,7 +136019,14 @@
         "TestSMTRDLSetupSelectsConcreteBackend",
         "TestSMTRDLStaticSetupRejectsWrongFeatures",
         "TestSMTUFIDLSetupProfilesAndBackends",
-        "TestSMTUFIDLStaticValidationMatchesSource"
+        "TestSMTUFIDLStaticValidationMatchesSource",
+        "TestSMTDenseObjectiveWeightedScopesAndNullCore",
+        "TestSMTDenseObjectiveStrictSourceRationalProjection",
+        "TestSMTDenseObjectiveUnboundedAndResourceStop",
+        "TestSMTDenseObjectiveSourceIndexAndCompilerDomains",
+        "TestSMTDenseObjectiveCoreOwnsScopedExpressions",
+        "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker",
+        "TestSMTDenseObjectiveNativeOptimizationCaller"
       ],
       "conditionals": [
         {
@@ -136106,20 +136127,23 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
-        }
+        },
+        {"name": "Retained arbitrary-precision dense optimization: internalize_objective/add_objective concrete ordered terms and missing foreign-enode attachment; value, fresh edge/objective simplex tableau with manager limit, maximize and rational-only assignment projection; mk_ineq/mk_gt/mk_ge numeric/core paths and null-justification exclusion (theory_dense_diff_logic_def.h:841-1130). Model init_model(model_generator&) preserves the existing final-check/optimized assignment, registers its arithmetic factory, fixes zeros and computes epsilon in native order (823-829).", "status": "ported", "go_targets": ["pkg/smtcore/theory_dense_diff_objective.go", "pkg/smtcore/theory_dense_diff_logic.go", "pkg/smtcore/theory_diff_logic_objective.go"], "tests": ["TestSMTDenseObjectiveWeightedScopesAndNullCore", "TestSMTDenseObjectiveStrictSourceRationalProjection", "TestSMTDenseObjectiveUnboundedAndResourceStop", "TestSMTDenseObjectiveSourceIndexAndCompilerDomains", "TestSMTDenseObjectiveCoreOwnsScopedExpressions", "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker", "TestSMTDenseObjectiveNativeOptimizationCaller"]}
       ],
       "ownership": [
         "The concrete dense matrix owns its rows, edges, cell trails and scope limits. Every stored or returned infinitesimal rational copies both big.Rat components; rollback restores owned snapshots before truncating child variables and edges. The provisional model is a fresh owned value slice. No generic or callback adapter is introduced.",
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
         "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
-        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
+        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners.",
+        "Dense optimization shares only the concrete difference-objective compiler, copied big.Rat term/constant storage, inequality builder and owning expression-core vector with the sparse port. The compiler receives the concrete dense owner solely for native missing-variable attachment; no universal callback/generic optimizer adapter is introduced. Each dense maximize owns a fresh local simplex borrowing the manager limit, skips the null sentinel edge and saves only non-null justification ASTs. A popped bound has exactly one remaining core reference; the dense theory Close releases it and can repeat safely. Model refresh owns a new model while independently acquired old models remain unchanged."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
+        "This is source-fidelity callback coverage, not proof of a correct complete dense optimizer. Native quirks are explicit: objective-index assignment lookup, objective-index zero anchor, unscaled recursive numeral accumulation, no objective-constant subtraction in inequalities, has_shared=false, and rational-only assignment publication. The source explicitly leaves epsilon adjustment as TBD in maximize. The prebuilt C++ strict-real vector reports optimum5-epsilon but evaluates (< x 5) to false and emits the exact unhandled dense-mi warning from opt_solver. Go tests reproduce and record this limitation, including through configured model refresh; they do not label that strict witness valid or repair it silently. The old Go InitializeModel incorrectly recomputed its assignment, losing a non-strict optimized point; it now follows the distinct native model-generator overload. Higher optimizer orchestration, strict-model correction, LRA/AS_OPTINF backends and Go CLI optimization commands remain open. All whole-unit status flags stay partial."
       ]
     },
     {
@@ -136135,7 +136159,9 @@
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_setup_rdl_test.go",
-        "pkg/smtcore/smt_setup_ufidl_test.go"
+        "pkg/smtcore/smt_setup_ufidl_test.go",
+        "pkg/smtcore/theory_dense_diff_objective.go",
+        "pkg/smtcore/theory_diff_logic_objective.go"
       ],
       "tests": [
         "TestSMTDenseDifferenceClosureExplanationsAndRollback",
@@ -136146,7 +136172,14 @@
         "TestSMTRDLSetupSelectsConcreteBackend",
         "TestSMTRDLStaticSetupRejectsWrongFeatures",
         "TestSMTUFIDLSetupProfilesAndBackends",
-        "TestSMTUFIDLStaticValidationMatchesSource"
+        "TestSMTUFIDLStaticValidationMatchesSource",
+        "TestSMTDenseObjectiveWeightedScopesAndNullCore",
+        "TestSMTDenseObjectiveStrictSourceRationalProjection",
+        "TestSMTDenseObjectiveUnboundedAndResourceStop",
+        "TestSMTDenseObjectiveSourceIndexAndCompilerDomains",
+        "TestSMTDenseObjectiveCoreOwnsScopedExpressions",
+        "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker",
+        "TestSMTDenseObjectiveNativeOptimizationCaller"
       ],
       "conditionals": [
         {
@@ -136355,18 +136388,21 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
-        }
+        },
+        {"name": "Retained arbitrary-precision dense optimization: internalize_objective/add_objective concrete ordered terms and missing foreign-enode attachment; value, fresh edge/objective simplex tableau with manager limit, maximize and rational-only assignment projection; mk_ineq/mk_gt/mk_ge numeric/core paths and null-justification exclusion (theory_dense_diff_logic_def.h:841-1130). Model init_model(model_generator&) preserves the existing final-check/optimized assignment, registers its arithmetic factory, fixes zeros and computes epsilon in native order (823-829).", "status": "ported", "go_targets": ["pkg/smtcore/theory_dense_diff_objective.go", "pkg/smtcore/theory_dense_diff_logic.go", "pkg/smtcore/theory_diff_logic_objective.go"], "tests": ["TestSMTDenseObjectiveWeightedScopesAndNullCore", "TestSMTDenseObjectiveStrictSourceRationalProjection", "TestSMTDenseObjectiveUnboundedAndResourceStop", "TestSMTDenseObjectiveSourceIndexAndCompilerDomains", "TestSMTDenseObjectiveCoreOwnsScopedExpressions", "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker", "TestSMTDenseObjectiveNativeOptimizationCaller"]}
       ],
       "ownership": [
         "The concrete dense matrix owns its rows, edges, cell trails and scope limits. Every stored or returned infinitesimal rational copies both big.Rat components; rollback restores owned snapshots before truncating child variables and edges. The provisional model is a fresh owned value slice. No generic or callback adapter is introduced.",
         "Dense matrix cells notify their concrete owning theory immediately at each source update, preserving occurrence/antecedent timing without a generic callback layer. The theory borrows its base/context in concrete syntax helpers and owns atom maps, occurrences, integrality flags, scopes and model numerals. Logical-context scopes own propagation and conflict justifications. Dense setup replaces only a theory with no variables or scopes before theory setup; it preserves registry order and closes the unused owner.",
         "RDL setup closes temporary feature collectors on validation failure and success, and configures the existing owning parameter fields before assertion internalization. Dense and sparse graph routes share the checked replacement of an unused constructor-time arithmetic plugin, preserving registry order and closing the replaced owner; default, proof, ITE and simplex routes keep their existing mixed-arithmetic owner.",
-        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners."
+        "UFIDL setup uses the existing temporary feature collector and releases it on success or real-sort rejection. Normal and first-push integer arithmetic reuse the constructor-time concrete owner, static proofs select per-column mixed integrality before internalization, and no-UF dense input reuses the checked unused-owner replacement path. The dense early return preserves unassigned parameter fields in their existing owners.",
+        "Dense optimization shares only the concrete difference-objective compiler, copied big.Rat term/constant storage, inequality builder and owning expression-core vector with the sparse port. The compiler receives the concrete dense owner solely for native missing-variable attachment; no universal callback/generic optimizer adapter is introduced. Each dense maximize owns a fresh local simplex borrowing the manager limit, skips the null sentinel edge and saves only non-null justification ASTs. A popped bound has exactly one remaining core reference; the dense theory Close releases it and can repeat safely. Model refresh owns a new model while independently acquired old models remain unchanged."
       ],
       "deviations": [
         "The QF_IDL dense setup branch now selects the concrete matrix-backed theory instead of retaining integer simplex. Focused checks cover integer and real occurrence propagation, negative-cycle context conflicts, scope restoration, rational epsilon scaling through published model values, and proof/simplex/first-push route exclusions. A dense IDL SAT/model/UNSAT/pop script passes exact C++ comparison, bringing strict scripts to 101. Other dense selection routes, remaining control fidelity, statistics, and optimization objectives remain incomplete.",
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
-        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete."
+        "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
+        "This is source-fidelity callback coverage, not proof of a correct complete dense optimizer. Native quirks are explicit: objective-index assignment lookup, objective-index zero anchor, unscaled recursive numeral accumulation, no objective-constant subtraction in inequalities, has_shared=false, and rational-only assignment publication. The source explicitly leaves epsilon adjustment as TBD in maximize. The prebuilt C++ strict-real vector reports optimum5-epsilon but evaluates (< x 5) to false and emits the exact unhandled dense-mi warning from opt_solver. Go tests reproduce and record this limitation, including through configured model refresh; they do not label that strict witness valid or repair it silently. The old Go InitializeModel incorrectly recomputed its assignment, losing a non-strict optimized point; it now follows the distinct native model-generator overload. Higher optimizer orchestration, strict-model correction, LRA/AS_OPTINF backends and Go CLI optimization commands remain open. All whole-unit status flags stay partial."
       ]
     },
     {
