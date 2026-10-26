@@ -126964,7 +126964,10 @@
         "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
         "pkg/smtcore/theory_arith_final_check.go",
         "pkg/smtcore/smt_model_incomplete_test.go",
-        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
+        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
+        "pkg/smtcore/theory_arith_epsilon.go",
+        "pkg/smtcore/theory_arith_epsilon_test.go",
+        "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -126997,7 +127000,9 @@
         "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
         "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints",
         "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
-        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
+        "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient",
+        "TestSMTArithmeticSharedEpsilonPreservesDistinctValues"
       ],
       "conditionals": [
         {
@@ -127235,13 +127240,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "update_epsilon/compute_epsilon bound quotient (theory_arith_core.h:3158-3194): start at one, take the exact rational-gap/infinitesimal-gap minimum for lower and upper bounds; halve only in separate shared-value refine_epsilon collisions, with exact scoped interval model values",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_epsilon.go",
+            "pkg/smtcore/theory_arith_epsilon_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2"
+          ],
+          "tests": [
+            "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient",
+            "TestSMTArithmeticSharedEpsilonPreservesDistinctValues",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
         "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
-        "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery."
+        "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery.",
+        "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
@@ -127960,7 +127984,8 @@
         "pkg/smtcore/theory_arith_definition_replay_test.go",
         "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2",
         "pkg/smtcore/smt_model_incomplete_test.go",
-        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2"
+        "pkg/cmd/g3/test_vectors/incomplete_theory_candidate_model.smt2",
+        "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2"
       ],
       "tests": [
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
@@ -128019,7 +128044,8 @@
         "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
         "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints",
         "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
-        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp"
+        "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
+        "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient"
       ],
       "conditionals": [
         {
@@ -129093,6 +129119,24 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "update_epsilon/compute_epsilon bound quotient (theory_arith_core.h:3158-3194): start at one, take the exact rational-gap/infinitesimal-gap minimum for lower and upper bounds; halve only in separate shared-value refine_epsilon collisions, with exact scoped interval model values",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_epsilon.go",
+            "pkg/smtcore/theory_arith_epsilon_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/real_interval_epsilon.smt2"
+          ],
+          "tests": [
+            "TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient",
+            "TestSMTArithmeticSharedEpsilonPreservesDistinctValues",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -129103,7 +129147,8 @@
         "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial.",
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
         "The concrete String consumer returns an owned big.Int copy of a justified mixed-arithmetic endpoint without creating an intermediary numeral AST. Borrowed tableau values and endpoint rationals never escape. Go nonlinear model patching may temporarily fix a candidate tableau; unexplained endpoints are recovered by the existing logical replay excluding candidate fixes, without replacing the current candidate solver or assignment. Retained logical replay can update existing pivot statistics, consistent with the Go arithmetic replay representation.",
-        "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery."
+        "Unsupported-operation state remains theory/scoped state; no new assignment override or model-output correction is introduced. Existing source final-check stages own their normal mutation, continuation and cursor changes before the final unsupported guard. Real symbolic-power candidates preserve opposite UF values and distinct fixed arguments through native model generation and CLI scope recovery.",
+        "Model epsilon remains the theory-owned rational delta; the bound calculation introduces no model handles or forced numeral output. The existing shared-value refinement retains independent symbolic assignments and halves only on actual collisions. The collision fixture uses the native lower bound19/2 to derive initial epsilon1/2, rather than depending on the removed unconditional quotient halving."
       ],
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",

@@ -98,7 +98,7 @@ func TestSMTArithmeticSharedEpsilonPreservesDistinctValues(t *testing.T) {
 		theory.solver.SetValue(column, value)
 	}
 	// Include a bound so the initial epsilon is exactly 1/2.
-	astTestMust(t, theory.solver.SetLower(columns[1], simplex.RationalInfinitesimal(big.NewRat(9, 1))))
+	astTestMust(t, theory.solver.SetLower(columns[1], simplex.RationalInfinitesimal(big.NewRat(19, 2))))
 	astTestMust(t, theory.computeModelDelta())
 	if theory.delta.Cmp(big.NewRat(1, 4)) != 0 {
 		t.Fatal("epsilon was not refined after shared-value collision", &theory.delta)
@@ -113,4 +113,43 @@ func TestSMTArithmeticSharedEpsilonPreservesDistinctValues(t *testing.T) {
 	if theory.delta.Cmp(big.NewRat(1, 1)) != 0 || theory.arithmeticColumnValue(columns[0]).Cmp(theory.arithmeticColumnValue(columns[1])) != 0 {
 		t.Fatal("equal symbolic values were separated")
 	}
+}
+
+func TestSMTArithmeticModelEpsilonUsesNativeBoundQuotient(t *testing.T) {
+	for _, test := range []struct {
+		name         string
+		main, eps    int64
+		lower, upper *simplex.Infinitesimal
+		want         *big.Rat
+	}{
+		{"lower", 10, -2, smtEpsilonBound(9, 0), nil, big.NewRat(1, 2)},
+		{"upper", 0, 3, nil, smtEpsilonBound(1, 0), big.NewRat(1, 3)},
+		{"both", 10, -2, smtEpsilonBound(9, 0), smtEpsilonBound(11, -5), big.NewRat(1, 3)},
+		{"cap-at-one", 10, -1, smtEpsilonBound(8, 0), nil, big.NewRat(1, 1)},
+		{"equal-main", 10, 2, smtEpsilonBound(10, 1), nil, big.NewRat(1, 1)},
+		{"ordered-epsilon", 10, 2, smtEpsilonBound(9, 1), nil, big.NewRat(1, 1)},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			// No enodes are shared here; the separate collision regression
+			// exercises refine_epsilon after this bound calculation.
+			theory := &SMTLinearArithmeticTheory{solver: simplex.NewSolver(nil)}
+			theory.solver.SetValue(0, *smtEpsilonBound(test.main, test.eps))
+			if test.lower != nil {
+				astTestMust(t, theory.solver.SetLower(0, *test.lower))
+			}
+			if test.upper != nil {
+				astTestMust(t, theory.solver.SetUpper(0, *test.upper))
+			}
+			astTestMust(t, theory.computeModelDelta())
+			if theory.delta.Cmp(test.want) != 0 {
+				t.Fatal("native model epsilon", &theory.delta, "want", test.want)
+			}
+		})
+	}
+}
+
+func smtEpsilonBound(main, epsilon int64) *simplex.Infinitesimal {
+	value := simplex.RationalInfinitesimal(big.NewRat(main, 1))
+	value.Epsilon.SetInt64(epsilon)
+	return &value
 }

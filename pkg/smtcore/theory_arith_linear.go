@@ -2040,7 +2040,6 @@ func (t *SMTLinearArithmeticTheory) computeModelDelta() error {
 			}
 			if main.Sign() > 0 && epsilon.Sign() < 0 {
 				candidate := new(big.Rat).Quo(&main, new(big.Rat).Neg(&epsilon))
-				candidate.Quo(candidate, big.NewRat(2, 1))
 				if candidate.Cmp(&t.delta) < 0 {
 					t.delta.Set(candidate)
 				}
