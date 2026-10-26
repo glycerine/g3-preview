@@ -255,6 +255,23 @@ func (c *Context) SetUIntOption(name string, value uint32) error {
 	return nil
 }
 
+// SetSymbolOption follows set_option_cmd::set_symbol's generic parameter
+// path. The source catalog validates the module/name and parses its type;
+// keeping that typed global value avoids an incorrectly typed local shadow.
+func (c *Context) SetSymbolOption(name, value string) error {
+	if err := c.valid(); err != nil {
+		return err
+	}
+	name = strings.ReplaceAll(name, "-", "_")
+	if err := c.config.Globals.SourceSetName(name, value); err != nil {
+		return err
+	}
+	if c.solver != nil {
+		return c.solver.UpdateParams(&c.params)
+	}
+	return nil
+}
+
 func (c *Context) Manager() (manager *ast.ASTManager, result error) {
 	if err := c.valid(); err != nil {
 		return nil, err

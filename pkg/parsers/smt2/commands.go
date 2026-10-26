@@ -193,13 +193,15 @@ func (p *commandParser) command() (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		if value != "true" && value != "false" {
-			return false, fmt.Errorf("Boolean option value expected")
-		}
 		if err = p.requireEnd(); err != nil {
 			return false, err
 		}
-		if err = p.context.SetBoolOption(key, value == "true"); err != nil {
+		if value == "true" || value == "false" {
+			err = p.context.SetBoolOption(key, value == "true")
+		} else {
+			err = p.context.SetSymbolOption(key, value)
+		}
+		if err != nil {
 			return false, err
 		}
 		if err = p.configurePatternOptions(); err != nil {

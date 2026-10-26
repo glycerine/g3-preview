@@ -22,11 +22,18 @@ digraph packages {
   "api" -> "arena";
   "api" -> "ast";
   "api" -> "engine";
+  "api" -> "interp";
+  "api" -> "model";
   "api" -> "smtcore";
+  "api" -> "solver";
   "api" -> "tactic";
+  "api" -> "util/cooperate";
   "api" -> "util/diagnostic";
+  "api" -> "util/lbool";
   "api" -> "util/memory";
+  "api" -> "util/numeral";
   "api" -> "util/params";
+  "api" -> "util/symbol";
   "api" -> "util/text";
   "api" -> "util/z3exception";
   "arena" [style=filled, fillcolor="#c9e8cb"];

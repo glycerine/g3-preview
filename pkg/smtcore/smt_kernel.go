@@ -71,24 +71,25 @@ type SMTKernel struct {
 	closed           bool
 
 	// Source m_has_quantifiers is sticky, including across scope pops.
-	assertedHasQuantifiers bool
-	assertedSubstitution   ast.ASTExprSubstitution
-	assertedScopedSubst    ast.ASTScopedExprSubstitution
-	assertedInconsistent   bool
-	assertedScopeConflicts []bool
-	assertedParams         uparams.ParamsRef
-	assertedParamsReady    bool
-	assertedElimAnd        bool
-	assertedPhaseReady     bool
-	preprocessingSetupDone bool
-	setupLogic             string
-	copiedArithmeticPlugin bool
-	copiedArithmeticOwner  *SMTArithParams
-	copiedArithmeticConfig SMTArithState
-	copiedBVOwner          *SMTBVParams
-	copiedBitBlasterOwner  *bit_blaster.SMTBitBlasterParams
-	copiedArrayPlugin      bool
-	copiedArrayOwner       *SMTArrayParams
+	assertedHasQuantifiers   bool
+	assertedSubstitution     ast.ASTExprSubstitution
+	assertedScopedSubst      ast.ASTScopedExprSubstitution
+	assertedInconsistent     bool
+	assertedScopeConflicts   []bool
+	assertedParams           uparams.ParamsRef
+	assertedParamsReady      bool
+	assertedElimAnd          bool
+	assertedPhaseReady       bool
+	preprocessingSetupDone   bool
+	setupLogic               string
+	sequenceSetupPlaceholder SMTTheoryInternalizer
+	copiedArithmeticPlugin   bool
+	copiedArithmeticOwner    *SMTArithParams
+	copiedArithmeticConfig   SMTArithState
+	copiedBVOwner            *SMTBVParams
+	copiedBitBlasterOwner    *bit_blaster.SMTBitBlasterParams
+	copiedArrayPlugin        bool
+	copiedArrayOwner         *SMTArrayParams
 }
 
 func (k *SMTKernel) readPreprocessorState(context *uparams.ParamsContext, globals *uparams.GlobalParamsService, params *uparams.ParamsRef) (state SMTPreprocessorState, result error) {

@@ -339,6 +339,9 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 
 var scriptResults = map[string]string{
 	"qfs_legacy_string_free_models.smt2":           "sat\n(((= s \"\") false))\nsat\n(((str.len s) 3))\nunsat\nsat\n((s \"abc\"))\nsat\n(((= s \"\") false))\n",
+	"generic_string_z3str3_free_models.smt2":       "sat\n(((= s \"\") false))\nsat\n(((str.len s) 3))\nunsat\nsat\n((s \"abc\"))\nsat\n(((= s \"\") false))\n",
+	"generic_string_auto_free_models.smt2":         "sat\n(((= s \"\") false))\nsat\n(((str.len s) 3))\nunsat\nsat\n((s \"abc\"))\nsat\n(((= s \"\") false))\n",
+	"generic_auto_nonstring_sequence.smt2":         "sat\n(((= x (seq.unit 7)) true))\nunsat\nsat\n(((seq.len x) 1))\n",
 	"seq_negative_symbolic_mixed.smt2":             "sat\n",
 	"theory_aware_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
 	"quant_seq_symbolic_int_prefix.smt2":           "sat\n(((= x (str.++ (int.to.str n) \"a\")) true))\nunsat\nsat\n(((= x \"7a\") true))\nsat\n",

@@ -39734,7 +39734,10 @@
         "pkg/parsers/smt2/commands_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd_context/reason_unknown.go",
-        "pkg/cmd_context/reason_unknown_test.go"
+        "pkg/cmd_context/reason_unknown_test.go",
+        "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -39872,13 +39875,27 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "set_option generic non-Boolean symbol parameter through source catalog and live solver update, retained smt.string_solver consumers",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Default-model get-value keeps expanded AST expressions pinned in command-local references and independently caches original input term strings. The scanner cache end is saved before each token advance; copied term strings survive cache reset and are passed alongside concrete AST handles to result output. Definitions, quoted identifiers, let terms and internal whitespace are echoed without AST expansion. Empty lists and quantified terms are rejected before result output. The rational_square_interval_scopes.smt2 C++ comparison checks exact 121/225 values after scoped rational square constraints. Indexed optimization-model queries remain outside this increment.",
         "Unsigned input rejects overflow, negative values for this path and trailing arguments before effects. Front-end timeout/rlimit values use the local unsigned parameter frame. Module values are parsed and owned by the source catalog, retaining its declared type even for integer input to Double options such as smt.restart_factor; no local UInt shadows that value. The catalog rejects unknown names and incompatible Boolean types. Floating-point, bit-vector and other remaining option-value branches are not claimed."
       ],
-      "deviations": []
+      "deviations": [
+        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment."
+      ]
     },
     {
       "path": "src/cmd_context/basic_cmds.h",
@@ -40434,7 +40451,10 @@
         "pkg/smtcore/theory_datatype.go",
         "pkg/smtcore/theory_datatype_recognizers.go",
         "pkg/smtcore/smt_solver.go",
-        "pkg/cmd_context/datatype_builtins_test.go"
+        "pkg/cmd_context/datatype_builtins_test.go",
+        "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -41163,6 +41183,18 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "set_option generic non-Boolean symbol parameter through source catalog and live solver update, retained smt.string_solver consumers",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -41173,7 +41205,8 @@
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete.",
-        "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery."
+        "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
+        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment."
       ]
     },
     {
@@ -41219,7 +41252,10 @@
         "pkg/smtcore/smt_model_checker.go",
         "pkg/smtcore/smt_model_checker_instances.go",
         "pkg/smtcore/smt_quantifier_manager.go",
-        "pkg/smtcore/smt_kernel.go"
+        "pkg/smtcore/smt_kernel.go",
+        "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
       ],
       "tests": [
         "TestCommandContextScopesDeclarationsAndModel",
@@ -41393,7 +41429,7 @@
         {
           "name": "insert_rec_fun: published declaration, reversed parameter variables, source identity-variable macro branch, proper-term body restriction, zero-arity equation or weight-zero reserved-QID definition with function/body patterns",
           "status": "ported",
-        "go_target": "pkg/cmd_context/recursive_functions.go",
+          "go_target": "pkg/cmd_context/recursive_functions.go",
           "go_targets": [
             "pkg/ast/ast_recursive_definition.go",
             "pkg/ast/rewriter/rewriter_engine.go",
@@ -41443,6 +41479,18 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "set_option generic non-Boolean symbol parameter through source catalog and live solver update, retained smt.string_solver consumers",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -41453,7 +41501,8 @@
       ],
       "deviations": [
         "Go strings, concrete maps/slices and explicit ASTRefs replace source symbol-table/owner internals. The early frontend uses the retained native SMTSolver directly; remaining source solver/tactic factory variants are not claimed complete.",
-        "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery."
+        "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
+        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment."
       ]
     },
     {
@@ -45534,7 +45583,8 @@
         "TestInterpolationManagerQuantifierDistributionAndArithmeticSolve",
         "TestInterpolationManagerCloseUniversally",
         "TestInterpolationManagerDiagnosticDisplayHelpers",
-        "TestInterpolationManagerBorrowAndCopyGuards"
+        "TestInterpolationManagerBorrowAndCopyGuards",
+        "TestDirectProofLocalizationQuantifierInsertion"
       ],
       "conditionals": [
         {
@@ -45659,11 +45709,13 @@
         }
       ],
       "ownership": [
-        "The copy-guarded wrapper borrows ASTManager and optional parameter services. Close releases its owned theory rewriters. Returned handles follow the Go AST package contract and callers pin handles retained beyond the immediate operation; rewriting and integer-division entry points return owning ASTRef values. Parameter and numeral copies are released on all exits."
+        "The copy-guarded wrapper borrows ASTManager and optional parameter services. Close releases its owned theory rewriters. Returned handles follow the Go AST package contract and callers pin handles retained beyond the immediate operation; rewriting and integer-division entry points return owning ASTRef values. Parameter and numeral copies are released on all exits.",
+        "MakeQuantifier retains an explicit input-body ASTRef throughout abstraction and construction, matching the native owning ast body wrapper and expr_abstract referenced-input precondition. The owning result remains distinct. The three existing localization/controlling-equality/universal-closure regressions now pass the checked/debug/trace source assertion as well as native builds; no assertion is weakened or skipped."
       ],
       "deviations": [
         "Native Go maps replace source operator lookup tables. Structural operations use checked ASTHandle values; theory rewriting returns owning ASTRef values because rewritten roots can otherwise be reclaimed before caller pinning.",
-        "The inactive get_bound_substitutes block and declaration-parameter adapters unused by retained interpolation consumers are not exposed. Diagnostic stdout helpers accept an explicit io.Writer."
+        "The inactive get_bound_substitutes block and declaration-parameter adapters unused by retained interpolation consumers are not exposed. Diagnostic stdout helpers accept an explicit io.Writer.",
+        "After merging interpolation API work, broad checked/debug/trace verification exposed three pre-existing quantifier tests passing an unreferenced body into expr_abstract. A read-only overlay of merged HEAD without the pending smtcore changes reproduced the same failures. Rooting the body at the interpolation wrapper boundary corrects the source lifetime; existing unit statuses and API-operation counts are unchanged."
       ]
     },
     {
@@ -45696,7 +45748,8 @@
         "TestInterpolationManagerQuantifierDistributionAndArithmeticSolve",
         "TestInterpolationManagerCloseUniversally",
         "TestInterpolationManagerDiagnosticDisplayHelpers",
-        "TestInterpolationManagerBorrowAndCopyGuards"
+        "TestInterpolationManagerBorrowAndCopyGuards",
+        "TestDirectProofLocalizationQuantifierInsertion"
       ],
       "conditionals": [
         {
@@ -45766,10 +45819,12 @@
         }
       ],
       "ownership": [
-        "Manager is a copy-guarded borrowed facade over ASTManager and optional parameter services. It owns and closes configured theory rewriters; persistent handle consumers retain explicit ASTRef responsibility."
+        "Manager is a copy-guarded borrowed facade over ASTManager and optional parameter services. It owns and closes configured theory rewriters; persistent handle consumers retain explicit ASTRef responsibility.",
+        "MakeQuantifier retains an explicit input-body ASTRef throughout abstraction and construction, matching the native owning ast body wrapper and expr_abstract referenced-input precondition. The owning result remains distinct. The three existing localization/controlling-equality/universal-closure regressions now pass the checked/debug/trace source assertion as well as native builds; no assertion is weakened or skipped."
       ],
       "deviations": [
-        "The inactive get_bound_substitutes declaration and generic declaration-parameter adapters unused by retained interpolation consumers are omitted under the retained-consumer rule. Diagnostic stdout helpers take an explicit io.Writer."
+        "The inactive get_bound_substitutes declaration and generic declaration-parameter adapters unused by retained interpolation consumers are omitted under the retained-consumer rule. Diagnostic stdout helpers take an explicit io.Writer.",
+        "After merging interpolation API work, broad checked/debug/trace verification exposed three pre-existing quantifier tests passing an unreferenced body into expr_abstract. A read-only overlay of merged HEAD without the pending smtcore changes reproduced the same failures. Rooting the body at the interpolation wrapper boundary corrects the source lifetime; existing unit statuses and API-operation counts are unchanged."
       ]
     },
     {
@@ -90668,7 +90723,10 @@
         "pkg/smtcore/smt_quantifier_manager.go",
         "pkg/smtcore/smt_kernel.go",
         "pkg/parsers/smt2/commands_scope_test.go",
-        "pkg/cmd/g3/test_vectors/datatype_boolean_fields_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/datatype_boolean_fields_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -91602,6 +91660,18 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "set_option generic non-Boolean symbol parameter through source catalog and live solver update, retained smt.string_solver consumers",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/context.go",
+          "go_targets": [
+            "pkg/parsers/smt2/commands.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -91617,7 +91687,8 @@
         "Go recursive grammar functions replace source explicit parser frame dispatch for retained branches. The current runner stops on the first command error; full C++ recovery and unsupported grammar branches remain open and fail explicitly.",
         "Explicit quantified patterns now reach E-matching through the SMT-LIB runner. Validation warnings use the process diagnostic warning service, invalid patterns follow ignore_bad_patterns, and ignored user patterns are consumed as S-expressions. Full legacy qualified unary-pattern and constant-pattern discard variants, expression labels, unknown-attribute warning/recovery and other parser grammar branches remain partial. The runner now has 92 strict C++ comparisons plus the separately documented C++ live-relevancy model defect regression.",
         "The new datatype C++ comparison exposed rejection of valid (push)/(pop). Scope counts now default to one only at a closing parenthesis. Invalid counts refuse before mutation; valid counts mutate the context before a trailing-token error, matching source control flow. Nested rollback and failed-command success suppression are tested with print-success enabled. Existing Go scanner error formatting is retained; broader parser work remains partial.",
-        "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery."
+        "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
+        "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment."
       ]
     },
     {
@@ -115165,7 +115236,9 @@
         "pkg/smtcore/smt_theory_assumptions_test.go",
         "pkg/smtcore/smt_theory.go",
         "pkg/smtcore/theory_str_expression_solver.go",
-        "pkg/smtcore/theory_str_expression_solver_test.go"
+        "pkg/smtcore/theory_str_expression_solver_test.go",
+        "pkg/smtcore/smt_setup.go",
+        "pkg/smtcore/smt_setup_string_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -115327,7 +115400,10 @@
         "TestSMTStringExpressionSolverBitVectorPredicates",
         "TestSMTStringExpressionSolverAutomatonConsumer",
         "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
-        "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
+        "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards",
+        "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
+        "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
+        "TestSMTStringFreeKernelModelAndCPPReference"
       ],
       "conditionals": [
         {
@@ -117024,6 +117100,16 @@
             "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
             "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards"
           ]
+        },
+        {
+          "name": "register_plugin preservation at deferred sequence setup: distinguish eager Go placeholder from explicitly installed native-style plugin",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
+            "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
+            "TestSMTStringFreeKernelModelAndCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -117071,7 +117157,8 @@
         "Extracted the existing context sharing decision used by arithmetic and arrays for the live sequence interface consumer as well. Ite precedes the zero-theory-variable case, root theory counts and active MAM sharing precede foreign-family parents, and only the single-owner fallthrough consults concrete owner rules. Arithmetic underspecified-operation and array-role checks remain concrete and unchanged; sequence inherits the base false hook. No universal callback or unused theory adapter was introduced. Context sharing TRACE/assertion and broader integration audits remain open.",
         "Both native TheoryCaseSplit modes are connected to retained String arrangements. This helper enforces at most one literal, with the arrangement disjunction supplied by its caller. Source duplicate registration assertion is retained in debug builds. Whole context/String completion is not claimed.",
         "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements.",
-        "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter."
+        "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter.",
+        "The kernel records the exact eager constructor sequence placeholder. Deferred setup may replace only that unused plugin, keeping registry order and closing its owners; explicitly registered String/Sequence plugins are preserved as in native register_plugin. Existing concrete String kernel model/oracle fixtures verify preservation. This does not claim all plugin-copy lifecycle work complete."
       ]
     },
     {
@@ -117167,7 +117254,9 @@
         "pkg/smtcore/theory_str_expression_solver.go",
         "pkg/smtcore/theory_str_expression_solver_test.go",
         "pkg/smtcore/theory_str_length_options.go",
-        "pkg/smtcore/theory_str_length_options_test.go"
+        "pkg/smtcore/theory_str_length_options_test.go",
+        "pkg/smtcore/smt_setup.go",
+        "pkg/smtcore/smt_setup_string_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -117284,7 +117373,10 @@
         "TestSMTStringExpressionSolverAutomatonConsumer",
         "TestSMTStringExpressionSolverConstructionFailureKeepsParent",
         "TestSMTStringExpressionSolverTheoryCloseAndConstructorGuards",
-        "TestSMTStringLengthOptionsPrioritiesAggressivePhasesAndLiteralCache"
+        "TestSMTStringLengthOptionsPrioritiesAggressivePhasesAndLiteralCache",
+        "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
+        "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
+        "TestSMTStringFreeKernelModelAndCPPReference"
       ],
       "conditionals": [
         {
@@ -117978,6 +118070,16 @@
           "tests": [
             "TestSMTStringLengthOptionsPrioritiesAggressivePhasesAndLiteralCache"
           ]
+        },
+        {
+          "name": "register_plugin preservation at deferred sequence setup: distinguish eager Go placeholder from explicitly installed native-style plugin",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
+            "TestSMTStringGroundedFinalCheckAndModelUseAssignedBytes",
+            "TestSMTStringFreeKernelModelAndCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -118011,7 +118113,8 @@
         "Unroll integration exposed a missing mk_enode true-equality assignment: delayed guards over already merged enodes previously remained undefined. Restored the native assignment using the existing equality-propagation reason and verified both gate contexts, opposite assignment conflict and pop. Native distinct-enode justification precondition is unchanged.",
         "Source successful next_case_split choices return before phase-map lookup; no selected-variable phase override is invented and that dead phase-only storage is omitted. Priorities add to clause activity; metadata updates use the native sign-based increased/decreased hook. Random choices retain heap membership. This increment does not complete String concat/concat arrangements.",
         "Concrete String expression-solver initialization and actual symbolic automaton product consumption are directly verified, including SAT/UNSAT byte predicates, Boolean query isolation from parent assertions, shared nondefault configuration and subsequent parent conflict-limit updates, unknown/cancellation/error scope cleanup, allocation frontiers, guards and teardown ownership. Query entry refreshes Go scalar parameter snapshots from the borrowed source owner rather than applying an empty update or cloning defaults. Native exceptions become Go errors; pop failures propagate with Undef. Enclosing automata construction scheduling/assumptions/path/intersection dispatch and remaining legacy String final checking are still pending; production QF_S routing is unchanged. Existing kernel algorithm port status is unchanged; shared ownership plumbing is a concrete representation replacement, not a new generic adapter.",
-        "Added a concrete retained String consumer of existing phase-cache fields, verified together with actual equality internalization, relevance and branch-priority services. This does not add an unused generic phase adapter or change context source-unit completion status."
+        "Added a concrete retained String consumer of existing phase-cache fields, verified together with actual equality internalization, relevance and branch-priority services. This does not add an unused generic phase adapter or change context source-unit completion status.",
+        "The kernel records the exact eager constructor sequence placeholder. Deferred setup may replace only that unused plugin, keeping registry order and closing its owners; explicitly registered String/Sequence plugins are preserved as in native register_plugin. Existing concrete String kernel model/oracle fixtures verify preservation. This does not claim all plugin-copy lifecycle work complete."
       ]
     },
     {
@@ -123966,7 +124069,10 @@
         "pkg/smtcore/smt_tactic_impl.go",
         "pkg/smtcore/smt_setup_check_test.go",
         "pkg/smtcore/smt_setup_string_test.go",
-        "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2"
+        "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
       ],
       "tests": [
         "TestSMTArraySharedRolesAndScopedInterfaceEqualities",
@@ -124031,7 +124137,10 @@
         "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
         "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
         "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
-        "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic"
+        "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic",
+        "TestSMTGenericSequenceBackendUsesUpdatedOptionsAndFeatures",
+        "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
+        "TestSMTGenericSelectorRespectsAutomaticSpecializedDispatch"
       ],
       "assertions": [
         {
@@ -124446,6 +124555,18 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "setup_seq_str at first push/check: current seq/z3str3/auto selector, non-String sequence features, QF_S/QF_BVRE profile precedence, invalid selector and permanent setup boundary",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTGenericSequenceBackendUsesUpdatedOptionsAndFeatures",
+            "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
+            "TestSMTGenericSelectorRespectsAutomaticSpecializedDispatch",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -124486,7 +124607,8 @@
         "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
         "Earlier profile tests entered feature setup through ordinary CheckSat. They now explicitly use the fresh setup_and_check entry before later incremental checks; expectations for backend selection and parameter owners are unchanged. New regressions independently require logic-only policy for ordinary zero-assumption checks and static policy for fresh no-assumption tactics.",
         "Negative-containment source audit confirmed setup_QF_S registers theory_str plus mixed integer arithmetic (smt_setup.cpp:725-728), while generic setup_seq_str selects theory_seq/theory_str according to string_solver/static features. Go still registers SMTSequenceTheory for QF_S; theory_str.cpp/.h have partial helper/owner ports but no selectable native constraint backend. A QF_S sat observation therefore does not verify generic ALL/theory_seq canonical containment. The saved pending_seq_negative_contains_canonize_scopes.smt2 captures the remaining ALL unconstrained-scope sat-versus-unknown difference. No routing implementation is credited by this audit.",
-        "Supersede the old QF_S Sequence/integer routing for initial logic/automatic setup with native String/mixed arithmetic. Five direct profile cases verify generic selector independence and borrowed ownership for enabled auto_config, plus disabled-auto-config default seq. A new CLI free-model/scoped contradiction/recovery script matches prebuilt C++. Generic setup_seq_str z3str3/auto selection and backend changes after parameters update before deferred setup remain unfinished; source units stay partial and verified 559706f8 predates this routing change."
+        "Supersede the old QF_S Sequence/integer routing for initial logic/automatic setup with native String/mixed arithmetic. Five direct profile cases verify generic selector independence and borrowed ownership for enabled auto_config, plus disabled-auto-config default seq. A new CLI free-model/scoped contradiction/recovery script matches prebuilt C++. Generic setup_seq_str and pre-setup option changes are now implemented at the deferred boundary; source units remain partial for broader setup and copy-path work. Verified 559706f8 predates these routing changes.",
+        "Generic setup_seq_str selection now reads current options and asserted-formula features at the first push/check boundary. auto selects Sequence for non-String sequences and String otherwise; z3str3/seq are explicit. QF_S and QF_BVRE profiles override the generic selector only while auto_config is enabled. setup_unknown(st) specialized dispatch is respected before generic-selector validation. Only eager Go placeholders can be replaced; explicit native-style installed plugins are preserved. Setup stays permanent across option updates and scope pops. Initial/deferred routing is covered, while broader setup profiles and concrete plugin-copy paths remain partial."
       ]
     },
     {
@@ -124544,7 +124666,10 @@
         "pkg/smtcore/smt_tactic_impl.go",
         "pkg/smtcore/smt_setup_check_test.go",
         "pkg/smtcore/smt_setup_string_test.go",
-        "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2"
+        "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_string_z3str3_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_string_auto_free_models.smt2",
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
       ],
       "tests": [
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
@@ -124592,7 +124717,10 @@
         "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
         "TestSMTSetupAndCheckRejectsRepeatedEmptyStandaloneContext",
         "TestSMTCheckAssumptionValidationFollowsSetupAndPrecedesInternalization",
-        "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic"
+        "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic",
+        "TestSMTGenericSequenceBackendUsesUpdatedOptionsAndFeatures",
+        "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
+        "TestSMTGenericSelectorRespectsAutomaticSpecializedDispatch"
       ],
       "conditionals": [
         {
@@ -124917,6 +125045,18 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "setup_seq_str at first push/check: current seq/z3str3/auto selector, non-String sequence features, QF_S/QF_BVRE profile precedence, invalid selector and permanent setup boundary",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "tests": [
+            "TestSMTGenericSequenceBackendUsesUpdatedOptionsAndFeatures",
+            "TestSMTSequenceBackendInvalidSelectorAndQFSLateModeChange",
+            "TestSMTGenericSelectorRespectsAutomaticSpecializedDispatch",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -124953,7 +125093,8 @@
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
         "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
         "Earlier profile tests entered feature setup through ordinary CheckSat. They now explicitly use the fresh setup_and_check entry before later incremental checks; expectations for backend selection and parameter owners are unchanged. New regressions independently require logic-only policy for ordinary zero-assumption checks and static policy for fresh no-assumption tactics.",
-        "Supersede the old QF_S Sequence/integer routing for initial logic/automatic setup with native String/mixed arithmetic. Five direct profile cases verify generic selector independence and borrowed ownership for enabled auto_config, plus disabled-auto-config default seq. A new CLI free-model/scoped contradiction/recovery script matches prebuilt C++. Generic setup_seq_str z3str3/auto selection and backend changes after parameters update before deferred setup remain unfinished; source units stay partial and verified 559706f8 predates this routing change."
+        "Supersede the old QF_S Sequence/integer routing for initial logic/automatic setup with native String/mixed arithmetic. Five direct profile cases verify generic selector independence and borrowed ownership for enabled auto_config, plus disabled-auto-config default seq. A new CLI free-model/scoped contradiction/recovery script matches prebuilt C++. Generic setup_seq_str and pre-setup option changes are now implemented at the deferred boundary; source units remain partial for broader setup and copy-path work. Verified 559706f8 predates these routing changes.",
+        "Generic setup_seq_str selection now reads current options and asserted-formula features at the first push/check boundary. auto selects Sequence for non-String sequences and String otherwise; z3str3/seq are explicit. QF_S and QF_BVRE profiles override the generic selector only while auto_config is enabled. setup_unknown(st) specialized dispatch is respected before generic-selector validation. Only eager Go placeholders can be replaced; explicit native-style installed plugins are preserved. Setup stays permanent across option updates and scope pops. Initial/deferred routing is covered, while broader setup profiles and concrete plugin-copy paths remain partial."
       ]
     },
     {
@@ -126429,7 +126570,9 @@
         "pkg/smtcore/theory_arith_equality_guards_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/theory_str_arithmetic_bounds.go",
-        "pkg/smtcore/theory_str_arithmetic_bounds_test.go"
+        "pkg/smtcore/theory_str_arithmetic_bounds_test.go",
+        "pkg/smtcore/theory_arith_definition_replay_test.go",
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -126460,7 +126603,8 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTStringArithmeticBoundsAssignmentAndScope",
         "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
-        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
+        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints",
+        "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms"
       ],
       "conditionals": [
         {
@@ -126668,6 +126812,16 @@
             "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
             "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
           ]
+        },
+        {
+          "name": "internalize_numeral/linear definition value publication without assigned arithmetic predicates, through concrete Go tableau replay",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -126679,7 +126833,8 @@
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
         "Integer-only difference-graph setup branches have no retained writer for constructor-only int_only=true; no unused clone specialization or universal factory/callback adapter was added.",
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
-        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial."
+        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial.",
+        "Native internalize_numeral initializes exact bounds/value immediately and native linear definitions enter the live tableau. The Go replay now detects newly created columns and definitions even without Boolean arithmetic assertions. Counts describe the successfully replayed tableau; pop rebuilds and synchronizes them. A deterministic old-code regression exposed numeral7 becoming0 in a sequence model. Positive/negative/rational numerals, later constant definitions and repeated scopes now publish exact values; the Seq Int CLI model satisfies its asserted equality against C++. No model-output rewriting or numeral-only patch bypass is used."
       ]
     },
     {
@@ -127387,7 +127542,9 @@
         "pkg/smtcore/theory_arith_pivot_test.go",
         "pkg/cmd_context/qflra_solver_test.go",
         "pkg/smtcore/theory_str_arithmetic_bounds.go",
-        "pkg/smtcore/theory_str_arithmetic_bounds_test.go"
+        "pkg/smtcore/theory_str_arithmetic_bounds_test.go",
+        "pkg/smtcore/theory_arith_definition_replay_test.go",
+        "pkg/cmd/g3/test_vectors/generic_auto_nonstring_sequence.smt2"
       ],
       "tests": [
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
@@ -127444,7 +127601,8 @@
         "TestCommandContextQFLRAFixedPivotSurvivesCallerUpdates",
         "TestSMTStringArithmeticBoundsAssignmentAndScope",
         "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
-        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
+        "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints",
+        "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms"
       ],
       "conditionals": [
         {
@@ -128488,6 +128646,16 @@
             "TestSMTStringArithmeticBoundsMixedGateAndNonintegerRefusals",
             "TestSMTStringArithmeticBoundsUnassignedAndWideEndpoints"
           ]
+        },
+        {
+          "name": "internalize_numeral/linear definition value publication without assigned arithmetic predicates, through concrete Go tableau replay",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "tests": [
+            "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -128511,7 +128679,8 @@
         "Integer feasibility no longer runs a hidden recursive bounded search. Its remaining fractional model is repaired through source Boolean branching and mixed-integer Gomory propagation, sharing SMT scope restoration, conflict learning, proofs and models with the other theories. Candidate-model point bounds remain confined to separate replays. The branch/cut counter persists as in the source and its configured ratio controls alternation. Current focused tests force both paths and repeated scopes.",
         "Euclidean arithmetic bounds are now scoped alongside existing numeric replay facts. Comparison-column facts are stored by the exact logical polynomial coefficient key rather than a shifting auxiliary column ID, and replay tightens the current shared expression column. The arithmetic theory owns the source-equivalent Euclidean numeral-manager lifetime and exposes checked cleanup through the existing optional theory Close hook. Temporary model-completion point bounds are never premises for Euclidean facts.",
         "Concrete SMT arithmetic pivot selection now consumes the previously parsed strategy and Bland threshold through the shared exact tableau. Equal-error candidates use ascending variable ID instead of C++ heap traversal order; existing normal entering-variable ties also remain deterministic rather than randomized. These are heuristic ordering differences. Source tableau trace/assertion sites and other incomplete arithmetic algorithms remain scoped to this partial unit.",
-        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial."
+        "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial.",
+        "Native internalize_numeral initializes exact bounds/value immediately and native linear definitions enter the live tableau. The Go replay now detects newly created columns and definitions even without Boolean arithmetic assertions. Counts describe the successfully replayed tableau; pop rebuilds and synchronizes them. A deterministic old-code regression exposed numeral7 becoming0 in a sequence model. Positive/negative/rational numerals, later constant definitions and repeated scopes now publish exact values; the Seq Int CLI model satisfies its asserted equality against C++. No model-output rewriting or numeral-only patch bypass is used."
       ]
     },
     {

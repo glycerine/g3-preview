@@ -24,6 +24,9 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 		if err := k.setupArrayBackend(); err != nil {
 			return err
 		}
+		if err := k.setupSequenceBackend(useStaticFeatures); err != nil {
+			return err
+		}
 		k.setupAssertedPolicies()
 		k.preprocessingSetupDone = true
 		return nil
@@ -85,6 +88,9 @@ func (k *SMTKernel) setupAssertedBounds(useStaticFeatures bool) error {
 		k.smtParams.preprocess.state.EliminateBounds = true
 	}
 	if err := k.setupArrayBackend(); err != nil {
+		return err
+	}
+	if err := k.setupSequenceBackend(useStaticFeatures); err != nil {
 		return err
 	}
 	k.setupAssertedPolicies()

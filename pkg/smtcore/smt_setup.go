@@ -2,7 +2,12 @@
 // logic routing for theories whose concrete Go solvers are not yet available.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 // smtLogicUsesUnknownSetup mirrors setup::setup_default's fallthrough to
 // setup_unknown. QF_FD is a retained Go specialization whose concrete finite
@@ -85,6 +90,139 @@ func smtLogicUsesFloatingPoint(logic string) bool {
 
 func smtLogicUsesSequences(logic string) bool {
 	return logic == "QF_BVRE" || logic == "QF_S" || smtLogicUsesUnknownSetup(logic)
+}
+
+// setup_unknown(st) may dispatch to a specialized arithmetic/array/BV
+// profile before reaching setup_unknown()/setup_seq_str. Keep that decision
+// separate from the generic string_solver parameter.
+func smtUnknownSetupUsesSequences(f *ast.StaticFeatures) bool {
+	if f.NumQuantifiers != 0 {
+		return true
+	}
+	if f.NumNonUFTheories() == 0 {
+		return false
+	}
+	n := f.NumTheories()
+	difference := (f.NumDiffTerms != 0 || f.NumDiffEqualities != 0 || f.NumDiffInequalities != 0) && f.NumArithEqualities == f.NumDiffEqualities && f.NumArithTerms == f.NumDiffTerms && f.NumArithInequalities == f.NumDiffInequalities
+	arithmetic := f.NumArithEqualities != 0 || f.NumArithTerms != 0 || f.NumArithInequalities != 0
+	if n == 1 && difference {
+		return f.HasInt == f.HasReal
+	}
+	if n == 2 && f.HasUF() && difference {
+		return f.HasReal || !f.HasInt
+	}
+	if n == 1 && arithmetic {
+		return false
+	}
+	if n == 2 && f.HasUF() && arithmetic {
+		return f.HasReal && (f.HasInt || f.NumNonLinear != 0)
+	}
+	if n == 1 && (f.HasBitVector || f.HasFloatingPoint || f.HasArrays) || n == 2 && f.HasFloatingPoint && f.HasBitVector {
+		return false
+	}
+	if n == 2 && f.HasUF() && f.HasArrays && (f.HasBitVector || f.HasInt) {
+		return false
+	}
+	return true
+}
+
+// Native plugin selection happens at the first push/check, after parameter
+// updates and asserted-formula collection. Constructor plugins are only Go
+// placeholders until this boundary.
+func (k *SMTKernel) setupSequenceBackend(useStaticFeatures bool) (result error) {
+	legacy := k.smtState.AutoConfig && k.setupLogic == "QF_S"
+	if !legacy && k.smtState.AutoConfig && k.setupLogic != "QF_BVRE" && !smtLogicUsesUnknownSetup(k.setupLogic) {
+		return nil
+	}
+	if !legacy && !(k.smtState.AutoConfig && k.setupLogic == "QF_BVRE") {
+		features, err := k.setupStaticFeatures(true)
+		if err != nil {
+			return err
+		}
+		defer func() { result = errors.Join(result, features.Close()) }()
+		if k.smtState.AutoConfig && useStaticFeatures && !smtUnknownSetupUsesSequences(features) {
+			return nil
+		}
+		choice, _, err := k.manager.Symbols.BareString(k.smtState.StringSolver)
+		if err != nil {
+			return err
+		}
+		switch choice {
+		case "seq":
+		case "z3str3":
+			legacy = true
+		case "auto":
+			legacy = !features.HasNonStringSequence
+		default:
+			return fmt.Errorf("invalid parameter for smt.string_solver, valid options are 'z3str3', 'seq', 'auto'")
+		}
+	}
+	family, err := k.manager.RegisterSequencePlugin()
+	if err != nil {
+		return err
+	}
+	s := k.internalizer
+	old := s.theories[family]
+	// context::register_plugin preserves an explicitly installed/copied
+	// plugin. Only the eager Go constructor placeholder may be replaced.
+	if old != nil && old != k.sequenceSetupPlaceholder {
+		return nil
+	}
+	if legacy {
+		if _, ok := old.(*SMTStringTheory); ok {
+			return nil
+		}
+	} else if _, ok := old.(*SMTSequenceTheory); ok {
+		return nil
+	}
+	position := -1
+	if old != nil {
+		switch previous := old.(type) {
+		case *SMTSequenceTheory:
+			if previous.NumVariables() != 0 {
+				return ast.ErrASTDomain
+			}
+		case *SMTStringTheory:
+			if previous.NumVariables() != 0 || len(previous.refs) != 0 {
+				return ast.ErrASTDomain
+			}
+		default:
+			return ast.ErrASTDomain
+		}
+		if len(s.scopes) != 0 || s.theoriesSetup {
+			return ast.ErrASTDomain
+		}
+		for index, theory := range s.theoryOrder {
+			if theory == old {
+				position = index
+				break
+			}
+		}
+		if position < 0 {
+			return ast.ErrASTDomain
+		}
+	}
+	var theory SMTTheoryInternalizer
+	if legacy {
+		theory, err = NewSMTStringTheory(family, &k.smtParams.str)
+	} else {
+		theory, err = NewSMTSequenceTheory(family)
+	}
+	if err != nil {
+		return err
+	}
+	if old == nil {
+		return k.RegisterTheory(theory)
+	}
+	if err = theory.Initialize(s); err != nil {
+		return errors.Join(err, theory.(interface{ Close() error }).Close())
+	}
+	if err = old.(interface{ Close() error }).Close(); err != nil {
+		return errors.Join(err, theory.(interface{ Close() error }).Close())
+	}
+	s.theories[family], s.theoryOrder[position] = theory, theory
+	k.sequenceSetupPlaceholder = nil
+	return nil
 }
 
 func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic string) error {
@@ -245,6 +383,7 @@ func smtInstallRetainedSetup(kernel *SMTKernel, manager *ast.ASTManager, logic s
 				return err
 			}
 		}
+		kernel.sequenceSetupPlaceholder = kernel.internalizer.theories[family]
 	}
 	if smtLogicUsesDatatypes(logic) {
 		family, err := manager.RegisterDatatypePlugin()

@@ -145,6 +145,8 @@ type SMTLinearArithmeticTheory struct {
 	solver              *simplex.Solver
 	simplexVariables    []uint32
 	nextSimplex         uint32
+	replayedNextSimplex uint32
+	replayedDefinitions int
 	definitions         map[SMTTheoryVar]smtLinearForm
 	atoms               []smtLinearArithmeticAtom
 	atomByBool          map[int32]int
@@ -211,6 +213,7 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		atomByBool:            make(map[int32]int),
 		definitions:           make(map[SMTTheoryVar]smtLinearForm),
 		nextSimplex:           1,
+		replayedNextSimplex:   1,
 		integer:               integer,
 		integerColumns:        make(map[uint32]bool),
 		castTerms:             make(map[ast.ASTHandle]bool),
@@ -762,7 +765,10 @@ func (t *SMTLinearArithmeticTheory) Assign(variable int32, truth bool) error {
 }
 
 func (t *SMTLinearArithmeticTheory) CanPropagate() bool {
-	return t != nil && (t.assertionHead < len(t.assertions) || t.pendingBoundHead < len(t.pendingBounds) || t.ownEqualityHead < len(t.ownEqualities))
+	// Native internalize_numeral/linear rows immediately initialize their
+	// tableau values. The Go replay must also publish new columns/definitions
+	// when no Boolean arithmetic atom was asserted (for example seq.unit(7)).
+	return t != nil && (t.replayedNextSimplex != t.nextSimplex || t.replayedDefinitions != len(t.definitions) || t.assertionHead < len(t.assertions) || t.pendingBoundHead < len(t.pendingBounds) || t.ownEqualityHead < len(t.ownEqualities))
 }
 
 func smtLinearAtomBound(atom *smtLinearArithmeticAtom, truth, integer bool) (lower bool, value simplex.Infinitesimal) {
@@ -1100,6 +1106,7 @@ func (t *SMTLinearArithmeticTheory) rebuild() (bool, error) {
 	solver, status, err := t.buildSimplexReplay(nil, seeds)
 	if err == nil && status == lbool.True {
 		t.solver = solver
+		t.replayedNextSimplex, t.replayedDefinitions = t.nextSimplex, len(t.definitions)
 	}
 	if err == nil && status == lbool.False && t.state != nil {
 		err = t.derivedBoundConflict(solver)

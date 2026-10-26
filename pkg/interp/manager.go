@@ -513,6 +513,13 @@ func (m *Manager) MakeQuantifier(op Operator, bound []ast.ASTHandle, body ast.AS
 	if len(bound) == 0 {
 		return body, nil
 	}
+	// Native make_quant receives an owning ast wrapper for body.
+	// expr_abstract requires that input root to remain referenced.
+	input, err := m.ast.NewRef(body)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, m.ast.DelRef(&input)) }()
 	out, err := m.ast.NewRef(ast.ASTHandle{})
 	if err != nil {
 		return ast.ASTHandle{}, err
