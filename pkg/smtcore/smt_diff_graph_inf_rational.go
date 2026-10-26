@@ -278,7 +278,7 @@ func (g *SMTInfRationalDiffGraph) NegativeCycleEdges() ([]int32, error) {
 }
 
 func (g *SMTInfRationalDiffGraph) NegativeCycleExplanations() ([]SMTLiteral, error) {
-	edges, err := g.NegativeCycleEdges()
+	edges, err := g.negativeCycleEdgesWithShortcuts()
 	if err != nil {
 		return nil, err
 	}

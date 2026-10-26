@@ -108822,7 +108822,12 @@
         "pkg/smtcore/smt_diff_graph_inf_rational.go",
         "pkg/smtcore/smt_diff_graph_inf_rational_test.go",
         "pkg/smtcore/smt_diff_graph_inf_zero.go",
-        "pkg/smtcore/smt_diff_graph_inf_zero_test.go"
+        "pkg/smtcore/smt_diff_graph_inf_zero_test.go",
+        "pkg/smtcore/smt_diff_graph_cycle.go",
+        "pkg/smtcore/smt_diff_graph_cycle_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_real.smt2",
+        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2"
       ],
       "tests": [
         "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
@@ -108840,7 +108845,10 @@
         "TestSMTInfRationalDiffGraphStrictNegativeCycle",
         "TestSMTInfRationalDiffGraphAssignmentScopeAndNormalization",
         "TestSMTInfRationalTightEdgeComponentsPathsAndUpdates",
-        "TestSMTInfRationalPairedZeroAndCycleEdgeIdentity"
+        "TestSMTInfRationalPairedZeroAndCycleEdgeIdentity",
+        "TestSMTDifferenceGraphShortcutsPreserveStrictConflict",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -109278,15 +109286,36 @@
             "TestSMTInfRationalDiffGraphStrictNegativeCycle",
             "TestSMTInfRationalDiffGraphAssignmentScopeAndNormalization"
           ]
+        },
+        {
+          "name": "Retained shared infinitesimal-rational traverse_neg_cycle2/check_explanation for mixed Int/Real difference logic and UTVPI: enabled weaker shortcuts, nonnegative relaxation delta with strictly negative remaining cycle, unchanged parent witness, concrete borrowed-edge traversal; no unused template/number specialization",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_diff_graph_cycle.go",
+            "pkg/smtcore/smt_diff_graph_cycle_test.go",
+            "pkg/smtcore/smt_diff_graph_inf_rational.go",
+            "pkg/smtcore/smt_utvpi_cycle.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/difference_shortcut_cores_real.smt2",
+            "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2"
+          ],
+          "tests": [
+            "TestSMTDifferenceGraphShortcutsPreserveStrictConflict",
+            "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
-        "Graph slices own copied big.Rat or concrete infinitesimal-rational assignments, weights and search values. Edge explanations borrow immutable SMTLiteral values. Scope rollback retires enabled edges before truncating adjacency and edge storage."
+        "Graph slices own copied big.Rat or concrete infinitesimal-rational assignments, weights and search values. Edge explanations borrow immutable SMTLiteral values. Scope rollback retires enabled edges before truncating adjacency and edge storage.",
+        "The shared cycle helper borrows graph edges and copies each infinitesimal potential; it never mutates graph-owned weights, parent links or enabled state. Difference-logic and UTVPI conflict justifications enter the existing scoped ownedJustifications list only after complete construction. Temporary original Farkas parameters are released on every exit; copied parameters live through proof use and are released on scope pop. The allocation-frontier test checks prefix cleanup and retry without publishing a partial conflict."
       ],
       "deviations": [
         "UTVPI statistics now expose the source cumulative conflict/assertion/core equality counters, equality-adapter counts and graph propagation cost via SMTSolver. Counts survive scope pop. The active two-argument disequality callback does not increment the source disequality counter; its only increment is in an unused overload. Other UTVPI graph statistics remain zero because this owner never calls implied-literal discovery or find_relaxed_edge.",
-        "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
-        "The retained concrete instantiations use math/big.Rat values directly or a pair of owned big.Rat values ordered lexicographically. No template or STL container is ported. The infinitesimal graph exposes only operations reached by real difference logic. Invalid source assertion domains return errSMTDiffGraphDomain."
+        "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. The difference-logic consumer now uses the same retained shortcut traversal. Its new_edge guard reads m_theory_resolve, constructor-fixed false with no retained writer (params/smt_params.h:268; theory_diff_logic.h:363; theory_diff_logic_def.h:563). Thus the activity-based cut callback has no reached learned-edge effect for this specialization either; no universal callback adapter or disabled learned-edge algorithm is added.",
+        "The retained concrete instantiations use math/big.Rat values directly or a pair of owned big.Rat values ordered lexicographically. No template or STL container is ported. The infinitesimal graph exposes only operations reached by real difference logic. Invalid source assertion domains return errSMTDiffGraphDomain.",
+        "Source setup_arith selects the retained arbitrary-precision infinitesimal graph for both Int and Real inputs while m_arith_int_only remains constructor-fixed false; no new unused rational-only/short-number template specialization is ported. Existing standalone rational graph behavior is outside this increment. General implied-bound discovery and the broader source display/diagnostic audit remain incomplete."
       ]
     },
     {
@@ -135898,7 +135927,16 @@
         "pkg/smtcore/theory_diff_logic_integer.go",
         "pkg/smtcore/theory_diff_logic_integer_test.go",
         "pkg/smtcore/theory_diff_logic_real.go",
-        "pkg/smtcore/theory_diff_logic_real_test.go"
+        "pkg/smtcore/theory_diff_logic_real_test.go",
+        "pkg/smtcore/smt_diff_graph_cycle.go",
+        "pkg/smtcore/smt_diff_graph_cycle_test.go",
+        "pkg/smtcore/smt_diff_graph_inf_rational.go",
+        "pkg/smtcore/smt_utvpi_cycle.go",
+        "pkg/smtcore/theory_diff_logic_conflict.go",
+        "pkg/smtcore/theory_diff_logic_conflict_test.go",
+        "pkg/smtcore/theory_utvpi.go",
+        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_real.smt2",
+        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -135920,7 +135958,10 @@
         "TestSMTRealDiffTheoryBuildsFiniteModelValues",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
         "TestSMTSolverPublishesStrictRealDifferenceModel",
-        "TestSMTSolverRealDifferenceEqualityAdapter"
+        "TestSMTSolverRealDifferenceEqualityAdapter",
+        "TestSMTDifferenceGraphShortcutsPreserveStrictConflict",
+        "TestSMTDifferenceContextShortcutConflictProof",
+        "TestSMTDifferenceConflictParameterAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -135994,11 +136035,36 @@
         {
           "name": "Equality propagation metadata, adaptive/implied-bound propagation, statistics and optimization (src/smt/theory_diff_logic.h:95-132,167-176,186-203,247-254,276-306,310-339,361-378,380-433)",
           "status": "unported"
+        },
+        {
+          "name": "Difference-logic shortened-cycle conflict publication with native extended justification and Farkas plus antecedent/result unit coefficients; source-region conflict parameter ownership through failed construction, scope pop and existing UTVPI publication",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_diff_graph_cycle.go",
+            "pkg/smtcore/smt_diff_graph_cycle_test.go",
+            "pkg/smtcore/smt_diff_graph_inf_rational.go",
+            "pkg/smtcore/smt_utvpi_cycle.go",
+            "pkg/smtcore/theory_diff_logic_conflict.go",
+            "pkg/smtcore/theory_diff_logic_conflict_test.go",
+            "pkg/smtcore/theory_diff_logic_real.go",
+            "pkg/smtcore/theory_utvpi.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/difference_shortcut_cores_real.smt2",
+            "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2"
+          ],
+          "tests": [
+            "TestSMTDifferenceGraphShortcutsPreserveStrictConflict",
+            "TestSMTDifferenceContextShortcutConflictProof",
+            "TestSMTDifferenceConflictParameterAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Basic setup releases its temporary feature collector on every exit and replaces only an unused arithmetic owner before scope/theory setup. A pre-existing disabled checkpoint can be replaced after a parameter update. Mixed graph model delta and numeral types come from the existing concrete graph and AST owner. Initialized direct-internalizer column specializations remain stable.",
-        "Each theory owns its concrete rational or infinitesimal-rational graph, atom and assertion slices, Boolean-variable index map, and scope snapshots. It borrows the initialized SMTInternalizerState and enodes through SMTTheoryBase; graph explanations borrow immutable SMTLiteral values."
+        "Each theory owns its concrete rational or infinitesimal-rational graph, atom and assertion slices, Boolean-variable index map, and scope snapshots. It borrows the initialized SMTInternalizerState and enodes through SMTTheoryBase; graph explanations borrow immutable SMTLiteral values.",
+        "The shared cycle helper borrows graph edges and copies each infinitesimal potential; it never mutates graph-owned weights, parent links or enabled state. Difference-logic and UTVPI conflict justifications enter the existing scoped ownedJustifications list only after complete construction. Temporary original Farkas parameters are released on every exit; copied parameters live through proof use and are released on scope pop. The allocation-frontier test checks prefix cleanup and retry without publishing a partial conflict."
       ],
       "deviations": [
         "Arithmetic copying now preserves every currently retained registered arithmetic backend: mixed/integer/real simplex, mixed/real difference graphs, dense arithmetic, UTVPI and arithmetic dummy. The copied plugins keep fresh solver data; simplex/difference/dense constructors borrow the source arithmetic parameter owner, while UTVPI keeps its constructor defaults. Source parameter updates refresh copies without destination setup overwriting them. Managed Go scalar ownership permits safe continued checks after the original solver and manager close. Non-arithmetic plugin copying and broader context-copy learned-state fidelity remain incomplete.",
@@ -136021,7 +136087,16 @@
         "pkg/smtcore/theory_diff_logic_real.go",
         "pkg/smtcore/theory_diff_logic_real_test.go",
         "pkg/smtcore/smt_boolean_propagation.go",
-        "pkg/smtcore/smt_internalizer_state.go"
+        "pkg/smtcore/smt_internalizer_state.go",
+        "pkg/smtcore/smt_diff_graph_cycle.go",
+        "pkg/smtcore/smt_diff_graph_cycle_test.go",
+        "pkg/smtcore/smt_diff_graph_inf_rational.go",
+        "pkg/smtcore/smt_utvpi_cycle.go",
+        "pkg/smtcore/theory_diff_logic_conflict.go",
+        "pkg/smtcore/theory_diff_logic_conflict_test.go",
+        "pkg/smtcore/theory_utvpi.go",
+        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_real.smt2",
+        "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2"
       ],
       "tests": [
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
@@ -136041,7 +136116,9 @@
         "TestSMTRealDiffTheoryBuildsFiniteModelValues",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
         "TestSMTSolverPublishesStrictRealDifferenceModel",
-        "TestSMTSolverRealDifferenceEqualityAdapter"
+        "TestSMTSolverRealDifferenceEqualityAdapter",
+        "TestSMTDifferenceContextShortcutConflictProof",
+        "TestSMTDifferenceConflictParameterAllocationFrontiers"
       ],
       "conditionals": [
         {
@@ -136233,11 +136310,35 @@
         {
           "name": "Adaptive and implied-bound propagation, cheap equality propagation, explained core equality/disequality reflection, reset/statistics/display, optimization and simplex integration (remaining src/smt/theory_diff_logic_def.h)",
           "status": "unported"
+        },
+        {
+          "name": "Difference-logic shortened-cycle conflict publication with native extended justification and Farkas plus antecedent/result unit coefficients; source-region conflict parameter ownership through failed construction, scope pop and existing UTVPI publication",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_diff_graph_cycle.go",
+            "pkg/smtcore/smt_diff_graph_cycle_test.go",
+            "pkg/smtcore/smt_diff_graph_inf_rational.go",
+            "pkg/smtcore/smt_utvpi_cycle.go",
+            "pkg/smtcore/theory_diff_logic_conflict.go",
+            "pkg/smtcore/theory_diff_logic_conflict_test.go",
+            "pkg/smtcore/theory_diff_logic_real.go",
+            "pkg/smtcore/theory_utvpi.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/difference_shortcut_cores_real.smt2",
+            "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2"
+          ],
+          "tests": [
+            "TestSMTDifferenceContextShortcutConflictProof",
+            "TestSMTDifferenceConflictParameterAllocationFrontiers",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Basic setup releases its temporary feature collector on every exit and replaces only an unused arithmetic owner before scope/theory setup. A pre-existing disabled checkpoint can be replaced after a parameter update. Mixed graph model delta and numeral types come from the existing concrete graph and AST owner. Initialized direct-internalizer column specializations remain stable.",
-        "Negative-cycle conflicts copy their literal antecedents into an SMT theory justification. Scoped graph activation, atoms, assertions, variables and incompleteness state roll back with the SMT context."
+        "Negative-cycle conflicts copy their literal antecedents into an SMT theory justification. Scoped graph activation, atoms, assertions, variables and incompleteness state roll back with the SMT context.",
+        "The shared cycle helper borrows graph edges and copies each infinitesimal potential; it never mutates graph-owned weights, parent links or enabled state. Difference-logic and UTVPI conflict justifications enter the existing scoped ownedJustifications list only after complete construction. Temporary original Farkas parameters are released on every exit; copied parameters live through proof use and are released on scope pop. The allocation-frontier test checks prefix cleanup and retry without publishing a partial conflict."
       ],
       "deviations": [
         "Explicit basic arithmetic modes 0/1/2/3 now select the retained backend at the first boundary. Mixed graph integer complements subtract one, real complements subtract epsilon, and Int model values are checked before publication. C++ rejects the observed mixed candidate with a fractional Int value; Go reports UNKNOWN before constructing that invalid numeral. Six exact mode/model/scope scripts bring strict C++ comparisons to 112. UTVPI, AS_OPTINF, other basic plugin routing and full unknown-logic automatic classification remain incomplete.",
@@ -144838,7 +144939,10 @@
         "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2",
         "pkg/smtcore/smt_utvpi_linearizer.go",
         "pkg/smtcore/smt_utvpi_graph.go",
-        "pkg/smtcore/smt_utvpi_graph_test.go"
+        "pkg/smtcore/smt_utvpi_graph_test.go",
+        "pkg/smtcore/smt_utvpi_cycle.go",
+        "pkg/smtcore/smt_diff_graph_cycle.go",
+        "pkg/smtcore/theory_diff_logic_conflict_test.go"
       ],
       "tests": [
         "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
@@ -144855,7 +144959,8 @@
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
         "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
         "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair",
-        "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse"
+        "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse",
+        "TestSMTUTVPIConflictParametersFollowScopeLifetime"
       ],
       "conditionals": [
         {
@@ -144982,10 +145087,26 @@
           "name": "Source display/reset and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "Retained UTVPI shortcut traversal delegates the shared concrete infinitesimal-rational graph algorithm; weighted extended-conflict parameters are registered with the existing context scope owner and released on backtracking",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_utvpi_cycle.go",
+            "pkg/smtcore/smt_diff_graph_cycle.go",
+            "pkg/smtcore/theory_utvpi.go",
+            "pkg/smtcore/theory_diff_logic_conflict_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
+            "TestSMTUTVPIContextShortcutConflictProof",
+            "TestSMTUTVPIConflictParametersFollowScopeLifetime"
+          ]
         }
       ],
       "ownership": [
-        "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
+        "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters.",
+        "The shared cycle helper borrows graph edges and copies each infinitesimal potential; it never mutates graph-owned weights, parent links or enabled state. Difference-logic and UTVPI conflict justifications enter the existing scoped ownedJustifications list only after complete construction. Temporary original Farkas parameters are released on every exit; copied parameters live through proof use and are released on scope pop. The allocation-frontier test checks prefix cleanup and retry without publishing a partial conflict."
       ],
       "deviations": [
         "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
@@ -145018,7 +145139,9 @@
         "pkg/cmd/g3/test_vectors/utvpi_mixed_model_refusal.smt2",
         "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2",
         "pkg/smtcore/smt_utvpi_graph.go",
-        "pkg/smtcore/smt_utvpi_graph_test.go"
+        "pkg/smtcore/smt_utvpi_graph_test.go",
+        "pkg/smtcore/smt_diff_graph_cycle.go",
+        "pkg/smtcore/theory_diff_logic_conflict_test.go"
       ],
       "tests": [
         "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
@@ -145034,7 +145157,8 @@
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
         "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
         "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair",
-        "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse"
+        "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse",
+        "TestSMTUTVPIConflictParametersFollowScopeLifetime"
       ],
       "conditionals": [
         {
@@ -145269,10 +145393,26 @@
           "name": "Source display/reset and remaining term-alias/control fidelity",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "Retained UTVPI shortcut traversal delegates the shared concrete infinitesimal-rational graph algorithm; weighted extended-conflict parameters are registered with the existing context scope owner and released on backtracking",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_utvpi_cycle.go",
+            "pkg/smtcore/smt_diff_graph_cycle.go",
+            "pkg/smtcore/theory_utvpi.go",
+            "pkg/smtcore/theory_diff_logic_conflict_test.go"
+          ],
+          "tests": [
+            "TestSMTUTVPINegativeCycleShortcutsAndStrictness",
+            "TestSMTUTVPIContextShortcutConflictProof",
+            "TestSMTUTVPIConflictParametersFollowScopeLifetime"
+          ]
         }
       ],
       "ownership": [
-        "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
+        "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters.",
+        "The shared cycle helper borrows graph edges and copies each infinitesimal potential; it never mutates graph-owned weights, parent links or enabled state. Difference-logic and UTVPI conflict justifications enter the existing scoped ownedJustifications list only after complete construction. Temporary original Farkas parameters are released on every exit; copied parameters live through proof use and are released on scope pop. The allocation-frontier test checks prefix cleanup and retry without publishing a partial conflict."
       ],
       "deviations": [
         "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",

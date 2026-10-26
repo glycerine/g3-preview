@@ -338,6 +338,8 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"difference_shortcut_cores_real.smt2":          "sat\nsat\nunsat\n(full chain3 strict_close)\nsat\nunsat\n(weak_close near chain0 chain3)\nsat\n",
+	"difference_shortcut_cores_int.smt2":           "sat\nsat\nunsat\n(full chain3 strict_close)\nsat\nunsat\n(weak_close near chain0 chain3)\nsat\n",
 	"mbqi_trace_parameter_updates.smt2":            "sat\nsat\nsat\n",
 	"mbqi_boolean_skolem_budget.smt2":              "unsat\n",
 	"disabled_arithmetic_numeral_models.smt2":      "sat\n((p true))\nunknown\n(((f 3.0) (not (= 3.0 Real!val!1)))\n ((f 4.0) (not (= 4.0 Real!val!1))))\nunsat\nunknown\n(((f 3.0) (not (= 3.0 Real!val!1)))\n ((f 4.0) (not (= 4.0 Real!val!1))))\nsat\n((p true))\n",
@@ -803,7 +805,7 @@ func TestSMTLibRunnerScripts(t *testing.T) {
 			if err != nil {
 				t.Fatal(err, out.String())
 			}
-			if canonicalOutput(out.String()) != canonicalOutput(expected) {
+			if canonicalReferenceOutput(name, out.String()) != canonicalReferenceOutput(name, expected) {
 				t.Fatal("Go SMT-LIB result", out.String(), "want", expected)
 			}
 		})
@@ -882,6 +884,22 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 }
 
 func canonicalReferenceOutput(name, output string) string {
+	if name == "difference_shortcut_cores_real.smt2" || name == "difference_shortcut_cores_int.smt2" {
+		// Conflict analysis stores core labels in an unordered declaration map.
+		// Compare exact membership within each core, keeping every result/scope.
+		lines := strings.Split(strings.TrimSpace(output), "\n")
+		for i, line := range lines {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, "(") && strings.HasSuffix(line, ")") {
+				labels := strings.Fields(line[1 : len(line)-1])
+				sort.Strings(labels)
+				line = "(" + strings.Join(labels, " ") + ")"
+			}
+			lines[i] = line
+		}
+		return strings.Join(lines, "\n")
+	}
+
 	if name == "sat_cores.smt2" {
 		// Source dep2asm is an unordered obj_map. This vector requires all
 		// three labels, so compare the exact core membership, not hash order.

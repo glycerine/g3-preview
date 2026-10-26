@@ -465,7 +465,7 @@ func (t *SMTRealDiffTheory) Propagate() error {
 					kept = append(kept, literal)
 				}
 			}
-			return state.SetTheoryConflict(t.FamilyID(), kept)
+			return t.setNegativeCycleConflict(kept)
 		}
 	}
 	return nil

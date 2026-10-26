@@ -316,6 +316,7 @@ func (t *SMTUTVPITheory) setConflict(edges []int32) (result error) {
 	if err != nil {
 		return errors.Join(err, owner.Release(t.state.manager))
 	}
+	t.state.ownedJustifications = append(t.state.ownedJustifications, owner)
 	t.state.inconsistent = true
 	t.state.conflict = wrapped
 	t.state.conflictLiteral = SMTNullLiteral
