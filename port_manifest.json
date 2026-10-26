@@ -122506,7 +122506,8 @@
         "pkg/smtcore/smt_tactic_native_test.go",
         "pkg/smtcore/theory_pb_model.go",
         "pkg/smtcore/theory_pb_model_test.go",
-        "pkg/smtcore/smt_model_value.go"
+        "pkg/smtcore/smt_model_value.go",
+        "pkg/smtcore/smt_model_traversal_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -122531,7 +122532,10 @@
         "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse",
         "TestSMTTacticCPPApplyReference",
         "TestSMTPBModelInitializerRegistersFactoryWithoutValueBuilder",
-        "TestSMTPBModelInitializerGuardsAndIndependentFactories"
+        "TestSMTPBModelInitializerGuardsAndIndependentFactories",
+        "TestSMTModelTraversalUsesNativeDependencyStackOrder",
+        "TestSMTModelTraversalSharesImplicitSortDependencies",
+        "TestSMTModelTraversalRechecksDependenciesOnlyInSourceDebug"
       ],
       "assertions": [
         {
@@ -122749,15 +122753,26 @@
             "TestSMTPBModelInitializerRegistersFactoryWithoutValueBuilder",
             "TestSMTPBModelInitializerGuardsAndIndependentFactories"
           ]
+        },
+        {
+          "name": "visit_child/visit_children/process_source/top_sort_sources: iterative last-pushed-first dependency traversal, shared per-sort implicit fresh-value dependencies, and source-debug-only second dependency query (src/smt/smt_model_generator.cpp:151-299)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "tests": [
+            "TestSMTModelTraversalUsesNativeDependencyStackOrder",
+            "TestSMTModelTraversalSharesImplicitSortDependencies",
+            "TestSMTModelTraversalRechecksDependenciesOnlyInSourceDebug"
+          ]
         }
       ],
       "ownership": [
         "The generator owns its proto-model, pinned constructed AST values, fresh placeholder objects, root-value map and source-ordering state while borrowing the AST manager, context, enode roots and theory-created model-value procedures.",
         "Model-generation relevance queries borrow the active internalizer relevancy service so disabled filtering includes every internalized expression even when the marked map is empty. Context-only fixtures without a service retain their explicitly marked view. The regression checks arithmetic argument separation, optional unused Boolean publication and evaluation of the generated UF interpretation in relevancy modes 0 and 2. The integer_uf_model_relevancy.smt2 C++ comparison evaluates model disequalities before and after a scope pop, catching omitted interpretations that SAT-only comparisons miss.",
-        "The mode-aware relevancy helper now lives on SMTInternalizerState and is shared with model finding; model-value and function publication retain their previously verified behavior."
+        "The mode-aware relevancy helper now lives on SMTInternalizerState and is shared with model finding; model-value and function publication retain their previously verified behavior.",
+        "The per-sort implicit-dependency set, source colors and iterative work stack are local to one topological traversal. Fresh placeholders and enodes remain borrowed; no recursive Go call stack or persistent sort cache is retained."
       ],
       "deviations": [
-        "The source iterative color traversal is expressed as a concrete recursive Go DFS with identical dependency-before-source order. A dependency cycle returns ast.ErrASTDomain instead of relying on a debug assertion.",
+        "The source iterative traversal, last-pushed-first order, shared per-sort implicit-dependency cache and source-debug-only second child visit are preserved. True dependency cycles retain the Go ast.ErrASTDomain guard for invalid input rather than reaching native missing-value assertions during construction.",
         "Model initialization is independent of per-enode value construction, matching the source virtual init_model/build_models distinction. A PB initializer registers its live factory although it has no ModelValue implementation; Boolean roots retain assignment wrappers and no unused PB value-procedure adapter is added."
       ]
     },
@@ -122775,7 +122790,8 @@
         "pkg/smtcore/smt_asserted_macros_test.go",
         "pkg/smtcore/smt_asserted_quasi_macros_test.go",
         "pkg/smtcore/smt_model_reservation_regression_test.go",
-        "pkg/smtcore/smt_tactic_native_test.go"
+        "pkg/smtcore/smt_tactic_native_test.go",
+        "pkg/smtcore/smt_model_traversal_test.go"
       ],
       "tests": [
         "TestSMTModelGeneratorFreshSourcesAndDependencyOrder",
@@ -122795,7 +122811,10 @@
         "TestSMTAssertedQuasiMacrosPublishConditionalModel",
         "TestSMTModelGeneratorReservesExistingValuesBeforeFreshAllocation",
         "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse",
-        "TestSMTTacticCPPApplyReference"
+        "TestSMTTacticCPPApplyReference",
+        "TestSMTModelTraversalUsesNativeDependencyStackOrder",
+        "TestSMTModelTraversalSharesImplicitSortDependencies",
+        "TestSMTModelTraversalRechecksDependenciesOnlyInSourceDebug"
       ],
       "conditionals": [
         {
@@ -122889,10 +122908,21 @@
             "TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse",
             "TestSMTTacticCPPApplyReference"
           ]
+        },
+        {
+          "name": "visit_child/visit_children/process_source/top_sort_sources: iterative last-pushed-first dependency traversal, shared per-sort implicit fresh-value dependencies, and source-debug-only second dependency query (src/smt/smt_model_generator.cpp:151-299)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_generator.go",
+          "tests": [
+            "TestSMTModelTraversalUsesNativeDependencyStackOrder",
+            "TestSMTModelTraversalSharesImplicitSortDependencies",
+            "TestSMTModelTraversalRechecksDependenciesOnlyInSourceDebug"
+          ]
         }
       ],
       "ownership": [
-        "Model-value procedures and dependencies borrow AST handles, enodes and generator-owned fresh placeholders. The future generator owns and pins the referenced AST values and sorts, matching the source m_asts owner."
+        "Model-value procedures and dependencies borrow AST handles, enodes and generator-owned fresh placeholders. The future generator owns and pins the referenced AST values and sorts, matching the source m_asts owner.",
+        "The per-sort implicit-dependency set, source colors and iterative work stack are local to one topological traversal. Fresh placeholders and enodes remain borrowed; no recursive Go call stack or persistent sort cache is retained."
       ],
       "deviations": [
         "The source tagged dependency union is represented by explicit Go fields and checked accessors. Invalid assertion domains return ast.ErrASTDomain."

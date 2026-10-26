@@ -566,78 +566,143 @@ func (g *SMTModelGenerator) topSortSources(roots []*SMTEnode, procedures map[*SM
 	if g == nil || g.manager == nil {
 		return nil, ast.ErrASTHandle
 	}
+	const (
+		white uint8 = iota
+		gray
+		black
+	)
 	colors := make(map[smtModelSourceKey]uint8)
+	traversedSorts := make(map[ast.ASTHandle]struct{})
+	var todo []smtModelSourceKey
 	result := make([]SMTModelValueDependency, 0, len(roots)+len(g.extraFresh))
-	var visit func(smtModelSourceKey) error
-	visit = func(key smtModelSourceKey) error {
+	// Push all white dependencies in producer order. The work stack consumes
+	// the last one first, matching native visit_child/process_source.
+	pushChild := func(key smtModelSourceKey) (bool, error) {
 		switch colors[key] {
-		case 1:
-			return ast.ErrASTDomain
-		case 2:
-			return nil
+		case white:
+			todo = append(todo, key)
+			return false, nil
+		case gray:
+			// A true dependency cycle cannot produce the values required by
+			// mk_values. Retain the Go domain guard for that invalid input.
+			return false, ast.ErrASTDomain
+		default:
+			return true, nil
 		}
-		colors[key] = 1
+	}
+	visitChildren := func(key smtModelSourceKey) (bool, error) {
+		visited := true
 		if key.fresh != nil {
+			sort := key.fresh.sort
+			if _, done := traversedSorts[sort]; done {
+				return true, nil
+			}
 			for _, root := range roots {
-				if root == nil || root.root != root {
-					return ast.ErrASTDomain
+				if root == nil {
+					return false, ast.ErrASTDomain
+				}
+				rootSort, err := g.manager.GetSort(root.owner)
+				if err != nil {
+					return false, err
+				}
+				if rootSort != sort {
+					continue
 				}
 				procedure := procedures[root]
-				if procedure == nil {
-					return ast.ErrASTDomain
+				if root.root != root || procedure == nil {
+					return false, ast.ErrASTDomain
 				}
-				sort, err := g.manager.GetSort(root.owner)
+				if procedure.IsFresh() {
+					continue
+				}
+				done, err := pushChild(smtModelSourceKey{node: root})
 				if err != nil {
+					return false, err
+				}
+				visited = visited && done
+			}
+			// Native marks the sort before processing any newly pushed roots.
+			// A second fresh source of this sort must not rescan those roots.
+			traversedSorts[sort] = struct{}{}
+			return visited, nil
+		}
+		if key.node == nil || key.node.root != key.node {
+			return false, ast.ErrASTDomain
+		}
+		procedure := procedures[key.node]
+		if procedure == nil {
+			return false, ast.ErrASTDomain
+		}
+		for _, dependency := range procedure.Dependencies() {
+			child, err := smtModelDependencyKey(dependency)
+			if err != nil {
+				return false, err
+			}
+			done, err := pushChild(child)
+			if err != nil {
+				return false, err
+			}
+			visited = visited && done
+		}
+		return visited, nil
+	}
+	process := func(key smtModelSourceKey) error {
+		if colors[key] == gray {
+			return ast.ErrASTDomain
+		}
+		if colors[key] == black {
+			return nil
+		}
+		todo = append(todo, key)
+		for len(todo) != 0 {
+			current := todo[len(todo)-1]
+			switch colors[current] {
+			case white:
+				colors[current] = gray
+				if _, err := visitChildren(current); err != nil {
 					return err
 				}
-				if sort == key.fresh.sort && !procedure.IsFresh() {
-					if err = visit(smtModelSourceKey{node: root}); err != nil {
+			case gray:
+				// This second visit is inside native SASSERT, including its effects.
+				if ast.ASTSourceDebug {
+					visited, err := visitChildren(current)
+					if err != nil {
 						return err
 					}
+					if !visited {
+						return ast.ErrASTDomain
+					}
 				}
-			}
-		} else {
-			if key.node == nil || key.node.root != key.node {
-				return ast.ErrASTDomain
-			}
-			procedure := procedures[key.node]
-			if procedure == nil {
-				return ast.ErrASTDomain
-			}
-			for _, dependency := range procedure.Dependencies() {
-				child, err := smtModelDependencyKey(dependency)
+				colors[current] = black
+				dependency, err := smtModelKeyDependency(current)
 				if err != nil {
 					return err
 				}
-				if err = visit(child); err != nil {
-					return err
-				}
+				result = append(result, dependency)
+			case black:
+				todo = todo[:len(todo)-1]
 			}
 		}
-		colors[key] = 2
-		dependency, err := smtModelKeyDependency(key)
-		if err != nil {
-			return err
-		}
-		result = append(result, dependency)
 		return nil
 	}
 	for _, fresh := range g.extraFresh {
-		if err := visit(smtModelSourceKey{fresh: fresh}); err != nil {
+		if err := process(smtModelSourceKey{fresh: fresh}); err != nil {
 			return nil, err
 		}
 	}
 	for _, root := range roots {
-		if procedure := procedures[root]; procedure == nil {
+		procedure := procedures[root]
+		if procedure == nil {
 			return nil, ast.ErrASTDomain
-		} else if procedure.IsFresh() {
-			if err := visit(smtModelSourceKey{node: root}); err != nil {
+		}
+		if procedure.IsFresh() {
+			if err := process(smtModelSourceKey{node: root}); err != nil {
 				return nil, err
 			}
 		}
 	}
 	for _, root := range roots {
-		if err := visit(smtModelSourceKey{node: root}); err != nil {
+		if err := process(smtModelSourceKey{node: root}); err != nil {
 			return nil, err
 		}
 	}
