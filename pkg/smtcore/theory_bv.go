@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter/bit_blaster"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -55,6 +56,7 @@ type SMTBitVectorTheory struct {
 	scopes             []smtBVScope
 	unsupported        bool
 	statistics         smtBVStatistics
+	trace              *diagnostic.TraceTags
 	config             SMTBVState
 	bitBlasterParams   bit_blaster.SMTBitBlasterParams
 }
@@ -769,6 +771,9 @@ func (t *SMTBitVectorTheory) PopScopes(count uint32) error {
 }
 
 func (t *SMTBitVectorTheory) FinalCheck() (SMTFinalCheckStatus, error) {
+	if err := t.checkBVInvariant(); err != nil {
+		return SMTFinalCheckDone, err
+	}
 	if t.unsupported {
 		return SMTFinalCheckGiveUp, nil
 	}

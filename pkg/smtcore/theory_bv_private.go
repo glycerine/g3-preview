@@ -61,7 +61,7 @@ func (t *SMTBitVectorTheory) mergePrivateClasses(left, right SMTTheoryVar) error
 	t.privateSize[r2] += t.privateSize[r1]
 	t.privateNext[r1], t.privateNext[r2] = t.privateNext[r2], t.privateNext[r1]
 	t.privateTrail = append(t.privateTrail, smtBVPrivateTrail{kind: smtBVPrivateMerge, child: r1})
-	return nil
+	return t.checkBVAfterMerge(r2)
 }
 
 // This undo path deliberately reads only native IDs and summaries: core

@@ -136257,7 +136257,9 @@
         "pkg/cmd/g3/test_vectors/bv_integer_conversion_scopes.smt2",
         "pkg/smtcore/theory_bv_operators.go",
         "pkg/smtcore/theory_bv_operators_test.go",
-        "pkg/cmd/g3/test_vectors/bv_native_operator_models.smt2"
+        "pkg/cmd/g3/test_vectors/bv_native_operator_models.smt2",
+        "pkg/smtcore/theory_bv_invariants.go",
+        "pkg/smtcore/theory_bv_invariants_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -136333,7 +136335,14 @@
         "TestSMTBVConversionAllocationRefusalAndScopedRetry",
         "TestSMTBVNativeOperatorCircuitsMatchSourceEngine",
         "TestSMTBVNativeOperatorRefusalScopeAndRetry",
-        "TestSMTBVNativeOperandLookupCreatesSuppressedVariable"
+        "TestSMTBVNativeOperandLookupCreatesSuppressedVariable",
+        "TestSMTBVInvariantFinalCheckAssertionGateAndPriority",
+        "TestSMTBVInvariantAssignmentGuardsAndSourceSites",
+        "TestSMTBVInvariantConstantSummarySourceGuardsAndSites",
+        "TestSMTBVInvariantAfterMergeCommitsAndTrailsBeforeAssertion",
+        "TestSMTBVInvariantMismatchTraceExactRecordAndErasure",
+        "TestSMTBVInvariantNonBVSummaryAndNativeErasure",
+        "TestSMTBVInvariantContinueActionPreservesSourceReturn"
       ],
       "conditionals": [
         {
@@ -136957,6 +136966,25 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Debug-only check_assignment/check_zero_one_bits/check_invariant (theory_bv.cpp:1670-1764), final-check invariant before approximation giveup and header after_merge_eh after the trailed private link: source early guards, native class assignment/size/relevancy assertions, reserved constant summary cardinality/owner/polarity/uniqueness checks, exact bv_bug CTRACE before assertion, runtime assertion gating and native build erasure; other diagnostics/lifecycle/method-owner closure remain open",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_invariants.go",
+            "pkg/smtcore/theory_bv_invariants_test.go",
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_private.go"
+          ],
+          "tests": [
+            "TestSMTBVInvariantFinalCheckAssertionGateAndPriority",
+            "TestSMTBVInvariantAssignmentGuardsAndSourceSites",
+            "TestSMTBVInvariantConstantSummarySourceGuardsAndSites",
+            "TestSMTBVInvariantAfterMergeCommitsAndTrailsBeforeAssertion",
+            "TestSMTBVInvariantMismatchTraceExactRecordAndErasure",
+            "TestSMTBVInvariantNonBVSummaryAndNativeErasure",
+            "TestSMTBVInvariantContinueActionPreservesSourceReturn"
+          ]
         }
       ],
       "ownership": [
@@ -136969,14 +136997,16 @@
         "The fixed-value cache owns native width/canonical integer-string keys and scalar theory-variable IDs only; source pop does not trail it, so each hit validates the current slot, BV sort, width, fixedness and value. Close clears the cache. Lexical e1/e2 ASTRefs protect projection operands during recursive equality internalization, and a failed axiom prefix leaves the previous representative intact without publishing its fixed-equality owner. The context owns queued bv-fixed-eq region justifications, which borrow the theory and variable slots and read current assignment polarity within their live scope. The retained native numeral-alias path has no invented eager bridge or extra bit2core count.",
         "ModelValue borrows existing native literal vectors and reads current assignments without rebuilding AST circuits or introducing late bit owners. The source debug fixedness guard precedes numeral construction; native release preserves the accumulated prefix at the first undefined literal. The registered model factory creates the numeral at the enode sort width, and the generator retains the expression wrapper result through its existing root-value ownership.",
         "Conversion calls own concrete ASTRef operands and rewritten sums across recursive internalization and temporary retirement, releasing lexical roots in reverse order on success/refusal. Comparison atoms own only canonical scalar SMTLiteral definitions; the context owns the underlying Boolean expression lifetime. Atom creation is on the native ordered private trail, independent of scoped relevance, and undo deletes IDs without consulting retired enodes. Cold 257-bit conversion allocation refusals are followed by scope retirement and retry.",
-        "Native operator calls use the configured concrete bit-blaster Engine, which borrows the AST manager, and transfer its typed ASTRef outputs into existing theory temporaries. Owned canonical literal-to-expression operands survive recursive internalization and shared temporary drains; copy/concat/extract outputs retain native operands until the published bit owner takes over. Scalar comparison/overflow failures release pending temporaries. Existing bitOwners/bitTrail retain Go AST representations while native signed literal vectors remain authoritative. Source get_var/mk_bits now creates fresh positive indexed atoms when sort attachment was suppressed, with independent variable/atom/cache scope retirement and no find_wpos. Ninety-six budget settings across multiplier, unsigned division and signed overflow exercise cold allocation refusal, scope cleanup and retry; this is bounded coverage, not a whole-unit ownership audit."
+        "Native operator calls use the configured concrete bit-blaster Engine, which borrows the AST manager, and transfer its typed ASTRef outputs into existing theory temporaries. Owned canonical literal-to-expression operands survive recursive internalization and shared temporary drains; copy/concat/extract outputs retain native operands until the published bit owner takes over. Scalar comparison/overflow failures release pending temporaries. Existing bitOwners/bitTrail retain Go AST representations while native signed literal vectors remain authoritative. Source get_var/mk_bits now creates fresh positive indexed atoms when sort attachment was suppressed, with independent variable/atom/cache scope retirement and no find_wpos. Ninety-six budget settings across multiplier, unsigned division and signed overflow exercise cold allocation refusal, scope cleanup and retry; this is bounded coverage, not a whole-unit ownership audit.",
+        "Invariant walkers borrow native private forest, literal, assignment, relevancy and summary state and do not create AST owners. Temporary Go Boolean slices replace the source debug-only summary vectors. The borrowed optional trace service falls back to the process tags; it owns sticky ostream failure independently of computation errors. Source assertions use the actual process debug context and action/input/notification owner. The post-merge check runs after the forest link and ordered trail event, so an assertion exception leaves a poppable committed prefix. Unmerge continues using native IDs without retired-enode reads."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
         "Whole-unit completion remains unproven. Native private forest/zero-one summaries, watched-position scan, bit propagation, merge/unmerge, bv-bit-eq proofs and default-stream display are implemented. The native fixed_var_table/fixed_var_eh/add_fixed_eq/fixed_eq_justification path now replaces the global Go fixed-value scan and guarded-clause approximation: untrailed width/value cache, current-slot validation, retained representative, exact five-per-bit plus final equality axioms, queued core equality, bv-fixed-eq antecedents and interleaved proof parents. Native mk_bit2bool now publishes only its atom/occurrence; prior eager alias bridges were absent in source and are removed. Retained BV TRACE/SASSERT and specialization-level union-find trace/invariant sites, remaining operator algorithms and complete method/ownership closure still require audit. Eager equality-internalization expansion remains removed in favor of the source no-op callback and native private merges. Native mk_value now uses canonical literals and preserves first-undefined release accumulation plus Z3DEBUG fixedness refusal, replacing the Go AST-bit scan/late-zero fallback. Conversion algorithms now follow source deferred/eager relevancy timing, native signed get_bits, rewritten weighted sums and exact per-bit integer equations. Comparison atoms retain definition literals across relevance pop and republish lazy bridges on re-entry; disabled relevancy emits eager bridges even when its propagator object exists. Whole-unit diagnostics/assertions and remaining source/owner closure remain open.",
         "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
         "The previous Go carry/XOR3 expansion-through-bridge approximation is removed in favor of the actual source gate clauses. A direct weighted-ITE BV model regression, also reached by the new PB encoder, passes; an overlay restoring old BV production code fails that new regression. The comparison atom definition has its own lexical AST reference across recursive internalization and temporary retirement, matching source expr_ref lifetime.",
-        "The legacy Go operator algorithms are removed in favor of the existing source bit-blaster Engine: AC arithmetic/logic folds from the last operand toward the first, subtraction calls MkSubtracter rather than negate-plus-add, and comparison/overflow/division/shift/rotate/reduction paths use the retained concrete algorithms with live extended-gate policy. Native get_var is distinct from approximation-aware apply_sort_cnstr. The extra direct Go BNEG circuit path has no source internalization case and is removed; retained preprocessed negations continue through the existing rewriter. Paired fresh-context circuit DAG checks preserve exact gate operand order and avoid AST-ID-dependent expanded carry differences caused by running an oracle first in the same manager. Unit status and method/ownership audit flags remain partial/false; full operator callback protocol, remaining debug invariants, TRACE/SASSERT, approximation/unsupported boundaries and lifecycle closure still require audit."
+        "The legacy Go operator algorithms are removed in favor of the existing source bit-blaster Engine: AC arithmetic/logic folds from the last operand toward the first, subtraction calls MkSubtracter rather than negate-plus-add, and comparison/overflow/division/shift/rotate/reduction paths use the retained concrete algorithms with live extended-gate policy. Native get_var is distinct from approximation-aware apply_sort_cnstr. The extra direct Go BNEG circuit path has no source internalization case and is removed; retained preprocessed negations continue through the existing rewriter. Paired fresh-context circuit DAG checks preserve exact gate operand order and avoid AST-ID-dependent expanded carry differences caused by running an oracle first in the same manager. Unit status and method/ownership audit flags remain partial/false; full operator callback protocol, remaining debug invariants, TRACE/SASSERT, approximation/unsupported boundaries and lifecycle closure still require audit.",
+        "The native BV debug invariant bodies and two retained invocation sites are now implemented, replacing omitted checks. Focused corrupt-state tests exercise each source assertion site, relevant-root/nonroot/conflict/non-BV guards, assertion switch/build erasure, post-link exception/pop behavior, exact mismatch trace and every truncated trace prefix. This does not close the remaining BV TRACE/SASSERT sites, specialized union-find diagnostics, model fixedness runtime assertion service, reset/name consumers or whole-method/ownership audit. Unit statuses and audit flags remain partial/false."
       ]
     },
     {
@@ -137018,7 +137048,9 @@
         "pkg/cmd/g3/test_vectors/bv_integer_conversion_scopes.smt2",
         "pkg/smtcore/theory_bv_operators.go",
         "pkg/smtcore/theory_bv_operators_test.go",
-        "pkg/cmd/g3/test_vectors/bv_native_operator_models.smt2"
+        "pkg/cmd/g3/test_vectors/bv_native_operator_models.smt2",
+        "pkg/smtcore/theory_bv_invariants.go",
+        "pkg/smtcore/theory_bv_invariants_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -137093,7 +137125,14 @@
         "TestSMTBVConversionAllocationRefusalAndScopedRetry",
         "TestSMTBVNativeOperatorCircuitsMatchSourceEngine",
         "TestSMTBVNativeOperatorRefusalScopeAndRetry",
-        "TestSMTBVNativeOperandLookupCreatesSuppressedVariable"
+        "TestSMTBVNativeOperandLookupCreatesSuppressedVariable",
+        "TestSMTBVInvariantFinalCheckAssertionGateAndPriority",
+        "TestSMTBVInvariantAssignmentGuardsAndSourceSites",
+        "TestSMTBVInvariantConstantSummarySourceGuardsAndSites",
+        "TestSMTBVInvariantAfterMergeCommitsAndTrailsBeforeAssertion",
+        "TestSMTBVInvariantMismatchTraceExactRecordAndErasure",
+        "TestSMTBVInvariantNonBVSummaryAndNativeErasure",
+        "TestSMTBVInvariantContinueActionPreservesSourceReturn"
       ],
       "conditionals": [
         {
@@ -137361,6 +137400,25 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Debug-only check_assignment/check_zero_one_bits/check_invariant (theory_bv.cpp:1670-1764), final-check invariant before approximation giveup and header after_merge_eh after the trailed private link: source early guards, native class assignment/size/relevancy assertions, reserved constant summary cardinality/owner/polarity/uniqueness checks, exact bv_bug CTRACE before assertion, runtime assertion gating and native build erasure; other diagnostics/lifecycle/method-owner closure remain open",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_invariants.go",
+            "pkg/smtcore/theory_bv_invariants_test.go",
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_private.go"
+          ],
+          "tests": [
+            "TestSMTBVInvariantFinalCheckAssertionGateAndPriority",
+            "TestSMTBVInvariantAssignmentGuardsAndSourceSites",
+            "TestSMTBVInvariantConstantSummarySourceGuardsAndSites",
+            "TestSMTBVInvariantAfterMergeCommitsAndTrailsBeforeAssertion",
+            "TestSMTBVInvariantMismatchTraceExactRecordAndErasure",
+            "TestSMTBVInvariantNonBVSummaryAndNativeErasure",
+            "TestSMTBVInvariantContinueActionPreservesSourceReturn"
+          ]
         }
       ],
       "ownership": [
@@ -137373,14 +137431,16 @@
         "The fixed-value cache owns native width/canonical integer-string keys and scalar theory-variable IDs only; source pop does not trail it, so each hit validates the current slot, BV sort, width, fixedness and value. Close clears the cache. Lexical e1/e2 ASTRefs protect projection operands during recursive equality internalization, and a failed axiom prefix leaves the previous representative intact without publishing its fixed-equality owner. The context owns queued bv-fixed-eq region justifications, which borrow the theory and variable slots and read current assignment polarity within their live scope. The retained native numeral-alias path has no invented eager bridge or extra bit2core count.",
         "ModelValue borrows existing native literal vectors and reads current assignments without rebuilding AST circuits or introducing late bit owners. The source debug fixedness guard precedes numeral construction; native release preserves the accumulated prefix at the first undefined literal. The registered model factory creates the numeral at the enode sort width, and the generator retains the expression wrapper result through its existing root-value ownership.",
         "Conversion calls own concrete ASTRef operands and rewritten sums across recursive internalization and temporary retirement, releasing lexical roots in reverse order on success/refusal. Comparison atoms own only canonical scalar SMTLiteral definitions; the context owns the underlying Boolean expression lifetime. Atom creation is on the native ordered private trail, independent of scoped relevance, and undo deletes IDs without consulting retired enodes. Cold 257-bit conversion allocation refusals are followed by scope retirement and retry.",
-        "Native operator calls use the configured concrete bit-blaster Engine, which borrows the AST manager, and transfer its typed ASTRef outputs into existing theory temporaries. Owned canonical literal-to-expression operands survive recursive internalization and shared temporary drains; copy/concat/extract outputs retain native operands until the published bit owner takes over. Scalar comparison/overflow failures release pending temporaries. Existing bitOwners/bitTrail retain Go AST representations while native signed literal vectors remain authoritative. Source get_var/mk_bits now creates fresh positive indexed atoms when sort attachment was suppressed, with independent variable/atom/cache scope retirement and no find_wpos. Ninety-six budget settings across multiplier, unsigned division and signed overflow exercise cold allocation refusal, scope cleanup and retry; this is bounded coverage, not a whole-unit ownership audit."
+        "Native operator calls use the configured concrete bit-blaster Engine, which borrows the AST manager, and transfer its typed ASTRef outputs into existing theory temporaries. Owned canonical literal-to-expression operands survive recursive internalization and shared temporary drains; copy/concat/extract outputs retain native operands until the published bit owner takes over. Scalar comparison/overflow failures release pending temporaries. Existing bitOwners/bitTrail retain Go AST representations while native signed literal vectors remain authoritative. Source get_var/mk_bits now creates fresh positive indexed atoms when sort attachment was suppressed, with independent variable/atom/cache scope retirement and no find_wpos. Ninety-six budget settings across multiplier, unsigned division and signed overflow exercise cold allocation refusal, scope cleanup and retry; this is bounded coverage, not a whole-unit ownership audit.",
+        "Invariant walkers borrow native private forest, literal, assignment, relevancy and summary state and do not create AST owners. Temporary Go Boolean slices replace the source debug-only summary vectors. The borrowed optional trace service falls back to the process tags; it owns sticky ostream failure independently of computation errors. Source assertions use the actual process debug context and action/input/notification owner. The post-merge check runs after the forest link and ordered trail event, so an assertion exception leaves a poppable committed prefix. Unmerge continues using native IDs without retired-enode reads."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
         "Whole-unit completion remains unproven. Native private forest/zero-one summaries, watched-position scan, bit propagation, merge/unmerge, bv-bit-eq proofs and default-stream display are implemented. The native fixed_var_table/fixed_var_eh/add_fixed_eq/fixed_eq_justification path now replaces the global Go fixed-value scan and guarded-clause approximation: untrailed width/value cache, current-slot validation, retained representative, exact five-per-bit plus final equality axioms, queued core equality, bv-fixed-eq antecedents and interleaved proof parents. Native mk_bit2bool now publishes only its atom/occurrence; prior eager alias bridges were absent in source and are removed. Retained BV TRACE/SASSERT and specialization-level union-find trace/invariant sites, remaining operator algorithms and complete method/ownership closure still require audit. Eager equality-internalization expansion remains removed in favor of the source no-op callback and native private merges. Native mk_value now uses canonical literals and preserves first-undefined release accumulation plus Z3DEBUG fixedness refusal, replacing the Go AST-bit scan/late-zero fallback. Conversion algorithms now follow source deferred/eager relevancy timing, native signed get_bits, rewritten weighted sums and exact per-bit integer equations. Comparison atoms retain definition literals across relevance pop and republish lazy bridges on re-entry; disabled relevancy emits eager bridges even when its propagator object exists. Whole-unit diagnostics/assertions and remaining source/owner closure remain open.",
         "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
         "The previous Go carry/XOR3 expansion-through-bridge approximation is removed in favor of the actual source gate clauses. A direct weighted-ITE BV model regression, also reached by the new PB encoder, passes; an overlay restoring old BV production code fails that new regression. The comparison atom definition has its own lexical AST reference across recursive internalization and temporary retirement, matching source expr_ref lifetime.",
-        "The legacy Go operator algorithms are removed in favor of the existing source bit-blaster Engine: AC arithmetic/logic folds from the last operand toward the first, subtraction calls MkSubtracter rather than negate-plus-add, and comparison/overflow/division/shift/rotate/reduction paths use the retained concrete algorithms with live extended-gate policy. Native get_var is distinct from approximation-aware apply_sort_cnstr. The extra direct Go BNEG circuit path has no source internalization case and is removed; retained preprocessed negations continue through the existing rewriter. Paired fresh-context circuit DAG checks preserve exact gate operand order and avoid AST-ID-dependent expanded carry differences caused by running an oracle first in the same manager. Unit status and method/ownership audit flags remain partial/false; full operator callback protocol, remaining debug invariants, TRACE/SASSERT, approximation/unsupported boundaries and lifecycle closure still require audit."
+        "The legacy Go operator algorithms are removed in favor of the existing source bit-blaster Engine: AC arithmetic/logic folds from the last operand toward the first, subtraction calls MkSubtracter rather than negate-plus-add, and comparison/overflow/division/shift/rotate/reduction paths use the retained concrete algorithms with live extended-gate policy. Native get_var is distinct from approximation-aware apply_sort_cnstr. The extra direct Go BNEG circuit path has no source internalization case and is removed; retained preprocessed negations continue through the existing rewriter. Paired fresh-context circuit DAG checks preserve exact gate operand order and avoid AST-ID-dependent expanded carry differences caused by running an oracle first in the same manager. Unit status and method/ownership audit flags remain partial/false; full operator callback protocol, remaining debug invariants, TRACE/SASSERT, approximation/unsupported boundaries and lifecycle closure still require audit.",
+        "The native BV debug invariant bodies and two retained invocation sites are now implemented, replacing omitted checks. Focused corrupt-state tests exercise each source assertion site, relevant-root/nonroot/conflict/non-BV guards, assertion switch/build erasure, post-link exception/pop behavior, exact mismatch trace and every truncated trace prefix. This does not close the remaining BV TRACE/SASSERT sites, specialized union-find diagnostics, model fixedness runtime assertion service, reset/name consumers or whole-method/ownership audit. Unit statuses and audit flags remain partial/false."
       ]
     },
     {
