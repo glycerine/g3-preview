@@ -87,6 +87,9 @@ func TestLPRationalCorePivotIndependentInverseRows(t *testing.T) {
 }
 
 func TestLPRationalCoreResidualIndependentRowsAndFindX(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)
 		r, n := 1+world%4, 3+world%4

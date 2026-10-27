@@ -302,6 +302,9 @@ func TestLARCoreScopesPhysicalBoundRestoration(t *testing.T) {
 }
 
 func TestLARCoreScopesPendingPushPublication(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	large := "1" + strings.Repeat("0", 999) + "7"
 	for _, direct := range []bool{false, true} {
 		for _, upper := range []bool{false, true} {

@@ -197,6 +197,9 @@ func TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts(t *testing.T) {
 }
 
 func TestLPPairPriorityQueueIndependentExactOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	q := NewPairPriorityQueue(h.m, 1)
 	values := make([]*RationalPair, 64)

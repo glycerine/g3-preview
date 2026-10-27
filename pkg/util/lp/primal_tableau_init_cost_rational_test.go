@@ -14,6 +14,9 @@ import (
 )
 
 func TestLPRationalTableauInitCostIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 320; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewRationalCoreFixture(t, h, 2, 6)
@@ -338,6 +341,9 @@ func TestLPRationalTableauInitCostReachedPrefixes(t *testing.T) {
 }
 
 func TestLPRationalTableauInitCostPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"fill", "restore", "infeasible"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

@@ -65,6 +65,9 @@ func lpIndependentInverseRow(b [][]*big.Rat, r int) []*big.Rat {
 	return v
 }
 func TestLPRationalDualBetaIndependentReinitialization(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 100; world++ {
 		h := newLPPairHarness(t)
 		n := uint32(1 + world%5)
@@ -93,6 +96,9 @@ func TestLPRationalDualBetaIndependentReinitialization(t *testing.T) {
 	}
 }
 func TestLPRationalDualBetaIndependentRecurrence(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(757132))
 	for world := 0; world < 320; world++ {
 		h := newLPPairHarness(t)

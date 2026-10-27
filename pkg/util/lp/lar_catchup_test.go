@@ -138,6 +138,9 @@ func lpCheckLARCatchUpSolve(t *testing.T, h *lpPairHarness, c *LARCoreSolver, a 
 }
 
 func TestLARCatchUpIndependentTraceModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(81627, 9251))
 	for world := 0; world < 160; world++ {
 		for _, floating := range []bool{false, true} {

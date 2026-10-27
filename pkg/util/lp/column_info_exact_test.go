@@ -8,6 +8,9 @@ import (
 )
 
 func TestLPRationalColumnIndependentFlagsAndShift(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 160; world++ {
 		for mask := 0; mask < 8; mask++ {
 			h := newLPPairHarness(t)
@@ -195,6 +198,9 @@ func TestLPRationalColumnGetterAssertionsAndEntryGuards(t *testing.T) {
 	}
 }
 func TestLPRationalColumnPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, phase := range []string{"low", "upper", "cost", "fixed", "get", "adjusted", "low-check", "upper-check", "both-check", "free-check"} {
 			done, failures, sawFixedBefore, sawFixedAfter := false, 0, false, false

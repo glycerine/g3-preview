@@ -82,6 +82,9 @@ func TestLPRationalBenchmarkIndependentArithmeticAndInputs(t *testing.T) {
 }
 
 func TestLPRationalBenchmarkReportFailureAndFlushPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	_, want, _ := lpScalarBenchmarkOracle(17, 1)
 	report := "operation with rationals no pairs 2\n" + lpBenchmarkNumberOracle(want) + "\n"
 	for _, plus := range []bool{false, true} {

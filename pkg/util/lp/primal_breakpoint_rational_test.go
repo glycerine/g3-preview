@@ -94,6 +94,9 @@ func TestLPRationalPrimalBreakpointIndependentSlopes(t *testing.T) {
 }
 
 func TestLPRationalPrimalBreakpointPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"enqueue", "slope-fixed", "slope-bound", "slope-entering"} {
 		for _, direct := range []bool{false, true} {
 			success, failures, queue := false, 0, 0

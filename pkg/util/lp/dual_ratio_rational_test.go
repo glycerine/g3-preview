@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPRationalDualRatioIndependentGroups(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(33171))
 	type candidate struct {
 		j                 uint32
@@ -133,6 +136,9 @@ func TestLPRationalDualRatioIndependentGroups(t *testing.T) {
 }
 
 func TestLPRationalDualRatioLossIndependentOracleAndAliases(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 200; world++ {
 		h := newLPPairHarness(t)
 		f, m := lpRationalDualBreakpointFixture(t, h, 4)
@@ -351,6 +357,9 @@ func TestLPRationalDualRatioSetOrderAndShortCircuit(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPRationalDualRatioMetadataAndStoppedPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, phase := range []string{"span-low", "span-upper", "loss-pivot", "loss-q", "boxed-q", "boxed-tight", "loss-local", "trial-local", "ratio-local", "alpha", "stopped"} {
 		t.Run(phase, func(t *testing.T) {
 			h := newLPPairHarness(t)
@@ -404,6 +413,9 @@ func TestLPRationalDualRatioMetadataAndStoppedPrefixes(t *testing.T) {
 	}
 }
 func TestLPRationalDualRatioPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"span", "loss", "ratio"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

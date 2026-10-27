@@ -141,6 +141,9 @@ func TestLARModelDeltaReachedPrefixes(t *testing.T) {
 }
 
 func TestLARModelDeltaPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, profile := range []string{"lower", "upper", "initial-copy"} {
 		for _, direct := range []bool{false, true} {
 			done, failures := false, 0

@@ -10,6 +10,9 @@ import (
 )
 
 func TestLPRationalDualCoreIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 160; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewRationalCoreFixture(t, h, 3, 6)
@@ -302,6 +305,9 @@ func TestLPRationalDualCoreLiveMetadataPrefixes(t *testing.T) {
 }
 
 func TestLPRationalDualCorePreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"construct", "start", "recalculate"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

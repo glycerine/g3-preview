@@ -14,6 +14,9 @@ import (
 )
 
 func TestLPExactTableauValuesIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 240; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewPairCoreFixture(t, h, 3, 6)
@@ -562,6 +565,9 @@ func TestLPExactTableauValuesReachedPrefixes(t *testing.T) {
 }
 
 func TestLPExactTableauValuesPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"values", "infeasible", "basis"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

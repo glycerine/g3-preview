@@ -91,6 +91,9 @@ func lpCheckTouchedIntervals(t *testing.T, h *lpPairHarness, p *LARBoundPropagat
 }
 
 func TestLARTouchedRowsIndependentIntervalsAndSolve(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 80; world++ {
 		for _, costs := range []bool{false, true} {
 			t.Run(fmt.Sprintf("%d/%v", world, costs), func(t *testing.T) {

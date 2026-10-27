@@ -116,6 +116,9 @@ func TestLPImpliedBoundIndependentExactAndEvidence(t *testing.T) {
 }
 
 func TestLPImpliedBoundConstructionPhysicalRefusals(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	value := strings.Repeat("1234567890", 100) + "/" + strings.Repeat("9876543210", 99) + "1"
 	failures := 0
 	for ordinal := int64(0); ordinal < 150; ordinal++ {
@@ -165,6 +168,9 @@ func TestLPImpliedBoundConstructionPhysicalRefusals(t *testing.T) {
 }
 
 func TestLPImpliedBoundAssignmentPhysicalRefusals(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	value := strings.Repeat("2345678901", 100) + "/" + strings.Repeat("7654321098", 99) + "1"
 	failures := 0
 	for ordinal := int64(0); ordinal < 150; ordinal++ {

@@ -232,6 +232,9 @@ func TestLPIntPriorityQueueTieAndResizePrefixes(t *testing.T) {
 }
 
 func TestLPUintPriorityQueueIndependentMapOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	q := NewUintPriorityQueue(1)
 	oracle := make(map[uint32]uint32)
 	random := rand.New(rand.NewPCG(1987, 413))
@@ -389,6 +392,9 @@ func TestLPUintPriorityQueueTieAndResizePrefixes(t *testing.T) {
 }
 
 func TestLPFloatPriorityQueueIndependentMapOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	q := NewFloatPriorityQueue(1)
 	oracle := make(map[uint32]float64)
 	random := rand.New(rand.NewPCG(1987, 413))

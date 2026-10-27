@@ -9,6 +9,9 @@ import (
 )
 
 func TestLPPairReducedCostIndependentSystems(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(82311, 7119))
 	for _, op := range []string{"fill", "init"} {
 		for world := 0; world < 120; world++ {
@@ -238,6 +241,9 @@ func TestLPPairReducedCostPhysicalOwnership(t *testing.T) {
 }
 
 func TestLPPairReducedCostLeavesOlderComparisonOwned(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"fill", "init"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

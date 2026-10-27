@@ -15,6 +15,9 @@ import (
 // Values differ from both operands, so a failed compound operation cannot
 // satisfy this test accidentally.
 func TestLPRationalExpressionPhysicalReturnCopies(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, phase := range []string{"shift", "minimum", "pin", "fixed", "rhs", "obsolete"} {
 		t.Run(phase, func(t *testing.T) {
 			seenReturnCopy, done := false, false

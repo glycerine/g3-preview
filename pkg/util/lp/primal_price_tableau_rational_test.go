@@ -11,6 +11,9 @@ import (
 )
 
 func TestLPRationalTableauPricingIndependentSelection(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(41279, 6713))
 	for world := 0; world < 320; world++ {
 		h := newLPPairHarness(t)
@@ -276,6 +279,9 @@ func TestLPRationalTableauPricingPhysicalOwnership(t *testing.T) {
 }
 
 func TestLPRationalTableauPricingOlderComparisonOwner(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"bound", "epsilon", "breakpoint"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

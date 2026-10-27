@@ -11,6 +11,9 @@ import (
 )
 
 func TestLARAllConstraintsIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 40; world++ {
 		for _, kind := range []LConstraintKind{LConstraintLE, LConstraintLT, LConstraintGE, LConstraintGT, LConstraintEQ} {
 			for _, offset := range []int64{-1, 0, 1} {

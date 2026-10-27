@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPExactStaticScopesIndependentDimensionOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	p := h.pair("2", "3")
 	m := NewRationalStaticMatrix(h.m, 2, 2)

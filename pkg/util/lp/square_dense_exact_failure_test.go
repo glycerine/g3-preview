@@ -137,6 +137,9 @@ func TestLPExactDenseBlockAllocationFailureCensus(t *testing.T) {
 
 // A dense owner may observe an older stopped comparison but must never adopt it.
 func TestLPExactDenseBlockLeavesOlderComparisonOwned(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

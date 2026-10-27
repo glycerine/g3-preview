@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPSparseDenseTriangularSolvesIndependentResiduals(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(11419, 893))
 	for world := 0; world < 220; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

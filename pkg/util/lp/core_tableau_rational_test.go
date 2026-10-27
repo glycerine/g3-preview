@@ -360,6 +360,9 @@ func TestLPRationalTableauStoppedMatrixBeforeNormalization(t *testing.T) {
 // The caller comparison predates the tableau owner. Core and matrix capture
 // must leave its receipt intact, including when their own arithmetic stops.
 func TestLPRationalTableauPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"divide", "cost", "pivot"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

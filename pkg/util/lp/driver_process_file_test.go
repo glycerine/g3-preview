@@ -286,6 +286,9 @@ func TestLPProcessFileGLPKInconclusivePrefixes(t *testing.T) {
 }
 
 func TestLPProcessFilePhysicalChildOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	large := strings.Repeat("1234567890", 20) + "7/13"
 	input := strings.Replace(lpMPSDriverModel(3, 2, 4, 5, 3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", large), 1)
 	name := lpMPSDriverFile(t, input)

@@ -172,6 +172,9 @@ func TestLARRandomIntervalBasicIndependentOracle(t *testing.T) {
 }
 
 func TestLARRandomIntervalDrawIndependentLattice(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := uint32(0); world < 120; world++ {
 		for _, mode := range []string{"free", "low", "upper", "boxed", "fixed", "reversed"} {
 			h := newLPPairHarness(t)

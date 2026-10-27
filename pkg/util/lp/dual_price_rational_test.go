@@ -23,6 +23,9 @@ func lpRationalDualPriceFixture(t *testing.T, h *lpPairHarness) (*lpRationalCore
 	return f, m
 }
 func TestLPRationalDualPriceIndependentExactOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 400; world++ {
 		h := newLPPairHarness(t)
 		f, m := lpRationalDualPriceFixture(t, h)
@@ -167,6 +170,9 @@ func TestLPRationalDualPriceDeltaAndSignSourceProfiles(t *testing.T) {
 }
 
 func TestLPRationalDualPriceRowBudgetAndStatus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, rows := range []uint32{0, 1, 17, 300, 301, 500} {
 		for _, percent := range []uint32{0, 1, 37, 100, 200, math.MaxUint32} {
 			h := newLPPairHarness(t)
@@ -428,6 +434,9 @@ func TestLPRationalDualPriceMetadataAndAssertionPrefixes(t *testing.T) {
 }
 
 func TestLPRationalDualPricePreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"edge", "row", "delta"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

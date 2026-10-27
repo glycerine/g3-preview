@@ -24,6 +24,9 @@ func lpRationalPricingFixture(t *testing.T, h *lpPairHarness, rows, cols uint32)
 }
 
 func TestLPRationalPrimalPricingIndependentEligibility(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	f, m := lpRationalPricingFixture(t, h, 0, 1)
 	lo, up := big.NewRat(-3, 7), big.NewRat(5, 13)
@@ -685,6 +688,9 @@ func TestLPRationalPrimalPricingSourceGuardsAndPrefixes(t *testing.T) {
 }
 
 func TestLPRationalPrimalPricingOlderComparisonOwner(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"bound", "epsilon", "choose", "breakpoint"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

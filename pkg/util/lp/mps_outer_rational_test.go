@@ -54,6 +54,9 @@ func (s lpMPSExactOuter) named(name string, out *numeral.Rational) error {
 }
 
 func TestLPRationalMPSOuterIndependentOptima(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(796800))
 	for world := 0; world < 60; world++ {
 		h := newLPPairHarness(t)

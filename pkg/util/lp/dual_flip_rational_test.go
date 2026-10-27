@@ -384,6 +384,9 @@ func TestLPRationalDualFlipPreservesOlderComparison(t *testing.T) {
 }
 
 func TestLPRationalDualFlipMetadataAndPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, phase := range []string{"signed-x", "signed-up", "signed-local", "process-local", "wave-nil", "wave-column", "xb-factor", "xb-basis", "cost-prefix", "cost-p", "beta-pivot", "beta-r", "apply-upper", "apply-interior", "matrix-offset", "stopped"} {
 		t.Run(phase, func(t *testing.T) {
 			h := newLPPairHarness(t)

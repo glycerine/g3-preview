@@ -10,6 +10,9 @@ import (
 )
 
 func TestLPDiagonalTailAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	receipts, pairPrefixes := 0, 0
 	for _, op := range []string{"constructor", "pair-constructor", "left", "right", "left-indexed", "right-indexed", "pair"} {
 		for _, direct := range []bool{false, true} {

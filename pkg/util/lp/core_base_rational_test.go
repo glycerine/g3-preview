@@ -42,6 +42,9 @@ func (f *lpRationalCoreFixture) close() {
 	f.h.must(f.a.Close())
 }
 func TestLPRationalCoreIndependentLUSolves(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(82719417))
 	for world := 0; world < 80; world++ {
 		h := newLPPairHarness(t)

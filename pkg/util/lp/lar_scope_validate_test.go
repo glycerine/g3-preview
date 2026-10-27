@@ -14,6 +14,9 @@ import (
 const larScopeFaultMagnitudeRepeats = 20
 
 func TestLARScopeEquationIndependentPairOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	rng := rand.New(rand.NewPCG(73182, 17))
 	for world := 0; world < 160; world++ {

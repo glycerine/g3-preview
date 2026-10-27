@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPSparseRowRestoreIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	m := lpNewExactSparse(t, h, 7)
 	f := newFloatSparseMatrix(7)

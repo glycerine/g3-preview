@@ -103,6 +103,9 @@ func lpExactSparseCheck(t *testing.T, h *lpPairHarness, m *RationalSparseMatrix,
 }
 
 func TestLPExactSparseIndependentMutationOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	m := lpNewExactSparse(t, h, 5)
 	p := h.pair("0", "0")
@@ -143,6 +146,9 @@ func TestLPExactSparseIndependentMutationOracle(t *testing.T) {
 }
 
 func TestLPExactSparseIndependentPivotOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(975, 67))
 	fills, cancels, empty := 0, 0, 0
 	for world := 0; world < 160; world++ {

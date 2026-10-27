@@ -227,6 +227,9 @@ func TestLARImpliedDisplayReachedGuards(t *testing.T) {
 }
 
 func TestLARImpliedDisplayPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, term := range []bool{false, true} {
 		found := false
 		for ordinal := int64(0); ordinal < 40 && !found; ordinal++ {

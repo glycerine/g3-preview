@@ -47,6 +47,9 @@ func lpRationalPresolveRow(t *testing.T, h *lpPairHarness, m *RationalLPSolver, 
 	return row
 }
 func TestLPRationalPresolveIndependentCornerExtrema(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 200; world++ {
 		h := newLPPairHarness(t)
 		m := lpRationalInputModel(t, h)

@@ -295,6 +295,9 @@ func TestLPDriverSetupLimitsAndFailurePrefixes(t *testing.T) {
 }
 
 func TestLPDriverSetupPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		success, failures, prefix := false, 0, false
 		for ordinal := int64(0); ordinal < 2000 && !success; ordinal++ {

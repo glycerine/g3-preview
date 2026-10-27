@@ -141,6 +141,9 @@ func TestLPRationalPrimalLimitThetaIndependentMinimum(t *testing.T) {
 }
 
 func TestLPRationalPrimalInfLimitIndependentScalarOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"negative", "positive", "low-positive"} {
 		for world := 0; world < 480; world++ {
 			h := newLPPairHarness(t)
@@ -250,6 +253,9 @@ func lpCallScalarBasisLimit(m *RationalPrimalCoreSolver, op string, d, theta *nu
 }
 
 func TestLPRationalPrimalBasisLimitIndependentScalarOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"upper-negative", "boxed-positive", "boxed-negative", "feasible-positive", "feasible-negative"} {
 		for world := 0; world < 240; world++ {
 			h := newLPPairHarness(t)
@@ -324,6 +330,9 @@ func TestLPRationalPrimalBasisLimitIndependentScalarOracle(t *testing.T) {
 }
 
 func TestLPRationalPrimalBasisDispatchIndependentScalarOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, kind := range []ColumnType{ColumnFree, ColumnFixed, ColumnLowBound, ColumnUpperBound, ColumnBoxed} {
 		for _, feasible := range []bool{false, true} {
 			for _, positive := range []bool{false, true} {

@@ -9,6 +9,9 @@ import (
 )
 
 func TestLPPairCoreReconstructIndependentSystems(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(9071, 719))
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)

@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPExactRowEtaIndependentMatrixProducts(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	p := h.pair("0", "0")
 	r := rand.New(rand.NewPCG(103, 2026))
@@ -585,6 +588,9 @@ func TestLPExactRowEtaTailComposition(t *testing.T) {
 }
 
 func TestLPExactRowEtaStoppedDestinationAndOlderRawOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		var h *lpPairHarness
 		if direct {

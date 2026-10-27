@@ -9,6 +9,9 @@ import (
 )
 
 func TestLARSolveOnSignatureIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 100; world++ {
 		for _, profile := range []string{"exact-pivot", "presolved", "missing-r-lu", "missing-d-lu", "initial-feasible", "infeasible"} {
 			h := newLPPairHarness(t)

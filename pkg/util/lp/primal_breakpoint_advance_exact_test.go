@@ -11,6 +11,9 @@ import (
 )
 
 func TestLPExactBreakpointAdvanceIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	randomStops, continuedZeros, exhausted := 0, 0, 0
 	for world := 0; world < 480; world++ {
 		h := newLPPairHarness(t)

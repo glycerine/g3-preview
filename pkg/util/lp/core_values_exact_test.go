@@ -382,6 +382,9 @@ func TestLPPairCoreValuesPhysicalOwnershipAndPrefixes(t *testing.T) {
 }
 
 func TestLPPairCoreValuesPreservesOlderComparisonOwner(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"update", "restore", "precise-index"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

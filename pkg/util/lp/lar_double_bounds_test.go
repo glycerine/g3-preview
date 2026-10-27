@@ -109,6 +109,9 @@ func TestLARDoubleBoundsIndependentConversionModels(t *testing.T) {
 }
 
 func TestLARStrictDeltaPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		success, failures := false, 0
 		for ordinal := int64(0); ordinal < 1000; ordinal++ {

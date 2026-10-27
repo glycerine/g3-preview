@@ -49,6 +49,9 @@ func lpRationalDualOuterBoxedStage(t *testing.T, h *lpPairHarness, m *RationalDu
 	h.must(m.CopyBAsideAndSetToZeros())
 }
 func TestLPRationalDualOuterIndependentPreparedVertices(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(366352))
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)
@@ -197,6 +200,9 @@ func TestLPRationalDualOuterFullEntrySourceBounds(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPRationalDualOuterPreparationIndependentRows(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(186336))
 	for world := 0; world < 160; world++ {
 		h := newLPPairHarness(t)

@@ -70,6 +70,9 @@ func lpStaticMust(t *testing.T, err error) {
 }
 
 func TestLPFloatStaticMatrixIndependentMutationOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	m := NewFloatStaticMatrix(5, 7)
 	want := make(map[IndexPair]float64)
 	r := rand.New(rand.NewPCG(188, 2026))

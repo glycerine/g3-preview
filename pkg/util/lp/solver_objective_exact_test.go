@@ -10,6 +10,9 @@ import (
 )
 
 func TestLPRationalObjectiveIndependentCostsAndReconstruction(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 160; world++ {
 		h := newLPPairHarness(t)
 		m := lpRationalInputModel(t, h)

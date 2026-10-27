@@ -36,6 +36,9 @@ func lpPropagationModel(t *testing.T, h *lpPairHarness, columns []uint32) (*LARB
 }
 
 func TestLARBoundPropagatorIndependentStrongestOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	columns := []uint32{41, LARTermStartIndex, 77, LARTermStartIndex + 1, LARTermStartIndex}
 	b, terms := lpPropagationModel(t, h, columns)

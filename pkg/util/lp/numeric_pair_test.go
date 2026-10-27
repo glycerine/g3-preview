@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPRationalPairPhysicalArithmeticPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	large := strings.Repeat("1234567890", 18) + "7/13"
 	ax := mustLPRat(t, large)
 	ay := big.NewRat(-7, 13)
@@ -186,6 +189,9 @@ func (h *lpPairHarness) check(p *RationalPair, x, y *big.Rat) {
 }
 
 func TestLPRationalPairArithmeticOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	a, b, out := h.pair("0", "0"), h.pair("0", "0"), h.pair("0", "0")
 	r := rand.New(rand.NewPCG(112, 1987))

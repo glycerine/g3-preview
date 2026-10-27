@@ -100,6 +100,9 @@ func lpIndependentRationalVertexMinimum(a [][]*big.Rat, b, c []*big.Rat) *big.Ra
 	return best
 }
 func TestLPRationalDualSolveIndependentVertices(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(745122))
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)
@@ -199,6 +202,9 @@ func lpRationalDualPricingFixture(t *testing.T, h *lpPairHarness, n uint32) (*lp
 	return f, m
 }
 func TestLPRationalDualSolvePricingIndependentRecordBudget(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(7211))
 	for world := 0; world < 500; world++ {
 		h := newLPPairHarness(t)
@@ -521,6 +527,9 @@ func TestLPRationalDualSolvePhysicalOwnership(t *testing.T) {
 	}
 }
 func TestLPRationalDualSolvePreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"price", "iteration", "solve"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

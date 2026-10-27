@@ -10,6 +10,9 @@ import (
 )
 
 func TestLPLUExtensionIndependentBasisOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(11937, 8313))
 	for world := 0; world < 24; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

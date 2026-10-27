@@ -55,6 +55,9 @@ func lpExactStaticCheck(t *testing.T, h *lpPairHarness, m *RationalStaticMatrix,
 }
 
 func TestLPExactStaticMatrixIndependentMutationOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	m := NewRationalStaticMatrix(h.m, 5, 7)
 	t.Cleanup(func() { h.must(m.Close()) })
@@ -124,6 +127,9 @@ func TestLPExactStaticMatrixIndependentMutationOracle(t *testing.T) {
 }
 
 func TestLPExactStaticMatrixIndependentPivotOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	r := rand.New(rand.NewPCG(899, 53))
 	multi := 0
 	for world := 0; world < 240; world++ {

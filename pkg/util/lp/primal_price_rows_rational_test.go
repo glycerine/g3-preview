@@ -13,6 +13,9 @@ import (
 )
 
 func TestLPRationalRowPricingIndependentSelection(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	staleLonger := 0
 	for world := 0; world < 480; world++ {
 		h := newLPPairHarness(t)

@@ -899,6 +899,9 @@ func TestLPIndexedPairVectorOlderRawInvocationIdentity(t *testing.T) {
 // rational normalization. Their receipts belong to the vector, alongside the
 // outer rational arithmetic frame, even after a completed coordinate prefix.
 func TestLPIndexedExactVectorNormalizationFailureOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	integerReceipts := 0
 	for _, pair := range []bool{false, true} {
 		for _, drop := range []bool{false, true} {

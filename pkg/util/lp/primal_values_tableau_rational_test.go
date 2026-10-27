@@ -279,6 +279,9 @@ func TestLPRationalTableauBasisIndependentElimination(t *testing.T) {
 }
 
 func TestLPRationalTableauValuesPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"values", "infeasible", "basis"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0
@@ -579,6 +582,9 @@ func TestLPRationalTableauValuesReachedPrefixes(t *testing.T) {
 }
 
 func TestLPRationalTableauValuesPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"values", "infeasible", "basis"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

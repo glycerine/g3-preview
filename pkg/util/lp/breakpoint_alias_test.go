@@ -11,6 +11,9 @@ import (
 // record. Its argument may borrow an already-owned record while push_back
 // grows the container. An interrupted later copy must leave that owner intact.
 func TestLPBreakpointOwnedDeltaAliasPhysicalPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	xText := "-" + strings.Repeat("1234567890", 20) + "/7"
 	yText := strings.Repeat("9876543210", 20) + "/13"
 	x, y := mustLPRat(t, xText), mustLPRat(t, yText)

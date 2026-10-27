@@ -35,6 +35,9 @@ func lpPrepareLARSignatureTableau(t *testing.T, h *lpPairHarness, c *LARCoreSolv
 }
 
 func TestLARSolveOnSignatureTableauIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, strategy := range []SimplexStrategy{StrategyTableauRows, StrategyTableauCosts} {
 		for world := 0; world < 60; world++ {
 			for _, profile := range []string{"exact-pivot", "presolved", "missing-d-lu", "initial-feasible", "infeasible", "signature-change"} {
