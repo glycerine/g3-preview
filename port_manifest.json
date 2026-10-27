@@ -90309,9 +90309,16 @@
       "path": "src/nlsat/nlsat_interval_set.cpp",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/interval_set.go",
+        "pkg/nlsat/interval_set_operations.go"
+      ],
+      "tests": [
+        "pkg/nlsat/interval_set_test.go",
+        "pkg/nlsat/interval_set_cpp_test.go",
+        "pkg/nlsat/interval_set_ownership_test.go"
+      ],
       "assertions": [
         {
           "line": 74,
@@ -90536,17 +90543,53 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "interval-set construction, zero-ref factories, alias fast paths, ordered algebraic ownership, reference retirement, extraction, literal justification deduplication and display",
+          "status": "partial",
+          "go_target": "pkg/nlsat/interval_set.go",
+          "tests": [
+            "TestIntervalUnionReasonBoundariesCompressionAndAliasing",
+            "TestIntervalReferenceOwnershipAndRefusalPrefixes",
+            "TestIntervalManagerBorrowingAndCopiedOwnerGuards"
+          ]
+        },
+        {
+          "name": "source endpoint comparisons, justification-preserving union and compression, full coverage, subset, geometric/justified equality and seeded complement witness selection",
+          "status": "partial",
+          "go_target": "pkg/nlsat/interval_set_operations.go",
+          "tests": [
+            "TestIntervalUnionAndSubsetIndependentNumberLineOracle",
+            "TestIntervalCompositeUnionsIndependentOracle",
+            "TestIntervalComplementEmptyAndReservoirRandomSequence",
+            "TestIntervalComplementGapsRationalPriorityAndIrrationalFallback",
+            "TestIntervalUnionsAndWitnessPrebuiltCPPOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Manager borrows the actual AlgebraicManager and SmallAllocator; the allocator must share the numeral runtime. Published interval sets use actual allocator object tokens and zero initial references. Algebraic endpoints are independently copied. Union scratch records own stable-address numerical cells, transfer them into the published array and retain failed cleanup on the manager. Source compression swaps endpoints and deletes discarded tail values. Refcount retirement tracks actual allocator release progress; Cleanup drains interrupted buffers/sets after numerical callees are acknowledged. Live caller sets prevent manager Close; both borrowed services must outlive it."
+      ],
+      "deviations": [
+        "Native Go metadata/slices/maps represent source fields and buffers; actual allocator reservations use reflected Go extents, not C++ ABI sizes. Stable scratch-record addresses and native backing storage differ from source inline128 buffer relocation. Exact source layout, every allocation/deletion/callback frontier, and all lexical numeral lifetimes remain unaudited. No C++ STL or universal adapter is ported.",
+        "The core logical algorithms are implemented. Source TRACE/CTRACE sites and the full internal assertion inventory still need connection; initial interval-set validation and refcount/witness guards use actual source debug gates. Whole methods_audited/ownership_audited remain false. Nil reference counting is a concrete Go empty-owner no-op, corresponding to the retained obj_ref caller behavior.",
+        "Independent oracles cover4356 single-interval pairs,240 composite models, endpoint/reason tie cases, random draw schedules, source is_int behavior, rational-first singleton gaps and irrational fallback. Prebuilt C++ checks64 emitted unions and one irrational complement witness. Sampled mk/union reservation prefixes include real numerical memout after the shared algebraic callee cleanup. These checks do not establish a complete NLSAT evaluator/explanation/search or tactic integration."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_interval_set.h",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/interval_set.go",
+        "pkg/nlsat/interval_set_operations.go"
+      ],
+      "tests": [
+        "pkg/nlsat/interval_set_test.go",
+        "pkg/nlsat/interval_set_cpp_test.go",
+        "pkg/nlsat/interval_set_ownership_test.go"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -90559,9 +90602,38 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "interval-set construction, zero-ref factories, alias fast paths, ordered algebraic ownership, reference retirement, extraction, literal justification deduplication and display",
+          "status": "partial",
+          "go_target": "pkg/nlsat/interval_set.go",
+          "tests": [
+            "TestIntervalUnionReasonBoundariesCompressionAndAliasing",
+            "TestIntervalReferenceOwnershipAndRefusalPrefixes",
+            "TestIntervalManagerBorrowingAndCopiedOwnerGuards"
+          ]
+        },
+        {
+          "name": "source endpoint comparisons, justification-preserving union and compression, full coverage, subset, geometric/justified equality and seeded complement witness selection",
+          "status": "partial",
+          "go_target": "pkg/nlsat/interval_set_operations.go",
+          "tests": [
+            "TestIntervalUnionAndSubsetIndependentNumberLineOracle",
+            "TestIntervalCompositeUnionsIndependentOracle",
+            "TestIntervalComplementEmptyAndReservoirRandomSequence",
+            "TestIntervalComplementGapsRationalPriorityAndIrrationalFallback",
+            "TestIntervalUnionsAndWitnessPrebuiltCPPOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Manager borrows the actual AlgebraicManager and SmallAllocator; the allocator must share the numeral runtime. Published interval sets use actual allocator object tokens and zero initial references. Algebraic endpoints are independently copied. Union scratch records own stable-address numerical cells, transfer them into the published array and retain failed cleanup on the manager. Source compression swaps endpoints and deletes discarded tail values. Refcount retirement tracks actual allocator release progress; Cleanup drains interrupted buffers/sets after numerical callees are acknowledged. Live caller sets prevent manager Close; both borrowed services must outlive it."
+      ],
+      "deviations": [
+        "Native Go metadata/slices/maps represent source fields and buffers; actual allocator reservations use reflected Go extents, not C++ ABI sizes. Stable scratch-record addresses and native backing storage differ from source inline128 buffer relocation. Exact source layout, every allocation/deletion/callback frontier, and all lexical numeral lifetimes remain unaudited. No C++ STL or universal adapter is ported.",
+        "The core logical algorithms are implemented. Source TRACE/CTRACE sites and the full internal assertion inventory still need connection; initial interval-set validation and refcount/witness guards use actual source debug gates. Whole methods_audited/ownership_audited remain false. Nil reference counting is a concrete Go empty-owner no-op, corresponding to the retained obj_ref caller behavior.",
+        "Independent oracles cover4356 single-interval pairs,240 composite models, endpoint/reason tie cases, random draw schedules, source is_int behavior, rational-first singleton gaps and irrational fallback. Prebuilt C++ checks64 emitted unions and one irrational complement witness. Sampled mk/union reservation prefixes include real numerical memout after the shared algebraic callee cleanup. These checks do not establish a complete NLSAT evaluator/explanation/search or tactic integration."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_justification.h",

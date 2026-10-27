@@ -280,8 +280,12 @@ digraph packages {
   "nlsat" [style=filled, fillcolor="#eeeeee"];
   "nlsat" -> "arena";
   "nlsat" -> "math/polynomial";
+  "nlsat" -> "sat";
   "nlsat" -> "util/diagnostic";
+  "nlsat" -> "util/memory";
+  "nlsat" -> "util/numeral";
   "nlsat" -> "util/params";
+  "nlsat" -> "util/random";
   "opt" [style=filled, fillcolor="#eeeeee"];
   "opt" -> "arena";
   "opt" -> "ast";
