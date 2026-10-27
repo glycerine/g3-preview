@@ -3259,15 +3259,24 @@
     {
       "package": "tactic/portfolio",
       "imports": [
+        "arena",
         "ast",
+        "ast/rewriter",
         "model",
         "smtcore",
         "solver",
         "tactic",
         "tactic/smtlogics",
-        "util/params"
+        "util/diagnostic",
+        "util/lbool",
+        "util/memory",
+        "util/numeral",
+        "util/params",
+        "util/statistics",
+        "util/symbol"
       ],
       "production_files": [
+        "enum2bv_solver.go",
         "smt_strategic_solver.go"
       ]
     },

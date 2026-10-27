@@ -2,7 +2,10 @@ package solver
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -123,5 +126,66 @@ func TestNamedAssertionsWithAssumptionsAndInvalidTag(t *testing.T) {
 	}
 	if count, _ := n.NumAssumptions(); count != 0 {
 		t.Fatal("operation assumption survived", count)
+	}
+}
+
+func TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange(t *testing.T) {
+	for _, mode := range []string{"check", "consequences", "close"} {
+		t.Run(mode, func(t *testing.T) {
+			base := solverTestManager(t)
+			var trace bytes.Buffer
+			tags := diagnostic.NewTraceTagsWithWriter(&trace)
+			m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: base.Symbols, Numerals: base.NumeralService(), Budget: base.Budget(), TraceTags: tags})
+			solverMust(t, err)
+			t.Cleanup(func() { solverMust(t, m.Close()) })
+			n, err := NewNamedAssertions(m, &namedCoreFixture{})
+			solverMust(t, err)
+			t.Cleanup(func() { solverMust(t, n.Close()) })
+			boolean, err := m.MkBoolSort()
+			solverMust(t, err)
+			var values []ast.ASTHandle
+			var ids []uint32
+			for _, name := range []string{"na-retire-first", "na-retire-second", "na-retire-third"} {
+				symbol, e := m.Symbols.Intern(name)
+				solverMust(t, e)
+				h, e := m.MkConst(symbol, boolean)
+				solverMust(t, e)
+				id, e := m.GetASTID(h)
+				solverMust(t, e)
+				values = append(values, h)
+				ids = append(ids, id)
+			}
+			tags.Enable("ast")
+			trace.Reset()
+			switch mode {
+			case "check":
+				_, err = n.CheckSat(values)
+			case "consequences":
+				_, _, err = n.WithAssumptions(values, func([]ast.ASTHandle) (lbool.LBool, []ast.ASTHandle, error) { return lbool.True, nil, nil })
+			case "close":
+				_, err = n.appendTemporary(values)
+				solverMust(t, err)
+				err = n.Close()
+			}
+			solverMust(t, err)
+			if len(n.assumptions) != 0 {
+				t.Fatal("retired assumptions retained")
+			}
+			for _, h := range values {
+				if _, e := m.GetKind(h); !errors.Is(e, ast.ErrASTHandle) {
+					t.Fatal("temporary assumption survived", e)
+				}
+			}
+			if tags.ShouldTrace("ast") {
+				previous := -1
+				for _, id := range ids {
+					pos := strings.Index(trace.String(), fmt.Sprintf("Deleting object %d ", id))
+					if pos <= previous {
+						t.Fatal("source forward range retirement order", ids, trace.String())
+					}
+					previous = pos
+				}
+			}
+		})
 	}
 }

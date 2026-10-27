@@ -149,13 +149,21 @@ func (n *NamedAssertions) appendTemporary(values []ast.ASTHandle) (uint32, error
 }
 
 func (n *NamedAssertions) restore(size uint32) error {
-	for uint32(len(n.assumptions)) > size {
-		i := len(n.assumptions) - 1
+	if uint64(size) > uint64(len(n.assumptions)) {
+		return arena.ErrBounds
+	}
+	// ref_vector_core::shrink decrements the removed range forward. Keep
+	// reached zero tokens until all remaining elements have retired so a
+	// stopped Go cleanup can continue without replaying an earlier decrement.
+	for i := int(size); i < len(n.assumptions); i++ {
+		if n.assumptions[i] == (ast.ASTRef{}) {
+			continue
+		}
 		if err := n.manager.DelRef(&n.assumptions[i]); err != nil {
 			return err
 		}
-		n.assumptions = n.assumptions[:i]
 	}
+	n.assumptions = n.assumptions[:size]
 	return nil
 }
 

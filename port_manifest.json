@@ -153372,14 +153372,15 @@
       "path": "src/solver/solver_na2as.cpp",
       "component": "solver",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/solver/named_assertions.go",
         "pkg/solver/named_assertions_test.go"
       ],
       "tests": [
         "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
-        "TestNamedAssertionsWithAssumptionsAndInvalidTag"
+        "TestNamedAssertionsWithAssumptionsAndInvalidTag",
+        "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
       ],
       "assertions": [
         {
@@ -153395,8 +153396,8 @@
           "text": "SASSERT(n <= lvl);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "tracked assertion validation, source trace, assumption pin and implication forwarding (solver_na2as.cpp:27-49)",
@@ -153423,29 +153424,39 @@
           "tests": [
             "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions"
           ]
+        },
+        {
+          "name": "Source ref_vector forward removed-range retirement for temporary check/consequence assumptions and adapter Close; reached zero tokens retained until range completion for explicit Go retry",
+          "status": "partial",
+          "go_target": "pkg/solver/named_assertions.go",
+          "tests": [
+            "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
+          ]
         }
       ],
       "ownership": [
-        "Each retained named assumption owns an ASTRef; temporary assumptions are pinned for exactly one operation and restored in reverse order.",
+        "Each retained named assumption owns an ASTRef; temporary assumptions are pinned for exactly one operation and retired in source forward removed-range order.",
         "The adapter borrows its manager, concrete core and optional trace owner."
       ],
       "deviations": [
         "Invalid tracked labels and pop depths return explicit Go domain/bounds errors at the reached source assertions.",
-        "NamedAssertionCore is a concrete typed derived-solver boundary replacing C++ protected virtual methods."
+        "NamedAssertionCore is a concrete typed derived-solver boundary replacing C++ protected virtual methods.",
+        "Retained enum2bv_solver review found that restore used reverse pop order instead of ref_vector_core::shrink forward decrements. Corrected and tested using actual AST deletion records. The source assert_expr new_t lexical expr_ref is still not represented by a separate ASTRef before core forwarding; existing algorithm tests do not establish full source assertion/trace/native exception ownership. Whole-unit completion/audit flags are withdrawn pending that concrete remaining audit; bounded existing evidence is preserved."
       ]
     },
     {
       "path": "src/solver/solver_na2as.h",
       "component": "solver",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/solver/named_assertions.go",
         "pkg/solver/named_assertions_test.go"
       ],
       "tests": [
         "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
-        "TestNamedAssertionsWithAssumptionsAndInvalidTag"
+        "TestNamedAssertionsWithAssumptionsAndInvalidTag",
+        "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
       ],
       "conditionals": [
         {
@@ -153457,8 +153468,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "complete named-assertion adapter surface and derived core boundary (solver_na2as.h:27-54)",
@@ -153468,13 +153479,22 @@
             "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
             "TestNamedAssertionsWithAssumptionsAndInvalidTag"
           ]
+        },
+        {
+          "name": "Source ref_vector forward removed-range retirement for temporary check/consequence assumptions and adapter Close; reached zero tokens retained until range completion for explicit Go retry",
+          "status": "partial",
+          "go_target": "pkg/solver/named_assertions.go",
+          "tests": [
+            "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
+          ]
         }
       ],
       "ownership": [
         "Native ASTRef slices replace expr_ref_vector and native uint32 slices replace scope vectors; Close releases every retained label."
       ],
       "deviations": [
-        "WithAssumptions supplies the source get_consequences append/restore scope to concrete Go solvers without exposing inheritance."
+        "WithAssumptions supplies the source get_consequences append/restore scope to concrete Go solvers without exposing inheritance.",
+        "Retained enum2bv_solver review found that restore used reverse pop order instead of ref_vector_core::shrink forward decrements. Corrected and tested using actual AST deletion records. The source assert_expr new_t lexical expr_ref is still not represented by a separate ASTRef before core forwarding; existing algorithm tests do not establish full source assertion/trace/native exception ownership. Whole-unit completion/audit flags are withdrawn pending that concrete remaining audit; bounded existing evidence is preserved."
       ]
     },
     {
@@ -167078,9 +167098,23 @@
       "path": "src/tactic/portfolio/enum2bv_solver.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/enum2bv_solver.go",
+        "pkg/tactic/portfolio/enum2bv_solver_test.go",
+        "pkg/tactic/portfolio/enum2bv_solver_prefix_test.go",
+        "pkg/tactic/portfolio/enum2bv_solver_cpp_test.go"
+      ],
+      "tests": [
+        "TestEnum2BVSolverQFFDReference",
+        "TestEnum2BVSolverScopeErrorPrefixes",
+        "TestEnum2BVSolverConsequenceProjectionBranches",
+        "TestEnum2BVSolverConstructorAndParameterPrefixes",
+        "TestEnum2BVSolverIncrementalModelsAndScopes",
+        "TestEnum2BVSolverTrackedAssumptionsAndCores",
+        "TestEnum2BVSolverConsequencesTranslateAndInternalize",
+        "TestEnum2BVSolverBaseStatusIndependentOfBackend"
+      ],
       "assertions": [
         {
           "line": 133,
@@ -167093,17 +167127,59 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained enum2bv incremental solver wrapper: assertion rewrite then bound flush/assert, rewriter-before-backend push and backend-before-rewriter pop, named assumption core, forwarded result/configuration surfaces, enum model reconstruction/filtering and consequence projection",
+          "status": "partial",
+          "go_targets": [
+            "pkg/tactic/portfolio/enum2bv_solver.go",
+            "pkg/tactic/portfolio/enum2bv_solver_test.go",
+            "pkg/tactic/portfolio/enum2bv_solver_prefix_test.go",
+            "pkg/tactic/portfolio/enum2bv_solver_cpp_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVSolverQFFDReference",
+            "TestEnum2BVSolverScopeErrorPrefixes",
+            "TestEnum2BVSolverConsequenceProjectionBranches",
+            "TestEnum2BVSolverConstructorAndParameterPrefixes",
+            "TestEnum2BVSolverIncrementalModelsAndScopes",
+            "TestEnum2BVSolverTrackedAssumptionsAndCores",
+            "TestEnum2BVSolverConsequencesTranslateAndInternalize",
+            "TestEnum2BVSolverBaseStatusIndependentOfBackend"
+          ]
+        }
+      ],
+      "ownership": [
+        "The wrapper retains the actual backend solver and independent base/rewriter parameter snapshots, plus the source NamedAssertions adapter. Rewriter destruction precedes the backend reference, then named assumptions/base parameters. Concrete call owners retain assertion tmp/proof/bounds, consequence bvars/bounds/datatype utility/rational/head, and model-converter/model-reference intermediates. A stopped cleanup remains attached before member destruction. Backend and model decrement continuations preserve the reached valid-reference prefix; general native throwing-destructor/physical NUM auditing remains open.",
+        "Solver.GetConsequences returns borrowed handles in the existing Go boundary. This wrapper owns a concrete published result vector until the next consequence query or Close; new roots acquire ownership before head/rational/query locals retire. The C++ caller-owned expr_ref_vector lifetime is not exposed as a new universal adapter.",
+        "The nonvirtual check_sat_result status remains owned by the wrapper base and starts Undef. Explicit SetStatus affects only that base; backend checks/SetStatus do not mutate it. Other virtual result operations remain forwarded as in enum2bv_solver.cpp. Tests distinguish this from the former accidental status forwarding."
+      ],
+      "deviations": [
+        "The source fd_solver pipeline also requires inc_sat_solver, pb2bv_solver and bounded_int2bv_solver integration. This increment exposes the concrete enum wrapper but does not redirect QF_FD/SAT defaults to an incomplete replacement pipeline. C++ QF_FD oracle cases compare this wrapper plus the actual Go SMT backend against the C++ full FD pipeline only on pure enum/Boolean scenarios. Status/model/consequence text matches canonically; named cores compare exact membership because the actual backends return opposite label order.",
+        "Go errors retain actual reached prefixes and provide explicit Close continuation. Whole-unit audit remains partial for inherited NamedAssertions lexical/diagnostic/exception details, cross-runtime translation, source VERIFY failure transport, arbitrary backend consumed-decrement behavior and physical numerical cleanup. Non-implication consequence outputs are rejected at the source defined VERIFY precondition; ordinary retained backends return implication-shaped results."
+      ]
     },
     {
       "path": "src/tactic/portfolio/enum2bv_solver.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/enum2bv_solver.go",
+        "pkg/tactic/portfolio/enum2bv_solver_test.go",
+        "pkg/tactic/portfolio/enum2bv_solver_prefix_test.go",
+        "pkg/tactic/portfolio/enum2bv_solver_cpp_test.go"
+      ],
+      "tests": [
+        "TestEnum2BVSolverQFFDReference",
+        "TestEnum2BVSolverScopeErrorPrefixes",
+        "TestEnum2BVSolverConsequenceProjectionBranches",
+        "TestEnum2BVSolverConstructorAndParameterPrefixes",
+        "TestEnum2BVSolverIncrementalModelsAndScopes",
+        "TestEnum2BVSolverTrackedAssumptionsAndCores",
+        "TestEnum2BVSolverConsequencesTranslateAndInternalize",
+        "TestEnum2BVSolverBaseStatusIndependentOfBackend"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -167116,9 +167192,37 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained enum2bv incremental solver wrapper: assertion rewrite then bound flush/assert, rewriter-before-backend push and backend-before-rewriter pop, named assumption core, forwarded result/configuration surfaces, enum model reconstruction/filtering and consequence projection",
+          "status": "partial",
+          "go_targets": [
+            "pkg/tactic/portfolio/enum2bv_solver.go",
+            "pkg/tactic/portfolio/enum2bv_solver_test.go",
+            "pkg/tactic/portfolio/enum2bv_solver_prefix_test.go",
+            "pkg/tactic/portfolio/enum2bv_solver_cpp_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVSolverQFFDReference",
+            "TestEnum2BVSolverScopeErrorPrefixes",
+            "TestEnum2BVSolverConsequenceProjectionBranches",
+            "TestEnum2BVSolverConstructorAndParameterPrefixes",
+            "TestEnum2BVSolverIncrementalModelsAndScopes",
+            "TestEnum2BVSolverTrackedAssumptionsAndCores",
+            "TestEnum2BVSolverConsequencesTranslateAndInternalize",
+            "TestEnum2BVSolverBaseStatusIndependentOfBackend"
+          ]
+        }
+      ],
+      "ownership": [
+        "The wrapper retains the actual backend solver and independent base/rewriter parameter snapshots, plus the source NamedAssertions adapter. Rewriter destruction precedes the backend reference, then named assumptions/base parameters. Concrete call owners retain assertion tmp/proof/bounds, consequence bvars/bounds/datatype utility/rational/head, and model-converter/model-reference intermediates. A stopped cleanup remains attached before member destruction. Backend and model decrement continuations preserve the reached valid-reference prefix; general native throwing-destructor/physical NUM auditing remains open.",
+        "Solver.GetConsequences returns borrowed handles in the existing Go boundary. This wrapper owns a concrete published result vector until the next consequence query or Close; new roots acquire ownership before head/rational/query locals retire. The C++ caller-owned expr_ref_vector lifetime is not exposed as a new universal adapter.",
+        "The nonvirtual check_sat_result status remains owned by the wrapper base and starts Undef. Explicit SetStatus affects only that base; backend checks/SetStatus do not mutate it. Other virtual result operations remain forwarded as in enum2bv_solver.cpp. Tests distinguish this from the former accidental status forwarding."
+      ],
+      "deviations": [
+        "The source fd_solver pipeline also requires inc_sat_solver, pb2bv_solver and bounded_int2bv_solver integration. This increment exposes the concrete enum wrapper but does not redirect QF_FD/SAT defaults to an incomplete replacement pipeline. C++ QF_FD oracle cases compare this wrapper plus the actual Go SMT backend against the C++ full FD pipeline only on pure enum/Boolean scenarios. Status/model/consequence text matches canonically; named cores compare exact membership because the actual backends return opposite label order.",
+        "Go errors retain actual reached prefixes and provide explicit Close continuation. Whole-unit audit remains partial for inherited NamedAssertions lexical/diagnostic/exception details, cross-runtime translation, source VERIFY failure transport, arbitrary backend consumed-decrement behavior and physical numerical cleanup. Non-implication consequence outputs are rejected at the source defined VERIFY precondition; ordinary retained backends return implication-shaped results."
+      ]
     },
     {
       "path": "src/tactic/portfolio/fd_solver.cpp",
@@ -263150,7 +263254,7 @@
     "packages_without_test_files": 7,
     "lp_seconds": 2.785,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean frozen df87768f8b0eb9bf668d4b71ef8233eeecee8e66, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes earlier datatype/enum ownership work, enum diagnostic exceptions/assertions260732f9, proof compositiona4561288, constructor parameter snapshot50da292d and retained dt2bv tactic/SMT-LIB model/core/scope integrationdf87768f. Default native run intentionally skips guarded LP cases; no full LP -short or full tagged suite is claimed. dt2bv/enum2bv/printer whole units remain partial for recorded exception/ownership/translation/display obligations. Current uncommitted enum2bv_solver implementation/tests are explicitly outside this snapshot. Complete smtcore/solver/tactic/CLI/API/higher-engine integration remains active; no source-unit/API status or audit promotion follows from the checkpoint."
+    "scope_warning": "Independently verified clean frozen df87768f8b0eb9bf668d4b71ef8233eeecee8e66, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes earlier datatype/enum ownership work, enum diagnostic exceptions/assertions260732f9, proof compositiona4561288, constructor parameter snapshot50da292d and retained dt2bv tactic/SMT-LIB model/core/scope integrationdf87768f. Default native run intentionally skips guarded LP cases; no full LP -short or full tagged suite is claimed. dt2bv/enum2bv/printer whole units remain partial for recorded exception/ownership/translation/display obligations. The subsequent enum2bv_solver implementation/tests and forward NamedAssertions retirement fix are explicitly outside this snapshot. Complete smtcore/solver/tactic/CLI/API/higher-engine integration remains active; no source-unit/API status or audit promotion follows from the checkpoint."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
