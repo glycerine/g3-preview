@@ -1,4 +1,5 @@
-// Source: src/ast/ast_printer.cpp:20-52; src/ast/ast_printer.h:24-58.
+// Source: src/ast/ast_printer.cpp:20-52; src/ast/ast_printer.h:24-58;
+// src/ast/ast.cpp:115-137 parameter/declaration head display.
 package ast
 
 import (
@@ -18,6 +19,91 @@ import (
 // pretty-print methods are unreachable in this base type and return a domain
 // error in the Go interface.
 type DefaultASTPrinter struct{ manager *ASTManager }
+
+// declarationHeadWriter is the concrete borrowed ostream used by parameter
+// numerals in display_parameters. The rational service owns conversion scratch.
+type declarationHeadWriter struct{ out io.Writer }
+
+func (w declarationHeadWriter) AppendCString(s string) error {
+	n, err := io.WriteString(w.out, s)
+	if err == nil && n != len(s) {
+		return io.ErrShortWrite
+	}
+	return err
+}
+func (w declarationHeadWriter) AppendInt32(n int32) error {
+	return w.AppendCString(strconv.FormatInt(int64(n), 10))
+}
+func (w declarationHeadWriter) AppendNumeralText(s string) error { return w.AppendCString(s) }
+
+// DisplayDeclarationHead writes a declaration's name and its parameters, as
+// consumed by smt::theory::display_app/display_flat_app (ast.cpp:115-137).
+// Private parameters are included here; this is not the low-level AST printer.
+func (m *ASTManager) DisplayDeclarationHead(out io.Writer, decl ASTHandle) error {
+	if err := m.lock(); err != nil {
+		return err
+	}
+	defer m.mu.Unlock()
+	if out == nil {
+		return ErrASTHandle
+	}
+	r, err := m.requireKind(decl, ASTFuncDecl)
+	if err != nil {
+		return err
+	}
+	d := m.declAt(r.slot)
+	if err = m.Symbols.WriteDisplay(out, d.name); err != nil {
+		return err
+	}
+	if d.info.slot == 0 {
+		return nil
+	}
+	info, err := m.info(d.info.slot, d.info.generation)
+	if err != nil || info.count == 0 {
+		return err
+	}
+	w := declarationHeadWriter{out}
+	if err = w.AppendCString("["); err != nil {
+		return err
+	}
+	for i := uint32(0); i < info.count; i++ {
+		p, err := m.infoParameter(info, i)
+		if err != nil {
+			return err
+		}
+		value, err := m.parameter(p)
+		if err != nil {
+			return err
+		}
+		switch value.Kind {
+		case ASTParameterInt:
+			err = w.AppendInt32(value.integer)
+		case ASTParameterSymbol:
+			err = m.Symbols.WriteDisplay(out, value.symbol)
+		case ASTParameterRational:
+			err = m.numerals.InsertInto(w, &value.Rational)
+		case ASTParameterAST:
+			if err = m.validNode(value.ast); err == nil {
+				err = w.AppendCString("#" + strconv.FormatUint(uint64(m.nodeAt(value.ast.slot).id), 10))
+			}
+		case ASTParameterDouble:
+			err = w.AppendCString(strconv.FormatFloat(value.double, 'g', 6, 64))
+		case ASTParameterExternal:
+			err = w.AppendCString("@" + strconv.FormatUint(uint64(value.external), 10))
+		default:
+			err = ErrASTDomain
+		}
+		if err != nil {
+			return err
+		}
+		if i+1 < info.count {
+			if err = w.AppendCString(":"); err != nil {
+				return err
+			}
+		}
+	}
+	return w.AppendCString("]")
+}
 
 func NewDefaultASTPrinter(m *ASTManager) (*DefaultASTPrinter, error) {
 	if m == nil {

@@ -12,6 +12,12 @@ func (t *SMTLRATheory) relevantShared(node *SMTEnode) (bool, error) {
 	if t.state.relevancy != nil && !t.state.relevancy.IsRelevant(node.owner) {
 		return false, nil
 	}
+	return t.sharedNode(node)
+}
+
+// Sharing is independent of relevancy in context::is_shared. Equality search
+// filters relevancy first, while the diagnostic display reports both values.
+func (t *SMTLRATheory) sharedNode(node *SMTEnode) (bool, error) {
 	shared, consult, err := t.state.sharedTheoryNode(node)
 	if err != nil || !consult || shared || len(t.underspecified) == 0 {
 		return shared, err
