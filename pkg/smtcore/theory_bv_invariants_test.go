@@ -284,9 +284,34 @@ func TestSMTBVInvariantNonBVSummaryAndNativeErasure(t *testing.T) {
 
 func TestSMTBVInvariantContinueActionPreservesSourceReturn(t *testing.T) {
 	d, _ := newLRASourceAssertionContext(t)
+	reportName := bvDebugActionInput(t, d, "CCCCCCCC")
+	m, s, bv := bvOccurrenceFixture(t)
+	truth, err := m.MkTrue()
+	astTestMust(t, err)
+	_, v := bvNativeWord(t, m, s, bv, truth)
+	bv.zeroOneBits[v][0].isTrue = false
+	status, err := bv.FinalCheck()
+	astTestMust(t, err)
+	if status != SMTFinalCheckDone {
+		t.Fatal("debugger continue changed source final-check return", status)
+	}
+	text, err := os.ReadFile(reportName)
+	astTestMust(t, err)
+	if diagnostic.DebugBuild {
+		if !strings.Contains(string(text), "Line: 1747\nbits[it->m_is_true][it->m_idx]\n") || strings.Count(string(text), "ASSERTION VIOLATION") != 1 {
+			t.Fatal("source C action notification", string(text))
+		}
+	} else if len(text) != 0 {
+		t.Fatal("native C-action path was not erased", string(text))
+	}
+}
+
+// Real stream/input/action owners are shared by the invariant and model tests.
+func bvDebugActionInput(t *testing.T, d *diagnostic.DebugContext, commands string) string {
+	t.Helper()
 	inputFile, err := os.CreateTemp(t.TempDir(), "bv-invariant-continue-input-*")
 	astTestMust(t, err)
-	_, err = inputFile.WriteString("CCCCCCCC")
+	_, err = inputFile.WriteString(commands)
 	astTestMust(t, err)
 	_, err = inputFile.Seek(0, 0)
 	astTestMust(t, err)
@@ -310,23 +335,5 @@ func TestSMTBVInvariantContinueActionPreservesSourceReturn(t *testing.T) {
 		astTestMust(t, inputFile.Close())
 		astTestMust(t, report.Close())
 	})
-	m, s, bv := bvOccurrenceFixture(t)
-	truth, err := m.MkTrue()
-	astTestMust(t, err)
-	_, v := bvNativeWord(t, m, s, bv, truth)
-	bv.zeroOneBits[v][0].isTrue = false
-	status, err := bv.FinalCheck()
-	astTestMust(t, err)
-	if status != SMTFinalCheckDone {
-		t.Fatal("debugger continue changed source final-check return", status)
-	}
-	text, err := os.ReadFile(report.Name())
-	astTestMust(t, err)
-	if diagnostic.DebugBuild {
-		if !strings.Contains(string(text), "Line: 1747\nbits[it->m_is_true][it->m_idx]\n") || strings.Count(string(text), "ASSERTION VIOLATION") != 1 {
-			t.Fatal("source C action notification", string(text))
-		}
-	} else if len(text) != 0 {
-		t.Fatal("native C-action path was not erased", string(text))
-	}
+	return report.Name()
 }

@@ -2,9 +2,13 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -38,6 +42,7 @@ func TestSMTBVModelValueNativePrefixAndDebugFixedness(t *testing.T) {
 		{"fully-fixed", []lbool.LBool{lbool.True, lbool.False, lbool.False, lbool.True}, "9", true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			_, report := newLRASourceAssertionContext(t)
 			m, s, bv, g := bvModelSourceFixture(t)
 			node, v := bvFixedSymbolic(t, m, s, bv, "native-model-"+tc.name, 4)
 			for index, value := range tc.bits {
@@ -63,7 +68,8 @@ func TestSMTBVModelValueNativePrefixAndDebugFixedness(t *testing.T) {
 			procedure, err := bv.ModelValue(node, g)
 			m.Budget().FailAfter(-1)
 			if smtcoreSourceDebug && !tc.fixed {
-				if !errors.Is(err, ast.ErrASTDomain) || procedure != nil || m.Stats() != before {
+				bvInvariantFailure(t, err, report, 1601, "r")
+				if procedure != nil || m.Stats() != before {
 					t.Fatal("source fixedness assertion must precede factory construction", err, procedure)
 				}
 				return
@@ -109,5 +115,79 @@ func TestSMTBVModelValueSignedLiteralsAndFactoryPipeline(t *testing.T) {
 	astTestMust(t, err)
 	if !yes || text != "7" || width != 4 {
 		t.Fatal("native signed and constant model bits", text, width)
+	}
+}
+
+func TestSMTBVModelValueRuntimeAssertionsAndActions(t *testing.T) {
+	for _, enabled := range []bool{false, true} {
+		for _, action := range []string{"T", "C"} {
+			t.Run(fmt.Sprint(enabled, "/", action), func(t *testing.T) {
+				d, _ := newLRASourceAssertionContext(t)
+				report := bvDebugActionInput(t, d, strings.Repeat(action, 8))
+				astTestMust(t, d.EnableAssertions(enabled))
+				m, s, bv, g := bvModelSourceFixture(t)
+				node, v := bvFixedSymbolic(t, m, s, bv, "runtime-model-prefix", 4)
+				for _, index := range []int{0, 2, 3} {
+					astTestMust(t, s.AssignLiteral(bv.bitLiterals[v][index], NewSMTBooleanAxiom()))
+				}
+				// The first undefined bit ends native accumulation before the high bits.
+				astTestMust(t, bv.InitializeModel(g))
+				before := m.Stats()
+				procedure, err := bv.ModelValue(node, g)
+				if diagnostic.DebugBuild && enabled && action == "T" {
+					bvInvariantFailure(t, err, report, 1601, "r")
+					if procedure != nil || m.Stats() != before {
+						t.Fatal("throw touched the model factory")
+					}
+					return
+				}
+				astTestMust(t, err)
+				value, err := procedure.MakeValue(g, nil)
+				astTestMust(t, err)
+				text, yes, err := m.BitVectorNumeralText(value)
+				astTestMust(t, err)
+				width, err := m.BitVectorSize(value)
+				astTestMust(t, err)
+				if !yes || text != "1" || width != 4 || procedure.IsFresh() || len(procedure.Dependencies()) != 0 {
+					t.Fatal("source continued prefix/factory", text, width)
+				}
+				output, err := os.ReadFile(report)
+				astTestMust(t, err)
+				if diagnostic.DebugBuild && enabled {
+					if !strings.Contains(string(output), "Line: 1601\nr\n") || strings.Count(string(output), "ASSERTION VIOLATION") != 1 {
+						t.Fatal("source continue notification", string(output))
+					}
+				} else if len(output) != 0 {
+					t.Fatal("disabled/native model assertion executed", string(output))
+				}
+			})
+		}
+	}
+}
+
+func TestSMTBVModelValueVariableAssertionPrecedesValueAndFactory(t *testing.T) {
+	for _, enabled := range []bool{false, true} {
+		t.Run(fmt.Sprint(enabled), func(t *testing.T) {
+			d, report := newLRASourceAssertionContext(t)
+			astTestMust(t, d.EnableAssertions(enabled))
+			m, s, bv, g := bvModelSourceFixture(t)
+			node, _ := bvFixedSymbolic(t, m, s, bv, "model-missing-variable", 4)
+			astTestMust(t, bv.InitializeModel(g))
+			variable := node.TheoryVar(bv.FamilyID())
+			astTestMust(t, node.DeleteTheoryVar(bv.FamilyID()))
+			defer func() { astTestMust(t, node.AddTheoryVar(bv.FamilyID(), variable)) }()
+			before := m.Stats()
+			m.Budget().FailAfter(0)
+			procedure, err := bv.ModelValue(node, g)
+			m.Budget().FailAfter(-1)
+			if diagnostic.DebugBuild && enabled {
+				bvInvariantFailure(t, err, report, 1596, "v != null_theory_var")
+			} else if !errors.Is(err, ast.ErrASTDomain) {
+				t.Fatal("invalid slot Go domain guard", err)
+			}
+			if procedure != nil || m.Stats() != before {
+				t.Fatal("variable assertion read a value or factory")
+			}
+		})
 	}
 }

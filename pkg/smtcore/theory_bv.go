@@ -860,22 +860,29 @@ func (t *SMTBitVectorTheory) IncludeFunctionInterpretation(declaration ast.ASTHa
 }
 
 func (t *SMTBitVectorTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
-	if node == nil || generator == nil || !t.IsAttachedToVariable(node) || generator.model == nil {
+	if node == nil || generator == nil || generator.model == nil {
 		return nil, ast.ErrASTDomain
 	}
 	state, err := t.State()
 	if err != nil {
 		return nil, err
 	}
-	// Source mk_value always evaluates get_fixed_value. Debug requires a
-	// fixed word; release uses the prefix accumulated before the first undef.
+	// Source mk_value always evaluates get_fixed_value, including when the
+	// runtime assertion switch is off. C actions resume with that native prefix.
 	variable := node.TheoryVar(t.FamilyID())
+	if err = bvAssert(1596, "v != null_theory_var", func() (bool, error) { return variable != SMTNullTheoryVar, nil }); err != nil {
+		return nil, err
+	}
+	// Invalid foreign/stale variable slots have no defined source access.
+	if !t.IsAttachedToVariable(node) {
+		return nil, ast.ErrASTDomain
+	}
 	value, fixed, err := t.fixedLiteralValue(variable)
 	if err != nil {
 		return nil, err
 	}
-	if smtcoreSourceDebug && !fixed {
-		return nil, ast.ErrASTDomain
+	if err = bvAssert(1601, "r", func() (bool, error) { return fixed, nil }); err != nil {
+		return nil, err
 	}
 	width, err := state.manager.BitVectorSize(node.owner)
 	if err != nil {
