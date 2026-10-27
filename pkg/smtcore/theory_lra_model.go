@@ -142,7 +142,7 @@ func (t *SMTLRATheory) InitializeModel(g *SMTModelGenerator) error {
 		return errors.Join(err, factory.Close())
 	}
 	t.modelOwner = &smtLRAModelOwner{g, factory}
-	return nil
+	return t.emitLRA("init_model", 2258, t.Display)
 }
 
 func (t *SMTLRATheory) ModelValue(node *SMTEnode, g *SMTModelGenerator) (SMTModelValueProcedure, error) {

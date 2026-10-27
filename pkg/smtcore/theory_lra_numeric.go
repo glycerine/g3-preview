@@ -255,9 +255,9 @@ func (s *smtLRANumeric) assertBound(v SMTTheoryVar, bv int32, value *big.Rat, up
 	return ci, nil
 }
 
-func (s *smtLRANumeric) makeFeasible() (lbool.LBool, error) {
+func (s *smtLRANumeric) startFeasibility() error {
 	if err := s.ready(); err != nil {
-		return lbool.Undef, err
+		return err
 	}
 	s.statistics.makeFeasible++
 	if n := s.solver.Core.RA.ColumnCount(); n > s.statistics.maxColumns {
@@ -266,22 +266,34 @@ func (s *smtLRANumeric) makeFeasible() (lbool.LBool, error) {
 	if n := s.solver.Core.RA.RowCount(); n > s.statistics.maxRows {
 		s.statistics.maxRows = n
 	}
+	return nil
+}
+
+func (s *smtLRANumeric) findFeasible() (lbool.LBool, lp.Status, error) {
 	status, err := s.solver.FindFeasibleSolution()
 	if err != nil {
 		s.stopped = true
-		return lbool.Undef, err
+		return lbool.Undef, status, err
 	}
 	s.statistics.iterations = s.solver.Settings.Stats.TotalIterations
 	s.statistics.factorizations = s.solver.Settings.Stats.Factorizations
 	s.statistics.pivots = s.solver.Settings.Stats.NeedToSolveInf
 	switch status {
 	case lp.StatusFeasible, lp.StatusOptimal:
-		return lbool.True, nil
+		return lbool.True, status, nil
 	case lp.StatusInfeasible:
-		return lbool.False, nil
+		return lbool.False, status, nil
 	default:
-		return lbool.Undef, nil
+		return lbool.Undef, status, nil
 	}
+}
+
+func (s *smtLRANumeric) makeFeasible() (lbool.LBool, error) {
+	if err := s.startFeasibility(); err != nil {
+		return lbool.Undef, err
+	}
+	result, _, err := s.findFeasible()
+	return result, err
 }
 
 // Source has_bound queries proper columns through LAR; terms have their own

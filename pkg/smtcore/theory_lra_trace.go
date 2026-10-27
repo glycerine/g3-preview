@@ -8,15 +8,26 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/lp"
 )
 
 func (t *SMTLRATheory) emitLRA(function string, line int, body func(io.Writer) error) error {
+	return t.emitLRATag("arith", function, line, body)
+}
+
+func (t *SMTLRATheory) lraTraceTags() *diagnostic.TraceTags {
 	tags := t.trace
 	if tags == nil {
 		tags = diagnostic.BorrowProcessTraceTags()
 	}
+	return tags
+}
+
+func (t *SMTLRATheory) emitLRATag(tag, function string, line int, body func(io.Writer) error) error {
+	tags := t.lraTraceTags()
 	var operandErr error
-	err := tags.EmitConditional("arith", function, "src/smt/theory_lra.cpp", line, func() bool { return true }, func(out io.Writer) error {
+	err := tags.EmitConditional(tag, function, "src/smt/theory_lra.cpp", line, func() bool { return true }, func(out io.Writer) error {
 		// Source ostream badbit does not prevent later operands from running.
 		operandErr = body(assertedTraceWriter{out})
 		return operandErr
@@ -103,4 +114,40 @@ func (t *SMTLRATheory) displayEvidence(out io.Writer, evidence []smtLRAEvidence)
 		}
 	}
 	return nil
+}
+
+// Source make_feasible clears values and publishes counters before the verbose
+// display. Its term getter may populate zero cache entries before LP search.
+func (t *SMTLRATheory) makeFeasible() (lbool.LBool, error) {
+	t.modelValues = nil
+	if err := t.numeric.startFeasibility(); err != nil {
+		return lbool.Undef, err
+	}
+	if err := t.emitLRATag("arith_verbose", "make_feasible", 2150, t.Display); err != nil {
+		return lbool.Undef, err
+	}
+	result, status, err := t.numeric.findFeasible()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if result == lbool.Undef {
+		if err = t.emitLRA("make_feasible", 2166, func(out io.Writer) error {
+			name, err := lp.StatusString(status)
+			if err != nil {
+				return err
+			}
+			return smtWriteTheoryText(out, "status treated as inconclusive: "+name+"\n")
+		}); err != nil {
+			return lbool.Undef, err
+		}
+	}
+	return result, nil
+}
+
+func (t *SMTLRATheory) displayLRAExpression(out io.Writer, expression ast.ASTHandle) error {
+	printer, err := ast.NewSimpleASTPrinterContext(t.state.manager, out, out)
+	if err != nil {
+		return err
+	}
+	return printer.DisplayExpr(out, expression, 0)
 }

@@ -669,8 +669,7 @@ func (t *SMTLRATheory) Propagate() error {
 		t.boundChecks = nil
 		return nil
 	}
-	t.modelValues = nil // Source make_feasible clears cached rational values.
-	status, err := t.numeric.makeFeasible()
+	status, err := t.makeFeasible()
 	if err != nil {
 		return err
 	}
@@ -696,9 +695,8 @@ func (t *SMTLRATheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	}
 	status := lbool.True
 	if t.numeric.solver.Bounds.Status.Value != lp.StatusOptimal {
-		t.modelValues = nil // Source make_feasible invalidates the rational model.
 		var err error
-		status, err = t.numeric.makeFeasible()
+		status, err = t.makeFeasible()
 		if err != nil {
 			return SMTFinalCheckGiveUp, err
 		}
