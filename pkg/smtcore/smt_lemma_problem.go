@@ -167,6 +167,18 @@ func (w *smtLemmaFileWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
+// SMTLemmaDumpError separates formula/owner exceptions from ostream badbit.
+// Source diagnostic consumers ignore StreamError and still evaluate validators.
+type SMTLemmaDumpError struct{ OperandError, StreamError error }
+
+func (e *SMTLemmaDumpError) Error() string {
+	if err := errors.Join(e.OperandError, e.StreamError); err != nil {
+		return err.Error()
+	}
+	return "SMT lemma dump failure"
+}
+func (e *SMTLemmaDumpError) Unwrap() []error { return []error{e.OperandError, e.StreamError} }
+
 // DumpLemmaAsSMTProblem writes the source lemma_N.smt2 in the current working
 // directory. Ostream failure still evaluates operands and advances the counter;
 // an AST/owner error unwinds the lexical file without advancing it.
@@ -178,19 +190,24 @@ func (s *SMTInternalizerState) DumpLemmaAsSMTProblem(antecedents []SMTLiteral, e
 	file, err := os.Create(name)
 	writer := &smtLemmaFileWriter{out: file, err: err}
 	closed := false
+	var operandErr, closeErr error
 	defer func() {
 		if file != nil && !closed {
-			result = errors.Join(result, file.Close())
+			closeErr = file.Close()
+		}
+		streamErr := errors.Join(writer.err, closeErr)
+		if operandErr != nil || streamErr != nil {
+			result = &SMTLemmaDumpError{OperandError: operandErr, StreamError: streamErr}
 		}
 	}()
-	if err = s.DisplayLemmaAsSMTProblem(writer, antecedents, equalities, consequent, logic); err != nil {
-		return name, errors.Join(err, writer.err)
+	operandErr = s.DisplayLemmaAsSMTProblem(writer, antecedents, equalities, consequent, logic)
+	if operandErr != nil {
+		return name, nil
 	}
-	var closeErr error
 	if file != nil {
 		closeErr = file.Close()
 		closed = true
 	}
 	smtLemmaID++
-	return name, errors.Join(writer.err, closeErr)
+	return name, nil
 }

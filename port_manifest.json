@@ -119366,7 +119366,8 @@
         "pkg/smtcore/smt_types.go",
         "pkg/smtcore/smt_lemma_problem.go",
         "pkg/smtcore/smt_lemma_problem_test.go",
-        "pkg/parsers/smt2/lemma_problem_test.go"
+        "pkg/parsers/smt2/lemma_problem_test.go",
+        "pkg/smtcore/theory_lra_validate_test.go"
       ],
       "tests": [
         "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
@@ -119376,7 +119377,8 @@
         "TestSMTLemmaProblemPremiseOrderAndConclusionPolarity",
         "TestSMTLemmaProblemEveryWriterPrefixAndGuards",
         "TestSMTLemmaProblemSharedFileSequenceFailuresAndWrap",
-        "TestSMTLemmaProblemPhysicalRootFailures"
+        "TestSMTLemmaProblemPhysicalRootFailures",
+        "TestSMTLRAValidatorDumpBadbitAndFailureTrace"
       ],
       "conditionals": [
         {
@@ -119462,16 +119464,26 @@
             "TestSMTLemmaProblemSharedFileSequenceFailuresAndWrap",
             "TestSMTLemmaProblemPhysicalRootFailures"
           ]
+        },
+        {
+          "name": "lemma dump operand failure separated from nonthrowing file ostream badbit for source validator consumers",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_lemma_problem.go",
+          "tests": [
+            "TestSMTLRAValidatorDumpBadbitAndFailureTrace"
+          ]
         }
       ],
       "ownership": [
         "Failure names and reason strings are returned as native Go strings; incomplete-theory objects remain borrowed from the internalizer registry.",
-        "Lemma problem owns the source current expr_ref and each formula-vector root through output; a refused cleanup remains in internalizer.lemmaProblem and Close retries it before retiring the manager. File streams close on ordinary return and AST errors; both overload shapes share one unsigned counter. File badbit continues source operands and advances the counter, while an AST/owner exception does not. Literal conversion is shared with existing proof/evidence consumers."
+        "Lemma problem owns the source current expr_ref and each formula-vector root through output; a refused cleanup remains in internalizer.lemmaProblem and Close retries it before retiring the manager. File streams close on ordinary return and AST errors; both overload shapes share one unsigned counter. File badbit continues source operands and advances the counter, while an AST/owner exception does not. Literal conversion is shared with existing proof/evidence consumers.",
+        "Fresh LRA validation context owns its kernel and temporary expression root; configured callers borrow the actual parent fparams and copy current context params. Raw internalizers create and own genuine default params/catalog/globals/fparams. Every partial constructor remains in the typed theory.validation owner until Close completes, before parent parameter/numeral retirement. Existing source nested-kernel borrowing is preserved."
       ],
       "deviations": [
         "Theory names are read through the retained optional Name method; unnamed theory implementations preserve the source generic incomplete-theory reason.",
         "The retained kernel display owns asserted-formula rendering. Remaining context, assignment, enode, clause, statistics and trace renderers have no retained Go caller, so no universal debug-display adapter is added.",
-        "Concrete Go io.Writer and os.File replace ostream/ofstream transport. Direct writer refusals are returned; the file overload retains sticky badbit, finishes operands, closes the file and returns its error while preserving source counter ordering and selected signed %d filename convention. Generated problems contain only optional logic/declarations/assertions, with no added check-sat. Full validator integration remains open; no whole-unit status/audit promotion."
+        "Concrete Go io.Writer and os.File replace ostream/ofstream transport. Direct writer refusals are returned; the file overload retains sticky badbit, finishes operands, closes the file and returns its error while preserving source counter ordering and selected signed %d filename convention. Generated problems contain only optional logic/declarations/assertions, with no added check-sat. Full validator integration remains open; no whole-unit status/audit promotion.",
+        "Source predicate l_true != nctx.check() admits UNKNOWN; no substitute arithmetic checker or silent missing-config skip is used. Generic logic-free context setup follows the native call sites rather than inheriting parent logic. Dump StreamError is reported to direct Go API callers but ignored by native validators, while OperandError propagates. Enabled/disabled/native assertion gates and exact source conditions/locations are checked. Equality/definition background sources are excluded with the constructor-disabled delayed registration path. Remaining trace sites/whole retained-source audit and higher engines remain open; all whole-unit statuses/audit flags unchanged."
       ]
     },
     {
@@ -138103,7 +138115,10 @@
         "pkg/smtcore/theory_lra_display.go",
         "pkg/smtcore/theory_lra_display_test.go",
         "pkg/smtcore/theory_lra_trace.go",
-        "pkg/smtcore/theory_lra_trace_test.go"
+        "pkg/smtcore/theory_lra_trace_test.go",
+        "pkg/smtcore/theory_lra_validate.go",
+        "pkg/smtcore/theory_lra_validate_test.go",
+        "pkg/smtcore/theory_lra_axioms_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -138213,7 +138228,13 @@
         "TestSMTLRADisplayEmptyClosedAndShortWriter",
         "TestSMTLRAEvidenceDisplaySignedLiteralsAndTwoPassOrder",
         "TestSMTLRAEvidenceDisplayZeroSecondPassAndWriterPrefixes",
-        "TestSMTLRAConflictTraceActualEvidenceAndBadStream"
+        "TestSMTLRAConflictTraceActualEvidenceAndBadStream",
+        "TestSMTLRAValidatorsFreshDefaultContextsAndPolarity",
+        "TestSMTLRAValidatorBorrowsFParamsCopiesContextAndAdmitsUnknown",
+        "TestSMTLRAValidatorDumpBadbitAndFailureTrace",
+        "TestSMTLRAValidationPhysicalConstructorCleanup",
+        "TestSMTLRAValidationConfiguredConstructorCleanup",
+        "TestSMTLRAValidatorAssertionGatesAndSourceLocations"
       ],
       "conditionals": [
         {
@@ -138416,6 +138437,19 @@
             "TestSMTLRAEvidenceDisplayZeroSecondPassAndWriterPrefixes",
             "TestSMTLRAConflictTraceActualEvidenceAndBadStream"
           ]
+        },
+        {
+          "name": "validate_conflict/validate_assign/validate_eq/add_background (2285-2327) and SASSERT call sites1435/2129/2229, immediate-source premises",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_lra_validate.go",
+          "tests": [
+            "TestSMTLRAValidatorsFreshDefaultContextsAndPolarity",
+            "TestSMTLRAValidatorBorrowsFParamsCopiesContextAndAdmitsUnknown",
+            "TestSMTLRAValidatorDumpBadbitAndFailureTrace",
+            "TestSMTLRAValidationPhysicalConstructorCleanup",
+            "TestSMTLRAValidationConfiguredConstructorCleanup",
+            "TestSMTLRAValidatorAssertionGatesAndSourceLocations"
+          ]
         }
       ],
       "ownership": [
@@ -138435,7 +138469,8 @@
         "Concrete smtLRAAxiomCall roots temporary coefficient/numeral/product expressions. A final blocker or strict NOT result is returned unrooted for immediate caller pinning and owns its arguments; it is never destroyed by retiring its lexical argument roots. The Boolean internalizer owns registered bound bases; the filter owns comparison declarations. Failed lexical cleanup moves roots to pendingAxiomRoots until theory Close. As existing InternalizeAtom, typed bound ownership is published before fallible bound-axiom work and refused work is queued in newBounds. Failed numeric string conversion stops its owner. Eight physical reference-budget frontiers verify refusal/success and zero explicit AST references after context/filter/caller cleanup.",
         "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created.",
         "Diagnostic output borrows AST heads/parameters and existing solver/cache owners. Rational parameter insertion uses the retained numeral service; Go character/formatting slices acquire no fictitious charged source owner. Exact writer prefixes, nil/closed guards and successful cleanup are checked. Cached term display can insert zero-valued missing proper columns, matching source.",
-        "Conflict evidence retains zero coefficients through the copied raw explanation for the second diagnostic pass, while conflict-premise publication filters them independently. Signed-expression refs borrow the AST manager and remain in pendingTraceRoots on failed retirement; Close retires them. Trace tags are borrowed, default to the process owner, and source operands continue after ostream badbit through the existing concrete assertedTraceWriter."
+        "Conflict evidence retains zero coefficients through the copied raw explanation for the second diagnostic pass, while conflict-premise publication filters them independently. Signed-expression refs borrow the AST manager and remain in pendingTraceRoots on failed retirement; Close retires them. Trace tags are borrowed, default to the process owner, and source operands continue after ostream badbit through the existing concrete assertedTraceWriter.",
+        "Fresh LRA validation context owns its kernel and temporary expression root; configured callers borrow the actual parent fparams and copy current context params. Raw internalizers create and own genuine default params/catalog/globals/fparams. Every partial constructor remains in the typed theory.validation owner until Close completes, before parent parameter/numeral retirement. Existing source nested-kernel borrowing is preserved."
       ],
       "deviations": [
         "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open.",
@@ -138454,7 +138489,8 @@
         "Eight Go regressions exercise strict actual LAR objective values and owned outputs, successive local improvements8->18->20 with GT blockers, strict child20-3epsilon with GE blocker and pop recovery, absent-index and actual mapped unbounded branches, opaque nonlinear registration without the old backend IsLinear gate, integer blocker rounding across negative/fractional values and epsilon signs, coefficient/constant reconstruction, filter/Boolean deduplication and scoped retirement, actual nonstrict/strict bound assignments, constant objectives, input domains and physical AST refusal cleanup. Existing prebuilt-C++ numeric/strict/coupled optimization oracles are invoked directly by the new AST callback tests and independently verify final source values and scopes. Intermediate points depend on compiler/column order; do not conflate this AST fixture8->18->20 with the numeric fixture17->20, and do not replace the retained outer optimizer loop with an eager local loop. The retained opt_solver caller initializes has_shared=false, and bounded LRA leaves it unchanged; the Go callback returns false without inventing a shared-variable scan. Positive epsilon lower thresholds negate a <= atom; nonpositive epsilon uses >=. Invalid infinity/fractional-Int or unmapped source preconditions become Go domain errors. The API returns borrowed AST handles under existing Go conventions. Whole source statuses/audit/API flags and public setup remain unchanged. Source/public-setup/Bool-normalization and whole-smtcore audit, plus higher optimizer/CLI/API integration, remain open; no complete engine or optimizer claim is made.",
         "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage.",
         "Bounded diagnostic increment only: source flags/status remain unchanged. Go io.Writer errors/short writes stop the current display. Associative flattening preserves native LIFO deferral, private parameters are included and foreign nonconstants use AST IDs. Source trace call sites/display_evidence and checked validation routines remain outside this increment; no whole LRA/smtcore completion credit.",
-        "Only live immediate inequality sources are implemented in display_evidence. Equality/definition producers are behind constructor-only m_delay_constraints=false and are excluded. Source zero-coefficient SASSERT uses the actual debug context; disabled assertions skip zero entries in the expression pass while retaining zero rows in the weighted pass. Native trace erasure, actual tagged emission, sticky writer failure, later Display cache side effects and preserved actual conflicts are checked. Source validate_assign/validate_conflict/validate_eq/add_background, remaining trace sites and context lemma-dump transport remain open; no whole-source status or audit promotion."
+        "Only live immediate inequality sources are implemented in display_evidence. Equality/definition producers are behind constructor-only m_delay_constraints=false and are excluded. Source zero-coefficient SASSERT uses the actual debug context; disabled assertions skip zero entries in the expression pass while retaining zero rows in the weighted pass. Native trace erasure, actual tagged emission, sticky writer failure, later Display cache side effects and preserved actual conflicts are checked. Source validate_assign/validate_conflict/validate_eq/add_background, remaining trace sites and context lemma-dump transport remain open; no whole-source status or audit promotion.",
+        "Source predicate l_true != nctx.check() admits UNKNOWN; no substitute arithmetic checker or silent missing-config skip is used. Generic logic-free context setup follows the native call sites rather than inheriting parent logic. Dump StreamError is reported to direct Go API callers but ignored by native validators, while OperandError propagates. Enabled/disabled/native assertion gates and exact source conditions/locations are checked. Equality/definition background sources are excluded with the constructor-disabled delayed registration path. Remaining trace sites/whole retained-source audit and higher engines remain open; all whole-unit statuses/audit flags unchanged."
       ]
     },
     {

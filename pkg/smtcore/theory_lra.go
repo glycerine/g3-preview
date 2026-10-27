@@ -39,10 +39,11 @@ type smtLRAResourceLimit struct{ manager *ast.ASTManager }
 func (l smtLRAResourceLimit) CancelFlag() (bool, error) { return l.manager.Canceled() }
 
 // SMTLRATheory is the concrete frontend for the retained LAR-backed theory.
-// Automatic QF_LRA/QF_UFLRA setup uses this backend. Assertion validators and
-// the remaining retained-source audit are still incomplete.
+// Automatic QF_LRA/QF_UFLRA setup uses this backend. Remaining source trace
+// sites and the complete retained-source audit are still incomplete.
 type SMTLRATheory struct {
 	*SMTTheoryBase
+	validation                        *smtLRAValidationContext
 	trace                             *diagnostic.TraceTags // Borrowed source trace control; nil uses the process tags.
 	pendingTraceRoots                 []ast.ASTRef
 	numeric                           *smtLRANumeric
@@ -801,6 +802,9 @@ func (t *SMTLRATheory) Close() error {
 	// already be unavailable to ordinary calls while Close is retried.
 	t.closed = true
 	t.state = nil
+	if err := t.closeValidation(); err != nil {
+		return err
+	}
 	if err := t.closeInitParams(); err != nil {
 		return err
 	}

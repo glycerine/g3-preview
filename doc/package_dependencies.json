@@ -2785,6 +2785,7 @@
         "theory_lra_shared.go",
         "theory_lra_statistics.go",
         "theory_lra_trace.go",
+        "theory_lra_validate.go",
         "theory_opt.go",
         "theory_pb.go",
         "theory_pb_compile.go",

@@ -341,6 +341,10 @@ func TestSMTLRABoundAxiomAllocationRefusalAndRetry(t *testing.T) {
 		t.Run(fmt.Sprint(stop), func(t *testing.T) {
 			f := newLRAFrontendFixture(t, true)
 			astTestMust(t, f.m.ToggleProofMode(ast.ASTProofEnabled))
+			// Checked source validators create a real default context, lazily
+			// initializing declaration-plugin parameters owned by the AST manager.
+			// Warm those persistent owners before the exact proof-parameter census.
+			astTestMust(t, f.a.checkValidation(smtLRAValidateAssignment, []SMTLiteral{SMTTrueLiteral}, SMTTrueLiteral, nil, nil))
 			x := f.variable("lra-bound-refusal-x")
 			first, second := f.app(smtArithOpGE, x, f.number(1)), f.app(smtArithOpGE, x, f.number(2))
 			var padding []ast.ASTParameter

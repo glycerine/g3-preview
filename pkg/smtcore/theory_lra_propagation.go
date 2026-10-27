@@ -37,6 +37,9 @@ func (t *SMTLRATheory) setLRAConflict() error {
 			core = append(core, e.literal)
 		}
 	}
+	if err := t.checkValidation(smtLRAValidateConflict, core, SMTFalseLiteral, nil, nil); err != nil {
+		return err
+	}
 	return t.state.SetTheoryConflict(t.FamilyID(), core)
 }
 
@@ -263,6 +266,9 @@ func (t *SMTLRATheory) propagateBasicBound(b *smtLRABound, truth bool) (result e
 }
 
 func (t *SMTLRATheory) assignLRABound(literal SMTLiteral, core []SMTLiteral, parameters []ast.ASTParameter) error {
+	if err := t.checkValidation(smtLRAValidateAssignment, core, literal, nil, nil); err != nil {
+		return err
+	}
 	s := t.state
 	if uint64(len(core)) < uint64(t.config.SmallLemmaSize) {
 		clause := make([]SMTLiteral, 0, len(core)+1)

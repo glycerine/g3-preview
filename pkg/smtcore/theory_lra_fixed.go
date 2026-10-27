@@ -172,5 +172,8 @@ func (t *SMTLRATheory) fixedVariable(v SMTTheoryVar, value *big.Rat) error {
 		return err
 	}
 	t.state.ownedJustifications = append(t.state.ownedJustifications, owner)
+	if err := t.checkValidation(smtLRAValidateEquality, hook.core, SMTFalseLiteral, left, right); err != nil {
+		return err
+	}
 	return t.state.assignEquality(left, right, NewSMTEqualityJustification(owner))
 }
