@@ -4,7 +4,6 @@ package rewriter
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -153,7 +152,7 @@ func (r *Enum2BVRewriter) reduceArgument(argument ast.ASTHandle, result *ast.AST
 		return false, err
 	}
 	if kind != ast.ASTApp {
-		return false, fmt.Errorf("unable to handle nested data-type expression")
+		return false, r.throwNonFD(argument)
 	}
 	decl, err := m.GetDecl(argument)
 	if err != nil {
@@ -181,7 +180,7 @@ func (r *Enum2BVRewriter) reduceArgument(argument ast.ASTHandle, result *ast.AST
 		return false, err
 	}
 	if family != ast.NullFamilyID || arity != 0 {
-		return false, fmt.Errorf("unable to handle nested data-type expression")
+		return false, r.throwNonFD(argument)
 	}
 	if fresh, found := r.enum2BV[decl]; found {
 		value, err := m.MkApp(fresh, nil)
@@ -417,7 +416,7 @@ func (c *enum2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgumen
 			return RewriteFailed, err
 		}
 		if finite {
-			return RewriteFailed, fmt.Errorf("unable to handle nested data-type expression")
+			return RewriteFailed, r.throwNonFD(a)
 		}
 	}
 	return RewriteFailed, nil
@@ -618,10 +617,18 @@ func (r *Enum2BVRewriter) Pop(scopes uint32) error {
 	if err := r.open(); err != nil {
 		return err
 	}
-	if len(r.bounds) != 0 || int(scopes) > len(r.scopeLimits) {
-		return ast.ErrASTDomain
+	if err := enum2BVSourceAssert(243, "m_bounds.empty()", func() bool { return len(r.bounds) == 0 }); err != nil {
+		return err
 	}
 	if scopes != 0 {
+		if err := enum2BVSourceAssert(245, "num_scopes <= m_enum_consts_lim.size()", func() bool { return int(scopes) <= len(r.scopeLimits) }); err != nil {
+			return err
+		}
+		// Native out-of-range scope subtraction/indexing is outside the
+		// source precondition; checked Go reports it without unsafe indexing.
+		if int(scopes) > len(r.scopeLimits) {
+			return ast.ErrASTDomain
+		}
 		level := len(r.scopeLimits) - int(scopes)
 		limit := r.scopeLimits[level]
 		for i := len(r.entries) - 1; i >= limit; i-- {
@@ -711,7 +718,9 @@ func (r *Enum2BVRewriter) releaseMembers() error {
 	for len(r.pending) != 0 {
 		p := &r.pending[0]
 		var err error
-		if p.quantifier != nil {
+		if p.printer != nil {
+			err = p.printer.close()
+		} else if p.quantifier != nil {
 			err = p.quantifier.close()
 		} else if p.scalar != nil {
 			err = p.scalar.close()

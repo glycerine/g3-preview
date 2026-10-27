@@ -73,6 +73,7 @@ type enum2BVPending struct {
 	app        *enum2BVAppScope
 	scalar     *enum2BVScalarScope
 	quantifier *enum2BVQuantifierScope
+	printer    *enum2BVErrorPrinter
 }
 
 func (r *Enum2BVRewriter) finishApp(s *enum2BVAppScope, result *error) {
@@ -92,6 +93,9 @@ func (r *Enum2BVRewriter) finishScalar(s *enum2BVScalarScope, result *error) {
 	*result = errors.Join(*result, err)
 }
 func enum2BVAppAssertion(kind ast.ASTKind) error {
+	return enum2BVSourceAssert(103, "is_app(a)", func() bool { return kind == ast.ASTApp })
+}
+func enum2BVSourceAssert(line int32, condition string, evaluate func() bool) error {
 	if !diagnostic.DebugBuild {
 		return nil
 	}
@@ -100,10 +104,10 @@ func enum2BVAppAssertion(kind ast.ASTKind) error {
 	if err != nil || !enabled {
 		return err
 	}
-	if kind == ast.ASTApp {
+	if evaluate() {
 		return nil
 	}
-	return diagnostic.DebugAssertionFailure(d, "src/ast/rewriter/enum2bv_rewriter.cpp", 103, "is_app(a)")
+	return diagnostic.DebugAssertionFailure(d, "src/ast/rewriter/enum2bv_rewriter.cpp", line, condition)
 }
 
 func (r *Enum2BVRewriter) reduceArguments(args ast.AppArguments, scope *enum2BVAppScope) (complete bool, err error) {
