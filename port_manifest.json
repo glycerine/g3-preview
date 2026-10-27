@@ -153375,12 +153375,16 @@
       "status": "partial",
       "go_targets": [
         "pkg/solver/named_assertions.go",
-        "pkg/solver/named_assertions_test.go"
+        "pkg/solver/named_assertions_test.go",
+        "pkg/solver/named_assertions_owner_test.go"
       ],
       "tests": [
         "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
         "TestNamedAssertionsWithAssumptionsAndInvalidTag",
-        "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
+        "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange",
+        "TestNamedAssertionImplicationOwnedAcrossCoreAndErrors",
+        "TestNamedAssertionNullTagBorrowsInput",
+        "TestNamedAssertionStoppedLocalPrecedesMemberRetirement"
       ],
       "assertions": [
         {
@@ -153432,16 +153436,28 @@
           "tests": [
             "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
           ]
+        },
+        {
+          "name": "Tracked assert_expr new_t concrete lexical ASTRef across virtual core forwarding; normal/error retirement after the core, preserved assumption publication, borrowed null-tag branch and pending local-before-member Close continuation",
+          "status": "partial",
+          "go_target": "pkg/solver/named_assertions.go",
+          "tests": [
+            "TestNamedAssertionImplicationOwnedAcrossCoreAndErrors",
+            "TestNamedAssertionNullTagBorrowsInput",
+            "TestNamedAssertionStoppedLocalPrecedesMemberRetirement"
+          ]
         }
       ],
       "ownership": [
         "Each retained named assumption owns an ASTRef; temporary assumptions are pinned for exactly one operation and retired in source forward removed-range order.",
-        "The adapter borrows its manager, concrete core and optional trace owner."
+        "The adapter borrows its manager, concrete core and optional trace owner.",
+        "After publishing its named assumption, AssertTracked owns the implication through a concrete namedAssertionScope ASTRef until the core call ends. Core errors preserve the already-published assumption; the implication retires on both success and error. A stopped local remains in observed unwind order in the adapter pending queue; operations reject pending/closing owners and Close drains locals before member assumptions. Actual numerical-mutation guard tests verify unconsumed local retention, the member barrier, final source-order observation and explicit Go retry. A null tag borrows its original formula without a local reference."
       ],
       "deviations": [
         "Invalid tracked labels and pop depths return explicit Go domain/bounds errors at the reached source assertions.",
         "NamedAssertionCore is a concrete typed derived-solver boundary replacing C++ protected virtual methods.",
-        "Retained enum2bv_solver review found that restore used reverse pop order instead of ref_vector_core::shrink forward decrements. Corrected and tested using actual AST deletion records. The source assert_expr new_t lexical expr_ref is still not represented by a separate ASTRef before core forwarding; existing algorithm tests do not establish full source assertion/trace/native exception ownership. Whole-unit completion/audit flags are withdrawn pending that concrete remaining audit; bounded existing evidence is preserved."
+        "Retained enum2bv_solver review found that restore used reverse pop order instead of ref_vector_core::shrink forward decrements. Corrected and tested using actual AST deletion records. The source assert_expr new_t lexical expr_ref is still not represented by a separate ASTRef before core forwarding; existing algorithm tests do not establish full source assertion/trace/native exception ownership. Whole-unit completion/audit flags are withdrawn pending that concrete remaining audit; bounded existing evidence is preserved.",
+        "The previously omitted new_t lexical expr_ref is now implemented and checked by real root/argument reference counts at the core call, post-call retirement and core-error publication prefix. Seven targeted controls verify pinning, retirement timing, no rollback, pending retention/barrier, local-before-member order and borrowed null-tag behavior. This does not establish every native throwing-destructor/consumed-NUM/reference-record allocation failure, nor the remaining source TRACE/assertion transport/gate details. Whole-unit status and method/ownership audit flags remain partial/false; earlier missing-local notes describe the pre-fix state."
       ]
     },
     {
@@ -153451,12 +153467,16 @@
       "status": "partial",
       "go_targets": [
         "pkg/solver/named_assertions.go",
-        "pkg/solver/named_assertions_test.go"
+        "pkg/solver/named_assertions_test.go",
+        "pkg/solver/named_assertions_owner_test.go"
       ],
       "tests": [
         "TestNamedAssertionsTrackedChecksScopesAndTemporaryAssumptions",
         "TestNamedAssertionsWithAssumptionsAndInvalidTag",
-        "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
+        "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange",
+        "TestNamedAssertionImplicationOwnedAcrossCoreAndErrors",
+        "TestNamedAssertionNullTagBorrowsInput",
+        "TestNamedAssertionStoppedLocalPrecedesMemberRetirement"
       ],
       "conditionals": [
         {
@@ -153487,14 +153507,26 @@
           "tests": [
             "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
           ]
+        },
+        {
+          "name": "Tracked assert_expr new_t concrete lexical ASTRef across virtual core forwarding; normal/error retirement after the core, preserved assumption publication, borrowed null-tag branch and pending local-before-member Close continuation",
+          "status": "partial",
+          "go_target": "pkg/solver/named_assertions.go",
+          "tests": [
+            "TestNamedAssertionImplicationOwnedAcrossCoreAndErrors",
+            "TestNamedAssertionNullTagBorrowsInput",
+            "TestNamedAssertionStoppedLocalPrecedesMemberRetirement"
+          ]
         }
       ],
       "ownership": [
-        "Native ASTRef slices replace expr_ref_vector and native uint32 slices replace scope vectors; Close releases every retained label."
+        "Native ASTRef slices replace expr_ref_vector and native uint32 slices replace scope vectors; Close releases every retained label.",
+        "After publishing its named assumption, AssertTracked owns the implication through a concrete namedAssertionScope ASTRef until the core call ends. Core errors preserve the already-published assumption; the implication retires on both success and error. A stopped local remains in observed unwind order in the adapter pending queue; operations reject pending/closing owners and Close drains locals before member assumptions. Actual numerical-mutation guard tests verify unconsumed local retention, the member barrier, final source-order observation and explicit Go retry. A null tag borrows its original formula without a local reference."
       ],
       "deviations": [
         "WithAssumptions supplies the source get_consequences append/restore scope to concrete Go solvers without exposing inheritance.",
-        "Retained enum2bv_solver review found that restore used reverse pop order instead of ref_vector_core::shrink forward decrements. Corrected and tested using actual AST deletion records. The source assert_expr new_t lexical expr_ref is still not represented by a separate ASTRef before core forwarding; existing algorithm tests do not establish full source assertion/trace/native exception ownership. Whole-unit completion/audit flags are withdrawn pending that concrete remaining audit; bounded existing evidence is preserved."
+        "Retained enum2bv_solver review found that restore used reverse pop order instead of ref_vector_core::shrink forward decrements. Corrected and tested using actual AST deletion records. The source assert_expr new_t lexical expr_ref is still not represented by a separate ASTRef before core forwarding; existing algorithm tests do not establish full source assertion/trace/native exception ownership. Whole-unit completion/audit flags are withdrawn pending that concrete remaining audit; bounded existing evidence is preserved.",
+        "The previously omitted new_t lexical expr_ref is now implemented and checked by real root/argument reference counts at the core call, post-call retirement and core-error publication prefix. Seven targeted controls verify pinning, retirement timing, no rollback, pending retention/barrier, local-before-member order and borrowed null-tag behavior. This does not establish every native throwing-destructor/consumed-NUM/reference-record allocation failure, nor the remaining source TRACE/assertion transport/gate details. Whole-unit status and method/ownership audit flags remain partial/false; earlier missing-local notes describe the pre-fix state."
       ]
     },
     {

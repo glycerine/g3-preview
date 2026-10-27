@@ -28,6 +28,8 @@ type NamedAssertions struct {
 	trace       *diagnostic.TraceTags
 	assumptions []ast.ASTRef
 	scopes      []uint32
+	pending     []*namedAssertionScope
+	closing     bool
 	closed      bool
 }
 
@@ -56,6 +58,9 @@ func (n *NamedAssertions) open() error {
 	}
 	if n.closed {
 		return arena.ErrClosed
+	}
+	if n.closing || len(n.pending) != 0 {
+		return ast.ErrASTPending
 	}
 	_, err := n.manager.ProofsEnabled()
 	return err
@@ -91,7 +96,7 @@ func (n *NamedAssertions) traceAssert(formula, tag ast.ASTHandle) error {
 	return operandErr
 }
 
-func (n *NamedAssertions) AssertTracked(formula, tag ast.ASTHandle) error {
+func (n *NamedAssertions) AssertTracked(formula, tag ast.ASTHandle) (err error) {
 	if err := n.open(); err != nil {
 		return err
 	}
@@ -117,7 +122,13 @@ func (n *NamedAssertions) AssertTracked(formula, tag ast.ASTHandle) error {
 		return err
 	}
 	n.assumptions = append(n.assumptions, ref)
+	scope := &namedAssertionScope{manager: n.manager}
+	defer n.finishAssertion(scope, &err)
 	implies, err := n.manager.MkImplies(tag, formula)
+	if err != nil {
+		return err
+	}
+	scope.implies, err = n.manager.NewRef(implies)
 	if err != nil {
 		return err
 	}
@@ -272,10 +283,37 @@ func (n *NamedAssertions) Close() error {
 	if n.closed {
 		return nil
 	}
+	n.closing = true
+	// The source assertion local must retire before member assumptions.
+	for len(n.pending) != 0 {
+		if err := n.pending[0].close(); err != nil {
+			return err
+		}
+		n.pending = n.pending[1:]
+	}
 	if err := n.restore(0); err != nil {
 		return err
 	}
 	n.scopes = nil
 	n.closed = true
 	return nil
+}
+
+// Source solver_na2as::assert_expr new_t, owned across the virtual call.
+type namedAssertionScope struct {
+	manager *ast.ASTManager
+	implies ast.ASTRef
+}
+
+func (s *namedAssertionScope) close() error {
+	if s.implies == (ast.ASTRef{}) {
+		return nil
+	}
+	return s.manager.DelRef(&s.implies)
+}
+func (n *NamedAssertions) finishAssertion(scope *namedAssertionScope, err *error) {
+	if cleanup := scope.close(); cleanup != nil {
+		n.pending = append(n.pending, scope)
+		*err = errors.Join(*err, cleanup)
+	}
 }
