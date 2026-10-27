@@ -2954,11 +2954,14 @@
         "datalog_factory.go",
         "datatype_factory.go",
         "factory.go",
+        "factory_assertions.go",
         "fpa_factory.go",
+        "numeral_factory.go",
         "proto_model.go",
         "sequence_factory.go",
         "string_factory.go",
-        "structured.go"
+        "structured.go",
+        "user_sort_factory.go"
       ]
     },
     {

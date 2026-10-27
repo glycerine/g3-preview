@@ -113387,21 +113387,113 @@
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/factory.go", "pkg/ast/ast_arith_numeral_rat.go", "pkg/ast/ast_bv_numeral_rat.go", "pkg/smtcore/proto_model/proto_model_test.go", "pkg/smtcore/proto_model/numeral_factory_test.go"],
-      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues", "TestArithmeticFactoryPreservesRequestedNumeralSort"],
+      "go_targets": [
+        "pkg/smtcore/proto_model/factory.go",
+        "pkg/ast/ast_arith_numeral_rat.go",
+        "pkg/ast/ast_bv_numeral_rat.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/numeral_factory_test.go",
+        "pkg/smtcore/proto_model/user_sort_factory.go",
+        "pkg/smtcore/proto_model/numeral_factory.go",
+        "pkg/smtcore/proto_model/factory_assertions.go",
+        "pkg/smtcore/proto_model/scalar_factory_source_test.go",
+        "pkg/smtcore/proto_model/proto_model.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+      ],
+      "tests": [
+        "TestValueFactoriesSomeFreshFreezeAndNumericValues",
+        "TestArithmeticFactoryPreservesRequestedNumeralSort",
+        "TestScalarFactorySourceUserRegisteredValuesAndFreeze",
+        "TestScalarFactorySourceFrozenRegistrationActions",
+        "TestScalarFactorySourceFrozenPathsAndClosedAssertionOwner",
+        "TestScalarFactorySourceNumeralExplicitValuesAndEnumeration",
+        "TestScalarFactorySourceBVExhaustionAndCursor",
+        "TestScalarFactorySourceAllocationFailureCursorRetry",
+        "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
+        "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "arithmetic and bit-vector exact numeral construction for requested sorts", "status": "ported", "go_target": "pkg/smtcore/proto_model/factory.go", "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"]}],
-      "ownership": ["Exact math/big integers are temporary Go values; the scalar factory owns references to canonical numeral ASTs."],
-      "deviations": []
+      "methods": [
+        {
+          "name": "arithmetic and bit-vector exact numeral construction for requested sorts",
+          "status": "ported",
+          "tests": [
+            "TestValueFactoriesSomeFreshFreezeAndNumericValues"
+          ],
+          "go_targets": [
+            "pkg/smtcore/proto_model/numeral_factory.go"
+          ]
+        },
+        {
+          "name": "Concrete retained unsigned user-sort and rational arithmetic/BV factory specializations: registered pair branches, cursor-after-success and source relative limit before fresh return, rational explicit numeral insertion, frozen-universe source dispatch and cpp65/82/83/111 assertions with actual process actions; Boolean family guard; common simple_factory assertion plumbing retains build/runtime gating",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/factory_assertions.go",
+            "pkg/smtcore/proto_model/scalar_factory_source_test.go",
+            "pkg/smtcore/proto_model/factory.go",
+            "pkg/smtcore/proto_model/proto_model.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+          ],
+          "tests": [
+            "TestScalarFactorySourceUserRegisteredValuesAndFreeze",
+            "TestScalarFactorySourceFrozenRegistrationActions",
+            "TestScalarFactorySourceFrozenPathsAndClosedAssertionOwner",
+            "TestScalarFactorySourceNumeralExplicitValuesAndEnumeration",
+            "TestScalarFactorySourceBVExhaustionAndCursor",
+            "TestScalarFactorySourceAllocationFailureCursorRetry",
+            "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
+            "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete numeralFactory implements the retained rational Number specialization, with a copied big.Rat enumeration cursor and independent AST references; arith/BV classes borrow the AST manager and select their existing canonical numeral utilities.",
+        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record."
+      ],
+      "deviations": [
+        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it."
+      ]
     },
     {
       "path": "src/smt/proto_model/numeral_factory.h",
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/factory.go", "pkg/smtcore/proto_model/proto_model_test.go", "pkg/smtcore/proto_model/numeral_factory_test.go"],
-      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues", "TestArithmeticFactoryPreservesRequestedNumeralSort"],
+      "go_targets": [
+        "pkg/smtcore/proto_model/factory.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/numeral_factory_test.go",
+        "pkg/smtcore/proto_model/user_sort_factory.go",
+        "pkg/smtcore/proto_model/numeral_factory.go",
+        "pkg/smtcore/proto_model/factory_assertions.go",
+        "pkg/smtcore/proto_model/scalar_factory_source_test.go",
+        "pkg/smtcore/proto_model/proto_model.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+      ],
+      "tests": [
+        "TestValueFactoriesSomeFreshFreezeAndNumericValues",
+        "TestArithmeticFactoryPreservesRequestedNumeralSort",
+        "TestScalarFactorySourceUserRegisteredValuesAndFreeze",
+        "TestScalarFactorySourceFrozenRegistrationActions",
+        "TestScalarFactorySourceFrozenPathsAndClosedAssertionOwner",
+        "TestScalarFactorySourceNumeralExplicitValuesAndEnumeration",
+        "TestScalarFactorySourceBVExhaustionAndCursor",
+        "TestScalarFactorySourceAllocationFailureCursorRetry",
+        "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
+        "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113414,9 +113506,51 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "concrete arithmetic and bit-vector numeral factory interfaces", "status": "ported", "go_target": "pkg/smtcore/proto_model/factory.go", "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"]}],
-      "ownership": ["A concrete scalarFactory replaces the live rational template instantiations without porting the C++ template container."],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete arithmetic and bit-vector numeral factory interfaces",
+          "status": "ported",
+          "tests": [
+            "TestValueFactoriesSomeFreshFreezeAndNumericValues"
+          ],
+          "go_targets": [
+            "pkg/smtcore/proto_model/numeral_factory.go"
+          ]
+        },
+        {
+          "name": "Concrete retained unsigned user-sort and rational arithmetic/BV factory specializations: registered pair branches, cursor-after-success and source relative limit before fresh return, rational explicit numeral insertion, frozen-universe source dispatch and cpp65/82/83/111 assertions with actual process actions; Boolean family guard; common simple_factory assertion plumbing retains build/runtime gating",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/factory_assertions.go",
+            "pkg/smtcore/proto_model/scalar_factory_source_test.go",
+            "pkg/smtcore/proto_model/factory.go",
+            "pkg/smtcore/proto_model/proto_model.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+          ],
+          "tests": [
+            "TestScalarFactorySourceUserRegisteredValuesAndFreeze",
+            "TestScalarFactorySourceFrozenRegistrationActions",
+            "TestScalarFactorySourceFrozenPathsAndClosedAssertionOwner",
+            "TestScalarFactorySourceNumeralExplicitValuesAndEnumeration",
+            "TestScalarFactorySourceBVExhaustionAndCursor",
+            "TestScalarFactorySourceAllocationFailureCursorRetry",
+            "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
+            "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete numeralFactory implements the retained rational Number specialization, with a copied big.Rat enumeration cursor and independent AST references; arith/BV classes borrow the AST manager and select their existing canonical numeral utilities.",
+        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record."
+      ],
+      "deviations": [
+        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it."
+      ]
     },
     {
       "path": "src/smt/proto_model/proto_model.cpp",
@@ -113569,8 +113703,31 @@
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/factory.go", "pkg/ast/ast_model_value.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"],
+      "go_targets": [
+        "pkg/smtcore/proto_model/factory.go",
+        "pkg/ast/ast_model_value.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/user_sort_factory.go",
+        "pkg/smtcore/proto_model/numeral_factory.go",
+        "pkg/smtcore/proto_model/factory_assertions.go",
+        "pkg/smtcore/proto_model/scalar_factory_source_test.go",
+        "pkg/smtcore/proto_model/proto_model.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+      ],
+      "tests": [
+        "TestValueFactoriesSomeFreshFreezeAndNumericValues",
+        "TestScalarFactorySourceUserRegisteredValuesAndFreeze",
+        "TestScalarFactorySourceFrozenRegistrationActions",
+        "TestScalarFactorySourceFrozenPathsAndClosedAssertionOwner",
+        "TestScalarFactorySourceNumeralExplicitValuesAndEnumeration",
+        "TestScalarFactorySourceBVExhaustionAndCursor",
+        "TestScalarFactorySourceAllocationFailureCursorRetry",
+        "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
+        "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 65,
@@ -113591,9 +113748,49 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "basic Boolean factory and user-sort freezing, universes, registration, some pairs and fresh model values", "status": "ported", "go_target": "pkg/smtcore/proto_model/factory.go", "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"]}],
-      "ownership": ["The user-sort factory owns canonical value and sort AST references; returned handles are borrowed."],
-      "deviations": []
+      "methods": [
+        {
+          "name": "basic Boolean factory and user-sort freezing, universes, registration, some pairs and fresh model values",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/factory.go",
+          "tests": [
+            "TestValueFactoriesSomeFreshFreezeAndNumericValues"
+          ]
+        },
+        {
+          "name": "Concrete retained unsigned user-sort and rational arithmetic/BV factory specializations: registered pair branches, cursor-after-success and source relative limit before fresh return, rational explicit numeral insertion, frozen-universe source dispatch and cpp65/82/83/111 assertions with actual process actions; Boolean family guard; common simple_factory assertion plumbing retains build/runtime gating",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/factory_assertions.go",
+            "pkg/smtcore/proto_model/scalar_factory_source_test.go",
+            "pkg/smtcore/proto_model/factory.go",
+            "pkg/smtcore/proto_model/proto_model.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+          ],
+          "tests": [
+            "TestScalarFactorySourceUserRegisteredValuesAndFreeze",
+            "TestScalarFactorySourceFrozenRegistrationActions",
+            "TestScalarFactorySourceFrozenPathsAndClosedAssertionOwner",
+            "TestScalarFactorySourceNumeralExplicitValuesAndEnumeration",
+            "TestScalarFactorySourceBVExhaustionAndCursor",
+            "TestScalarFactorySourceAllocationFailureCursorRetry",
+            "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
+            "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
+      "ownership": [
+        "The user-sort factory owns canonical value and sort AST references; returned handles are borrowed.",
+        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record."
+      ],
+      "deviations": [
+        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it."
+      ]
     },
     {
       "path": "src/smt/proto_model/value_factory.h",
@@ -113604,7 +113801,14 @@
         "pkg/smtcore/proto_model/factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
         "pkg/smtcore/proto_model/datalog_factory.go",
-        "pkg/smtcore/proto_model/datalog_factory_source_test.go"
+        "pkg/smtcore/proto_model/datalog_factory_source_test.go",
+        "pkg/smtcore/proto_model/user_sort_factory.go",
+        "pkg/smtcore/proto_model/numeral_factory.go",
+        "pkg/smtcore/proto_model/factory_assertions.go",
+        "pkg/smtcore/proto_model/scalar_factory_source_test.go",
+        "pkg/smtcore/proto_model/proto_model.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
       ],
       "tests": [
         "TestValueFactoriesSomeFreshFreezeAndNumericValues",
@@ -113614,7 +113818,17 @@
         "TestDatalogFactorySourceRegistrationOwnershipAndCursor",
         "TestDatalogFactorySourceFreshAllocationRefusalRetry",
         "TestDatalogFactorySourceAssertionOwnerAndWarmSelection",
-        "TestDatalogFactorySourceProtoModelDispatch"
+        "TestDatalogFactorySourceProtoModelDispatch",
+        "TestScalarFactorySourceUserRegisteredValuesAndFreeze",
+        "TestScalarFactorySourceFrozenRegistrationActions",
+        "TestScalarFactorySourceFrozenPathsAndClosedAssertionOwner",
+        "TestScalarFactorySourceNumeralExplicitValuesAndEnumeration",
+        "TestScalarFactorySourceBVExhaustionAndCursor",
+        "TestScalarFactorySourceAllocationFailureCursorRetry",
+        "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
+        "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -113679,16 +113893,44 @@
             "TestDatalogFactorySourceAssertionOwnerAndWarmSelection",
             "TestDatalogFactorySourceProtoModelDispatch"
           ]
+        },
+        {
+          "name": "Concrete retained unsigned user-sort and rational arithmetic/BV factory specializations: registered pair branches, cursor-after-success and source relative limit before fresh return, rational explicit numeral insertion, frozen-universe source dispatch and cpp65/82/83/111 assertions with actual process actions; Boolean family guard; common simple_factory assertion plumbing retains build/runtime gating",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/factory_assertions.go",
+            "pkg/smtcore/proto_model/scalar_factory_source_test.go",
+            "pkg/smtcore/proto_model/factory.go",
+            "pkg/smtcore/proto_model/proto_model.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+          ],
+          "tests": [
+            "TestScalarFactorySourceUserRegisteredValuesAndFreeze",
+            "TestScalarFactorySourceFrozenRegistrationActions",
+            "TestScalarFactorySourceFrozenPathsAndClosedAssertionOwner",
+            "TestScalarFactorySourceNumeralExplicitValuesAndEnumeration",
+            "TestScalarFactorySourceBVExhaustionAndCursor",
+            "TestScalarFactorySourceAllocationFailureCursorRetry",
+            "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
+            "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "Concrete typed Go implementations cover the retained unsigned and rational instantiations; native maps and slices replace C++ object tables and vectors.",
-        "The concrete datalog factory owns one reference per registered/generated value and sort; duplicate registration acquires no extra reference. Ordinary Close releases sort references before values, preserving independent AST owners. Real cold descriptor-frontier failures leave the fresh cursor unchanged and allow retry. Whole constructor/publication and interrupted teardown prefix audit remains open."
+        "The concrete datalog factory owns one reference per registered/generated value and sort; duplicate registration acquires no extra reference. Ordinary Close releases sort references before values, preserving independent AST owners. Real cold descriptor-frontier failures leave the fresh cursor unchanged and allow retry. Whole constructor/publication and interrupted teardown prefix audit remains open.",
+        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record."
       ],
       "deviations": [
-        "The live scalar instantiations share one concrete implementation selected by a closed factory kind; no any-valued adapter or generic public surface is introduced.",
-        "Corrective retained-instantiation audit withdraws the earlier whole-header completion/audit claim. Datalog has its own concrete unsigned implementation. The existing shared scalar implementation still uses an unbounded big.Int cursor for the unsigned user-sort specialization and advances it before checking insert failure; other numeral/user-sort instantiations and diagnostic/ownership paths need source audit, not a universal adapter.",
-        "Go slices and a membership map replace C++ unordered-table layout. SomeValue/SomeValues select existing values in stable insertion order; no STL hash-table implementation is ported. Checked Go errors represent invalid physical owners and the finite-domain numeral bounds exception. No billions-of-iterations uint32 wrap campaign or complete whole-unit factory/lifecycle closure is claimed."
+        "Retained unsigned user-sort and datalog specializations use concrete uint32 state; arithmetic and bit-vector subclasses share only the concrete rational-number specialization. Native maps/slices replace unordered C++ container layout; no any-valued template adapter, generic code or STL implementation is added.",
+        "The previous mixed scalarFactory implementation has been removed. The actual retained unsigned and rational algorithms now have separate Go state, and insertion errors precede cursor advancement. Whole-header status and both audit flags remain partial/false because constructor/map-publication and interrupted destruction prefixes and complete numerical-owner composition remain unproven.",
+        "Go slices and a membership map replace C++ unordered-table layout. SomeValue/SomeValues select existing values in stable insertion order; no STL hash-table implementation is ported. Checked Go errors represent invalid physical owners and the finite-domain numeral bounds exception. No billions-of-iterations uint32 wrap campaign or complete whole-unit factory/lifecycle closure is claimed.",
+        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it."
       ]
     },
     {

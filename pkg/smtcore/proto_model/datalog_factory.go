@@ -46,21 +46,6 @@ func (f *DatalogFactory) open() error {
 	return nil
 }
 
-func datalogFactoryAssert(line int32, condition string, evaluate func() bool) error {
-	if !diagnostic.DebugBuild {
-		return nil
-	}
-	d := diagnostic.BorrowProcessDebugContext()
-	enabled, err := diagnostic.SourceAssertionsEnabled(d)
-	if err != nil {
-		return err
-	}
-	if enabled && !evaluate() {
-		return diagnostic.DebugAssertionFailure(d, "src/smt/proto_model/value_factory.h", line, condition)
-	}
-	return nil
-}
-
 func (f *DatalogFactory) valueSet(sort ast.ASTHandle) (*datalogValueSet, error) {
 	if err := f.open(); err != nil {
 		return nil, err
@@ -82,15 +67,15 @@ func (f *DatalogFactory) valueSet(sort ast.ASTHandle) (*datalogValueSet, error) 
 		f.sets[sort] = set
 		f.sorts = append(f.sorts, ref)
 	}
-	if err := datalogFactoryAssert(105, "set != 0", func() bool { return set != nil }); err != nil {
+	if err := simpleFactoryAssert(105, "set != 0", func() bool { return set != nil }); err != nil {
 		return nil, err
 	}
 	if diagnostic.DebugBuild {
 		var set2 *datalogValueSet
-		if err := datalogFactoryAssert(108, "m_sort2value_set.find(s, set2)", func() bool { set2 = f.sets[sort]; return set2 != nil }); err != nil {
+		if err := simpleFactoryAssert(108, "m_sort2value_set.find(s, set2)", func() bool { set2 = f.sets[sort]; return set2 != nil }); err != nil {
 			return nil, err
 		}
-		if err := datalogFactoryAssert(109, "set == set2", func() bool { return set == set2 }); err != nil {
+		if err := simpleFactoryAssert(109, "set == set2", func() bool { return set == set2 }); err != nil {
 			return nil, err
 		}
 	}
@@ -117,7 +102,7 @@ func (f *DatalogFactory) insert(value uint32, sort ast.ASTHandle) (ast.ASTHandle
 		set.values = append(set.values, numeral)
 		fresh = true
 	}
-	if err := datalogFactoryAssert(125, "set->m_values.contains(new_val)", func() bool { _, ok := set.seen[numeral]; return ok }); err != nil {
+	if err := simpleFactoryAssert(125, "set->m_values.contains(new_val)", func() bool { _, ok := set.seen[numeral]; return ok }); err != nil {
 		return ast.ASTHandle{}, fresh, err
 	}
 	return numeral, fresh, nil
@@ -161,7 +146,7 @@ func (f *DatalogFactory) SomeValues(sort ast.ASTHandle) (first, second ast.ASTHa
 		return
 	}
 	if exists {
-		err = datalogFactoryAssert(171, "v1 != v2", func() bool { return first != second })
+		err = simpleFactoryAssert(171, "v1 != v2", func() bool { return first != second })
 		if err != nil {
 			return
 		}
@@ -201,7 +186,7 @@ func (f *DatalogFactory) FreshValue(sort ast.ASTHandle) (ast.ASTHandle, error) {
 			return ast.ASTHandle{}, nil
 		}
 		if fresh {
-			if err := datalogFactoryAssert(201, "result != 0", func() bool { return value != (ast.ASTHandle{}) }); err != nil {
+			if err := simpleFactoryAssert(201, "result != 0", func() bool { return value != (ast.ASTHandle{}) }); err != nil {
 				return ast.ASTHandle{}, err
 			}
 			return value, nil

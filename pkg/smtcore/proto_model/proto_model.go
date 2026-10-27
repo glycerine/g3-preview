@@ -17,7 +17,7 @@ type ProtoModel struct {
 	rewriter    *rewriter.TheoryRewriter
 	factories   map[ast.FamilyID]ValueFactory
 	factoryList []ValueFactory
-	user        *scalarFactory
+	user        *userSortFactory
 	aux         map[ast.ASTHandle]struct{}
 	partial     bool
 	closePhase  uint8
@@ -65,7 +65,7 @@ func NewProtoModel(m *ast.ASTManager, config model.ModelEvaluatorConfig) (p *Pro
 	if err = p.RegisterFactory(newBasicFactory(m)); err != nil {
 		return nil, err
 	}
-	p.user = newScalarFactory(m, 4, scalarUser)
+	p.user = newUserSortFactory(m)
 	if err = p.RegisterFactory(p.user); err != nil {
 		return nil, err
 	}

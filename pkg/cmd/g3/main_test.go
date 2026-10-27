@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"user_universe_factory_scopes.smt2":            "sat\n(((distinct a b c) true)\n ((= (f a) b) true)\n ((= (f b) c) true)\n ((= (f c) a) true))\nunsat\nsat\n(((distinct a b c) true)\n ((= (f a) b) true))\n",
 	"bv_native_operator_models.smt2":               "sat\n((a #xa)\n ((bvadd a b c) #xe)\n ((bvsub a b) #x7)\n ((bvmul a b c) #xe)\n ((bvudiv a b) #x3)\n ((bvurem a b) #x1)\n ((bvsdiv a b) #xe)\n ((bvsrem a b) #x0)\n ((bvsmod a b) #x0)\n ((bvshl a b) #x0)\n ((bvlshr a b) #x1)\n ((bvashr a b) #xf)\n ((ext_rotate_left a b) #x5)\n ((ext_rotate_right a b) #x5)\n ((bvumul_noovfl a b) false)\n ((bvsmul_noovfl a b) false)\n ((bvsmul_noudfl a b) false)\n ((bvredor a) #b1)\n ((bvredand a) #b0))\nunsat\nsat\nunsat\nsat\n",
 	"bv_integer_conversion_scopes.smt2":            "sat\n(((= b #xf) true)\n ((= (bv2int b) 15) true)\n ((= (bv2int (bvnot b)) 0) true))\nunsat\nsat\nunsat\nsat\n",
 	"bv_signed_function_model.smt2":                "sat\n(((f #x7) true)\n ((f #x5) false)\n ((= (mkbv p (not q) true false) #x7) true))\nunsat\nsat\n",
