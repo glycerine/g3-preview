@@ -55,6 +55,9 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
+	if q.strategy == 4 {
+		return q.state.ensureRelevanceActivityQueue()
+	}
 	if q.strategy == 6 {
 		return q.state.ensureTheoryAwareBranching()
 	}
@@ -180,14 +183,7 @@ func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error)
 		}
 		return next, phase, err
 	case 4:
-		if next, err := q.randomVariable(0.02); err != nil || next != SMTNullBoolVar {
-			return next, lbool.Undef, err
-		}
-		if next, phase, err := q.relevantVariable(true, false); err != nil || next != SMTNullBoolVar {
-			return next, phase, err
-		}
-		next, err := q.highestActivityRange(q.activeCreationLimit, ^uint64(0))
-		return next, lbool.Undef, err
+		return q.nextRelevanceActivity()
 	case 5:
 		return q.relevantVariable(false, true)
 	default:
@@ -212,13 +208,28 @@ func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error)
 }
 
 // The Go no-progress check needs availability, not a consumed decision.
-// Strategy 6's native next_case_split removes a selected heap entry.
+// Strategies 4 and 6 remove selected heap entries in next_case_split.
 func (q *SMTActivityCaseSplitQueue) hasCaseSplit() (bool, error) {
 	if q == nil || q.state == nil {
 		return false, ast.ErrASTHandle
 	}
 	if err := q.state.open(); err != nil {
 		return false, err
+	}
+	if q.strategy == 4 {
+		// Native's unconditional 2% random branch can select any unassigned
+		// variable, including one absent from the relevance/delayed queues.
+		// Probe availability without consuming its RNG, queue head or heap.
+		for variable := SMTFirstBoolVar; int(variable) < len(q.state.boolExpr); variable++ {
+			value, err := q.state.Assignment(NewSMTLiteral(variable, false))
+			if err != nil {
+				return false, err
+			}
+			if value == lbool.Undef {
+				return true, nil
+			}
+		}
+		return false, nil
 	}
 	if q.strategy != 6 {
 		variable, _, err := q.NextCaseSplit()

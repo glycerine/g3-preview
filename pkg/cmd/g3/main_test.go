@@ -358,6 +358,7 @@ var scriptResults = map[string]string{
 	"seq_negative_symbolic_mixed.smt2":             "sat\n",
 	"theory_aware_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
 	"relevance_fifo_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
+	"relevance_activity_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
 	"quant_seq_symbolic_int_prefix.smt2":           "sat\n(((= x (str.++ (int.to.str n) \"a\")) true))\nunsat\nsat\n(((= x \"7a\") true))\nsat\n",
 	"quant_seq_shared_boolean_scopes.smt2":         "unsat\nsat\n(((= x z) true) ((= x y) false) ((= (f x) (f z)) true) ((= (f x) (f y)) false))\nunsat\n",
 	"quant_seq_explanation_scopes.smt2":            "unsat\n(associative_words)\nunsat\nsat\n",

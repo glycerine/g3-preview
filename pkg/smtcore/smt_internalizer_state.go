@@ -14,6 +14,8 @@ import (
 )
 
 type smtInternalizerScope struct {
+	relActLimit          int
+	relActHead           int
 	relevanceFIFO        smtRelevanceFIFOScope
 	trueFirstLimit       int
 	theoryCaseSplitLimit int
@@ -104,6 +106,7 @@ type smtPendingEquality struct {
 }
 
 type SMTInternalizerState struct {
+	relevanceActivity          smtRelevanceActivityQueue
 	relevanceFIFO              smtRelevanceFIFO
 	lemmaProblem               *smtLemmaProblem // Interrupted lexical roots, retired before the manager.
 	theoryProgress             uint64
@@ -473,6 +476,9 @@ func (s *SMTInternalizerState) MkBoolVar(expression ast.ASTHandle) (int32, error
 	s.watches = append(s.watches, SMTWatchList{}, SMTWatchList{})
 	s.booleanStack = append(s.booleanStack, expression)
 	s.statistics.NumMkBoolVar++
+	if err := s.relevanceActivityCreated(variable); err != nil {
+		return SMTNullBoolVar, err
+	}
 	if s.theoryAwareBranching != nil {
 		if err := s.theoryAwareBranching.created(variable); err != nil {
 			return SMTNullBoolVar, err
@@ -676,7 +682,8 @@ func (s *SMTInternalizerState) PushScope() error {
 		reasons[key] = literal
 	}
 	s.scopes = append(s.scopes, smtInternalizerScope{
-		relevanceFIFO:        s.relevanceFIFO.snapshot(),
+		relevanceFIFO: s.relevanceFIFO.snapshot(),
+		relActLimit:   len(s.relevanceActivity.entries), relActHead: s.relevanceActivity.head,
 		trueFirstLimit:       len(s.trueFirstTrail),
 		theoryCaseSplitLimit: len(s.theoryCaseSplitSets),
 		booleanLimit:         len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending), pendingHead: s.pendingHead,
@@ -769,6 +776,12 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 }
 
 func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
+	if scope.relActLimit < 0 || scope.relActLimit > len(s.relevanceActivity.entries) || scope.relActHead < 0 || scope.relActHead > scope.relActLimit {
+		return ast.ErrASTDomain
+	}
+	clear(s.relevanceActivity.entries[scope.relActLimit:])
+	s.relevanceActivity.entries = s.relevanceActivity.entries[:scope.relActLimit]
+	s.relevanceActivity.head = scope.relActHead
 	if err := s.relevanceFIFO.restore(scope.relevanceFIFO); err != nil {
 		return err
 	}
@@ -838,6 +851,11 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		s.assignment[positive.Negated().Index()] = entry.value.Negated()
 		s.booleanData[entry.variable].SetJustification(entry.justification)
 		s.booleanData[entry.variable].ScopeLevel = entry.scopeLevel
+		if entry.value == lbool.Undef {
+			if err := s.relevanceActivityUnassigned(entry.variable); err != nil {
+				return err
+			}
+		}
 		if entry.value == lbool.Undef && s.theoryAwareBranching != nil {
 			if err := s.theoryAwareBranching.unassigned(entry.variable); err != nil {
 				return err
@@ -927,6 +945,9 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	for len(s.booleanStack) > scope.booleanLimit {
 		expression := s.booleanStack[len(s.booleanStack)-1]
 		variable := s.boolVar[expression]
+		if err := s.relevanceActivityDeleted(variable); err != nil {
+			return err
+		}
 		if s.theoryAwareBranching != nil {
 			if err := s.theoryAwareBranching.deleted(variable); err != nil {
 				return err
@@ -1076,6 +1097,13 @@ func (s *SMTInternalizerState) Close() error {
 	if s.theoryAwareBranching != nil {
 		result = errors.Join(result, s.theoryAwareBranching.heap.Close())
 		s.theoryAwareBranching = nil
+	}
+	if s.relevanceActivity.delayed != nil {
+		if err := s.relevanceActivity.delayed.Close(); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			s.relevanceActivity.delayed = nil
+		}
 	}
 	result = errors.Join(result, s.dynamicAck.close())
 	if s.quantifierManager != nil {
