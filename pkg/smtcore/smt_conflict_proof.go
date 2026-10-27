@@ -201,17 +201,7 @@ func (b *smtConflictProofBuilder) equalityProof(first, second *SMTEnode) (ast.AS
 }
 
 func (b *smtConflictProofBuilder) literalExpression(literal SMTLiteral) (ast.ASTHandle, error) {
-	if literal == SMTTrueLiteral {
-		return b.state.manager.MkTrue()
-	}
-	if literal == SMTFalseLiteral {
-		return b.state.manager.MkFalse()
-	}
-	expression, err := b.state.BoolExpression(literal.Var())
-	if err != nil || !literal.Sign() {
-		return expression, err
-	}
-	return b.state.manager.MkNot(expression)
+	return b.state.literalExpression(literal)
 }
 
 func (b *smtConflictProofBuilder) clauseProof(clause *SMTClause) (ast.ASTHandle, error) {

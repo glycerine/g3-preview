@@ -103,6 +103,7 @@ type smtPendingEquality struct {
 }
 
 type SMTInternalizerState struct {
+	lemmaProblem               *smtLemmaProblem // Interrupted lexical roots, retired before the manager.
 	theoryProgress             uint64
 	manager                    *ast.ASTManager
 	theoryRewriter             *rewriter.TheoryRewriter // borrowed from the kernel
@@ -1041,6 +1042,13 @@ func (s *SMTInternalizerState) Close() error {
 		return nil
 	}
 	var result error
+	if s.lemmaProblem != nil {
+		if err := s.lemmaProblem.close(); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			s.lemmaProblem = nil
+		}
+	}
 	if len(s.scopes) != 0 {
 		if err := s.PopScopes(uint32(len(s.scopes))); err != nil {
 			result = errors.Join(result, fmt.Errorf("close SMT scopes: %w", err))

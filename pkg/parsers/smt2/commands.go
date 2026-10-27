@@ -228,9 +228,12 @@ func (p *commandParser) command() (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		arity, err := p.unsigned()
-		if err != nil {
-			return false, err
+		var arity uint32
+		if p.token != RightParenToken {
+			arity, err = p.unsigned()
+			if err != nil {
+				return false, err
+			}
 		}
 		if arity != 0 {
 			return false, fmt.Errorf("parameterized user sorts are not ported yet")

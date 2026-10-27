@@ -2631,6 +2631,7 @@
         "smt_kernel.go",
         "smt_kernel_results.go",
         "smt_learned_persistence.go",
+        "smt_lemma_problem.go",
         "smt_literal.go",
         "smt_literal_approx_set.go",
         "smt_literal_display.go",

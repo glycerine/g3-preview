@@ -32,19 +32,7 @@ func (t *SMTLRATheory) emitLRA(function string, line int, body func(io.Writer) e
 
 func (t *SMTLRATheory) displayEvidenceLiteral(out io.Writer, literal SMTLiteral) (result error) {
 	m := t.state.manager
-	var expression ast.ASTHandle
-	var err error
-	switch literal {
-	case SMTTrueLiteral:
-		expression, err = m.MkTrue()
-	case SMTFalseLiteral:
-		expression, err = m.MkFalse()
-	default:
-		expression, err = t.state.BoolExpression(literal.Var())
-		if err == nil && literal.Sign() {
-			expression, err = m.MkNot(expression)
-		}
-	}
+	expression, err := t.state.literalExpression(literal)
 	if err != nil {
 		return err
 	}
