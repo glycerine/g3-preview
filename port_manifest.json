@@ -263971,14 +263971,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "fc241a634f7a86d9b4d5d3121b1b9fd0fcecbfc8",
+    "commit": "d87c7c5304079ecdfc4e04356608bc04cfd7f307",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-27T21:49:42.440992+00:00",
-    "completed_utc": "2026-10-27T21:53:09.780748+00:00",
+    "started_utc": "2026-10-27T22:53:10.019340+00:00",
+    "completed_utc": "2026-10-27T22:56:40.050898+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-fc241a63.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-fc241a63.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-fc241a63.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-d87c7c53.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-d87c7c53.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-d87c7c53.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -263992,11 +263992,11 @@
     ],
     "GOMAXPROCS": 4,
     "package_timeout": "35m",
-    "packages_with_ok_result": 89,
-    "packages_without_test_files": 6,
-    "lp_seconds": 2.777,
+    "packages_with_ok_result": 90,
+    "packages_without_test_files": 5,
+    "lp_seconds": 2.829,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean frozen fc241a634f7a86d9b4d5d3121b1b9fd0fcecbfc8, unchanged at start/end/verification; all95 packages exactly once (89 tested,6 without tests), prebuilt C++ comparisons, CPU affinity8-16/GOMAXPROCS4 and insdict v0.14.6. Includes shared BV2int context37ead867, arithmetic reducer/traversal4c27607f, bounded integer solver918fa498, and retained FD composition plus proof-gated QF_FD command routingfc241a63. Native CLI checks include mixed FD models/cores/scopes/reset, weighted PB, wide offset models and source unbounded-integer unknown; existing interpolation/API checks pass. Default run intentionally skips guarded LP cases; no full LP -short or full tagged-suite claim. Nineteen affected packages separately pass native/combined and focused FD checks pass four profiles. Relevant wrapper/source diagnostic and exact lexical/physical ownership audits remain open; complete smtcore, general strategic factory, public API, optimization/Horn/interpolation service integration remain unproven. Root production/tests and dependency graph match this frozen snapshot at documentation-only recording; no source-unit/API status or audit promotion."
+    "scope_warning": "Independently verified clean frozen d87c7c5304079ecdfc4e04356608bc04cfd7f307, unchanged at start/end/verification; all95 packages exactly once (90 tested,5 without tests), canonical prebuilt C++ comparisons, CPU affinity8-16/GOMAXPROCS4 and insdict v0.14.6. Includes all earlier FD/SMT-LIB work plus BV2real utility/reducers0c5c97c9, source diagnosticsc06c45a8, retained NLA2BV tactic/model/CLI integration and parser session-global fix e215b5b2, and NLSAT algebraic assignment foundation d87c7c53. Actual compiled Go/C++ NLA CLI vectors separately match byte-for-byte. Existing interpolation/API tests pass. Default run intentionally skips guarded LP cases; no full LP -short or full tagged-suite claim. Twenty affected packages separately pass native/combined and focused assignment checks pass four profiles. NLSAT atom/clause/interval/evaluator/explanation/search and goal/tactic integration remain unported; assignment/source diagnostic and exact lexical/physical ownership audits remain partial. Complete smtcore, general strategic factory, public API, optimization/Horn/interpolation service integration remain unproven. Root production/tests and dependency graph match this frozen snapshot at documentation-only recording; no source-unit/API status or audit promotion is made."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
