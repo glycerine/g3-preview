@@ -3277,6 +3277,7 @@
       ],
       "production_files": [
         "enum2bv_solver.go",
+        "pb2bv_solver.go",
         "smt_strategic_solver.go"
       ]
     },

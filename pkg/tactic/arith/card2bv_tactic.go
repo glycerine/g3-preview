@@ -231,7 +231,7 @@ func (t *Card2BVTactic) Apply(g *tactic.Goal, result *tactic.TacticResult) (err 
 	}()
 	w.theory, err = rewriter.NewTheoryRewriter(t.manager, t.context, t.globals, &t.params)
 	if err == nil {
-		w.pseudo, err = rewriter.NewPB2BVRewriter(t.manager)
+		w.pseudo, err = rewriter.NewPB2BVRewriter(t.manager, t.context, &t.params)
 	}
 	if err != nil {
 		return err
@@ -314,7 +314,7 @@ func (w *card2BVApplication) rewriteGoal(g *tactic.Goal) error {
 		}
 		// The source PB traversal is non-proof-generating and leaves the
 		// initially empty new_pr2 slot untouched, even in proof-enabled goals.
-		if err = w.pseudo.Rewrite(f, w.second); err != nil {
+		if err = w.pseudo.Rewrite(f, w.second, w.proof2); err != nil {
 			return err
 		}
 		if proofs {

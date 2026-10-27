@@ -35227,10 +35227,12 @@
       "path": "src/ast/rewriter/pb2bv_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/pb2bv_rewriter.go",
-        "pkg/ast/util_psort_ast_context.go"
+        "pkg/ast/util_psort_ast_context.go",
+        "pkg/ast/rewriter/pb2bv_params_source_test.go",
+        "pkg/tactic/arith/card2bv_tactic.go"
       ],
       "tests": [
         "TestPB2BVCardinalityTraversalAndOrShortcut",
@@ -35239,7 +35241,10 @@
         "TestPB2BVCleanupReconstructsImplementation",
         "TestPB2BVCloseGuards",
         "TestPsortASTContextRetainedConsumerTransfers",
-        "TestPsortASTNetworkFiniteCardinalityClauseSemantics"
+        "TestPsortASTNetworkFiniteCardinalityClauseSemantics",
+        "TestPB2BVParametersSurviveCleanupReplacement",
+        "TestPB2BVTraversalAlwaysPreservesCallerProof",
+        "TestPB2BVFreshDeclarationRetirementFollowsSourceRange"
       ],
       "assertions": [
         {
@@ -35275,8 +35280,8 @@
           "text": "SASSERT(num_scopes <= m_fresh_lim.size());"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "card2bv_rewriter overflow-aware mk_le_ge pair/tree circuit, weighted mk_bv dualization and simplified Boolean ITE construction (src/ast/rewriter/pb2bv_rewriter.cpp:54-225)",
@@ -35322,29 +35327,49 @@
             "TestPB2BVCleanupReconstructsImplementation",
             "TestPB2BVCloseGuards"
           ]
+        },
+        {
+          "name": "Actual constructor params_ref copy and public Cleanup local across imp header destruction/reconstruction; always-false proof traversal preserves caller proof; source forward fresh-declaration range retirement with reached consumed-token continuation",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/pb2bv_rewriter.go",
+            "pkg/ast/rewriter/pb2bv_params_source_test.go"
+          ],
+          "tests": [
+            "TestPB2BVParametersSurviveCleanupReplacement",
+            "TestPB2BVTraversalAlwaysPreservesCallerProof",
+            "TestPB2BVFreshDeclarationRetirementFollowsSourceRange"
+          ]
         }
       ],
       "ownership": [
-        "PB2BVRewriter owns its traversal, concrete sorting network context/runtime, fresh declaration references, scope limits and pending side-constraint references. Sorting-network fresh applications remain owned by the context trail while the fresh declaration vector independently increments each declaration. FlushSideConstraints transfers clause references to the caller without decrementing them; Pop decrements declarations beyond the restored scope only after clauses have been flushed. Cleanup destroys and reconstructs the complete implementation graph while preserving the borrowed AST manager and outer owner."
+        "PB2BVRewriter owns its traversal, concrete sorting network context/runtime, fresh declaration references, scope limits and pending side-constraint references. Sorting-network fresh applications remain owned by the context trail while the fresh declaration vector independently increments each declaration. FlushSideConstraints transfers clause references to the caller without decrementing them; Pop decrements declarations beyond the restored scope only after clauses have been flushed. Cleanup destroys and reconstructs the complete implementation graph while preserving the borrowed AST manager and outer owner.",
+        "The rewriter borrows its explicit ParamsContext and owns the actual constructor ParamsRef, retaining a separate Cleanup local until replacement construction succeeds or Close abandons it. Old imp header retirement precedes replacement reservation; failed replacement retains the snapshot for explicit Go continuation. Parameter destructor receipts avoid replaying an already-reached decrement. Fresh declaration shrink/destruction uses source forward vector order and acknowledges consumed raw-node decrements. The public proof slot is borrowed and untouched because the source card_pb_rewriter always disables proof generation, even in proof-enabled managers."
       ],
       "deviations": [
-        "The source's process-global sorting allocation state is represented by an owned util/memory Runtime bound to the AST budget. The no-proof Go Traversal makes the always-null proof output implicit. The source parameter update is empty and its saved initial params_ref affects only reconstruction, so Go omits that behavior-free snapshot. Source assertions for positive integral bounds, nonnegative coefficients, flushed lemmas and scope depth are checked errors. Arbitrary C++ rationals are represented by math/big.Rat and concrete numeral-service values."
+        "The source's process-global sorting allocation state is represented by an owned util/memory Runtime bound to the AST budget. The no-proof Go Traversal makes the always-null proof output implicit. The source parameter update is empty and its saved initial params_ref affects only reconstruction, so Go omits that behavior-free snapshot. Source assertions for positive integral bounds, nonnegative coefficients, flushed lemmas and scope depth are checked errors. Arbitrary C++ rationals are represented by math/big.Rat and concrete numeral-service values.",
+        "Whole-unit completion/audit claims are withdrawn on retained pb2bv_solver consumer review: the former Go constructor omitted m_params and public Cleanup local ownership, the public Rewrite omitted its proof argument, and fresh-vector retirement ran backward. These concrete gaps are corrected with actual params owners, caller updates and real AST deletion observations. Broader weighted/cardinality/arithmetic lexical owners, persistent rational/argument buffers, source TRACE/assertion gates, native throwing-destructor/physical NUM paths and other source member-order details remain separate unproven obligations. Existing bounded mathematical evidence is retained; it does not establish whole-source ownership closure."
       ]
     },
     {
       "path": "src/ast/rewriter/pb2bv_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
-        "pkg/ast/rewriter/pb2bv_rewriter.go"
+        "pkg/ast/rewriter/pb2bv_rewriter.go",
+        "pkg/ast/rewriter/pb2bv_params_source_test.go",
+        "pkg/tactic/arith/card2bv_tactic.go"
       ],
       "tests": [
         "TestPB2BVCardinalityTraversalAndOrShortcut",
         "TestPB2BVWeightedConversionAndScopeGuards",
         "TestPB2BVArithmeticBooleanITERecognition",
         "TestPB2BVCleanupReconstructsImplementation",
-        "TestPB2BVCloseGuards"
+        "TestPB2BVCloseGuards",
+        "TestPB2BVParametersSurviveCleanupReplacement",
+        "TestPB2BVTraversalAlwaysPreservesCallerProof",
+        "TestPB2BVFreshDeclarationRetirementFollowsSourceRange"
       ],
       "conditionals": [
         {
@@ -35356,8 +35381,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "pb2bv_rewriter constructor, destructor, parameter, manager, step, cleanup, fresh-constant, rewrite, scope, side-constraint, count and statistics surface (src/ast/rewriter/pb2bv_rewriter.h:26-43)",
@@ -35370,13 +35395,28 @@
             "TestPB2BVCleanupReconstructsImplementation",
             "TestPB2BVCloseGuards"
           ]
+        },
+        {
+          "name": "Actual constructor params_ref copy and public Cleanup local across imp header destruction/reconstruction; always-false proof traversal preserves caller proof; source forward fresh-declaration range retirement with reached consumed-token continuation",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/pb2bv_rewriter.go",
+            "pkg/ast/rewriter/pb2bv_params_source_test.go"
+          ],
+          "tests": [
+            "TestPB2BVParametersSurviveCleanupReplacement",
+            "TestPB2BVTraversalAlwaysPreservesCallerProof",
+            "TestPB2BVFreshDeclarationRetirementFollowsSourceRange"
+          ]
         }
       ],
       "ownership": [
-        "The exported Go owner preserves the header's single owning implementation object, borrowed manager, scoped fresh declarations and transferred side-constraint contract with checked handles and explicit Close."
+        "The exported Go owner preserves the header's single owning implementation object, borrowed manager, scoped fresh declarations and transferred side-constraint contract with checked handles and explicit Close.",
+        "The rewriter borrows its explicit ParamsContext and owns the actual constructor ParamsRef, retaining a separate Cleanup local until replacement construction succeeds or Close abandons it. Old imp header retirement precedes replacement reservation; failed replacement retains the snapshot for explicit Go continuation. Parameter destructor receipts avoid replaying an already-reached decrement. Fresh declaration shrink/destruction uses source forward vector order and acknowledges consumed raw-node decrements. The public proof slot is borrowed and untouched because the source card_pb_rewriter always disables proof generation, even in proof-enabled managers."
       ],
       "deviations": [
-        "Go exposes Rewrite without a proof output because this source specialization disables proofs, returns statistics as concrete structs, and returns transferred side constraints as an owning handle slice."
+        "Go exposes Rewrite without a proof output because this source specialization disables proofs, returns statistics as concrete structs, and returns transferred side constraints as an owning handle slice.",
+        "Whole-unit completion/audit claims are withdrawn on retained pb2bv_solver consumer review: the former Go constructor omitted m_params and public Cleanup local ownership, the public Rewrite omitted its proof argument, and fresh-vector retirement ran backward. These concrete gaps are corrected with actual params owners, caller updates and real AST deletion observations. Broader weighted/cardinality/arithmetic lexical owners, persistent rational/argument buffers, source TRACE/assertion gates, native throwing-destructor/physical NUM paths and other source member-order details remain separate unproven obligations. Existing bounded mathematical evidence is retained; it does not establish whole-source ownership closure."
       ]
     },
     {
@@ -167296,22 +167336,80 @@
       "path": "src/tactic/portfolio/pb2bv_solver.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/pb2bv_solver.go",
+        "pkg/tactic/portfolio/pb2bv_solver_test.go",
+        "pkg/tactic/portfolio/pb2bv_solver_prefix_test.go",
+        "pkg/tactic/portfolio/pb2bv_solver_cpp_test.go"
+      ],
+      "tests": [
+        "TestPB2BVSolverQFFDTruthTableReference",
+        "TestPB2BVSolverFlushFailureKeepsPublishedPrefixAndBuffer",
+        "TestPB2BVSolverPopFailureStillDiscardsPending",
+        "TestPB2BVSolverConstructorParametersAndRefusals",
+        "TestPB2BVSolverTranslateDoesNotFlushOrCopyPending",
+        "TestPB2BVSolverBuffersAndFlushesAtSourceBoundaries",
+        "TestPB2BVSolverPopDiscardsPendingAndPreservesZeroPop",
+        "TestPB2BVSolverFreshModelFilteringAfterDestruction",
+        "TestPB2BVSolverNamedCoreAndNoFreshModelIdentity"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained lazy PB2BV solver: buffer-only assertions; flush before push/check/consequences/assertion inspection; pending reset before pop; source base status/params; backend result forwarding; fresh-model filter and no-fresh identity; source backend-only translation without pending-buffer replay",
+          "status": "partial",
+          "go_targets": [
+            "pkg/tactic/portfolio/pb2bv_solver.go",
+            "pkg/tactic/portfolio/pb2bv_solver_test.go",
+            "pkg/tactic/portfolio/pb2bv_solver_prefix_test.go",
+            "pkg/tactic/portfolio/pb2bv_solver_cpp_test.go"
+          ],
+          "tests": [
+            "TestPB2BVSolverQFFDTruthTableReference",
+            "TestPB2BVSolverFlushFailureKeepsPublishedPrefixAndBuffer",
+            "TestPB2BVSolverPopFailureStillDiscardsPending",
+            "TestPB2BVSolverConstructorParametersAndRefusals",
+            "TestPB2BVSolverTranslateDoesNotFlushOrCopyPending",
+            "TestPB2BVSolverBuffersAndFlushesAtSourceBoundaries",
+            "TestPB2BVSolverPopDiscardsPendingAndPreservesZeroPop",
+            "TestPB2BVSolverFreshModelFilteringAfterDestruction",
+            "TestPB2BVSolverNamedCoreAndNoFreshModelIdentity"
+          ]
+        }
+      ],
+      "ownership": [
+        "Buffered assertions own ASTRefs until a successful complete flush or source pop/Close. Flush locals own formula/proof refs and concrete side-clause handles transferred by the retained rewriter. A backend failure preserves the source input buffer and already-forwarded prefix; no rollback is invented. Pending lexical cleanup precedes derived members. Rewriter destruction precedes backend release, then buffered assertions, named assumptions and base parameters. Model filtering owns its actual filter/model-reference intermediates; no-fresh output preserves the backend model identity. Constructor and parameter ownership use actual refs and reached decrement receipts."
+      ],
+      "deviations": [
+        "The new wrapper is exposed as a concrete Go solver and tested composed over enum2bv and the actual SMT backend. Complete QF_FD/SAT dispatcher installation still needs the remaining bounded_int2bv/inc_sat_solver pipeline work; no incomplete default is installed.",
+        "Eight independent truth tables (64 complete Boolean assignments) compare against prebuilt C++ QF_FD. The old C++ indexed-PB parser rejects fields wider than unsigned32, so the wide-coefficient oracle uses the exactly equivalent integer-ITE predicate; Go still exercises the direct arbitrary-precision PB constructor. No C++ parser error or extra sat output is accepted as a passing oracle.",
+        "Whole units remain partial for retained PB algorithm lexical/NUM ownership and diagnostic work, native exceptional destruction, arbitrary backend decrement failures and independent-runtime translation. Source translate intentionally does not flush/copy unflushed wrapper assertions; the Go port preserves that behavior rather than inventing a replay."
+      ]
     },
     {
       "path": "src/tactic/portfolio/pb2bv_solver.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/pb2bv_solver.go",
+        "pkg/tactic/portfolio/pb2bv_solver_test.go",
+        "pkg/tactic/portfolio/pb2bv_solver_prefix_test.go",
+        "pkg/tactic/portfolio/pb2bv_solver_cpp_test.go"
+      ],
+      "tests": [
+        "TestPB2BVSolverQFFDTruthTableReference",
+        "TestPB2BVSolverFlushFailureKeepsPublishedPrefixAndBuffer",
+        "TestPB2BVSolverPopFailureStillDiscardsPending",
+        "TestPB2BVSolverConstructorParametersAndRefusals",
+        "TestPB2BVSolverTranslateDoesNotFlushOrCopyPending",
+        "TestPB2BVSolverBuffersAndFlushesAtSourceBoundaries",
+        "TestPB2BVSolverPopDiscardsPendingAndPreservesZeroPop",
+        "TestPB2BVSolverFreshModelFilteringAfterDestruction",
+        "TestPB2BVSolverNamedCoreAndNoFreshModelIdentity"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -167324,9 +167422,37 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained lazy PB2BV solver: buffer-only assertions; flush before push/check/consequences/assertion inspection; pending reset before pop; source base status/params; backend result forwarding; fresh-model filter and no-fresh identity; source backend-only translation without pending-buffer replay",
+          "status": "partial",
+          "go_targets": [
+            "pkg/tactic/portfolio/pb2bv_solver.go",
+            "pkg/tactic/portfolio/pb2bv_solver_test.go",
+            "pkg/tactic/portfolio/pb2bv_solver_prefix_test.go",
+            "pkg/tactic/portfolio/pb2bv_solver_cpp_test.go"
+          ],
+          "tests": [
+            "TestPB2BVSolverQFFDTruthTableReference",
+            "TestPB2BVSolverFlushFailureKeepsPublishedPrefixAndBuffer",
+            "TestPB2BVSolverPopFailureStillDiscardsPending",
+            "TestPB2BVSolverConstructorParametersAndRefusals",
+            "TestPB2BVSolverTranslateDoesNotFlushOrCopyPending",
+            "TestPB2BVSolverBuffersAndFlushesAtSourceBoundaries",
+            "TestPB2BVSolverPopDiscardsPendingAndPreservesZeroPop",
+            "TestPB2BVSolverFreshModelFilteringAfterDestruction",
+            "TestPB2BVSolverNamedCoreAndNoFreshModelIdentity"
+          ]
+        }
+      ],
+      "ownership": [
+        "Buffered assertions own ASTRefs until a successful complete flush or source pop/Close. Flush locals own formula/proof refs and concrete side-clause handles transferred by the retained rewriter. A backend failure preserves the source input buffer and already-forwarded prefix; no rollback is invented. Pending lexical cleanup precedes derived members. Rewriter destruction precedes backend release, then buffered assertions, named assumptions and base parameters. Model filtering owns its actual filter/model-reference intermediates; no-fresh output preserves the backend model identity. Constructor and parameter ownership use actual refs and reached decrement receipts."
+      ],
+      "deviations": [
+        "The new wrapper is exposed as a concrete Go solver and tested composed over enum2bv and the actual SMT backend. Complete QF_FD/SAT dispatcher installation still needs the remaining bounded_int2bv/inc_sat_solver pipeline work; no incomplete default is installed.",
+        "Eight independent truth tables (64 complete Boolean assignments) compare against prebuilt C++ QF_FD. The old C++ indexed-PB parser rejects fields wider than unsigned32, so the wide-coefficient oracle uses the exactly equivalent integer-ITE predicate; Go still exercises the direct arbitrary-precision PB constructor. No C++ parser error or extra sat output is accepted as a passing oracle.",
+        "Whole units remain partial for retained PB algorithm lexical/NUM ownership and diagnostic work, native exceptional destruction, arbitrary backend decrement failures and independent-runtime translation. Source translate intentionally does not flush/copy unflushed wrapper assertions; the Go port preserves that behavior rather than inventing a replay."
+      ]
     },
     {
       "path": "src/tactic/portfolio/smt_strategic_solver.cpp",

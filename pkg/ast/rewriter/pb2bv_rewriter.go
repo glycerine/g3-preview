@@ -32,21 +32,27 @@ func (c *pb2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArguments
 // auxiliary trail, declarations and side constraints. The AST manager is
 // borrowed. Do not copy this owner.
 type PB2BVRewriter struct {
-	self          *PB2BVRewriter
-	manager       *ast.ASTManager
-	pseudo        *PseudoBooleanRewriter
-	arithFamily   ast.FamilyID
-	runtime       *umemory.Runtime
-	context       *ast.PsortASTContext
-	network       *ast.PsortASTNetwork
-	configuration pb2BVConfiguration
-	traversal     *Traversal
-	fresh         []ast.ASTHandle // owning declaration references
-	freshLimits   []uint32
-	freshSeen     uint32
-	numTranslated uint32
-	header        uint64
-	closed        bool
+	paramsContext       *uparams.ParamsContext
+	parameters          uparams.ParamsRef
+	parametersDecrement uparams.ParamsDecrementReceipt
+	cleanupParameters   uparams.ParamsRef
+	cleanupDecrement    uparams.ParamsDecrementReceipt
+	closing             bool
+	self                *PB2BVRewriter
+	manager             *ast.ASTManager
+	pseudo              *PseudoBooleanRewriter
+	arithFamily         ast.FamilyID
+	runtime             *umemory.Runtime
+	context             *ast.PsortASTContext
+	network             *ast.PsortASTNetwork
+	configuration       pb2BVConfiguration
+	traversal           *Traversal
+	fresh               []ast.ASTHandle // owning declaration references
+	freshLimits         []uint32
+	freshSeen           uint32
+	numTranslated       uint32
+	header              uint64
+	closed              bool
 }
 
 type PB2BVStatistics struct {
@@ -56,23 +62,33 @@ type PB2BVStatistics struct {
 
 // NewPB2BVRewriter constructs the source implementation graph. A nonnil
 // partial owner returned with an error must be closed.
-func NewPB2BVRewriter(m *ast.ASTManager) (*PB2BVRewriter, error) {
+func NewPB2BVRewriter(m *ast.ASTManager, c *uparams.ParamsContext, p *uparams.ParamsRef) (*PB2BVRewriter, error) {
 	if m == nil {
 		return nil, ast.ErrASTHandle
+	}
+	if c == nil || c.SymbolsField != m.Symbols || c.NumeralsField != m.NumeralService() || c.BudgetField != m.Budget() {
+		return nil, uparams.ErrParamsOwner
 	}
 	n := uint64(reflect.TypeOf(PB2BVRewriter{}).Size())
 	if err := m.Budget().Reserve(n); err != nil {
 		return nil, err
 	}
-	r := &PB2BVRewriter{manager: m, header: n}
+	r := &PB2BVRewriter{manager: m, paramsContext: c, header: n, closing: true}
 	r.self = r
-	if err := r.constructMembers(); err != nil {
+	if err := r.constructMembers(p); err != nil {
 		return r, err
 	}
 	return r, nil
 }
 
-func (r *PB2BVRewriter) constructMembers() (err error) {
+func (r *PB2BVRewriter) constructMembers(p *uparams.ParamsRef) (err error) {
+	r.parameters, err = r.paramsContext.NewValue()
+	if err != nil {
+		return err
+	}
+	if err = r.paramsContext.Assign(&r.parameters, p); err != nil {
+		return err
+	}
 	m := r.manager
 	if r.pseudo, err = NewPseudoBooleanRewriter(m); err != nil {
 		return err
@@ -96,11 +112,12 @@ func (r *PB2BVRewriter) constructMembers() (err error) {
 	if r.traversal, err = NewTraversal(m, &r.configuration); err != nil {
 		return err
 	}
+	r.closing = false
 	return nil
 }
 
 func (r *PB2BVRewriter) open() error {
-	if r == nil || r.self != r || r.closed || r.manager == nil || r.traversal == nil {
+	if r == nil || r.self != r || r.closed || r.closing || r.manager == nil || r.traversal == nil {
 		return ast.ErrASTHandle
 	}
 	_, err := r.manager.ProofsEnabled()
@@ -721,8 +738,9 @@ func (r *PB2BVRewriter) rewriteApp(decl ast.ASTHandle, args ast.AppArguments, ou
 	return RewriteDone, r.manager.SetRef(out, result)
 }
 
-// Rewrite traverses an expression and converts reached cardinality constraints.
-func (r *PB2BVRewriter) Rewrite(expression ast.ASTHandle, out ast.ASTRef) error {
+// Rewrite converts reached cardinality constraints. The source traversal
+// always disables proof generation and leaves the caller proof slot untouched.
+func (r *PB2BVRewriter) Rewrite(expression ast.ASTHandle, out, _ ast.ASTRef) error {
 	if err := r.open(); err != nil {
 		return err
 	}
@@ -791,11 +809,22 @@ func (r *PB2BVRewriter) Pop(scopes uint32) error {
 	if scopes != 0 {
 		newSize := uint32(len(r.freshLimits)) - scopes
 		limit := r.freshLimits[newSize]
-		for i := len(r.fresh) - 1; i >= int(limit); i-- {
-			if err = r.manager.DecRef(r.fresh[i]); err != nil {
-				return err
+		for i := int(limit); i < len(r.fresh); i++ {
+			if r.fresh[i].IsNull() {
+				continue
 			}
-			r.fresh[i] = ast.ASTHandle{}
+			consumed, e := r.manager.DecRefConsumed(r.fresh[i])
+			if consumed {
+				r.fresh[i] = ast.ASTHandle{}
+			}
+			if e != nil {
+				r.closing = true
+				return e
+			}
+			if !consumed {
+				r.closing = true
+				return ast.ErrASTPending
+			}
 		}
 		r.fresh = r.fresh[:limit]
 		r.freshLimits = r.freshLimits[:newSize]
@@ -840,11 +869,20 @@ func (r *PB2BVRewriter) destroyMembers() error {
 		}
 		r.context = nil
 	}
-	for i := len(r.fresh) - 1; i >= 0; i-- {
-		if err := r.manager.DecRef(r.fresh[i]); err != nil {
+	for i, h := range r.fresh {
+		if h.IsNull() {
+			continue
+		}
+		consumed, err := r.manager.DecRefConsumed(h)
+		if consumed {
+			r.fresh[i] = ast.ASTHandle{}
+		}
+		if err != nil {
 			return err
 		}
-		r.fresh[i] = ast.ASTHandle{}
+		if !consumed {
+			return ast.ErrASTPending
+		}
 	}
 	r.fresh = nil
 	r.freshLimits = nil
@@ -860,22 +898,48 @@ func (r *PB2BVRewriter) destroyMembers() error {
 		}
 		r.pseudo = nil
 	}
-	return nil
+	return r.endParameters(&r.parameters, &r.parametersDecrement)
 }
 
 // Cleanup reconstructs the complete source implementation while retaining the
 // outer owner and borrowed manager.
 func (r *PB2BVRewriter) Cleanup() error {
-	if err := r.open(); err != nil {
-		return err
+	if r == nil || r.self != r || r.closed {
+		return ast.ErrASTHandle
+	}
+	r.closing = true
+	if r.cleanupParameters == (uparams.ParamsRef{}) {
+		var err error
+		r.cleanupParameters, err = r.paramsContext.NewValue()
+		if err != nil {
+			return err
+		}
+		if err = r.paramsContext.Assign(&r.cleanupParameters, &r.parameters); err != nil {
+			return errors.Join(err, r.endParameters(&r.cleanupParameters, &r.cleanupDecrement))
+		}
 	}
 	if err := r.destroyMembers(); err != nil {
 		return err
 	}
+	r.manager.Budget().Release(r.header)
+	r.header = 0
+	n := uint64(reflect.TypeOf(PB2BVRewriter{}).Size())
+	if err := r.manager.Budget().Reserve(n); err != nil {
+		return err
+	}
+	r.header = n
 	r.freshSeen = 0
 	r.numTranslated = 0
 	r.arithFamily = ast.NullFamilyID
-	return r.constructMembers()
+	if err := r.constructMembers(&r.cleanupParameters); err != nil {
+		return err
+	}
+	r.closing = true
+	if err := r.endParameters(&r.cleanupParameters, &r.cleanupDecrement); err != nil {
+		return err
+	}
+	r.closing = false
+	return nil
 }
 
 func (r *PB2BVRewriter) Close() error {
@@ -885,11 +949,31 @@ func (r *PB2BVRewriter) Close() error {
 	if r.closed {
 		return nil
 	}
+	r.closing = true
 	if err := r.destroyMembers(); err != nil {
 		return err
 	}
 	r.manager.Budget().Release(r.header)
 	r.header = 0
+	if err := r.endParameters(&r.cleanupParameters, &r.cleanupDecrement); err != nil {
+		return err
+	}
 	r.closed = true
 	return nil
+}
+
+func (r *PB2BVRewriter) endParameters(p *uparams.ParamsRef, receipt *uparams.ParamsDecrementReceipt) error {
+	if *p == (uparams.ParamsRef{}) {
+		return nil
+	}
+	var err error
+	if receipt.Invocation() != 0 {
+		err = r.paramsContext.CompleteDecrement(p, *receipt)
+	} else {
+		err = r.paramsContext.DelTracked(p, receipt)
+	}
+	if err == nil {
+		*receipt = uparams.ParamsDecrementReceipt{}
+	}
+	return err
 }

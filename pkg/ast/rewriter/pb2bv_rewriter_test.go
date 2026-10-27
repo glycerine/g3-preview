@@ -13,7 +13,8 @@ func pb2BVFixture(t *testing.T) (*ast.ASTManager, *PB2BVRewriter) {
 	astTestMust(t, err)
 	_, err = m.RegisterBitVectorPlugin()
 	astTestMust(t, err)
-	r, err := NewPB2BVRewriter(m)
+	c, p := enum2BVParameters(t, m)
+	r, err := NewPB2BVRewriter(m, c, p)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	return m, r
@@ -28,7 +29,7 @@ func TestPB2BVCardinalityTraversalAndOrShortcut(t *testing.T) {
 	atLeastOne, err := m.MkPseudoBooleanAtLeast([]ast.ASTHandle{a, b, c}, 1)
 	astTestMust(t, err)
 	out := astTestPin(t, m, atLeastOne)
-	astTestMust(t, r.Rewrite(atLeastOne, out))
+	astTestMust(t, r.Rewrite(atLeastOne, out, ast.ASTRef{}))
 	got, err := m.RefGet(out)
 	astTestMust(t, err)
 	if family, e := m.GetFamilyID(got); e != nil || family != m.BasicFamilyID() {
@@ -40,7 +41,7 @@ func TestPB2BVCardinalityTraversalAndOrShortcut(t *testing.T) {
 
 	atMostOne, err := m.MkPseudoBooleanAtMost([]ast.ASTHandle{a, b, c}, 1)
 	astTestMust(t, err)
-	astTestMust(t, r.Rewrite(atMostOne, out))
+	astTestMust(t, r.Rewrite(atMostOne, out, ast.ASTRef{}))
 	got, err = m.RefGet(out)
 	astTestMust(t, err)
 	if got == atMostOne {
@@ -70,7 +71,7 @@ func TestPB2BVWeightedConversionAndScopeGuards(t *testing.T) {
 	weighted, err := m.MkPseudoBooleanGE(values[:2], []ast.ASTHandle{a, b}, &values[2])
 	astTestMust(t, err)
 	out := astTestPin(t, m, a)
-	astTestMust(t, r.Rewrite(weighted, out))
+	astTestMust(t, r.Rewrite(weighted, out, ast.ASTRef{}))
 	got, err := m.RefGet(out)
 	astTestMust(t, err)
 	if got == weighted {
@@ -115,7 +116,7 @@ func TestPB2BVArithmeticBooleanITERecognition(t *testing.T) {
 	comparison, err := m.MkFamilyApp(r.arithFamily, arithOpGE, nil, []ast.ASTHandle{conditional, two})
 	astTestMust(t, err)
 	out := astTestPin(t, m, comparison)
-	astTestMust(t, r.Rewrite(comparison, out))
+	astTestMust(t, r.Rewrite(comparison, out, ast.ASTRef{}))
 	got, err := m.RefGet(out)
 	astTestMust(t, err)
 	if got != a {
@@ -131,7 +132,7 @@ func TestPB2BVCloseGuards(t *testing.T) {
 	a := goalTestAtom(t, m, "pb2bv-close")
 	out := astTestPin(t, m, a)
 	astTestMust(t, r.Close())
-	if err := r.Rewrite(a, out); err != ast.ErrASTHandle {
+	if err := r.Rewrite(a, out, ast.ASTRef{}); err != ast.ErrASTHandle {
 		t.Fatal("closed rewriter accepted traversal", err)
 	}
 }
@@ -144,7 +145,7 @@ func TestPB2BVCleanupReconstructsImplementation(t *testing.T) {
 	astTestMust(t, err)
 	astTestPin(t, m, constraint)
 	out := astTestPin(t, m, constraint)
-	astTestMust(t, r.Rewrite(constraint, out))
+	astTestMust(t, r.Rewrite(constraint, out, ast.ASTRef{}))
 	if translated, e := r.NumTranslated(); e != nil || translated != 1 {
 		t.Fatal("pre-cleanup translation", translated, e)
 	}
@@ -162,7 +163,7 @@ func TestPB2BVCleanupReconstructsImplementation(t *testing.T) {
 	if stats != (PB2BVStatistics{}) {
 		t.Fatal("cleanup statistics reset", stats)
 	}
-	astTestMust(t, r.Rewrite(constraint, out))
+	astTestMust(t, r.Rewrite(constraint, out, ast.ASTRef{}))
 	if translated, e := r.NumTranslated(); e != nil || translated != 1 {
 		t.Fatal("post-cleanup translation", translated, e)
 	}
