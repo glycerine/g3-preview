@@ -138169,7 +138169,9 @@
         "pkg/cmd/g3/test_vectors/lra_scoped_rational_witness_a.smt2",
         "pkg/cmd/g3/test_vectors/lra_scoped_rational_witness_b.smt2",
         "pkg/cmd/g3/test_vectors/lra_scoped_uf_witness_a.smt2",
-        "pkg/cmd/g3/test_vectors/lra_scoped_uf_witness_b.smt2"
+        "pkg/cmd/g3/test_vectors/lra_scoped_uf_witness_b.smt2",
+        "pkg/smtcore/theory_lra_parameter_lifetime_test.go",
+        "pkg/cmd/g3/test_vectors/lra_propagation_mode_updates.smt2"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -138317,7 +138319,12 @@
         "TestSMTLRABasicExternalReasonKeepsFarkasWithoutProofs",
         "TestSMTLRABasicTautologyRetiresParametersWithoutProofs",
         "TestSMTLRABasicNoProofParameterRefusalKeepsOwners",
-        "TestSMTLibRunnerLRAScopedRationalAndUFModelOracles"
+        "TestSMTLibRunnerLRAScopedRationalAndUFModelOracles",
+        "TestSMTLRAPropagationModeUpdatesDoNotReinitializeLPTracking",
+        "TestSMTLRAPropagationThresholdUpdateDoesNotEnableLPTracking",
+        "TestSMTLRAKernelParameterUpdatePreservesInitialTracking",
+        "TestSMTLRAFreshCopyInitializesTrackingFromCurrentParameters",
+        "TestSMTLibRunnerLRAPropagationModeUpdatesMatchCPP"
       ],
       "conditionals": [
         {
@@ -138596,6 +138603,18 @@
             "TestSMTLRABasicTautologyRetiresParametersWithoutProofs",
             "TestSMTLRABasicNoProofParameterRefusalKeepsOwners"
           ]
+        },
+        {
+          "name": "init_solver bound_propagation frozen initialization versus live propagation_mode callback gates, kernel parameter updates and mk_fresh/current-owner behavior",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_lra.go",
+          "tests": [
+            "TestSMTLRAPropagationModeUpdatesDoNotReinitializeLPTracking",
+            "TestSMTLRAPropagationThresholdUpdateDoesNotEnableLPTracking",
+            "TestSMTLRAKernelParameterUpdatePreservesInitialTracking",
+            "TestSMTLRAFreshCopyInitializesTrackingFromCurrentParameters",
+            "TestSMTLibRunnerLRAPropagationModeUpdatesMatchCPP"
+          ]
         }
       ],
       "ownership": [
@@ -138623,7 +138642,8 @@
         "LP implied-bound traces borrow the active propagator/implied-bound and use the existing LAR printer owners; source ostream badbit continues numerical printing and the propagator closes on success. Fixed-equality evidence is emitted after justification ownership is published and before validation/assignment. The trace-only has_lower_bound call remains inside its enabled trace body, including nested has_bound trace ordering.",
         "Numerical bound creation and inequality-source publication are concrete sequential phases: assert_bound trace observes the new actual LAR constraint before inequality directory/row-stat publication, then add_ineq_constraint prints after metadata publication. Direct numerical callers retain a wrapper that executes both phases. Term traces borrow current LAR terms and print before numeral fixed-cache insertion. Bound batches retain retry ownership after failed computation; trace IO refusal continues real numerical operands.",
         "LRA mk_var now follows the source publication order: append the borrowed enode variable slot, check/extend bound directories, then attach its theory variable to the context. The bounds invariant fails before egraph attachment. A failed attachment retains the slot for Close and stops numerical reuse. Existing other theories retain SMTTheoryBase.CreateVariable semantics. Raw-value assertion gates inspect registered mappings only in checked enabled builds, then use the existing concrete LAR reader. Conflict/fixed/LP evidence passes through the same concrete inequality consumer; direct numerical guard behavior remains explicit.",
-        "LRA numerical conflicts now own the source SMTExtTheoryConflictJustification with original literal premises, empty immediate equality vector and empty parameter vector, registered once in the logical context scope. Basic-bound propagation always constructs Farkas/unit/unit parameters; an external reason retains its own parameter copies even with proof production disabled, while lexical originals and discarded small self-premise lemmas retire their parameters. Scope pop invalidates every retained parameter handle. Failed cold parameter creation publishes no reason and preserves owned-parameter counts."
+        "LRA numerical conflicts now own the source SMTExtTheoryConflictJustification with original literal premises, empty immediate equality vector and empty parameter vector, registered once in the logical context scope. Basic-bound propagation always constructs Farkas/unit/unit parameters; an external reason retains its own parameter copies even with proof production disabled, while lexical originals and discarded small self-premise lemmas retire their parameters. Scope pop invalidates every retained parameter handle. Failed cold parameter creation publishes no reason and preserves owned-parameter counts.",
+        "The existing LAR owner retains its initialization-time BoundPropagation row-tracking flag across ConfigureArithmetic, kernel parameter updates, scopes and new searches. The live arithmetic owner continues to gate basic/LP callbacks. A fresh copied LRA/LAR owner reads the current arithmetic configuration at its own initialization instead of copying the old LP flag; later borrowed owner updates and source Close preserve that fresh frozen setting."
       ],
       "deviations": [
         "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open.",
@@ -138651,7 +138671,8 @@
         "Seven retained registration/sharing trace sites preserve source ordering, including swapped unsorted bound-batch order before threshold sorting, the source reversed lower_t <= / upper_t >= labels, binary clause output before publication, mapped-term reuse silence, and source context scope/parent counts under shared. A large real coefficient forces an actual numeric printer reservation after a refused trace header; its allocation error is propagated and all owners close after lifting the refusal. doc/smt_lra_trace_audit.json accounts for all51 source TRACE/CTRACE sites:42 live ports and9 exclusions for unused three-literal mk_clause, constructor-disabled delayed registration and commented-out compound/use-list paths. This trace-only inventory does not prove all algorithms/assertions/owner paths or complete LRA/smtcore/higher engines.",
         "Ten remaining live source SASSERT sites now use actual g3debug and process assertion gates, exact source conditions/locations, and noninteractive throw-capable diagnostic owners in tests. Disabled/native expressions are erased. Duplicate atoms and invalid values/evidence retain Go domain errors outside enabled checked assertions. The old unmapped objective test explicitly disables assertions for its existing domain-error expectation; new enabled checked tests cover the same ObjectiveValue caller and source1027 failure. doc/smt_lra_assertion_audit.json accounts for all27 textual SASSERT occurrences:15 active ports,2 persistent-column checks eliminated by local Go accumulators,9 no-retained-path exclusions and1 commented-out statement. Some predicates are invariants guaranteed by preceding branches, without a fabricated false-path test. Complete source methods/owner/consumer audit and higher engines remain unproven; no whole-unit promotion.",
         "Whole-method/owner audit found and corrected two prior simplifications: using SetTheoryConflict selected the simple rather than extended source justification; checking ProofsEnabled before basic Farkas construction erased source metadata and its destructor lifetime in the external-reason path. Four new tests verify both proof modes, extended antecedent traversal/proof fact, exact three-parameter ownership and retirement, preserved native self-premise tautology, and an actual physical parameter-frontier refusal. Checked validation lazily creates persistent declaration-plugin parameters; its tautology is warmed before exact owner censuses without weakening the +3/return-to-baseline assertions. Full retained-method/owner/consumer review and complete LRA/smtcore/higher engines remain open; no whole-unit promotion.",
-        "Additional end-to-end evidence only:192 deterministic SMT-LIB scripts,48 rational and48 UF/rational cases through each default and explicit smt tactic route, agree with prebuilt C++ on SAT/UNSAT/SAT and both initial/post-pop full-conjunction model checks. Each base has an independently constructed rational witness; child lower bounds contradict a sum upper bound. Four permanent input files exercised on both routes add8 regression cases, checking the original conjunction and its negation before push and after pop. Concrete models may differ; no algorithm or whole-unit status changed, and this bounded corpus does not prove complete LRA/smtcore/higher engines."
+        "Additional end-to-end evidence only:192 deterministic SMT-LIB scripts,48 rational and48 UF/rational cases through each default and explicit smt tactic route, agree with prebuilt C++ on SAT/UNSAT/SAT and both initial/post-pop full-conjunction model checks. Each base has an independently constructed rational witness; child lower bounds contradict a sum upper bound. Four permanent input files exercised on both routes add8 regression cases, checking the original conjunction and its negation before push and after pop. Concrete models may differ; no algorithm or whole-unit status changed, and this bounded corpus does not prove complete LRA/smtcore/higher engines.",
+        "Removed the post-initialization ConfigureArithmetic write to LAR.Settings.BoundPropagation: C++ init_solver sets it only once at source291, while smt_solver::updt_params updates the borrowed fparams and context params. Tests cover all9 initial/current modes0/1/2 with actual feasibility/touched-row/implication outcomes, an initially zero threshold, kernel updates/scopes and fresh-copy owner lifetime. The pre-existing zero-threshold test now configures the threshold before registration/initialization, preserving its original initial-flag and disabled-callback assertions. A five-check SMT-LIB mode-switch script matches prebuilt C++. No whole-unit promotion; complete retained-method/owner/consumer review and smtcore/higher engines remain open."
       ]
     },
     {
@@ -138703,7 +138724,9 @@
         "pkg/cmd/g3/test_vectors/lra_scoped_rational_witness_a.smt2",
         "pkg/cmd/g3/test_vectors/lra_scoped_rational_witness_b.smt2",
         "pkg/cmd/g3/test_vectors/lra_scoped_uf_witness_a.smt2",
-        "pkg/cmd/g3/test_vectors/lra_scoped_uf_witness_b.smt2"
+        "pkg/cmd/g3/test_vectors/lra_scoped_uf_witness_b.smt2",
+        "pkg/smtcore/theory_lra_parameter_lifetime_test.go",
+        "pkg/cmd/g3/test_vectors/lra_propagation_mode_updates.smt2"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -138817,7 +138840,12 @@
         "TestSMTLRABasicExternalReasonKeepsFarkasWithoutProofs",
         "TestSMTLRABasicTautologyRetiresParametersWithoutProofs",
         "TestSMTLRABasicNoProofParameterRefusalKeepsOwners",
-        "TestSMTLibRunnerLRAScopedRationalAndUFModelOracles"
+        "TestSMTLibRunnerLRAScopedRationalAndUFModelOracles",
+        "TestSMTLRAPropagationModeUpdatesDoNotReinitializeLPTracking",
+        "TestSMTLRAPropagationThresholdUpdateDoesNotEnableLPTracking",
+        "TestSMTLRAKernelParameterUpdatePreservesInitialTracking",
+        "TestSMTLRAFreshCopyInitializesTrackingFromCurrentParameters",
+        "TestSMTLibRunnerLRAPropagationModeUpdatesMatchCPP"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -138867,6 +138895,18 @@
             "TestSMTLRABasicTautologyRetiresParametersWithoutProofs",
             "TestSMTLRABasicNoProofParameterRefusalKeepsOwners"
           ]
+        },
+        {
+          "name": "init_solver bound_propagation frozen initialization versus live propagation_mode callback gates, kernel parameter updates and mk_fresh/current-owner behavior",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_lra.go",
+          "tests": [
+            "TestSMTLRAPropagationModeUpdatesDoNotReinitializeLPTracking",
+            "TestSMTLRAPropagationThresholdUpdateDoesNotEnableLPTracking",
+            "TestSMTLRAKernelParameterUpdatePreservesInitialTracking",
+            "TestSMTLRAFreshCopyInitializesTrackingFromCurrentParameters",
+            "TestSMTLibRunnerLRAPropagationModeUpdatesMatchCPP"
+          ]
         }
       ],
       "ownership": [
@@ -138887,7 +138927,8 @@
         "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created.",
         "Diagnostic output borrows AST heads/parameters and existing solver/cache owners. Rational parameter insertion uses the retained numeral service; Go character/formatting slices acquire no fictitious charged source owner. Exact writer prefixes, nil/closed guards and successful cleanup are checked. Cached term display can insert zero-valued missing proper columns, matching source.",
         "LRA mk_var now follows the source publication order: append the borrowed enode variable slot, check/extend bound directories, then attach its theory variable to the context. The bounds invariant fails before egraph attachment. A failed attachment retains the slot for Close and stops numerical reuse. Existing other theories retain SMTTheoryBase.CreateVariable semantics. Raw-value assertion gates inspect registered mappings only in checked enabled builds, then use the existing concrete LAR reader. Conflict/fixed/LP evidence passes through the same concrete inequality consumer; direct numerical guard behavior remains explicit.",
-        "LRA numerical conflicts now own the source SMTExtTheoryConflictJustification with original literal premises, empty immediate equality vector and empty parameter vector, registered once in the logical context scope. Basic-bound propagation always constructs Farkas/unit/unit parameters; an external reason retains its own parameter copies even with proof production disabled, while lexical originals and discarded small self-premise lemmas retire their parameters. Scope pop invalidates every retained parameter handle. Failed cold parameter creation publishes no reason and preserves owned-parameter counts."
+        "LRA numerical conflicts now own the source SMTExtTheoryConflictJustification with original literal premises, empty immediate equality vector and empty parameter vector, registered once in the logical context scope. Basic-bound propagation always constructs Farkas/unit/unit parameters; an external reason retains its own parameter copies even with proof production disabled, while lexical originals and discarded small self-premise lemmas retire their parameters. Scope pop invalidates every retained parameter handle. Failed cold parameter creation publishes no reason and preserves owned-parameter counts.",
+        "The existing LAR owner retains its initialization-time BoundPropagation row-tracking flag across ConfigureArithmetic, kernel parameter updates, scopes and new searches. The live arithmetic owner continues to gate basic/LP callbacks. A fresh copied LRA/LAR owner reads the current arithmetic configuration at its own initialization instead of copying the old LP flag; later borrowed owner updates and source Close preserve that fresh frozen setting."
       ],
       "deviations": [
         "The retained setup selects the shared exact Go linear solver for QF_LRA and QF_UFLRA.",
@@ -138909,7 +138950,8 @@
         "Removed two superseded aggregate method records: the historical theory_arith_linear platform-replacement mapping predates the actual LAR frontend, and unported theory_opt callbacks predates the audited objective implementation. Current bounded method entries already document those ports. Whole LRA status/audit flags remain unchanged. Added lifecycle traces preserve source cache effects, native erasure and duplicated candidate equality lines; remaining trace sites and complete retained-source audit remain open.",
         "Ten remaining live source SASSERT sites now use actual g3debug and process assertion gates, exact source conditions/locations, and noninteractive throw-capable diagnostic owners in tests. Disabled/native expressions are erased. Duplicate atoms and invalid values/evidence retain Go domain errors outside enabled checked assertions. The old unmapped objective test explicitly disables assertions for its existing domain-error expectation; new enabled checked tests cover the same ObjectiveValue caller and source1027 failure. doc/smt_lra_assertion_audit.json accounts for all27 textual SASSERT occurrences:15 active ports,2 persistent-column checks eliminated by local Go accumulators,9 no-retained-path exclusions and1 commented-out statement. Some predicates are invariants guaranteed by preceding branches, without a fabricated false-path test. Complete source methods/owner/consumer audit and higher engines remain unproven; no whole-unit promotion.",
         "Whole-method/owner audit found and corrected two prior simplifications: using SetTheoryConflict selected the simple rather than extended source justification; checking ProofsEnabled before basic Farkas construction erased source metadata and its destructor lifetime in the external-reason path. Four new tests verify both proof modes, extended antecedent traversal/proof fact, exact three-parameter ownership and retirement, preserved native self-premise tautology, and an actual physical parameter-frontier refusal. Checked validation lazily creates persistent declaration-plugin parameters; its tautology is warmed before exact owner censuses without weakening the +3/return-to-baseline assertions. Full retained-method/owner/consumer review and complete LRA/smtcore/higher engines remain open; no whole-unit promotion.",
-        "Additional end-to-end evidence only:192 deterministic SMT-LIB scripts,48 rational and48 UF/rational cases through each default and explicit smt tactic route, agree with prebuilt C++ on SAT/UNSAT/SAT and both initial/post-pop full-conjunction model checks. Each base has an independently constructed rational witness; child lower bounds contradict a sum upper bound. Four permanent input files exercised on both routes add8 regression cases, checking the original conjunction and its negation before push and after pop. Concrete models may differ; no algorithm or whole-unit status changed, and this bounded corpus does not prove complete LRA/smtcore/higher engines."
+        "Additional end-to-end evidence only:192 deterministic SMT-LIB scripts,48 rational and48 UF/rational cases through each default and explicit smt tactic route, agree with prebuilt C++ on SAT/UNSAT/SAT and both initial/post-pop full-conjunction model checks. Each base has an independently constructed rational witness; child lower bounds contradict a sum upper bound. Four permanent input files exercised on both routes add8 regression cases, checking the original conjunction and its negation before push and after pop. Concrete models may differ; no algorithm or whole-unit status changed, and this bounded corpus does not prove complete LRA/smtcore/higher engines.",
+        "Removed the post-initialization ConfigureArithmetic write to LAR.Settings.BoundPropagation: C++ init_solver sets it only once at source291, while smt_solver::updt_params updates the borrowed fparams and context params. Tests cover all9 initial/current modes0/1/2 with actual feasibility/touched-row/implication outcomes, an initially zero threshold, kernel updates/scopes and fresh-copy owner lifetime. The pre-existing zero-threshold test now configures the threshold before registration/initialization, preserving its original initial-flag and disabled-callback assertions. A five-check SMT-LIB mode-switch script matches prebuilt C++. No whole-unit promotion; complete retained-method/owner/consumer review and smtcore/higher engines remain open."
       ]
     },
     {

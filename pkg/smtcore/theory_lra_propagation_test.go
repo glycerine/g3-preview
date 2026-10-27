@@ -336,15 +336,12 @@ func TestSMTLRAPropagationConflictThresholdSurvivesPop(t *testing.T) {
 }
 
 func TestSMTLRAPropagationZeroThresholdDisablesBasicAndLP(t *testing.T) {
-	f := newLRAFrontendFixture(t, true)
+	f := newLRAFrontendFixtureWithPropagation(t, true, 2, 0)
 	target := prepareLRALPPropagation(t, f)
 	x, err := f.m.GetArg(target, 0)
 	astTestMust(t, err)
 	strong := f.app(smtArithOpGE, x, f.number(4))
 	astTestMust(t, f.s.Internalize(strong, true))
-	config := f.a.config
-	config.PropagationThreshold = 0
-	astTestMust(t, f.a.ConfigureArithmetic(config))
 	if f.a.numeric.solver.Settings.BoundPropagation {
 		t.Fatal("initial LP setting ignored zero propagation threshold")
 	}

@@ -169,10 +169,10 @@ func (t *SMTLRATheory) ConfigureArithmetic(config SMTArithState) error {
 		// binary-bound writer selects the QF_RDL backend.
 		return ast.ErrASTDomain
 	}
+	// Source init_solver sets the LP row-tracking flag once. Live arithmetic
+	// changes gate callbacks through propagation_mode; they do not reconfigure
+	// an existing LAR solver or recreate rows that were never tracked.
 	t.config = config
-	if t.numeric != nil {
-		t.numeric.solver.Settings.BoundPropagation = t.propagationEnabled()
-	}
 	return nil
 }
 

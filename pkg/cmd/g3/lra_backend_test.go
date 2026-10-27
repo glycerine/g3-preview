@@ -120,3 +120,24 @@ func TestSMTLibRunnerConcreteLRADefaultSelection(t *testing.T) {
 		})
 	}
 }
+
+func TestSMTLibRunnerLRAPropagationModeUpdatesMatchCPP(t *testing.T) {
+	script, err := os.ReadFile("test_vectors/lra_propagation_mode_updates.smt2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	const want = "sat unsat sat sat sat"
+	var output bytes.Buffer
+	if err = run(bytes.NewReader(script), &output); err != nil || canonicalOutput(output.String()) != want {
+		t.Fatal("Go live propagation modes", err, output.String())
+	}
+	if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+		cmd := exec.Command(reference, "-in")
+		cmd.Stdin = bytes.NewReader(script)
+		var stdout, stderr bytes.Buffer
+		cmd.Stdout, cmd.Stderr = &stdout, &stderr
+		if err = cmd.Run(); err != nil || stderr.Len() != 0 || canonicalOutput(stdout.String()) != want {
+			t.Fatal("C++ live propagation modes", err, stdout.String(), stderr.String())
+		}
+	}
+}

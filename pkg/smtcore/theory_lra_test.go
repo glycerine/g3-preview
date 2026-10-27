@@ -18,6 +18,11 @@ type lraFrontendFixture struct {
 
 func newLRAFrontendFixture(t *testing.T, reflect bool) *lraFrontendFixture {
 	t.Helper()
+	return newLRAFrontendFixtureWithPropagation(t, reflect, 2, ^uint32(0))
+}
+
+func newLRAFrontendFixtureWithPropagation(t *testing.T, reflect bool, mode, threshold uint32) *lraFrontendFixture {
+	t.Helper()
 	m := astTestManager(t)
 	family, err := m.RegisterArithmeticPlugin()
 	astTestMust(t, err)
@@ -26,6 +31,8 @@ func newLRAFrontendFixture(t *testing.T, reflect bool) *lraFrontendFixture {
 	astTestMust(t, err)
 	config := a.config
 	config.Reflect = reflect
+	config.BoundProp = mode
+	config.PropagationThreshold = threshold
 	astTestMust(t, a.ConfigureArithmetic(config))
 	astTestMust(t, s.RegisterTheory(a))
 	sort, err := m.MkFamilySort(family, 0, nil)
