@@ -66,7 +66,7 @@ func fpaDisplayFixture(t *testing.T) (*ast.ASTManager, *SMTInternalizerState, *S
 }
 
 func TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables(t *testing.T) {
-	_, s, fp, _, want := fpaDisplayFixture(t)
+	m, s, fp, terms, want := fpaDisplayFixture(t)
 	var out bytes.Buffer
 	astTestMust(t, fp.Display(&out))
 	if out.String() != want {
@@ -74,9 +74,26 @@ func TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables(t *testing.T) {
 	}
 	out.Reset()
 	astTestMust(t, s.DisplayTheories(&out))
-	if out.String() != want {
-		t.Fatal("context omitted FPA display", out.String(), want)
+	contextWant := fpaFixtureBVDisplayExpected(t, m, terms[3]) + want
+	if out.String() != contextWant {
+		t.Fatal("context theory composition", out.String(), contextWant)
 	}
+}
+
+// This fixture has one independent three-bit BV variable, registered before
+// the FPA owner. Source display_theories invokes both concrete printers.
+func fpaFixtureBVDisplayExpected(t *testing.T, m *ast.ASTManager, word ast.ASTHandle) string {
+	t.Helper()
+	id, err := m.GetASTID(word)
+	astTestMust(t, err)
+	var bits [3]uint32
+	for i := range bits {
+		bit, err := m.MkBitVectorBit2Bool(uint32(i), word)
+		astTestMust(t, err)
+		bits[i], err = m.GetASTID(bit)
+		astTestMust(t, err)
+	}
+	return fmt.Sprintf("Theory bv:\nv%-4d #%-4d -> #%-4d, bits: #%d #%d #%d\natoms:\n#%d -> #%d[0]\n#%d -> #%d[1]\n#%d -> #%d[2]\n", 0, id, id, bits[0], bits[1], bits[2], bits[0], id, bits[1], id, bits[2], id)
 }
 
 type theoryDisplayFlushWriter struct {
@@ -126,6 +143,7 @@ func TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability(t *testing.T) {
 
 func TestSMTFPADisplayMergeRootAndScopeRollback(t *testing.T) {
 	m, s, fp, terms, base := fpaDisplayFixture(t)
+	contextBase := fpaFixtureBVDisplayExpected(t, m, terms[3]) + base
 	astTestMust(t, s.PushScope())
 	astTestMust(t, s.addEquality(s.context.enodes[terms[0]], s.context.enodes[terms[1]], NewSMTEqualityAxiom()))
 	extra, err := m.MkConst(astTestSymbol(t, m, "scoped-fpa"), mustFPASort(t, m, terms[0]))
@@ -151,8 +169,8 @@ func TestSMTFPADisplayMergeRootAndScopeRollback(t *testing.T) {
 	astTestMust(t, s.PopScopes(1))
 	out.Reset()
 	astTestMust(t, s.DisplayTheories(&out))
-	if out.String() != base {
-		t.Fatal("FPA display rollback", out.String(), base)
+	if out.String() != contextBase {
+		t.Fatal("FPA display rollback", out.String(), contextBase)
 	}
 }
 

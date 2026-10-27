@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"bv_private_propagation_scopes.smt2":           "sat\n((b0 true)\n (b1 true)\n (b2 true)\n (b3 true)\n (b4 true)\n ((= x #xf) true)\n ((= y #xf) true))\nunsat\nsat\nsat\n((b0 false)\n (b1 false)\n (b2 false)\n (b3 false)\n (b4 false)\n ((= x #x0) true)\n ((= y #x0) true))\nsat\n",
 	"bv_bit_occurrences_scopes.smt2":               "sat\n(((= ((_ extract 0 0) x) #b1) true)\n ((= ((_ extract 2 2) x) #b1) true)\n ((= ((_ extract 3 3) x) (bvnot ((_ extract 1 1) x))) true))\nsat\n(((= x #x7) true)\n ((= y #x8) true))\nsat\n(((= x #xd) true)\n ((= y #x2) true))\nunsat\nsat\n",
 	"basic_infinite_arithmetic.smt2":               "sat\n(((>= i 0) true)\n ((<= i 2) true)\n ((> r 0) true)\n ((< r (/ 1.0 3.0)) true)\n ((distinct (f r) (f (/ 1.0 2.0))) true))\nunsat\n(real_conflict)\nsat\nunsat\n(integer_conflict)\nsat\nsat\n(((= (* r r) (/ 1.0 16.0)) true))\nsat\n",
 	"reset_assertions_default.smt2":                "success\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsuccess\nsat\nsuccess\nsuccess\nsat\n((x 3))\n",

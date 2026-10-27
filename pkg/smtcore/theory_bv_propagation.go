@@ -1,0 +1,248 @@
+// Source: src/smt/theory_bv.cpp:330-351,1163-1281,1383-1457.
+package smtcore
+
+import (
+	"errors"
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
+)
+
+// Source expand_diseq's e1/e2/diff expr_refs survive recursive
+// internalization even when that visit drains the shared circuit temporaries.
+func (t *SMTBitVectorTheory) internalizeBitDifference(left, right SMTLiteral) (result SMTLiteral, resultErr error) {
+	s, err := t.State()
+	if err != nil {
+		return SMTNullLiteral, err
+	}
+	first, err := s.literalExpression(left)
+	if err != nil {
+		return SMTNullLiteral, err
+	}
+	firstRoot, err := s.manager.NewRef(first)
+	if err != nil {
+		return SMTNullLiteral, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, s.manager.DelRef(&firstRoot)) }()
+	second, err := s.literalExpression(right)
+	if err != nil {
+		return SMTNullLiteral, err
+	}
+	secondRoot, err := s.manager.NewRef(second)
+	if err != nil {
+		return SMTNullLiteral, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, s.manager.DelRef(&secondRoot)) }()
+	difference, err := t.boolXor(first, second)
+	if err != nil {
+		return SMTNullLiteral, err
+	}
+	differenceRoot, err := s.manager.NewRef(difference)
+	if err != nil {
+		return SMTNullLiteral, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, s.manager.DelRef(&differenceRoot)) }()
+	if err = s.Internalize(difference, true); err != nil {
+		return SMTNullLiteral, err
+	}
+	return s.Literal(difference)
+}
+
+func (t *SMTBitVectorTheory) findWatchedPosition(variable SMTTheoryVar) error {
+	if variable < 0 || int(variable) >= len(t.bitLiterals) {
+		return ast.ErrASTDomain
+	}
+	bits := t.bitLiterals[variable]
+	initial := t.watchedPosition[variable]
+	for ; uint64(t.watchedPosition[variable]) < uint64(len(bits)); t.watchedPosition[variable]++ {
+		value, err := t.state.Assignment(bits[t.watchedPosition[variable]])
+		if err != nil {
+			return err
+		}
+		if value == lbool.Undef {
+			return nil
+		}
+	}
+	t.watchedPosition[variable] = 0
+	for ; t.watchedPosition[variable] < initial; t.watchedPosition[variable]++ {
+		if uint64(t.watchedPosition[variable]) >= uint64(len(bits)) {
+			return ast.ErrASTDomain
+		}
+		value, err := t.state.Assignment(bits[t.watchedPosition[variable]])
+		if err != nil {
+			return err
+		}
+		if value == lbool.Undef {
+			return nil
+		}
+	}
+	// The watched-position scan is native. The existing fixed-value consumer
+	// remains pending the separate fixed_var_table/fixed_eq_justification port.
+	return t.discoverFixedEqualities()
+}
+
+func (t *SMTBitVectorTheory) propagateBits() error {
+	s, err := t.State()
+	if err != nil {
+		return err
+	}
+	for i := 0; i < len(t.propagationQueue); i++ {
+		entry := t.propagationQueue[i]
+		v, index := entry.variable, entry.index
+		if v < 0 || int(v) >= len(t.bitLiterals) || uint64(index) >= uint64(len(t.bitLiterals[v])) {
+			return ast.ErrASTDomain
+		}
+		if t.watchedPosition[v] == index {
+			if err = t.findWatchedPosition(v); err != nil {
+				return err
+			}
+		}
+		bit := t.bitLiterals[v][index]
+		value, err := s.Assignment(bit)
+		if err != nil {
+			return err
+		}
+		if value == lbool.Undef {
+			continue
+		}
+		antecedent := bit
+		if value == lbool.False {
+			antecedent = antecedent.Negated()
+		}
+		for other := t.privateNext[v]; other != v; other = t.privateNext[other] {
+			if uint64(index) >= uint64(len(t.bitLiterals[other])) {
+				return ast.ErrASTDomain
+			}
+			consequent := t.bitLiterals[other][index]
+			otherValue, err := s.Assignment(consequent)
+			if err != nil {
+				return err
+			}
+			if value != otherValue {
+				if value == lbool.False {
+					consequent = consequent.Negated()
+				}
+				if err = t.assignBit(consequent, v, other, index, antecedent, false); err != nil {
+					return err
+				}
+				if s.inconsistent {
+					t.propagationQueue = t.propagationQueue[:0]
+					return nil
+				}
+			}
+		}
+	}
+	t.propagationQueue = t.propagationQueue[:0]
+	return nil
+}
+
+func (t *SMTBitVectorTheory) assignBit(consequent SMTLiteral, from, to SMTTheoryVar, index uint32, antecedent SMTLiteral, propagateClass bool) error {
+	t.statistics.bit2core++
+	s, err := t.State()
+	if err != nil {
+		return err
+	}
+	first, err := t.Enode(from)
+	if err != nil {
+		return err
+	}
+	second, err := t.Enode(to)
+	if err != nil {
+		return err
+	}
+	owner := &smtBVBitEqualityJustification{SMTJustificationBase: NewSMTJustificationBase(true), first: first, second: second, theory: t.FamilyID(), consequent: consequent, antecedent: antecedent}
+	wrapped, err := NewSMTBooleanJustification(owner)
+	if err != nil {
+		return err
+	}
+	s.ownedJustifications = append(s.ownedJustifications, owner)
+	if consequent == SMTFalseLiteral {
+		t.statistics.conflicts++
+		s.setBooleanConflict(wrapped, SMTNullLiteral)
+		return nil
+	}
+	if err = s.AssignLiteral(consequent, wrapped); err != nil {
+		return err
+	}
+	equality, err := t.MkEqualityLiteral(first.owner, second.owner, false)
+	if err != nil {
+		return err
+	}
+	if err = s.addTheoryAxiom(t.FamilyID(), []SMTLiteral{consequent.Negated(), antecedent, equality.Negated()}); err != nil {
+		return err
+	}
+	if t.watchedPosition[to] == index {
+		if err = t.findWatchedPosition(to); err != nil {
+			return err
+		}
+	}
+	entries, exists := t.bitAtoms[consequent.Var()]
+	if !exists {
+		return ast.ErrASTDomain
+	}
+	for i := len(entries) - 1; i >= 0; i-- {
+		entry := entries[i]
+		entryRoot, err := t.privateRoot(entry.variable)
+		if err != nil {
+			return err
+		}
+		targetRoot, err := t.privateRoot(to)
+		if err != nil {
+			return err
+		}
+		if propagateClass || entryRoot != targetRoot || entry.index != index {
+			t.propagationQueue = append(t.propagationQueue, entry)
+		}
+	}
+	return nil
+}
+
+func (t *SMTBitVectorTheory) mergeBitClasses(root, child, first, second SMTTheoryVar) error {
+	consistent, err := t.mergeZeroOneBits(root, child)
+	if err != nil || !consistent {
+		return err
+	}
+	t.propagationQueue = t.propagationQueue[:0]
+	if len(t.bitLiterals[first]) != len(t.bitLiterals[second]) {
+		return ast.ErrASTDomain
+	}
+	s := t.state
+	for {
+		changed := false
+		for index := 0; index < len(t.bitLiterals[first]); index++ {
+			bit1, bit2 := t.bitLiterals[first][index], t.bitLiterals[second][index]
+			value1, err := s.Assignment(bit1)
+			if err != nil {
+				return err
+			}
+			value2, err := s.Assignment(bit2)
+			if err != nil {
+				return err
+			}
+			if value1 == value2 {
+				continue
+			}
+			changed = true
+			if value1 != lbool.Undef {
+				if value1 == lbool.False {
+					bit1, bit2 = bit1.Negated(), bit2.Negated()
+				}
+				err = t.assignBit(bit2, first, second, uint32(index), bit1, true)
+			} else if value2 != lbool.Undef {
+				if value2 == lbool.False {
+					bit1, bit2 = bit1.Negated(), bit2.Negated()
+				}
+				err = t.assignBit(bit1, second, first, uint32(index), bit2, true)
+			}
+			if err != nil {
+				return err
+			}
+			if s.inconsistent {
+				return nil
+			}
+		}
+		if !changed {
+			break
+		}
+	}
+	return t.propagateBits()
+}

@@ -176,33 +176,16 @@ func TestSMTBitVectorAdditionCircuit(t *testing.T) {
 	if status != lbool.False {
 		t.Fatal("BV addition circuit", status)
 	}
-	stats := statistics.New()
-	astTestMust(t, solver.CollectStatistics(stats))
-	found := false
-	for i := 0; i < stats.Size(); i++ {
-		if stats.Key(i) == "bv dynamic eqs" {
-			found = stats.IsUint(i) && stats.UintValue(i) != 0
-		}
-	}
-	if !found {
-		t.Fatal("missing BV equality statistics")
-	}
-	var beforeReset uint32
-	for i := 0; i < stats.Size(); i++ {
-		if stats.Key(i) == "bv dynamic eqs" {
-			beforeReset = stats.UintValue(i)
-		}
-	}
+	// Source statistics omit zero contributions. This solver fixture may
+	// finish by congruence/disequality before native bit propagation runs.
+	name, err := m.Symbols.Intern("bv")
+	astTestMust(t, err)
+	family, err := m.FamilyIDForSymbol(name)
+	astTestMust(t, err)
+	theory := solver.kernel.internalizer.theories[family].(*SMTBitVectorTheory)
+	beforeReset := theory.statistics
 	astTestMust(t, solver.kernel.ResetStatistics())
-	stats.Reset()
-	astTestMust(t, solver.CollectStatistics(stats))
-	found = false
-	for i := 0; i < stats.Size(); i++ {
-		if stats.Key(i) == "bv dynamic eqs" {
-			found = stats.IsUint(i) && stats.UintValue(i) == beforeReset
-		}
-	}
-	if !found {
+	if theory.statistics != beforeReset {
 		t.Fatal("source no-op reset changed BV statistics")
 	}
 }
@@ -382,7 +365,7 @@ func TestSMTBitVectorDiscoversFixedEquality(t *testing.T) {
 	}
 }
 
-func TestSMTBitVectorExpandsNewEquality(t *testing.T) {
+func TestSMTBitVectorMergesNativeClasses(t *testing.T) {
 	m, family, solver := smtBVSolver(t)
 	family, err := m.RegisterBitVectorPlugin()
 	astTestMust(t, err)
@@ -404,8 +387,16 @@ func TestSMTBitVectorExpandsNewEquality(t *testing.T) {
 	}
 	before := len(state.Clauses())
 	astTestMust(t, theory.NewEquality(leftNode.TheoryVar(family), rightNode.TheoryVar(family)))
-	if len(state.Clauses()) <= before || theory.statistics.eqDynamic == 0 {
-		t.Fatal("new equality did not publish bit equivalence", before, len(state.Clauses()), theory.statistics.eqDynamic)
+	leftVar, rightVar := leftNode.TheoryVar(family), rightNode.TheoryVar(family)
+	leftRoot, err := theory.privateRoot(leftVar)
+	astTestMust(t, err)
+	rightRoot, err := theory.privateRoot(rightVar)
+	astTestMust(t, err)
+	if leftRoot != rightRoot || theory.privateNext[leftVar] != rightVar || theory.privateNext[rightVar] != leftVar {
+		t.Fatal("new equality did not merge native BV classes")
+	}
+	if len(state.Clauses()) != before || theory.statistics.eqDynamic != 0 {
+		t.Fatal("source unassigned merge should not invent a bit-equivalence expansion", before, len(state.Clauses()), theory.statistics.eqDynamic)
 	}
 }
 

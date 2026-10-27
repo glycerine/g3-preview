@@ -22,7 +22,7 @@ const (
 
 type smtBVScope struct {
 	bits, lazyBridges, fixedEqualities int
-	atoms, occurrences                 int
+	atoms, occurrences, private        int
 	unsupported                        bool
 }
 
@@ -43,6 +43,14 @@ type SMTBitVectorTheory struct {
 	bitAtomTrail       []int32
 	bitOccurrenceTrail []smtBVBitOccurrenceTrail
 	bitLiterals        [][]SMTLiteral
+	privateFind        []SMTTheoryVar
+	privateSize        []uint32
+	privateNext        []SMTTheoryVar
+	privateTrail       []smtBVPrivateTrail
+	zeroOneBits        [][]smtBVZeroOneBit
+	mergeAux           [2][]SMTTheoryVar
+	watchedPosition    []uint32
+	propagationQueue   []smtBVBitOccurrence
 	bitOwners          map[ast.ASTHandle]ast.ASTRef
 	bitTrail           []ast.ASTHandle
 	lazyBridges        map[ast.ASTHandle]ast.ASTRef
@@ -1489,63 +1497,17 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	}
 	// Source init_bits calls find_wpos immediately. All bits may already be
 	// fixed when a new compound term reuses an existing circuit.
-	if err = t.discoverFixedEqualities(); err != nil {
+	if err = t.findWatchedPosition(state.context.enodes[expression].TheoryVar(t.FamilyID())); err != nil {
 		return false, err
 	}
 	return true, nil
 }
 
-func (t *SMTBitVectorTheory) InternalizeEquality(expression ast.ASTHandle, variable int32) error {
-	state, err := t.State()
-	if err != nil {
-		return err
-	}
-	left, err := state.manager.GetArg(expression, 0)
-	if err != nil {
-		return err
-	}
-	right, err := state.manager.GetArg(expression, 1)
-	if err != nil {
-		return err
-	}
-	leftBits, err := t.bitsFor(left)
-	if err != nil {
-		return err
-	}
-	rightBits, err := t.bitsFor(right)
-	if err != nil || len(leftBits) != len(rightBits) {
-		if err != nil {
-			return err
-		}
-		return ast.ErrASTDomain
-	}
-	equalities := make([]ast.ASTHandle, len(leftBits))
-	for i := range equalities {
-		equalities[i], err = state.manager.MkIff(leftBits[i], rightBits[i])
-		if err != nil {
-			return err
-		}
-	}
-	definition, err := state.manager.MkAndArgs(equalities)
-	if err != nil {
-		return err
-	}
-	if err = state.Internalize(definition, true); err != nil {
-		return err
-	}
-	defined, err := state.Literal(definition)
-	if err != nil {
-		return err
-	}
-	literal := NewSMTLiteral(variable, false)
-	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal.Negated(), defined}); err != nil {
-		return err
-	}
-	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()}); err != nil {
-		return err
-	}
-	t.statistics.eqDynamic++
-	return nil
+// Source theory_bv inherits the base no-op internalize_eq_eh.
+// Native class merging and bit propagation handle asserted equalities.
+func (t *SMTBitVectorTheory) InternalizeEquality(_ ast.ASTHandle, _ int32) error {
+	_, err := t.State()
+	return err
 }
 
 func (t *SMTBitVectorTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHandle) error {
@@ -1627,16 +1589,10 @@ func (t *SMTBitVectorTheory) Relevant(expression ast.ASTHandle) error {
 }
 
 func (t *SMTBitVectorTheory) NewEquality(left, right SMTTheoryVar) error {
-	leftNode, err := t.Enode(left)
-	if err != nil {
+	if _, err := t.State(); err != nil {
 		return err
 	}
-	rightNode, err := t.Enode(right)
-	if err != nil {
-		return err
-	}
-	_, err = t.MkEqualityLiteral(leftNode.owner, rightNode.owner, true)
-	return err
+	return t.mergePrivateClasses(left, right)
 }
 
 func (t *SMTBitVectorTheory) NewDisequality(left, right SMTTheoryVar) error {
@@ -1648,40 +1604,32 @@ func (t *SMTBitVectorTheory) NewDisequality(left, right SMTTheoryVar) error {
 	if err != nil {
 		return err
 	}
-	leftBits, err := t.bitsFor(leftNode.owner)
+	state, err := t.State()
 	if err != nil {
 		return err
 	}
-	rightBits, err := t.bitsFor(rightNode.owner)
-	if err != nil || len(leftBits) == 0 || len(leftBits) != len(rightBits) {
-		if err != nil {
-			return err
-		}
+	isBV, err := state.manager.IsBitVector(leftNode.owner)
+	if err != nil || !isBV {
+		return err
+	}
+	leftBits, rightBits := t.bitLiterals[left], t.bitLiterals[right]
+	if len(leftBits) == 0 || len(leftBits) != len(rightBits) {
 		return ast.ErrASTDomain
 	}
-	state, _ := t.State()
-	differences := make([]ast.ASTHandle, len(leftBits))
-	for i := range differences {
-		differences[i], err = t.boolXor(leftBits[i], rightBits[i])
+	equality, err := t.MkEqualityLiteral(leftNode.owner, rightNode.owner, true)
+	if err != nil {
+		return err
+	}
+	for i := range leftBits {
+		if leftBits[i] == rightBits[i].Negated() {
+			return nil
+		}
+	}
+	clause := []SMTLiteral{equality}
+	for i := range leftBits {
+		literal, err := t.internalizeBitDifference(leftBits[i], rightBits[i])
 		if err != nil {
 			return errors.Join(err, t.releaseTemporary())
-		}
-	}
-	if err = t.retainTemporary(differences); err != nil {
-		return errors.Join(err, t.releaseTemporary())
-	}
-	clause := make([]SMTLiteral, 1, len(differences)+1)
-	clause[0], err = t.MkEqualityLiteral(leftNode.owner, rightNode.owner, true)
-	if err != nil {
-		return errors.Join(err, t.releaseTemporary())
-	}
-	for _, difference := range differences {
-		if err = state.Internalize(difference, true); err != nil {
-			return errors.Join(err, t.releaseTemporary())
-		}
-		literal, literalErr := state.Literal(difference)
-		if literalErr != nil {
-			return errors.Join(literalErr, t.releaseTemporary())
 		}
 		clause = append(clause, literal)
 	}
@@ -1742,34 +1690,19 @@ func (t *SMTBitVectorTheory) fixedAssignment(bits []ast.ASTHandle) (*big.Int, []
 	return value, antecedents, true, nil
 }
 
-func (t *SMTBitVectorTheory) Assign(variable int32, _ bool) (result error) {
-	if t.discoveringFixed {
-		return nil
-	}
-	_, err := t.State()
-	if err != nil {
+func (t *SMTBitVectorTheory) Assign(variable int32, _ bool) error {
+	if _, err := t.State(); err != nil {
 		return err
 	}
-	completed := false
-	occurrences := t.bitAtoms[variable]
-	for i := len(occurrences) - 1; i >= 0; i-- {
-		node, err := t.Enode(occurrences[i].variable)
-		if err != nil {
-			return err
-		}
-		_, _, fixed, fixedErr := t.fixedAssignment(t.bits[node.owner])
-		if fixedErr != nil {
-			return fmt.Errorf("bit-vector completion check for %d: %w", node.owner.Slot(), fixedErr)
-		}
-		if fixed {
-			completed = true
-			break
-		}
-	}
-	if !completed {
+	entries, exists := t.bitAtoms[variable]
+	if !exists {
 		return nil
 	}
-	return t.discoverFixedEqualities()
+	t.propagationQueue = t.propagationQueue[:0]
+	for i := len(entries) - 1; i >= 0; i-- {
+		t.propagationQueue = append(t.propagationQueue, entries[i])
+	}
+	return t.propagateBits()
 }
 
 func (t *SMTBitVectorTheory) discoverFixedEqualities() error {
@@ -1847,7 +1780,7 @@ func (t *SMTBitVectorTheory) PushScope() error {
 	}
 	t.scopes = append(t.scopes, smtBVScope{
 		bits: len(t.bitTrail), lazyBridges: len(t.lazyBridgeTrail),
-		atoms: len(t.bitAtomTrail), occurrences: len(t.bitOccurrenceTrail),
+		atoms: len(t.bitAtomTrail), occurrences: len(t.bitOccurrenceTrail), private: len(t.privateTrail),
 		fixedEqualities: len(t.fixedTrail), unsupported: t.unsupported,
 	})
 	return nil
@@ -1863,7 +1796,7 @@ func (t *SMTBitVectorTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
-	if err = t.restoreBitOccurrences(scope); err != nil {
+	if err = t.restorePrivateTrail(scope); err != nil {
 		return err
 	}
 	for _, expression := range t.bitTrail[scope.bits:] {
@@ -1896,6 +1829,8 @@ func (t *SMTBitVectorTheory) PopScopes(count uint32) error {
 		return err
 	}
 	t.bitLiterals = t.bitLiterals[:len(t.variables)]
+	t.watchedPosition = t.watchedPosition[:len(t.variables)]
+	t.zeroOneBits = t.zeroOneBits[:len(t.variables)]
 	return nil
 }
 
@@ -1945,6 +1880,9 @@ func (t *SMTBitVectorTheory) Close() (result error) {
 	t.bitAtomTrail = nil
 	t.bitOccurrenceTrail = nil
 	t.bitLiterals = nil
+	t.privateFind, t.privateNext, t.privateSize = nil, nil, nil
+	t.privateTrail, t.zeroOneBits, t.watchedPosition, t.propagationQueue = nil, nil, nil, nil
+	t.mergeAux = [2][]SMTTheoryVar{}
 	t.fixedEqualities = nil
 	t.fixedTrail = nil
 	for expression, owner := range t.lazyBridges {

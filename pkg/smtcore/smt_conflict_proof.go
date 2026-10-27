@@ -334,6 +334,8 @@ func (b *smtConflictProofBuilder) objectProof(object SMTJustification) (ast.ASTH
 	switch value := object.(type) {
 	case *SMTJustificationProofWrapper:
 		proof, err = value.Proof()
+	case *smtBVBitEqualityJustification:
+		proof, err = b.bvBitEqualityProof(value)
 	case *smtDynamicAckJustification:
 		proof, err = b.dynamicAckProof(value)
 	case *SMTUnitResolutionJustification:

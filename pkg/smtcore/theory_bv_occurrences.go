@@ -23,7 +23,13 @@ func (t *SMTBitVectorTheory) CreateVariable(node *SMTEnode) (SMTTheoryVar, error
 	if err != nil {
 		return variable, err
 	}
+	t.privateFind = append(t.privateFind, variable)
+	t.privateSize = append(t.privateSize, 1)
+	t.privateNext = append(t.privateNext, variable)
+	t.privateTrail = append(t.privateTrail, smtBVPrivateTrail{kind: smtBVNewVariable})
 	t.bitLiterals = append(t.bitLiterals, nil)
+	t.watchedPosition = append(t.watchedPosition, 0)
+	t.zeroOneBits = append(t.zeroOneBits, nil)
 	return variable, nil
 }
 
@@ -45,9 +51,11 @@ func (t *SMTBitVectorTheory) addBitOccurrence(boolean int32, variable SMTTheoryV
 	if !exists {
 		t.bitAtoms[boolean] = nil
 		t.bitAtomTrail = append(t.bitAtomTrail, boolean)
+		t.privateTrail = append(t.privateTrail, smtBVPrivateTrail{kind: smtBVNewAtom, boolean: boolean})
 	}
 	t.bitAtoms[boolean] = append(occurrences, smtBVBitOccurrence{variable, index})
 	t.bitOccurrenceTrail = append(t.bitOccurrenceTrail, smtBVBitOccurrenceTrail{boolean})
+	t.privateTrail = append(t.privateTrail, smtBVPrivateTrail{kind: smtBVNewOccurrence, boolean: boolean})
 	return nil
 }
 
@@ -77,6 +85,10 @@ func (t *SMTBitVectorTheory) registerBitLiteral(expression ast.ASTHandle, index 
 		return ast.ErrASTDomain
 	}
 	t.bitLiterals[variable] = append(bits, literal)
+	if literal.Var() == SMTTrueBoolVar {
+		t.zeroOneBits[variable] = append(t.zeroOneBits[variable], smtBVZeroOneBit{variable: variable, index: index, isTrue: literal == SMTTrueLiteral})
+		return nil
+	}
 	if literal.Var() != SMTTrueBoolVar {
 		data, err := s.BooleanData(literal.Var())
 		if err != nil {
@@ -94,26 +106,6 @@ func (t *SMTBitVectorTheory) registerBitLiteral(expression ast.ASTHandle, index 
 		}
 	}
 	return t.addBitOccurrence(literal.Var(), variable, index)
-}
-
-func (t *SMTBitVectorTheory) restoreBitOccurrences(scope smtBVScope) error {
-	if scope.occurrences < 0 || scope.occurrences > len(t.bitOccurrenceTrail) || scope.atoms < 0 || scope.atoms > len(t.bitAtomTrail) {
-		return ast.ErrASTDomain
-	}
-	for i := len(t.bitOccurrenceTrail) - 1; i >= scope.occurrences; i-- {
-		boolean := t.bitOccurrenceTrail[i].boolean
-		entries := t.bitAtoms[boolean]
-		if len(entries) == 0 {
-			return ast.ErrASTDomain
-		}
-		t.bitAtoms[boolean] = entries[:len(entries)-1]
-	}
-	t.bitOccurrenceTrail = t.bitOccurrenceTrail[:scope.occurrences]
-	for _, boolean := range t.bitAtomTrail[scope.atoms:] {
-		delete(t.bitAtoms, boolean)
-	}
-	t.bitAtomTrail = t.bitAtomTrail[:scope.atoms]
-	return nil
 }
 
 // Source display_atoms orders bit atoms by Boolean variable, while each atom
@@ -326,22 +318,42 @@ func (t *SMTBitVectorTheory) findNewBitDisequalities(variable SMTTheoryVar, inde
 		if width != otherWidth {
 			continue
 		}
-		t.statistics.diseqStatic++
-		equality, err := t.MkEqualityLiteral(node.owner, other.owner, true)
+		if err = t.newStaticBitDisequality(variable, entry.variable, index); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Source mk_new_diseq_axiom is also called by constant-summary merging.
+func (t *SMTBitVectorTheory) newStaticBitDisequality(left, right SMTTheoryVar, index uint32) error {
+	s, err := t.State()
+	if err != nil {
+		return err
+	}
+	node, err := t.Enode(left)
+	if err != nil {
+		return err
+	}
+	other, err := t.Enode(right)
+	if err != nil {
+		return err
+	}
+	t.statistics.diseqStatic++
+	equality, err := t.MkEqualityLiteral(node.owner, other.owner, true)
+	if err != nil {
+		return err
+	}
+	if err = s.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated()}); err != nil {
+		return err
+	}
+	if s.relevancy != nil && s.relevancy.enabled {
+		expression, err := s.BoolExpression(equality.Var())
 		if err != nil {
 			return err
 		}
-		if err = s.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated()}); err != nil {
+		if err = s.relevancy.AddPairDependency(node.owner, other.owner, expression); err != nil {
 			return err
-		}
-		if s.relevancy != nil && s.relevancy.enabled {
-			expression, err := s.BoolExpression(equality.Var())
-			if err != nil {
-				return err
-			}
-			if err = s.relevancy.AddPairDependency(node.owner, other.owner, expression); err != nil {
-				return err
-			}
 		}
 	}
 	return nil

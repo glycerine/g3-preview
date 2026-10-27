@@ -116528,7 +116528,8 @@
         "pkg/smtcore/smt_case_split_factory_test.go",
         "pkg/cmd/g3/test_vectors/queue_factory_fallback_scopes.smt2",
         "pkg/smtcore/smt_case_split_assertions.go",
-        "pkg/smtcore/smt_case_split_assertions_test.go"
+        "pkg/smtcore/smt_case_split_assertions_test.go",
+        "pkg/smtcore/smt_relevancy_retirement_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -116798,7 +116799,8 @@
         "TestSMTCaseSplitSourceAdmissionAndCandidateAssertions",
         "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
         "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
-        "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
+        "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands",
+        "TestSMTRelevancyBaseMarksSurviveScopedInternalization"
       ],
       "conditionals": [
         {
@@ -118842,6 +118844,19 @@
             "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
             "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
           ]
+        },
+        {
+          "name": "pop_scope_core and expression relevancy ownership: enode creation preserves earlier expression marks, while retiring scoped enodes/Boolean variables leaves earlier marks to the relevancy propagator scope; preserves fixed-value argument notifications after BV backtracking",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_relevancy_retirement_test.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go"
+          ],
+          "tests": [
+            "TestSMTRelevancyBaseMarksSurviveScopedInternalization",
+            "TestQFBVTacticCPP"
+          ]
         }
       ],
       "ownership": [
@@ -118880,7 +118895,8 @@
         "Kernel owns one queue for its context lifetime. The queue borrows the actual SMTParams owner and refreshes phase fields only after validating that owner is open and not stopped/running. Parameter updates retain the installed concrete strategy, all heap owners, phase counter/cache-on state and current RNG stream. First component setup, reached by check or user push, reseeds the stream once using the current owner. Search initialization resets only phase_default. Kernel close releases the borrowed queue pointer; existing internalizer owners retain their established close paths.",
         "Internalizer borrows optional queue-specific TraceTags for source consumers, falling back to process tags. Trace emitters retain static source headers and lazy operands. Sticky ostream failure does not prevent later operand evaluation, selected-variable return, secondary-goal reinsertion, goal publication or theory-priority mutation; operand-computation errors still propagate. Explicit theory-priority endl flush precedes the footer flush. Profiles3/5 borrow the manager NumericTextStream for unconditional decide-and-or records; profile4 intentionally omits them. No new trace owner or universal adapter is introduced.",
         "Factory receives the actual borrowed SMTParamsState field, emits its warning before strategy mutation and heap allocation, and leaves that mutation visible even if queue allocation refuses. Source solver full updt_params follows context construction, so requested case_split can be restored without replacing the installed queue. Borrowed nested owners retain fallback mutation; owned copies isolate it from the source owner. Already constructed raw contexts retain their queue when parameter services are later installed. RNG is seeded before warning callbacks and is not restarted after a callback advances it.",
-        "Queue assertions borrow the process DebugContext and obey SourceAssertionsEnabled before evaluating predicates. Failure uses DebugAssertionFailure, retaining bound notification/action behavior instead of a Boolean-only domain substitute. Native/disabled builds retain existing Go bounds/domain safeguards. Queue heads are restored before their source assertions; goal primary/head/current restore before secondary removal/reinsertion, then the secondary queue shrinks before final head assertion. Native index guard protects the source-undefined out-of-range access after an erased/continuing assertion."
+        "Queue assertions borrow the process DebugContext and obey SourceAssertionsEnabled before evaluating predicates. Failure uses DebugAssertionFailure, retaining bound notification/action behavior instead of a Boolean-only domain substitute. Native/disabled builds retain existing Go bounds/domain safeguards. Queue heads are restored before their source assertions; goal primary/head/current restore before secondary removal/reinsertion, then the secondary queue shrinks before final head assertion. Native index guard protects the source-undefined out-of-range access after an erased/continuing assertion.",
+        "Relevancy marks are owned by the relevancy propagator expression scope, independently of enode/Boolean-variable creation scopes. Context retirement removes a mark directly only for a standalone context without a relevancy service; normal solver pop delegates mark removal to that service, preserving any earlier mark on a surviving expression."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -120665,7 +120681,9 @@
         "pkg/smtcore/theory_fpa_display.go",
         "pkg/smtcore/theory_fpa_display_test.go",
         "pkg/smtcore/theory_str_display.go",
-        "pkg/smtcore/theory_str_display_test.go"
+        "pkg/smtcore/theory_str_display_test.go",
+        "pkg/smtcore/theory_bv_display.go",
+        "pkg/smtcore/theory_bv_private_test.go"
       ],
       "tests": [
         "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
@@ -120698,7 +120716,8 @@
         "TestSMTFPADisplayEmptyGateAndGuards",
         "TestSMTFPADisplayColdAllocationRefusalAndRetry",
         "TestSMTStringDisplaySourceLiteralAndContextDispatch",
-        "TestSMTStringDisplayOwnerAndWriterGuards"
+        "TestSMTStringDisplayOwnerAndWriterGuards",
+        "TestSMTBVNativeDisplayUsesPrivateRootsAndActualLiteralVectors"
       ],
       "conditionals": [
         {
@@ -120870,6 +120889,17 @@
           "tests": [
             "TestSMTStringDisplaySourceLiteralAndContextDispatch",
             "TestSMTStringDisplayOwnerAndWriterGuards"
+          ]
+        },
+        {
+          "name": "display_theories dispatches concrete native BV display: actual private roots, signed/constant native bit literals, fixed numeral, indexed atom heads and zero-variable silence",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_display.go",
+            "pkg/smtcore/theory_bv_private_test.go"
+          ],
+          "tests": [
+            "TestSMTBVNativeDisplayUsesPrivateRootsAndActualLiteralVectors"
           ]
         }
       ],
@@ -121749,7 +121779,8 @@
         "pkg/smtcore/smt_internalizer_state_test.go",
         "pkg/smtcore/smt_model_checker.go",
         "pkg/smtcore/smt_model_publication_test.go",
-        "pkg/smtcore/smt_model_checker_instances_test.go"
+        "pkg/smtcore/smt_model_checker_instances_test.go",
+        "pkg/smtcore/smt_relevancy_retirement_test.go"
       ],
       "tests": [
         "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
@@ -121809,7 +121840,8 @@
         "TestSMTTheoryAwareAvailabilityDoesNotConsumeChoice",
         "TestSMTInternalizerNegatedReservedTruthLiterals",
         "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
-        "TestSMTMBQICounterexamplesPublishAfterForcedBaseRestart"
+        "TestSMTMBQICounterexamplesPublishAfterForcedBaseRestart",
+        "TestSMTRelevancyBaseMarksSurviveScopedInternalization"
       ],
       "conditionals": [
         {
@@ -122453,6 +122485,19 @@
             "TestSMTInternalizerNegatedReservedTruthLiterals",
             "TestSMTSolverPublishesAcceptedMBQICandidateWithoutRebuilding",
             "TestSMTMBQICounterexamplesPublishAfterForcedBaseRestart"
+          ]
+        },
+        {
+          "name": "mk_enode preserves expression relevancy already marked before term-context enode creation; gate-context Boolean ownership and later enode scopes stay independent",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_internalizer_state.go",
+            "pkg/smtcore/smt_relevancy_retirement_test.go",
+            "pkg/tactic/smtlogics/qfbv_tactic_test.go"
+          ],
+          "tests": [
+            "TestSMTRelevancyBaseMarksSurviveScopedInternalization",
+            "TestQFBVTacticCPP"
           ]
         }
       ],
@@ -136194,7 +136239,14 @@
         "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
         "pkg/smtcore/theory_bv_occurrences.go",
         "pkg/smtcore/theory_bv_occurrences_test.go",
-        "pkg/cmd/g3/test_vectors/bv_bit_occurrences_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/bv_bit_occurrences_scopes.smt2",
+        "pkg/smtcore/theory_bv_private.go",
+        "pkg/smtcore/theory_bv_propagation.go",
+        "pkg/smtcore/theory_bv_justification.go",
+        "pkg/smtcore/theory_bv_display.go",
+        "pkg/smtcore/theory_bv_private_test.go",
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/cmd/g3/test_vectors/bv_private_propagation_scopes.smt2"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -136207,7 +136259,7 @@
         "TestSMTBitVectorExpandsDynamicDisequality",
         "TestSMTBitVectorPublishesStaticDisequality",
         "TestSMTBitVectorDiscoversFixedEquality",
-        "TestSMTBitVectorExpandsNewEquality",
+        "TestSMTBitVectorMergesNativeClasses",
         "TestSMTBitVectorCongruentTermsPropagateBits",
         "TestSMTBitVectorUnsignedDivisionCircuit",
         "TestSMTBitVectorSignedDivisionCircuits",
@@ -136241,7 +136293,18 @@
         "TestSMTBVBitProjectionOwnerFirstInitializationAndNumeralExpansion",
         "TestSMTBVBitProjectionExistingNumeralCreatesOnlyRequestedAlias",
         "TestSMTBVBitAtomsScopedCreationOnExistingBooleanAndCloseOwners",
-        "TestSMTBVBitProjectionAllocationRefusalScopeRetirement"
+        "TestSMTBVBitProjectionAllocationRefusalScopeRetirement",
+        "TestSMTBVNativeForestSizeTiesCircularOrderAndScopedRetirement",
+        "TestSMTBVNativeMergeRepeatedPropagationAndSourceJustifications",
+        "TestSMTBVNativeConstantSummaryConflictCommitsAndUnmerges",
+        "TestSMTBVNativeAssignUsesClassAndRepeatedPositions",
+        "TestSMTBVNativeMergeCallbackErrorStopsBeforeLink",
+        "TestSMTBVNativeWatchedPositionWrapsAfterPop",
+        "TestSMTBVNativeBitEqualityProofParentsAndConstantAntecedent",
+        "TestSMTBVNativeFalseConsequentConflictAndRollback",
+        "TestSMTBVNativeDisplayUsesPrivateRootsAndActualLiteralVectors",
+        "TestSMTBVNativeDisequalitySkipsComplementaryPositions",
+        "TestSMTBVNativeEqualityInternalizationIsSourceNoop"
       ],
       "conditionals": [
         {
@@ -136631,7 +136694,7 @@
             "TestSMTBitVectorExpandsDynamicDisequality",
             "TestSMTBitVectorPublishesStaticDisequality",
             "TestSMTBitVectorDiscoversFixedEquality",
-            "TestSMTBitVectorExpandsNewEquality",
+            "TestSMTBitVectorMergesNativeClasses",
             "TestSMTBitVectorCongruentTermsPropagateBits"
           ]
         },
@@ -136652,7 +136715,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: display_atoms helper ported; full BV display, native private roots, trace operands and invariant checks remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display is implemented using private roots; TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -136751,6 +136814,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Concrete BV private forest and ordered undo, zero/one class summaries, watched-position scan and propagation queue, repeated pre-link merge propagation, logical-conflict link commit versus callback-error interruption, bv-bit-eq antecedents and equality-first proof construction, inherited no-op internalize_eq_eh, static-disequality early return and native BV display; fixed-value table/justification and diagnostic closure remain pending",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_private.go",
+            "pkg/smtcore/theory_bv_propagation.go",
+            "pkg/smtcore/theory_bv_justification.go",
+            "pkg/smtcore/theory_bv_display.go",
+            "pkg/smtcore/theory_bv_private_test.go",
+            "pkg/smtcore/smt_conflict_proof.go",
+            "pkg/cmd/g3/test_vectors/bv_private_propagation_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMTBVNativeForestSizeTiesCircularOrderAndScopedRetirement",
+            "TestSMTBVNativeMergeRepeatedPropagationAndSourceJustifications",
+            "TestSMTBVNativeConstantSummaryConflictCommitsAndUnmerges",
+            "TestSMTBVNativeAssignUsesClassAndRepeatedPositions",
+            "TestSMTBVNativeMergeCallbackErrorStopsBeforeLink",
+            "TestSMTBVNativeWatchedPositionWrapsAfterPop",
+            "TestSMTBVNativeBitEqualityProofParentsAndConstantAntecedent",
+            "TestSMTBVNativeFalseConsequentConflictAndRollback",
+            "TestSMTBVNativeDisplayUsesPrivateRootsAndActualLiteralVectors",
+            "TestSMTBVNativeDisequalitySkipsComplementaryPositions",
+            "TestSMTBVNativeEqualityInternalizationIsSourceNoop"
+          ]
         }
       ],
       "ownership": [
@@ -136758,11 +136847,12 @@
         "Bit occurrence keys strip Boolean negations to mirror source literal-variable indexing; scoped bit owners retain the indexed atoms until occurrence removal. Compound interpreted terms participate in fixed-value equality discovery.",
         "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs.",
         "Sort-attached symbolic bit vectors retain the normal bitOwners/bitTrail roots before Boolean internalization; failures keep the published prefix owned for solver cleanup and scope restoration.",
-        "Boolean-variable keys and concrete theory-variable/index occurrences borrow native solver IDs. Separate atom-creation and occurrence trails restore heads and erase scoped atom keys before theory-variable truncation, without accessing already-retired core enodes. Existing ASTRef bitOwners retain expression lifetimes. Native signed literal vectors shrink with actual theory variables; Close clears all occurrence/trail owners. Allocation refusal is exercised at a cold 257-bit projection frontier followed by scope retirement and retry."
+        "Boolean-variable keys and concrete theory-variable/index occurrences borrow native solver IDs. Separate atom-creation and occurrence trails restore heads and erase scoped atom keys before theory-variable truncation, without accessing already-retired core enodes. Existing ASTRef bitOwners retain expression lifetimes. Native signed literal vectors shrink with actual theory variables; Close clears all occurrence/trail owners. Allocation refusal is exercised at a cold 257-bit projection frontier followed by scope retirement and retry.",
+        "A concrete SMTTheoryVar forest owns parent/size/circular-next slices and one ordered private trail interleaving variable creation, merges, atom creation and occurrence heads. Callback errors stop before link commit; logical conflict still commits the link. Unmerge restores links before trimming copied zero/one suffixes using private IDs only, never retired enodes. Native bv-bit-eq region justifications borrow scoped enodes; the logical context owns their lifetime and proof dispatch visits equality before a nonconstant antecedent. Disequality e1/e2/diff lexical ASTRefs survive recursive internalization and shared-temporary retirement."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
-        "Whole-unit completion is unproven: the source private BV union-find, zero/one summaries, watched positions, imperative propagation queue, merge/unmerge callbacks and custom bit-equality justifications are still missing. Existing Go SAT clauses and core congruence do not establish source-algorithm fidelity. Full BV display/TRACE/SASSERT consumers remain live and incomplete; no diagnostic helper is classified dead solely because the Go context printer is unfinished.",
+        "Whole-unit completion remains unproven. Native BV private forest/zero-one summaries, watched-position scan, imperative bit propagation, merge/unmerge algorithms, bv-bit-eq antecedents/proof parents and full default-stream display are implemented. The fixed_var_table/fixed_var_eh/add_fixed_eq/fixed_eq_justification paths still use the earlier Go global fixed-value scan and clause approximation; source ordered table lifetime, exact axiom schedule and bv-fixed-eq proof owner remain to port. Retained BV TRACE/SASSERT and specialization-level union-find trace/invariant call sites remain incomplete. Native bit2bool eager alias bridges and broader operator methods still need whole-unit source/ownership closure. Eager equality-internalization expansion is removed: theory_bv inherits the source no-op base callback, while actual core equality events merge private classes.",
         "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
         "The previous Go carry/XOR3 expansion-through-bridge approximation is removed in favor of the actual source gate clauses. A direct weighted-ITE BV model regression, also reached by the new PB encoder, passes; an overlay restoring old BV production code fails that new regression. The comparison atom definition has its own lexical AST reference across recursive internalization and temporary retirement, matching source expr_ref lifetime."
       ]
@@ -136788,7 +136878,14 @@
         "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
         "pkg/smtcore/theory_bv_occurrences.go",
         "pkg/smtcore/theory_bv_occurrences_test.go",
-        "pkg/cmd/g3/test_vectors/bv_bit_occurrences_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/bv_bit_occurrences_scopes.smt2",
+        "pkg/smtcore/theory_bv_private.go",
+        "pkg/smtcore/theory_bv_propagation.go",
+        "pkg/smtcore/theory_bv_justification.go",
+        "pkg/smtcore/theory_bv_display.go",
+        "pkg/smtcore/theory_bv_private_test.go",
+        "pkg/smtcore/smt_conflict_proof.go",
+        "pkg/cmd/g3/test_vectors/bv_private_propagation_scopes.smt2"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -136801,7 +136898,7 @@
         "TestSMTBitVectorExpandsDynamicDisequality",
         "TestSMTBitVectorPublishesStaticDisequality",
         "TestSMTBitVectorDiscoversFixedEquality",
-        "TestSMTBitVectorExpandsNewEquality",
+        "TestSMTBitVectorMergesNativeClasses",
         "TestSMTBitVectorCongruentTermsPropagateBits",
         "TestSMTBitVectorUnsignedDivisionCircuit",
         "TestSMTBitVectorSignedDivisionCircuits",
@@ -136834,7 +136931,18 @@
         "TestSMTBVBitProjectionOwnerFirstInitializationAndNumeralExpansion",
         "TestSMTBVBitProjectionExistingNumeralCreatesOnlyRequestedAlias",
         "TestSMTBVBitAtomsScopedCreationOnExistingBooleanAndCloseOwners",
-        "TestSMTBVBitProjectionAllocationRefusalScopeRetirement"
+        "TestSMTBVBitProjectionAllocationRefusalScopeRetirement",
+        "TestSMTBVNativeForestSizeTiesCircularOrderAndScopedRetirement",
+        "TestSMTBVNativeMergeRepeatedPropagationAndSourceJustifications",
+        "TestSMTBVNativeConstantSummaryConflictCommitsAndUnmerges",
+        "TestSMTBVNativeAssignUsesClassAndRepeatedPositions",
+        "TestSMTBVNativeMergeCallbackErrorStopsBeforeLink",
+        "TestSMTBVNativeWatchedPositionWrapsAfterPop",
+        "TestSMTBVNativeBitEqualityProofParentsAndConstantAntecedent",
+        "TestSMTBVNativeFalseConsequentConflictAndRollback",
+        "TestSMTBVNativeDisplayUsesPrivateRootsAndActualLiteralVectors",
+        "TestSMTBVNativeDisequalitySkipsComplementaryPositions",
+        "TestSMTBVNativeEqualityInternalizationIsSourceNoop"
       ],
       "conditionals": [
         {
@@ -136901,7 +137009,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: display_atoms helper ported; full BV display, native private roots, trace operands and invariant checks remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display is implemented using private roots; TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -136988,6 +137096,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Concrete BV private forest and ordered undo, zero/one class summaries, watched-position scan and propagation queue, repeated pre-link merge propagation, logical-conflict link commit versus callback-error interruption, bv-bit-eq antecedents and equality-first proof construction, inherited no-op internalize_eq_eh, static-disequality early return and native BV display; fixed-value table/justification and diagnostic closure remain pending",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_private.go",
+            "pkg/smtcore/theory_bv_propagation.go",
+            "pkg/smtcore/theory_bv_justification.go",
+            "pkg/smtcore/theory_bv_display.go",
+            "pkg/smtcore/theory_bv_private_test.go",
+            "pkg/smtcore/smt_conflict_proof.go",
+            "pkg/cmd/g3/test_vectors/bv_private_propagation_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMTBVNativeForestSizeTiesCircularOrderAndScopedRetirement",
+            "TestSMTBVNativeMergeRepeatedPropagationAndSourceJustifications",
+            "TestSMTBVNativeConstantSummaryConflictCommitsAndUnmerges",
+            "TestSMTBVNativeAssignUsesClassAndRepeatedPositions",
+            "TestSMTBVNativeMergeCallbackErrorStopsBeforeLink",
+            "TestSMTBVNativeWatchedPositionWrapsAfterPop",
+            "TestSMTBVNativeBitEqualityProofParentsAndConstantAntecedent",
+            "TestSMTBVNativeFalseConsequentConflictAndRollback",
+            "TestSMTBVNativeDisplayUsesPrivateRootsAndActualLiteralVectors",
+            "TestSMTBVNativeDisequalitySkipsComplementaryPositions",
+            "TestSMTBVNativeEqualityInternalizationIsSourceNoop"
+          ]
         }
       ],
       "ownership": [
@@ -136995,11 +137129,12 @@
         "Bit occurrence keys strip Boolean negations to mirror source literal-variable indexing; scoped bit owners retain the indexed atoms until occurrence removal. Compound interpreted terms participate in fixed-value equality discovery.",
         "Bit-vector setup updates existing scalar parameter owners and the registered concrete BV theory before first-boundary internalization. The bit-blaster borrows the existing manager; successful add/subtract calls transfer all owned output and carry AST references into the theory temporary roots, released by its existing reset/close lifetime. Engine failure paths release their own incomplete outputs.",
         "Sort-attached symbolic bit vectors retain the normal bitOwners/bitTrail roots before Boolean internalization; failures keep the published prefix owned for solver cleanup and scope restoration.",
-        "Boolean-variable keys and concrete theory-variable/index occurrences borrow native solver IDs. Separate atom-creation and occurrence trails restore heads and erase scoped atom keys before theory-variable truncation, without accessing already-retired core enodes. Existing ASTRef bitOwners retain expression lifetimes. Native signed literal vectors shrink with actual theory variables; Close clears all occurrence/trail owners. Allocation refusal is exercised at a cold 257-bit projection frontier followed by scope retirement and retry."
+        "Boolean-variable keys and concrete theory-variable/index occurrences borrow native solver IDs. Separate atom-creation and occurrence trails restore heads and erase scoped atom keys before theory-variable truncation, without accessing already-retired core enodes. Existing ASTRef bitOwners retain expression lifetimes. Native signed literal vectors shrink with actual theory variables; Close clears all occurrence/trail owners. Allocation refusal is exercised at a cold 257-bit projection frontier followed by scope retirement and retry.",
+        "A concrete SMTTheoryVar forest owns parent/size/circular-next slices and one ordered private trail interleaving variable creation, merges, atom creation and occurrence heads. Callback errors stop before link commit; logical conflict still commits the link. Unmerge restores links before trimming copied zero/one suffixes using private IDs only, never retired enodes. Native bv-bit-eq region justifications borrow scoped enodes; the logical context owns their lifetime and proof dispatch visits equality before a nonconstant antecedent. Disequality e1/e2/diff lexical ASTRefs survive recursive internalization and shared-temporary retirement."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
-        "Whole-unit completion is unproven: the source private BV union-find, zero/one summaries, watched positions, imperative propagation queue, merge/unmerge callbacks and custom bit-equality justifications are still missing. Existing Go SAT clauses and core congruence do not establish source-algorithm fidelity. Full BV display/TRACE/SASSERT consumers remain live and incomplete; no diagnostic helper is classified dead solely because the Go context printer is unfinished.",
+        "Whole-unit completion remains unproven. Native BV private forest/zero-one summaries, watched-position scan, imperative bit propagation, merge/unmerge algorithms, bv-bit-eq antecedents/proof parents and full default-stream display are implemented. The fixed_var_table/fixed_var_eh/add_fixed_eq/fixed_eq_justification paths still use the earlier Go global fixed-value scan and clause approximation; source ordered table lifetime, exact axiom schedule and bv-fixed-eq proof owner remain to port. Retained BV TRACE/SASSERT and specialization-level union-find trace/invariant call sites remain incomplete. Native bit2bool eager alias bridges and broader operator methods still need whole-unit source/ownership closure. Eager equality-internalization expansion is removed: theory_bv inherits the source no-op base callback, while actual core equality events merge private classes.",
         "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
         "The previous Go carry/XOR3 expansion-through-bridge approximation is removed in favor of the actual source gate clauses. A direct weighted-ITE BV model regression, also reached by the new PB encoder, passes; an overlay restoring old BV production code fails that new regression. The comparison atom definition has its own lexical AST reference across recursive internalization and temporary retirement, matching source expr_ref lifetime."
       ]
