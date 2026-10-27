@@ -257772,14 +257772,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "c6c42ba46302df5c1ff34adec74092941e2271ef",
+    "commit": "1011e705ecedd499721e219ef430013a9e5ac402",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-27T00:57:56.682934+00:00",
-    "completed_utc": "2026-10-27T01:03:14.821478+00:00",
+    "started_utc": "2026-10-27T01:58:19.681908+00:00",
+    "completed_utc": "2026-10-27T02:03:42.468993+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-c6c42ba4.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-c6c42ba4.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-c6c42ba4.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-1011e705.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-1011e705.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-1011e705.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -257795,9 +257795,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 187.951,
+    "lp_seconds": 190.31,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean frozen c6c42ba46302df5c1ff34adec74092941e2271ef, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes public LRA selection, objective/statistics/setup/SMT-LIB integration, context diagnostics/application printers, live conflict evidence traces, lemma writer/file overloads, optional declare-sort arity0 parsing, actual fresh-context validators and SASSERT gates. All corresponding source-unit/API status flags remain unchanged. Native default LP intentionally skips53 exhaustive cases enabled by -short; these passed at unguarded e9906db6. Actual g3checked/g3debug/g3trace checks on seven affected packages pass separately, including source assertion throw/location tests and physical constructor cleanup; no full tagged suite claim. Earlier extra tagged polynomial timeout and documented native C++ post-pop/model/local-optimization limitations remain explicit. Root pkg and graph match snapshot at recording; no complete LRA/smtcore/higher-engine claim."
+    "scope_warning": "Independently verified clean frozen1011e705ecedd499721e219ef430013a9e5ac402, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes the prior LRA lifecycle/optimization/frontend/propagation/fixed-equality trace increments, checked core assertion and concrete context literal printers through1011e705, in addition to the c6c42ba4 checkpoint. Excludes the newer9edff1bd registration-phase split, seven registration/sharing trace sites and51-site trace inventory; seven affected packages for that increment passed native and g3checked/g3debug/g3trace separately. Native default LP intentionally skips53 exhaustive cases enabled by -short; these passed at unguarded e9906db6. No full tagged suite claim. Earlier extra tagged polynomial timeout and documented native C++ post-pop/model/local-optimization limitations remain explicit. No complete LRA/smtcore/higher-engine claim."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
