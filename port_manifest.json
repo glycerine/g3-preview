@@ -261126,14 +261126,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "03a4b2e829b5da21538c54817a5570074ad04a7c",
+    "commit": "6602abfefc1e67ac556e98b4f8b9defd53d94ea2",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-27T12:37:44.077873+00:00",
-    "completed_utc": "2026-10-27T12:41:09.712157+00:00",
+    "started_utc": "2026-10-27T13:38:00.228822+00:00",
+    "completed_utc": "2026-10-27T13:41:28.637955+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-03a4b2e8.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-03a4b2e8.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-03a4b2e8.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-6602abfe.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-6602abfe.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-6602abfe.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -261149,9 +261149,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 17.536,
+    "lp_seconds": 5.323,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean frozen 03a4b2e829b5da21538c54817a5570074ad04a7c, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes forward factory AST-reference release ordering8d510b1e, consumed-token owning cleanup retryfe4e2f4f, and Datalog source trace/max-value assertion/VERIFY/name/display and fresh-owner verification03a4b2e8. Physical cleanup regression separately passes checked/debug with and without trace; it is not a native-build test. Twelve selected packages separately pass native and g3checked/g3debug/g3trace; portfolio has no tests. Datalog focused checks also pass debug-only and trace-only. Eight Datalog semantic controls are rejected; omit205 survives its behavioral probe and is not counted as rejected, with actual205 error-return execution separately covered. No full tagged suite claim. Constructor/representation-map and native destructor failure-prefix contracts, whole value_factory.h/theory_dl.cpp audits, broader BV/FPA diagnostics, full context/plugin composition and smtcore/solver/tactic/CLI/API/higher-engine closure remain incomplete. Native C++ FiniteDomain parser registration is absent; typed FD tests and general CLI comparisons remain distinct evidence. Prior tagged polynomial timeout and characterized native C++ model/local-optimization limitations remain documented. Root production/tests and graph match the snapshot at documentation-only recording; no source-unit/API status or audit flag changes."
+    "scope_warning": "Independently verified clean frozen 6602abfefc1e67ac556e98b4f8b9defd53d94ea2, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes measured LP guards00154ffc, canonical native FPA model reconstruction and first FP/RM SMT-LIB comparison d67af1fe, and source numeric0/1 factory, fresh fatal path and actual width/special-value utilities6602abfe. Nine affected packages separately pass native and g3checked/g3debug/g3trace. Focused public FP callers, debug-only and trace-only checks pass; five model and seven final factory semantic controls are rejected behaviorally. No full tagged suite claim. Shared SomeValues raw-handle versus caller-owned expr_ref outputs, source model input/result TRACE, fallback paths, full native destructor failure prefixes, whole-factory/BV/FPA lifecycle audits, context composition and broad smtcore/solver/tactic/CLI/API/higher-engine completion remain open. Prior tagged polynomial timeout and characterized prebuilt C++ model/local-optimization limitations remain documented. Root production/tests and dependency graph match this snapshot at documentation-only recording; no source-unit/API status or audit flag changes."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
