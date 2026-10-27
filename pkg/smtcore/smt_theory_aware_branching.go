@@ -89,6 +89,9 @@ func (s *SMTInternalizerState) AddTheoryAwareBranchingInfo(variable int32, prior
 	if err := s.ensureTheoryAwareBranching(); err != nil {
 		return err
 	}
+	if err := s.traceTheoryPriority(variable, priority); err != nil {
+		return err
+	}
 	q := s.theoryAwareBranching
 	q.priorities[variable] = priority
 	// Native phase lookup occurs only after next=null_bool_var; successful
@@ -112,6 +115,9 @@ func (q *smtTheoryAwareBranchingQueue) next(frequency float64) (int32, error) {
 		candidate := int32(q.state.random.Next() % uint32(len(q.state.boolExpr)))
 		value, err := q.state.Assignment(NewSMTLiteral(candidate, false))
 		if err != nil {
+			return SMTNullBoolVar, err
+		}
+		if err = q.state.traceRandomSplit(1171, candidate, value); err != nil {
 			return SMTNullBoolVar, err
 		}
 		if value == lbool.Undef {

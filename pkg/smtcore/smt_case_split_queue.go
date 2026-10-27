@@ -286,10 +286,37 @@ func (q *SMTActivityCaseSplitQueue) hasCaseSplit() (bool, error) {
 		}
 		return false, nil
 	}
-	if q.strategy != 6 {
-		variable, _, err := q.NextCaseSplit()
-		return variable != SMTNullBoolVar, err
+
+	if q.strategy == 3 {
+		f := &q.state.relevanceFIFO
+		for _, entries := range [][]ast.ASTHandle{f.first[f.firstHead:], f.second[f.secondHead:]} {
+			for _, expression := range entries {
+				if ok, err := q.relevantCandidateAvailable(expression); err != nil || ok {
+					return ok, err
+				}
+			}
+		}
+		return false, nil
 	}
+	if q.strategy == 5 {
+		f := &q.state.relevanceGoal
+		for _, expression := range f.first[f.head:] {
+			if ok, err := q.relevantCandidateAvailable(expression); err != nil || ok {
+				return ok, err
+			}
+		}
+		indices, err := f.heap.AppendValues(nil)
+		if err != nil {
+			return false, err
+		}
+		for _, index := range indices {
+			if ok, err := q.relevantCandidateAvailable(f.second[index].expression); err != nil || ok {
+				return ok, err
+			}
+		}
+		return false, nil
+	}
+
 	values, err := q.state.theoryAwareBranching.heap.AppendValues(nil)
 	if err != nil {
 		return false, err
@@ -378,11 +405,18 @@ func (q *SMTActivityCaseSplitQueue) randomVariable(frequency float64) (int32, er
 		return SMTNullBoolVar, nil
 	}
 	candidate := int32(q.state.random.Next() % uint32(len(q.state.boolExpr)))
-	if candidate < SMTFirstBoolVar {
-		return SMTNullBoolVar, nil
-	}
 	value, err := q.state.Assignment(NewSMTLiteral(candidate, false))
-	if err != nil || value != lbool.Undef {
+	if err != nil {
+		return SMTNullBoolVar, err
+	}
+	line := 118
+	if q.strategy == 4 {
+		line = 638
+	}
+	if err = q.state.traceRandomSplit(line, candidate, value); err != nil {
+		return SMTNullBoolVar, err
+	}
+	if value != lbool.Undef {
 		return SMTNullBoolVar, err
 	}
 	return candidate, nil
@@ -414,6 +448,12 @@ func (q *SMTActivityCaseSplitQueue) relevantCandidate(expression ast.ASTHandle) 
 		if err != nil || !found {
 			return SMTNullBoolVar, lbool.Undef, false, err
 		}
+		if err = q.traceDecideAndOr(expression, child); err != nil {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
+		if err = q.traceCaseSplitCandidate(expression, child); err != nil {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
 		literal, err := q.state.Literal(child)
 		if err != nil {
 			if err = q.state.Internalize(child, false); err != nil {
@@ -428,9 +468,18 @@ func (q *SMTActivityCaseSplitQueue) relevantCandidate(expression ast.ASTHandle) 
 		if literal.Sign() {
 			phase = lbool.False
 		}
+		if err = q.traceCaseSplitQueue(true); err != nil {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
 		return literal.Var(), phase, true, nil
 	}
 	if internalized && value == lbool.Undef {
+		if err = q.traceCaseSplitCandidate(expression, ast.ASTHandle{}); err != nil {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
+		if err = q.traceCaseSplitQueue(false); err != nil {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
 		return variable, lbool.Undef, true, nil
 	}
 	return SMTNullBoolVar, lbool.Undef, false, nil
@@ -510,4 +559,52 @@ func (s *SMTInternalizerState) expressionGeneration(expression ast.ASTHandle) (u
 		}
 	}
 	return maximum, nil
+}
+
+// Go's final-check progress guard is observational: it must not perform a
+// source decision, advance a cursor/RNG, or emit decision trace records.
+func (q *SMTActivityCaseSplitQueue) relevantCandidateAvailable(expression ast.ASTHandle) (bool, error) {
+	op, basic, err := q.state.basicOperation(expression)
+	if err != nil {
+		return false, err
+	}
+	isOr, isAnd := basic && op == ast.ASTOpOr, basic && op == ast.ASTOpAnd
+	variable, internalized := q.state.BoolVar(expression)
+	if !internalized && !isOr {
+		return false, nil
+	}
+	value := lbool.True
+	if internalized {
+		value, err = q.state.Assignment(NewSMTLiteral(variable, false))
+		if err != nil {
+			return false, err
+		}
+	}
+	if isOr && value == lbool.True || isAnd && value == lbool.False {
+		count, err := q.state.manager.GetNumArgs(expression)
+		if err != nil {
+			return false, err
+		}
+		undefined := false
+		for i := uint32(0); i < count; i++ {
+			child, err := q.state.manager.GetArg(expression, i)
+			if err != nil {
+				return false, err
+			}
+			literal, err := q.state.Literal(child)
+			if err != nil {
+				continue
+			}
+			childValue, err := q.state.Assignment(literal)
+			if err != nil {
+				return false, err
+			}
+			if childValue == value {
+				return false, nil
+			}
+			undefined = undefined || childValue == lbool.Undef
+		}
+		return undefined, nil
+	}
+	return internalized && value == lbool.Undef, nil
 }

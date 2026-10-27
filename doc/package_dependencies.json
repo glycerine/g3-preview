@@ -2593,6 +2593,7 @@
         "smt_bv_lifecycle.go",
         "smt_candidate_validation.go",
         "smt_case_split_queue.go",
+        "smt_case_split_trace.go",
         "smt_cg_table.go",
         "smt_check.go",
         "smt_checker.go",

@@ -122,6 +122,11 @@ func (q *SMTActivityCaseSplitQueue) nextRelevanceGoal() (int32, lbool.LBool, err
 		if err != nil {
 			return SMTNullBoolVar, lbool.Undef, err
 		}
+		if err = q.state.emitCaseSplitTrace("case_split", "next_case_split", 915, func(out io.Writer) error {
+			return smtWriteTheoryText(out, fmt.Sprintf("q %d idx %d\n", len(f.second), index))
+		}); err != nil {
+			return SMTNullBoolVar, lbool.Undef, err
+		}
 		f.second[index].lastDecided = int32(q.state.scopeLevel)
 		v, phase, usable, err := q.relevantCandidate(f.second[index].expression)
 		if err != nil {
@@ -183,6 +188,9 @@ func (s *SMTInternalizerState) relevanceGoalAssigned(literal SMTLiteral) error {
 		return err
 	}
 	if matched {
+		if err = s.traceFoundGoal(expression); err != nil {
+			return err
+		}
 		f.current = expression
 	}
 	return nil

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	uheap "github.com/glycerine/g3/pkg/util/heap"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
@@ -108,6 +109,7 @@ type smtPendingEquality struct {
 }
 
 type SMTInternalizerState struct {
+	queueTrace                 *diagnostic.TraceTags // Borrowed control; nil uses process trace tags.
 	delayedActivity            *uheap.Int
 	activityCacheRetiring      bool
 	cachedActivity             bool
@@ -741,6 +743,9 @@ func (s *SMTInternalizerState) PushScope() error {
 			return err
 		}
 	}
+	if err := s.traceCaseSplitScope(false); err != nil {
+		return err
+	}
 	for index, theory := range s.theoryOrder {
 		if err := theory.PushScope(); err != nil {
 			for undo := index - 1; undo >= 0; undo-- {
@@ -804,6 +809,9 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	s.relevanceActivity.entries = s.relevanceActivity.entries[:scope.relActLimit]
 	s.relevanceActivity.head = scope.relActHead
 	if err := s.relevanceFIFO.restore(scope.relevanceFIFO); err != nil {
+		return err
+	}
+	if err := s.traceCaseSplitScope(true); err != nil {
 		return err
 	}
 	if err := s.undoTheoryCaseSplits(scope.theoryCaseSplitLimit); err != nil {
