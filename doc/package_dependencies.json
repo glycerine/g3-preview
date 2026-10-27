@@ -768,6 +768,7 @@
         "dl_rewriter.go",
         "elim_bounds.go",
         "enum2bv_expr_scope.go",
+        "enum2bv_quantifier_scope.go",
         "enum2bv_rewriter.go",
         "expr_free_vars.go",
         "expr_replacer.go",

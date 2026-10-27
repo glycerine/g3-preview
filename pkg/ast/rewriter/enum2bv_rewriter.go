@@ -22,6 +22,7 @@ type enum2BVConfiguration struct {
 	DefaultConfiguration
 	owner   *Enum2BVRewriter
 	utility *ast.DatatypeUtil
+	sorts   []ast.ASTHandle // source rw_cfg::m_sorts borrowed member buffer
 }
 
 type Enum2BVRewriter struct {
@@ -434,82 +435,106 @@ func enum2BVArgumentSlice(arguments ast.AppArguments) ([]ast.ASTHandle, error) {
 	return result, nil
 }
 
-func (c *enum2BVConfiguration) ReduceQuantifier(q, body ast.ASTHandle, patterns, noPatterns ast.AppArguments, out, _ ast.ASTRef) (bool, error) {
+func (c *enum2BVConfiguration) ReduceQuantifier(q, body ast.ASTHandle, patterns, noPatterns ast.AppArguments, out, proof ast.ASTRef) (changed bool, err error) {
 	r := c.owner
 	m := r.manager
+	if err = r.open(); err != nil {
+		return false, err
+	}
+	c.sorts = c.sorts[:0]
+	scope := &enum2BVQuantifierScope{manager: m}
+	defer r.finishQuantifier(scope, &err)
 	count, err := m.GetNumDeclarations(q)
 	if err != nil {
 		return false, err
 	}
-	sorts := make([]ast.ASTHandle, count)
-	names := make([]usymbol.Symbol, count)
-	var bounds []ast.ASTHandle
 	found := false
 	for i := uint32(0); i < count; i++ {
-		sort, e := m.GetDeclarationSort(q, i)
-		if e != nil {
-			return false, e
+		sort, err := m.GetDeclarationSort(q, i)
+		if err != nil {
+			return false, err
 		}
-		names[i], e = m.GetDeclarationName(q, i)
-		if e != nil {
-			return false, e
+		finite, err := r.isFinite(sort)
+		if err != nil {
+			return false, err
 		}
-		finite, e := r.isFinite(sort)
-		if e != nil {
-			return false, e
-		}
-		if !finite {
-			sorts[i] = sort
-			continue
-		}
-		found = true
-		constructors, e := m.DatatypeNumConstructors(sort)
-		if e != nil {
-			return false, e
-		}
-		width := enum2BVWidth(constructors)
-		sorts[i], e = m.BitVectorSort(width)
-		if e != nil {
-			return false, e
-		}
-		if !enum2BVPowerOfTwo(constructors) || constructors == 1 {
-			variable, e := m.MkVar(count-i-1, sorts[i])
-			if e != nil {
-				return false, e
+		if finite {
+			nc, err := m.DatatypeNumConstructors(sort)
+			if err != nil {
+				return false, err
 			}
-			upper, e := m.BitVectorNumeralUnsigned(constructors-1, width)
-			if e != nil {
-				return false, e
+			bvSort, err := m.BitVectorSort(enum2BVWidth(nc))
+			if err != nil {
+				return false, err
 			}
-			bound, e := m.MkBitVectorULE(variable, upper)
-			if e != nil {
-				return false, e
+			c.sorts = append(c.sorts, bvSort)
+			nc, err = m.DatatypeNumConstructors(sort)
+			if err != nil {
+				return false, err
 			}
-			bounds = append(bounds, bound)
+			if !enum2BVPowerOfTwo(nc) || nc == 1 {
+				variable, err := m.MkVar(count-i-1, c.sorts[i])
+				if err != nil {
+					return false, err
+				}
+				upper, err := m.BitVectorNumeralUnsigned(nc-1, enum2BVWidth(nc))
+				if err != nil {
+					return false, err
+				}
+				bound, err := m.MkBitVectorULE(variable, upper)
+				if err != nil {
+					return false, err
+				}
+				if err = scope.push(bound); err != nil {
+					return false, err
+				}
+			}
+			found = true
+		} else {
+			c.sorts = append(c.sorts, sort)
 		}
 	}
 	if !found {
 		return false, nil
 	}
+	if err = enum2BVAssign(m, &scope.body, body); err != nil {
+		return false, err
+	}
+	// Source tmp is never assigned and therefore owns no reference record.
 	forall, err := m.IsForall(q)
 	if err != nil {
 		return false, err
 	}
-	newBody := body
-	if len(bounds) != 0 {
+	if len(scope.bounds) != 0 {
 		if forall {
-			condition, e := m.MkAndArray(bounds)
-			if e != nil {
-				return false, e
+			condition, err := m.MkAndArray(scope.values)
+			if err != nil {
+				return false, err
 			}
-			newBody, e = m.MkImplies(condition, body)
-			if e != nil {
-				return false, e
+			old, err := m.RefGet(scope.body)
+			if err != nil {
+				return false, err
+			}
+			value, err := m.MkImplies(condition, old)
+			if err != nil {
+				return false, err
+			}
+			if err = enum2BVAssign(m, &scope.body, value); err != nil {
+				return false, err
 			}
 		} else {
-			bounds = append(bounds, body)
-			newBody, err = m.MkAndArray(bounds)
+			old, err := m.RefGet(scope.body)
 			if err != nil {
+				return false, err
+			}
+			if err = scope.push(old); err != nil {
+				return false, err
+			}
+			value, err := m.MkAndArray(scope.values)
+			if err != nil {
+				return false, err
+			}
+			if err = enum2BVAssign(m, &scope.body, value); err != nil {
 				return false, err
 			}
 		}
@@ -522,6 +547,13 @@ func (c *enum2BVConfiguration) ReduceQuantifier(q, body ast.ASTHandle, patterns,
 	if err != nil {
 		return false, err
 	}
+	names := make([]usymbol.Symbol, count)
+	for i := uint32(0); i < count; i++ {
+		names[i], err = m.GetDeclarationName(q, i)
+		if err != nil {
+			return false, err
+		}
+	}
 	weight, err := m.GetQuantifierWeight(q)
 	if err != nil {
 		return false, err
@@ -530,15 +562,21 @@ func (c *enum2BVConfiguration) ReduceQuantifier(q, body ast.ASTHandle, patterns,
 	if err != nil {
 		return false, err
 	}
-	value, err := m.MkQuantifier(ast.ASTQuantifierSpec{
-		Forall: forall, Sorts: sorts, Names: names, Body: newBody,
-		Weight: weight, QID: qid, SkolemID: skid,
-		Patterns: newPatterns, NoPatterns: newNoPatterns,
-	})
+	newBody, err := m.RefGet(scope.body)
 	if err != nil {
 		return false, err
 	}
-	return true, m.SetRef(out, value)
+	value, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: forall, Sorts: c.sorts, Names: names, Body: newBody, Weight: weight, QID: qid, SkolemID: skid, Patterns: newPatterns, NoPatterns: newNoPatterns})
+	if err != nil {
+		return false, err
+	}
+	if err = m.SetRef(out, value); err != nil {
+		return false, err
+	}
+	if err = m.SetRef(proof, ast.ASTHandle{}); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (r *Enum2BVRewriter) Rewrite(root ast.ASTHandle, out, proof ast.ASTRef) error {
@@ -673,7 +711,9 @@ func (r *Enum2BVRewriter) releaseMembers() error {
 	for len(r.pending) != 0 {
 		p := &r.pending[0]
 		var err error
-		if p.scalar != nil {
+		if p.quantifier != nil {
+			err = p.quantifier.close()
+		} else if p.scalar != nil {
 			err = p.scalar.close()
 		} else {
 			err = p.app.close()
@@ -684,6 +724,8 @@ func (r *Enum2BVRewriter) releaseMembers() error {
 		r.pending = r.pending[1:]
 	}
 
+	// rw_cfg::m_sorts is the last declared derived member.
+	r.config.sorts = nil
 	if r.config.utility != nil {
 		if err := r.config.utility.Close(); err != nil {
 			return err

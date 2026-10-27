@@ -70,8 +70,9 @@ func (s *enum2BVScalarScope) close() error {
 // The only scalar shapes are reduce_args' tmp and reduce_arg's f_def.
 // Queue cleanup in the observed innermost-first unwind order.
 type enum2BVPending struct {
-	app    *enum2BVAppScope
-	scalar *enum2BVScalarScope
+	app        *enum2BVAppScope
+	scalar     *enum2BVScalarScope
+	quantifier *enum2BVQuantifierScope
 }
 
 func (r *Enum2BVRewriter) finishApp(s *enum2BVAppScope, result *error) {
