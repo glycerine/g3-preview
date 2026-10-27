@@ -94,10 +94,8 @@ func TestSMTLRAPropagationTraceNumericalBoundAndRefusedOutput(t *testing.T) {
 				t.Fatal(text)
 			}
 			evidence := text[start:]
-			sumID, err := f.m.GetASTID(sum)
-			astTestMust(t, err)
-			let := fmt.Sprintf("(let ((?x%d (+ trace-implied-x trace-implied-y)))\n(>= ?x%d 5.0))", sumID, sumID)
-			for _, part := range []string{let, "(<= trace-implied-y 2.0)", "\n --> (>= trace-implied-x 3.0)\n", "implied bound\n", " >= 3\nend of implied bound\n"} {
+			// mk_pp uses SMT2 formatting; a single-use sum is printed inline.
+			for _, part := range []string{"(>= (+ trace-implied-x trace-implied-y) 5.0)", "(<= trace-implied-y 2.0)", "\n --> (>= trace-implied-x 3.0)\n", "implied bound\n", " >= 3\nend of implied bound\n"} {
 				if !strings.Contains(evidence, part) {
 					t.Fatal(part, evidence)
 				}

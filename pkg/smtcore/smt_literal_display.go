@@ -33,7 +33,8 @@ func (l SMTLiteral) Display(out io.Writer, manager *ast.ASTManager, expressions 
 	if err != nil {
 		return err
 	}
-	printer, err := ast.NewLegacySMTPrinter(manager)
+	out = smtContextDisplayWriter{out}
+	printer, err := ast.NewSimpleASTPrinterContext(manager, out, out)
 	if err != nil {
 		return err
 	}
@@ -42,7 +43,7 @@ func (l SMTLiteral) Display(out io.Writer, manager *ast.ASTManager, expressions 
 			return err
 		}
 	}
-	if err = printer.DisplayExpr(out, expression, nil); err != nil {
+	if err = printer.DisplayExpr(out, expression, 0); err != nil {
 		return err
 	}
 	if l.Sign() {

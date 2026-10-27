@@ -31,7 +31,7 @@ func TestSMTLiteralASTAwareCompactVerboseAndVectorDisplay(t *testing.T) {
 	}
 	var verbose bytes.Buffer
 	astTestMust(t, DisplaySMTLiteralsVerbose(&verbose, manager, []SMTLiteral{SMTNullLiteral, positive, negative}, expressions, " | "))
-	if verbose.String() != "null | k!24010 | (not k!24010)" {
+	if verbose.String() != "null | k!2401 | (not k!2401)" {
 		t.Fatal("verbose", verbose.String())
 	}
 	negated := NegateSMTLiterals([]SMTLiteral{positive, negative, SMTTrueLiteral})

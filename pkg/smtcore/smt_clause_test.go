@@ -78,7 +78,7 @@ func TestSMTClauseConstructionAtomsActivityDisplayAndClose(t *testing.T) {
 	}
 	var verbose bytes.Buffer
 	astTestMust(t, clause.Display(&verbose, expressions))
-	if verbose.String() != "(clause k!25010 (not k!25020))" {
+	if verbose.String() != "(clause k!2501 (not k!2502))" {
 		t.Fatal("verbose clause", verbose.String())
 	}
 	if !clause.IsWatch(NewSMTLiteral(2, true)) {

@@ -2602,6 +2602,7 @@
         "smt_conflict_levels.go",
         "smt_conflict_proof.go",
         "smt_conflict_resolver.go",
+        "smt_context_display.go",
         "smt_context_invariant.go",
         "smt_context_literal_display.go",
         "smt_context_stat.go",
