@@ -18998,7 +18998,8 @@
         "pkg/tactic/core/reduce_args_tactic_test.go",
         "pkg/tactic/bv/dt2bv_tactic.go",
         "pkg/tactic/bv/dt2bv_tactic_test.go",
-        "pkg/tactic/bv/dt2bv_cpp_test.go"
+        "pkg/tactic/bv/dt2bv_cpp_test.go",
+        "pkg/tactic/arith/bv2real_util.go"
       ],
       "tests": [
         "TestASTExprVisitorSourceCountSharedAndAllMarks",
@@ -19022,7 +19023,8 @@
         "TestDT2BVSMTLIBModelsAndCoresCPP",
         "TestDT2BVModelReconstructionProofsAndDependencies",
         "TestDT2BVClassificationPersistsUntilCleanupAndAppendsGoals",
-        "TestDT2BVApplicationAllocationPrefixes"
+        "TestDT2BVApplicationAllocationPrefixes",
+        "pkg/tactic/arith/bv2real_util_test.go"
       ],
       "conditionals": [
         {
@@ -19090,6 +19092,14 @@
             "TestDT2BVClassificationPersistsUntilCleanupAndAppendsGoals",
             "TestDT2BVApplicationAllocationPrefixes"
           ]
+        },
+        {
+          "name": "bv2real_util contains concrete postorder app/var/quantifier consumer including patterns/no-patterns and shared-only visited state",
+          "status": "partial",
+          "go_target": "pkg/tactic/arith/bv2real_util.go",
+          "tests": [
+            "TestBV2RealUtilContainsQuantifierMetadataAndBorrowedViews"
+          ]
         }
       ],
       "ownership": [
@@ -19102,7 +19112,8 @@
         "Real public AST Close may acknowledge younger lexical marks then stop on an older NUM formatting destructor. Original archived tuples/body/source/first-own causes remain charged and attached after ACK; retries skip the acknowledged leaf without reading later foreign marks. Exact history metadata is refunded only by actual final owning manager storage/header teardown. Current unlisted diagnostics remain in the charged header, and a later call archives source-ended acknowledged diagnostics before overwriting lexical storage. Independent fresh-context ordinal campaigns preserve every original source mark-trail reservation; private child ACK is not represented as enclosing owner end.",
         "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
         "The retained goal NumExprs caller uses GetNumExprsWithVisited with a concrete native map[ASTHandle]bool and native traversal frames while reusing visitExprCore/visitExprProc. Root/shared-node deduplication, postorder argument/body/pattern/no-pattern traversal and associative weight remain. Legacy explicit mark overloads and their stopped source ownership remain separate; no universal callback adapter or generic container is added.",
-        "New retained dt2bv check_fd instantiation is implemented with concrete Go frames and actual ASTFastMark1. Existing counter/skolem checks do not establish all new classification-callback/exception frontiers, so whole-template-unit completion/audit claims remain partial pending that concrete audit; existing bounded method evidence is retained."
+        "New retained dt2bv check_fd instantiation is implemented with concrete Go frames and actual ASTFastMark1. Existing counter/skolem checks do not establish all new classification-callback/exception frontiers, so whole-template-unit completion/audit claims remain partial pending that concrete audit; existing bounded method evidence is retained.",
+        "The retained bv2real contains visitor uses concrete native Go frames and shared-only map visitation, with early registered-encoding exit after children. Tests cover quantifier bodies and annotation-only occurrences. Exact source fast-mark ownership/refusal audit for this added consumer remains open."
       ]
     },
     {
@@ -155881,9 +155892,15 @@
       "path": "src/tactic/arith/bv2real_rewriter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/bv2real_util.go",
+        "pkg/tactic/arith/bv2real_rewriter.go"
+      ],
+      "tests": [
+        "pkg/tactic/arith/bv2real_util_test.go",
+        "pkg/tactic/arith/bv2real_rewriter_test.go"
+      ],
       "assertions": [
         {
           "line": 55,
@@ -155996,17 +156013,58 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "bv2real_util encoding signature cache, defaults, signed arithmetic, divisor alignment/divisibility, matching, reduced interpretation and concrete contains visitor",
+          "status": "partial",
+          "go_target": "pkg/tactic/arith/bv2real_util.go",
+          "tests": [
+            "TestBV2RealUtilDefaultsDeclarationsCacheAndReset",
+            "TestBV2RealUtilSignedArithmeticIndependentOracle",
+            "TestBV2RealUtilRealNumeralMatchAndIntegerRefusal",
+            "TestBV2RealUtilDivisorAlignmentAndRefusalPrefixes",
+            "TestBV2RealUtilMultiplicationWidthLimit",
+            "TestBV2RealUtilReducedPrebuiltCPPOracle",
+            "TestBV2RealUtilContainsQuantifierMetadataAndBorrowedViews",
+            "TestBV2RealUtilWideDefaultsAndOwnerGuards"
+          ]
+        },
+        {
+          "name": "bv2real_rewriter arithmetic, coefficient equality/ITE, comparison approximations, exact other-root comparison, elimination and concrete no-proof traversals",
+          "status": "partial",
+          "go_target": "pkg/tactic/arith/bv2real_rewriter.go",
+          "tests": [
+            "TestBV2RealRewriterArithmeticIndependentCoefficientOracle",
+            "TestBV2RealRewriterRefusalsAndFailedFoldPrefix",
+            "TestBV2RealRewriterEliminationAndArithmeticPrebuiltCPPOracle",
+            "TestBV2RealRewriterEqualityAndConditional",
+            "TestBV2RealRewriterPositivePredicatesAndStrictStatus",
+            "TestBV2RealRewriterComparisonsPrebuiltCPPOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Utility owns auxiliary declarations, comparison declaration member refs, side conditions and three default project numeral values. Reset clears side conditions while retaining declaration caches. Rewriters borrow the utility and own concrete no-proof traversals. Reduction calls retain generated AST references and numeral owners through output handoff; failed local cleanup remains attached for Close retries. Copied and closed owners are rejected. This does not establish exact source lexical expr_ref/rational replacement order or physical cache/vector allocation fidelity."
+      ],
+      "deviations": [
+        "Only the actual retained nla2bv uint default-root/divisor instantiation is exposed; no unused generic adapters or STL are ported. Native Go maps and slices implement signature caches and traversal. Exact big.Rat metadata is used in both caches without duplicating source project-numeral owners for each signature copy; cache ownership/allocation audit remains open.",
+        "Source sqrt(2) comparisons are under-approximations, not equivalences. Tests check both side-condition feasibility and exclusion of incorrect polarity against the prebuilt C++ executable for 72 closed comparisons, plus 18 arithmetic/elimination and 18 signed real interpretation equivalences. No whole-source completion claim follows from these bounded checks.",
+        "Source assertion and TRACE sites remain to be connected. NLA2BV consumer integration, symbolic/quantified reducer campaigns and full source lexical ownership/refusal audit remain open. Whole-unit methods_audited and ownership_audited stay false."
+      ]
     },
     {
       "path": "src/tactic/arith/bv2real_rewriter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/bv2real_util.go",
+        "pkg/tactic/arith/bv2real_rewriter.go"
+      ],
+      "tests": [
+        "pkg/tactic/arith/bv2real_util_test.go",
+        "pkg/tactic/arith/bv2real_rewriter_test.go"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -156019,9 +156077,44 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "bv2real_util encoding signature cache, defaults, signed arithmetic, divisor alignment/divisibility, matching, reduced interpretation and concrete contains visitor",
+          "status": "partial",
+          "go_target": "pkg/tactic/arith/bv2real_util.go",
+          "tests": [
+            "TestBV2RealUtilDefaultsDeclarationsCacheAndReset",
+            "TestBV2RealUtilSignedArithmeticIndependentOracle",
+            "TestBV2RealUtilRealNumeralMatchAndIntegerRefusal",
+            "TestBV2RealUtilDivisorAlignmentAndRefusalPrefixes",
+            "TestBV2RealUtilMultiplicationWidthLimit",
+            "TestBV2RealUtilReducedPrebuiltCPPOracle",
+            "TestBV2RealUtilContainsQuantifierMetadataAndBorrowedViews",
+            "TestBV2RealUtilWideDefaultsAndOwnerGuards"
+          ]
+        },
+        {
+          "name": "bv2real_rewriter arithmetic, coefficient equality/ITE, comparison approximations, exact other-root comparison, elimination and concrete no-proof traversals",
+          "status": "partial",
+          "go_target": "pkg/tactic/arith/bv2real_rewriter.go",
+          "tests": [
+            "TestBV2RealRewriterArithmeticIndependentCoefficientOracle",
+            "TestBV2RealRewriterRefusalsAndFailedFoldPrefix",
+            "TestBV2RealRewriterEliminationAndArithmeticPrebuiltCPPOracle",
+            "TestBV2RealRewriterEqualityAndConditional",
+            "TestBV2RealRewriterPositivePredicatesAndStrictStatus",
+            "TestBV2RealRewriterComparisonsPrebuiltCPPOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Utility owns auxiliary declarations, comparison declaration member refs, side conditions and three default project numeral values. Reset clears side conditions while retaining declaration caches. Rewriters borrow the utility and own concrete no-proof traversals. Reduction calls retain generated AST references and numeral owners through output handoff; failed local cleanup remains attached for Close retries. Copied and closed owners are rejected. This does not establish exact source lexical expr_ref/rational replacement order or physical cache/vector allocation fidelity."
+      ],
+      "deviations": [
+        "Only the actual retained nla2bv uint default-root/divisor instantiation is exposed; no unused generic adapters or STL are ported. Native Go maps and slices implement signature caches and traversal. Exact big.Rat metadata is used in both caches without duplicating source project-numeral owners for each signature copy; cache ownership/allocation audit remains open.",
+        "Source sqrt(2) comparisons are under-approximations, not equivalences. Tests check both side-condition feasibility and exclusion of incorrect polarity against the prebuilt C++ executable for 72 closed comparisons, plus 18 arithmetic/elimination and 18 signed real interpretation equivalences. No whole-source completion claim follows from these bounded checks.",
+        "Source assertion and TRACE sites remain to be connected. NLA2BV consumer integration, symbolic/quantified reducer campaigns and full source lexical ownership/refusal audit remain open. Whole-unit methods_audited and ownership_audited stay false."
+      ]
     },
     {
       "path": "src/tactic/arith/card2bv_tactic.cpp",
