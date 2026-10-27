@@ -118089,7 +118089,9 @@
         "pkg/smtcore/theory_lra_lifecycle_test.go",
         "pkg/smtcore/theory_lra_numeric_reference_test.go",
         "pkg/smtcore/smt_lemma_problem.go",
-        "pkg/smtcore/smt_lemma_problem_test.go"
+        "pkg/smtcore/smt_lemma_problem_test.go",
+        "pkg/smtcore/theory_lra_propagation_trace_test.go",
+        "pkg/smtcore/smt_context_literal_display.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -118251,7 +118253,8 @@
         "TestSMTLemmaProblemPremiseOrderAndConclusionPolarity",
         "TestSMTLemmaProblemEveryWriterPrefixAndGuards",
         "TestSMTLemmaProblemSharedFileSequenceFailuresAndWrap",
-        "TestSMTLemmaProblemPhysicalRootFailures"
+        "TestSMTLemmaProblemPhysicalRootFailures",
+        "TestSMTContextLiteralDisplaysForLRAEvidence"
       ],
       "conditionals": [
         {
@@ -119047,6 +119050,14 @@
             "TestSMTLemmaProblemSharedFileSequenceFailuresAndWrap",
             "TestSMTLemmaProblemPhysicalRootFailures"
           ]
+        },
+        {
+          "name": "context display_literal_verbose/display_literals_verbose and inline display_detailed_literal retained by LRA propagation/fixed equality",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_context_literal_display.go",
+          "tests": [
+            "TestSMTContextLiteralDisplaysForLRAEvidence"
+          ]
         }
       ],
       "ownership": [
@@ -119074,7 +119085,8 @@
         "A concrete LRA axiom call owns its temporary AST references and retains any refused cleanup prefix until theory Close. The context owns internalized Boolean expressions, clauses and relevance watches; the theory additionally pins watch target expressions because the Go relevance registry borrows handles, including temporary NOT targets. Scope pop retires those pins after the relevance scope has been removed, and Close retires remaining watch/pending roots while the AST manager is alive. Eight physical AST-reference-budget samples cover refusal/success and verify zero explicit AST references after context/caller cleanup.",
         "The quantifier manager binds its quick checker to the existing internalizer, which it borrows for the manager lifetime. The typed optional direct-value callback returns an AST expression handle; canonize roots each returned value before querying another argument or rewriting, and clearQuery retires those roots alongside rewritten expressions. Standalone quick-checker SetValue remains available; managed queries use live theory dispatch. LRA reuses the owned Go rational cache and does not initialize a model for this query. Failed numeric owners are refused.",
         "The internalizer borrows the kernel context-parameter reference while the kernel remains alive. A lexical LPParams helper acquires its lp module owner before numerical construction, reads simplex strategy and pivoted-row mode after LAR construction, and closes on success/failure. A refused helper cleanup stays reachable from the theory and is retried by Close before numerical/rational owners. Any failed initialization stops the partial numeric owner. A failed private rational-manager constructor can return a partial integer manager as the error with no rational owner; LRA retains that concrete IntegerManager and closes it before the shared service, including the tagged debug allocator frontiers. Fresh copies own distinct private numeral managers and LAR solvers, borrow only the existing source arithmetic parameter state and read LP settings from destination context/module services. Allocation refusal samples exercise partial construction and final child-owner retirement.",
-        "Lemma problem owns the source current expr_ref and each formula-vector root through output; a refused cleanup remains in internalizer.lemmaProblem and Close retries it before retiring the manager. File streams close on ordinary return and AST errors; both overload shapes share one unsigned counter. File badbit continues source operands and advances the counter, while an AST/owner exception does not. Literal conversion is shared with existing proof/evidence consumers."
+        "Lemma problem owns the source current expr_ref and each formula-vector root through output; a refused cleanup remains in internalizer.lemmaProblem and Close retries it before retiring the manager. File streams close on ordinary return and AST errors; both overload shapes share one unsigned counter. File badbit continues source operands and advances the counter, while an AST/owner exception does not. Literal conversion is shared with existing proof/evidence consumers.",
+        "Concrete context literal printers borrow the internalizer Boolean-expression directory and manager, preserving source newline separators without a trailing separator. Detailed printing delegates to the existing AST-aware literal renderer; no new AST roots, copied Boolean maps or generic display adapter."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
@@ -119097,7 +119109,8 @@
         "Preserve source dispatch: no direct idiv Relevant branch, no nonzero identity for literal-zero division/modulo, signed remainder guards, strict floor upper bound and both is_int implication directions. enum_const_mod defaults false and has no retained writer; its enumeration branch is not ported and true is rejected by the LRA configuration profile. The three-literal mk_axiom overload has no retained LRA call site and is not ported. The concrete LRA backend must participate in the shared arithmetic equality-atom convention; otherwise the generated guard2=0 stays undecided and division remains unconstrained. The direct is_int callback is tested as a clause publisher, while raw assigned unsupported Bool normalization remains a preprocessing prerequisite to audit before public setup. Prebuilt C++ QF_UFLRA is_int examples return unknown, not a claimed integer-solving capability. FinalCheck still returns GiveUp and public setup remains unchanged; remaining callbacks/integration and whole-source completion remain open.",
         "Four concrete regressions cover unavailable proper columns, source term-before-model zero insertion and persistent term caching, fresh proper/term values after explicit invalidation, uninterpreted Real applications dispatched by sort family, unattached/missing-theory/nil boundaries, exact fractional-Int refusal, stopped owner guard, managed quick-checker proof of x+1=3 at x=2 versus an actual queued/materialized counterexample for x+1=4, and distinct explicit roots for both values and the rewritten application with retirement at query cleanup. No synthesized zero is returned for an unavailable proper column and no model initialization is inserted. C++ validate_eq_in_model appears only in declarations/definitions across src, with no retained invocation; its unused LRA override is not ported under the retained-consumer rule. This supersedes its earlier pending-work listing. Source statuses/audit flags remain unchanged; quick-checker units retain their existing ported status while LRA/context remain partial. Public LRA setup selection, LP parameter forwarding, statistics/copy/reset, objective AST callbacks and remaining source/integration audit are still open.",
         "Four new Go regressions plus a prebuilt-C++ oracle cover all four strategies, defaults/module/local/wrong-kind fallback precedence, both pivot modes, initialized settings remaining unchanged after parameter updates, invalid enum refusal, registration rollback/stopped-owner guards, nine physical constructor allocation samples including the two tagged partial-integer-owner cleanup regressions, fresh translated LRA identity and zero copied variables, destination LP overrides, source Close independence and translated scoped SAT/UNSAT/SAT. The installed source LRA is explicit in the lifecycle fixture because public setup still selects the older backend; the fixture marks source setup complete solely so actual copy_plugins/Translate sees that installed plugin. The destination copied plugin survives its normal setup and replays actual assertions. Prebuilt C++ checks all four LP modes and actual LU factorization statistics, omitting model requests covered by the separate known post-pop model-limitation oracle. Invalid native enum states become Go domain errors; standalone internalizer fixtures without parameter services retain source defaults. Source units and context remain partial; all status/audit/API flags and public routing remain unchanged. Source statistics/reset, objective AST callbacks and remaining setup/source/Bool-normalization integration audit remain pending.",
-        "Concrete Go io.Writer and os.File replace ostream/ofstream transport. Direct writer refusals are returned; the file overload retains sticky badbit, finishes operands, closes the file and returns its error while preserving source counter ordering and selected signed %d filename convention. Generated problems contain only optional logic/declarations/assertions, with no added check-sat. Full validator integration remains open; no whole-unit status/audit promotion."
+        "Concrete Go io.Writer and os.File replace ostream/ofstream transport. Direct writer refusals are returned; the file overload retains sticky badbit, finishes operands, closes the file and returns its error while preserving source counter ordering and selected signed %d filename convention. Generated problems contain only optional logic/declarations/assertions, with no added check-sat. Full validator integration remains open; no whole-unit status/audit promotion.",
+        "Previously deferred context literal renderers now have retained Go LRA propagation/fixed-equality callers. Their scalar/vector/detailed paths are ported; remaining broad context/assignment/enode/clause displays and whole-context completeness remain unproven."
       ]
     },
     {
@@ -119367,7 +119380,9 @@
         "pkg/smtcore/smt_lemma_problem.go",
         "pkg/smtcore/smt_lemma_problem_test.go",
         "pkg/parsers/smt2/lemma_problem_test.go",
-        "pkg/smtcore/theory_lra_validate_test.go"
+        "pkg/smtcore/theory_lra_validate_test.go",
+        "pkg/smtcore/theory_lra_propagation_trace_test.go",
+        "pkg/smtcore/smt_context_literal_display.go"
       ],
       "tests": [
         "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
@@ -119378,7 +119393,8 @@
         "TestSMTLemmaProblemEveryWriterPrefixAndGuards",
         "TestSMTLemmaProblemSharedFileSequenceFailuresAndWrap",
         "TestSMTLemmaProblemPhysicalRootFailures",
-        "TestSMTLRAValidatorDumpBadbitAndFailureTrace"
+        "TestSMTLRAValidatorDumpBadbitAndFailureTrace",
+        "TestSMTContextLiteralDisplaysForLRAEvidence"
       ],
       "conditionals": [
         {
@@ -119472,18 +119488,28 @@
           "tests": [
             "TestSMTLRAValidatorDumpBadbitAndFailureTrace"
           ]
+        },
+        {
+          "name": "context display_literal_verbose/display_literals_verbose and inline display_detailed_literal retained by LRA propagation/fixed equality",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_context_literal_display.go",
+          "tests": [
+            "TestSMTContextLiteralDisplaysForLRAEvidence"
+          ]
         }
       ],
       "ownership": [
         "Failure names and reason strings are returned as native Go strings; incomplete-theory objects remain borrowed from the internalizer registry.",
         "Lemma problem owns the source current expr_ref and each formula-vector root through output; a refused cleanup remains in internalizer.lemmaProblem and Close retries it before retiring the manager. File streams close on ordinary return and AST errors; both overload shapes share one unsigned counter. File badbit continues source operands and advances the counter, while an AST/owner exception does not. Literal conversion is shared with existing proof/evidence consumers.",
-        "Fresh LRA validation context owns its kernel and temporary expression root; configured callers borrow the actual parent fparams and copy current context params. Raw internalizers create and own genuine default params/catalog/globals/fparams. Every partial constructor remains in the typed theory.validation owner until Close completes, before parent parameter/numeral retirement. Existing source nested-kernel borrowing is preserved."
+        "Fresh LRA validation context owns its kernel and temporary expression root; configured callers borrow the actual parent fparams and copy current context params. Raw internalizers create and own genuine default params/catalog/globals/fparams. Every partial constructor remains in the typed theory.validation owner until Close completes, before parent parameter/numeral retirement. Existing source nested-kernel borrowing is preserved.",
+        "Concrete context literal printers borrow the internalizer Boolean-expression directory and manager, preserving source newline separators without a trailing separator. Detailed printing delegates to the existing AST-aware literal renderer; no new AST roots, copied Boolean maps or generic display adapter."
       ],
       "deviations": [
         "Theory names are read through the retained optional Name method; unnamed theory implementations preserve the source generic incomplete-theory reason.",
-        "The retained kernel display owns asserted-formula rendering. Remaining context, assignment, enode, clause, statistics and trace renderers have no retained Go caller, so no universal debug-display adapter is added.",
+        "The retained kernel display owns asserted-formula rendering. Concrete context literal renderers are now consumed by LRA propagation/fixed equality; remaining context, assignment, enode, clause and statistics renderers still need retained-consumer audit.",
         "Concrete Go io.Writer and os.File replace ostream/ofstream transport. Direct writer refusals are returned; the file overload retains sticky badbit, finishes operands, closes the file and returns its error while preserving source counter ordering and selected signed %d filename convention. Generated problems contain only optional logic/declarations/assertions, with no added check-sat. Full validator integration remains open; no whole-unit status/audit promotion.",
-        "Source predicate l_true != nctx.check() admits UNKNOWN; no substitute arithmetic checker or silent missing-config skip is used. Generic logic-free context setup follows the native call sites rather than inheriting parent logic. Dump StreamError is reported to direct Go API callers but ignored by native validators, while OperandError propagates. Enabled/disabled/native assertion gates and exact source conditions/locations are checked. Equality/definition background sources are excluded with the constructor-disabled delayed registration path. Remaining trace sites/whole retained-source audit and higher engines remain open; all whole-unit statuses/audit flags unchanged."
+        "Source predicate l_true != nctx.check() admits UNKNOWN; no substitute arithmetic checker or silent missing-config skip is used. Generic logic-free context setup follows the native call sites rather than inheriting parent logic. Dump StreamError is reported to direct Go API callers but ignored by native validators, while OperandError propagates. Enabled/disabled/native assertion gates and exact source conditions/locations are checked. Equality/definition background sources are excluded with the constructor-disabled delayed registration path. Remaining trace sites/whole retained-source audit and higher engines remain open; all whole-unit statuses/audit flags unchanged.",
+        "Previously deferred context literal renderers now have retained Go LRA propagation/fixed-equality callers. Their scalar/vector/detailed paths are ported; remaining broad context/assignment/enode/clause displays and whole-context completeness remain unproven."
       ]
     },
     {
@@ -121838,7 +121864,8 @@
       "go_targets": [
         "pkg/smtcore/smt_literal.go",
         "pkg/smtcore/smt_literal_display.go",
-        "pkg/smtcore/smt_literal_source_test.go"
+        "pkg/smtcore/smt_literal_source_test.go",
+        "pkg/smtcore/theory_lra_propagation_trace_test.go"
       ],
       "tests": [
         "TestSMTLiteralSignedSentinelsAndSourceOperations",
@@ -121846,7 +121873,8 @@
         "TestSMTLiteralSourceStreamSignedNullAndBooleanConstants",
         "TestSMTLiteralSeparateInsertionFlagsAndEveryOutputReservation",
         "TestSMTLiteralASTAwareCompactVerboseAndVectorDisplay",
-        "TestSMTLiteralASTAwareDisplayGuardsAndWriterErrors"
+        "TestSMTLiteralASTAwareDisplayGuardsAndWriterErrors",
+        "TestSMTContextLiteralDisplaysForLRAEvidence"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -121870,13 +121898,23 @@
             "TestSMTLiteralASTAwareCompactVerboseAndVectorDisplay",
             "TestSMTLiteralASTAwareDisplayGuardsAndWriterErrors"
           ]
+        },
+        {
+          "name": "short-write detection for AST-aware literal display and verbose separators consumed by retained LRA context evidence",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_literal_display.go",
+          "tests": [
+            "TestSMTContextLiteralDisplaysForLRAEvidence"
+          ]
         }
       ],
       "ownership": [
-        "Inline four-byte signed literal has no owning payload. Subsumption reads borrowed spans in source order; numeric ostream insertion uses the existing actual stream owner and preserves immediate output/cold graphs at every allocation refusal."
+        "Inline four-byte signed literal has no owning payload. Subsumption reads borrowed spans in source order; numeric ostream insertion uses the existing actual stream owner and preserves immediate output/cold graphs at every allocation refusal.",
+        "Literal printing borrows manager expressions; special literals, negative wrappers and verbose separators use checked Go writes, with no added expression roots. Native trace badbit continuation remains owned by the existing assertedTraceWriter wrapper."
       ],
       "deviations": [
-        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. Go slices replace literal vectors and buffers. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported."
+        "Go zero literal equals source true; source default construction explicitly calls DefaultSMTLiteral. Source signed-constructible variable domain is preserved without claiming C++ signed-overflow behavior. Go slices replace literal vectors and buffers. Source diff_logic literal fixtures are reused; the difference-logic graph test itself is not claimed ported.",
+        "Direct Go literal/context writers return io.ErrShortWrite for zero-progress writes of true/false/null, negation wrappers and verbose separators, matching existing expression-print error handling. Source trace transport still ignores ostream badbit and continues later operands."
       ]
     },
     {
@@ -138121,7 +138159,8 @@
         "pkg/smtcore/theory_lra_axioms_test.go",
         "pkg/smtcore/theory_lra_lifecycle_trace_test.go",
         "pkg/smtcore/theory_lra_objective_trace_test.go",
-        "pkg/smtcore/theory_lra_frontend_trace_test.go"
+        "pkg/smtcore/theory_lra_frontend_trace_test.go",
+        "pkg/smtcore/theory_lra_propagation_trace_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -138250,7 +138289,12 @@
         "TestSMTLRAFrontendTraceRegistrationAssignmentAndScope",
         "TestSMTLRAFrontendTraceEqualityDisequalityAndRelevancy",
         "TestSMTLRAFrontendTraceUnassignedDecrementAndScopeRestore",
-        "TestSMTLRAFrontendTraceLPBoundCounterAndBadbit"
+        "TestSMTLRAFrontendTraceLPBoundCounterAndBadbit",
+        "TestSMTContextLiteralDisplaysForLRAEvidence",
+        "TestSMTLRAPropagationTraceNumericalBoundAndRefusedOutput",
+        "TestSMTLRAPropagationTraceInterestAndConflict",
+        "TestSMTLRAFixedEqualityTraceNestedQueryAndEvidence",
+        "TestSMTLRAPropagationCoreSourceAssertionGate"
       ],
       "conditionals": [
         {
@@ -138483,6 +138527,18 @@
             "TestSMTLRAFrontendTraceUnassignedDecrementAndScopeRestore",
             "TestSMTLRAFrontendTraceLPBoundCounterAndBadbit"
           ]
+        },
+        {
+          "name": "propagation/fixed TRACE1290/1316/1339/1383/1389/1413/1415/1797/2057/2098/2116 and DEBUG_CODE/SASSERT1425",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_lra_propagation.go",
+          "tests": [
+            "TestSMTContextLiteralDisplaysForLRAEvidence",
+            "TestSMTLRAPropagationTraceNumericalBoundAndRefusedOutput",
+            "TestSMTLRAPropagationTraceInterestAndConflict",
+            "TestSMTLRAFixedEqualityTraceNestedQueryAndEvidence",
+            "TestSMTLRAPropagationCoreSourceAssertionGate"
+          ]
         }
       ],
       "ownership": [
@@ -138506,7 +138562,8 @@
         "Fresh LRA validation context owns its kernel and temporary expression root; configured callers borrow the actual parent fparams and copy current context params. Raw internalizers create and own genuine default params/catalog/globals/fparams. Every partial constructor remains in the typed theory.validation owner until Close completes, before parent parameter/numeral retirement. Existing source nested-kernel borrowing is preserved.",
         "Trace control is borrowed and tag-specific. Numeric feasibility now exposes concrete counter/start and solve/sample phases to place source display between them; direct numeric callers preserve their previous operation. Pre-search display can populate zero-column term cache entries and init_model preserves existing term entries after updating proper columns. Display writer refusal keeps later operands alive; operand errors still propagate.",
         "Objective traces borrow the returned blocker/lower-bound handles while printing; callers still pin only after callback return. Final blockers and NOT expressions are not temporarily rooted then destroyed. Existing lexical argument refs and Boolean-internalizer ownership remain unchanged. Ostream refusal preserves return handles, strictness, Boolean registration and actual numerical maximization.",
-        "Frontend traces borrow existing AST expressions without adding final expression roots. Assignment expression lookup and printing occur only inside the enabled trace body. Source counter tracing precedes each update in atom/objective registration and basic/LP propagation; existing context/scope restoration owns the counter trail. No dictionary, solver, equality-adapter or scope owner is replaced."
+        "Frontend traces borrow existing AST expressions without adding final expression roots. Assignment expression lookup and printing occur only inside the enabled trace body. Source counter tracing precedes each update in atom/objective registration and basic/LP propagation; existing context/scope restoration owns the counter trail. No dictionary, solver, equality-adapter or scope owner is replaced.",
+        "LP implied-bound traces borrow the active propagator/implied-bound and use the existing LAR printer owners; source ostream badbit continues numerical printing and the propagator closes on success. Fixed-equality evidence is emitted after justification ownership is published and before validation/assignment. The trace-only has_lower_bound call remains inside its enabled trace body, including nested has_bound trace ordering."
       ],
       "deviations": [
         "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open.",
@@ -138529,7 +138586,8 @@
         "Source predicate l_true != nctx.check() admits UNKNOWN; no substitute arithmetic checker or silent missing-config skip is used. Generic logic-free context setup follows the native call sites rather than inheriting parent logic. Dump StreamError is reported to direct Go API callers but ignored by native validators, while OperandError propagates. Enabled/disabled/native assertion gates and exact source conditions/locations are checked. Equality/definition background sources are excluded with the constructor-disabled delayed registration path. Remaining trace sites/whole retained-source audit and higher engines remain open; all whole-unit statuses/audit flags unchanged.",
         "Removed two superseded aggregate method records: the historical theory_arith_linear platform-replacement mapping predates the actual LAR frontend, and unported theory_opt callbacks predates the audited objective implementation. Current bounded method entries already document those ports. Whole LRA status/audit flags remain unchanged. Added lifecycle traces preserve source cache effects, native erasure and duplicated candidate equality lines; remaining trace sites and complete retained-source audit remain open.",
         "Source optimization output uses numeric_pair::to_string `(main, epsilon)`, not inf_rational formatting; mk_gt reports the rounded comparison numeral separately. Unmapped infinity has no Unbounded trace, while the mapped failed-maximize branch does. First lower-bound registration emits its unnegated base only once, then every call emits the final expression after strict negation. Four sites only; no higher optimizer integration or whole LRA/smtcore completion claim.",
-        "Nine live frontend trace sites preserve source timing: failed atom trace precedes found_not_handled mutation; its Unhandled trace follows marker/underspecified publication. Strict successful atom trace follows bound/Boolean/trail registration and precedes bound axioms. Equality and disequality trace before adapter work, assignment before enqueue, relevancy before operator dispatch, nonzero scope pop after restoration. Native tracing erases operand evaluation, and refused ostream output does not stop callbacks. Dead lazy-path trace sites738/747 remain excluded; whole LRA/smtcore and higher engine completeness remains unproven."
+        "Nine live frontend trace sites preserve source timing: failed atom trace precedes found_not_handled mutation; its Unhandled trace follows marker/underspecified publication. Strict successful atom trace follows bound/Boolean/trail registration and precedes bound axioms. Equality and disequality trace before adapter work, assignment before enqueue, relevancy before operator dispatch, nonzero scope pop after restoration. Native tracing erases operand evaluation, and refused ostream output does not stop callbacks. Dead lazy-path trace sites738/747 remain excluded; whole LRA/smtcore and higher engine completeness remains unproven.",
+        "Source CTRACE1316 reports the cumulative implied-bound count, not its delta; its comparison stays after numerical propagation and cancellation. Actual fixtures cover interest rejection, a derived bound, propagation conflict, basic implication, a numeral fixed merge and nested trace-only term-bound query. The cumulative-count, exhausted-count and stale-implied early-return sites1316/1413/1389 are implemented at source positions without a claim that these conditional branches are forced by the fixtures. Checked core assignment assertions use the real process assertion switch at source1425; native/disabled builds do not look up the core. Other live LRA trace sites and full source/owner/consumer completeness remain open."
       ]
     },
     {

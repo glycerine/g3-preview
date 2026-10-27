@@ -8,6 +8,7 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/lp"
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -77,8 +78,14 @@ type smtLRABoundPropagation struct {
 func (p *smtLRABoundPropagation) BoundIsInteresting(index uint32, kind lp.LConstraintKind, value *numeral.Rational) (bool, error) {
 	t := p.owner
 	v := t.variableForLPIndex(index)
-	if v == SMTNullTheoryVar || int(v) >= len(t.bounds) || t.unassigned[v] == 0 {
+	if v == SMTNullTheoryVar {
 		return false, nil
+	}
+	if int(v) >= len(t.bounds) || t.unassigned[v] == 0 {
+		err := t.emitLRA("bound_is_interesting", 1339, func(out io.Writer) error {
+			return smtWriteTheoryText(out, "return\n")
+		})
+		return false, err
 	}
 	r, err := t.numeric.rational(value)
 	if err != nil {
@@ -123,6 +130,7 @@ func (t *SMTLRATheory) propagateLPBounds() (err error) {
 			t.numeric.stopped = true
 		}
 	}()
+	previousImplied := t.numeric.solver.Settings.Stats.ImpliedBounds
 	hook := &smtLRABoundPropagation{owner: t}
 	t.propagator = t.numeric.solver.NewBoundPropagator()
 	t.propagator.Interest, t.propagator.Evidence = hook, hook
@@ -134,6 +142,14 @@ func (t *SMTLRATheory) propagateLPBounds() (err error) {
 		return err
 	}
 	if !canceled {
+		currentImplied := t.numeric.solver.Settings.Stats.ImpliedBounds
+		if currentImplied > previousImplied {
+			if err = t.emitLRA("propagate_bounds_with_lp_solver", 1316, func(out io.Writer) error {
+				return smtWriteTheoryText(out, fmt.Sprintf("found %d implied bounds\n", currentImplied))
+			}); err != nil {
+				return err
+			}
+		}
 		if t.numeric.solver.Bounds.Status.Value == lp.StatusInfeasible {
 			if err = t.setLRAConflict(); err != nil {
 				return err
@@ -148,7 +164,26 @@ func (t *SMTLRATheory) propagateLPBounds() (err error) {
 					break
 				}
 				v := t.variableForLPIndex(implied.Column)
-				if v == SMTNullTheoryVar || int(v) >= len(t.bounds) || t.unassigned[v] == 0 {
+				if v == SMTNullTheoryVar {
+					continue
+				}
+				if err = t.emitLRA("propagate_lp_solver_bound", 1383, func(out io.Writer) error {
+					kind, err := lp.LConstraintKindString(implied.Kind())
+					if err != nil {
+						return err
+					}
+					r, err := t.numeric.rational(&implied.Bound)
+					if err != nil {
+						return err
+					}
+					return smtWriteTheoryText(out, fmt.Sprintf("v%d %s %s\n", v, kind, r.RatString()))
+				}); err != nil {
+					return err
+				}
+				if int(v) >= len(t.bounds) || t.unassigned[v] == 0 {
+					if err = t.emitLRA("propagate_lp_solver_bound", 1389, func(out io.Writer) error { return smtWriteTheoryText(out, "return\n") }); err != nil {
+						return err
+					}
 					continue
 				}
 				r, err := t.numeric.rational(&implied.Bound)
@@ -176,7 +211,32 @@ func (t *SMTLRATheory) propagateLPBounds() (err error) {
 							return err
 						}
 					}
+					if t.unassigned[v] == 0 {
+						if err = t.emitLRA("propagate_lp_solver_bound", 1413, func(out io.Writer) error { return smtWriteTheoryText(out, "missed bound\n") }); err != nil {
+							return err
+						}
+					}
 					if err = t.updateUnassignedBounds(v, -1); err != nil {
+						return err
+					}
+					if err = t.emitLRA("propagate_lp_solver_bound", 1415, func(out io.Writer) error {
+						if err := t.state.DisplayLiteralsVerbose(out, hook.core); err != nil {
+							return err
+						}
+						if err := smtWriteTheoryText(out, "\n --> "); err != nil {
+							return err
+						}
+						if err := t.state.DisplayLiteralVerbose(out, literal); err != nil {
+							return err
+						}
+						if err := smtWriteTheoryText(out, "\n"); err != nil {
+							return err
+						}
+						return t.numeric.solver.PrintImpliedBound(implied, out)
+					}); err != nil {
+						return err
+					}
+					if err = t.checkLRAPropagationCore(hook.core); err != nil {
 						return err
 					}
 					t.lpPropagations++
@@ -243,6 +303,20 @@ func (t *SMTLRATheory) propagateBasicBound(b *smtLRABound, truth bool) (result e
 		return nil
 	}
 	literal := NewSMTLiteral(nearest.boolean, nearest.upper == findLower)
+	if err := t.emitLRA("propagate_bound", 1797, func(out io.Writer) error {
+		if err := t.state.DisplayLiteralVerbose(out, NewSMTLiteral(b.boolean, !truth)); err != nil {
+			return err
+		}
+		if err := smtWriteTheoryText(out, " => "); err != nil {
+			return err
+		}
+		if err := t.state.DisplayLiteralVerbose(out, literal); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, "\n")
+	}); err != nil {
+		return err
+	}
 	if err := t.updateUnassignedBounds(b.variable, -1); err != nil {
 		return err
 	}
@@ -314,5 +388,28 @@ func (t *SMTLRATheory) assignLRABound(literal SMTLiteral, core []SMTLiteral, par
 		return errors.Join(err, owner.Release(s.manager))
 	}
 	s.ownedJustifications = append(s.ownedJustifications, owner)
+	return nil
+}
+
+// Source DEBUG_CODE/SASSERT at theory_lra.cpp:1424-1425. Neither the
+// assignment lookups nor their failure paths exist in a native build.
+func (t *SMTLRATheory) checkLRAPropagationCore(core []SMTLiteral) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil || !enabled {
+		return err
+	}
+	for _, literal := range core {
+		value, err := t.state.Assignment(literal)
+		if err != nil {
+			return err
+		}
+		if value != lbool.True {
+			return diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 1425, "ctx().get_assignment(lit) == l_true")
+		}
+	}
 	return nil
 }

@@ -704,6 +704,9 @@ func (t *SMTLRATheory) Propagate() error {
 		return err
 	}
 	if status == lbool.False {
+		if err := t.emitLRA("propagate", 1290, func(out io.Writer) error { return smtWriteTheoryText(out, "propagation conflict\n") }); err != nil {
+			return err
+		}
 		return t.setLRAConflict()
 	}
 	if status == lbool.True {

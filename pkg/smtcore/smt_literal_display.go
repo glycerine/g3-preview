@@ -23,14 +23,11 @@ func (l SMTLiteral) Display(out io.Writer, manager *ast.ASTManager, expressions 
 	}
 	switch l {
 	case SMTTrueLiteral:
-		_, err := io.WriteString(out, "true")
-		return err
+		return smtWriteTheoryText(out, "true")
 	case SMTFalseLiteral:
-		_, err := io.WriteString(out, "false")
-		return err
+		return smtWriteTheoryText(out, "false")
 	case SMTNullLiteral:
-		_, err := io.WriteString(out, "null")
-		return err
+		return smtWriteTheoryText(out, "null")
 	}
 	expression, err := smtLiteralExpression(l, expressions)
 	if err != nil {
@@ -41,7 +38,7 @@ func (l SMTLiteral) Display(out io.Writer, manager *ast.ASTManager, expressions 
 		return err
 	}
 	if l.Sign() {
-		if _, err = io.WriteString(out, "(not "); err != nil {
+		if err = smtWriteTheoryText(out, "(not "); err != nil {
 			return err
 		}
 	}
@@ -49,7 +46,7 @@ func (l SMTLiteral) Display(out io.Writer, manager *ast.ASTManager, expressions 
 		return err
 	}
 	if l.Sign() {
-		_, err = io.WriteString(out, ")")
+		err = smtWriteTheoryText(out, ")")
 	}
 	return err
 }
@@ -99,7 +96,7 @@ func DisplaySMTLiteralsCompact(out io.Writer, manager *ast.ASTManager, literals 
 func DisplaySMTLiteralsVerbose(out io.Writer, manager *ast.ASTManager, literals []SMTLiteral, expressions []ast.ASTHandle, separator string) error {
 	for i, literal := range literals {
 		if i != 0 {
-			if _, err := io.WriteString(out, separator); err != nil {
+			if err := smtWriteTheoryText(out, separator); err != nil {
 				return err
 			}
 		}

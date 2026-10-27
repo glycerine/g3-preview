@@ -2,6 +2,8 @@
 package smtcore
 
 import (
+	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -66,6 +68,9 @@ func (t *SMTLRATheory) hasFixedBound(index uint32, value *big.Rat, lower bool) (
 		return t.numeric.hasRationalBound(index, lower, value)
 	}
 	v := t.variableForLPIndex(index)
+	if err := t.emitLRA("has_bound", 2057, func(out io.Writer) error { return smtWriteTheoryText(out, fmt.Sprintf("%d %d\n", index, v)) }); err != nil {
+		return smtLRANoIndex, false, err
+	}
 	if v != SMTNullTheoryVar {
 		n, err := t.Enode(v)
 		if err != nil {
@@ -138,6 +143,34 @@ func (t *SMTLRATheory) fixedVariable(v SMTTheoryVar, value *big.Rat) error {
 	if err != nil {
 		return err
 	}
+	if err = t.emitLRA("fixed_var_eh", 2098, func(out io.Writer) error {
+		if err := smtWriteTheoryText(out, "fixed: "); err != nil {
+			return err
+		}
+		if err := t.displayLRAExpression(out, left.owner); err != nil {
+			return err
+		}
+		if err := smtWriteTheoryText(out, " "); err != nil {
+			return err
+		}
+		if err := t.displayLRAExpression(out, right.owner); err != nil {
+			return err
+		}
+		if err := smtWriteTheoryText(out, " "+value.RatString()+" "); err != nil {
+			return err
+		}
+		_, found, err := t.hasFixedBound(wi, value, true)
+		if err != nil {
+			return err
+		}
+		flag := 0
+		if found {
+			flag = 1
+		}
+		return smtWriteTheoryText(out, fmt.Sprintf("%d\n", flag))
+	}); err != nil {
+		return err
+	}
 	lo2, fixed, err := t.hasFixedBound(wi, value, true)
 	if err != nil || !fixed {
 		return err
@@ -172,6 +205,31 @@ func (t *SMTLRATheory) fixedVariable(v SMTTheoryVar, value *big.Rat) error {
 		return err
 	}
 	t.state.ownedJustifications = append(t.state.ownedJustifications, owner)
+	if err = t.emitLRA("fixed_var_eh", 2116, func(out io.Writer) error {
+		for _, literal := range hook.core {
+			if err := t.state.DisplayDetailedLiteral(out, literal); err != nil {
+				return err
+			}
+			if err := smtWriteTheoryText(out, "\n"); err != nil {
+				return err
+			}
+		}
+		if err := smtWriteTheoryText(out, " ==> "); err != nil {
+			return err
+		}
+		if err := t.displayLRAExpression(out, left.owner); err != nil {
+			return err
+		}
+		if err := smtWriteTheoryText(out, " = "); err != nil {
+			return err
+		}
+		if err := t.displayLRAExpression(out, right.owner); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, "\n")
+	}); err != nil {
+		return err
+	}
 	if err := t.checkValidation(smtLRAValidateEquality, hook.core, SMTFalseLiteral, left, right); err != nil {
 		return err
 	}

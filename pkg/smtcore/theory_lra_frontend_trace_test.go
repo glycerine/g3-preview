@@ -204,7 +204,7 @@ func TestSMTLRAFrontendTraceUnassignedDecrementAndScopeRestore(t *testing.T) {
 		if f.a.unassigned[bound.variable] != before-1 || f.a.basicPropagations != 1 {
 			t.Fatal("basic propagation count")
 		}
-		checkLRAFrontendOutput(t, w, tags, lraObjectiveTraceRecord("arith", "updt_unassigned_bounds", 595, fmt.Sprintf("v%d %d += -1\n", bound.variable, before)))
+		checkLRAFrontendOutput(t, w, tags, lraObjectiveTraceRecord("arith", "propagate_bound", 1797, "(>= trace-counter-x 2.0) => (>= trace-counter-x 1.0)\n")+lraObjectiveTraceRecord("arith", "updt_unassigned_bounds", 595, fmt.Sprintf("v%d %d += -1\n", bound.variable, before)))
 		if tags.ShouldTrace("arith") && !refuse && w.snapshots[595].unassigned != before {
 			t.Fatal("counter trace after decrement")
 		}
