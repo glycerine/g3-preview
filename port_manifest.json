@@ -259628,14 +259628,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "3eafca2cf53aea2df967b7adcd693b7ddb6edb44",
+    "commit": "5ceb7456b7f6ef91e61c6f554617cefd13eb3e8a",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-27T05:45:59.458620+00:00",
-    "completed_utc": "2026-10-27T05:49:36.257754+00:00",
+    "started_utc": "2026-10-27T06:50:26.692493+00:00",
+    "completed_utc": "2026-10-27T06:53:42.949401+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-3eafca2c.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-3eafca2c.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-3eafca2c.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-5ceb7456.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-5ceb7456.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-5ceb7456.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -259651,9 +259651,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 86.181,
+    "lp_seconds": 57.13,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean frozen 3eafca2cf53aea2df967b7adcd693b7ddb6edb44, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes retained equality-adapter/context-display prerequisites, all seven concrete queue algorithms and ownership, queue/phase/RNG lifetime, all24 live queue TRACE sites, factory warning/fparams/RNG/solver-update order and default numeric strategies, and all31 queue SASSERT call-site mappings. Root production/tests and graph match the snapshot at documentation-only recording. This record changes no source unit/API status or audit flag. Default native LP skips102 slow cases enabled by -short;49 newly guarded cases passed an unguarded LP baseline and the prior53 passed the earlier unguarded checkpoint. Seven affected packages separately pass g3checked/g3debug/g3trace; no full tagged suite claim. Prior tagged polynomial timeout and characterized native C++ model/local-optimization limitations remain documented. Comprehensive queue method/owner closure, full context display integration and complete smtcore/solver/tactic/CLI/API/higher-engine closure remain open. Green tests do not establish complete porting."
+    "scope_warning": "Independently verified clean frozen 5ceb7456b7f6ef91e61c6f554617cefd13eb3e8a, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes FPA and string concrete displays, indexed BV bit atoms/literal vectors/scoped head restoration, owner-first bit2bool initialization and per-position static disequalities, plus the registered SMT-LIB regression. Default LP skips146 slow cases enabled by -short; all44 newly guarded cases pass the explicit -short run. Seven affected packages separately pass g3checked/g3debug/g3trace; no full tagged suite claim. FPA and BV source units were corrected to partial when actual retained omissions were identified. Private BV union-find/queues/justifications, full BV and context display and broader smtcore/solver/tactic/CLI/API/higher-engine closure remain incomplete. Prior tagged polynomial timeout and characterized native C++ model/local-optimization limitations remain documented. Root production/tests and graph match the snapshot at documentation-only recording. This record changes no source unit/API status or audit flag. Green tests do not establish complete porting."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
