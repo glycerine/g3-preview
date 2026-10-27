@@ -1,0 +1,6 @@
+(set-option :produce-models true)
+(set-logic ALL)
+(declare-const x Real)
+(assert (= (* x x) 3.0))
+(check-sat-using (then (using-params nla2bv :nla2bv_root 3 :nla2bv_divisor 2 :nla2bv_bv_size 3) simplify bit-blast sat))
+(get-value ((= (* x x) 3.0)))

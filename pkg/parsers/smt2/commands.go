@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/cmd_context"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type commandParser struct {
@@ -38,6 +39,21 @@ func ParseCommands(context *cmd_context.Context, input io.Reader, out io.Writer)
 	if err := context.SetRegularOutput(out); err != nil {
 		return err
 	}
+	// Source gparams is process-wide. During this single-goroutine command
+	// session, lazy AST algebraic owners and printers must see this context's
+	// parameter service. Restore the enclosing session after parser cleanup.
+	globals, err := context.GlobalParameters()
+	if err != nil {
+		return err
+	}
+	previous, err := uparams.BindProcessGlobalParamsService(globals)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_, err := uparams.BindProcessGlobalParamsService(previous)
+		result = errors.Join(result, err)
+	}()
 	compliant, err := context.Compliant()
 	if err != nil {
 		return err

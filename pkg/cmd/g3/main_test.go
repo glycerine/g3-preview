@@ -338,6 +338,10 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"nla2bv_bounded_scopes.smt2":                   "sat\n((x 7))\nunsat\nsat\n((x 7))\n",
+	"nla2bv_under_unknown.smt2":                    "unknown\nsat\n(((= (* x x) 4) true))\n",
+	"nla2bv_real_models.smt2":                      "sat\n(((= (* x x) 2.0) true))\nunknown\nsat\n(((= (* x x) 2.0) true))\n",
+	"nla2bv_root_parameters.smt2":                  "sat\n(((= (* x x) 3.0) true))\n",
 	"fd_weighted_pb.smt2":                          "sat\n((p true) (q true) (r false))\nunsat\nsat\n",
 	"fd_unbounded_unknown.smt2":                    "unknown\n",
 	"fd_wide_offset_model.smt2":                    "sat\n((x 36893488147419103233))\n",

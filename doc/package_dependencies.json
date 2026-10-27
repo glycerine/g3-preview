@@ -3151,6 +3151,8 @@
         "linear_equation.go",
         "linear_equation_debug.go",
         "linear_equation_trace.go",
+        "nla2bv_rules.go",
+        "nla2bv_tactic.go",
         "normalize_bounds_tactic.go",
         "normalize_bounds_trace.go",
         "pb2bv_apply.go",
