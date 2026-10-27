@@ -257902,14 +257902,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "1011e705ecedd499721e219ef430013a9e5ac402",
+    "commit": "cef7cae912a1d09256c2d46148762323222b7983",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-27T01:58:19.681908+00:00",
-    "completed_utc": "2026-10-27T02:03:42.468993+00:00",
+    "started_utc": "2026-10-27T03:06:47.694072+00:00",
+    "completed_utc": "2026-10-27T03:12:05.584473+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-1011e705.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-1011e705.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-1011e705.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-cef7cae9.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-cef7cae9.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-cef7cae9.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -257925,9 +257925,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 190.31,
+    "lp_seconds": 186.789,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean frozen1011e705ecedd499721e219ef430013a9e5ac402, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes the prior LRA lifecycle/optimization/frontend/propagation/fixed-equality trace increments, checked core assertion and concrete context literal printers through1011e705, in addition to the c6c42ba4 checkpoint. Excludes the newer9edff1bd registration-phase split, seven registration/sharing trace sites and51-site trace inventory; seven affected packages for that increment passed native and g3checked/g3debug/g3trace separately. Native default LP intentionally skips53 exhaustive cases enabled by -short; these passed at unguarded e9906db6. No full tagged suite claim. Earlier extra tagged polynomial timeout and documented native C++ post-pop/model/local-optimization limitations remain explicit. No complete LRA/smtcore/higher-engine claim."
+    "scope_warning": "Independently verified clean frozen cef7cae912a1d09256c2d46148762323222b7983, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes all preceding LRA registration traces, trace/assertion inventories, source assertion/variable attachment ordering, extended conflict/basic parameter owners, eight scoped rational/UF model oracles and frozen LP tracking versus live arithmetic modes/fresh-copy behavior through cef7cae9. Root production/tests and graph match this snapshot at documentation-only recording. Source status/audit flags and API operation records are unchanged. Native default LP intentionally skips53 exhaustive cases enabled by -short; these passed at unguarded e9906db6. Seven affected packages passed g3checked/g3debug/g3trace separately; no full tagged suite claim. Earlier extra tagged polynomial timeout and characterized native C++ post-pop/model/local-optimization limitations remain explicit. A live arith_eq_adapter display caller at theory_arith_core.h:1475 contradicts a historical no-caller entry and requires implementation/reconciliation; broader equality-adapter/context display and complete LRA/smtcore/higher-engine audits remain open. Green tests do not prove complete porting."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
