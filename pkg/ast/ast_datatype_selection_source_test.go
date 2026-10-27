@@ -43,15 +43,20 @@ func TestDatatypeSelectionInstantiatesAllConstructorsBeforeCounter(t *testing.T)
 				m.Budget().FailAfter(0)
 				_, _, err = u.NonRecursiveConstructor(sort)
 				m.Budget().FailAfter(-1)
-				if !errors.Is(err, arena.ErrInjectedFailure) || u.start != 0 || len(u.refs) != 0 || len(u.constructors) != 0 {
+				if !errors.Is(err, arena.ErrInjectedFailure) || u.start != 0 || len(u.refs) != 1 || len(u.constructors) != 0 || len(u.lists) != 1 || len(u.lists[sort].values) != 0 {
 					t.Fatal("cold list failure advanced selection or published preference", err, u.start)
 				}
+				astTestMust(t, u.Reset())
 			}
 			chosen, found, err := u.NonRecursiveConstructor(sort)
 			astTestMust(t, err)
 			constructors, err := m.DatatypeConstructors(sort)
 			astTestMust(t, err)
-			if !found || chosen != constructors[1] || u.start != 1 {
+			expected := uint32(1)
+			if fail {
+				expected = 2
+			}
+			if !found || chosen != constructors[expected] || u.start != expected {
 				t.Fatal("source selection changed", chosen, u.start)
 			}
 			var last uint32
@@ -100,8 +105,19 @@ func TestDatatypeSelectionUnsignedIndexWrap(t *testing.T) {
 	} else {
 		astTestMust(t, err)
 	}
-	if found || !value.IsNull() || u.start != math.MaxUint32-1 || len(u.refs) != 0 || len(u.constructors) != 0 {
-		t.Fatal("unsigned source candidate sequence changed", value, found, u.start)
+	wantRefs, wantPreferences := 6, 1
+	if diagnostic.DebugBuild {
+		wantRefs, wantPreferences = 4, 0
+	}
+	if found || !value.IsNull() || u.start != math.MaxUint32-1 || len(u.refs) != wantRefs || len(u.constructors) != wantPreferences {
+		t.Fatal("unsigned source candidate sequence or null preference publication changed", value, found, u.start, len(u.refs), len(u.constructors))
+	}
+	if !diagnostic.DebugBuild {
+		_, found, err = u.NonRecursiveConstructor(sorts[0])
+		astTestMust(t, err)
+		if found || len(u.refs) != 6 || u.start != math.MaxUint32-1 {
+			t.Fatal("native null preference cache hit retried selection")
+		}
 	}
 }
 

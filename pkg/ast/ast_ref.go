@@ -57,6 +57,11 @@ func (m *ASTManager) NewRef(h ASTHandle) (ASTRef, error) {
 		return ASTRef{}, e
 	}
 	defer m.mu.Unlock()
+	return m.newRef(h)
+}
+
+// newRef is the same checked owning operation with the manager lock held.
+func (m *ASTManager) newRef(h ASTHandle) (ASTRef, error) {
 	var node astNodeRef
 	var e error
 	if !h.IsNull() {
@@ -215,6 +220,11 @@ func (m *ASTManager) DelRef(ref *ASTRef) error {
 		return e
 	}
 	defer m.mu.Unlock()
+	return m.delRef(ref)
+}
+
+// delRef is used by concrete lexical owners while the manager lock is held.
+func (m *ASTManager) delRef(ref *ASTRef) error {
 	if ref == nil {
 		return ErrASTHandle
 	}

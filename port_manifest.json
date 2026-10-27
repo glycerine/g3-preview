@@ -16393,7 +16393,9 @@
         "pkg/ast/ast_datatype_util_test.go",
         "pkg/ast/ast_datatype_util_reset_test.go",
         "pkg/ast/ast_datatype_util_teardown_test.go",
-        "pkg/ast/ast_datatype_selection_source_test.go"
+        "pkg/ast/ast_datatype_selection_source_test.go",
+        "pkg/ast/ast_datatype_constructor_cache_test.go",
+        "pkg/ast/ast_ref.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16412,7 +16414,11 @@
         "TestDatatypeUtilInterruptedTeardown",
         "TestDatatypeSelectionInstantiatesAllConstructorsBeforeCounter",
         "TestDatatypeSelectionUnsignedIndexWrap",
-        "TestDatatypeUtilSourceAssertionsConsultActualOwner"
+        "TestDatatypeUtilSourceAssertionsConsultActualOwner",
+        "TestDatatypeConstructorCacheOwnsAllDeclarationsIndependently",
+        "TestDatatypeConstructorCacheRetainsStoppedPublishedPrefixes",
+        "TestDatatypeConstructorCacheSourceForwardDeletionOrder",
+        "TestASTDatatypePluginOwnsAndFinalizesConcreteUtility"
       ],
       "assertions": [
         {
@@ -16646,17 +16652,49 @@
             "TestDatatypeUtilSourceAssertionsConsultActualOwner",
             "TestDatatypeUtilStoppedPinPrefixesRetainSourceOwners"
           ]
+        },
+        {
+          "name": "Concrete DatatypeUtil get_datatype_constructors cache (753-767): sort pin before cache publication, owning constructor-local before separate cache pin and borrowed-list append, cache hits preserve stopped vectors, Reset/Close retire all pins in source order",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_ref.go",
+            "pkg/ast/ast_datatype_constructor_cache_test.go"
+          ],
+          "tests": [
+            "TestDatatypeConstructorCacheOwnsAllDeclarationsIndependently",
+            "TestDatatypeConstructorCacheRetainsStoppedPublishedPrefixes",
+            "TestDatatypeConstructorCacheSourceForwardDeletionOrder"
+          ]
+        },
+        {
+          "name": "Retained plugin::u lazy concrete utility and plugin::finalize definition owners/maps before cached utility destruction (150-170); manager default-value and theory/factory caches remain independent",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_definition.go",
+            "pkg/ast/ast_datatype_plugin.go",
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_constructor_cache_test.go",
+            "pkg/smtcore/theory_datatype_restart_test.go"
+          ],
+          "tests": [
+            "TestASTDatatypePluginOwnsAndFinalizesConcreteUtility",
+            "TestSMTDatatypeRestartAdvancesIndependentUtility"
+          ]
         }
       ],
       "ownership": [
         "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Translation snapshots definitions without retaining source pointers, then destination definitions acquire their own translated sort references. Declaration and description query results remain borrowed manager nodes.",
-        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in forward source ref_vector order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache.",
-        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
+        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in forward source ref_vector order. Copied Go owners are rejected. The AST plugin lazily owns a separate instance of the same concrete DatatypeUtil, including full constructor-cache and preference pins. Plugin finalization retires definition owners before closing the utility in forward source reference-vector order.",
+        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
+        "The concrete DatatypeUtil now has an independent constructor-vector cache owning its datatype sort and every constructor in declaration order, before its separate selected-preference pins. Constructor-local func_decl_ref and permanent cache reference use separate checked ASTRef tokens and actual INC/DEC operations. Partial maps/lists and acquired pins remain until Reset/Close; native Go containers replace STL storage without claiming its allocation ABI."
       ],
       "deviations": [
         "Private utility memoization maps are omitted because concrete Go queries reconstruct hash-consed declarations and compute recursion/enum properties directly. The unused plugin remove entry point and undeclared get_datatype_size declaration are not ported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed.",
         "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: utility construction/get_non_rec_constructor source assertions, util_bug trace, pin-publication failure prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself.",
-        "The next source review corrects eager constructor materialization, literal uint32 candidate-index overflow, ordered forbidden-stack search, reached utility assertions, constructor family registration and first-pin retention before a second preference acquisition failure. Declaration AST-ID ordering and a cold node-page allocation refusal verify the counter frontier; a valid recursive sort exposes the native unsigned-overflow no-result/SASSERT(r) behavior. Source get_datatype_constructors also owns a per-utility cache that pins the sort and every constructor before preference acquisition. That cache and its ordered owner prefixes are still missing from the concrete Go utility (which currently reconstructs declarations and owns selected preferences); util_bug traces and their pretty-printer lifetimes also remain open. These are retained source obligations, not dead code, and prevent whole-unit completion."
+        "The next source review corrects eager constructor materialization, literal uint32 candidate-index overflow, ordered forbidden-stack search, reached utility assertions, constructor family registration and first-pin retention before a second preference acquisition failure. Declaration AST-ID ordering and a cold node-page allocation refusal verify the counter frontier; a valid recursive sort exposes the native unsigned-overflow no-result/SASSERT(r) behavior. The subsequent concrete utility increment restores get_datatype_constructors cache pins and ordered owner prefixes. The manager-plugin utility now shares the concrete cache representation with independent ownership; util_bug traces and their pretty-printer lifetimes remain open. These are retained source obligations, not dead code, and prevent whole-unit completion.",
+        "Both DatatypeFactory/theory utilities and the manager-plugin default-value utility now use the same concrete constructor-cache owner with independent instances. The manager plugin creates its utility lazily and retires definition owners before closing it. The actual SMT datatype restart regression exposed constructor identity loss when this plugin cache was missing; restoring the source owner preserves declarations across an independent theory Reset. No test lifetime was weakened. Utility util_bug traces/pretty-printer lifetimes and physical consumed-NUM failure prefixes for this member remain open. Locked newRef/delRef leaves share the existing checked public implementation; constructors/maps/slices use native Go allocation rather than an STL allocation ABI.",
+        "The literal unsigned-overflow no-constructor path now preserves the source native/continued-SASSERT prefix: acquire the preference sort pin, append a null ASTRef owner, and cache the null result without treating a warm null entry as found. An aborting debug assertion stops before this publication. The regression covers native null-prefix retention/cache hits and the aborting debug prefix; it does not claim a physical numeric failure campaign for this member."
       ]
     },
     {
@@ -16681,7 +16719,9 @@
         "pkg/ast/ast_datatype_util_test.go",
         "pkg/ast/ast_datatype_util_reset_test.go",
         "pkg/ast/ast_datatype_util_teardown_test.go",
-        "pkg/ast/ast_datatype_selection_source_test.go"
+        "pkg/ast/ast_datatype_selection_source_test.go",
+        "pkg/ast/ast_datatype_constructor_cache_test.go",
+        "pkg/ast/ast_ref.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16699,7 +16739,11 @@
         "TestDatatypeUtilInterruptedTeardown",
         "TestDatatypeSelectionInstantiatesAllConstructorsBeforeCounter",
         "TestDatatypeSelectionUnsignedIndexWrap",
-        "TestDatatypeUtilSourceAssertionsConsultActualOwner"
+        "TestDatatypeUtilSourceAssertionsConsultActualOwner",
+        "TestDatatypeConstructorCacheOwnsAllDeclarationsIndependently",
+        "TestDatatypeConstructorCacheRetainsStoppedPublishedPrefixes",
+        "TestDatatypeConstructorCacheSourceForwardDeletionOrder",
+        "TestASTDatatypePluginOwnsAndFinalizesConcreteUtility"
       ],
       "conditionals": [
         {
@@ -16825,17 +16869,49 @@
             "TestDatatypeUtilSourceAssertionsConsultActualOwner",
             "TestDatatypeUtilStoppedPinPrefixesRetainSourceOwners"
           ]
+        },
+        {
+          "name": "Concrete DatatypeUtil get_datatype_constructors cache (753-767): sort pin before cache publication, owning constructor-local before separate cache pin and borrowed-list append, cache hits preserve stopped vectors, Reset/Close retire all pins in source order",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_ref.go",
+            "pkg/ast/ast_datatype_constructor_cache_test.go"
+          ],
+          "tests": [
+            "TestDatatypeConstructorCacheOwnsAllDeclarationsIndependently",
+            "TestDatatypeConstructorCacheRetainsStoppedPublishedPrefixes",
+            "TestDatatypeConstructorCacheSourceForwardDeletionOrder"
+          ]
+        },
+        {
+          "name": "Retained plugin::u lazy concrete utility and plugin::finalize definition owners/maps before cached utility destruction (150-170); manager default-value and theory/factory caches remain independent",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_definition.go",
+            "pkg/ast/ast_datatype_plugin.go",
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_constructor_cache_test.go",
+            "pkg/smtcore/theory_datatype_restart_test.go"
+          ],
+          "tests": [
+            "TestASTDatatypePluginOwnsAndFinalizesConcreteUtility",
+            "TestSMTDatatypeRestartAdvancesIndependentUtility"
+          ]
         }
       ],
       "ownership": [
         "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager. Exported definition descriptions contain borrowed handles and copied native slices.",
-        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in forward source ref_vector order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache.",
-        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
+        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in forward source ref_vector order. Copied Go owners are rejected. The AST plugin lazily owns a separate instance of the same concrete DatatypeUtil, including full constructor-cache and preference pins. Plugin finalization retires definition owners before closing the utility in forward source reference-vector order.",
+        "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
+        "The concrete DatatypeUtil now has an independent constructor-vector cache owning its datatype sort and every constructor in declaration order, before its separate selected-preference pins. Constructor-local func_decl_ref and permanent cache reference use separate checked ASTRef tokens and actual INC/DEC operations. Partial maps/lists and acquired pins remain until Reset/Close; native Go containers replace STL storage without claiming its allocation ABI."
       ],
       "deviations": [
         "Private utility caches, the unused plugin remove entry point, and the undeclared get_datatype_size implementation are omitted under the retained-consumer rule. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes.",
         "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: utility construction/get_non_rec_constructor source assertions, util_bug trace, pin-publication failure prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself.",
-        "The next source review corrects eager constructor materialization, literal uint32 candidate-index overflow, ordered forbidden-stack search, reached utility assertions, constructor family registration and first-pin retention before a second preference acquisition failure. Declaration AST-ID ordering and a cold node-page allocation refusal verify the counter frontier; a valid recursive sort exposes the native unsigned-overflow no-result/SASSERT(r) behavior. Source get_datatype_constructors also owns a per-utility cache that pins the sort and every constructor before preference acquisition. That cache and its ordered owner prefixes are still missing from the concrete Go utility (which currently reconstructs declarations and owns selected preferences); util_bug traces and their pretty-printer lifetimes also remain open. These are retained source obligations, not dead code, and prevent whole-unit completion."
+        "The next source review corrects eager constructor materialization, literal uint32 candidate-index overflow, ordered forbidden-stack search, reached utility assertions, constructor family registration and first-pin retention before a second preference acquisition failure. Declaration AST-ID ordering and a cold node-page allocation refusal verify the counter frontier; a valid recursive sort exposes the native unsigned-overflow no-result/SASSERT(r) behavior. The subsequent concrete utility increment restores get_datatype_constructors cache pins and ordered owner prefixes. The manager-plugin utility now shares the concrete cache representation with independent ownership; util_bug traces and their pretty-printer lifetimes remain open. These are retained source obligations, not dead code, and prevent whole-unit completion.",
+        "Both DatatypeFactory/theory utilities and the manager-plugin default-value utility now use the same concrete constructor-cache owner with independent instances. The manager plugin creates its utility lazily and retires definition owners before closing it. The actual SMT datatype restart regression exposed constructor identity loss when this plugin cache was missing; restoring the source owner preserves declarations across an independent theory Reset. No test lifetime was weakened. Utility util_bug traces/pretty-printer lifetimes and physical consumed-NUM failure prefixes for this member remain open. Locked newRef/delRef leaves share the existing checked public implementation; constructors/maps/slices use native Go allocation rather than an STL allocation ABI.",
+        "The literal unsigned-overflow no-constructor path now preserves the source native/continued-SASSERT prefix: acquire the preference sort pin, append a null ASTRef owner, and cache the null result without treating a warm null entry as found. An aborting debug assertion stops before this publication. The regression covers native null-prefix retention/cache hits and the aborting debug prefix; it does not claim a physical numeric failure campaign for this member."
       ]
     },
     {

@@ -49,7 +49,11 @@ func TestDatatypeUtilInterruptedTeardown(t *testing.T) {
 			if !found {
 				t.Fatal("missing constructor")
 			}
-			astTestPin(t, m, constructor)
+			allConstructors, err := m.DatatypeConstructors(sorts[0])
+			astTestMust(t, err)
+			for _, c := range allConstructors {
+				astTestPin(t, m, c)
+			}
 			beforeSort, err := m.GetRefCount(sorts[0])
 			astTestMust(t, err)
 			beforeConstructor, err := m.GetRefCount(constructor)
@@ -108,7 +112,7 @@ func TestDatatypeUtilInterruptedTeardown(t *testing.T) {
 			astTestMust(t, err)
 			afterConstructor, err := m.GetRefCount(constructor)
 			astTestMust(t, err)
-			if afterSort+1 != beforeSort || afterConstructor+1 != beforeConstructor {
+			if afterSort+2 != beforeSort || afterConstructor+2 != beforeConstructor {
 				t.Fatal("retry lost or duplicated a decrement")
 			}
 			if mode == "reset" {

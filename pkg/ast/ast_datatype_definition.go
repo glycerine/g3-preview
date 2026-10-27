@@ -776,43 +776,26 @@ func (m *ASTManager) DatatypeIsRecursive(sort ASTHandle) (bool, error) {
 	return m.datatypeRecursive(r, make(map[astNodeRef]uint8))
 }
 
-func (m *ASTManager) datatypeNonRecursiveConstructor(sort astNodeRef, forbidden []astNodeRef) (astNodeRef, bool, error) {
-	if m.datatypePlugin == nil {
+func (m *ASTManager) datatypeNonRecursiveConstructor(sort astNodeRef) (astNodeRef, bool, error) {
+	p := m.datatypePlugin
+	if p == nil {
 		return astNodeRef{}, false, ErrASTHandle
 	}
-	p := m.datatypePlugin
-	if err := datatypeUtilAssert(907, "is_datatype(ty)", func() bool { return m.datatypeUtilIsDatatype(sort) }); err != nil {
-		return astNodeRef{}, false, err
+	if p.utility == nil {
+		utility, err := m.newDatatypeUtil()
+		if err != nil {
+			return astNodeRef{}, false, err
+		}
+		p.utility = utility
 	}
-	if constructor, found := p.nonRecursive[sort]; found {
-		return constructor, true, nil
-	}
-	constructor, found, err := m.datatypeNonRecursiveConstructorCore(sort, forbidden, &p.utilityStart)
-	if err == nil {
-		err = datatypeUtilAssert(916, "forbidden_set.back() == ty", func() bool { return forbidden[len(forbidden)-1] == sort })
-	}
-	if err == nil {
-		err = datatypeUtilAssert(917, "r", func() bool { return found })
-	}
-	if err != nil || !found {
-		return astNodeRef{}, found, err
-	}
-	if err = m.incNode(sort); err != nil {
-		return astNodeRef{}, false, err
-	}
-	if err = m.incNode(constructor); err != nil {
-		_, undoErr := m.decNode(sort)
-		return astNodeRef{}, false, errors.Join(err, undoErr)
-	}
-	p.definitionRefs = append(p.definitionRefs, sort, constructor)
-	p.nonRecursive[sort] = constructor
-	return constructor, true, nil
+	h, found, err := p.utility.nonRecursiveConstructor(m.external(sort))
+	return astNodeRef{slot: h.slot, generation: h.generation}, found, err
 }
 
-func (m *ASTManager) datatypeNonRecursiveConstructorCore(sort astNodeRef, forbidden []astNodeRef, counter *uint32) (astNodeRef, bool, error) {
+func (m *ASTManager) datatypeNonRecursiveConstructorCore(sort astNodeRef, forbidden []astNodeRef, counter *uint32, utility *DatatypeUtil) (astNodeRef, bool, error) {
 	// Source get_datatype_constructors instantiates every declaration before
 	// the selection counter advances, including declarations never selected.
-	constructors, err := m.datatypeConstructors(sort)
+	constructors, err := utility.constructorList(sort)
 	if err != nil {
 		return astNodeRef{}, false, err
 	}
@@ -852,7 +835,7 @@ func (m *ASTManager) datatypeNonRecursiveConstructorCore(sort astNodeRef, forbid
 				break
 			}
 			forbidden = append(forbidden, field)
-			_, found, err := m.datatypeNonRecursiveConstructorCore(field, forbidden, counter)
+			_, found, err := m.datatypeNonRecursiveConstructorCore(field, forbidden, counter, utility)
 			if err == nil {
 				err = datatypeUtilAssert(976, "forbidden_set.back() == T_i", func() bool { return forbidden[len(forbidden)-1] == field })
 			}
@@ -880,6 +863,6 @@ func (m *ASTManager) DatatypeNonRecursiveConstructor(sort ASTHandle) (ASTHandle,
 	if err != nil {
 		return ASTHandle{}, false, err
 	}
-	constructor, found, err := m.datatypeNonRecursiveConstructor(r, []astNodeRef{r})
+	constructor, found, err := m.datatypeNonRecursiveConstructor(r)
 	return m.external(constructor), found, err
 }

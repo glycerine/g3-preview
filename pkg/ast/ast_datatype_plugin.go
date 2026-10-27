@@ -42,8 +42,7 @@ type astDatatypePluginOwner struct {
 	definitionNames                       map[usymbol.Symbol]*astDatatypeDefinition
 	definitionRefs                        []astNodeRef
 	classID                               uint32
-	utilityStart                          uint32
-	nonRecursive                          map[astNodeRef]astNodeRef
+	utility                               *DatatypeUtil
 	completed, published, memoryTraceLive bool
 	membersEnded                          bool
 }
@@ -68,7 +67,6 @@ func (m *ASTManager) registerDatatypePlugin() (FamilyID, error) {
 	p.accessors = make(map[astDatatypeAccessorKey][]usymbol.Symbol)
 	p.definitions = make(map[astNodeRef]*astDatatypeDefinition)
 	p.definitionNames = make(map[usymbol.Symbol]*astDatatypeDefinition)
-	p.nonRecursive = make(map[astNodeRef]astNodeRef)
 	p.self = p
 	m.traceRegisteredPluginAllocated(p.traceIdentity(), p.header, 41, "datatype_decl_plugin", &p.memoryTraceLive)
 	m.datatypePluginFailed = p
@@ -144,14 +142,19 @@ func (m *ASTManager) finalizeDatatypePlugin() error {
 			return err
 		}
 	}
-	p.membersEnded = true
+	// Source resets m_defs after deleting definitions and before m_util.
 	clear(p.accessors)
 	p.accessors = nil
 	clear(p.definitions)
 	p.definitions = nil
 	clear(p.definitionNames)
 	p.definitionNames = nil
-	clear(p.nonRecursive)
-	p.nonRecursive = nil
+	if p.utility != nil {
+		if err := p.utility.closeLocked(); err != nil {
+			return err
+		}
+		p.utility = nil
+	}
+	p.membersEnded = true
 	return nil
 }
