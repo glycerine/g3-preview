@@ -14322,7 +14322,10 @@
         "pkg/ast/ast_smt2_declare_fun.go",
         "pkg/ast/ast_smt2_quantifier_root.go",
         "pkg/ast/ast_datatype_util_trace.go",
-        "pkg/ast/ast_datatype_util_trace_test.go"
+        "pkg/ast/ast_datatype_util_trace_test.go",
+        "pkg/smtcore/proto_model/datatype_trace.go",
+        "pkg/smtcore/proto_model/datatype_trace_source_test.go",
+        "pkg/smtcore/proto_model/source_collectors_external_test.go"
       ],
       "tests": [
         "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
@@ -14363,7 +14366,10 @@
         "TestDatatypeUtilTraceStickyStreamStillEvaluatesOperands",
         "TestDatatypeUtilTraceComputationFailureStopsBeforeCounterAndCache",
         "TestDatatypeUtilRecursiveSourceTracePreservesForbiddenOrder",
-        "TestDatatypeUtilTraceConsultsActualPPGlobalOwner"
+        "TestDatatypeUtilTraceConsultsActualPPGlobalOwner",
+        "TestDatatypeFactoryTraceUsesActualBvPrinterParameters",
+        "TestDatatypeFactoryTraceUsesActualAliasDepth",
+        "TestDatatypeFactoryTraceBorrowsInputAndOwnsDocument"
       ],
       "conditionals": [
         {
@@ -14694,6 +14700,21 @@
             "TestDatatypeUtilRecursiveSourceTracePreservesForbiddenOrder",
             "TestDatatypeUtilTraceConsultsActualPPGlobalOwner"
           ]
+        },
+        {
+          "name": "Concrete datatype-factory expression printer constructor profile: decimal, precision, BV literals, FP real literals, BV negative spelling, alias depth/weight and associative flattening; all eight actual pp fields reach expression traversal",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_smt2_boolean_tree.go",
+            "pkg/smtcore/proto_model/datatype_trace.go",
+            "pkg/smtcore/proto_model/datatype_trace_source_test.go",
+            "pkg/smtcore/proto_model/source_collectors_external_test.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryTraceUsesActualBvPrinterParameters",
+            "TestDatatypeFactoryTraceUsesActualAliasDepth",
+            "TestDatatypeFactoryTraceBorrowsInputAndOwnsDocument"
+          ]
         }
       ],
       "ownership": [
@@ -14706,7 +14727,8 @@
         "Standard bytes.Buffer and strconv replace C++ character/string container behavior without STL implementation credit. Long radix checks cover widths through 4097 while source numeral ownership and formatter refusal campaigns retain their checked boundaries.",
         "Native Go expression traversal and NumericTextStream rendering replace the C++ frame containers and ostream insertion layer. The cmd_context parametric-sort override is a separate source-unit obligation.",
         "This is a concrete retained datatype-trace path, not a generic ast_ref stream adapter or whole SMT2-printer audit. Tests cover exact enum text, all recursive trace branches, forbidden-vector order, simultaneous input and format pins, warm cache silence, sticky stream refusal, real PP/global owner closure and allocation refusals before invoke/core-header counter publication. General pretty-printer ownership/failure auditing and physical consumed-numeral cleanup for these temporary owners remain open. Native Go rendering streams replace ostream storage; STL internals are not ported.",
-        "Whole-unit audited completion is withdrawn for the newly reached datatype diagnostic operands: normal sort_ref/func_decl_ref/default-printer lifetimes are implemented and checked, while the broader retained wrapper and exceptional pretty-printer ownership audit is not closed by this bounded increment. General expression/ref overload coverage is not inferred from the two concrete operand kinds tested here."
+        "Whole-unit audited completion is withdrawn for the newly reached datatype diagnostic operands: normal sort_ref/func_decl_ref/default-printer lifetimes are implemented and checked, while the broader retained wrapper and exceptional pretty-printer ownership audit is not closed by this bounded increment. General expression/ref overload coverage is not inferred from the two concrete operand kinds tested here.",
+        "Datatype-factory trace expressions now use actual pp constructor snapshots, retaining legacy defaults for callers without an explicit profile. Tests vary BV literal/negative flags and alias depth, and observe borrowed input plus a live owned document during insertion. This does not establish every printer option or exceptional cleanup path; whole-unit audit stays partial."
       ]
     },
     {
@@ -113897,7 +113919,10 @@
         "pkg/smtcore/proto_model/structured_teardown_source_test.go",
         "pkg/smtcore/proto_model/datatype_teardown_source_test.go",
         "pkg/smtcore/proto_model/datatype_scope.go",
-        "pkg/smtcore/proto_model/datatype_factory_source_test.go"
+        "pkg/smtcore/proto_model/datatype_factory_source_test.go",
+        "pkg/smtcore/proto_model/datatype_trace.go",
+        "pkg/smtcore/proto_model/datatype_trace_source_test.go",
+        "pkg/smtcore/proto_model/source_collectors_external_test.go"
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
@@ -113923,7 +113948,16 @@
         "TestDatatypeFactoryAlmostFreshWithoutPreviousLastValue",
         "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
         "TestDatatypeFactoryContainsUsesQuantifierBody",
-        "TestDatatypeFactorySourceFreshDistinctnessAssertion"
+        "TestDatatypeFactorySourceFreshDistinctnessAssertion",
+        "TestDatatypeFactoryColdFreshExactTrace",
+        "TestDatatypeFactoryRecursiveTraceAndNestedLastValue",
+        "TestDatatypeFactoryEnabledLoopTraceSeedsLastValueBeforeFormatterFailure",
+        "TestDatatypeFactoryNestedTraceRefusalRemainsSticky",
+        "TestDatatypeFactoryTraceUsesActualBvPrinterParameters",
+        "TestDatatypeFactoryTraceUsesActualAliasDepth",
+        "TestDatatypeFactoryConditionalTracePrecedesDistinctnessAssertion",
+        "TestDatatypeFactoryTraceFiniteSiblingFallback",
+        "TestDatatypeFactoryTraceBorrowsInputAndOwnsDocument"
       ],
       "assertions": [
         {
@@ -114056,17 +114090,39 @@
             "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
             "TestDatatypeFactorySourceFreshDistinctnessAssertion"
           ]
+        },
+        {
+          "name": "All fourteen datatype_factory TRACE/CTRACE sites with lazy operands, source insertion order, actual global pp constructor profile, borrowed AST input and owned format document; shared nested stream refusal preserves operand side effects",
+          "status": "partial",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_trace.go",
+            "pkg/smtcore/proto_model/datatype_trace_source_test.go",
+            "pkg/smtcore/proto_model/source_collectors_external_test.go",
+            "pkg/ast/ast_smt2_boolean_tree.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryColdFreshExactTrace",
+            "TestDatatypeFactoryRecursiveTraceAndNestedLastValue",
+            "TestDatatypeFactoryEnabledLoopTraceSeedsLastValueBeforeFormatterFailure",
+            "TestDatatypeFactoryNestedTraceRefusalRemainsSticky",
+            "TestDatatypeFactoryTraceUsesActualBvPrinterParameters",
+            "TestDatatypeFactoryTraceUsesActualAliasDepth",
+            "TestDatatypeFactoryConditionalTracePrecedesDistinctnessAssertion",
+            "TestDatatypeFactoryTraceFiniteSiblingFallback",
+            "TestDatatypeFactoryTraceBorrowsInputAndOwnsDocument"
+          ]
         }
       ],
       "ownership": [
         "DatatypeFactory retains generated datatype values and borrows constructor metadata from the AST manager.",
         "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime.",
-        "DatatypeFactory now uses its own DatatypeUtil.Constructors cache in every enumeration path. Each source argument vector immediately owns every appended expression; approach1/2 separately own their candidate expr_ref. Candidate retirement precedes forward argument-vector retirement. The source contains_app helper owns its target/check roots and traverses quantifier bodies without annotations. Failed lexical cleanup is retained in observed innermost-first order and completed before last-value map/utility/base destruction; registry APIs cannot revive the stopped owner."
+        "DatatypeFactory now uses its own DatatypeUtil.Constructors cache in every enumeration path. Each source argument vector immediately owns every appended expression; approach1/2 separately own their candidate expr_ref. Candidate retirement precedes forward argument-vector retirement. The source contains_app helper owns its target/check roots and traverses quantifier bodies without annotations. Failed lexical cleanup is retained in observed innermost-first order and completed before last-value map/utility/base destruction; registry APIs cannot revive the stopped owner.",
+        "mk_pp borrows its AST input. Each insertion owns its actual format_ref and rendering stream, snapshots the actual process pp module in source constructor order, and retires constructor-local helpers before document building. Interrupted trace cleanup joins the typed lexical queue before utility/base destruction. Normal pin lifetimes and operand refusal prefixes are checked; general physical destructor failure remains open."
       ],
       "deviations": [
         "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
         "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations.",
-        "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Tests observe a real argument pin during the second provider call and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. General datatype_factory TRACE/CTRACE statements remain unported, including enabled-trace get_last_fresh_value evaluation inside approach2; remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial."
+        "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Tests observe a real argument pin during the second provider call and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. All fourteen datatype_factory TRACE/CTRACE sites now execute with their source gates, operand order and actual process printer parameters, including enabled-trace get_last_fresh_value cache publication in approach2. Remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial."
       ]
     },
     {
@@ -114088,7 +114144,10 @@
         "pkg/smtcore/proto_model/structured_teardown_source_test.go",
         "pkg/smtcore/proto_model/datatype_teardown_source_test.go",
         "pkg/smtcore/proto_model/datatype_scope.go",
-        "pkg/smtcore/proto_model/datatype_factory_source_test.go"
+        "pkg/smtcore/proto_model/datatype_factory_source_test.go",
+        "pkg/smtcore/proto_model/datatype_trace.go",
+        "pkg/smtcore/proto_model/datatype_trace_source_test.go",
+        "pkg/smtcore/proto_model/source_collectors_external_test.go"
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
@@ -114114,7 +114173,16 @@
         "TestDatatypeFactoryAlmostFreshWithoutPreviousLastValue",
         "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
         "TestDatatypeFactoryContainsUsesQuantifierBody",
-        "TestDatatypeFactorySourceFreshDistinctnessAssertion"
+        "TestDatatypeFactorySourceFreshDistinctnessAssertion",
+        "TestDatatypeFactoryColdFreshExactTrace",
+        "TestDatatypeFactoryRecursiveTraceAndNestedLastValue",
+        "TestDatatypeFactoryEnabledLoopTraceSeedsLastValueBeforeFormatterFailure",
+        "TestDatatypeFactoryNestedTraceRefusalRemainsSticky",
+        "TestDatatypeFactoryTraceUsesActualBvPrinterParameters",
+        "TestDatatypeFactoryTraceUsesActualAliasDepth",
+        "TestDatatypeFactoryConditionalTracePrecedesDistinctnessAssertion",
+        "TestDatatypeFactoryTraceFiniteSiblingFallback",
+        "TestDatatypeFactoryTraceBorrowsInputAndOwnsDocument"
       ],
       "conditionals": [
         {
@@ -114227,17 +114295,39 @@
             "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
             "TestDatatypeFactorySourceFreshDistinctnessAssertion"
           ]
+        },
+        {
+          "name": "All fourteen datatype_factory TRACE/CTRACE sites with lazy operands, source insertion order, actual global pp constructor profile, borrowed AST input and owned format document; shared nested stream refusal preserves operand side effects",
+          "status": "partial",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_trace.go",
+            "pkg/smtcore/proto_model/datatype_trace_source_test.go",
+            "pkg/smtcore/proto_model/source_collectors_external_test.go",
+            "pkg/ast/ast_smt2_boolean_tree.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryColdFreshExactTrace",
+            "TestDatatypeFactoryRecursiveTraceAndNestedLastValue",
+            "TestDatatypeFactoryEnabledLoopTraceSeedsLastValueBeforeFormatterFailure",
+            "TestDatatypeFactoryNestedTraceRefusalRemainsSticky",
+            "TestDatatypeFactoryTraceUsesActualBvPrinterParameters",
+            "TestDatatypeFactoryTraceUsesActualAliasDepth",
+            "TestDatatypeFactoryConditionalTracePrecedesDistinctnessAssertion",
+            "TestDatatypeFactoryTraceFiniteSiblingFallback",
+            "TestDatatypeFactoryTraceBorrowsInputAndOwnsDocument"
+          ]
         }
       ],
       "ownership": [
         "The last-fresh table borrows handles whose owning references are held by the structured factory.",
         "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime.",
-        "DatatypeFactory now uses its own DatatypeUtil.Constructors cache in every enumeration path. Each source argument vector immediately owns every appended expression; approach1/2 separately own their candidate expr_ref. Candidate retirement precedes forward argument-vector retirement. The source contains_app helper owns its target/check roots and traverses quantifier bodies without annotations. Failed lexical cleanup is retained in observed innermost-first order and completed before last-value map/utility/base destruction; registry APIs cannot revive the stopped owner."
+        "DatatypeFactory now uses its own DatatypeUtil.Constructors cache in every enumeration path. Each source argument vector immediately owns every appended expression; approach1/2 separately own their candidate expr_ref. Candidate retirement precedes forward argument-vector retirement. The source contains_app helper owns its target/check roots and traverses quantifier bodies without annotations. Failed lexical cleanup is retained in observed innermost-first order and completed before last-value map/utility/base destruction; registry APIs cannot revive the stopped owner.",
+        "mk_pp borrows its AST input. Each insertion owns its actual format_ref and rendering stream, snapshots the actual process pp module in source constructor order, and retires constructor-local helpers before document building. Interrupted trace cleanup joins the typed lexical queue before utility/base destruction. Normal pin lifetimes and operand refusal prefixes are checked; general physical destructor failure remains open."
       ],
       "deviations": [
         "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
         "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations.",
-        "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Tests observe a real argument pin during the second provider call and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. General datatype_factory TRACE/CTRACE statements remain unported, including enabled-trace get_last_fresh_value evaluation inside approach2; remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial."
+        "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Tests observe a real argument pin during the second provider call and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. All fourteen datatype_factory TRACE/CTRACE sites now execute with their source gates, operand order and actual process printer parameters, including enabled-trace get_last_fresh_value cache publication in approach2. Remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial."
       ]
     },
     {
@@ -247584,7 +247674,8 @@
         "pkg/smtcore/param_datatype_refs.go",
         "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go",
         "pkg/ast/rewriter/array_rewriter_trace.go",
-        "pkg/ast/rewriter/var_substitution_trace.go"
+        "pkg/ast/rewriter/var_substitution_trace.go",
+        "pkg/util/diagnostic/util_trace_nested_failure_test.go"
       ],
       "tests": [
         "TestASTFPAFPComponentsNumeralsAndTrace",
@@ -247697,7 +247788,8 @@
         "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite",
         "TestBoolRewriterTryITEValueFalseSourceTrace",
         "TestArrayRewriterAppCoreSourceTrace",
-        "TestVarSubstitutionResultSourceTrace"
+        "TestVarSubstitutionResultSourceTrace",
+        "TestNestedTraceRecordsShareImmediateStreamFailure"
       ],
       "conditionals": [
         {
@@ -249960,6 +250052,18 @@
           "status": "ported",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
           "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
+        },
+        {
+          "name": "Immediately shared ostream failure across nested records: publish physical failure before nested operand evaluation and adopt inner stream failure before outer insertion/footer while operand computation continues",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/diagnostic/util_trace_tags.go",
+            "pkg/util/diagnostic/util_trace_nested_failure_test.go"
+          ],
+          "tests": [
+            "TestNestedTraceRecordsShareImmediateStreamFailure",
+            "TestDatatypeFactoryNestedTraceRefusalRemainsSticky"
+          ]
         }
       ],
       "ownership": [
@@ -249967,7 +250071,8 @@
       ],
       "deviations": [
         "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE plus MPF sqrt-helper and MPFF lt, add/sub, mul, div, floor/ceil and power STRACE plus set_core, add_sub, mul, div, power and to_mpq TRACE are wired; MPBQ rational-lower select_small and debug-only add/sub TRACE plus MPQ parser set TRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open.",
-        "MPN div_n TRACE emits every source-defined insertion through the opening numerator bracket. The next C++ display_raw read requests limb m+n from a logical m+n buffer and is undefined; Go returns arena.ErrBounds at that boundary, suppressing later borrow/newline/footer output. This is the complete defined behavior of this reached call site, not a port of the invalid read."
+        "MPN div_n TRACE emits every source-defined insertion through the opening numerator bracket. The next C++ display_raw read requests limb m+n from a logical m+n buffer and is undefined; Go returns arena.ErrBounds at that boundary, suppressing later borrow/newline/footer output. This is the complete defined behavior of this reached call site, not a port of the invalid read.",
+        "Nested factory traces exposed independently cached stream errors. Physical failures now publish immediately to the shared stream and existing writers synchronize before insertion/return, without classifying unrelated operand computation errors as ostream failure. Optional call-site coverage outside this increment remains open."
       ]
     },
     {
@@ -250075,7 +250180,8 @@
         "pkg/smtcore/param_datatype_refs.go",
         "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go",
         "pkg/ast/rewriter/array_rewriter_trace.go",
-        "pkg/ast/rewriter/var_substitution_trace.go"
+        "pkg/ast/rewriter/var_substitution_trace.go",
+        "pkg/util/diagnostic/util_trace_nested_failure_test.go"
       ],
       "tests": [
         "TestASTFPAFPComponentsNumeralsAndTrace",
@@ -250186,7 +250292,8 @@
         "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite",
         "TestBoolRewriterTryITEValueFalseSourceTrace",
         "TestArrayRewriterAppCoreSourceTrace",
-        "TestVarSubstitutionResultSourceTrace"
+        "TestVarSubstitutionResultSourceTrace",
+        "TestNestedTraceRecordsShareImmediateStreamFailure"
       ],
       "conditionals": [
         {
@@ -252449,6 +252556,18 @@
           "status": "ported",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
           "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
+        },
+        {
+          "name": "Immediately shared ostream failure across nested records: publish physical failure before nested operand evaluation and adopt inner stream failure before outer insertion/footer while operand computation continues",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/diagnostic/util_trace_tags.go",
+            "pkg/util/diagnostic/util_trace_nested_failure_test.go"
+          ],
+          "tests": [
+            "TestNestedTraceRecordsShareImmediateStreamFailure",
+            "TestDatatypeFactoryNestedTraceRefusalRemainsSticky"
+          ]
         }
       ],
       "ownership": [
@@ -252456,7 +252575,8 @@
       ],
       "deviations": [
         "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE plus MPF sqrt-helper and MPFF lt, add/sub, mul, div, floor/ceil and power STRACE plus set_core, add_sub, mul, div, power and to_mpq TRACE are wired; MPBQ rational-lower select_small and debug-only add/sub TRACE plus MPQ parser set TRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open.",
-        "MPN div_n TRACE emits every source-defined insertion through the opening numerator bracket. The next C++ display_raw read requests limb m+n from a logical m+n buffer and is undefined; Go returns arena.ErrBounds at that boundary, suppressing later borrow/newline/footer output. This is the complete defined behavior of this reached call site, not a port of the invalid read."
+        "MPN div_n TRACE emits every source-defined insertion through the opening numerator bracket. The next C++ display_raw read requests limb m+n from a logical m+n buffer and is undefined; Go returns arena.ErrBounds at that boundary, suppressing later borrow/newline/footer output. This is the complete defined behavior of this reached call site, not a port of the invalid read.",
+        "Nested factory traces exposed independently cached stream errors. Physical failures now publish immediately to the shared stream and existing writers synchronize before insertion/return, without classifying unrelated operand computation errors as ostream failure. Optional call-site coverage outside this increment remains open."
       ]
     },
     {

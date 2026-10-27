@@ -64,7 +64,17 @@ func (f *DatatypeFactory) SomeValue(s ast.ASTHandle) (value ast.ASTHandle, err e
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	return value, f.RegisterValue(value)
+	if err = f.RegisterValue(value); err != nil {
+		return value, err
+	}
+	err = f.trace("get_some_value", 41, nil, func(w *datatypeFactoryTraceWriter) error {
+		if err := w.ast(value); err != nil {
+			return err
+		}
+		w.text("\n")
+		return nil
+	})
+	return value, err
 }
 
 // Concrete argument construction for SomeValue and approach1, retaining each
@@ -117,7 +127,15 @@ func (f *DatatypeFactory) constructorArguments(scope *datatypeFactoryScope, c, s
 }
 func (f *DatatypeFactory) lastValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	if value, found := f.last[s]; found {
-		return value, nil
+		err := f.trace("get_last_fresh_value", 51, nil, func(w *datatypeFactoryTraceWriter) error {
+			w.text("cached fresh value: ")
+			if err := w.ast(value); err != nil {
+				return err
+			}
+			w.text("\n")
+			return nil
+		})
+		return value, err
 	}
 	set, err := f.valueSet(s)
 	if err != nil {
@@ -149,16 +167,10 @@ func (f *DatatypeFactory) contains(root, needle ast.ASTHandle) (found bool, err 
 	if err != nil {
 		return false, err
 	}
-	defer func() {
-		closeErr := contains.Close()
-		if closeErr != nil {
-			f.pending = append(f.pending, datatypeFactoryPending{contains: contains})
-		}
-		err = errors.Join(err, closeErr)
-	}()
+	defer f.finishContains(contains, &err)
 	return contains.Check(root)
 }
-func (f *DatatypeFactory) isSubtermOfLastValue(value ast.ASTHandle) (bool, error) {
+func (f *DatatypeFactory) isSubtermOfLastValue(value ast.ASTHandle) (result bool, err error) {
 	sort, err := f.manager.GetSort(value)
 	if err != nil {
 		return false, err
@@ -167,11 +179,41 @@ func (f *DatatypeFactory) isSubtermOfLastValue(value ast.ASTHandle) (bool, error
 	if !found {
 		return false, nil
 	}
-	return f.contains(last, value)
+	contains, err := ast.NewContainsApp(f.manager, value)
+	if err != nil {
+		return false, err
+	}
+	defer f.finishContains(contains, &err)
+	result, err = contains.Check(last)
+	if err != nil {
+		return false, err
+	}
+	err = f.trace("is_subterm_of_last_value", 71, nil, func(w *datatypeFactoryTraceWriter) error {
+		if err := w.ast(value); err != nil {
+			return err
+		}
+		w.text(" in ")
+		if err := w.ast(last); err != nil {
+			return err
+		}
+		w.text(" ")
+		w.bit(result)
+		w.text("\n")
+		return nil
+	})
+	return result, err
+}
+func (f *DatatypeFactory) isDatatype(s ast.ASTHandle) (bool, error) {
+	family, err := f.manager.GetFamilyID(s)
+	if err != nil || family != f.family {
+		return false, err
+	}
+	kind, err := f.manager.GetDeclKind(s)
+	return kind == ast.ASTDatatypeSort, err
 }
 func (f *DatatypeFactory) sibling(s, arg ast.ASTHandle) (bool, error) {
-	fid, err := f.manager.GetFamilyID(arg)
-	if err != nil || fid != f.family {
+	datatype, err := f.isDatatype(arg)
+	if err != nil || !datatype {
 		return false, err
 	}
 	return f.manager.DatatypeAreSiblings(s, arg)
@@ -292,10 +334,28 @@ func (f *DatatypeFactory) almostConstructor(s, c ast.ASTHandle, set *factoryValu
 			f.last[s] = value
 		}
 	}
-	return value, true, nil
+	err = f.trace("get_almost_fresh_value", 129, nil, func(w *datatypeFactoryTraceWriter) error {
+		w.text("almost fresh: ")
+		if err := w.ast(value); err != nil {
+			return err
+		}
+		w.text("\n")
+		return nil
+	})
+	return value, true, err
 }
 func (f *DatatypeFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	if err := f.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err := f.trace("get_fresh_value", 139, nil, func(w *datatypeFactoryTraceWriter) error {
+		w.text("generating fresh value for: ")
+		if err := w.name(s); err != nil {
+			return err
+		}
+		w.text("\n")
+		return nil
+	}); err != nil {
 		return ast.ASTHandle{}, err
 	}
 	set, err := f.valueSet(s)
@@ -314,7 +374,15 @@ func (f *DatatypeFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 		if recursive {
 			f.last[s] = value
 		}
-		return value, nil
+		err = f.trace("get_fresh_value", 147, nil, func(w *datatypeFactoryTraceWriter) error {
+			w.text("0. result: ")
+			if err := w.ast(value); err != nil {
+				return err
+			}
+			w.text("\n")
+			return nil
+		})
+		return value, err
 	}
 	constructors, err := f.utility.Constructors(s)
 	if err != nil {
@@ -334,6 +402,19 @@ func (f *DatatypeFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 		return ast.ASTHandle{}, f.assertNonrecursive(s, 246)
 	}
 	for iteration := uint32(1); ; iteration++ {
+		if err := f.trace("get_fresh_value", 191, nil, func(w *datatypeFactoryTraceWriter) error {
+			value, err := f.lastValue(s)
+			if err != nil {
+				return err
+			}
+			if err = w.ast(value); err != nil {
+				return err
+			}
+			w.text("\n")
+			return nil
+		}); err != nil {
+			return ast.ASTHandle{}, err
+		}
 		constructors, err = f.utility.Constructors(s)
 		if err != nil {
 			return ast.ASTHandle{}, err
@@ -360,6 +441,15 @@ func (f *DatatypeFactory) freshConstructor(s, c ast.ASTHandle, set *factoryValue
 	if err = scope.ownCandidate(value); err != nil {
 		return value, false, err
 	}
+	if err = f.trace("get_fresh_value", 174, func() bool { _, seen := set.seen[value]; return used && seen }, func(w *datatypeFactoryTraceWriter) error {
+		if err := w.ast(value); err != nil {
+			return err
+		}
+		w.text("\n")
+		return nil
+	}); err != nil {
+		return value, false, err
+	}
 	if err = datatypeFactoryAssert(175, "!found_fresh_arg || !set->contains(new_value)", func() bool { _, seen := set.seen[value]; return !used || !seen }); err != nil {
 		return value, false, err
 	}
@@ -376,7 +466,15 @@ func (f *DatatypeFactory) freshConstructor(s, c ast.ASTHandle, set *factoryValue
 	if recursive {
 		f.last[s] = value
 	}
-	return value, true, nil
+	err = f.trace("get_fresh_value", 180, nil, func(w *datatypeFactoryTraceWriter) error {
+		w.text("1. result: ")
+		if err := w.ast(value); err != nil {
+			return err
+		}
+		w.text("\n")
+		return nil
+	})
+	return value, true, err
 }
 func (f *DatatypeFactory) recursiveConstructor(s, c ast.ASTHandle, set *factoryValueSet, iteration uint32) (value ast.ASTHandle, accepted bool, err error) {
 	scope := &datatypeFactoryScope{manager: f.manager}
@@ -385,10 +483,47 @@ func (f *DatatypeFactory) recursiveConstructor(s, c ast.ASTHandle, set *factoryV
 	if err != nil {
 		return value, false, err
 	}
+	if err = f.trace("get_fresh_value", 197, nil, func(w *datatypeFactoryTraceWriter) error {
+		w.text("checking constructor: ")
+		if err := w.name(c); err != nil {
+			return err
+		}
+		w.text("\n")
+		return nil
+	}); err != nil {
+		return value, false, err
+	}
 	foundSibling := false
 	for i := uint32(0); i < n; i++ {
 		domain, err := f.manager.GetDomain(c, i)
 		if err != nil {
+			return value, false, err
+		}
+		if err = f.trace("get_fresh_value", 200, nil, func(w *datatypeFactoryTraceWriter) error {
+			if err := w.ast(s); err != nil {
+				return err
+			}
+			w.text(" ")
+			if err := w.ast(domain); err != nil {
+				return err
+			}
+			w.text(" are_siblings ")
+			siblings, err := f.manager.DatatypeAreSiblings(s, domain)
+			if err != nil {
+				return err
+			}
+			w.bit(siblings)
+			w.text("  is_datatype ")
+			datatype, err := f.isDatatype(domain)
+			if err != nil {
+				return err
+			}
+			w.bit(datatype)
+			w.text(" found_sibling ")
+			w.bit(foundSibling)
+			w.text("\n")
+			return nil
+		}); err != nil {
 			return value, false, err
 		}
 		sibling := false
@@ -410,6 +545,16 @@ func (f *DatatypeFactory) recursiveConstructor(s, c ast.ASTHandle, set *factoryV
 				return value, false, err
 			}
 			if arg.IsNull() {
+				if err = f.trace("get_fresh_value", 215, nil, func(w *datatypeFactoryTraceWriter) error {
+					w.text("no argument found for ")
+					if err := w.ast(domain); err != nil {
+						return err
+					}
+					w.text("\n")
+					return nil
+				}); err != nil {
+					return value, false, err
+				}
 				arg, err = f.model.SomeValue(domain)
 				if err != nil {
 					return value, false, err
@@ -442,6 +587,16 @@ func (f *DatatypeFactory) recursiveConstructor(s, c ast.ASTHandle, set *factoryV
 	if err = scope.ownCandidate(value); err != nil {
 		return value, false, err
 	}
+	if err = f.trace("get_fresh_value", 232, nil, func(w *datatypeFactoryTraceWriter) error {
+		w.text("potential new value: ")
+		if err := w.ast(value); err != nil {
+			return err
+		}
+		w.text("\n")
+		return nil
+	}); err != nil {
+		return value, false, err
+	}
 	f.last[s] = value
 	if _, seen := set.seen[value]; seen {
 		return value, false, nil
@@ -449,7 +604,15 @@ func (f *DatatypeFactory) recursiveConstructor(s, c ast.ASTHandle, set *factoryV
 	if err = f.RegisterValue(value); err != nil {
 		return value, false, err
 	}
-	return value, true, nil
+	err = f.trace("get_fresh_value", 236, nil, func(w *datatypeFactoryTraceWriter) error {
+		w.text("2. result: ")
+		if err := w.ast(value); err != nil {
+			return err
+		}
+		w.text("\n")
+		return nil
+	})
+	return value, true, err
 }
 func (f *DatatypeFactory) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
 	if err := f.open(); err != nil {
@@ -479,7 +642,9 @@ func (f *DatatypeFactory) Close() error {
 	for len(f.pending) != 0 {
 		p := &f.pending[0]
 		var err error
-		if p.contains != nil {
+		if p.trace != nil {
+			err = p.trace.close()
+		} else if p.contains != nil {
 			err = p.contains.Close()
 		} else {
 			err = p.scope.close()

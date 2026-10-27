@@ -155,8 +155,23 @@ func (w *traceStickyWriter) leaveOutput() {
 }
 
 func (w *traceStickyWriter) capture(err error) {
-	if err != nil && w.first == nil {
+	if err == nil {
+		return
+	}
+	if w.first == nil {
 		w.first = err
+	}
+	if w.streamErr == nil {
+		w.streamErr = err
+	}
+	// Nested TRACE records share one actual ostream state immediately.
+	if w.owner != nil && w.owner.streamErr == nil {
+		w.owner.streamErr = w.streamErr
+	}
+}
+func (w *traceStickyWriter) syncFailure() {
+	if w.owner != nil && w.owner.streamErr != nil {
+		w.capture(w.owner.streamErr)
 	}
 }
 func (w *traceStickyWriter) remember(n, want int, err error) (int, error) {
@@ -170,6 +185,7 @@ func (w *traceStickyWriter) remember(n, want int, err error) (int, error) {
 	return n, err
 }
 func (w *traceStickyWriter) Write(p []byte) (int, error) {
+	w.syncFailure()
 	if w.first != nil {
 		return 0, w.first
 	}
@@ -179,6 +195,7 @@ func (w *traceStickyWriter) Write(p []byte) (int, error) {
 	return w.remember(n, len(p), err)
 }
 func (w *traceStickyWriter) WriteString(s string) (int, error) {
+	w.syncFailure()
 	if w.first != nil {
 		return 0, w.first
 	}
@@ -208,6 +225,7 @@ func (w *traceStickyWriter) AppendCString(s string) error {
 	return err
 }
 func (w *traceStickyWriter) AppendInt32(v int32) error {
+	w.syncFailure()
 	if w.first != nil {
 		return w.first
 	}
@@ -227,6 +245,7 @@ func (w *traceStickyWriter) AppendInt32(v int32) error {
 	return err
 }
 func (w *traceStickyWriter) AppendUint32(v uint32) error {
+	w.syncFailure()
 	if w.first != nil {
 		return w.first
 	}
@@ -246,6 +265,7 @@ func (w *traceStickyWriter) AppendUint32(v uint32) error {
 	return err
 }
 func (w *traceStickyWriter) Flush() error {
+	w.syncFailure()
 	if w.first != nil {
 		return w.first
 	}
@@ -269,6 +289,7 @@ func WriteTraceEndl(w io.Writer) error {
 }
 
 func (w *traceStickyWriter) finish() error {
+	w.syncFailure()
 	w.enterOutput()
 	defer w.leaveOutput()
 	if err := flushTrace(w.out); err != nil {
@@ -334,6 +355,7 @@ func (t *TraceTags) EmitShort(tag string, body func(io.Writer) error) error {
 	sticky := &traceStickyWriter{owner: t, out: w, first: t.streamErr, streamErr: t.streamErr}
 	if body != nil {
 		bodyErr := body(sticky)
+		sticky.syncFailure()
 		if sticky.bodyComputationFailed(bodyErr) {
 			t.streamErr = sticky.streamErr
 			return bodyErr
@@ -360,6 +382,7 @@ func (t *TraceTags) EmitConditional(tag, function, file string, line int, condit
 	sticky.capture(writeTraceHeader(sticky, tag, function, file, line))
 	if body != nil {
 		bodyErr := body(sticky)
+		sticky.syncFailure()
 		if sticky.bodyComputationFailed(bodyErr) {
 			t.streamErr = sticky.streamErr
 			return bodyErr

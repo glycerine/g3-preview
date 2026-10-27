@@ -2,6 +2,7 @@
 package ast
 
 import (
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"strconv"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -37,10 +38,21 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 	return m.smt2PPExprTree(root, names, true)
 }
 
-// SMT2PPExprConfig selects source SMT2 expression-printer numeral profiles.
+// SMT2PPExprProfile captures the source printer constructor's eight pp fields.
+type SMT2PPExprProfile struct {
+	Decimal                                bool
+	DecimalPrecision                       uint32
+	BVLiterals, FPRealLiterals, BVNegative bool
+	MaxDepth, MinAliasSize                 uint32
+	FlatAssoc                              bool
+}
+
+// SMT2PPExprConfig keeps legacy numeral options and an optional full profile.
 type SMT2PPExprConfig struct {
 	Decimal          bool
 	DecimalPrecision uint32
+	Profile          *SMT2PPExprProfile
+	Globals          *uparams.GlobalParamsService
 }
 
 // SMT2PPBooleanTreeWithConfig prints a Boolean tree with the requested
@@ -81,6 +93,10 @@ func (m *ASTManager) smt2PPExprTreeWithInfoProfile(root ASTHandle, names []usymb
 }
 
 func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Symbol, requireBool bool, info *smt2PPInfo, enclosingAliases int, allowAliases bool, config SMT2PPExprConfig) (ASTHandle, error) {
+	profile := SMT2PPExprProfile{Decimal: config.Decimal, DecimalPrecision: config.DecimalPrecision, BVLiterals: true, MaxDepth: 5, MinAliasSize: 10, FlatAssoc: true}
+	if config.Profile != nil {
+		profile = *config.Profile
+	}
 	boolSort, err := m.MkBoolSort()
 	if err != nil {
 		return ASTHandle{}, err
@@ -196,7 +212,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 			if e != nil {
 				return result{}, e
 			}
-			if allowAliases && h != root && (childInfo.depth >= 5 || occurrences[h] > 1) {
+			if allowAliases && h != root && (childInfo.depth >= profile.MaxDepth || occurrences[h] > 1) {
 				return registerAlias(h, format, 0, childInfo.depth, childInfo.weight, occurrences[h] > 1)
 			}
 			return result{docs: []ASTHandle{format}, weight: childInfo.weight, depth: childInfo.depth}, nil
@@ -225,7 +241,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 		}
 		if count == 0 {
 			if sort != boolSort {
-				format, matched, e := m.smt2PPArithLiteral(h, config.Decimal, config.DecimalPrecision)
+				format, matched, e := m.smt2PPArithLiteral(h, profile.Decimal, profile.DecimalPrecision)
 				if e != nil {
 					return result{}, e
 				}
@@ -244,7 +260,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 					return result{}, e
 				}
 				if matched {
-					format, e = m.ppBitVectorLiteral(h, false, true, nil)
+					format, e = m.ppBitVectorLiteral(h, profile.BVNegative, profile.BVLiterals, config.Globals)
 					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, e
 				}
 				matched, e = m.smt2IsFloatingPointNumeral(h)
@@ -252,7 +268,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 					return result{}, e
 				}
 				if matched {
-					format, e = m.ppFloatBitVectorLiteral(h, true, nil)
+					format, e = m.ppFloatLiteral(h, profile.BVLiterals, profile.FPRealLiterals, config.Globals)
 					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, e
 				}
 				format, matched, e = m.SMT2PPDatalogLiteral(h)
@@ -301,7 +317,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 				patternChildrenApps = false
 			}
 			flat := false
-			if childKind == ASTApp && occurrences[child] == 1 {
+			if profile.FlatAssoc && childKind == ASTApp && occurrences[child] == 1 {
 				flat, e = m.smt2FlatAssocCandidate(h, child)
 				if e != nil {
 					return result{}, e
@@ -360,7 +376,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 		if e != nil {
 			return result{}, e
 		}
-		if allowAliases && h != root && (value.depth >= 5 || value.weight >= 10 && occurrences[h] > 1) {
+		if allowAliases && h != root && (value.depth >= profile.MaxDepth || value.weight >= profile.MinAliasSize && occurrences[h] > 1) {
 			return registerAlias(h, format, value.level, value.depth, value.weight, occurrences[h] > 1)
 		}
 		value.docs = []ASTHandle{format}

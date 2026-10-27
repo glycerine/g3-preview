@@ -425,7 +425,9 @@ digraph packages {
   "smtcore/proto_model" -> "ast/rewriter";
   "smtcore/proto_model" -> "model";
   "smtcore/proto_model" -> "util/diagnostic";
+  "smtcore/proto_model" -> "util/params";
   "smtcore/proto_model" -> "util/symbol";
+  "smtcore/proto_model" -> "util/text";
   "solver" [style=filled, fillcolor="#eeeeee"];
   "solver" -> "arena";
   "solver" -> "ast";

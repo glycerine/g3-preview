@@ -1,6 +1,8 @@
 // Source AST scalar/indexed readers. All public borrows remain handle values.
 package ast
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 func (m *ASTManager) declIdentity(r astNodeRef) (FamilyID, int32, error) {
 	if e := m.validNode(r); e != nil {
 		return -1, -1, e
@@ -277,4 +279,13 @@ func (m *ASTManager) GetFormatManager() (*ASTManager, error) {
 		return m, nil
 	}
 	return m.Format, nil
+}
+
+// BorrowSourceTraceTags returns the selected source-global/per-manager stream
+// owner. Consumers borrow its identity; the manager retains no extra lifetime.
+func (m *ASTManager) BorrowSourceTraceTags() *diagnostic.TraceTags {
+	if m.traceTags != nil {
+		return m.traceTags
+	}
+	return diagnostic.BorrowProcessTraceTags()
 }

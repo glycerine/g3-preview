@@ -2951,7 +2951,9 @@
         "ast/rewriter",
         "model",
         "util/diagnostic",
-        "util/symbol"
+        "util/params",
+        "util/symbol",
+        "util/text"
       ],
       "production_files": [
         "array_factory.go",
@@ -2959,6 +2961,7 @@
         "datalog_factory.go",
         "datatype_factory.go",
         "datatype_scope.go",
+        "datatype_trace.go",
         "factory.go",
         "factory_assertions.go",
         "fpa_factory.go",

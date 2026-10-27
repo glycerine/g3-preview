@@ -10,6 +10,7 @@ import (
 type datatypeFactoryPending struct {
 	scope    *datatypeFactoryScope
 	contains *ast.ContainsApp
+	trace    *datatypeFactoryTraceWriter
 }
 
 type datatypeFactoryScope struct {
@@ -56,6 +57,14 @@ func (f *DatatypeFactory) finishScope(s *datatypeFactoryScope, result *error) {
 	err := s.close()
 	if err != nil {
 		f.pending = append(f.pending, datatypeFactoryPending{scope: s})
+	}
+	*result = errors.Join(*result, err)
+}
+
+func (f *DatatypeFactory) finishContains(contains *ast.ContainsApp, result *error) {
+	err := contains.Close()
+	if err != nil {
+		f.pending = append(f.pending, datatypeFactoryPending{contains: contains})
 	}
 	*result = errors.Join(*result, err)
 }
