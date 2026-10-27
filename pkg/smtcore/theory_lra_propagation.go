@@ -176,7 +176,9 @@ func (t *SMTLRATheory) propagateLPBounds() (err error) {
 							return err
 						}
 					}
-					t.unassigned[v]--
+					if err = t.updateUnassignedBounds(v, -1); err != nil {
+						return err
+					}
 					t.lpPropagations++
 					if err = t.assignLRABound(literal, hook.core, nil); err != nil {
 						return err
@@ -241,7 +243,9 @@ func (t *SMTLRATheory) propagateBasicBound(b *smtLRABound, truth bool) (result e
 		return nil
 	}
 	literal := NewSMTLiteral(nearest.boolean, nearest.upper == findLower)
-	t.unassigned[b.variable]--
+	if err := t.updateUnassignedBounds(b.variable, -1); err != nil {
+		return err
+	}
 	t.basicPropagations++
 	proofs, err := t.state.manager.ProofsEnabled()
 	if err != nil {

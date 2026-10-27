@@ -4,6 +4,8 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -210,7 +212,10 @@ func (t *SMTLRATheory) foundNotHandled(h ast.ASTHandle) error {
 	if err == nil && u {
 		t.underspecified = append(t.underspecified, h)
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return t.traceLRAExpression("found_not_handled", 300, "Unhandled: ", h, "\n")
 }
 
 func (t *SMTLRATheory) reflect(h ast.ASTHandle) (bool, error) {
@@ -526,7 +531,7 @@ func (t *SMTLRATheory) InternalizeAtom(atom ast.ASTHandle, _ bool) (bool, error)
 		return false, err
 	}
 	if !own || op != smtArithOpLE && op != smtArithOpGE {
-		return true, t.foundNotHandled(atom)
+		return t.refuseAtom(atom)
 	}
 	lhs, err := t.state.manager.GetArg(atom, 0)
 	if err != nil {
@@ -545,7 +550,7 @@ func (t *SMTLRATheory) InternalizeAtom(atom ast.ASTHandle, _ bool) (bool, error)
 		return false, err
 	}
 	if !matched || kind != ast.ASTApp {
-		return true, t.foundNotHandled(atom)
+		return t.refuseAtom(atom)
 	}
 	v, err := t.internalizeDef(lhs)
 	if err != nil {
@@ -554,9 +559,14 @@ func (t *SMTLRATheory) InternalizeAtom(atom ast.ASTHandle, _ bool) (bool, error)
 	b := &smtLRABound{boolean: bv, variable: v, upper: op == smtArithOpLE}
 	b.value.Set(r)
 	t.bounds[v] = append(t.bounds[v], b)
-	t.unassigned[v]++
+	if err = t.updateUnassignedBounds(v, 1); err != nil {
+		return false, err
+	}
 	t.boundTrail = append(t.boundTrail, v)
 	t.boundByBoolean[bv] = b
+	if err = t.traceLRAExpression("internalize_atom_strict", 714, "Internalized ", atom, "\n"); err != nil {
+		return false, err
+	}
 	if err = t.mkBoundAxioms(b); err != nil {
 		t.newBounds = append(t.newBounds, b)
 		return false, err
@@ -585,6 +595,9 @@ func (t *SMTLRATheory) InternalizeEquality(h ast.ASTHandle, _ int32) error {
 	}
 	n1, n2 := t.state.context.enodes[left], t.state.context.enodes[right]
 	if n1 != nil && n2 != nil && n1 != n2 && t.IsAttachedToVariable(n1) && t.IsAttachedToVariable(n2) {
+		if err = t.traceLRAExpression("internalize_eq_eh", 781, "", h, "\n"); err != nil {
+			return err
+		}
 		return t.equalityAdapter.MkAxioms(n1.TheoryVar(t.FamilyID()), n2.TheoryVar(t.FamilyID()))
 	}
 	return nil
@@ -597,6 +610,11 @@ func (t *SMTLRATheory) NewEquality(left, right SMTTheoryVar) error {
 }
 func (t *SMTLRATheory) NewDisequality(left, right SMTTheoryVar) error {
 	if _, err := t.State(); err != nil {
+		return err
+	}
+	if err := t.emitLRA("new_diseq_eh", 806, func(out io.Writer) error {
+		return smtWriteTheoryText(out, fmt.Sprintf("v%d != v%d\n", left, right))
+	}); err != nil {
 		return err
 	}
 	t.statistics.disequalities++
@@ -625,6 +643,18 @@ func (t *SMTLRATheory) Assign(bv int32, truth bool) error {
 	}
 	if t.boundByBoolean[bv] == nil {
 		return ast.ErrASTDomain
+	}
+	if err := t.emitLRA("assign_eh", 787, func(out io.Writer) error {
+		expression, err := t.state.BoolExpression(bv)
+		if err != nil {
+			return err
+		}
+		if err = t.displayLRAExpression(out, expression); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, fmt.Sprintf(" %t\n", truth))
+	}); err != nil {
+		return err
 	}
 	t.assignments = append(t.assignments, smtLRAAssignment{bv, truth})
 	return nil
@@ -789,7 +819,12 @@ func (t *SMTLRATheory) PopScopes(n uint32) error {
 	if err := t.equalityAdapter.PopScopes(n); err != nil {
 		return err
 	}
-	return t.SMTTheoryBase.PopScopes(n)
+	if err := t.SMTTheoryBase.PopScopes(n); err != nil {
+		return err
+	}
+	return t.emitLRA("pop_scope_eh", 856, func(out io.Writer) error {
+		return smtWriteTheoryText(out, fmt.Sprintf("num scopes: %d new scope level: %d\n", n, len(t.scopes)))
+	})
 }
 
 func (t *SMTLRATheory) Close() error {
@@ -864,4 +899,11 @@ func (t *SMTLRATheory) Close() error {
 	t.scopes = nil
 	t.underspecified = nil
 	return nil
+}
+
+func (t *SMTLRATheory) refuseAtom(atom ast.ASTHandle) (bool, error) {
+	if err := t.traceLRAExpression("internalize_atom_strict", 705, "Could not internalize ", atom, "\n"); err != nil {
+		return false, err
+	}
+	return true, t.foundNotHandled(atom)
 }

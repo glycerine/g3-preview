@@ -151,3 +151,29 @@ func (t *SMTLRATheory) displayLRAExpression(out io.Writer, expression ast.ASTHan
 	}
 	return printer.DisplayExpr(out, expression, 0)
 }
+
+// Source TRACE operands are borrowed expressions. Disabled/native traces must
+// not evaluate the printer or require an expression lookup.
+func (t *SMTLRATheory) traceLRAExpression(function string, line int, prefix string, expression ast.ASTHandle, suffix string) error {
+	return t.emitLRA(function, line, func(out io.Writer) error {
+		if err := smtWriteTheoryText(out, prefix); err != nil {
+			return err
+		}
+		if err := t.displayLRAExpression(out, expression); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, suffix)
+	})
+}
+
+func (t *SMTLRATheory) updateUnassignedBounds(v SMTTheoryVar, increment int) error {
+	if err := t.emitLRA("updt_unassigned_bounds", 595, func(out io.Writer) error {
+		return smtWriteTheoryText(out, fmt.Sprintf("v%d %d += %d\n", v, t.unassigned[v], increment))
+	}); err != nil {
+		return err
+	}
+	// The native vector holds unsigned values. Preserve its arithmetic; the
+	// enclosing context/scope already owns the restoration trail in Go.
+	t.unassigned[v] += uint32(increment)
+	return nil
+}

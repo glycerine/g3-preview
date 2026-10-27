@@ -126,6 +126,7 @@ func TestSMTLRAObjectiveTraceLowerBoundRegistrationReuseAndPolarity(t *testing.T
 		}
 		for attempt := 0; attempt < 2; attempt++ {
 			out.Reset()
+			before := f.a.unassigned[v]
 			h := f.pin(f.a.MakeObjectiveLowerBound(filter, v, point))
 			var printed bytes.Buffer
 			astTestMust(t, f.a.displayLRAExpression(&printed, h))
@@ -135,6 +136,7 @@ func TestSMTLRAObjectiveTraceLowerBoundRegistrationReuseAndPolarity(t *testing.T
 			want := ""
 			if tags.ShouldTrace("arith") {
 				if attempt == 0 {
+					want += lraObjectiveTraceRecord("arith", "updt_unassigned_bounds", 595, fmt.Sprintf("v%d %d += 1\n", v, before))
 					want += lraObjectiveTraceRecord("arith", "mk_ge", 2444, base+"\n")
 				}
 				want += lraObjectiveTraceRecord("arith", "mk_ge", 2449, final+"\n")

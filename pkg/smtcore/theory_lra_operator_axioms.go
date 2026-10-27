@@ -125,6 +125,9 @@ func (t *SMTLRATheory) Relevant(term ast.ASTHandle) (result error) {
 	if len(t.pendingAxiomRoots) != 0 {
 		return ast.ErrASTHandle
 	}
+	if err := t.traceLRAExpression("relevant_eh", 864, "", term, "\n"); err != nil {
+		return err
+	}
 	op, own, err := t.operation(term)
 	if err != nil || !own {
 		return err

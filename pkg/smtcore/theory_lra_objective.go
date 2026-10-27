@@ -253,7 +253,9 @@ func (t *SMTLRATheory) MakeObjectiveLowerBound(filter *tactic.FilterModelConvert
 		// Publish ownership before the fallible axiom work, as InternalizeAtom
 		// does, so an allocation refusal leaves a registered, retryable bound.
 		t.bounds[v] = append(t.bounds[v], b)
-		t.unassigned[v]++
+		if err = t.updateUnassignedBounds(v, 1); err != nil {
+			return result, err
+		}
 		t.boundTrail = append(t.boundTrail, v)
 		t.boundByBoolean[bv] = b
 		if err = t.mkBoundAxioms(b); err != nil {
