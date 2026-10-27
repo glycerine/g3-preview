@@ -3271,6 +3271,7 @@
         "smtcore",
         "solver",
         "tactic",
+        "tactic/arith",
         "tactic/smtlogics",
         "util/diagnostic",
         "util/lbool",
@@ -3281,6 +3282,8 @@
         "util/symbol"
       ],
       "production_files": [
+        "bounded_int2bv_conversion.go",
+        "bounded_int2bv_solver.go",
         "enum2bv_solver.go",
         "pb2bv_solver.go",
         "smt_strategic_solver.go"

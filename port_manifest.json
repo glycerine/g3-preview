@@ -167158,9 +167158,16 @@
       "path": "src/tactic/portfolio/bounded_int2bv_solver.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/bounded_int2bv_solver.go",
+        "pkg/tactic/portfolio/bounded_int2bv_conversion.go"
+      ],
+      "tests": [
+        "pkg/tactic/portfolio/bounded_int2bv_solver_test.go",
+        "pkg/tactic/portfolio/bounded_int2bv_prefix_test.go",
+        "pkg/tactic/portfolio/bounded_int2bv_cpp_test.go"
+      ],
       "assertions": [
         {
           "line": 107,
@@ -167201,17 +167208,48 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete bounded integer solver buffering, bounds/scopes, substitution and BV2int rewriting, model/consequence conversion and delegated solver API",
+          "status": "partial",
+          "go_target": "pkg/tactic/portfolio/bounded_int2bv_solver.go",
+          "tests": [
+            "TestBoundedInt2BVSolverFlushBoundariesAndModels",
+            "TestBoundedInt2BVSolverConjunctionOrderAndFailurePrefix",
+            "TestBoundedInt2BVSolverScopedBoundsAndConsequences",
+            "TestBoundedInt2BVSolverNamedCoreAndUnconvertedBounds",
+            "TestBoundedInt2BVSolverFailurePrefixAndPopDiscard",
+            "TestBoundedInt2BVSolverConstructorRefusalsParametersAndTranslate",
+            "TestBoundedInt2BVSolverNonzeroOffsetConsequence",
+            "TestBoundedInt2BVSolverEmptyInspectionAndIndependentStatus",
+            "TestBoundedInt2BVSolverWideOffsetModelsAndConsequences",
+            "TestBoundedInt2BVSolverSourceWidthsAndRangeGuards",
+            "TestBoundedInt2BVSolverNonlinearPrebuiltCPPAndModels"
+          ]
+        }
+      ],
+      "ownership": [
+        "Owns base parameter value and tracked decrement receipt, retained backend solver, NamedAssertions, assertion roots, one BoundManager per scope, BV2IntContext and concrete rewriter, and independent BV/integer declaration vectors. Maps borrow declarations; exact big.Rat offsets are Go values. Pop erases map tails backwards then retires removed BV declarations forwards followed by integer declarations; Close destroys bound managers backwards before rewriter/context and declaration members. Concrete pending call owns safe substitution, intermediate AST roots, numeral locals, model converters/references and owned output until successful handoff. Borrowed consequence results remain owned until the next consequence query or Close."
+      ],
+      "deviations": [
+        "Uses native Go slices/maps and exact big.Rat arithmetic; no STL implementation or generic adapter. max_bv_size is read by the concrete context constructor only. Source parameter updates copy base values and forward to backend, without refreshing that constructor scalar. Source left-tail conjunction flattening, lazy flush boundaries, failed forwarding prefixes, Pop0 behavior, source width formula and zero-offset range-guard omission are retained. Consequences use actual num+offset, despite the source explanatory comment describing subtraction. Translate only translates backend and starts a fresh wrapper, without flushing/copying pending input or source mappings.",
+        "Executable wrapper is available for explicit composition and passes bounded model/core/scope/oracle checks, but the FD default dispatcher/inc_sat consumer is not yet connected. Source TRACE/SASSERT/VERIFY gates, exact source lexical rational/ref local lifetimes and physical vector/map allocation/refusal behavior remain unaudited; therefore both whole-unit audit flags stay false. Call scopes currently retain AST intermediates through output handoff and preserve failed numeral cleanup, without claiming exact source local lifetimes. Shared symbol/numeral-service translation is tested; arbitrary service-remapping translation is not claimed. Prebuilt C++ QF_FD comparisons cover 24 bounded nonlinear cases, not complete solver equivalence."
+      ]
     },
     {
       "path": "src/tactic/portfolio/bounded_int2bv_solver.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/bounded_int2bv_solver.go",
+        "pkg/tactic/portfolio/bounded_int2bv_conversion.go"
+      ],
+      "tests": [
+        "pkg/tactic/portfolio/bounded_int2bv_solver_test.go",
+        "pkg/tactic/portfolio/bounded_int2bv_prefix_test.go",
+        "pkg/tactic/portfolio/bounded_int2bv_cpp_test.go"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -167224,9 +167262,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "concrete bounded integer solver buffering, bounds/scopes, substitution and BV2int rewriting, model/consequence conversion and delegated solver API",
+          "status": "partial",
+          "go_target": "pkg/tactic/portfolio/bounded_int2bv_solver.go",
+          "tests": [
+            "TestBoundedInt2BVSolverFlushBoundariesAndModels",
+            "TestBoundedInt2BVSolverConjunctionOrderAndFailurePrefix",
+            "TestBoundedInt2BVSolverScopedBoundsAndConsequences",
+            "TestBoundedInt2BVSolverNamedCoreAndUnconvertedBounds",
+            "TestBoundedInt2BVSolverFailurePrefixAndPopDiscard",
+            "TestBoundedInt2BVSolverConstructorRefusalsParametersAndTranslate",
+            "TestBoundedInt2BVSolverNonzeroOffsetConsequence",
+            "TestBoundedInt2BVSolverEmptyInspectionAndIndependentStatus",
+            "TestBoundedInt2BVSolverWideOffsetModelsAndConsequences",
+            "TestBoundedInt2BVSolverSourceWidthsAndRangeGuards",
+            "TestBoundedInt2BVSolverNonlinearPrebuiltCPPAndModels"
+          ]
+        }
+      ],
+      "ownership": [
+        "Owns base parameter value and tracked decrement receipt, retained backend solver, NamedAssertions, assertion roots, one BoundManager per scope, BV2IntContext and concrete rewriter, and independent BV/integer declaration vectors. Maps borrow declarations; exact big.Rat offsets are Go values. Pop erases map tails backwards then retires removed BV declarations forwards followed by integer declarations; Close destroys bound managers backwards before rewriter/context and declaration members. Concrete pending call owns safe substitution, intermediate AST roots, numeral locals, model converters/references and owned output until successful handoff. Borrowed consequence results remain owned until the next consequence query or Close."
+      ],
+      "deviations": [
+        "Uses native Go slices/maps and exact big.Rat arithmetic; no STL implementation or generic adapter. max_bv_size is read by the concrete context constructor only. Source parameter updates copy base values and forward to backend, without refreshing that constructor scalar. Source left-tail conjunction flattening, lazy flush boundaries, failed forwarding prefixes, Pop0 behavior, source width formula and zero-offset range-guard omission are retained. Consequences use actual num+offset, despite the source explanatory comment describing subtraction. Translate only translates backend and starts a fresh wrapper, without flushing/copying pending input or source mappings.",
+        "Executable wrapper is available for explicit composition and passes bounded model/core/scope/oracle checks, but the FD default dispatcher/inc_sat consumer is not yet connected. Source TRACE/SASSERT/VERIFY gates, exact source lexical rational/ref local lifetimes and physical vector/map allocation/refusal behavior remain unaudited; therefore both whole-unit audit flags stay false. Call scopes currently retain AST intermediates through output handoff and preserve failed numeral cleanup, without claiming exact source local lifetimes. Shared symbol/numeral-service translation is tested; arbitrary service-remapping translation is not claimed. Prebuilt C++ QF_FD comparisons cover 24 bounded nonlinear cases, not complete solver equivalence."
+      ]
     },
     {
       "path": "src/tactic/portfolio/default_tactic.cpp",

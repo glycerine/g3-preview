@@ -521,6 +521,7 @@ digraph packages {
   "tactic/portfolio" -> "smtcore";
   "tactic/portfolio" -> "solver";
   "tactic/portfolio" -> "tactic";
+  "tactic/portfolio" -> "tactic/arith";
   "tactic/portfolio" -> "tactic/smtlogics";
   "tactic/portfolio" -> "util/diagnostic";
   "tactic/portfolio" -> "util/lbool";
