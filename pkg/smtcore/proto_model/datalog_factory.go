@@ -1,20 +1,23 @@
-// Source: src/smt/theory_dl.cpp finite-domain model factory.
+// Source: src/smt/theory_dl.cpp:45-57; concrete simple_factory<unsigned>
+// from src/smt/proto_model/value_factory.h:79-221.
 package protomodel
 
 import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 type datalogValueSet struct {
 	values []ast.ASTHandle
 	seen   map[ast.ASTHandle]struct{}
-	next   uint64
+	next   uint32
 }
 
-// DatalogFactory enumerates the declared finite domain with its canonical
-// datalog numerals.
+// DatalogFactory implements the retained unsigned simple_factory. A slice plus
+// membership map replaces the source unordered set; selection among registered
+// values uses insertion order rather than exposing C++ hash-table layout.
 type DatalogFactory struct {
 	manager *ast.ASTManager
 	family  ast.FamilyID
@@ -36,72 +39,134 @@ func NewDatalogFactory(manager *ast.ASTManager) (*DatalogFactory, error) {
 
 func (f *DatalogFactory) FamilyID() ast.FamilyID { return f.family }
 
+func (f *DatalogFactory) open() error {
+	if f == nil || f.manager == nil || f.sets == nil {
+		return ast.ErrASTHandle
+	}
+	return nil
+}
+
+func datalogFactoryAssert(line int32, condition string, evaluate func() bool) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil {
+		return err
+	}
+	if enabled && !evaluate() {
+		return diagnostic.DebugAssertionFailure(d, "src/smt/proto_model/value_factory.h", line, condition)
+	}
+	return nil
+}
+
 func (f *DatalogFactory) valueSet(sort ast.ASTHandle) (*datalogValueSet, error) {
+	if err := f.open(); err != nil {
+		return nil, err
+	}
 	finite, err := f.manager.IsDatalogFiniteSort(sort)
-	if err != nil || !finite {
-		if err != nil {
-			return nil, err
-		}
-		return nil, ast.ErrASTDomain
-	}
-	if set := f.sets[sort]; set != nil {
-		return set, nil
-	}
-	ref, err := f.manager.NewRef(sort)
 	if err != nil {
 		return nil, err
 	}
-	set := &datalogValueSet{seen: make(map[ast.ASTHandle]struct{})}
-	f.sets[sort] = set
-	f.sorts = append(f.sorts, ref)
+	if !finite {
+		return nil, ast.ErrASTDomain
+	}
+	set := f.sets[sort]
+	if set == nil {
+		ref, err := f.manager.NewRef(sort)
+		if err != nil {
+			return nil, err
+		}
+		set = &datalogValueSet{seen: make(map[ast.ASTHandle]struct{})}
+		f.sets[sort] = set
+		f.sorts = append(f.sorts, ref)
+	}
+	if err := datalogFactoryAssert(105, "set != 0", func() bool { return set != nil }); err != nil {
+		return nil, err
+	}
+	if diagnostic.DebugBuild {
+		var set2 *datalogValueSet
+		if err := datalogFactoryAssert(108, "m_sort2value_set.find(s, set2)", func() bool { set2 = f.sets[sort]; return set2 != nil }); err != nil {
+			return nil, err
+		}
+		if err := datalogFactoryAssert(109, "set == set2", func() bool { return set == set2 }); err != nil {
+			return nil, err
+		}
+	}
 	return set, nil
 }
 
-func (f *DatalogFactory) insert(value uint64, sort ast.ASTHandle) (ast.ASTHandle, bool, error) {
+func (f *DatalogFactory) insert(value uint32, sort ast.ASTHandle) (ast.ASTHandle, bool, error) {
 	set, err := f.valueSet(sort)
 	if err != nil {
 		return ast.ASTHandle{}, false, err
 	}
-	numeral, err := f.manager.MkDatalogNumeral(value, sort)
+	numeral, err := f.manager.MkDatalogNumeral(uint64(value), sort)
 	if err != nil {
 		return ast.ASTHandle{}, false, err
 	}
-	if _, found := set.seen[numeral]; found {
-		return numeral, false, nil
+	fresh := false
+	if _, found := set.seen[numeral]; !found {
+		ref, err := f.manager.NewRef(numeral)
+		if err != nil {
+			return ast.ASTHandle{}, false, err
+		}
+		f.values = append(f.values, ref)
+		set.seen[numeral] = struct{}{}
+		set.values = append(set.values, numeral)
+		fresh = true
 	}
-	ref, err := f.manager.NewRef(numeral)
-	if err != nil {
-		return ast.ASTHandle{}, false, err
+	if err := datalogFactoryAssert(125, "set->m_values.contains(new_val)", func() bool { _, ok := set.seen[numeral]; return ok }); err != nil {
+		return ast.ASTHandle{}, fresh, err
 	}
-	set.seen[numeral] = struct{}{}
-	set.values = append(set.values, numeral)
-	f.values = append(f.values, ref)
-	return numeral, true, nil
+	return numeral, fresh, nil
 }
 
 func (f *DatalogFactory) SomeValue(sort ast.ASTHandle) (ast.ASTHandle, error) {
-	set, err := f.valueSet(sort)
-	if err != nil {
+	if err := f.open(); err != nil {
 		return ast.ASTHandle{}, err
 	}
-	if len(set.values) != 0 {
+	if set := f.sets[sort]; set != nil && len(set.values) != 0 {
 		return set.values[0], nil
 	}
 	value, _, err := f.insert(0, sort)
 	return value, err
 }
 
-func (f *DatalogFactory) SomeValues(sort ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
-	size, matched, err := f.manager.DatalogFiniteSortSize(sort)
-	if err != nil || !matched {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+func (f *DatalogFactory) SomeValues(sort ast.ASTHandle) (first, second ast.ASTHandle, distinct bool, err error) {
+	if err = f.open(); err != nil {
+		return
 	}
-	first, err := f.SomeValue(sort)
-	if err != nil || size < 2 {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	set, exists := f.sets[sort]
+	if exists && len(set.values) >= 2 {
+		first, second = set.values[0], set.values[1]
+	} else if exists && len(set.values) == 1 {
+		first = set.values[0]
+		second, _, err = f.insert(0, sort)
+		if err != nil {
+			return
+		}
+		if first == second {
+			second, _, err = f.insert(1, sort)
+		}
+	} else {
+		first, _, err = f.insert(0, sort)
+		if err != nil {
+			return
+		}
+		second, _, err = f.insert(1, sort)
 	}
-	second, _, err := f.insert(1, sort)
-	return first, second, err == nil, err
+	if err != nil {
+		return
+	}
+	if exists {
+		err = datalogFactoryAssert(171, "v1 != v2", func() bool { return first != second })
+		if err != nil {
+			return
+		}
+	}
+	return first, second, true, nil
 }
 
 func (f *DatalogFactory) FreshValue(sort ast.ASTHandle) (ast.ASTHandle, error) {
@@ -109,25 +174,45 @@ func (f *DatalogFactory) FreshValue(sort ast.ASTHandle) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	size, matched, err := f.manager.DatalogFiniteSortSize(sort)
-	if err != nil || !matched {
+	size, err := f.manager.GetSortSize(sort)
+	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	for set.next < size {
-		candidate := set.next
+	var maxSize uint32
+	hasMax := false
+	if size.IsFinite() {
+		n, e := size.Size()
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if n < uint64(^uint32(0)) {
+			maxSize = uint32(n)
+			hasMax = true
+		}
+	}
+	start := set.next
+	for {
+		value, fresh, err := f.insert(set.next, sort)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
 		set.next++
-		value, fresh, insertErr := f.insert(candidate, sort)
-		if insertErr != nil {
-			return ast.ASTHandle{}, insertErr
+		if hasMax && set.next > maxSize+start {
+			return ast.ASTHandle{}, nil
 		}
 		if fresh {
+			if err := datalogFactoryAssert(201, "result != 0", func() bool { return value != (ast.ASTHandle{}) }); err != nil {
+				return ast.ASTHandle{}, err
+			}
 			return value, nil
 		}
 	}
-	return ast.ASTHandle{}, nil
 }
 
 func (f *DatalogFactory) RegisterValue(value ast.ASTHandle) error {
+	if err := f.open(); err != nil {
+		return err
+	}
 	sort, err := f.manager.GetSort(value)
 	if err != nil {
 		return err
@@ -139,32 +224,33 @@ func (f *DatalogFactory) RegisterValue(value ast.ASTHandle) error {
 	if _, found := set.seen[value]; found {
 		return nil
 	}
-	if _, matched, err := f.manager.DatalogNumeralValue(value); err != nil || !matched {
-		if err != nil {
-			return err
-		}
-		return ast.ErrASTDomain
-	}
+
 	ref, err := f.manager.NewRef(value)
 	if err != nil {
 		return err
 	}
+	f.values = append(f.values, ref)
 	set.seen[value] = struct{}{}
 	set.values = append(set.values, value)
-	f.values = append(f.values, ref)
 	return nil
 }
 
+// Member destruction releases sorts before the value vector. Values keep
+// their own sort references alive until the later value-vector release.
 func (f *DatalogFactory) Close() (err error) {
 	if f == nil || f.manager == nil {
 		return nil
 	}
-	for i := len(f.values) - 1; i >= 0; i-- {
-		err = errors.Join(err, f.manager.DelRef(&f.values[i]))
-	}
+	f.sets = nil
 	for i := len(f.sorts) - 1; i >= 0; i-- {
 		err = errors.Join(err, f.manager.DelRef(&f.sorts[i]))
 	}
-	f.values, f.sorts, f.sets = nil, nil, nil
+	for i := len(f.values) - 1; i >= 0; i-- {
+		err = errors.Join(err, f.manager.DelRef(&f.values[i]))
+	}
+	if err == nil {
+		f.values, f.sorts = nil, nil
+		f.manager = nil
+	}
 	return err
 }

@@ -113599,9 +113599,23 @@
       "path": "src/smt/proto_model/value_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/proto_model/factory.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/datalog_factory.go",
+        "pkg/smtcore/proto_model/datalog_factory_source_test.go"
+      ],
+      "tests": [
+        "TestValueFactoriesSomeFreshFreezeAndNumericValues",
+        "TestDatalogFactorySourceSomeValuesRegisteredBranches",
+        "TestDatalogFactorySourceSingletonAndExhaustionPrefixes",
+        "TestDatalogFactorySourceFreshSkipsRegisteredValues",
+        "TestDatalogFactorySourceRegistrationOwnershipAndCursor",
+        "TestDatalogFactorySourceFreshAllocationRefusalRetry",
+        "TestDatalogFactorySourceAssertionOwnerAndWarmSelection",
+        "TestDatalogFactorySourceProtoModelDispatch"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113638,11 +113652,44 @@
           "text": "SASSERT(result != 0);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [{"name": "typed ValueFactory interface plus concrete basic, scalar numeral, and user-sort factory algorithms", "status": "ported", "go_target": "pkg/smtcore/proto_model/factory.go", "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues"]}],
-      "ownership": ["Concrete typed Go implementations cover the retained unsigned and rational instantiations; native maps and slices replace C++ object tables and vectors."],
-      "deviations": ["The live scalar instantiations share one concrete implementation selected by a closed factory kind; no any-valued adapter or generic public surface is introduced."]
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [
+        {
+          "name": "typed ValueFactory interface plus concrete basic, scalar numeral, and user-sort factory algorithms",
+          "status": "partial",
+          "go_target": "pkg/smtcore/proto_model/factory.go",
+          "tests": [
+            "TestValueFactoriesSomeFreshFreezeAndNumericValues"
+          ]
+        },
+        {
+          "name": "Retained dl_factory concrete simple_factory<unsigned> algorithms: uint32 cursor, registered single/pair branches, arbitrary registered expressions, collision scan, mk_value-before-next increment and source bounds exception instead of early exhaustion; source assertion gates105/108/109/125/171/201 and warm SomeValue bypass; independent value/sort retains and ordinary source member release order",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datalog_factory.go",
+            "pkg/smtcore/proto_model/datalog_factory_source_test.go"
+          ],
+          "tests": [
+            "TestDatalogFactorySourceSomeValuesRegisteredBranches",
+            "TestDatalogFactorySourceSingletonAndExhaustionPrefixes",
+            "TestDatalogFactorySourceFreshSkipsRegisteredValues",
+            "TestDatalogFactorySourceRegistrationOwnershipAndCursor",
+            "TestDatalogFactorySourceFreshAllocationRefusalRetry",
+            "TestDatalogFactorySourceAssertionOwnerAndWarmSelection",
+            "TestDatalogFactorySourceProtoModelDispatch"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete typed Go implementations cover the retained unsigned and rational instantiations; native maps and slices replace C++ object tables and vectors.",
+        "The concrete datalog factory owns one reference per registered/generated value and sort; duplicate registration acquires no extra reference. Ordinary Close releases sort references before values, preserving independent AST owners. Real cold descriptor-frontier failures leave the fresh cursor unchanged and allow retry. Whole constructor/publication and interrupted teardown prefix audit remains open."
+      ],
+      "deviations": [
+        "The live scalar instantiations share one concrete implementation selected by a closed factory kind; no any-valued adapter or generic public surface is introduced.",
+        "Corrective retained-instantiation audit withdraws the earlier whole-header completion/audit claim. Datalog has its own concrete unsigned implementation. The existing shared scalar implementation still uses an unbounded big.Int cursor for the unsigned user-sort specialization and advances it before checking insert failure; other numeral/user-sort instantiations and diagnostic/ownership paths need source audit, not a universal adapter.",
+        "Go slices and a membership map replace C++ unordered-table layout. SomeValue/SomeValues select existing values in stable insertion order; no STL hash-table implementation is ported. Checked Go errors represent invalid physical owners and the finite-domain numeral bounds exception. No billions-of-iterations uint32 wrap campaign or complete whole-unit factory/lifecycle closure is claimed."
+      ]
     },
     {
       "path": "src/smt/qi_queue.cpp",
@@ -139728,7 +139775,8 @@
         "pkg/smtcore/theory_dl.go",
         "pkg/smtcore/proto_model/datalog_factory.go",
         "pkg/smtcore/theory_dl_model.go",
-        "pkg/smtcore/theory_dl_model_test.go"
+        "pkg/smtcore/theory_dl_model_test.go",
+        "pkg/smtcore/proto_model/datalog_factory_source_test.go"
       ],
       "tests": [
         "TestSMTDatalogStrictOrderReduction",
@@ -139740,7 +139788,14 @@
         "TestSMTDatalogNativeModelGeneratorAndScopedProcedureLifetime",
         "TestSMTDatalogNativeModelRefusalAndRetry",
         "TestSMTDatalogNativeDeclarationWidthAndScopedMap",
-        "TestSMTDatalogNativeOrderBridgeTermContextAndRelevance"
+        "TestSMTDatalogNativeOrderBridgeTermContextAndRelevance",
+        "TestDatalogFactorySourceSomeValuesRegisteredBranches",
+        "TestDatalogFactorySourceSingletonAndExhaustionPrefixes",
+        "TestDatalogFactorySourceFreshSkipsRegisteredValues",
+        "TestDatalogFactorySourceRegistrationOwnershipAndCursor",
+        "TestDatalogFactorySourceFreshAllocationRefusalRetry",
+        "TestDatalogFactorySourceAssertionOwnerAndWarmSelection",
+        "TestDatalogFactorySourceProtoModelDispatch"
       ],
       "assertions": [
         {
@@ -139790,14 +139845,33 @@
             "TestSMTDatalogNativeDeclarationWidthAndScopedMap",
             "TestSMTDatalogNativeOrderBridgeTermContextAndRelevance"
           ]
+        },
+        {
+          "name": "Retained dl_factory concrete simple_factory<unsigned> algorithms: uint32 cursor, registered single/pair branches, arbitrary registered expressions, collision scan, mk_value-before-next increment and source bounds exception instead of early exhaustion; source assertion gates105/108/109/125/171/201 and warm SomeValue bypass; independent value/sort retains and ordinary source member release order",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datalog_factory.go",
+            "pkg/smtcore/proto_model/datalog_factory_source_test.go"
+          ],
+          "tests": [
+            "TestDatalogFactorySourceSomeValuesRegisteredBranches",
+            "TestDatalogFactorySourceSingletonAndExhaustionPrefixes",
+            "TestDatalogFactorySourceFreshSkipsRegisteredValues",
+            "TestDatalogFactorySourceRegistrationOwnershipAndCursor",
+            "TestDatalogFactorySourceFreshAllocationRefusalRetry",
+            "TestDatalogFactorySourceAssertionOwnerAndWarmSelection",
+            "TestDatalogFactorySourceProtoModelDispatch"
+          ]
         }
       ],
       "ownership": [
-        "Per-sort declarations hold independent AST references; scoped map entries and references are retired on scope pop. Deferred model procedures borrow their theory/enode and own no AST reference. Each evaluation owns its temporary representative reference and numeral until return. The existing model factory owns its registered sorts/values; its complete source ownership audit remains open."
+        "Per-sort declarations hold independent AST references; scoped map entries and references are retired on scope pop. Deferred model procedures borrow their theory/enode and own no AST reference. Each evaluation owns its temporary representative reference and numeral until return. The existing model factory owns its registered sorts/values; its complete source ownership audit remains open.",
+        "The concrete datalog factory owns one reference per registered/generated value and sort; duplicate registration acquires no extra reference. Ordinary Close releases sort references before values, preserving independent AST owners. Real cold descriptor-frontier failures leave the fresh cursor unchanged and allow retry. Whole constructor/publication and interrupted teardown prefix audit remains open."
       ],
       "deviations": [
         "Corrective source audit removes the minimum-width approximation: representatives and finite-domain BV constants use the source width of64 bits. Model evaluation neither internalizes missing representatives nor sums partially assigned bits nor clamps invalid values to zero. The missing-BV assertion uses the actual runtime debug notification/input/action owners; signed conversion uses the existing MPQ/MPZ service. Physical invalid Go handles return checked errors.",
-        "Whole-unit completion and earlier audit flags are withdrawn. Other TRACE/SASSERT/VERIFY sites, fresh-copy and factory behavior, and full lifecycle/error-prefix fidelity still require audit. The prebuilt C++ executable has no FiniteDomain sort parser registration, so new finite-domain cases use the retained typed API; existing SMT-LIB C++ differential checks remain separate integration evidence."
+        "Whole-unit completion remains unproven. The concrete datalog factory algorithm is now mapped separately, while constructor/publication and interrupted teardown prefixes, other theory TRACE/SASSERT/VERIFY sites and fresh-copy/display lifecycle consumers still require audit. The prebuilt C++ executable has no FiniteDomain sort parser registration; typed API tests and existing CLI differential checks remain distinct evidence.",
+        "Go slices and a membership map replace C++ unordered-table layout. SomeValue/SomeValues select existing values in stable insertion order; no STL hash-table implementation is ported. Checked Go errors represent invalid physical owners and the finite-domain numeral bounds exception. No billions-of-iterations uint32 wrap campaign or complete whole-unit factory/lifecycle closure is claimed."
       ]
     },
     {

@@ -2945,6 +2945,7 @@
         "ast",
         "ast/rewriter",
         "model",
+        "util/diagnostic",
         "util/symbol"
       ],
       "production_files": [
