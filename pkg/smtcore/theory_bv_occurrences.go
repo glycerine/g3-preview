@@ -33,6 +33,45 @@ func (t *SMTBitVectorTheory) CreateVariable(node *SMTEnode) (SMTTheoryVar, error
 	return variable, nil
 }
 
+// Source get_var/mk_bits (theory_bv.cpp:49-63,160-167) is distinct
+// from apply_sort_cnstr: it creates indexed native atoms even if sort attachment
+// was suppressed or the approximation flag was already set. It does not find_wpos.
+func (t *SMTBitVectorTheory) nativeVariable(node *SMTEnode) (SMTTheoryVar, error) {
+	if node == nil {
+		return SMTNullTheoryVar, ast.ErrASTDomain
+	}
+	variable := node.TheoryVar(t.FamilyID())
+	if variable != SMTNullTheoryVar {
+		return variable, nil
+	}
+	width, err := t.state.manager.BitVectorSize(node.owner)
+	if err != nil {
+		return SMTNullTheoryVar, err
+	}
+	variable, err = t.CreateVariable(node)
+	if err != nil {
+		return SMTNullTheoryVar, err
+	}
+	bits, err := t.symbolicBits(node.owner, width)
+	if err != nil {
+		return SMTNullTheoryVar, err
+	}
+	if err = t.publishBitOwner(node.owner, bits); err != nil {
+		return SMTNullTheoryVar, err
+	}
+	for _, bit := range bits {
+		if err = t.state.Internalize(bit, true); err != nil {
+			return SMTNullTheoryVar, err
+		}
+		boolean, found := t.state.BoolVar(bit)
+		if !found {
+			return SMTNullTheoryVar, ast.ErrASTDomain
+		}
+		t.bitLiterals[variable] = append(t.bitLiterals[variable], NewSMTLiteral(boolean, false))
+	}
+	return variable, nil
+}
+
 func (t *SMTBitVectorTheory) addBitOccurrence(boolean int32, variable SMTTheoryVar, index uint32) error {
 	if boolean == SMTTrueBoolVar {
 		return nil

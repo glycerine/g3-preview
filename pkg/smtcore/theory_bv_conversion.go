@@ -8,14 +8,14 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-// Concrete lexical roots keep conversion operands alive independently of
+// Concrete lexical roots keep native operands and conversion terms alive across
 // recursively drained bit-blaster temporaries and context rewriter caches.
-type smtBVConversionCall struct {
+type smtBVExpressionCall struct {
 	theory *SMTBitVectorTheory
 	refs   []ast.ASTRef
 }
 
-func (c *smtBVConversionCall) hold(h ast.ASTHandle, err error) (ast.ASTHandle, error) {
+func (c *smtBVExpressionCall) hold(h ast.ASTHandle, err error) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
@@ -25,39 +25,32 @@ func (c *smtBVConversionCall) hold(h ast.ASTHandle, err error) (ast.ASTHandle, e
 	}
 	return h, err
 }
-func (c *smtBVConversionCall) close() (result error) {
+func (c *smtBVExpressionCall) close() (result error) {
 	for i := len(c.refs) - 1; i >= 0; i-- {
 		result = errors.Join(result, c.theory.state.manager.DelRef(&c.refs[i]))
 	}
 	return result
 }
-func (c *smtBVConversionCall) number(n *big.Int) (ast.ASTHandle, error) {
+func (c *smtBVExpressionCall) number(n *big.Int) (ast.ASTHandle, error) {
 	return c.hold(c.theory.state.manager.ArithmeticIntegerNumeralText(n.String()))
 }
-func (c *smtBVConversionCall) app(op int32, args ...ast.ASTHandle) (ast.ASTHandle, error) {
+func (c *smtBVExpressionCall) app(op int32, args ...ast.ASTHandle) (ast.ASTHandle, error) {
 	family, err := c.theory.state.manager.ArithmeticFamilyID()
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
 	return c.hold(c.theory.state.manager.MkFamilyApp(family, op, nil, args))
 }
-func (c *smtBVConversionCall) bits(expression ast.ASTHandle) ([]ast.ASTHandle, error) {
+func (c *smtBVExpressionCall) bits(expression ast.ASTHandle) ([]ast.ASTHandle, error) {
 	t := c.theory
 	s := t.state
 	node := s.context.enodes[expression]
 	if node == nil {
 		return nil, ast.ErrASTDomain
 	}
-	v := node.TheoryVar(t.FamilyID())
-	if v == SMTNullTheoryVar {
-		sort, err := s.manager.GetSort(expression)
-		if err != nil {
-			return nil, err
-		}
-		if err = t.ApplySortConstraint(node, sort); err != nil {
-			return nil, err
-		}
-		v = node.TheoryVar(t.FamilyID())
+	v, err := t.nativeVariable(node)
+	if err != nil {
+		return nil, err
 	}
 	if v < 0 || int(v) >= len(t.bitLiterals) {
 		return nil, ast.ErrASTDomain
@@ -96,7 +89,7 @@ func (t *SMTBitVectorTheory) assertBVToIntAxiom(expression ast.ASTHandle) (resul
 	if err != nil {
 		return err
 	}
-	c := smtBVConversionCall{theory: t}
+	c := smtBVExpressionCall{theory: t}
 	defer func() { result = errors.Join(result, c.close()) }()
 	argument, err := s.manager.GetArg(expression, 0)
 	if err != nil {
@@ -165,7 +158,7 @@ func (t *SMTBitVectorTheory) assertIntToBVAxiom(expression ast.ASTHandle) (resul
 	if err != nil {
 		return err
 	}
-	c := smtBVConversionCall{theory: t}
+	c := smtBVExpressionCall{theory: t}
 	defer func() { result = errors.Join(result, c.close()) }()
 	argument, err := s.manager.GetArg(expression, 0)
 	if err != nil {

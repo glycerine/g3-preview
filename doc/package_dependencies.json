@@ -2772,6 +2772,7 @@
         "theory_bv_fixed.go",
         "theory_bv_justification.go",
         "theory_bv_occurrences.go",
+        "theory_bv_operators.go",
         "theory_bv_private.go",
         "theory_bv_propagation.go",
         "theory_datatype.go",
