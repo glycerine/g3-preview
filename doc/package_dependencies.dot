@@ -278,6 +278,9 @@ digraph packages {
   "muz/base" [style=filled, fillcolor="#eeeeee"];
   "muz/base" -> "util/params";
   "nlsat" [style=filled, fillcolor="#eeeeee"];
+  "nlsat" -> "arena";
+  "nlsat" -> "math/polynomial";
+  "nlsat" -> "util/diagnostic";
   "nlsat" -> "util/params";
   "opt" [style=filled, fillcolor="#eeeeee"];
   "opt" -> "arena";

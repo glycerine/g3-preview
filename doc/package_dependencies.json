@@ -2080,9 +2080,13 @@
     {
       "package": "nlsat",
       "imports": [
+        "arena",
+        "math/polynomial",
+        "util/diagnostic",
         "util/params"
       ],
       "production_files": [
+        "assignment.go",
         "gparams_catalog_collectors.go"
       ]
     },

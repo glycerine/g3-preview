@@ -89742,9 +89742,14 @@
       "path": "src/nlsat/nlsat_assignment.h",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/assignment.go"
+      ],
+      "tests": [
+        "pkg/nlsat/assignment_test.go",
+        "pkg/nlsat/source_collectors_external_test.go"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -89767,9 +89772,34 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "assignment set/copy/set_core, reset-variable/reset-flags, raw value lookup, checked var2anum lookup, cell/assignment swap and decimal display",
+          "status": "partial",
+          "go_target": "pkg/nlsat/assignment.go",
+          "tests": [
+            "TestAssignmentResetCopyAndExchangePreserveHiddenCells",
+            "TestAssignmentIndependentStateMachine",
+            "TestAssignmentGrowthRefusalRetainsReachedPrefixAndDisplay",
+            "TestAssignmentIrrationalOwnersAndPrebuiltCPPOracle"
+          ]
+        },
+        {
+          "name": "undef_var_assignment membership-only mask with unmasked raw lookup and borrowed manager",
+          "status": "ported",
+          "go_target": "pkg/nlsat/assignment.go",
+          "tests": [
+            "TestAssignmentMaskBorrowAndSourceAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Assignment borrows the actual AlgebraicManager and owns every retained numerical cell independently of membership flags. Reset only retires the active flag range. Copy transfers the source mask but copies values only for assigned positions, preserving older hidden destination cells. SetCore swaps the incoming owner with the previous slot. Destructor retires the younger Boolean-vector storage before deleting every numerical cell in forward order. Native slices charge their reflected Go extents; stale backing cells are cleared when owned handles move during growth. Close is resumable and rejects new operations after it starts."
+      ],
+      "deviations": [
+        "Concrete native Go slices implement storage; no C++ vector/STL implementation or universal value adapter is ported. Exact source vector allocation, relocation and every numerical refusal/lifetime frontier remain unaudited. Borrowed cell addresses expire on vector growth. Go typed bounds/owner guards reject source-invalid accesses and cross-manager swaps/copies. Source assignment lookup/swap assertions use actual debug gates; full bound C/T assertion transport is not established by explicit Go assertion tests.",
+        "240-step independent state-machine tests exercise masks and hidden slots across set/reset/copy/swaps. A reached value-vector growth followed by flag-vector refusal is characterized. Irrational copy/exchange tests call actual algebraic services and check two resulting squared-root values against prebuilt C++ root expressions. This is a retained foundation, not a complete NLSAT engine: atom/clause/interval/evaluator/explanation/search and goal/tactic integration remain unported."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_clause.cpp",
