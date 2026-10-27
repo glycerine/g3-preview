@@ -212,6 +212,9 @@ func (r *BV2IntContext) CollectPower2(g *tactic.Goal) error {
 		if !ok || v.IsNull() {
 			continue
 		}
+		if err = bv2IntSourceAssert(68, "!bounds.empty()", len(bounds) > 0); err != nil {
+			return err
+		}
 		sort.Slice(bounds, func(i, j int) bool { return bounds[i].Cmp(&bounds[j]) < 0 })
 		var power big.Rat
 		power.SetInt64(1)
