@@ -5,7 +5,6 @@ package smtcore
 import (
 	"errors"
 	"fmt"
-	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
 	astfpa "github.com/glycerine/g3/pkg/ast/fpa"
@@ -21,6 +20,7 @@ type smtFPAConversion struct {
 }
 
 type smtFPAValueProcedure struct {
+	manager      *ast.ASTManager
 	dependencies []SMTModelValueDependency
 	ebits        uint32
 	sbits        uint32
@@ -34,86 +34,13 @@ func (p *smtFPAValueProcedure) Dependencies() []SMTModelValueDependency {
 func (*smtFPAValueProcedure) IsFresh() bool { return false }
 
 func (p *smtFPAValueProcedure) MakeValue(generator *SMTModelGenerator, values []ast.ASTHandle) (ast.ASTHandle, error) {
-	if p == nil || generator == nil || len(values) != len(p.dependencies) {
+	if p == nil || p.manager == nil || generator == nil || len(values) != len(p.dependencies) {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
-	manager := generator.manager
 	if p.rounding {
-		if len(values) != 1 {
-			return ast.ASTHandle{}, ast.ErrASTDomain
-		}
-		text, matched, err := manager.BitVectorNumeralText(values[0])
-		if err != nil || !matched {
-			if err != nil {
-				return ast.ASTHandle{}, err
-			}
-			return ast.ASTHandle{}, ast.ErrASTDomain
-		}
-		code, ok := new(big.Int).SetString(text, 10)
-		if !ok || !code.IsUint64() {
-			return ast.ASTHandle{}, ast.ErrASTDomain
-		}
-		operation := ast.FPAOpRMTowardZero
-		switch code.Uint64() {
-		case 0:
-			operation = ast.FPAOpRMNearestEven
-		case 1:
-			operation = ast.FPAOpRMNearestAway
-		case 2:
-			operation = ast.FPAOpRMTowardPositive
-		case 3:
-			operation = ast.FPAOpRMTowardNegative
-		}
-		family, err := manager.ExistingFloatingPointFamilyID()
-		if err != nil || family == ast.NullFamilyID {
-			if err != nil {
-				return ast.ASTHandle{}, err
-			}
-			return ast.ASTHandle{}, ast.ErrASTDomain
-		}
-		return manager.MkFamilyApp(family, operation, nil, nil)
+		return p.manager.MkFPARoundingModeModelValue(values)
 	}
-	var sign, exponent, significand ast.ASTHandle
-	var err error
-	if len(values) == 3 {
-		sign, exponent, significand = values[0], values[1], values[2]
-	} else if len(values) == 1 {
-		text, matched, textErr := manager.BitVectorNumeralText(values[0])
-		if textErr != nil || !matched {
-			if textErr != nil {
-				return ast.ASTHandle{}, textErr
-			}
-			return ast.ASTHandle{}, ast.ErrASTDomain
-		}
-		packed, ok := new(big.Int).SetString(text, 10)
-		if !ok || packed.Sign() < 0 {
-			return ast.ASTHandle{}, ast.ErrASTDomain
-		}
-		signValue := new(big.Int).Rsh(new(big.Int).Set(packed), uint(p.ebits+p.sbits-1))
-		exponentValue := new(big.Int).Rsh(new(big.Int).Set(packed), uint(p.sbits-1))
-		exponentValue.And(exponentValue, new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), uint(p.ebits)), big.NewInt(1)))
-		significandValue := new(big.Int).And(new(big.Int).Set(packed), new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), uint(p.sbits-1)), big.NewInt(1)))
-		sign, err = manager.BitVectorNumeralRat(new(big.Rat).SetInt(signValue), 1)
-		if err == nil {
-			exponent, err = manager.BitVectorNumeralRat(new(big.Rat).SetInt(exponentValue), p.ebits)
-		}
-		if err == nil {
-			significand, err = manager.BitVectorNumeralRat(new(big.Rat).SetInt(significandValue), p.sbits-1)
-		}
-		if err != nil {
-			return ast.ASTHandle{}, err
-		}
-	} else {
-		return ast.ASTHandle{}, ast.ErrASTDomain
-	}
-	family, err := manager.ExistingFloatingPointFamilyID()
-	if err != nil || family == ast.NullFamilyID {
-		if err != nil {
-			return ast.ASTHandle{}, err
-		}
-		return ast.ASTHandle{}, ast.ErrASTDomain
-	}
-	return manager.MkFamilyApp(family, ast.FPAOpFP, nil, []ast.ASTHandle{sign, exponent, significand})
+	return p.manager.MkFPAModelValue(p.ebits, p.sbits, values)
 }
 
 // SMTFloatingPointTheory preserves FP and rounding-mode terms in the e-graph
@@ -872,7 +799,7 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 	if err != nil {
 		return nil, err
 	}
-	procedure := &smtFPAValueProcedure{ebits: ebits, sbits: sbits, rounding: rounding}
+	procedure := &smtFPAValueProcedure{manager: state.manager, ebits: ebits, sbits: sbits, rounding: rounding}
 	if own && op == ast.FPAOpFP {
 		procedure.dependencies = make([]SMTModelValueDependency, 3)
 		for i := range procedure.dependencies {

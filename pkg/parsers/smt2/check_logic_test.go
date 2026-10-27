@@ -12,6 +12,15 @@ import (
 
 func TestSMT2LogicValidationCPP(t *testing.T) {
 	for _, tc := range []struct{ name, setup, command, want string }{
+		{"fp-indexed-sort", "(set-logic QF_FPBV)", "(declare-const x (_ FloatingPoint 3 4))", ""},
+		{"fp-rm-sort", "(set-logic QF_FP)", "(declare-const r RoundingMode)", ""},
+		{"fp-hidden-sort", "(set-logic QF_BV)", "(declare-const x (_ FloatingPoint 3 4))", "unknown sort"},
+		{"fp-hidden-rm", "(set-logic QF_LIA)", "(declare-const r RoundingMode)", "unknown sort"},
+		{"fp-hidden-op", "(set-logic QF_BV)", "(assert (= RNE RTZ))", "unknown constant RNE"},
+		{"fp-alias-Float16", "(set-logic QF_FP)", "(declare-const x Float16)", ""},
+		{"fp-alias-Float32", "(set-logic QF_FP)", "(declare-const x Float32)", ""},
+		{"fp-alias-Float64", "(set-logic QF_FP)", "(declare-const x Float64)", ""},
+		{"fp-alias-Float128", "(set-logic QF_FP)", "(declare-const x Float128)", ""},
 		{"integer-sort", "(set-logic QF_UF)", "(declare-const x Int)", "unknown sort"},
 		{"real-sort", "(set-logic QF_LIA)", "(declare-const x Real)", "logic does not support reals"},
 		{"bv-sort", "(set-logic QF_LIA)", "(declare-const x (_ BitVec 8))", "unknown sort"},

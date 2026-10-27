@@ -425,6 +425,18 @@ func (c *Context) LookupSort(name string) (ast.ASTHandle, error) {
 	if !c.BuiltinSortAvailable(name) {
 		return ast.ASTHandle{}, fmt.Errorf("unknown sort %s", name)
 	}
+	if name == "FloatingPoint" {
+		return ast.ASTHandle{}, fmt.Errorf("invalid floating-point sort, expecting two parameters")
+	}
+	for i, alias := range []string{"RoundingMode", "Float16", "Float32", "Float64", "Float128"} {
+		if name == alias {
+			family, err := m.RegisterFloatingPointPlugin()
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			return m.MkFamilySort(family, int32(i+1), nil)
+		}
+	}
 	if name == "Seq" {
 		return ast.ASTHandle{}, fmt.Errorf("Invalid sequence sort, expecting one parameter")
 	}

@@ -64,6 +64,18 @@ func (c *Context) initBuiltins() error {
 			return err
 		}
 	}
+	family, err = m.RegisterFloatingPointPlugin()
+	if err != nil {
+		return err
+	}
+	if c.logic == "" || solver.LogicHasFPA(c.logic) {
+		if err = m.GetFloatingPointOpNames(&names, logic); err != nil {
+			return err
+		}
+		if err = c.addBuiltinNames(family, &names); err != nil {
+			return err
+		}
+	}
 	family, err = m.RegisterPseudoBooleanPlugin()
 	if err != nil {
 		return err
@@ -127,6 +139,8 @@ func (c *Context) BuiltinSortAvailable(name string) bool {
 		return c.logic == "" || solver.LogicHasArithmetic(c.logic)
 	case "BitVec":
 		return c.logic == "" || solver.LogicHasBitVector(c.logic)
+	case "FloatingPoint", "RoundingMode", "Float16", "Float32", "Float64", "Float128":
+		return c.logic == "" || solver.LogicHasFPA(c.logic)
 	case "Array":
 		return c.logic == "" || solver.LogicHasArray(c.logic)
 	case "String", "StringSequence", "Seq", "RegEx":

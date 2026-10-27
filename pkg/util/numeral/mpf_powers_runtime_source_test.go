@@ -31,12 +31,20 @@ func TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction(t *testing.
 		b.FailAfter(0)
 		again, err := m.powerTwoWrapper(n, false)
 		serviceMust(t, err)
+		borrowed, err := m.BorrowPowerOfTwo(n)
+		serviceMust(t, err)
+		if borrowed != a {
+			t.Fatal("borrow must expose the cached NUM, not an owned copy", n)
+		}
 		if again != w || b.Used() != before {
 			t.Fatal("source cache hit allocated or replaced wrapper")
 		}
 		b.FailAfter(-1)
 	}
 	serviceMust(t, m.SourceFinalize())
+	if _, err := m.BorrowPowerOfTwo(0); err == nil {
+		t.Fatal("ended owner lent a cached power")
+	}
 	if r.Stats().LiveBlocks != 0 {
 		t.Fatal("source power wrapper/NUM destruction", r.Stats())
 	}

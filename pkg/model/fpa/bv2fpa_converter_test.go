@@ -134,15 +134,32 @@ func TestBV2FPAConverterConvertsFloatAndRoundingConstants(t *testing.T) {
 	testMust(t, err)
 	encoded, err := sourceConverter.MkConst(floatDecl)
 	testMust(t, err)
-	sign, err := m.GetArg(encoded, 0)
-	testMust(t, err)
-	packed, err := m.GetArg(sign, 0)
-	testMust(t, err)
-	packedDecl, err := m.GetDecl(packed)
-	testMust(t, err)
 	packedValue, err := m.BitVectorNumeralUnsigned(0x3fc00000, 32)
 	testMust(t, err)
-	testMust(t, sourceModel.RegisterConstant(packedDecl, packedValue))
+	var consumedFloatDecls []ast.ASTHandle
+	// Source fpa2bv_converter.cpp:190-214 creates three independent field
+	// constants under Z3DEBUG and one packed constant in the release build.
+	if ast.ASTSourceDebug {
+		for i, field := range []struct{ value, width uint32 }{{0, 1}, {127, 8}, {1 << 22, 23}} {
+			expression, e := m.GetArg(encoded, uint32(i))
+			testMust(t, e)
+			declaration, e := m.GetDecl(expression)
+			testMust(t, e)
+			value, e := m.BitVectorNumeralUnsigned(field.value, field.width)
+			testMust(t, e)
+			testMust(t, sourceModel.RegisterConstant(declaration, value))
+			consumedFloatDecls = append(consumedFloatDecls, declaration)
+		}
+	} else {
+		sign, e := m.GetArg(encoded, 0)
+		testMust(t, e)
+		packed, e := m.GetArg(sign, 0)
+		testMust(t, e)
+		declaration, e := m.GetDecl(packed)
+		testMust(t, e)
+		testMust(t, sourceModel.RegisterConstant(declaration, packedValue))
+		consumedFloatDecls = append(consumedFloatDecls, declaration)
+	}
 
 	family, err := m.RegisterFloatingPointPlugin()
 	testMust(t, err)
@@ -167,9 +184,12 @@ func TestBV2FPAConverterConvertsFloatAndRoundingConstants(t *testing.T) {
 	defer func() { testMust(t, converter.Close()) }()
 	seen, err := converter.ConvertModel(sourceModel, targetModel)
 	testMust(t, err)
-	if _, ok := seen[packedDecl]; !ok {
-		t.Fatal("packed declaration was not consumed")
+	for _, declaration := range consumedFloatDecls {
+		if _, ok := seen[declaration]; !ok {
+			t.Fatal("float backing declaration was not consumed", declaration)
+		}
 	}
+
 	if _, ok := seen[rmBitsDecl]; !ok {
 		t.Fatal("rounding declaration was not consumed")
 	}

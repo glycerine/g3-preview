@@ -40636,7 +40636,8 @@
         "pkg/smtcore/smt_setup_simple.go",
         "pkg/smtcore/smt_setup_lra_backend_test.go",
         "pkg/cmd_context/statistics_test.go",
-        "pkg/cmd/g3/lra_backend_test.go"
+        "pkg/cmd/g3/lra_backend_test.go",
+        "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -41479,7 +41480,49 @@
             "TestSMTLibRunnerCPPReference"
           ]
         },
-        {"name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]}
+        {
+          "name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_setup_real.go",
+            "pkg/smtcore/smt_setup_simple.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/reason_unknown.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/smtcore/smt_setup_lra_backend_test.go",
+            "pkg/cmd_context/statistics_test.go",
+            "pkg/cmd/g3/lra_backend_test.go"
+          ],
+          "tests": [
+            "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+            "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+            "TestSMTLRAPublicSetupProofAndTrackedConflict",
+            "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+            "TestCommandContextStatisticsWriterAndWatch",
+            "TestSMTLibRunnerConcreteLRASmoke",
+            "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+            "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+            "TestSMTLibRunnerConcreteLRADefaultSelection"
+          ]
+        },
+        {
+          "name": "FPA logic-gated builtin name installation in init_manager_core/logic_has_fpa (669-710), concrete RoundingMode and Float16/32/64/128 sort lookup through retained declaration plugin. Full context and model composition remain partial.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/cmd_context/applications.go",
+            "pkg/cmd_context/context.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMT2LogicValidationCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
       ],
       "ownership": [
         "The command context owns its lazily created AST manager and SMTSolver, original assertion and optional core-tag ASTRefs, function/sort declaration trails and local params. Standalone sessions own and close the borrowed solver-service graph after context resources are released.",
@@ -91201,7 +91244,8 @@
         "pkg/smtcore/smt_setup_lra_backend_test.go",
         "pkg/cmd_context/statistics_test.go",
         "pkg/cmd/g3/lra_backend_test.go",
-        "pkg/parsers/smt2/lemma_problem_test.go"
+        "pkg/parsers/smt2/lemma_problem_test.go",
+        "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -92235,13 +92279,53 @@
             "TestSMTLibRunnerCPPReference"
           ]
         },
-        {"name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.", "status": "ported", "go_targets": ["pkg/smtcore/smt_setup_real.go", "pkg/smtcore/smt_setup_simple.go", "pkg/smtcore/smt_kernel.go", "pkg/cmd_context/context.go", "pkg/cmd_context/reason_unknown.go", "pkg/cmd_context/tactic_commands.go", "pkg/parsers/smt2/commands.go", "pkg/smtcore/smt_setup_lra_backend_test.go", "pkg/cmd_context/statistics_test.go", "pkg/cmd/g3/lra_backend_test.go"], "tests": ["TestSMTLRAPublicSetupLogicAutoAndFirstPush", "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate", "TestSMTLRAPublicSetupProofAndTrackedConflict", "TestCommandContextStatisticsResultPriorityAndProcessCounters", "TestCommandContextStatisticsWriterAndWatch", "TestSMTLibRunnerConcreteLRASmoke", "TestSMTLibRunnerConcreteLRAIsIntNormalization", "TestSMTLibRunnerConcreteLRAScriptsMatchCPP", "TestSMTLibRunnerConcreteLRADefaultSelection"]},
+        {
+          "name": "Retained get-info :all-statistics dispatch and cmd_context display_statistics: active result priority, source check stopwatch, allocator-domain memory rounding/counts, passive rlimit count and SMT2 rendering.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_setup_real.go",
+            "pkg/smtcore/smt_setup_simple.go",
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/reason_unknown.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/parsers/smt2/commands.go",
+            "pkg/smtcore/smt_setup_lra_backend_test.go",
+            "pkg/cmd_context/statistics_test.go",
+            "pkg/cmd/g3/lra_backend_test.go"
+          ],
+          "tests": [
+            "TestSMTLRAPublicSetupLogicAutoAndFirstPush",
+            "TestSMTLRAPublicSetupAllocationFailureRetiresCandidate",
+            "TestSMTLRAPublicSetupProofAndTrackedConflict",
+            "TestCommandContextStatisticsResultPriorityAndProcessCounters",
+            "TestCommandContextStatisticsWriterAndWatch",
+            "TestSMTLibRunnerConcreteLRASmoke",
+            "TestSMTLibRunnerConcreteLRAIsIntNormalization",
+            "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
+            "TestSMTLibRunnerConcreteLRADefaultSelection"
+          ]
+        },
         {
           "name": "parse_declare_sort (2149-2174): absent arity defaults to zero, enabling native context lemma dumps",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/commands.go",
           "tests": [
             "TestSMT2ContextLemmaProblemsGoAndCPP"
+          ]
+        },
+        {
+          "name": "Retained indexed FloatingPoint sort construction through existing FPA declaration plugin, with command-context logic visibility; concrete FP/RM model/scoping script compared against prebuilt C++ executable. Generic parser closure remains open.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/check_logic_test.go",
+            "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMT2LogicValidationCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         }
       ],
@@ -140524,7 +140608,11 @@
         "pkg/ast/rewriter/fpa2bv_constructor_frontier_test.go",
         "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
         "pkg/smtcore/theory_fpa_display.go",
-        "pkg/smtcore/theory_fpa_display_test.go"
+        "pkg/smtcore/theory_fpa_display_test.go",
+        "pkg/ast/ast_fpa_model_value.go",
+        "pkg/ast/ast_fpa_model_value_test.go",
+        "pkg/smtcore/theory_fpa_model_source_test.go",
+        "pkg/util/numeral/mpf_borrowed_power.go"
       ],
       "tests": [
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
@@ -140538,7 +140626,13 @@
         "TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability",
         "TestSMTFPADisplayMergeRootAndScopeRollback",
         "TestSMTFPADisplayEmptyGateAndGuards",
-        "TestSMTFPADisplayColdAllocationRefusalAndRetry"
+        "TestSMTFPADisplayColdAllocationRefusalAndRetry",
+        "TestASTFPAModelPackedAndComponentsExhaustive",
+        "TestASTFPAModelRoundingModeCodes",
+        "TestASTFPAModelWideBiasedExponent",
+        "TestSMTFPANativeModelProcedureCanonicalComponents",
+        "TestSMTFPAModelWidthAssertionsAndActions",
+        "TestSMTFPAModelNumeralVerification"
       ],
       "assertions": [
         {
@@ -140794,7 +140888,7 @@
         },
         {
           "name": "canonical value factory, FP and rounding-mode model value procedures, and converted-function model finalization",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/smtcore/theory_fpa.go",
           "tests": [
             "TestSMTFloatingPointModelReconstructsWrappedConstants",
@@ -140812,6 +140906,24 @@
             "TestSMTFPADisplayEmptyGateAndGuards",
             "TestSMTFPADisplayColdAllocationRefusalAndRetry"
           ]
+        },
+        {
+          "name": "Native fpa_value_proc and fpa_rm_value_proc numerical bodies (theory_fpa.cpp:136-192,212-230): borrowed theory manager, actual MPZ bias and cached powers, packed/three-field decoding, unbias before signed conversion, late scoped MPF construction, canonical numeral registration, real SASSERT/VERIFY actions, and RM default-to-zero mapping. Input/result TRACE and complete owner-failure-prefix audit remain open.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/ast_fpa_model_value.go",
+            "pkg/ast/ast_fpa_model_value_test.go",
+            "pkg/smtcore/theory_fpa_model_source_test.go",
+            "pkg/util/numeral/mpf_borrowed_power.go"
+          ],
+          "tests": [
+            "TestASTFPAModelPackedAndComponentsExhaustive",
+            "TestASTFPAModelRoundingModeCodes",
+            "TestASTFPAModelWideBiasedExponent",
+            "TestSMTFPANativeModelProcedureCanonicalComponents",
+            "TestSMTFPAModelWidthAssertionsAndActions",
+            "TestSMTFPAModelNumeralVerification"
+          ]
         }
       ],
       "ownership": [
@@ -140825,7 +140937,8 @@
         "NewEquality and NewDisequality remain inert because the exact structural-equality bit-vector definition is installed syntactically; creating fresh Boolean circuits during a Go e-graph merge would violate rollback ordering.",
         "Float operands are reached recursively while translating atoms and equalities; rounding-mode relevancy additionally connects wrappers to finite encodings. Context display_theories is a retained display consumer and now reaches the complete FPA printer. The previous claim that native trace/display had no separate retained consumer was unsupported: live t_fpa/t_fpa_detail/t_fpa_internalize traces and source assertions remain unported, and fresh-theory reachability still requires revalidation.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
-        "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change."
+        "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change.",
+        "The former broad model/factory ported claim is withdrawn: the factory still supplies signed zeros instead of source numeric 0/1; fresh-value fatal behavior, rounding-mode factory extensions, model fallback paths, source input/result TRACE, numerical destructor failure prefixes and full lifecycle audit remain open. Native model reconstruction now uses the actual plugin MPF/MPZ owners and canonical registration instead of math/big extraction followed by a raw fp constructor. The selected small-format C++ SMT-LIB comparison is integration evidence, not whole-unit completion. Ebits64 also reaches the source signed top-exponent helper limit (2^63); the tested multi-limb boundary is ebits63."
       ]
     },
     {
@@ -140839,7 +140952,11 @@
         "pkg/ast/rewriter/fpa2bv_constructor_frontier_test.go",
         "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
         "pkg/smtcore/theory_fpa_display.go",
-        "pkg/smtcore/theory_fpa_display_test.go"
+        "pkg/smtcore/theory_fpa_display_test.go",
+        "pkg/ast/ast_fpa_model_value.go",
+        "pkg/ast/ast_fpa_model_value_test.go",
+        "pkg/smtcore/theory_fpa_model_source_test.go",
+        "pkg/util/numeral/mpf_borrowed_power.go"
       ],
       "tests": [
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
@@ -140850,7 +140967,13 @@
         "TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability",
         "TestSMTFPADisplayMergeRootAndScopeRollback",
         "TestSMTFPADisplayEmptyGateAndGuards",
-        "TestSMTFPADisplayColdAllocationRefusalAndRetry"
+        "TestSMTFPADisplayColdAllocationRefusalAndRetry",
+        "TestASTFPAModelPackedAndComponentsExhaustive",
+        "TestASTFPAModelRoundingModeCodes",
+        "TestASTFPAModelWideBiasedExponent",
+        "TestSMTFPANativeModelProcedureCanonicalComponents",
+        "TestSMTFPAModelWidthAssertionsAndActions",
+        "TestSMTFPAModelNumeralVerification"
       ],
       "conditionals": [
         {
@@ -140877,7 +141000,7 @@
       "methods": [
         {
           "name": "floating-point value factory, model value dependency procedures and SMT theory interface",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/smtcore/theory_fpa.go",
           "tests": [
             "TestSMTFloatingPointModelReconstructsWrappedConstants",
@@ -140895,6 +141018,24 @@
             "TestSMTFPADisplayEmptyGateAndGuards",
             "TestSMTFPADisplayColdAllocationRefusalAndRetry"
           ]
+        },
+        {
+          "name": "Native fpa_value_proc and fpa_rm_value_proc numerical bodies (theory_fpa.cpp:136-192,212-230): borrowed theory manager, actual MPZ bias and cached powers, packed/three-field decoding, unbias before signed conversion, late scoped MPF construction, canonical numeral registration, real SASSERT/VERIFY actions, and RM default-to-zero mapping. Input/result TRACE and complete owner-failure-prefix audit remain open.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/ast_fpa_model_value.go",
+            "pkg/ast/ast_fpa_model_value_test.go",
+            "pkg/smtcore/theory_fpa_model_source_test.go",
+            "pkg/util/numeral/mpf_borrowed_power.go"
+          ],
+          "tests": [
+            "TestASTFPAModelPackedAndComponentsExhaustive",
+            "TestASTFPAModelRoundingModeCodes",
+            "TestASTFPAModelWideBiasedExponent",
+            "TestSMTFPANativeModelProcedureCanonicalComponents",
+            "TestSMTFPAModelWidthAssertionsAndActions",
+            "TestSMTFPAModelNumeralVerification"
+          ]
         }
       ],
       "ownership": [
@@ -140905,7 +141046,8 @@
       "deviations": [
         "The native fresh-value factory method is itself unimplemented; the Go factory implements the retained canonical-value operations and deliberately reports that it cannot manufacture an unbounded fresh FP value.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
-        "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change."
+        "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change.",
+        "The former broad model/factory ported claim is withdrawn: the factory still supplies signed zeros instead of source numeric 0/1; fresh-value fatal behavior, rounding-mode factory extensions, model fallback paths, source input/result TRACE, numerical destructor failure prefixes and full lifecycle audit remain open. Native model reconstruction now uses the actual plugin MPF/MPZ owners and canonical registration instead of math/big extraction followed by a raw fp constructor. The selected small-format C++ SMT-LIB comparison is integration evidence, not whole-unit completion. Ebits64 also reaches the source signed top-exponent helper limit (2^63); the tested multi-limb boundary is ebits63."
       ]
     },
     {
@@ -220908,7 +221050,9 @@
         "pkg/ast/ast_fpa_api_numeral_text.go",
         "pkg/ast/ast_fpa_api_numeral_text_test.go",
         "pkg/api/api_numeral_string.go",
-        "pkg/api/api_numeral_string_test.go"
+        "pkg/api/api_numeral_string_test.go",
+        "pkg/util/numeral/mpf_borrowed_power.go",
+        "pkg/util/numeral/mpf_powers_runtime_source_test.go"
       ],
       "tests": [
         "TestASTFPAFPComponentsNumeralsAndTrace",
@@ -221161,7 +221305,9 @@
           "name": "Concrete mk_fp scoped_mpf value construction and retirement (fpa_rewriter.cpp:684-705; mpf.h:300-324)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_fp_components.go",
-          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+          "tests": [
+            "TestASTFPAFPComponentsNumeralsAndTrace"
+          ]
         },
         {
           "name": "mpf.h:48 private unreachable copy assignment has no retained source call",
@@ -221281,8 +221427,13 @@
           "name": "Retained API numeral-string caller-local scoped_mpf is constructed before rounding-mode recognition and MPF formatting, then deleted after the detached result is built (api_numeral.cpp:194-226)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_api_numeral_text.go",
-          "go_targets": ["pkg/api/api_numeral_string.go"],
-          "tests": ["TestASTFPANumeralStringAPIScopedMPFAndBranches", "TestAPINumeralStringArithmeticFPAAndRefusal"]
+          "go_targets": [
+            "pkg/api/api_numeral_string.go"
+          ],
+          "tests": [
+            "TestASTFPANumeralStringAPIScopedMPFAndBranches",
+            "TestAPINumeralStringArithmeticFPAAndRefusal"
+          ]
         },
         {
           "name": "Remaining caller-local scoped_mpf scalar specializations in retained FPA API and SMT callers beyond separately credited AST rewriter and subpaving paths",
@@ -221292,8 +221443,14 @@
           "name": "Concrete fpa_rewriter classification and mk_eq_core caller-local scoped_mpf values are ported; model_evaluator/th_rewriter integration remains open (fpa_rewriter.cpp:41-104,547-667)",
           "status": "partial",
           "go_target": "pkg/ast/ast_fpa_classification_read.go",
-          "go_targets": ["pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/rewriter/fpa_classification_test.go"],
-          "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit"]
+          "go_targets": [
+            "pkg/ast/ast_fpa_smt_equality.go",
+            "pkg/ast/rewriter/fpa_classification_test.go"
+          ],
+          "tests": [
+            "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal",
+            "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit"
+          ]
         },
         {
           "name": "Concrete AST fpa_decl_plugin scoped_mpf_vector value storage: native indexed growth, source set and ascending owned-value release (fpa_decl_plugin.cpp:23-61; mpf.h:327)",
@@ -221311,8 +221468,15 @@
           "name": "Concrete AST SMT2 pp_float_literal caller-local scoped_mpf owner for real and bit-vector formats (src/ast/ast_smt2_pp.cpp:235-288; src/util/mpf.h:300-324)",
           "status": "ported",
           "go_target": "pkg/ast/ast_smt2_float_real.go",
-          "go_targets": ["pkg/ast/ast_smt2_float_bv_literal.go"],
-          "tests": ["TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat", "TestASTSMT2FloatDefaultBitVectorFields", "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix", "TestASTSMT2FloatDefaultEveryActualReservation"]
+          "go_targets": [
+            "pkg/ast/ast_smt2_float_bv_literal.go"
+          ],
+          "tests": [
+            "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat",
+            "TestASTSMT2FloatDefaultBitVectorFields",
+            "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix",
+            "TestASTSMT2FloatDefaultEveryActualReservation"
+          ]
         },
         {
           "name": "Concrete subpaving context_mpf_wrapper scoped_mpf constant and scoped_mpf_vector coefficient owner (src/math/subpaving/subpaving.cpp:88-107; src/util/mpf.h:300-327)",
@@ -221672,8 +221836,17 @@
           "name": "mpf.cpp:1590-1606; mpf.h:292 retained to_string_raw fields use native Go strings and concrete integer conversion at float-set and integral-round TRACE callers",
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpf_raw_text.go",
-          "go_targets": ["pkg/util/numeral/mpf_value_input_trace.go", "pkg/util/numeral/mpf_round_integral_trace.go"],
-          "tests": ["TestArbitraryFloatRawStringLiteralClassification", "TestArbitraryFloatNativeRawStringInterruptedNumericalReadCanRetry", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal", "TestArbitraryFloatRoundIntegralTraceBranches", "TestArbitraryFloatRoundIntegralTraceSourceInsertions"]
+          "go_targets": [
+            "pkg/util/numeral/mpf_value_input_trace.go",
+            "pkg/util/numeral/mpf_round_integral_trace.go"
+          ],
+          "tests": [
+            "TestArbitraryFloatRawStringLiteralClassification",
+            "TestArbitraryFloatNativeRawStringInterruptedNumericalReadCanRetry",
+            "TestArbitraryFloatSetFloatRawTraceFormatterRefusal",
+            "TestArbitraryFloatRoundIntegralTraceBranches",
+            "TestArbitraryFloatRoundIntegralTraceSourceInsertions"
+          ]
         },
         {
           "name": "mpf.cpp:1572-1576; mpf.h:141 to_rational_string actual scoped rational, to_rational and original rational string return",
@@ -221761,7 +221934,13 @@
           "name": "mpf.cpp:1621-1633; mpf.h:293 Linux AMD64 first-eight-byte hexfloat diagnostic for retained mpf_dbg_rem TRACE at 1435,1441,1483",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_remainder_object_trace.go",
-          "tests": ["TestArbitraryFloatRemainderObjectTraceSourceFirstWord", "TestArbitraryFloatPartialRemainderScalarTraceOrder", "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace", "TestArbitraryFloatPartialRemainderZeroResidualEmitsFinalTrace", "TestArbitraryFloatRemResultTraceSpecialAndGeneral"]
+          "tests": [
+            "TestArbitraryFloatRemainderObjectTraceSourceFirstWord",
+            "TestArbitraryFloatPartialRemainderScalarTraceOrder",
+            "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace",
+            "TestArbitraryFloatPartialRemainderZeroResidualEmitsFinalTrace",
+            "TestArbitraryFloatRemResultTraceSpecialAndGeneral"
+          ]
         },
         {
           "name": "mpf.h:155-173 sig_normalized and exp_normalized have no production source caller",
@@ -221825,7 +222004,9 @@
           "name": "Retained fpa_decl_plugin::get_some_value caller-local MPF NaN construction, numeral registration, source-order deletion and refused-construction continuation (fpa_decl_plugin.cpp:856-863; mpf.h)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_some_value.go",
-          "go_targets": ["pkg/model/model_evaluator_fpa_test.go"],
+          "go_targets": [
+            "pkg/model/model_evaluator_fpa_test.go"
+          ],
           "tests": [
             "TestASTFloatingPointSomeValueSourceDefaults",
             "TestASTFloatingPointSomeValueRefusedMPFConstruction",
@@ -221840,6 +222021,17 @@
             "TestASTFloatingPointSpecialDeclSortSelectionAndScopedValue",
             "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup",
             "TestASTFloatingPointSpecialAppReachesDeclarationAndClassification"
+          ]
+        },
+        {
+          "name": "Concrete read-only m_powers2 cache access consumed by theory_fpa.cpp:158,161; borrowed actual NUM wrapper without copy/deletion authority, cache-hit allocation erasure and ended-owner refusal",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/numeral/mpf_borrowed_power.go",
+            "pkg/util/numeral/mpf_powers_runtime_source_test.go"
+          ],
+          "tests": [
+            "TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction"
           ]
         }
       ],

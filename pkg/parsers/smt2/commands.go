@@ -595,6 +595,9 @@ func (p *commandParser) sort() (ast.ASTHandle, error) {
 		if !p.context.BuiltinSortAvailable(name) {
 			return ast.ASTHandle{}, fmt.Errorf("unknown sort %s", name)
 		}
+		if name == "FloatingPoint" && len(indices) == 2 {
+			return p.pin(m.FloatingPointSort(indices[0], indices[1]))
+		}
 		if name != "BitVec" || len(indices) != 1 {
 			return ast.ASTHandle{}, fmt.Errorf("unsupported indexed sort %s", name)
 		}
