@@ -55,12 +55,25 @@ func (f *DatatypeFactory) SomeValue(s ast.ASTHandle) (value ast.ASTHandle, err e
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	scope := &datatypeFactoryScope{manager: f.manager}
-	defer f.finishScope(scope, &err)
-	if _, err = f.constructorArguments(scope, c, s, false); err != nil {
+	// Source get_some_value uses ptr_vector<expr>: these arguments borrow
+	// the model providers' values, unlike the fresh paths' expr_ref_vector.
+	n, err := f.manager.GetArity(c)
+	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	value, err = f.manager.MkApp(c, scope.values)
+	var args []ast.ASTHandle
+	for i := uint32(0); i < n; i++ {
+		domain, err := f.manager.GetDomain(c, i)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		arg, err := f.model.SomeValue(domain)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		args = append(args, arg)
+	}
+	value, err = f.manager.MkApp(c, args)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
@@ -77,9 +90,9 @@ func (f *DatatypeFactory) SomeValue(s ast.ASTHandle) (value ast.ASTHandle, err e
 	return value, err
 }
 
-// Concrete argument construction for SomeValue and approach1, retaining each
-// source expr_ref_vector element before the next argument is evaluated.
-func (f *DatatypeFactory) constructorArguments(scope *datatypeFactoryScope, c, s ast.ASTHandle, tryFresh bool) (used bool, err error) {
+// Approach1 retains each source expr_ref_vector element before the next
+// argument is evaluated. Cold SomeValue uses borrowed arguments separately.
+func (f *DatatypeFactory) freshConstructorArguments(scope *datatypeFactoryScope, c, s ast.ASTHandle) (used bool, err error) {
 	n, err := f.manager.GetArity(c)
 	if err != nil {
 		return false, err
@@ -89,7 +102,7 @@ func (f *DatatypeFactory) constructorArguments(scope *datatypeFactoryScope, c, s
 		if err != nil {
 			return false, err
 		}
-		if !used && tryFresh {
+		if !used {
 			recursive, err := f.manager.DatatypeIsRecursive(s)
 			if err != nil {
 				return false, err
@@ -430,7 +443,7 @@ func (f *DatatypeFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 func (f *DatatypeFactory) freshConstructor(s, c ast.ASTHandle, set *factoryValueSet) (value ast.ASTHandle, accepted bool, err error) {
 	scope := &datatypeFactoryScope{manager: f.manager}
 	defer f.finishScope(scope, &err)
-	used, err := f.constructorArguments(scope, c, s, true)
+	used, err := f.freshConstructorArguments(scope, c, s)
 	if err != nil {
 		return value, false, err
 	}

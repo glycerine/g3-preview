@@ -90,19 +90,19 @@ func TestDatatypeFactoryColdArgumentFailureLeavesRegistryUnpublished(t *testing.
 			if err != nil {
 				return err
 			}
-			observed = count == before+1
+			observed = count == before
 			return stop
 		}
 		return nil
 	}
 	_, err = f.SomeValue(sort)
 	if !errors.Is(err, stop) || !observed || len(f.sets) != 0 || len(f.sorts) != 0 || len(f.values) != 0 || len(f.pending) != 0 {
-		t.Fatal("cold failure lost its argument owner or published the value set", err, observed)
+		t.Fatal("cold failure pinned a borrowed argument or published the value set", err, observed)
 	}
 	after, err := m.GetRefCount(provider.values[0])
 	protoMust(t, err)
 	if after != before {
-		t.Fatal("failed argument vector retained a pin")
+		t.Fatal("borrowed argument vector changed its input reference count")
 	}
 }
 
@@ -273,5 +273,35 @@ func TestDatatypeFactorySourceFreshDistinctnessAssertion(t *testing.T) {
 	}
 	if m.Stats().LiveReferences != before || len(f.pending) != 0 {
 		t.Fatal("assertion exit retained argument/candidate references")
+	}
+}
+
+// datatype_factory.cpp:156 uses expr_ref_vector, in contrast to the
+// borrowed ptr_vector in get_some_value at line34.
+func TestDatatypeFactoryFreshArgumentsOwnBeforeNextProvider(t *testing.T) {
+	m, f, provider, sort, constructor := datatypeFactoryBVFixture(t, 2)
+	value := provider.values[len(provider.values)-1]
+	before, err := m.GetRefCount(value)
+	protoMust(t, err)
+	stop := errors.New("second fresh-constructor argument stopped")
+	observed := false
+	provider.some = func(i int) error {
+		count, err := m.GetRefCount(value)
+		if err != nil {
+			return err
+		}
+		observed = count == before+1
+		return stop
+	}
+	set, err := f.valueSet(sort)
+	protoMust(t, err)
+	_, _, err = f.freshConstructor(sort, constructor, set)
+	if !errors.Is(err, stop) || !observed || len(set.values) != 0 || len(f.pending) != 0 {
+		t.Fatal("fresh argument vector lost its owner or published a value", err, observed)
+	}
+	after, err := m.GetRefCount(value)
+	protoMust(t, err)
+	if after != before {
+		t.Fatal("fresh argument owner survived failed constructor", after, before)
 	}
 }
