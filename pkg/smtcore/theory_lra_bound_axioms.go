@@ -3,6 +3,8 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"math/big"
 	"sort"
 
@@ -116,10 +118,23 @@ func (t *SMTLRATheory) publishBoundAxiom(literals []SMTLiteral) (result error) {
 		}
 		defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(t.state.manager, parameters)) }()
 	}
+	if err = t.emitLRA("mk_clause", 440, func(out io.Writer) error {
+		if err := t.state.DisplayLiteralsVerbose(out, literals); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, "\n")
+	}); err != nil {
+		return err
+	}
 	return t.state.addTheoryAxiomWithParameters(t.FamilyID(), literals, parameters)
 }
 
 func (t *SMTLRATheory) flushBoundAxioms() error {
+	if len(t.newBounds) > 0 {
+		if err := t.emitLRA("flush_bound_axioms", 1612, func(out io.Writer) error { return smtWriteTheoryText(out, "flush bound axioms\n") }); err != nil {
+			return err
+		}
+	}
 	for len(t.newBounds) > 0 {
 		last := len(t.newBounds) - 1
 		batch := []*smtLRABound{t.newBounds[last]}
@@ -134,6 +149,21 @@ func (t *SMTLRATheory) flushBoundAxioms() error {
 			last = len(t.newBounds) - 1
 			t.newBounds[i] = t.newBounds[last]
 			t.newBounds = t.newBounds[:last]
+		}
+		if err := t.emitLRATag("arith_verbose", "flush_bound_axioms", 1627, func(out io.Writer) error {
+			for _, b := range batch {
+				kind := "<="
+				if b.upper {
+					kind = ">="
+				}
+				if err := smtWriteTheoryText(out, fmt.Sprintf("v%d  %s %s\n", b.variable, kind, b.value.RatString())); err != nil {
+					return err
+				}
+			}
+			return nil
+		}); err != nil {
+			t.newBounds = append(t.newBounds, batch...)
+			return err
 		}
 		occurrences := append([]*smtLRABound(nil), t.bounds[variable]...)
 		// Native compares only thresholds. Stable Go order resolves equal keys;

@@ -211,11 +211,11 @@ func (s *smtLRANumeric) addTerm(v SMTTheoryVar, coefficients []smtLRACoefficient
 	return index, err
 }
 
-func (s *smtLRANumeric) assertBound(v SMTTheoryVar, bv int32, value *big.Rat, upper, truth bool) (ci uint32, err error) {
+func (s *smtLRANumeric) addBound(v SMTTheoryVar, value *big.Rat, upper, truth bool) (ci uint32, err error) {
 	if err = s.ready(); err != nil {
 		return smtLRANoIndex, err
 	}
-	if v < 0 || bv < 0 || value == nil {
+	if v < 0 || value == nil {
 		return smtLRANoIndex, ast.ErrASTDomain
 	}
 	if s.solver.Bounds.Status.Value == lp.StatusInfeasible {
@@ -247,12 +247,31 @@ func (s *smtLRANumeric) assertBound(v SMTTheoryVar, bv int32, value *big.Rat, up
 	if err != nil {
 		return ci, err
 	}
+	return ci, nil
+}
+
+func (s *smtLRANumeric) registerBoundConstraint(ci uint32, bv int32, truth bool) {
 	for len(s.inequalities) <= int(ci) {
 		s.inequalities = append(s.inequalities, SMTNullLiteral)
 	}
 	s.inequalities[ci] = NewSMTLiteral(bv, !truth)
 	s.statistics.rows++
-	return ci, nil
+}
+
+// Direct numerical consumers retain both phases. The AST frontend emits its
+// source assert_bound trace between creation and inequality publication.
+func (s *smtLRANumeric) assertBound(v SMTTheoryVar, bv int32, value *big.Rat, upper, truth bool) (uint32, error) {
+	if err := s.ready(); err != nil {
+		return smtLRANoIndex, err
+	}
+	if bv < 0 {
+		return smtLRANoIndex, ast.ErrASTDomain
+	}
+	ci, err := s.addBound(v, value, upper, truth)
+	if err == nil && ci != smtLRANoIndex {
+		s.registerBoundConstraint(ci, bv, truth)
+	}
+	return ci, err
 }
 
 func (s *smtLRANumeric) startFeasibility() error {

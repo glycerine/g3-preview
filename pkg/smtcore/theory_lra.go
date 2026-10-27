@@ -489,7 +489,28 @@ func (t *SMTLRATheory) internalizeDef(term ast.ASTHandle) (SMTTheoryVar, error) 
 		coefficients[i].variable = w
 		coefficients[i].value.Set(&st.coefficients[i])
 	}
-	_, err = t.numeric.addTerm(v, coefficients, &st.constant)
+	_, wasMapped := t.numeric.index(v)
+	index, err := t.numeric.addTerm(v, coefficients, &st.constant)
+	if err == nil && !wasMapped {
+		err = t.emitLRA("internalize_def", 640, func(out io.Writer) error {
+			if err := smtWriteTheoryText(out, fmt.Sprintf("v%d := ", v)); err != nil {
+				return err
+			}
+			if err := t.displayLRAExpression(out, term); err != nil {
+				return err
+			}
+			if err := smtWriteTheoryText(out, fmt.Sprintf(" slack: %d scopes: %d\n", index, len(t.scopes))); err != nil {
+				return err
+			}
+			if !t.numeric.solver.IsTerm(index) || uint64(index-lp.LARTermStartIndex) >= uint64(len(t.numeric.solver.Terms)) {
+				return ast.ErrASTDomain
+			}
+			if err := t.numeric.solver.PrintTerm(t.numeric.solver.Terms[index-lp.LARTermStartIndex], out); err != nil {
+				return err
+			}
+			return smtWriteTheoryText(out, "\n")
+		})
+	}
 	if err == nil {
 		if value, number, e := t.numeral(term); e != nil {
 			return v, e
@@ -685,9 +706,23 @@ func (t *SMTLRATheory) Propagate() error {
 			return ast.ErrASTDomain
 		}
 		t.boundChecks = append(t.boundChecks, a.boolean)
-		ci, err := t.numeric.assertBound(b.variable, a.boolean, &b.value, b.upper, a.truth)
+		ci, err := t.numeric.addBound(b.variable, &b.value, b.upper, a.truth)
 		if err != nil {
 			return err
+		}
+		if ci != smtLRANoIndex {
+			if err = t.emitLRA("assert_bound", 1973, func(out io.Writer) error { return smtWriteTheoryText(out, fmt.Sprintf("v%d\n", b.variable)) }); err != nil {
+				return err
+			}
+			t.numeric.registerBoundConstraint(ci, a.boolean, a.truth)
+			if err = t.emitLRA("add_ineq_constraint", 550, func(out io.Writer) error {
+				if err := t.numeric.solver.PrintConstraint(ci, out); err != nil {
+					return err
+				}
+				return smtWriteTheoryText(out, "\n")
+			}); err != nil {
+				return err
+			}
 		}
 		if err = t.propagateFixedBounds(b, ci, a.truth); err != nil {
 			t.numeric.stopped = true

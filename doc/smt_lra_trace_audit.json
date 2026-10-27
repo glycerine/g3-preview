@@ -1,0 +1,320 @@
+{
+  "source": "src/smt/theory_lra.cpp",
+  "scope": "TRACE/CTRACE statements only; this does not audit all algorithms, assertions, owner lifetimes or retained higher consumers, and does not establish whole LRA/smtcore completion.",
+  "counts": {
+    "total": 51,
+    "ported": 42,
+    "excluded_no_retained_path": 9
+  },
+  "sites": [
+    {
+      "line": 300,
+      "source_statement": "TRACE(\"arith\", tout << \"Unhandled: \" << mk_pp(n, m) << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 440,
+      "source_statement": "TRACE(\"arith\", literal lits[2]; lits[0] = l1; lits[1] = l2; ctx().display_literals_verbose(tout, 2, lits); tout << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_bound_axioms.go"
+    },
+    {
+      "line": 445,
+      "source_statement": "TRACE(\"arith\", literal lits[3]; lits[0] = l1; lits[1] = l2; lits[2] = l3; ctx().display_literals_verbose(tout, 3, lits); tout << \"\\n\";);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "The three-literal mk_clause overload has no retained call. Every live local mk_clause invocation at1562-1604 passes two literals plus coefficient count/vector; the equality adapter owns its own three-literal clause publication."
+    },
+    {
+      "line": 550,
+      "source_statement": "TRACE(\"arith\", m_solver->print_constraint(index, tout); tout << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 577,
+      "source_statement": "TRACE(\"arith\",",
+      "disposition": "excluded_no_retained_path",
+      "reason": "internalize_eq(v1,v2) is reached only in constructor-disabled delayed final_check at1154-1168. The immediate new_eq_eh call at796 is commented out."
+    },
+    {
+      "line": 595,
+      "source_statement": "TRACE(\"arith\", tout << \"v\" << v << \" \" << m_unassigned_bounds[v] << \" += \" << inc << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_trace.go"
+    },
+    {
+      "line": 640,
+      "source_statement": "TRACE(\"arith\", tout << \"v\" << v << \" := \" << mk_pp(term, m) << \" slack: \" << vi << \" scopes: \" << m_scopes.size() << \"\\n\";",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 705,
+      "source_statement": "TRACE(\"arith\", tout << \"Could not internalize \" << mk_pp(atom, m) << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 714,
+      "source_statement": "TRACE(\"arith\", tout << \"Internalized \" << mk_pp(atom, m) << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 738,
+      "source_statement": "TRACE(\"arith\", tout << \"Could not internalize \" << mk_pp(atom, m) << \"\\n\";);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "internalize_atom_lazy is gated by m_delay_constraints at680, initialized false at659 with no retained writer."
+    },
+    {
+      "line": 747,
+      "source_statement": "TRACE(\"arith\", tout << \"Internalized \" << mk_pp(atom, m) << \"\\n\";);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "internalize_atom_lazy is gated by m_delay_constraints at680, initialized false at659 with no retained writer."
+    },
+    {
+      "line": 781,
+      "source_statement": "TRACE(\"arith\", tout << mk_pp(atom, m) << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 787,
+      "source_statement": "TRACE(\"arith\", tout << mk_pp(ctx().bool_var2expr(v), m) << \" \" << (is_true?\"true\":\"false\") << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 806,
+      "source_statement": "TRACE(\"arith\", tout << \"v\" << v1 << \" != \" << \"v\" << v2 << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 856,
+      "source_statement": "TRACE(\"arith\", tout << \"num scopes: \" << num_scopes << \" new scope level: \" << m_scopes.size() << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 864,
+      "source_statement": "TRACE(\"arith\", tout << mk_pp(n, m) << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_operator_axioms.go"
+    },
+    {
+      "line": 1081,
+      "source_statement": "TRACE(\"arith\",",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_shared.go"
+    },
+    {
+      "line": 1091,
+      "source_statement": "TRACE(\"arith\", display(tout););",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_shared.go"
+    },
+    {
+      "line": 1111,
+      "source_statement": "TRACE(\"arith\", tout << mk_pp(n1->get_owner(), m) << \" = \" << mk_pp(n2->get_owner(), m) << \"\\n\";",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_shared.go"
+    },
+    {
+      "line": 1138,
+      "source_statement": "CTRACE(\"arith\",",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_shared.go"
+    },
+    {
+      "line": 1220,
+      "source_statement": "TRACE(\"shared\", tout << ctx().get_scope_level() << \" \" <<  v << \" \" << r->get_num_parents() << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_shared.go"
+    },
+    {
+      "line": 1290,
+      "source_statement": "TRACE(\"arith\", tout << \"propagation conflict\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 1316,
+      "source_statement": "CTRACE(\"arith\", new_num_of_p > num_of_p, tout << \"found \" << new_num_of_p << \" implied bounds\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go",
+      "verification_limit": "Implemented at its source conditional; current numerical fixtures do not claim to force this branch."
+    },
+    {
+      "line": 1339,
+      "source_statement": "TRACE(\"arith\", tout << \"return\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go"
+    },
+    {
+      "line": 1383,
+      "source_statement": "TRACE(\"arith\", tout << \"v\" << v << \" \" << be.kind() << \" \" << be.m_bound << \"\\n\";",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go"
+    },
+    {
+      "line": 1389,
+      "source_statement": "TRACE(\"arith\", tout << \"return\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go",
+      "verification_limit": "Implemented at its source conditional; current numerical fixtures do not claim to force this branch."
+    },
+    {
+      "line": 1413,
+      "source_statement": "CTRACE(\"arith\", m_unassigned_bounds[v] == 0, tout << \"missed bound\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go",
+      "verification_limit": "Implemented at its source conditional; current numerical fixtures do not claim to force this branch."
+    },
+    {
+      "line": 1415,
+      "source_statement": "TRACE(\"arith\",",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go"
+    },
+    {
+      "line": 1612,
+      "source_statement": "CTRACE(\"arith\", !m_new_bounds.empty(), tout << \"flush bound axioms\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_bound_axioms.go"
+    },
+    {
+      "line": 1627,
+      "source_statement": "CTRACE(\"arith_verbose\", !atoms.empty(),",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_bound_axioms.go"
+    },
+    {
+      "line": 1797,
+      "source_statement": "TRACE(\"arith\",",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go"
+    },
+    {
+      "line": 1850,
+      "source_statement": "TRACE(\"arith\", tout << mk_pp(get_owner(v), m) << \"\\n\";);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "propagate_bound_compound has only a commented-out call at1279-1284; add_use_lists/del_use_lists calls at716/587 are also commented out."
+    },
+    {
+      "line": 1856,
+      "source_statement": "TRACE(\"arith_verbose\", display_bound(tout << \"assigned \", *vb) << \"\\n\";);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "propagate_bound_compound has only a commented-out call at1279-1284; add_use_lists/del_use_lists calls at716/587 are also commented out."
+    },
+    {
+      "line": 1882,
+      "source_statement": "TRACE(\"arith\",",
+      "disposition": "excluded_no_retained_path",
+      "reason": "propagate_bound_compound has only a commented-out call at1279-1284; add_use_lists/del_use_lists calls at716/587 are also commented out."
+    },
+    {
+      "line": 1893,
+      "source_statement": "TRACE(\"arith_verbose\", display_bound(tout << \"skip \", *vb) << \"\\n\";);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "propagate_bound_compound has only a commented-out call at1279-1284; add_use_lists/del_use_lists calls at716/587 are also commented out."
+    },
+    {
+      "line": 1944,
+      "source_statement": "TRACE(\"arith_verbose\", tout << (is_lub?\"lub\":\"glb\") << \" is \" << r << \"\\n\";);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "get_bound is called only by get_lub/get_glb, whose consumers are confined to unreachable propagate_bound_compound (sole call commented at1279-1284)."
+    },
+    {
+      "line": 1973,
+      "source_statement": "TRACE(\"arith\", tout << \"v\" << b.get_var() << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 2057,
+      "source_statement": "TRACE(\"arith\", tout << vi << \" \" << v << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_fixed.go"
+    },
+    {
+      "line": 2098,
+      "source_statement": "TRACE(\"arith\", tout << \"fixed: \" << mk_pp(get_owner(v1), m) << \" \" << mk_pp(get_owner(v2), m) << \" \" << bound << \" \" << has_lower_bound(vi2, ci3, bound) << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_fixed.go"
+    },
+    {
+      "line": 2116,
+      "source_statement": "TRACE(\"arith\",",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_fixed.go"
+    },
+    {
+      "line": 2150,
+      "source_statement": "TRACE(\"arith_verbose\", display(tout););",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_trace.go"
+    },
+    {
+      "line": 2166,
+      "source_statement": "TRACE(\"arith\", tout << \"status treated as inconclusive: \" << status << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_trace.go"
+    },
+    {
+      "line": 2222,
+      "source_statement": "TRACE(\"arith\", tout << \"scope: \" << ctx().get_scope_level() << \"\\n\"; display_evidence(tout, m_explanation); );",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go"
+    },
+    {
+      "line": 2223,
+      "source_statement": "TRACE(\"arith\", display(tout););",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go"
+    },
+    {
+      "line": 2258,
+      "source_statement": "TRACE(\"arith\", display(tout););",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_model.go"
+    },
+    {
+      "line": 2292,
+      "source_statement": "CTRACE(\"arith\", !result, ctx().display_lemma_as_smt_problem(tout, m_core.size(), m_core.c_ptr(), m_eqs.size(), m_eqs.c_ptr(), false_literal);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_validate.go"
+    },
+    {
+      "line": 2306,
+      "source_statement": "CTRACE(\"arith\", !result, ctx().display_lemma_as_smt_problem(tout, m_core.size(), m_core.c_ptr(), m_eqs.size(), m_eqs.c_ptr(), lit);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_validate.go"
+    },
+    {
+      "line": 2361,
+      "source_statement": "TRACE(\"arith\", tout << \"Unbounded \" << v << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_objective.go"
+    },
+    {
+      "line": 2392,
+      "source_statement": "TRACE(\"opt\", tout << \"v\" << v << \" \" << val << \" \" << r << \" \" << e << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_objective.go"
+    },
+    {
+      "line": 2444,
+      "source_statement": "TRACE(\"arith\", tout << mk_pp(b, m) << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_objective.go"
+    },
+    {
+      "line": 2449,
+      "source_statement": "TRACE(\"arith\", tout << b << \"\\n\";);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_objective.go"
+    }
+  ]
+}
