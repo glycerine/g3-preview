@@ -136251,7 +136251,10 @@
         "pkg/smtcore/theory_bv_fixed_test.go",
         "pkg/cmd/g3/test_vectors/bv_fixed_cache_scopes.smt2",
         "pkg/smtcore/theory_bv_model_source_test.go",
-        "pkg/cmd/g3/test_vectors/bv_signed_function_model.smt2"
+        "pkg/cmd/g3/test_vectors/bv_signed_function_model.smt2",
+        "pkg/smtcore/theory_bv_conversion.go",
+        "pkg/smtcore/theory_bv_conversion_test.go",
+        "pkg/cmd/g3/test_vectors/bv_integer_conversion_scopes.smt2"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -136319,7 +136322,12 @@
         "TestSMTBVFixedCacheReusedSlotForBVToInt",
         "TestSMTBVFixedEqualityAllocationRefusalRetainsRepresentativeAndRetries",
         "TestSMTBVModelValueNativePrefixAndDebugFixedness",
-        "TestSMTBVModelValueSignedLiteralsAndFactoryPipeline"
+        "TestSMTBVModelValueSignedLiteralsAndFactoryPipeline",
+        "TestSMTBVConversionSourceAxiomsAndRelevance",
+        "TestSMTBVConversionNativeSignedBitsAndMissingEnode",
+        "TestSMTBVComparisonDefinitionSurvivesRelevancePop",
+        "TestSMTBVConversionRelevanceReentryAndDisabledFallback",
+        "TestSMTBVConversionAllocationRefusalAndScopedRetry"
       ],
       "conditionals": [
         {
@@ -136714,8 +136722,8 @@
           ]
         },
         {
-          "name": "bv2int and int2bv bridges, relevancy, lazy comparison bridges, blast limit, enode reflection/congruence parameters, model values, division-by-zero interpretations, statistics and scoped cleanup",
-          "status": "ported",
+          "name": "Legacy BV feature coverage: conversion bridges, blast limit, enode parameters, models, division-by-zero interpretations, statistics and cleanup; remaining whole-method/source/owner audit is open, with native conversion/relevancy algorithms recorded separately below",
+          "status": "partial",
           "go_target": "pkg/smtcore/theory_bv.go",
           "tests": [
             "TestSMTBitVectorToIntAxiom",
@@ -136899,6 +136907,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Native conversion/relevancy algorithms (theory_bv.cpp:185-198,554-685,920-980,1282-1316): canonical signed literal get_bits, rewritten weighted n-ary BV2Int sum, Int2BV top modulus plus per-bit div/mod equations, gate-false equality and relevant-before-unit ordering, delayed axioms with scope re-entry, no Int2BV find_wpos, retained le_atom literal definitions and native literal relevancy; TRACE/assertion closure remains outside this increment",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_private.go",
+            "pkg/smtcore/theory_bv_conversion.go",
+            "pkg/smtcore/theory_bv_conversion_test.go",
+            "pkg/cmd/g3/test_vectors/bv_integer_conversion_scopes.smt2",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTBVConversionSourceAxiomsAndRelevance",
+            "TestSMTBVConversionNativeSignedBitsAndMissingEnode",
+            "TestSMTBVComparisonDefinitionSurvivesRelevancePop",
+            "TestSMTBVConversionRelevanceReentryAndDisabledFallback",
+            "TestSMTBVConversionAllocationRefusalAndScopedRetry",
+            "TestSMTBitVectorLazyComparisonBridge",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -136909,11 +136939,12 @@
         "Boolean-variable keys and concrete theory-variable/index occurrences borrow native solver IDs. Separate atom-creation and occurrence trails restore heads and erase scoped atom keys before theory-variable truncation, without accessing already-retired core enodes. Existing ASTRef bitOwners retain expression lifetimes. Native signed literal vectors shrink with actual theory variables; Close clears all occurrence/trail owners. Allocation refusal is exercised at a cold 257-bit projection frontier followed by scope retirement and retry.",
         "A concrete SMTTheoryVar forest owns parent/size/circular-next slices and one ordered private trail interleaving variable creation, merges, atom creation and occurrence heads. Callback errors stop before link commit; logical conflict still commits the link. Unmerge restores links before trimming copied zero/one suffixes using private IDs only, never retired enodes. Native bv-bit-eq region justifications borrow scoped enodes; the logical context owns their lifetime and proof dispatch visits equality before a nonconstant antecedent. Disequality e1/e2/diff lexical ASTRefs survive recursive internalization and shared-temporary retirement.",
         "The fixed-value cache owns native width/canonical integer-string keys and scalar theory-variable IDs only; source pop does not trail it, so each hit validates the current slot, BV sort, width, fixedness and value. Close clears the cache. Lexical e1/e2 ASTRefs protect projection operands during recursive equality internalization, and a failed axiom prefix leaves the previous representative intact without publishing its fixed-equality owner. The context owns queued bv-fixed-eq region justifications, which borrow the theory and variable slots and read current assignment polarity within their live scope. The retained native numeral-alias path has no invented eager bridge or extra bit2core count.",
-        "ModelValue borrows existing native literal vectors and reads current assignments without rebuilding AST circuits or introducing late bit owners. The source debug fixedness guard precedes numeral construction; native release preserves the accumulated prefix at the first undefined literal. The registered model factory creates the numeral at the enode sort width, and the generator retains the expression wrapper result through its existing root-value ownership."
+        "ModelValue borrows existing native literal vectors and reads current assignments without rebuilding AST circuits or introducing late bit owners. The source debug fixedness guard precedes numeral construction; native release preserves the accumulated prefix at the first undefined literal. The registered model factory creates the numeral at the enode sort width, and the generator retains the expression wrapper result through its existing root-value ownership.",
+        "Conversion calls own concrete ASTRef operands and rewritten sums across recursive internalization and temporary retirement, releasing lexical roots in reverse order on success/refusal. Comparison atoms own only canonical scalar SMTLiteral definitions; the context owns the underlying Boolean expression lifetime. Atom creation is on the native ordered private trail, independent of scoped relevance, and undo deletes IDs without consulting retired enodes. Cold 257-bit conversion allocation refusals are followed by scope retirement and retry."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
-        "Whole-unit completion remains unproven. Native private forest/zero-one summaries, watched-position scan, bit propagation, merge/unmerge, bv-bit-eq proofs and default-stream display are implemented. The native fixed_var_table/fixed_var_eh/add_fixed_eq/fixed_eq_justification path now replaces the global Go fixed-value scan and guarded-clause approximation: untrailed width/value cache, current-slot validation, retained representative, exact five-per-bit plus final equality axioms, queued core equality, bv-fixed-eq antecedents and interleaved proof parents. Native mk_bit2bool now publishes only its atom/occurrence; prior eager alias bridges were absent in source and are removed. Retained BV TRACE/SASSERT and specialization-level union-find trace/invariant sites, remaining operator algorithms and complete method/ownership closure still require audit. Eager equality-internalization expansion remains removed in favor of the source no-op callback and native private merges. Native mk_value now uses canonical literals and preserves first-undefined release accumulation plus Z3DEBUG fixedness refusal, replacing the Go AST-bit scan/late-zero fallback. Conversion-axiom relevancy timing and repeated lazy-comparison relevancy still require source/owner closure.",
+        "Whole-unit completion remains unproven. Native private forest/zero-one summaries, watched-position scan, bit propagation, merge/unmerge, bv-bit-eq proofs and default-stream display are implemented. The native fixed_var_table/fixed_var_eh/add_fixed_eq/fixed_eq_justification path now replaces the global Go fixed-value scan and guarded-clause approximation: untrailed width/value cache, current-slot validation, retained representative, exact five-per-bit plus final equality axioms, queued core equality, bv-fixed-eq antecedents and interleaved proof parents. Native mk_bit2bool now publishes only its atom/occurrence; prior eager alias bridges were absent in source and are removed. Retained BV TRACE/SASSERT and specialization-level union-find trace/invariant sites, remaining operator algorithms and complete method/ownership closure still require audit. Eager equality-internalization expansion remains removed in favor of the source no-op callback and native private merges. Native mk_value now uses canonical literals and preserves first-undefined release accumulation plus Z3DEBUG fixedness refusal, replacing the Go AST-bit scan/late-zero fallback. Conversion algorithms now follow source deferred/eager relevancy timing, native signed get_bits, rewritten weighted sums and exact per-bit integer equations. Comparison atoms retain definition literals across relevance pop and republish lazy bridges on re-entry; disabled relevancy emits eager bridges even when its propagator object exists. Whole-unit diagnostics/assertions and remaining source/owner closure remain open.",
         "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
         "The previous Go carry/XOR3 expansion-through-bridge approximation is removed in favor of the actual source gate clauses. A direct weighted-ITE BV model regression, also reached by the new PB encoder, passes; an overlay restoring old BV production code fails that new regression. The comparison atom definition has its own lexical AST reference across recursive internalization and temporary retirement, matching source expr_ref lifetime."
       ]
@@ -136951,7 +136982,10 @@
         "pkg/smtcore/theory_bv_fixed_test.go",
         "pkg/cmd/g3/test_vectors/bv_fixed_cache_scopes.smt2",
         "pkg/smtcore/theory_bv_model_source_test.go",
-        "pkg/cmd/g3/test_vectors/bv_signed_function_model.smt2"
+        "pkg/cmd/g3/test_vectors/bv_signed_function_model.smt2",
+        "pkg/smtcore/theory_bv_conversion.go",
+        "pkg/smtcore/theory_bv_conversion_test.go",
+        "pkg/cmd/g3/test_vectors/bv_integer_conversion_scopes.smt2"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -137018,7 +137052,12 @@
         "TestSMTBVFixedCacheReusedSlotForBVToInt",
         "TestSMTBVFixedEqualityAllocationRefusalRetainsRepresentativeAndRetries",
         "TestSMTBVModelValueNativePrefixAndDebugFixedness",
-        "TestSMTBVModelValueSignedLiteralsAndFactoryPipeline"
+        "TestSMTBVModelValueSignedLiteralsAndFactoryPipeline",
+        "TestSMTBVConversionSourceAxiomsAndRelevance",
+        "TestSMTBVConversionNativeSignedBitsAndMissingEnode",
+        "TestSMTBVComparisonDefinitionSurvivesRelevancePop",
+        "TestSMTBVConversionRelevanceReentryAndDisabledFallback",
+        "TestSMTBVConversionAllocationRefusalAndScopedRetry"
       ],
       "conditionals": [
         {
@@ -137242,6 +137281,28 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Native conversion/relevancy algorithms (theory_bv.cpp:185-198,554-685,920-980,1282-1316): canonical signed literal get_bits, rewritten weighted n-ary BV2Int sum, Int2BV top modulus plus per-bit div/mod equations, gate-false equality and relevant-before-unit ordering, delayed axioms with scope re-entry, no Int2BV find_wpos, retained le_atom literal definitions and native literal relevancy; TRACE/assertion closure remains outside this increment",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_private.go",
+            "pkg/smtcore/theory_bv_conversion.go",
+            "pkg/smtcore/theory_bv_conversion_test.go",
+            "pkg/cmd/g3/test_vectors/bv_integer_conversion_scopes.smt2",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTBVConversionSourceAxiomsAndRelevance",
+            "TestSMTBVConversionNativeSignedBitsAndMissingEnode",
+            "TestSMTBVComparisonDefinitionSurvivesRelevancePop",
+            "TestSMTBVConversionRelevanceReentryAndDisabledFallback",
+            "TestSMTBVConversionAllocationRefusalAndScopedRetry",
+            "TestSMTBitVectorLazyComparisonBridge",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -137252,11 +137313,12 @@
         "Boolean-variable keys and concrete theory-variable/index occurrences borrow native solver IDs. Separate atom-creation and occurrence trails restore heads and erase scoped atom keys before theory-variable truncation, without accessing already-retired core enodes. Existing ASTRef bitOwners retain expression lifetimes. Native signed literal vectors shrink with actual theory variables; Close clears all occurrence/trail owners. Allocation refusal is exercised at a cold 257-bit projection frontier followed by scope retirement and retry.",
         "A concrete SMTTheoryVar forest owns parent/size/circular-next slices and one ordered private trail interleaving variable creation, merges, atom creation and occurrence heads. Callback errors stop before link commit; logical conflict still commits the link. Unmerge restores links before trimming copied zero/one suffixes using private IDs only, never retired enodes. Native bv-bit-eq region justifications borrow scoped enodes; the logical context owns their lifetime and proof dispatch visits equality before a nonconstant antecedent. Disequality e1/e2/diff lexical ASTRefs survive recursive internalization and shared-temporary retirement.",
         "The fixed-value cache owns native width/canonical integer-string keys and scalar theory-variable IDs only; source pop does not trail it, so each hit validates the current slot, BV sort, width, fixedness and value. Close clears the cache. Lexical e1/e2 ASTRefs protect projection operands during recursive equality internalization, and a failed axiom prefix leaves the previous representative intact without publishing its fixed-equality owner. The context owns queued bv-fixed-eq region justifications, which borrow the theory and variable slots and read current assignment polarity within their live scope. The retained native numeral-alias path has no invented eager bridge or extra bit2core count.",
-        "ModelValue borrows existing native literal vectors and reads current assignments without rebuilding AST circuits or introducing late bit owners. The source debug fixedness guard precedes numeral construction; native release preserves the accumulated prefix at the first undefined literal. The registered model factory creates the numeral at the enode sort width, and the generator retains the expression wrapper result through its existing root-value ownership."
+        "ModelValue borrows existing native literal vectors and reads current assignments without rebuilding AST circuits or introducing late bit owners. The source debug fixedness guard precedes numeral construction; native release preserves the accumulated prefix at the first undefined literal. The registered model factory creates the numeral at the enode sort width, and the generator retains the expression wrapper result through its existing root-value ownership.",
+        "Conversion calls own concrete ASTRef operands and rewritten sums across recursive internalization and temporary retirement, releasing lexical roots in reverse order on success/refusal. Comparison atoms own only canonical scalar SMTLiteral definitions; the context owns the underlying Boolean expression lifetime. Atom creation is on the native ordered private trail, independent of scoped relevance, and undo deletes IDs without consulting retired enodes. Cold 257-bit conversion allocation refusals are followed by scope retirement and retry."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
-        "Whole-unit completion remains unproven. Native private forest/zero-one summaries, watched-position scan, bit propagation, merge/unmerge, bv-bit-eq proofs and default-stream display are implemented. The native fixed_var_table/fixed_var_eh/add_fixed_eq/fixed_eq_justification path now replaces the global Go fixed-value scan and guarded-clause approximation: untrailed width/value cache, current-slot validation, retained representative, exact five-per-bit plus final equality axioms, queued core equality, bv-fixed-eq antecedents and interleaved proof parents. Native mk_bit2bool now publishes only its atom/occurrence; prior eager alias bridges were absent in source and are removed. Retained BV TRACE/SASSERT and specialization-level union-find trace/invariant sites, remaining operator algorithms and complete method/ownership closure still require audit. Eager equality-internalization expansion remains removed in favor of the source no-op callback and native private merges. Native mk_value now uses canonical literals and preserves first-undefined release accumulation plus Z3DEBUG fixedness refusal, replacing the Go AST-bit scan/late-zero fallback. Conversion-axiom relevancy timing and repeated lazy-comparison relevancy still require source/owner closure.",
+        "Whole-unit completion remains unproven. Native private forest/zero-one summaries, watched-position scan, bit propagation, merge/unmerge, bv-bit-eq proofs and default-stream display are implemented. The native fixed_var_table/fixed_var_eh/add_fixed_eq/fixed_eq_justification path now replaces the global Go fixed-value scan and guarded-clause approximation: untrailed width/value cache, current-slot validation, retained representative, exact five-per-bit plus final equality axioms, queued core equality, bv-fixed-eq antecedents and interleaved proof parents. Native mk_bit2bool now publishes only its atom/occurrence; prior eager alias bridges were absent in source and are removed. Retained BV TRACE/SASSERT and specialization-level union-find trace/invariant sites, remaining operator algorithms and complete method/ownership closure still require audit. Eager equality-internalization expansion remains removed in favor of the source no-op callback and native private merges. Native mk_value now uses canonical literals and preserves first-undefined release accumulation plus Z3DEBUG fixedness refusal, replacing the Go AST-bit scan/late-zero fallback. Conversion algorithms now follow source deferred/eager relevancy timing, native signed get_bits, rewritten weighted sums and exact per-bit integer equations. Comparison atoms retain definition literals across relevance pop and republish lazy bridges on re-entry; disabled relevancy emits eager bridges even when its propagator object exists. Whole-unit diagnostics/assertions and remaining source/owner closure remain open.",
         "Automatic bit-vector profiles now enable the retained extended gates in the actual add/subtract implementation, preserving expanded Boolean gates when automatic setup is disabled. BVRE selects the logic-only QF_LIA profile even during feature-based setup. The explicit blast-size guard fixture disables automatic setup before applying its own theory configuration. Profile tests cover first-push, first-check, disabled setup, shared floating-point/array routes and actual gate shape. The arithmetic carry/model scope script raises strict C++ comparisons to 99. Remaining automatic backend selection and other setup profiles stay partial.",
         "The previous Go carry/XOR3 expansion-through-bridge approximation is removed in favor of the actual source gate clauses. A direct weighted-ITE BV model regression, also reached by the new PB encoder, passes; an overlay restoring old BV production code fails that new regression. The comparison atom definition has its own lexical AST reference across recursive internalization and temporary retirement, matching source expr_ref lifetime."
       ]

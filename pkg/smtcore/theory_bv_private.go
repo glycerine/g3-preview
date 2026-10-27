@@ -11,6 +11,7 @@ const (
 	smtBVPrivateMerge
 	smtBVNewAtom
 	smtBVNewOccurrence
+	smtBVNewComparison
 )
 
 type smtBVPrivateTrail struct {
@@ -104,6 +105,8 @@ func (t *SMTBitVectorTheory) restorePrivateTrail(scope smtBVScope) error {
 			}
 			t.bitAtoms[event.boolean] = entries[:len(entries)-1]
 			t.bitOccurrenceTrail = t.bitOccurrenceTrail[:len(t.bitOccurrenceTrail)-1]
+		case smtBVNewComparison:
+			delete(t.comparisonAtoms, event.boolean)
 		case smtBVNewAtom:
 			delete(t.bitAtoms, event.boolean)
 			t.bitAtomTrail = t.bitAtomTrail[:len(t.bitAtomTrail)-1]

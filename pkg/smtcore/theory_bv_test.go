@@ -259,12 +259,12 @@ func TestSMTBitVectorLazyComparisonBridge(t *testing.T) {
 	config.LazyLE = true
 	astTestMust(t, theory.ConfigureBitVector(config))
 	astTestMust(t, solver.kernel.internalizer.Internalize(comparison, false))
-	if len(theory.lazyBridges) != 1 {
-		t.Fatal("comparison bridge was not delayed", len(theory.lazyBridges))
+	if len(theory.comparisonAtoms) != 1 {
+		t.Fatal("comparison bridge was not delayed", len(theory.comparisonAtoms))
 	}
 	before := len(solver.kernel.internalizer.Clauses())
 	astTestMust(t, theory.Relevant(comparison))
-	if len(theory.lazyBridges) != 0 || len(solver.kernel.internalizer.Clauses()) < before+2 {
+	if len(theory.comparisonAtoms) != 1 || len(solver.kernel.internalizer.Clauses()) < before+2 {
 		t.Fatal("relevant comparison did not publish bridge", before, len(solver.kernel.internalizer.Clauses()))
 	}
 }
