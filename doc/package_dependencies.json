@@ -2958,6 +2958,7 @@
         "cleanup.go",
         "datalog_factory.go",
         "datatype_factory.go",
+        "datatype_scope.go",
         "factory.go",
         "factory_assertions.go",
         "fpa_factory.go",

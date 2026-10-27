@@ -113895,7 +113895,9 @@
         "pkg/smtcore/proto_model/factory_release_order_source_test.go",
         "pkg/smtcore/proto_model/factory_release_failure_source_test.go",
         "pkg/smtcore/proto_model/structured_teardown_source_test.go",
-        "pkg/smtcore/proto_model/datatype_teardown_source_test.go"
+        "pkg/smtcore/proto_model/datatype_teardown_source_test.go",
+        "pkg/smtcore/proto_model/datatype_scope.go",
+        "pkg/smtcore/proto_model/datatype_factory_source_test.go"
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
@@ -113915,7 +113917,13 @@
         "TestStructuredFactoryClosedRegistryCannotRevive",
         "TestStructuredFactoryValueSetActualAssertionOwner",
         "TestStructuredFactoryRetryRetainsUnconsumedReferences",
-        "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown"
+        "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown",
+        "TestDatatypeFactoryColdArgumentFailureLeavesRegistryUnpublished",
+        "TestDatatypeFactoryAlmostFreshSeedsRecursiveCache",
+        "TestDatatypeFactoryAlmostFreshWithoutPreviousLastValue",
+        "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
+        "TestDatatypeFactoryContainsUsesQuantifierBody",
+        "TestDatatypeFactorySourceFreshDistinctnessAssertion"
       ],
       "assertions": [
         {
@@ -114018,15 +114026,47 @@
           "tests": [
             "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown"
           ]
+        },
+        {
+          "name": "Native datatype value/fresh/almost control flow: lookup-only cold get_some_value, recursive almost-fresh seed, utility-owned constructor lists, actual contains_app including quantifier bodies, unsigned recursive iteration and all seven source SASSERT sites",
+          "status": "partial",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/datatype_factory_source_test.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryColdArgumentFailureLeavesRegistryUnpublished",
+            "TestDatatypeFactoryAlmostFreshSeedsRecursiveCache",
+            "TestDatatypeFactoryAlmostFreshWithoutPreviousLastValue",
+            "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
+            "TestDatatypeFactoryContainsUsesQuantifierBody",
+            "TestDatatypeFactorySourceFreshDistinctnessAssertion"
+          ]
+        },
+        {
+          "name": "Concrete expr_ref_vector arguments and approach1/2 expr_ref candidates: pin each argument before the next provider call, candidate ownership before assertion/membership/registration, candidate-before-forward-argument retirement, ordered retained lexical cleanup before factory members",
+          "status": "partial",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_scope.go",
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/datatype_factory_source_test.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryColdArgumentFailureLeavesRegistryUnpublished",
+            "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
+            "TestDatatypeFactorySourceFreshDistinctnessAssertion"
+          ]
         }
       ],
       "ownership": [
         "DatatypeFactory retains generated datatype values and borrows constructor metadata from the AST manager.",
-        "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime."
+        "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime.",
+        "DatatypeFactory now uses its own DatatypeUtil.Constructors cache in every enumeration path. Each source argument vector immediately owns every appended expression; approach1/2 separately own their candidate expr_ref. Candidate retirement precedes forward argument-vector retirement. The source contains_app helper owns its target/check roots and traverses quantifier bodies without annotations. Failed lexical cleanup is retained in observed innermost-first order and completed before last-value map/utility/base destruction; registry APIs cannot revive the stopped owner."
       ],
       "deviations": [
         "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
-        "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations."
+        "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations.",
+        "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Tests observe a real argument pin during the second provider call and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. General datatype_factory TRACE/CTRACE statements remain unported, including enabled-trace get_last_fresh_value evaluation inside approach2; remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial."
       ]
     },
     {
@@ -114046,7 +114086,9 @@
         "pkg/smtcore/proto_model/factory_release_order_source_test.go",
         "pkg/smtcore/proto_model/factory_release_failure_source_test.go",
         "pkg/smtcore/proto_model/structured_teardown_source_test.go",
-        "pkg/smtcore/proto_model/datatype_teardown_source_test.go"
+        "pkg/smtcore/proto_model/datatype_teardown_source_test.go",
+        "pkg/smtcore/proto_model/datatype_scope.go",
+        "pkg/smtcore/proto_model/datatype_factory_source_test.go"
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
@@ -114066,7 +114108,13 @@
         "TestStructuredFactoryClosedRegistryCannotRevive",
         "TestStructuredFactoryValueSetActualAssertionOwner",
         "TestStructuredFactoryRetryRetainsUnconsumedReferences",
-        "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown"
+        "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown",
+        "TestDatatypeFactoryColdArgumentFailureLeavesRegistryUnpublished",
+        "TestDatatypeFactoryAlmostFreshSeedsRecursiveCache",
+        "TestDatatypeFactoryAlmostFreshWithoutPreviousLastValue",
+        "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
+        "TestDatatypeFactoryContainsUsesQuantifierBody",
+        "TestDatatypeFactorySourceFreshDistinctnessAssertion"
       ],
       "conditionals": [
         {
@@ -114149,15 +114197,47 @@
           "tests": [
             "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown"
           ]
+        },
+        {
+          "name": "Native datatype value/fresh/almost control flow: lookup-only cold get_some_value, recursive almost-fresh seed, utility-owned constructor lists, actual contains_app including quantifier bodies, unsigned recursive iteration and all seven source SASSERT sites",
+          "status": "partial",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/datatype_factory_source_test.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryColdArgumentFailureLeavesRegistryUnpublished",
+            "TestDatatypeFactoryAlmostFreshSeedsRecursiveCache",
+            "TestDatatypeFactoryAlmostFreshWithoutPreviousLastValue",
+            "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
+            "TestDatatypeFactoryContainsUsesQuantifierBody",
+            "TestDatatypeFactorySourceFreshDistinctnessAssertion"
+          ]
+        },
+        {
+          "name": "Concrete expr_ref_vector arguments and approach1/2 expr_ref candidates: pin each argument before the next provider call, candidate ownership before assertion/membership/registration, candidate-before-forward-argument retirement, ordered retained lexical cleanup before factory members",
+          "status": "partial",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_scope.go",
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/datatype_factory_source_test.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryColdArgumentFailureLeavesRegistryUnpublished",
+            "TestDatatypeFactoryFreshCandidateOwnedAcrossRegistrationFailure",
+            "TestDatatypeFactorySourceFreshDistinctnessAssertion"
+          ]
         }
       ],
       "ownership": [
         "The last-fresh table borrows handles whose owning references are held by the structured factory.",
-        "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime."
+        "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime.",
+        "DatatypeFactory now uses its own DatatypeUtil.Constructors cache in every enumeration path. Each source argument vector immediately owns every appended expression; approach1/2 separately own their candidate expr_ref. Candidate retirement precedes forward argument-vector retirement. The source contains_app helper owns its target/check roots and traverses quantifier bodies without annotations. Failed lexical cleanup is retained in observed innermost-first order and completed before last-value map/utility/base destruction; registry APIs cannot revive the stopped owner."
       ],
       "deviations": [
         "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
-        "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations."
+        "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations.",
+        "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Tests observe a real argument pin during the second provider call and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. General datatype_factory TRACE/CTRACE statements remain unported, including enabled-trace get_last_fresh_value evaluation inside approach2; remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial."
       ]
     },
     {
