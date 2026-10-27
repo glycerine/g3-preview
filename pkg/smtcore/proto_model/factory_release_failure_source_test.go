@@ -9,8 +9,11 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -42,7 +45,7 @@ func factoryReleaseTLSMinimum(t *testing.T, r *umemory.Runtime) {
 }
 
 func TestFactoryRealNumeralReleaseFailureRetry(t *testing.T) {
-	for _, kind := range []string{"arith", "bv", "datalog", "user"} {
+	for _, kind := range []string{"arith", "bv", "datalog", "user", "array", "datatype"} {
 		t.Run(kind, func(t *testing.T) {
 			b := arena.NewBudget(1 << 28)
 			rt, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, ThreadLocal: true, SizeTBits: 64})
@@ -69,6 +72,12 @@ func TestFactoryRealNumeralReleaseFailureRetry(t *testing.T) {
 			real, err := m.GetSort(large)
 			protoMust(t, err)
 			var f ValueFactory
+			var md *ProtoModel
+			var closeServices func()
+			if kind == "array" || kind == "datatype" {
+				protoMust(t, m.RegisterDeclarationPlugins())
+				md, closeServices = structuredReleaseModel(t, m, rt)
+			}
 			var sort ast.ASTHandle
 			switch kind {
 			case "arith":
@@ -84,11 +93,26 @@ func TestFactoryRealNumeralReleaseFailureRetry(t *testing.T) {
 				f, err = NewDatalogFactory(m)
 				protoMust(t, err)
 				sort, err = m.MkDatalogFiniteSort(protoSymbol(t, m, "release-domain"), 8)
+			case "array":
+				f, err = NewArrayFactory(md)
+				protoMust(t, err)
+				boolean, e := m.MkBoolSort()
+				protoMust(t, e)
+				sort, err = m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+			case "datatype":
+				f, err = NewDatatypeFactory(md)
+				protoMust(t, err)
+				sorts, e := m.MkDatatypes([]ast.DatatypeDefinition{{Name: protoSymbol(t, m, "release-datatype"), Constructors: []ast.DatatypeConstructorDefinition{{Name: protoSymbol(t, m, "release-dt-value"), Recognizer: protoSymbol(t, m, "is-release-dt-value")}}}})
+				protoMust(t, e)
+				sort = sorts[0]
 			case "user":
 				f = newUserSortFactory(m)
 				sort, err = m.MkUninterpretedSort(protoSymbol(t, m, "release-universe"), nil)
 			}
 			protoMust(t, err)
+			if md != nil {
+				protoMust(t, md.RegisterFactory(f))
+			}
 			value := large
 			if kind != "arith" {
 				// RegisterValue accepts an expression of the factory's sort. A real
@@ -155,7 +179,13 @@ func TestFactoryRealNumeralReleaseFailureRetry(t *testing.T) {
 				t.Fatal("cleanup horizon")
 			}
 			protoMust(t, m.DelRef(&held))
+			if md != nil {
+				finish(md.Close)
+			}
 			finish(m.Close)
+			if closeServices != nil {
+				closeServices()
+			}
 			finish(q.Close)
 			finish(symbols.Close)
 			if err = rt.Deallocate(&recovery); err != nil && (!errors.Is(err, arena.ErrBounds) || recovery != (umemory.Block{})) {
@@ -169,5 +199,32 @@ func TestFactoryRealNumeralReleaseFailureRetry(t *testing.T) {
 				t.Fatal("owning retry revisited a retired AST reference", retry, again)
 			}
 		})
+	}
+}
+
+// Build the actual model/evaluator owner needed by structured constructors,
+// sharing the physical numeral Runtime used by the release frontier above.
+func structuredReleaseModel(t *testing.T, m *ast.ASTManager, rt *umemory.Runtime) (*ProtoModel, func()) {
+	t.Helper()
+	b := m.Budget()
+	context, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: b})
+	protoMust(t, err)
+	catalog, err := uparams.NewGlobalParamsCatalog(m.Symbols, uparams.GlobalParamsCatalogConfig{Budget: b})
+	protoMust(t, err)
+	globals, err := uparams.NewGlobalParamsService(m.Symbols, context, uparams.GlobalParamsConfig{Budget: b, Catalog: catalog})
+	protoMust(t, err)
+	protoMust(t, globals.InitializeSource())
+	params, err := context.NewValue()
+	protoMust(t, err)
+	cooperation, err := cooperate.NewCooperation(b)
+	protoMust(t, err)
+	md, err := NewProtoModel(m, model.ModelEvaluatorConfig{Context: context, Globals: globals, Params: &params, Memory: rt, Cooperation: cooperation})
+	protoMust(t, err)
+	return md, func() {
+		protoMust(t, cooperation.Close())
+		protoMust(t, context.Del(&params))
+		protoMust(t, globals.Close())
+		protoMust(t, catalog.Close())
+		protoMust(t, context.Close())
 	}
 }

@@ -161,6 +161,9 @@ func (f *ArrayFactory) makeTwo(s ast.ASTHandle) (ok bool, result error) {
 	return true, fi2.InsertEntry(args, r2)
 }
 func (f *ArrayFactory) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
+	if err := f.open(); err != nil {
+		return false, err
+	}
 	set := f.sets[s]
 	if set == nil || len(set.values) == 0 {
 		ok, err := f.makeTwo(s)

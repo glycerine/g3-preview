@@ -14,9 +14,9 @@ import (
 // Each value/sort comes from the actual retained concrete specialization. The
 // test observes the manager's source deletion records, not a destructor hook.
 func TestFactorySourceForwardReferenceDestruction(t *testing.T) {
-	for _, kind := range []string{"datalog", "user", "arith", "bv"} {
+	for _, kind := range []string{"datalog", "user", "arith", "bv", "array", "datatype"} {
 		t.Run(kind, func(t *testing.T) {
-			owner, _ := protoFixture(t)
+			owner, _, config := protoFixtureWithConfig(t)
 			var output bytes.Buffer
 			tags := diagnostic.NewTraceTagsWithWriter(&output)
 			m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: owner.Symbols, Numerals: owner.NumeralService(), Budget: owner.Budget(), TraceTags: tags})
@@ -26,6 +26,7 @@ func TestFactorySourceForwardReferenceDestruction(t *testing.T) {
 			var factory ValueFactory
 			var sort ast.ASTHandle
 			var prefix []ast.ASTHandle
+			var constructors []ast.ASTHandle
 			switch kind {
 			case "datalog":
 				f, err := NewDatalogFactory(m)
@@ -60,6 +61,44 @@ func TestFactorySourceForwardReferenceDestruction(t *testing.T) {
 				factory = f
 				sort, err = m.MkFamilySort(f.FamilyID(), 0, nil)
 				protoMust(t, err)
+			case "array":
+				md, err := NewProtoModel(m, config)
+				protoMust(t, err)
+				t.Cleanup(func() { protoMust(t, md.Close()) })
+				f, err := NewArrayFactory(md)
+				protoMust(t, err)
+				factory = f
+				index, err := m.MkBoolSort()
+				protoMust(t, err)
+				for i := 0; i < 2; i++ {
+					emptyRange, err := m.MkUninterpretedSort(protoSymbol(t, m, fmt.Sprintf("empty-array-range-%d", i)), nil)
+					protoMust(t, err)
+					empty, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{index}), emptyRange)
+					protoMust(t, err)
+					_, err = f.valueSet(empty)
+					protoMust(t, err)
+					prefix = append(prefix, empty)
+				}
+				rangeSort, err := m.BitVectorSort(8)
+				protoMust(t, err)
+				sort, err = m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{index}), rangeSort)
+				protoMust(t, err)
+			case "datatype":
+				md, err := NewProtoModel(m, config)
+				protoMust(t, err)
+				t.Cleanup(func() { protoMust(t, md.Close()) })
+				f, err := NewDatatypeFactory(md)
+				protoMust(t, err)
+				factory = f
+				var definitions []ast.DatatypeConstructorDefinition
+				for i := 0; i < 4; i++ {
+					definitions = append(definitions, ast.DatatypeConstructorDefinition{Name: protoSymbol(t, m, fmt.Sprintf("release-ctor-%d", i)), Recognizer: protoSymbol(t, m, fmt.Sprintf("is-release-ctor-%d", i))})
+				}
+				sorts, err := m.MkDatatypes([]ast.DatatypeDefinition{{Name: protoSymbol(t, m, "ReleaseEnum"), Constructors: definitions}})
+				protoMust(t, err)
+				sort = sorts[0]
+				constructors, err = m.DatatypeConstructors(sort)
+				protoMust(t, err)
 			case "bv":
 				f, err := NewBitVectorFactory(m)
 				protoMust(t, err)
@@ -69,7 +108,7 @@ func TestFactorySourceForwardReferenceDestruction(t *testing.T) {
 			}
 			t.Cleanup(func() { protoMust(t, factory.Close()) })
 			var values []ast.ASTHandle
-			for _, n := range []uint64{3, 1, 5, 7} {
+			for position, n := range []uint64{3, 1, 5, 7} {
 				var value ast.ASTHandle
 				switch kind {
 				case "datalog":
@@ -78,6 +117,12 @@ func TestFactorySourceForwardReferenceDestruction(t *testing.T) {
 					value, err = m.MkModelValue(uint32(n), sort)
 				case "arith":
 					value, err = m.ArithmeticNumeralRat(big.NewRat(int64(n), 2), false)
+				case "array":
+					number, e := m.BitVectorNumeralUint64(n, 8)
+					protoMust(t, e)
+					value, err = m.MkConstArray(sort, number)
+				case "datatype":
+					value, err = m.MkApp(constructors[position], nil)
 				case "bv":
 					value, err = m.BitVectorNumeralUint64(n, 8)
 				}

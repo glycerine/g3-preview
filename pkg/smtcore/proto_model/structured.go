@@ -19,20 +19,36 @@ func newStructuredFactory(m *ast.ASTManager, family ast.FamilyID, md *ProtoModel
 	return structuredFactory{manager: m, family: family, model: md, sets: make(map[ast.ASTHandle]*factoryValueSet)}
 }
 func (f *structuredFactory) FamilyID() ast.FamilyID { return f.family }
-func (f *structuredFactory) valueSet(s ast.ASTHandle) (*factoryValueSet, error) {
-	if set := f.sets[s]; set != nil {
-		return set, nil
+func (f *structuredFactory) open() error {
+	if f == nil || f.manager == nil || f.sets == nil {
+		return ast.ErrASTHandle
 	}
-	ref, err := f.manager.NewRef(s)
-	if err != nil {
+	return nil
+}
+
+func (f *structuredFactory) valueSet(s ast.ASTHandle) (*factoryValueSet, error) {
+	if err := f.open(); err != nil {
 		return nil, err
 	}
-	set := &factoryValueSet{seen: make(map[ast.ASTHandle]struct{})}
-	f.sets[s] = set
-	f.sorts = append(f.sorts, ref)
+	set := f.sets[s]
+	if set == nil {
+		ref, err := f.manager.NewRef(s)
+		if err != nil {
+			return nil, err
+		}
+		set = &factoryValueSet{seen: make(map[ast.ASTHandle]struct{})}
+		f.sets[s] = set
+		f.sorts = append(f.sorts, ref)
+	}
+	if err := valueFactoryAssert("src/smt/proto_model/struct_factory.cpp", 30, "set != 0", func() bool { return set != nil }); err != nil {
+		return nil, err
+	}
 	return set, nil
 }
 func (f *structuredFactory) RegisterValue(v ast.ASTHandle) error {
+	if err := f.open(); err != nil {
+		return err
+	}
 	s, err := f.manager.GetSort(v)
 	if err != nil {
 		return err
@@ -110,13 +126,30 @@ func (f *structuredFactory) SomeValues(s ast.ASTHandle, factory ValueFactory, fi
 	}
 }
 
+// Source struct_factory destroys its borrowed-value sets in its body, then
+// m_sorts before m_values. Each native ref_vector releases in insertion order.
+// Go owning retries skip tokens that DelRef consumed before returning an error;
+// the borrowed AST manager retains any interrupted numerical deletion graph.
 func (f *structuredFactory) Close() (err error) {
-	for i := len(f.values) - 1; i >= 0; i-- {
-		err = errors.Join(err, f.manager.DelRef(&f.values[i]))
+	if f == nil || f.manager == nil {
+		return nil
 	}
-	for i := len(f.sorts) - 1; i >= 0; i-- {
+	f.sets = nil
+	for i := range f.sorts {
+		if f.sorts[i] == (ast.ASTRef{}) {
+			continue
+		}
 		err = errors.Join(err, f.manager.DelRef(&f.sorts[i]))
 	}
-	f.values, f.sorts, f.sets = nil, nil, nil
+	for i := range f.values {
+		if f.values[i] == (ast.ASTRef{}) {
+			continue
+		}
+		err = errors.Join(err, f.manager.DelRef(&f.values[i]))
+	}
+	if err == nil {
+		f.values, f.sorts = nil, nil
+		f.manager, f.model = nil, nil
+	}
 	return err
 }
