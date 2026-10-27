@@ -263125,14 +263125,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "65e1baf84e39671fc4dafdbe25d2b7336bdc22d1",
+    "commit": "df87768f8b0eb9bf668d4b71ef8233eeecee8e66",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-27T18:42:41.961589+00:00",
-    "completed_utc": "2026-10-27T18:46:07.282814+00:00",
+    "started_utc": "2026-10-27T19:43:27.185494+00:00",
+    "completed_utc": "2026-10-27T19:46:51.112263+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-65e1baf8.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-65e1baf8.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-65e1baf8.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-df87768f.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-df87768f.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-df87768f.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -263148,9 +263148,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 88,
     "packages_without_test_files": 7,
-    "lp_seconds": 2.711,
+    "lp_seconds": 2.785,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean frozen 65e1baf84e39671fc4dafdbe25d2b7336bdc22d1, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes prior datatype factory traces/actual printer profiles/nested stream failuresf82c7e34, corrected borrowed cold arguments733a3d79, recursion cache and generic-definition traversal2fd75495, enum caches/independent rewriter utilities/caller-owned bounds8195efbf, application/argument owners and publication prefixes8a669567, and quantifier bounds/body/sort-buffer/proof ordering65e1baf8. Default native run intentionally skips guarded LP cases; no full LP -short or full tagged suite is claimed. Twelve affected packages separately pass native/combined; current quantifier and other enum2bv regressions pass four focused build profiles, and six current quantifier semantic controls reject behaviorally. Whole enum2bv/plugin/factory/SMT2 printer units remain partial. Remaining source pretty-print errors, params_ref, assertions/proof-engine composition, utility caches and general native exceptional/NUM destruction remain open, as does complete smtcore/solver/tactic/CLI/API/higher-engine integration. Root production/tests and dependency graph match this snapshot at documentation-only recording; no source-unit/API status or audit promotion."
+    "scope_warning": "Independently verified clean frozen df87768f8b0eb9bf668d4b71ef8233eeecee8e66, unchanged at start/end/verification; all95 packages exactly once (88 tested,7 without tests), prebuilt C++ comparisons and insdict v0.14.6. Includes earlier datatype/enum ownership work, enum diagnostic exceptions/assertions260732f9, proof compositiona4561288, constructor parameter snapshot50da292d and retained dt2bv tactic/SMT-LIB model/core/scope integrationdf87768f. Default native run intentionally skips guarded LP cases; no full LP -short or full tagged suite is claimed. dt2bv/enum2bv/printer whole units remain partial for recorded exception/ownership/translation/display obligations. Current uncommitted enum2bv_solver implementation/tests are explicitly outside this snapshot. Complete smtcore/solver/tactic/CLI/API/higher-engine integration remains active; no source-unit/API status or audit promotion follows from the checkpoint."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
