@@ -47,6 +47,9 @@ func lpFloatSparseCheck(t *testing.T, m *FloatSparseMatrix, want map[IndexPair]f
 }
 
 func TestLPFloatSparseIndependentMutationOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	m := newFloatSparseMatrix(9)
 	rng := rand.New(rand.NewPCG(177, 81))
 	want := make(map[IndexPair]float64)

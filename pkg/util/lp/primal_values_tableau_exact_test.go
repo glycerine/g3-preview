@@ -166,6 +166,9 @@ func TestLPExactTableauValuesIndependentModels(t *testing.T) {
 }
 
 func TestLPExactTableauBasisIndependentElimination(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewPairCoreFixture(t, h, 2, 4)

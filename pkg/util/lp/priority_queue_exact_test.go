@@ -617,6 +617,9 @@ func TestLPPairPriorityQueueOlderComparisonIdentity(t *testing.T) {
 }
 
 func TestLPRationalPriorityQueueRetainedShrinkMutationPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	values := []*RationalPair{h.pair("0", "0"), h.pair("1", "0"), h.pair("2", "0"), h.pair("3", "0")}
 	for _, world := range []string{"clear", "decrease-child", "decrease-parent", "increase-left", "increase-right", "dequeue"} {

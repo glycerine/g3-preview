@@ -157,6 +157,9 @@ func TestLPRationalPrimalCostSwitchIndependentModels(t *testing.T) {
 }
 
 func TestLPRationalPrimalCostBackupDenseReplacement(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, phase := range []string{"replace", "empty", "only", "self"} {
 		h := newLPPairHarness(t)
 		f := lpNewRationalCoreFixture(t, h, 1, 3)

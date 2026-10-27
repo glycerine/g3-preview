@@ -18,6 +18,9 @@ func lpScalarBreakpointOracle(x, bound, d *big.Rat, typ BreakpointType, directio
 }
 
 func TestLPRationalPrimalBreakpointCollectIndependentDelta(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 600; world++ {
 		h := newLPPairHarness(t)
 		f, m := lpRationalPricingFixture(t, h, 0, 0)

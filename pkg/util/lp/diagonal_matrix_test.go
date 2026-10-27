@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPDiagonalTailIndependentMatrixOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(83741, 17931))
 	for world := 0; world < 240; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

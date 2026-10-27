@@ -36,6 +36,9 @@ func lpNewLARLUPreparedModel(t *testing.T, h *lpPairHarness, b [][]*big.Rat) *LA
 }
 
 func TestLARLUExtendIndependentBasisAndPolicy(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	for world := 0; world < 36; world++ {
 		n := 1 + world%4

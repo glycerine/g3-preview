@@ -103,6 +103,9 @@ func TestLARChangedBoundsBasicMembershipTransitions(t *testing.T) {
 }
 
 func TestLARChangedBoundsActualLURowsAndValues(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	for world := 0; world < 100; world++ {
 		a := big.NewRat(int64(world%17-8), 7)

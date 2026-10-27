@@ -51,6 +51,9 @@ func TestLPRationalPrimalBreakpointIndependentRecords(t *testing.T) {
 }
 
 func TestLPRationalPrimalBreakpointIndependentSlopes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 480; world++ {
 		h := newLPPairHarness(t)
 		f, m := lpRationalPricingFixture(t, h, 1, 2)

@@ -11,6 +11,9 @@ import (
 )
 
 func TestLPExactSnapColumnIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	kinds := []ColumnType{ColumnFree, ColumnLowBound, ColumnUpperBound, ColumnFixed, ColumnBoxed, ColumnType(99)}
 	for world := 0; world < 600; world++ {
 		h := newLPPairHarness(t)

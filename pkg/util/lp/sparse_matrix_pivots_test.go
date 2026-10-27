@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPSparsePivotPreparationIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(109, 886))
 	for world := 0; world < 120; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

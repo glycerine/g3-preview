@@ -45,6 +45,9 @@ func TestLPRationalPrimalHarrisIndependentScalarOracle(t *testing.T) {
 }
 
 func TestLPRationalPrimalBoundStepIndependentFlipsAndAliases(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, kind := range []ColumnType{ColumnFree, ColumnFixed, ColumnLowBound, ColumnUpperBound, ColumnBoxed} {
 		for _, direction := range []int32{-1, 0, 1} {
 			for world := 0; world < 32; world++ {

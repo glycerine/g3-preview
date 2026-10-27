@@ -35,6 +35,9 @@ func TestLPFloatSparseOriginalInitU(t *testing.T) {
 }
 
 func TestLPFloatSparseBasisIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(154, 2026))
 	type entry struct {
 		row   uint32

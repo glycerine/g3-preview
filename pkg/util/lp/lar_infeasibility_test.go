@@ -115,6 +115,9 @@ func TestLARInfeasibilityStoredRowIndependentModels(t *testing.T) {
 }
 
 func TestLARInfeasibilityPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, row := range []bool{false, true} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

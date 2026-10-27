@@ -48,6 +48,9 @@ func TestLPExactDenseBlockParentPublicationStages(t *testing.T) {
 }
 
 func TestLPExactDenseBlockParentAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	denseStops, parentReceipts, rowBeforeColumn, fillRowBeforeColumn := 0, 0, 0, 0
 	for _, op := range []string{"common", "remove", "fill", "update"} {
 		for _, direct := range []bool{false, true} {

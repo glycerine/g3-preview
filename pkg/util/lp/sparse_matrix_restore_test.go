@@ -154,6 +154,9 @@ func TestLPFloatSparseRowRestoreToleranceAndIEEE(t *testing.T) {
 }
 
 func TestLPExactSparseRowRestoreAllocationCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"existing", "new", "remove"} {
 			t.Run(fmt.Sprint(direct, "/", op), func(t *testing.T) {

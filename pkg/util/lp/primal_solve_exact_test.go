@@ -77,6 +77,9 @@ func TestLPExactSolveLUIndependentBoundedOptima(t *testing.T) {
 }
 
 func TestLPExactSolveTableauIndependentBoundedOptima(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 160; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewPairCoreFixture(t, h, 1, 3)

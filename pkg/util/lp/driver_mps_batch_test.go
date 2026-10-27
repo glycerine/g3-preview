@@ -405,6 +405,9 @@ func TestLPMPSBatchChildFailurePrefixes(t *testing.T) {
 }
 
 func TestLPMPSBatchPhysicalChildOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	home := t.TempDir()
 	large := strings.Repeat("1234567890", 20) + "7/13"
 	lpBatchPut(t, home, "l0redund.mps", strings.Replace(lpProcessFixedGLPKModel(3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", large), 1))

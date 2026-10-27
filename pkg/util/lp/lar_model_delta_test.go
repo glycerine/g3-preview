@@ -19,6 +19,9 @@ func lpLARModelDeltaFixture(t *testing.T, h *lpPairHarness, kind ColumnType) *LA
 }
 
 func TestLARModelDeltaIndependentBounds(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, kind := range []ColumnType{ColumnFree, ColumnLowBound, ColumnUpperBound, ColumnFixed, ColumnBoxed} {
 		for world := 0; world < 80; world++ {
 			t.Run(fmt.Sprintf("%d/%d", kind, world), func(t *testing.T) {

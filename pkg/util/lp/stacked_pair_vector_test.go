@@ -313,6 +313,9 @@ func TestLPStackedPairVectorPendingAllocationIdentity(t *testing.T) {
 // Assignment proxies borrow the actual source element. Journal growth and
 // append relocation must not turn a cross-element source into the destination.
 func TestLPStackedPairVectorBorrowedElementAssignmentAndTailRestore(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 16; world++ {
 		h := newLPPairHarness(t)
 		a := h.pair(strings.Repeat("1234567890", 20)+fmt.Sprint(world)+"/7", "-11/13")

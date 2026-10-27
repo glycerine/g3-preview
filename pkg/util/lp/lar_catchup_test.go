@@ -216,6 +216,9 @@ func TestLARCatchUpIndependentTraceModels(t *testing.T) {
 }
 
 func TestLARCatchUpReverseIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(91712, 1513))
 	for world := 0; world < 100; world++ {
 		h := newLPPairHarness(t)

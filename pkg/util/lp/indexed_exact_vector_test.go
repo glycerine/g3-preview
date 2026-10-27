@@ -536,6 +536,9 @@ func TestLPIndexedPairVectorExactCopyOwnership(t *testing.T) {
 }
 
 func TestLPIndexedPairVectorExactSparseOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	var values []*RationalPair
 	for i := -4; i <= 4; i++ {

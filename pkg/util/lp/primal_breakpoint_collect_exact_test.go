@@ -70,6 +70,9 @@ func TestLPExactBreakpointCollectIndependentDeltaOracle(t *testing.T) {
 }
 
 func TestLPExactBreakpointCollectIndependentModelOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 200; world++ {
 		h := newLPPairHarness(t)
 		coefficient := int64(world%7 - 3)

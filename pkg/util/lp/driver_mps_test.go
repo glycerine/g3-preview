@@ -624,6 +624,9 @@ func TestLPMPSDriverFullRunPhysicalOwnership(t *testing.T) {
 }
 
 func TestLPMPSDriverPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	name := lpMPSDriverFile(t, lpMPSDriverModel(3, 2, 4, 5, 3))
 	for _, phase := range []string{"run", "objective"} {
 		matched := false

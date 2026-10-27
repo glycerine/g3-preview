@@ -185,6 +185,9 @@ func TestLPRationalCoreIndependentLUSolves(t *testing.T) {
 }
 
 func TestLPRationalCoreExactBoundProfiles(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for typ := ColumnFree; typ <= ColumnFixed; typ++ {
 		for _, tolerance := range []float64{0, -1, 1e99, math.Inf(1), math.NaN()} {
 			h := newLPPairHarness(t)

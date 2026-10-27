@@ -296,6 +296,9 @@ func TestLARConstraintDisplayReachedPrefixes(t *testing.T) {
 }
 
 func TestLARConstraintDisplayPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, profile := range []string{"large", "term-negative", "term-large"} {
 		for _, direct := range []bool{false, true} {
 			done, failures := false, 0
