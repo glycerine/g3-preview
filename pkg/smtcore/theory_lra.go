@@ -7,6 +7,7 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/lp"
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -42,6 +43,8 @@ func (l smtLRAResourceLimit) CancelFlag() (bool, error) { return l.manager.Cance
 // the remaining retained-source audit are still incomplete.
 type SMTLRATheory struct {
 	*SMTTheoryBase
+	trace                             *diagnostic.TraceTags // Borrowed source trace control; nil uses the process tags.
+	pendingTraceRoots                 []ast.ASTRef
 	numeric                           *smtLRANumeric
 	initParams                        *lp.LPParams
 	numerals                          *numeral.RationalManager
@@ -807,7 +810,7 @@ func (t *SMTLRATheory) Close() error {
 		}
 		t.constructorInteger = nil
 	}
-	for _, refs := range []*[]ast.ASTRef{&t.pendingAxiomRoots, &t.axiomRefs} {
+	for _, refs := range []*[]ast.ASTRef{&t.pendingTraceRoots, &t.pendingAxiomRoots, &t.axiomRefs} {
 		for len(*refs) > 0 {
 			i := len(*refs) - 1
 			if err := t.axiomManager.DelRef(&(*refs)[i]); err != nil {

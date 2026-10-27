@@ -3,6 +3,8 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -18,9 +20,22 @@ func (t *SMTLRATheory) setLRAConflict() error {
 	}
 	t.conflictCount++ // Search-wide count: restored by init_search, not by pop.
 	t.statistics.conflicts++
+	if err = t.emitLRA("set_conflict", 2222, func(out io.Writer) error {
+		if err := smtWriteTheoryText(out, fmt.Sprintf("scope: %d\n", t.state.scopeLevel)); err != nil {
+			return err
+		}
+		return t.displayEvidence(out, evidence)
+	}); err != nil {
+		return err
+	}
+	if err = t.emitLRA("set_conflict", 2223, t.Display); err != nil {
+		return err
+	}
 	var core []SMTLiteral
 	for _, e := range evidence {
-		core = append(core, e.literal)
+		if e.coefficient.Sign() != 0 {
+			core = append(core, e.literal)
+		}
 	}
 	return t.state.SetTheoryConflict(t.FamilyID(), core)
 }

@@ -34,8 +34,8 @@ type smtLRAEvidence struct {
 
 // smtLRANumeric is the concrete LAR owner of the retained LRA implementation.
 // Its manager is borrowed and must outlive Close. It does not substitute the
-// math/simplex algorithm for LAR. The AST/event half of theory_lra will attach
-// to this owner; setup continues to use the existing backend until then.
+// math/simplex algorithm for LAR. SMTLRATheory owns the AST/event half, and
+// automatic QF_LRA/QF_UFLRA setup selects it at the first setup boundary.
 type smtLRANumeric struct {
 	manager      *numeral.RationalManager
 	solver       *lp.LARSolver
@@ -513,13 +513,16 @@ func (s *smtLRANumeric) infeasibilityEvidence() (result []smtLRAEvidence, err er
 		if e != nil {
 			return nil, e
 		}
-		if coefficient.Sign() == 0 {
-			continue
-		}
-		if entry.Index >= s.solver.NumberOfConstraints() || int(entry.Index) >= len(s.inequalities) || s.inequalities[entry.Index] == SMTNullLiteral {
+		literal := SMTNullLiteral
+		if coefficient.Sign() != 0 && (entry.Index >= s.solver.NumberOfConstraints() || int(entry.Index) >= len(s.inequalities) || s.inequalities[entry.Index] == SMTNullLiteral) {
 			return nil, ast.ErrASTDomain
 		}
-		result = append(result, smtLRAEvidence{entry.Index, s.inequalities[entry.Index], *coefficient})
+		if int(entry.Index) < len(s.inequalities) {
+			literal = s.inequalities[entry.Index]
+		}
+		// Source display_evidence's second pass includes zero coefficients.
+		// Consumers that form conflict premises filter them independently.
+		result = append(result, smtLRAEvidence{entry.Index, literal, *coefficient})
 	}
 	if err = s.explanation.Close(); err != nil {
 		return nil, err
