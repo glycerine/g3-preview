@@ -2,7 +2,6 @@
 package protomodel
 
 import (
-	"errors"
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -16,8 +15,6 @@ type StringFactory struct {
 	family  ast.FamilyID
 	strings map[string]struct{}
 	next    uint32
-	refs    []ast.ASTRef
-	owned   map[ast.ASTHandle]struct{}
 }
 
 func NewStringFactory(model *ProtoModel, family ast.FamilyID) (*StringFactory, error) {
@@ -27,25 +24,10 @@ func NewStringFactory(model *ProtoModel, family ast.FamilyID) (*StringFactory, e
 	if err := model.open(); err != nil {
 		return nil, err
 	}
-	return &StringFactory{manager: model.manager, family: family, strings: make(map[string]struct{}), owned: make(map[ast.ASTHandle]struct{})}, nil
+	return &StringFactory{manager: model.manager, family: family, strings: make(map[string]struct{})}, nil
 }
 
 func (f *StringFactory) FamilyID() ast.FamilyID { return f.family }
-
-// The Go factory interface returns handles rather than the source's expr_ref
-// output parameters. Retain generated expressions until the factory closes.
-func (f *StringFactory) retain(value ast.ASTHandle) (ast.ASTHandle, error) {
-	if _, found := f.owned[value]; found {
-		return value, nil
-	}
-	ref, err := f.manager.NewRef(value)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	f.refs = append(f.refs, ref)
-	f.owned[value] = struct{}{}
-	return value, nil
-}
 
 func (f *StringFactory) stringValue(text string) (ast.ASTHandle, error) {
 	if f == nil || f.manager == nil {
@@ -55,20 +37,29 @@ func (f *StringFactory) stringValue(text string) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	return f.retain(value)
+	return value, nil
 }
 
 func (f *StringFactory) SomeValue(ast.ASTHandle) (ast.ASTHandle, error) {
 	return f.stringValue("some value")
 }
 
-func (f *StringFactory) SomeValues(ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
-	first, err := f.stringValue("value 1")
+func (f *StringFactory) SomeValues(_ ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
+	value, err := f.stringValue("value 1")
 	if err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		return false, err
 	}
-	second, err := f.stringValue("value 2")
-	return first, second, err == nil, err
+	if err = f.manager.SetRef(first, value); err != nil {
+		return false, err
+	}
+	value, err = f.stringValue("value 2")
+	if err != nil {
+		return false, err
+	}
+	if err = f.manager.SetRef(second, value); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (f *StringFactory) FreshValue(sort ast.ASTHandle) (ast.ASTHandle, error) {
@@ -105,20 +96,17 @@ func (f *StringFactory) FreshValue(sort ast.ASTHandle) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	return f.retain(regexValue)
+	return regexValue, nil
 }
 
 func (*StringFactory) RegisterValue(ast.ASTHandle) error { return nil }
 
-func (f *StringFactory) Close() (result error) {
-	if f == nil || f.manager == nil {
-		return nil
+func (f *StringFactory) Close() error {
+	if f != nil {
+		f.strings = nil
+		f.manager = nil
 	}
-	for i := len(f.refs) - 1; i >= 0; i-- {
-		result = errors.Join(result, f.manager.DelRef(&f.refs[i]))
-	}
-	f.refs, f.strings, f.owned, f.manager = nil, nil, nil, nil
-	return result
+	return nil
 }
 
 var _ ValueFactory = (*StringFactory)(nil)

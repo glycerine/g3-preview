@@ -42,7 +42,7 @@ func TestDatalogFactorySourceSomeValuesRegisteredBranches(t *testing.T) {
 				protoMust(t, f.RegisterValue(v))
 				old = append(old, v)
 			}
-			a, b, ok, err := f.SomeValues(sort)
+			a, b, ok, err := protoTestSomeValues(t, m, f, sort)
 			protoMust(t, err)
 			if !ok || a == b {
 				t.Fatal("source some-values requires two distinct values", a, b, ok)
@@ -68,7 +68,7 @@ func TestDatalogFactorySourceSomeValuesRegisteredBranches(t *testing.T) {
 				}
 			}
 			before := len(f.values)
-			a2, b2, ok, err := f.SomeValues(sort)
+			a2, b2, ok, err := protoTestSomeValues(t, m, f, sort)
 			protoMust(t, err)
 			if !ok || a2 != a || b2 != b || len(f.values) != before {
 				t.Fatal("warm pair selection changed or retained duplicates")
@@ -85,8 +85,8 @@ func TestDatalogFactorySourceSingletonAndExhaustionPrefixes(t *testing.T) {
 				_, err := f.SomeValue(sort)
 				protoMust(t, err)
 			}
-			first, second, ok, err := f.SomeValues(sort)
-			if !errors.Is(err, ast.ErrASTDomain) || ok || second != (ast.ASTHandle{}) {
+			first, second, ok, err := protoTestSomeValues(t, m, f, sort)
+			if !errors.Is(err, ast.ErrASTDomain) || ok || (!warm && !second.IsNull()) || (warm && second != first) {
 				t.Fatal("source attempts out-of-range numeral one", first, second, ok, err)
 			}
 			datalogFactoryNumber(t, m, first, 0)
@@ -170,7 +170,7 @@ func TestDatalogFactorySourceRegistrationOwnershipAndCursor(t *testing.T) {
 	if _, err = f.SomeValue(sort); !errors.Is(err, ast.ErrASTHandle) {
 		t.Fatal("closed factory value", err)
 	}
-	if _, _, _, err = f.SomeValues(sort); !errors.Is(err, ast.ErrASTHandle) {
+	if _, _, _, err = protoTestSomeValues(t, m, f, sort); !errors.Is(err, ast.ErrASTHandle) {
 		t.Fatal("closed factory pair", err)
 	}
 	if _, err = f.FreshValue(sort); !errors.Is(err, ast.ErrASTHandle) {
@@ -234,8 +234,8 @@ func TestDatalogFactorySourceFreshAllocationRefusalRetry(t *testing.T) {
 }
 
 func TestDatalogFactorySourceAssertionOwnerAndWarmSelection(t *testing.T) {
-	_, f, sort := datalogFactoryFixture(t, 8)
-	_, _, _, err := f.SomeValues(sort)
+	m, f, sort := datalogFactoryFixture(t, 8)
+	_, _, _, err := protoTestSomeValues(t, m, f, sort)
 	protoMust(t, err)
 	b := arena.NewBudget(1 << 20)
 	region, err := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
@@ -255,7 +255,7 @@ func TestDatalogFactorySourceAssertionOwnerAndWarmSelection(t *testing.T) {
 	}()
 	for _, enabled := range []bool{false, true} {
 		protoMust(t, d.EnableAssertions(enabled))
-		a, b, ok, err := f.SomeValues(sort)
+		a, b, ok, err := protoTestSomeValues(t, m, f, sort)
 		protoMust(t, err)
 		if !ok || a == b {
 			t.Fatal("healthy assertion owner changed pair")
@@ -268,7 +268,7 @@ func TestDatalogFactorySourceAssertionOwnerAndWarmSelection(t *testing.T) {
 	if v != f.sets[sort].values[0] {
 		t.Fatal("warm selection changed the stored expression")
 	}
-	a, bv, ok, err := f.SomeValues(sort)
+	a, bv, ok, err := protoTestSomeValues(t, m, f, sort)
 	if diagnostic.DebugBuild {
 		if !errors.Is(err, arena.ErrClosed) || ok || a == (ast.ASTHandle{}) || bv == (ast.ASTHandle{}) {
 			t.Fatal("line171 must consult owner after pair publication", a, bv, ok, err)
@@ -297,7 +297,7 @@ func TestDatalogFactorySourceProtoModelDispatch(t *testing.T) {
 	one, err := m.MkDatalogNumeral(1, sort)
 	protoMust(t, err)
 	protoMust(t, p.RegisterValue(one))
-	first, second, distinct, err := p.SomeValues(sort)
+	first, second, distinct, err := protoTestSomeValues(t, m, p, sort)
 	protoMust(t, err)
 	if !distinct || first != one || first == second {
 		t.Fatal("prototype-model dispatch did not preserve registered pair", first, second, distinct)

@@ -4,67 +4,69 @@ package ast
 // MkFPAModelFactoryValue follows fpa_value_factory::get_some_value. This is
 // separate from the declaration plugin's get_some_value, which supplies NaN.
 func (m *ASTManager) MkFPAModelFactoryValue(sort ASTHandle) (ASTHandle, error) {
-	first, _, err := m.mkFPAModelFactoryValues(sort, false)
+	first, err := m.mkFPAModelFactoryValues(sort, false, ASTRef{}, ASTRef{})
 	return first, err
 }
 
-// MkFPAModelFactoryPair follows get_some_values, reusing the same scoped MPF
-// for numeric zero then numeric one. Returned handles use the model factory's
-// existing borrowed-handle interface; they do not acquire factory references.
-func (m *ASTManager) MkFPAModelFactoryPair(sort ASTHandle) (ASTHandle, ASTHandle, error) {
-	return m.mkFPAModelFactoryValues(sort, true)
+// MkFPAModelFactoryPair writes caller-owned outputs before the next setter or
+// the scoped MPF destructor. It never retains a separate factory reference.
+func (m *ASTManager) MkFPAModelFactoryPair(sort ASTHandle, first, second ASTRef) error {
+	_, err := m.mkFPAModelFactoryValues(sort, true, first, second)
+	return err
 }
 
-func (m *ASTManager) mkFPAModelFactoryValues(sort ASTHandle, pair bool) (first, second ASTHandle, result error) {
+func (m *ASTManager) mkFPAModelFactoryValues(sort ASTHandle, pair bool, first, second ASTRef) (out ASTHandle, result error) {
 	if err := m.lock(); err != nil {
-		return first, second, err
+		return out, err
 	}
 	defer m.mu.Unlock()
 	defer func() {
 		if !pair && result != nil {
-			first = ASTHandle{}
+			out = ASTHandle{}
 		}
 	}()
 	p := m.floatingPointPlugin
 	if p == nil || p.self != p || !p.published || p.sourceEnded {
-		return first, second, ErrASTHandle
+		return out, ErrASTHandle
 	}
 	frame, err := p.beginNumeralProbe()
 	if err != nil {
-		return first, second, err
+		return out, err
 	}
 	var last astNodeRef
 	defer p.finishNumeralConstruction(frame, &result, &last)
 	ref, err := m.requireKind(sort, ASTSort)
 	if err != nil {
-		return first, second, err
+		return out, err
 	}
 	ebits, err := m.fpaUtilExponentBits(ref)
 	if err != nil {
-		return first, second, err
+		return out, err
 	}
 	sbits, err := m.fpaUtilSignificandBits(ref)
 	if err != nil {
-		return first, second, err
+		return out, err
 	}
 	if result = p.numeric.SetInt32(&frame.value, ebits, sbits, 0); result != nil {
-		return first, second, result
+		return out, result
 	}
 	last, result = p.mkNumeral(&frame.value, nil)
 	if result != nil {
-		return first, second, result
+		return out, result
 	}
-	first = m.external(last)
 	if !pair {
-		return first, second, nil
+		return m.external(last), nil
+	}
+	if result = m.assignRef(first, last); result != nil {
+		return out, result
 	}
 	if result = p.numeric.SetInt32(&frame.value, ebits, sbits, 1); result != nil {
-		return first, second, result
+		return out, result
 	}
 	last, result = p.mkNumeral(&frame.value, nil)
 	if result != nil {
-		return first, second, result
+		return out, result
 	}
-	second = m.external(last)
-	return first, second, nil
+	result = m.assignRef(second, last)
+	return out, result
 }

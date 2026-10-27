@@ -35,7 +35,7 @@ func TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues(t *testing.T) {
 			zero, err := p.SomeValue(sort)
 			protoMust(t, err)
 			protoPin(t, m, zero)
-			first, second, ok, err := p.SomeValues(sort)
+			first, second, ok, err := protoTestSomeValues(t, m, p, sort)
 			protoMust(t, err)
 			if !ok || first != zero || first == second {
 				t.Fatal("source numeric pair", first, second, zero, ok)
@@ -70,7 +70,7 @@ func TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues(t *testing.T) {
 			}
 			// Repeated borrowed-handle calls canonicalize. Output expr_ref ownership
 			// is a separate interface audit; register_value itself retains nothing.
-			a, b, ok, err := p.SomeValues(sort)
+			a, b, ok, err := protoTestSomeValues(t, m, p, sort)
 			protoMust(t, err)
 			if !ok || a != first || b != second {
 				t.Fatal("unstable canonical pair")
@@ -95,7 +95,7 @@ func TestFloatingPointFactoryRejectsNonFloatSortsWithSourceAssertion(t *testing.
 					protoMust(t, err)
 					protoMust(t, d.EnableAssertions(enabled))
 					if pair {
-						_, _, _, err = f.SomeValues(sort)
+						_, _, _, err = protoTestSomeValues(t, m, f, sort)
 					} else {
 						_, err = f.SomeValue(sort)
 					}
@@ -161,7 +161,7 @@ func TestFloatingPointFactoryClosedAndNilGuards(t *testing.T) {
 		if _, err := factory.SomeValue(ast.ASTHandle{}); !errors.Is(err, ast.ErrASTHandle) {
 			t.Fatal("closed scalar", err)
 		}
-		if _, _, _, err := factory.SomeValues(ast.ASTHandle{}); !errors.Is(err, ast.ErrASTHandle) {
+		if _, _, _, err := protoTestSomeValues(t, m, factory, ast.ASTHandle{}); !errors.Is(err, ast.ErrASTHandle) {
 			t.Fatal("closed pair", err)
 		}
 	}
@@ -184,7 +184,7 @@ func TestFloatingPointFactoryArrayRangeConsumer(t *testing.T) {
 	array, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), fp)
 	protoMust(t, err)
 	protoPin(t, m, array)
-	a, b, ok, err := p.SomeValues(array)
+	a, b, ok, err := protoTestSomeValues(t, m, p, array)
 	protoMust(t, err)
 	if !ok || a == b {
 		t.Fatal("array pair was not built")
@@ -289,9 +289,14 @@ func TestFloatingPointFactoryColdAllocationPrefixes(t *testing.T) {
 			sort, err := m.FloatingPointSort(8, 24)
 			protoMust(t, err)
 			protoPin(t, m, sort)
+			firstRef, secondRef := protoTestOutputRefs(t, m)
 			m.Budget().FailAfter(ordinal)
-			first, second, ok, call := f.SomeValues(sort)
+			ok, call := f.SomeValues(sort, firstRef, secondRef)
 			m.Budget().FailAfter(-1)
+			first, read := m.RefGet(firstRef)
+			protoMust(t, read)
+			second, read := m.RefGet(secondRef)
+			protoMust(t, read)
 			if call != nil {
 				failed = true
 				if ok {

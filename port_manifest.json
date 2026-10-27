@@ -113410,9 +113410,27 @@
       "path": "src/smt/proto_model/array_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/array_factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestArrayAndDatatypeFactories"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/proto_model/array_factory.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
+      ],
+      "tests": [
+        "TestArrayAndDatatypeFactories",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
+      ],
       "assertions": [
         {
           "line": 79,
@@ -113435,19 +113453,70 @@
           "text": "SASSERT(set->size() >= 2);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [{"name": "auxiliary declaration construction, as-array interpretations, representative arguments, distinct pair construction, and fresh arrays", "status": "ported", "go_target": "pkg/smtcore/proto_model/array_factory.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [
+        {
+          "name": "auxiliary declaration construction, as-array interpretations, representative arguments, distinct pair construction, and fresh arrays",
+          "status": "partial",
+          "go_target": "pkg/smtcore/proto_model/array_factory.go",
+          "tests": [
+            "TestArrayAndDatatypeFactories"
+          ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Actual array construction and fresh-index fallback own two local range references through argument/interpretation construction and entry insertion, then release in reverse order.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/array_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
+        }
+      ],
       "ownership": ["ArrayFactory retains every constructed as-array value; the prototype model owns each auxiliary declaration and function interpretation."],
-      "deviations": []
+      "deviations": [
+        "Earlier whole-unit audited claims are withdrawn. Concrete output-reference protocol and per-branch publication now follow the source, but complete unit methods/ownership are not proven. Structured member teardown still releases Go value references before sort references, while source struct_factory members destroy sorts before values. Complete constructor/map/storage and destructor failure prefixes and remaining source assertions/trace require audit. For seq_factory, unsigned cursor width, trail/unique-sequence ownership and remaining dispatch/prefix methods also remain open; the SomeValues unsupported-sort fatal path alone is now ported."
+      ]
     },
     {
       "path": "src/smt/proto_model/array_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/array_factory.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestArrayAndDatatypeFactories"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/proto_model/array_factory.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
+      ],
+      "tests": [
+        "TestArrayAndDatatypeFactories",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113458,11 +113527,44 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [{"name": "array value-factory construction and complete value-generation interface", "status": "ported", "go_target": "pkg/smtcore/proto_model/array_factory.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [
+        {
+          "name": "array value-factory construction and complete value-generation interface",
+          "status": "partial",
+          "go_target": "pkg/smtcore/proto_model/array_factory.go",
+          "tests": [
+            "TestArrayAndDatatypeFactories"
+          ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Actual array construction and fresh-index fallback own two local range references through argument/interpretation construction and entry insertion, then release in reverse order.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/array_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
+        }
+      ],
       "ownership": ["The factory borrows its manager and prototype model and owns its structured value registry."],
-      "deviations": []
+      "deviations": [
+        "Earlier whole-unit audited claims are withdrawn. Concrete output-reference protocol and per-branch publication now follow the source, but complete unit methods/ownership are not proven. Structured member teardown still releases Go value references before sort references, while source struct_factory members destroy sorts before values. Complete constructor/map/storage and destructor failure prefixes and remaining source assertions/trace require audit. For seq_factory, unsigned cursor width, trail/unique-sequence ownership and remaining dispatch/prefix methods also remain open; the SomeValues unsupported-sort fatal path alone is now ported."
+      ]
     },
     {
       "path": "src/smt/proto_model/datatype_factory.cpp",
@@ -113472,11 +113574,25 @@
       "go_targets": [
         "pkg/smtcore/proto_model/datatype_factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
-        "pkg/smtcore/proto_model/datatype_utility_test.go"
+        "pkg/smtcore/proto_model/datatype_utility_test.go",
+        "pkg/smtcore/proto_model/structured.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
-        "TestDatatypeFactoryUsesIndependentCachedConstructorUtility"
+        "TestDatatypeFactoryUsesIndependentCachedConstructorUtility",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "assertions": [
         {
@@ -113530,6 +113646,29 @@
           "tests": [
             "TestDatatypeFactoryUsesIndependentCachedConstructorUtility"
           ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Source struct_factory size0/1/multiple branches publish first before second creation, write null second before returning false, and preserve caller outputs on later failure.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/structured.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
         }
       ],
       "ownership": [
@@ -113546,11 +113685,25 @@
       "go_targets": [
         "pkg/smtcore/proto_model/datatype_factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
-        "pkg/smtcore/proto_model/datatype_utility_test.go"
+        "pkg/smtcore/proto_model/datatype_utility_test.go",
+        "pkg/smtcore/proto_model/structured.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
-        "TestDatatypeFactoryUsesIndependentCachedConstructorUtility"
+        "TestDatatypeFactoryUsesIndependentCachedConstructorUtility",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "conditionals": [
         {
@@ -113583,6 +113736,29 @@
           ],
           "tests": [
             "TestDatatypeFactoryUsesIndependentCachedConstructorUtility"
+          ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Source struct_factory size0/1/multiple branches publish first before second creation, write null second before returning false, and preserve caller outputs on later failure.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/structured.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
           ]
         }
       ],
@@ -113844,14 +114020,27 @@
         "pkg/smtcore/proto_model/proto_model_test.go",
         "pkg/smtcore/proto_model/cleanup_test.go",
         "pkg/smtcore/proto_model/constructor_failure_test.go",
-        "pkg/ackermannization/lackr_test.go"
+        "pkg/ackermannization/lackr_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestValueFactoriesSomeFreshFreezeAndNumericValues",
         "TestProtoModelCompletionCleanupEvaluationAndFinalModel",
         "TestProtoModelCleanupOwnsRewrittenFallbackUntilInstalled",
         "TestProtoModelConstructorFailureRetainsAllocatedOwner",
-        "TestLackrAllocationFrontiers"
+        "TestLackrAllocationFrontiers",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "assertions": [
         {
@@ -113903,6 +114092,28 @@
             "TestProtoModelConstructorFailureRetainsAllocatedOwner",
             "TestLackrAllocationFrontiers"
           ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/proto_model.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
         }
       ],
       "ownership": [
@@ -113918,8 +114129,28 @@
       "component": "smt",
       "role": "production",
       "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/proto_model.go", "pkg/smtcore/proto_model/cleanup.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestValueFactoriesSomeFreshFreezeAndNumericValues", "TestProtoModelCompletionCleanupEvaluationAndFinalModel"],
+      "go_targets": [
+        "pkg/smtcore/proto_model/proto_model.go",
+        "pkg/smtcore/proto_model/cleanup.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
+      ],
+      "tests": [
+        "TestValueFactoriesSomeFreshFreezeAndNumericValues",
+        "TestProtoModelCompletionCleanupEvaluationAndFinalModel",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
+      ],
       "conditionals": [
         {
           "line": 28,
@@ -113932,7 +114163,38 @@
       ],
       "methods_audited": true,
       "ownership_audited": true,
-      "methods": [{"name": "complete ProtoModel public construction, model-building, universe, evaluation, completion, cleanup and conversion surface", "status": "ported", "go_target": "pkg/smtcore/proto_model/proto_model.go", "tests": ["TestProtoModelCompletionCleanupEvaluationAndFinalModel"]}],
+      "methods": [
+        {
+          "name": "complete ProtoModel public construction, model-building, universe, evaluation, completion, cleanup and conversion surface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/proto_model.go",
+          "tests": [
+            "TestProtoModelCompletionCleanupEvaluationAndFinalModel"
+          ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/proto_model.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
+        }
+      ],
       "ownership": ["The Go owner is noncopyable, closes child services in dependency order, and rejects operations once final-model conversion begins."],
       "deviations": []
     },
@@ -113940,28 +114202,100 @@
       "path": "src/smt/proto_model/struct_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/structured.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestArrayAndDatatypeFactories"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/proto_model/structured.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/datatype_factory.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
+      ],
+      "tests": [
+        "TestArrayAndDatatypeFactories",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
+      ],
       "assertions": [
         {
           "line": 30,
           "text": "SASSERT(set != 0);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [{"name": "per-sort value registry, registration, distinct representative selection, and destruction", "status": "ported", "go_target": "pkg/smtcore/proto_model/structured.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [
+        {
+          "name": "per-sort value registry, registration, distinct representative selection, and destruction",
+          "status": "partial",
+          "go_target": "pkg/smtcore/proto_model/structured.go",
+          "tests": [
+            "TestArrayAndDatatypeFactories"
+          ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Source struct_factory size0/1/multiple branches publish first before second creation, write null second before returning false, and preserve caller outputs on later failure.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/structured.go",
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
+        }
+      ],
       "ownership": ["Native maps and slices replace pointer containers; explicit ASTRef slices retain every sort and structured value."],
-      "deviations": []
+      "deviations": [
+        "Earlier whole-unit audited claims are withdrawn. Concrete output-reference protocol and per-branch publication now follow the source, but complete unit methods/ownership are not proven. Structured member teardown still releases Go value references before sort references, while source struct_factory members destroy sorts before values. Complete constructor/map/storage and destructor failure prefixes and remaining source assertions/trace require audit. For seq_factory, unsigned cursor width, trail/unique-sequence ownership and remaining dispatch/prefix methods also remain open; the SomeValues unsupported-sort fatal path alone is now ported."
+      ]
     },
     {
       "path": "src/smt/proto_model/struct_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
-      "go_targets": ["pkg/smtcore/proto_model/structured.go", "pkg/smtcore/proto_model/proto_model_test.go"],
-      "tests": ["TestArrayAndDatatypeFactories"],
+      "status": "partial",
+      "go_targets": [
+        "pkg/smtcore/proto_model/structured.go",
+        "pkg/smtcore/proto_model/proto_model_test.go",
+        "pkg/smtcore/proto_model/datatype_factory.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
+      ],
+      "tests": [
+        "TestArrayAndDatatypeFactories",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -113972,11 +114306,45 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
-      "methods": [{"name": "structured factory base state and shared value operations", "status": "ported", "go_target": "pkg/smtcore/proto_model/structured.go", "tests": ["TestArrayAndDatatypeFactories"]}],
+      "methods_audited": false,
+      "ownership_audited": false,
+      "methods": [
+        {
+          "name": "structured factory base state and shared value operations",
+          "status": "partial",
+          "go_target": "pkg/smtcore/proto_model/structured.go",
+          "tests": [
+            "TestArrayAndDatatypeFactories"
+          ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Source struct_factory size0/1/multiple branches publish first before second creation, write null second before returning false, and preserve caller outputs on later failure.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/structured.go",
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
+        }
+      ],
       "ownership": ["The base borrows ProtoModel and ASTManager and owns its sort/value references."],
-      "deviations": []
+      "deviations": [
+        "Earlier whole-unit audited claims are withdrawn. Concrete output-reference protocol and per-branch publication now follow the source, but complete unit methods/ownership are not proven. Structured member teardown still releases Go value references before sort references, while source struct_factory members destroy sorts before values. Complete constructor/map/storage and destructor failure prefixes and remaining source assertions/trace require audit. For seq_factory, unsigned cursor width, trail/unique-sequence ownership and remaining dispatch/prefix methods also remain open; the SomeValues unsupported-sort fatal path alone is now ported."
+      ]
     },
     {
       "path": "src/smt/proto_model/value_factory.cpp",
@@ -113996,7 +114364,10 @@
         "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2",
         "pkg/smtcore/proto_model/datalog_factory.go",
         "pkg/smtcore/proto_model/factory_release_order_source_test.go",
-        "pkg/smtcore/proto_model/factory_release_failure_source_test.go"
+        "pkg/smtcore/proto_model/factory_release_failure_source_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestValueFactoriesSomeFreshFreezeAndNumericValues",
@@ -114011,7 +114382,17 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestFactorySourceForwardReferenceDestruction",
-        "TestFactoryRealNumeralReleaseFailureRetry"
+        "TestFactoryRealNumeralReleaseFailureRetry",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "assertions": [
         {
@@ -114093,6 +114474,31 @@
           "tests": [
             "TestFactoryRealNumeralReleaseFailureRetry"
           ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/factory.go",
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/datalog_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
         }
       ],
       "ownership": [
@@ -114125,7 +114531,10 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2",
         "pkg/smtcore/proto_model/factory_release_order_source_test.go",
-        "pkg/smtcore/proto_model/factory_release_failure_source_test.go"
+        "pkg/smtcore/proto_model/factory_release_failure_source_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestValueFactoriesSomeFreshFreezeAndNumericValues",
@@ -114147,7 +114556,17 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestFactorySourceForwardReferenceDestruction",
-        "TestFactoryRealNumeralReleaseFailureRetry"
+        "TestFactoryRealNumeralReleaseFailureRetry",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "conditionals": [
         {
@@ -114263,6 +114682,31 @@
           ],
           "tests": [
             "TestFactoryRealNumeralReleaseFailureRetry"
+          ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/factory.go",
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/datalog_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
           ]
         }
       ],
@@ -140742,7 +141186,10 @@
         "pkg/ast/ast_fpa_model_factory.go",
         "pkg/ast/ast_fpa_model_factory_test.go",
         "pkg/ast/ast_fpa_util_width.go",
-        "pkg/smtcore/proto_model/fpa_factory_source_test.go"
+        "pkg/smtcore/proto_model/fpa_factory_source_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
@@ -140772,7 +141219,17 @@
         "TestFloatingPointFactoryFreshContinueExit",
         "TestFloatingPointFactoryColdAllocationPrefixes",
         "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
-        "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
+        "TestASTFPAModelFactoryUsesOneLiveNumericalScope",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "assertions": [
         {
@@ -141066,7 +141523,7 @@
           ]
         },
         {
-          "name": "fpa_value_factory numerical bodies (theory_fpa.h:48-62,65-66): one actual scoped MPF, native machine-int setter0 then canonical registration, same MPF setter1 for the pair, no retained factory values, real NOT_IMPLEMENTED_YET/UNREACHABLE fresh-value behavior and ignored register_value. Source expr_ref output ownership remains a separate open interface audit.",
+          "name": "fpa_value_factory numerical bodies (theory_fpa.h:48-62,65-66): one actual scoped MPF, native machine-int setter0 then canonical registration, same MPF setter1 for the pair, no retained factory values, real NOT_IMPLEMENTED_YET/UNREACHABLE fresh-value behavior and ignored register_value. Caller-owned ASTRef output publication is now implemented and physically failure-tested separately.",
           "status": "ported",
           "go_targets": [
             "pkg/ast/ast_fpa_model_factory.go",
@@ -141087,6 +141544,30 @@
             "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
             "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
           ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. FPA assigns zero output before set(1), one output before scoped MPF destruction; failed old-output NUM release leaves incoming acquisition on the caller reference.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/ast_fpa_model_factory.go",
+            "pkg/ast/ast_fpa_model_factory_test.go",
+            "pkg/smtcore/proto_model/fpa_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
         }
       ],
       "ownership": [
@@ -141101,8 +141582,8 @@
         "Float operands are reached recursively while translating atoms and equalities; rounding-mode relevancy additionally connects wrappers to finite encodings. Context display_theories is a retained display consumer and now reaches the complete FPA printer. The previous claim that native trace/display had no separate retained consumer was unsupported: live t_fpa/t_fpa_detail/t_fpa_internalize traces and source assertions remain unported, and fresh-theory reachability still requires revalidation.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
         "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change.",
-        "The former broad model/factory ported claim remains withdrawn. Factory numerical0/1 and fatal fresh behavior now use the retained native owners/macros; invented RM defaults are removed. The shared model factory interface still returns raw AST handles rather than source get_some_values expr_ref outputs, so caller output-reference publication/error-prefix ownership remains unclosed. Model fallback paths, source model input/result TRACE, numerical destructor failure prefixes and full lifecycle audit remain open. Native model reconstruction uses actual plugin MPF/MPZ owners and canonical registration. The small-format prebuilt C++ SMT-LIB comparison is integration evidence, not whole-unit completion. Ebits64 reaches the source signed top-exponent helper limit (2^63); the tested multi-limb boundary remains ebits63.",
-        "The native cold factory reservation sweep reaches failures and completion with fixture budget0 cleanup, but no later refusal after publishing zero was observed in this preallocated-arena profile. It is not evidence for all source allocator/destructor/output-reference failure prefixes. Native NOT_IMPLEMENTED_YET stops at the existing explicit GNU-unreachable guard; checked Continue is separately verified to exit107 in an actual child process. The source factory is not an RM value enumerator: width assertions fire before absent parameter reads, and erased/continued assertions retain literal parameter semantics when real foreign sort metadata provides them."
+        "The former broad model/factory ported claim remains withdrawn. Factory numerical0/1, real source fatal fresh behavior and caller-owned ASTRef pair outputs are now transcribed, including publication before the next setter/destructor and actual old-output NUM release failure. The raw-pair/factory-lifetime workaround is removed across all concrete factories and live array/sequence consumers. Model fallback paths, input/result TRACE, full numerical destruction/failure-prefix audit and broader lifecycle completion remain open. Native model reconstruction uses actual plugin MPF/MPZ owners; whole FPA units remain partial. Ebits64 reaches the source signed top-exponent helper limit; the tested multi-limb boundary remains ebits63.",
+        "Cold factory allocation sweeps construct caller output references before fault injection and lift faults before reading/closing those outputs. The earlier preallocated-arena census did not reach a refusal after zero publication; it was not whole failure-prefix evidence. New checked/debug physical NUM tests independently reach a consumed old-output release, prove the exact incoming acquisition remains caller-owned, keep the second output unchanged, and finish all actual owners at budget0. Native GNU-unreachable versus checked Continue exit107 behavior remains separately characterized."
       ]
     },
     {
@@ -141124,7 +141605,10 @@
         "pkg/ast/ast_fpa_model_factory.go",
         "pkg/ast/ast_fpa_model_factory_test.go",
         "pkg/ast/ast_fpa_util_width.go",
-        "pkg/smtcore/proto_model/fpa_factory_source_test.go"
+        "pkg/smtcore/proto_model/fpa_factory_source_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
@@ -141151,7 +141635,17 @@
         "TestFloatingPointFactoryFreshContinueExit",
         "TestFloatingPointFactoryColdAllocationPrefixes",
         "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
-        "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
+        "TestASTFPAModelFactoryUsesOneLiveNumericalScope",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "conditionals": [
         {
@@ -141216,7 +141710,7 @@
           ]
         },
         {
-          "name": "fpa_value_factory numerical bodies (theory_fpa.h:48-62,65-66): one actual scoped MPF, native machine-int setter0 then canonical registration, same MPF setter1 for the pair, no retained factory values, real NOT_IMPLEMENTED_YET/UNREACHABLE fresh-value behavior and ignored register_value. Source expr_ref output ownership remains a separate open interface audit.",
+          "name": "fpa_value_factory numerical bodies (theory_fpa.h:48-62,65-66): one actual scoped MPF, native machine-int setter0 then canonical registration, same MPF setter1 for the pair, no retained factory values, real NOT_IMPLEMENTED_YET/UNREACHABLE fresh-value behavior and ignored register_value. Caller-owned ASTRef output publication is now implemented and physically failure-tested separately.",
           "status": "ported",
           "go_targets": [
             "pkg/ast/ast_fpa_model_factory.go",
@@ -141237,6 +141731,30 @@
             "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
             "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
           ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. FPA assigns zero output before set(1), one output before scoped MPF destruction; failed old-output NUM release leaves incoming acquisition on the caller reference.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/ast_fpa_model_factory.go",
+            "pkg/ast/ast_fpa_model_factory_test.go",
+            "pkg/smtcore/proto_model/fpa_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
         }
       ],
       "ownership": [
@@ -141248,8 +141766,8 @@
         "The native fresh-value factory method is itself unimplemented; the Go factory implements the retained canonical-value operations and deliberately reports that it cannot manufacture an unbounded fresh FP value.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
         "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change.",
-        "The former broad model/factory ported claim remains withdrawn. Factory numerical0/1 and fatal fresh behavior now use the retained native owners/macros; invented RM defaults are removed. The shared model factory interface still returns raw AST handles rather than source get_some_values expr_ref outputs, so caller output-reference publication/error-prefix ownership remains unclosed. Model fallback paths, source model input/result TRACE, numerical destructor failure prefixes and full lifecycle audit remain open. Native model reconstruction uses actual plugin MPF/MPZ owners and canonical registration. The small-format prebuilt C++ SMT-LIB comparison is integration evidence, not whole-unit completion. Ebits64 reaches the source signed top-exponent helper limit (2^63); the tested multi-limb boundary remains ebits63.",
-        "The native cold factory reservation sweep reaches failures and completion with fixture budget0 cleanup, but no later refusal after publishing zero was observed in this preallocated-arena profile. It is not evidence for all source allocator/destructor/output-reference failure prefixes. Native NOT_IMPLEMENTED_YET stops at the existing explicit GNU-unreachable guard; checked Continue is separately verified to exit107 in an actual child process. The source factory is not an RM value enumerator: width assertions fire before absent parameter reads, and erased/continued assertions retain literal parameter semantics when real foreign sort metadata provides them."
+        "The former broad model/factory ported claim remains withdrawn. Factory numerical0/1, real source fatal fresh behavior and caller-owned ASTRef pair outputs are now transcribed, including publication before the next setter/destructor and actual old-output NUM release failure. The raw-pair/factory-lifetime workaround is removed across all concrete factories and live array/sequence consumers. Model fallback paths, input/result TRACE, full numerical destruction/failure-prefix audit and broader lifecycle completion remain open. Native model reconstruction uses actual plugin MPF/MPZ owners; whole FPA units remain partial. Ebits64 reaches the source signed top-exponent helper limit; the tested multi-limb boundary remains ebits63.",
+        "Cold factory allocation sweeps construct caller output references before fault injection and lift faults before reading/closing those outputs. The earlier preallocated-arena census did not reach a refusal after zero publication; it was not whole failure-prefix evidence. New checked/debug physical NUM tests independently reach a consumed old-output release, prove the exact incoming acquisition remains caller-owned, keep the second output unchanged, and finish all actual owners at budget0. Native GNU-unreachable versus checked Continue exit107 behavior remains separately characterized."
       ]
     },
     {
@@ -142255,7 +142773,10 @@
         "pkg/smtcore/theory_pb_inline_guard_test.go",
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_internalizer.go",
-        "pkg/smtcore/smt_conflict_continuation_test.go"
+        "pkg/smtcore/smt_conflict_continuation_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -142307,7 +142828,17 @@
         "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause",
         "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
         "TestSMTPBInternalizeTermSourceUnreachableGuard",
-        "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict"
+        "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "conditionals": [
         {
@@ -142947,6 +143478,29 @@
           "tests": [
             "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict"
           ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. PB factory publishes true then false through the independent model initializer.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_model.go",
+            "pkg/smtcore/theory_pb_model_test.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
         }
       ],
       "ownership": [
@@ -143021,7 +143575,10 @@
         "pkg/smtcore/theory_pb_inline_guard_test.go",
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_internalizer.go",
-        "pkg/smtcore/smt_conflict_continuation_test.go"
+        "pkg/smtcore/smt_conflict_continuation_test.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestSMTPseudoBooleanQFFDExactCardinality",
@@ -143073,7 +143630,17 @@
         "TestSMTPBLiteralNetworkStatisticsWrapBeforeFactoryAndClause",
         "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
         "TestSMTPBInternalizeTermSourceUnreachableGuard",
-        "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict"
+        "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "assertions": [
         {
@@ -143414,6 +143981,29 @@
           ],
           "tests": [
             "TestSMTPBAssignmentContinuesVariableWatchesAfterLiteralConflict"
+          ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. PB factory publishes true then false through the independent model initializer.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_pb_model.go",
+            "pkg/smtcore/theory_pb_model_test.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
           ]
         }
       ],
@@ -145591,15 +146181,28 @@
       "path": "src/smt/theory_seq_empty.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_seq_empty.go",
-        "pkg/smtcore/proto_model/sequence_factory.go"
+        "pkg/smtcore/proto_model/sequence_factory.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestSMTEmptySequenceTheoryScopesAndModelFactory",
         "TestSMTSequenceLogicsInstallSafeCheckpointTheory",
-        "TestSequenceFactoryCanonicalFreshAndGenericValues"
+        "TestSequenceFactoryCanonicalFreshAndGenericValues",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "conditionals": [
         {
@@ -145611,20 +146214,47 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "sequence, string and regular-expression canonical values, distinct values, collision-free fresh strings and registered-value delimiter avoidance",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/smtcore/proto_model/sequence_factory.go",
-          "tests": ["TestSequenceFactoryCanonicalFreshAndGenericValues"]
+          "tests": [
+            "TestSequenceFactoryCanonicalFreshAndGenericValues"
+          ]
         },
         {
           "name": "empty sequence theory internalization refusal, scoped usage, final-check status, fresh construction and model-factory registration",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_seq_empty.go",
-          "tests": ["TestSMTEmptySequenceTheoryScopesAndModelFactory", "TestSMTSequenceLogicsInstallSafeCheckpointTheory"]
+          "tests": [
+            "TestSMTEmptySequenceTheoryScopesAndModelFactory",
+            "TestSMTSequenceLogicsInstallSafeCheckpointTheory"
+          ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Forward actual caller references into the element factory, then replace those same outputs with units; unsupported sort dispatches real NOT_IMPLEMENTED_YET at94.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/sequence_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
         }
       ],
       "ownership": [
@@ -145632,7 +146262,8 @@
         "SMTEmptySequenceTheory owns its scoped used-state and borrows the SMT context through SMTTheoryBase."
       ],
       "deviations": [
-        "The source's unused per-sort unique-sequence prefix map has no retained consumer. Standalone character literals are not exposed by the retained AST surface; character values remain represented through string constants."
+        "The source's unused per-sort unique-sequence prefix map has no retained consumer. Standalone character literals are not exposed by the retained AST surface; character values remain represented through string constants.",
+        "Earlier whole-unit audited claims are withdrawn. The concrete SomeValues caller-output protocol, same-reference element delegation and unsupported-sort NOT_IMPLEMENTED_YET path now follow source. Complete seq_factory methods and ownership remain unproven: Go next is uint64 while source m_next is unsigned; source trail and unique-sequence ownership and remaining dispatch/prefix methods require audit. No complete sequence factory or empty-theory closure is claimed."
       ]
     },
     {
@@ -145762,7 +146393,11 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/theory_str_display.go",
         "pkg/smtcore/theory_str_display_test.go",
-        "pkg/smtcore/theory_fpa_display.go"
+        "pkg/smtcore/theory_fpa_display.go",
+        "pkg/smtcore/proto_model/string_factory.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -146006,7 +146641,17 @@
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
         "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
         "TestSMTStringDisplaySourceLiteralAndContextDispatch",
-        "TestSMTStringDisplayOwnerAndWriterGuards"
+        "TestSMTStringDisplayOwnerAndWriterGuards",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "conditionals": [
         {
@@ -147974,6 +148619,28 @@
             "TestSMTStringDisplaySourceLiteralAndContextDispatch",
             "TestSMTStringDisplayOwnerAndWriterGuards"
           ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Remove StringFactory generated-AST refs/owned cache: source owns symbols/cursor, and caller outputs or model entries own the generated expressions.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/string_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
         }
       ],
       "ownership": [
@@ -148213,7 +148880,10 @@
         "pkg/smtcore/smt_solver.go",
         "pkg/smtcore/theory_str_display.go",
         "pkg/smtcore/theory_str_display_test.go",
-        "pkg/smtcore/theory_fpa_display.go"
+        "pkg/smtcore/theory_fpa_display.go",
+        "pkg/smtcore/proto_model/output_helpers_test.go",
+        "pkg/smtcore/proto_model/output_source_test.go",
+        "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -148458,7 +149128,17 @@
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
         "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
         "TestSMTStringDisplaySourceLiteralAndContextDispatch",
-        "TestSMTStringDisplayOwnerAndWriterGuards"
+        "TestSMTStringDisplayOwnerAndWriterGuards",
+        "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+        "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+        "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+        "TestFactoryOutputsSequenceForwardsElementFailure",
+        "TestFactoryOutputsAliasFollowsSourceAssignments",
+        "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+        "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+        "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+        "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+        "TestFactoryOutputsRealOldNumeralReleaseFailure"
       ],
       "conditionals": [
         {
@@ -149744,6 +150424,28 @@
             "TestSMTStringDisplaySourceLiteralAndContextDispatch",
             "TestSMTStringDisplayOwnerAndWriterGuards"
           ]
+        },
+        {
+          "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Remove StringFactory generated-AST refs/owned cache: source owns symbols/cursor, and caller outputs or model entries own the generated expressions.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/string_factory.go",
+            "pkg/smtcore/proto_model/output_helpers_test.go",
+            "pkg/smtcore/proto_model/output_source_test.go",
+            "pkg/smtcore/proto_model/output_release_failure_test.go"
+          ],
+          "tests": [
+            "TestFactoryOutputsDatalogConstructionFailurePrefixes",
+            "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
+            "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
+            "TestFactoryOutputsSequenceForwardsElementFailure",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestFactoryOutputsStringOwnedByCallerAndSurviveFactoryClose",
+            "TestFactoryOutputsSequenceUnsupportedSortReportsSourceMacro",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals",
+            "TestFactoryOutputsDatatypeSingletonPublishesBeforeFalse",
+            "TestFactoryOutputsRealOldNumeralReleaseFailure"
+          ]
         }
       ],
       "ownership": [
@@ -149799,7 +150501,7 @@
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
-        "The header str_value_factory is implemented separately from seq_factory. Some values are exactly some value/value 1/value 2; fresh names use !hex! with a wrapping uint32 counter, skip previously generated names and share the counter with regex fresh values. Registering an existing !0! is ignored, as native requires, rather than adopting SequenceFactory collision avoidance. Go owns returned handles through factory close to represent native output-ref lifetime. The subsequent owner increment implements theory_str init_model/mk_value separately from this factory-method credit; full constraint handling and backend selection remain incomplete.",
+        "The header str_value_factory is implemented separately from seq_factory. Some values are exactly some value/value 1/value 2; fresh names use !hex! with a wrapping uint32 counter, skip previously generated names and share the counter with regex fresh values. Registering an existing !0! is ignored, as native requires, rather than adopting SequenceFactory collision avoidance. Factory outputs now use caller-owned ASTRef objects without a generated-expression lifetime cache; single-value returns remain borrowed as in source. The subsequent owner increment implements theory_str init_model/mk_value separately from this factory-method credit; full constraint handling and backend selection remain incomplete.",
         "Added a distinct SMTStringTheory owner, without changing existing solver setup. String-only attachments and the native Boolean callback/enode behavior are implemented; integer length, Boolean relation and regex results do not acquire string theory variables. The private union-find supplies source model class lookup independently of the core egraph, including repeated scope rollback. The active 255-byte model-search alphabet preserves lowercase/capital/digit/mark/control ordering and excludes NUL; the full byte-string length axiom still counts NUL and high bytes. The source lifetime cache uses the borrowed StringConstantCache parameter dynamically and retains child-scope literals across pops. Fresh borrows the same parameter owner while resetting mutable caches, counters and equivalence classes.",
         "Ported basic string/concat/guarded string-equality length axiom routines and syntactic concat evaluation; source assertion publication and the basic constant queue are connected. Syntactic evaluation deliberately cannot turn a private model class into an axiom. Model callbacks now install the distinct StringFactory and resolve strings using recursive concat and the private union-find, with exact **UNUSED** decimal fallback names. The native constant-length unit bypasses the lifetime assertion trail, while other assert_axiom expressions are retained as source m_trail requires.",
         "This is a partial owner/lifecycle/model increment, not a complete theory_str backend. The full constructor/nested regex solver, The subsequent relation increment implements asserted-formula search traversal and supported basic/concat/prefix/suffix/Contains worklists. handle_equality before private merge, concat arrangement/cut-variable and remaining library queues, legacy regex cache/consumer integration, persisted/replayed axioms, native final_check_eh and setup_QF_S/string_solver routing remain open. FinalCheck explicitly returns GiveUp until those routines are connected, and production setup still selects the existing sequence implementation. No solver-level native completeness or new C++ comparison credit is claimed by these owner tests.",

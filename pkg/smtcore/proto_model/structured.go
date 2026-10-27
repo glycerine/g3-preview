@@ -53,25 +53,63 @@ func (f *structuredFactory) RegisterValue(v ast.ASTHandle) error {
 	f.values = append(f.values, ref)
 	return nil
 }
-func (f *structuredFactory) SomeValues(s ast.ASTHandle, factory ValueFactory) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+func (f *structuredFactory) SomeValues(s ast.ASTHandle, factory ValueFactory, first, second ast.ASTRef) (bool, error) {
 	set, err := f.valueSet(s)
 	if err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		return false, err
 	}
-	for len(set.values) < 2 {
-		var v ast.ASTHandle
-		if len(set.values) == 0 {
-			v, err = factory.FreshValue(s)
-		} else {
-			v, err = factory.FreshValue(s)
+	switch len(set.values) {
+	case 0:
+		value, err := factory.FreshValue(s)
+		if err != nil {
+			return false, err
 		}
-		if err != nil || v.IsNull() {
-			return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		if err = f.manager.SetRef(first, value); err != nil {
+			return false, err
 		}
-		set = f.sets[s]
+		value, err = factory.FreshValue(s)
+		if err != nil {
+			return false, err
+		}
+		if err = f.manager.SetRef(second, value); err != nil {
+			return false, err
+		}
+		a, err := f.manager.RefGet(first)
+		if err != nil {
+			return false, err
+		}
+		b, err := f.manager.RefGet(second)
+		if err != nil {
+			return false, err
+		}
+		return !a.IsNull() && !b.IsNull(), nil
+	case 1:
+		value, err := factory.SomeValue(s)
+		if err != nil {
+			return false, err
+		}
+		if err = f.manager.SetRef(first, value); err != nil {
+			return false, err
+		}
+		value, err = factory.FreshValue(s)
+		if err != nil {
+			return false, err
+		}
+		if err = f.manager.SetRef(second, value); err != nil {
+			return false, err
+		}
+		return !value.IsNull(), nil
+	default:
+		if err = f.manager.SetRef(first, set.values[0]); err != nil {
+			return false, err
+		}
+		if err = f.manager.SetRef(second, set.values[1]); err != nil {
+			return false, err
+		}
+		return true, nil
 	}
-	return set.values[0], set.values[1], true, nil
 }
+
 func (f *structuredFactory) Close() (err error) {
 	for i := len(f.values) - 1; i >= 0; i-- {
 		err = errors.Join(err, f.manager.DelRef(&f.values[i]))

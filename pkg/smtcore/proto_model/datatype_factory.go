@@ -317,8 +317,8 @@ func (f *DatatypeFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 		}
 	}
 }
-func (f *DatatypeFactory) SomeValues(s ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
-	return f.structuredFactory.SomeValues(s, f)
+func (f *DatatypeFactory) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
+	return f.structuredFactory.SomeValues(s, f, first, second)
 }
 func (f *DatatypeFactory) Close() error {
 	f.last = nil

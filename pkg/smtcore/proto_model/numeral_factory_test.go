@@ -24,7 +24,7 @@ func TestArithmeticFactoryPreservesRequestedNumeralSort(t *testing.T) {
 		protoMust(t, err)
 		fresh, err := p.FreshValue(sort)
 		protoMust(t, err)
-		left, right, distinct, err := p.SomeValues(sort)
+		left, right, distinct, err := protoTestSomeValues(t, m, p, sort)
 		protoMust(t, err)
 		if first != zero || first == fresh || !distinct || left == right {
 			t.Fatal("arithmetic value generation", first, zero, fresh, left, right, distinct)

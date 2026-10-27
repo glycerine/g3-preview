@@ -9,7 +9,9 @@ import (
 type ValueFactory interface {
 	FamilyID() ast.FamilyID
 	SomeValue(ast.ASTHandle) (ast.ASTHandle, error)
-	SomeValues(ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error)
+	// SomeValues assigns caller-owned outputs at their source publication points.
+	// The caller retains both reference objects on success, refusal, and failure.
+	SomeValues(ast.ASTHandle, ast.ASTRef, ast.ASTRef) (bool, error)
 	FreshValue(ast.ASTHandle) (ast.ASTHandle, error)
 	RegisterValue(ast.ASTHandle) error
 	Close() error
@@ -38,13 +40,22 @@ func (f *basicFactory) SomeValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	}
 	return f.manager.MkFalse()
 }
-func (f *basicFactory) SomeValues(s ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
-	v1, err := f.SomeValue(s)
-	if err != nil || v1.IsNull() {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+func (f *basicFactory) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
+	value, err := f.SomeValue(s)
+	if err != nil || value.IsNull() {
+		return false, err
 	}
-	v2, err := f.manager.MkTrue()
-	return v1, v2, err == nil, err
+	if err = f.manager.SetRef(first, value); err != nil {
+		return false, err
+	}
+	value, err = f.manager.MkTrue()
+	if err != nil {
+		return false, err
+	}
+	if err = f.manager.SetRef(second, value); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 func (f *basicFactory) FreshValue(ast.ASTHandle) (ast.ASTHandle, error) {
 	return ast.ASTHandle{}, nil

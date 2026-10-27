@@ -19,7 +19,7 @@ func TestStringFactoryNativeDefaultsFreshNamesAndIgnoredRegistration(t *testing.
 	protoMust(t, err)
 	value, err := p.SomeValue(sort)
 	protoMust(t, err)
-	first, second, ok, err := p.SomeValues(sort)
+	first, second, ok, err := protoTestSomeValues(t, m, p, sort)
 	protoMust(t, err)
 	if !ok {
 		t.Fatal("string factory could not provide two values")

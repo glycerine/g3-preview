@@ -131,39 +131,76 @@ func (f *numeralFactory) SomeValue(sort ast.ASTHandle) (ast.ASTHandle, error) {
 	return value, err
 }
 
-func (f *numeralFactory) SomeValues(sort ast.ASTHandle) (first, second ast.ASTHandle, distinct bool, err error) {
-	if err = f.open(); err != nil {
-		return
+func (f *numeralFactory) SomeValues(sort ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
+	if err := f.open(); err != nil {
+		return false, err
 	}
 	set, exists := f.sets[sort]
 	if exists && len(set.values) >= 2 {
-		first, second = set.values[0], set.values[1]
-	} else if exists && len(set.values) == 1 {
-		first = set.values[0]
-		second, _, err = f.insert(big.NewRat(0, 1), sort)
-		if err != nil {
-			return
+		if err := f.manager.SetRef(first, set.values[0]); err != nil {
+			return false, err
 		}
-		if first == second {
-			second, _, err = f.insert(big.NewRat(1, 1), sort)
+		if err := f.manager.SetRef(second, set.values[1]); err != nil {
+			return false, err
+		}
+	} else if exists && len(set.values) == 1 {
+		if err := f.manager.SetRef(first, set.values[0]); err != nil {
+			return false, err
+		}
+		value, _, err := f.insert(big.NewRat(0, 1), sort)
+		if err != nil {
+			return false, err
+		}
+		if err = f.manager.SetRef(second, value); err != nil {
+			return false, err
+		}
+		a, err := f.manager.RefGet(first)
+		if err != nil {
+			return false, err
+		}
+		b, err := f.manager.RefGet(second)
+		if err != nil {
+			return false, err
+		}
+		if a == b {
+			value, _, err = f.insert(big.NewRat(1, 1), sort)
+			if err != nil {
+				return false, err
+			}
+			if err = f.manager.SetRef(second, value); err != nil {
+				return false, err
+			}
 		}
 	} else {
-		first, _, err = f.insert(big.NewRat(0, 1), sort)
+		value, _, err := f.insert(big.NewRat(0, 1), sort)
 		if err != nil {
-			return
+			return false, err
 		}
-		second, _, err = f.insert(big.NewRat(1, 1), sort)
-	}
-	if err != nil {
-		return
+		if err = f.manager.SetRef(first, value); err != nil {
+			return false, err
+		}
+		value, _, err = f.insert(big.NewRat(1, 1), sort)
+		if err != nil {
+			return false, err
+		}
+		if err = f.manager.SetRef(second, value); err != nil {
+			return false, err
+		}
 	}
 	if exists {
-		err = simpleFactoryAssert(171, "v1 != v2", func() bool { return first != second })
+		a, err := f.manager.RefGet(first)
 		if err != nil {
-			return
+			return false, err
+		}
+		b, err := f.manager.RefGet(second)
+		if err != nil {
+			return false, err
+		}
+		if err = simpleFactoryAssert(171, "v1 != v2", func() bool { return a != b }); err != nil {
+			return false, err
 		}
 	}
-	return first, second, true, nil
+	return true, nil
 }
 
 func (f *numeralFactory) FreshValue(sort ast.ASTHandle) (ast.ASTHandle, error) {

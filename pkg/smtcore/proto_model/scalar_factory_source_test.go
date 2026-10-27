@@ -64,7 +64,7 @@ func TestScalarFactorySourceUserRegisteredValuesAndFreeze(t *testing.T) {
 	one, err := m.MkModelValue(1, sort)
 	protoMust(t, err)
 	protoMust(t, p.RegisterValue(one))
-	first, second, ok, err := p.SomeValues(sort)
+	first, second, ok, err := protoTestSomeValues(t, m, p, sort)
 	protoMust(t, err)
 	zero, err := m.MkModelValue(0, sort)
 	protoMust(t, err)
@@ -85,7 +85,7 @@ func TestScalarFactorySourceUserRegisteredValuesAndFreeze(t *testing.T) {
 	protoMust(t, p.FreezeUniverse(sort))
 	protoMust(t, p.FreezeUniverse(sort))
 	size := len(p.user.KnownUniverse(sort))
-	a, b, ok, err := p.SomeValues(sort)
+	a, b, ok, err := protoTestSomeValues(t, m, p, sort)
 	protoMust(t, err)
 	if !ok || a != one || b != zero {
 		t.Fatal("frozen pair selection", a, b, ok)
@@ -159,7 +159,7 @@ func TestScalarFactorySourceFrozenPathsAndClosedAssertionOwner(t *testing.T) {
 	protoMust(t, p.FreezeUniverse(sort))
 	d, _ := scalarFactoryDebugActions(t, "T")
 	protoMust(t, d.Close())
-	a, b, ok, err := p.SomeValues(sort)
+	a, b, ok, err := protoTestSomeValues(t, m, p, sort)
 	protoMust(t, err)
 	if ok || !a.IsNull() || !b.IsNull() {
 		t.Fatal("frozen singleton produced pair")
@@ -197,7 +197,7 @@ func TestScalarFactorySourceNumeralExplicitValuesAndEnumeration(t *testing.T) {
 	if same != v || after != before {
 		t.Fatal("explicit numeral acquired duplicate reference")
 	}
-	a, b, ok, err := p.SomeValues(sort)
+	a, b, ok, err := protoTestSomeValues(t, m, p, sort)
 	protoMust(t, err)
 	if !ok || a != v || a == b {
 		t.Fatal("registered fractional pair")
@@ -216,7 +216,7 @@ func TestScalarFactorySourceNumeralExplicitValuesAndEnumeration(t *testing.T) {
 	protoMust(t, err)
 	bs, err := m.GetSort(high)
 	protoMust(t, err)
-	a, b, ok, err = p.SomeValues(bs)
+	a, b, ok, err = protoTestSomeValues(t, m, p, bs)
 	protoMust(t, err)
 	if !ok || a != high || a == b {
 		t.Fatal("registered normalized BV pair")
@@ -238,7 +238,7 @@ func TestScalarFactorySourceBVExhaustionAndCursor(t *testing.T) {
 	sort, err := m.BitVectorSort(1)
 	protoMust(t, err)
 	protoPin(t, m, sort)
-	a, b, ok, err := p.SomeValues(sort)
+	a, b, ok, err := protoTestSomeValues(t, m, p, sort)
 	protoMust(t, err)
 	if !ok || a == b {
 		t.Fatal("one-bit pair")
@@ -373,7 +373,7 @@ func TestScalarFactorySourceBasicRejectsOtherSortFamilies(t *testing.T) {
 	if !value.IsNull() {
 		t.Fatal("nonbasic kind-zero sort was treated as Bool", value)
 	}
-	_, _, ok, err := f.SomeValues(real)
+	_, _, ok, err := protoTestSomeValues(t, m, f, real)
 	protoMust(t, err)
 	if ok {
 		t.Fatal("non-Bool basic pair")
@@ -404,7 +404,7 @@ func TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner(t *testing.T) {
 				protoMust(t, err)
 			}
 			protoPin(t, m, sort)
-			first, second, ok, err := p.SomeValues(sort)
+			first, second, ok, err := protoTestSomeValues(t, m, p, sort)
 			protoMust(t, err)
 			if !ok || first == second {
 				t.Fatal("warm pair setup")
@@ -412,8 +412,6 @@ func TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner(t *testing.T) {
 			hold, err := m.NewRef(first)
 			protoMust(t, err)
 			defer func() { protoMust(t, m.DelRef(&hold)) }()
-			before, err := m.GetRefCount(first)
-			protoMust(t, err)
 			live := diagnostic.BorrowProcessDebugContext()
 			d, _ := scalarFactoryDebugActions(t, "T")
 			protoMust(t, d.Close())
@@ -422,7 +420,7 @@ func TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner(t *testing.T) {
 			if value != first {
 				t.Fatal("assertion-free warm selection changed value")
 			}
-			a, b, ok, err := p.SomeValues(sort)
+			a, b, ok, err := protoTestSomeValues(t, m, p, sort)
 			if diagnostic.DebugBuild {
 				if !errors.Is(err, arena.ErrClosed) || ok || a != first || b != second {
 					t.Fatal("warm pair line171 prefix", a, b, ok, err)
@@ -433,6 +431,8 @@ func TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner(t *testing.T) {
 			// Restore before tearing down numeric owners; the helper cleanup
 			// independently restores this same borrowed pointer afterward.
 			_, err = diagnostic.BindProcessDebugContext(live)
+			protoMust(t, err)
+			before, err := m.GetRefCount(first)
 			protoMust(t, err)
 			protoMust(t, p.Close())
 			after, err := m.GetRefCount(first)

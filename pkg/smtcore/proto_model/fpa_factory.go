@@ -28,12 +28,12 @@ func (f *FloatingPointFactory) SomeValue(sort ast.ASTHandle) (ast.ASTHandle, err
 	return f.manager.MkFPAModelFactoryValue(sort)
 }
 
-func (f *FloatingPointFactory) SomeValues(sort ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+func (f *FloatingPointFactory) SomeValues(sort ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
 	if f == nil || f.manager == nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, ast.ErrASTHandle
+		return false, ast.ErrASTHandle
 	}
-	first, second, err := f.manager.MkFPAModelFactoryPair(sort)
-	return first, second, err == nil, err
+	err := f.manager.MkFPAModelFactoryPair(sort, first, second)
+	return err == nil, err
 }
 
 // Source get_fresh_value is a fatal NOT_IMPLEMENTED_YET, not a null value.

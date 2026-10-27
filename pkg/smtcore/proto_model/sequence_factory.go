@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // SequenceFactory supplies canonical and fresh values for sequence and
@@ -64,33 +65,65 @@ func (f *SequenceFactory) SomeValue(sort ast.ASTHandle) (ast.ASTHandle, error) {
 	return ast.ASTHandle{}, ast.ErrASTDomain
 }
 
-func (f *SequenceFactory) SomeValues(sort ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+func (f *SequenceFactory) SomeValues(sort ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
+	if f == nil || f.manager == nil {
+		return false, ast.ErrASTHandle
+	}
 	stringSort, err := f.manager.IsStringSort(sort)
 	if err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		return false, err
 	}
 	if stringSort {
-		first, err := f.manager.MkString("a")
+		value, err := f.manager.MkString("a")
 		if err != nil {
-			return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+			return false, err
 		}
-		second, err := f.manager.MkString("b")
-		return first, second, err == nil, err
+		if err = f.manager.SetRef(first, value); err != nil {
+			return false, err
+		}
+		value, err = f.manager.MkString("b")
+		if err != nil {
+			return false, err
+		}
+		if err = f.manager.SetRef(second, value); err != nil {
+			return false, err
+		}
+		return true, nil
 	}
 	sequence, _, element, err := f.classify(sort)
-	if err != nil || !sequence {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
-	}
-	first, second, ok, err := f.model.SomeValues(element)
-	if err != nil || !ok {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
-	}
-	first, err = f.manager.MkSequenceUnit(first)
 	if err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		return false, err
 	}
-	second, err = f.manager.MkSequenceUnit(second)
-	return first, second, err == nil, err
+	if !sequence {
+		return false, diagnostic.BorrowProcessDebugContext().NotImplementedYet("src/smt/theory_seq_empty.h", 94)
+	}
+	ok, err := f.model.SomeValues(element, first, second)
+	if err != nil || !ok {
+		return false, err
+	}
+	value, err := f.manager.RefGet(first)
+	if err != nil {
+		return false, err
+	}
+	value, err = f.manager.MkSequenceUnit(value)
+	if err != nil {
+		return false, err
+	}
+	if err = f.manager.SetRef(first, value); err != nil {
+		return false, err
+	}
+	value, err = f.manager.RefGet(second)
+	if err != nil {
+		return false, err
+	}
+	value, err = f.manager.MkSequenceUnit(value)
+	if err != nil {
+		return false, err
+	}
+	if err = f.manager.SetRef(second, value); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (f *SequenceFactory) freshString() (ast.ASTHandle, error) {

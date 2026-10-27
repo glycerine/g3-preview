@@ -104,13 +104,35 @@ func (f *ArrayFactory) SomeValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	}
 	return v, fi.InsertEntry(args, result)
 }
-func (f *ArrayFactory) makeTwo(s ast.ASTHandle) (bool, error) {
+func (f *ArrayFactory) makeTwo(s ast.ASTHandle) (ok bool, result error) {
+	first, err := f.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return false, err
+	}
+	var second ast.ASTRef
+	defer func() {
+		if second != (ast.ASTRef{}) {
+			if e := f.manager.DelRef(&second); e != nil {
+				result = errors.Join(result, e)
+				ok = false
+				return
+			}
+		}
+		result = errors.Join(result, f.manager.DelRef(&first))
+		if result != nil {
+			ok = false
+		}
+	}()
+	second, err = f.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return false, err
+	}
 	_, rangeSort, err := f.arrayShape(s)
 	if err != nil {
 		return false, err
 	}
-	r1, r2, ok, err := f.model.SomeValues(rangeSort)
-	if err != nil || !ok {
+	pairOK, err := f.model.SomeValues(rangeSort, first, second)
+	if err != nil || !pairOK {
 		return false, err
 	}
 	args, err := f.someArguments(s)
@@ -125,33 +147,50 @@ func (f *ArrayFactory) makeTwo(s ast.ASTHandle) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	r1, err := f.manager.RefGet(first)
+	if err != nil {
+		return false, err
+	}
 	if err = fi1.InsertEntry(args, r1); err != nil {
+		return false, err
+	}
+	r2, err := f.manager.RefGet(second)
+	if err != nil {
 		return false, err
 	}
 	return true, fi2.InsertEntry(args, r2)
 }
-func (f *ArrayFactory) SomeValues(s ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
-	set, err := f.valueSet(s)
-	if err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
-	}
-	if len(set.values) == 0 {
+func (f *ArrayFactory) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
+	set := f.sets[s]
+	if set == nil || len(set.values) == 0 {
 		ok, err := f.makeTwo(s)
 		if err != nil || !ok {
-			return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+			return false, err
 		}
 	}
 	set = f.sets[s]
-	if len(set.values) == 1 {
-		v, err := f.FreshValue(s)
-		if err != nil || v.IsNull() {
-			return ast.ASTHandle{}, ast.ASTHandle{}, false, err
-		}
-		set = f.sets[s]
+	if set == nil || len(set.values) == 0 {
+		return false, ast.ErrASTDomain
 	}
-	return set.values[0], set.values[1], true, nil
+	if err := f.manager.SetRef(first, set.values[0]); err != nil {
+		return false, err
+	}
+	if len(set.values) == 1 {
+		value, err := f.FreshValue(s)
+		if err != nil {
+			return false, err
+		}
+		if err = f.manager.SetRef(second, value); err != nil {
+			return false, err
+		}
+		return !value.IsNull(), nil
+	}
+	if err := f.manager.SetRef(second, set.values[1]); err != nil {
+		return false, err
+	}
+	return true, nil
 }
-func (f *ArrayFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
+func (f *ArrayFactory) FreshValue(s ast.ASTHandle) (out ast.ASTHandle, result error) {
 	set, err := f.valueSet(s)
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -176,8 +215,30 @@ func (f *ArrayFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 		}
 		return v, fi.InsertEntry(args, rangeValue)
 	}
-	r1, r2, ok, err := f.model.SomeValues(rangeSort)
-	if err != nil || !ok {
+	first, err := f.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var second ast.ASTRef
+	defer func() {
+		if second != (ast.ASTRef{}) {
+			if e := f.manager.DelRef(&second); e != nil {
+				result = errors.Join(result, e)
+				out = ast.ASTHandle{}
+				return
+			}
+		}
+		result = errors.Join(result, f.manager.DelRef(&first))
+		if result != nil {
+			out = ast.ASTHandle{}
+		}
+	}()
+	second, err = f.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	pairOK, err := f.model.SomeValues(rangeSort, first, second)
+	if err != nil || !pairOK {
 		return ast.ASTHandle{}, err
 	}
 	a1, a2 := make([]ast.ASTHandle, len(domain)), make([]ast.ASTHandle, len(domain))
@@ -210,7 +271,15 @@ func (f *ArrayFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
+	r1, err := f.manager.RefGet(first)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
 	if err = fi.InsertEntry(a1, r1); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	r2, err := f.manager.RefGet(second)
+	if err != nil {
 		return ast.ASTHandle{}, err
 	}
 	return v, fi.InsertEntry(a2, r2)

@@ -123,25 +123,25 @@ func (p *ProtoModel) SomeValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	}
 	return p.user.SomeValue(s)
 }
-func (p *ProtoModel) SomeValues(s ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+func (p *ProtoModel) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
 	if err := p.open(); err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		return false, err
 	}
 	user, err := p.isUserSort(s)
 	if err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		return false, err
 	}
 	if user {
-		return p.user.SomeValues(s)
+		return p.user.SomeValues(s, first, second)
 	}
 	fid, err := p.manager.GetFamilyID(s)
 	if err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		return false, err
 	}
 	if f := p.factories[fid]; f != nil {
-		return f.SomeValues(s)
+		return f.SomeValues(s, first, second)
 	}
-	return ast.ASTHandle{}, ast.ASTHandle{}, false, nil
+	return false, nil
 }
 func (p *ProtoModel) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	if err := p.open(); err != nil {

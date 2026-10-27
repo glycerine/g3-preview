@@ -90,7 +90,7 @@ func TestValueFactoriesSomeFreshFreezeAndNumericValues(t *testing.T) {
 	protoMust(t, err)
 	yes, err := m.MkTrue()
 	protoMust(t, err)
-	v1, v2, ok, err := p.SomeValues(b)
+	v1, v2, ok, err := protoTestSomeValues(t, m, p, b)
 	protoMust(t, err)
 	if !ok || v1 != no || v2 != yes {
 		t.Fatal("Boolean values", v1, v2, ok)
@@ -167,7 +167,7 @@ func TestArrayAndDatatypeFactories(t *testing.T) {
 	a, err := m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{b}), b)
 	protoMust(t, err)
 	protoPin(t, m, a)
-	x, y, ok, err := p.SomeValues(a)
+	x, y, ok, err := protoTestSomeValues(t, m, p, a)
 	protoMust(t, err)
 	if !ok || x.IsNull() || y.IsNull() || x == y {
 		t.Fatal("array values", x, y, ok)
@@ -204,7 +204,7 @@ func TestArrayAndDatatypeFactories(t *testing.T) {
 	df, err := NewDatatypeFactory(p)
 	protoMust(t, err)
 	protoMust(t, p.RegisterFactory(df))
-	c0, c1, ok, err := p.SomeValues(color[0])
+	c0, c1, ok, err := protoTestSomeValues(t, m, p, color[0])
 	protoMust(t, err)
 	if !ok || c0.IsNull() || c1.IsNull() || c0 == c1 {
 		t.Fatal("datatype values", c0, c1, ok)

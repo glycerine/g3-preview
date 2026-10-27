@@ -23,7 +23,7 @@ func TestSequenceFactoryCanonicalFreshAndGenericValues(t *testing.T) {
 	if text, matched, e := m.SequenceStringValue(value); e != nil || !matched || text != "" {
 		t.Fatal("string some value", text, matched, e)
 	}
-	first, second, ok, err := p.SomeValues(stringSort)
+	first, second, ok, err := protoTestSomeValues(t, m, p, stringSort)
 	protoMust(t, err)
 	firstText, firstString, err := m.SequenceStringValue(first)
 	protoMust(t, err)
@@ -49,7 +49,7 @@ func TestSequenceFactoryCanonicalFreshAndGenericValues(t *testing.T) {
 	sequenceSort, err := m.MkFamilySort(family, 0, []ast.ASTParameter{parameter})
 	protoMust(t, err)
 	protoMust(t, m.DelParameter(&parameter))
-	first, second, ok, err = p.SomeValues(sequenceSort)
+	first, second, ok, err = protoTestSomeValues(t, m, p, sequenceSort)
 	protoMust(t, err)
 	firstUnit, err := m.IsSequenceUnit(first)
 	protoMust(t, err)

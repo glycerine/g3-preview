@@ -20,16 +20,25 @@ func (f *smtPBValueFactory) SomeValue(ast.ASTHandle) (ast.ASTHandle, error) {
 	return f.manager.MkTrue()
 }
 
-func (f *smtPBValueFactory) SomeValues(ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+func (f *smtPBValueFactory) SomeValues(_ ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
 	if f == nil || f.manager == nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, ast.ErrASTHandle
+		return false, ast.ErrASTHandle
 	}
-	a, err := f.manager.MkTrue()
+	value, err := f.manager.MkTrue()
 	if err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+		return false, err
 	}
-	b, err := f.manager.MkFalse()
-	return a, b, err == nil, err
+	if err = f.manager.SetRef(first, value); err != nil {
+		return false, err
+	}
+	value, err = f.manager.MkFalse()
+	if err != nil {
+		return false, err
+	}
+	if err = f.manager.SetRef(second, value); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (*smtPBValueFactory) FreshValue(ast.ASTHandle) (ast.ASTHandle, error) {
