@@ -47,12 +47,8 @@ func (t *SMTDatalogTheory) declarationsFor(sort ast.ASTHandle) (smtDatalogDeclar
 	if err != nil {
 		return smtDatalogDeclarations{}, err
 	}
-	size, matched, err := state.manager.DatalogFiniteSortSize(sort)
-	if err != nil || !matched || size == 0 {
-		if err != nil {
-			return smtDatalogDeclarations{}, err
-		}
-		return smtDatalogDeclarations{}, ast.ErrASTDomain
+	if err = datalogAssert(205, "!m_reps.contains(s)", func() bool { _, found := t.declarations[sort]; return !found }); err != nil {
+		return smtDatalogDeclarations{}, err
 	}
 	const width uint32 = 64
 	bitVector, err := state.manager.BitVectorSort(width)
@@ -126,6 +122,9 @@ func (t *SMTDatalogTheory) ensureVariable(expression ast.ASTHandle) (bool, error
 	if t.IsAttachedToVariable(node) {
 		return false, nil
 	}
+	if err = t.traceDatalogExpression("mk_rep", 234, expression); err != nil {
+		return false, err
+	}
 	_, err = t.CreateVariable(node)
 	return err == nil, err
 }
@@ -133,6 +132,9 @@ func (t *SMTDatalogTheory) ensureVariable(expression ast.ASTHandle) (bool, error
 func (t *SMTDatalogTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
 	state, err := t.State()
 	if err != nil {
+		return false, err
+	}
+	if err = t.traceDatalogExpression("internalize_term", 140, expression); err != nil {
 		return false, err
 	}
 	sort, err := state.manager.GetSort(expression)
@@ -149,6 +151,9 @@ func (t *SMTDatalogTheory) InternalizeTerm(expression ast.ASTHandle) (bool, erro
 func (t *SMTDatalogTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool, error) {
 	state, err := t.State()
 	if err != nil {
+		return false, err
+	}
+	if err = t.traceDatalogExpression("internalize_atom", 117, expression); err != nil {
 		return false, err
 	}
 	if _, found := state.BoolVar(expression); found {
@@ -306,14 +311,7 @@ func (t *SMTDatalogTheory) Relevant(expression ast.ASTHandle) error {
 		if err = t.assertConstraint(inverse); err != nil {
 			return err
 		}
-		size, matched, sizeErr := state.manager.DatalogFiniteSortSize(sort)
-		if sizeErr != nil || !matched || size == 0 {
-			if sizeErr != nil {
-				return sizeErr
-			}
-			return ast.ErrASTDomain
-		}
-		maximum, maximumErr := state.manager.BitVectorNumeralUint64(size-1, declarations.bits)
+		maximum, maximumErr := t.datalogMaximum(sort)
 		if maximumErr != nil {
 			return maximumErr
 		}
@@ -331,6 +329,9 @@ func (t *SMTDatalogTheory) Relevant(expression ast.ASTHandle) error {
 func (t *SMTDatalogTheory) assertConstraint(expression ast.ASTHandle) error {
 	state, err := t.State()
 	if err != nil {
+		return err
+	}
+	if err = t.traceDatalogExpression("assert_cnstr", 272, expression); err != nil {
 		return err
 	}
 	if err = state.Internalize(expression, false); err != nil {

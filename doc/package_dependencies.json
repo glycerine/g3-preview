@@ -2792,6 +2792,7 @@
         "theory_diff_logic_objective.go",
         "theory_diff_logic_real.go",
         "theory_dl.go",
+        "theory_dl_diagnostics.go",
         "theory_dl_model.go",
         "theory_dummy.go",
         "theory_fpa.go",

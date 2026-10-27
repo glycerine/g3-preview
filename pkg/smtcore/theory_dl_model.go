@@ -117,12 +117,16 @@ func (p *smtDatalogValueProcedure) MakeValue(generator *SMTModelGenerator, _ []a
 }
 
 func (t *SMTDatalogTheory) traceDatalogModelValue(value ast.ASTHandle) error {
+	return t.traceDatalogExpression("mk_value", 99, value)
+}
+
+func (t *SMTDatalogTheory) traceDatalogExpression(function string, line int, value ast.ASTHandle) error {
 	tags := t.trace
 	if tags == nil {
 		tags = diagnostic.BorrowProcessTraceTags()
 	}
 	var operandErr error
-	err := tags.EmitConditional("theory_dl", "mk_value", "src/smt/theory_dl.cpp", 99, func() bool { return true }, func(out io.Writer) error {
+	err := tags.EmitConditional("theory_dl", function, "src/smt/theory_dl.cpp", line, func() bool { return true }, func(out io.Writer) error {
 		out = assertedTraceWriter{out}
 		printer, e := ast.NewSimpleASTPrinterContext(t.state.manager, out, out)
 		if e != nil {

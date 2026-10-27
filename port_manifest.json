@@ -140161,7 +140161,10 @@
         "pkg/smtcore/proto_model/user_sort_factory.go",
         "pkg/smtcore/proto_model/numeral_factory.go",
         "pkg/smtcore/proto_model/factory_release_order_source_test.go",
-        "pkg/smtcore/proto_model/factory_release_failure_source_test.go"
+        "pkg/smtcore/proto_model/factory_release_failure_source_test.go",
+        "pkg/smtcore/theory_dl_diagnostics.go",
+        "pkg/smtcore/theory_dl_diagnostics_test.go",
+        "pkg/smtcore/theory_dl_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTDatalogStrictOrderReduction",
@@ -140182,7 +140185,13 @@
         "TestDatalogFactorySourceAssertionOwnerAndWarmSelection",
         "TestDatalogFactorySourceProtoModelDispatch",
         "TestFactorySourceForwardReferenceDestruction",
-        "TestFactoryRealNumeralReleaseFailureRetry"
+        "TestFactoryRealNumeralReleaseFailureRetry",
+        "TestSMTDatalogSourceTraceEntryAndAttachmentOrder",
+        "TestSMTDatalogSourceTraceErasureAndOstreamFailure",
+        "TestSMTDatalogSourceDeclarationAssertionGateAndCache",
+        "TestSMTDatalogSourceMaximumVerificationAndActions",
+        "TestSMTDatalogSourceZeroMaximumAssertionActions",
+        "TestSMTDatalogFreshTranslationAndAuxiliaryOwners"
       ],
       "assertions": [
         {
@@ -140275,20 +140284,42 @@
           "tests": [
             "TestFactoryRealNumeralReleaseFailureRetry"
           ]
+        },
+        {
+          "name": "Retained Datalog TRACE117/140/234/272 at source entry/cache/attachment/constraint positions; cache-miss assertion gate205 without an invented cardinality read; max_value VERIFY246 and SASSERT247 using actual process messages/actions, VERIFY independent of assertion switch and present in native, defined unsigned zero-size continuation after C/disabled and checked guard before uninitialized sz; literal source Name/empty Display; destination setup verified as existing mk_fresh equivalent for Translate and auxiliary contexts",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_dl.go",
+            "pkg/smtcore/theory_dl_model.go",
+            "pkg/smtcore/theory_dl_diagnostics.go",
+            "pkg/smtcore/theory_dl_diagnostics_test.go",
+            "pkg/smtcore/theory_dl_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTDatalogSourceTraceEntryAndAttachmentOrder",
+            "TestSMTDatalogSourceTraceErasureAndOstreamFailure",
+            "TestSMTDatalogSourceDeclarationAssertionGateAndCache",
+            "TestSMTDatalogSourceMaximumVerificationAndActions",
+            "TestSMTDatalogSourceZeroMaximumAssertionActions",
+            "TestSMTDatalogFreshTranslationAndAuxiliaryOwners"
+          ]
         }
       ],
       "ownership": [
         "Per-sort declarations hold independent AST references; scoped map entries and references are retired on scope pop. Deferred model procedures borrow their theory/enode and own no AST reference. Each evaluation owns its temporary representative reference and numeral until return. The existing model factory owns its registered sorts/values; its complete source ownership audit remains open.",
         "The concrete datalog factory owns one reference per registered/generated value and sort; duplicate registration acquires no extra reference. Ordinary Close releases sort references before values, preserving independent AST owners. Real cold descriptor-frontier failures leave the fresh cursor unchanged and allow retry. Whole constructor/publication and interrupted teardown prefix audit remains open.",
         "Existing AST source deletion traces verify forward destruction of sole-owned values in all four concrete factories, and sole-owned empty datalog/user-sort sort sets verify sort-vector order and sort-before-value member order. An independent older value reference survives factory destruction; repeated Close emits no replay. The test uses actual AST IDs/refcounts and source trace records, without a mock destructor callback or private-payload edits.",
-        "A real 1,600,000-bit numeral and supported public ThreadLocal memory.Runtime operations reach a consumed physical NUM release refusal in all four factory owners (registered expressions may hold an arithmetic child). AST DelRef retires three factory tokens despite ErrBounds; retry succeeds without changing AST manager stats or memory-owner state. A caller-owned later value survives, repeated Close does not replay, and subsequent real manager/numeral/runtime cleanup ends at zero budget. Tests alter no NUM payload, descriptor, refcount, factory slice or source mask."
+        "A real 1,600,000-bit numeral and supported public ThreadLocal memory.Runtime operations reach a consumed physical NUM release refusal in all four factory owners (registered expressions may hold an arithmetic child). AST DelRef retires three factory tokens despite ErrBounds; retry succeeds without changing AST manager stats or memory-owner state. A caller-owned later value survives, repeated Close does not replay, and subsequent real manager/numeral/runtime cleanup ends at zero budget. Tests alter no NUM payload, descriptor, refcount, factory slice or source mask.",
+        "Trace formatting borrows AST operands, is erased when disabled/native and preserves operand evaluation after ostream badbit; returned model numerals retain their existing lifetime. Fresh same/cross-manager destination and auxiliary contexts own independent datalog state; no redundant plugin-copy adapter or source parameter owner is introduced. Factory publication/ref-vector backing-allocation boundaries remain unclosed and are distinguished from Go ASTRef descriptor allocation."
       ],
       "deviations": [
         "Corrective source audit removes the minimum-width approximation: representatives and finite-domain BV constants use the source width of64 bits. Model evaluation neither internalizes missing representatives nor sums partially assigned bits nor clamps invalid values to zero. The missing-BV assertion uses the actual runtime debug notification/input/action owners; signed conversion uses the existing MPQ/MPZ service. Physical invalid Go handles return checked errors.",
-        "Whole-unit completion remains unproven. The concrete datalog factory algorithm is now mapped separately, while constructor/publication and interrupted teardown prefixes, other theory TRACE/SASSERT/VERIFY sites and fresh-copy/display lifecycle consumers still require audit. The prebuilt C++ executable has no FiniteDomain sort parser registration; typed API tests and existing CLI differential checks remain distinct evidence.",
+        "Whole-unit completion remains unproven: representation-map/trail publication and complete source constructor/destructor failure prefixes remain open. Normal declaration pairs, model evaluation, concrete factory algorithms, source diagnostics/name/empty display and retained destination construction are mapped separately. The source partial-representative-map false assertion state is not manufactured in the combined Go declaration record. The prebuilt executable has no FiniteDomain parser registration; typed API tests and existing CLI differential checks remain distinct evidence.",
         "Go slices and a membership map replace C++ unordered-table layout. SomeValue/SomeValues select existing values in stable insertion order; no STL hash-table implementation is ported. Checked Go errors represent invalid physical owners and the finite-domain numeral bounds exception. No billions-of-iterations uint32 wrap campaign or complete whole-unit factory/lifecycle closure is claimed.",
         "The normal within-vector release ordering gap is corrected. This bounded check does not close constructor/map-publication or interrupted-destructor failure-prefix fidelity; whole value_factory.h and theory_dl.cpp remain partial. No C++ container implementation, generic adapter, or additional native full-suite checkpoint is introduced.",
-        "The reproduced Go owning-retry defect is fixed: previously Close revisited zero ASTRef tokens and permanently returned invalid-owner errors. The physical regression runs under g3checked && g3debug, both with and without g3trace; other profiles cover ordinary teardown. Constructor/map-publication and complete native source failure-prefix fidelity remain open. Source-unit statuses/audit flags remain unchanged; no C++ rebuild or extra full native suite is claimed."
+        "The reproduced Go owning-retry defect is fixed: previously Close revisited zero ASTRef tokens and permanently returned invalid-owner errors. The physical regression runs under g3checked && g3debug, both with and without g3trace; other profiles cover ordinary teardown. Constructor/map-publication and complete native source failure-prefix fidelity remain open. Source-unit statuses/audit flags remain unchanged; no C++ rebuild or extra full native suite is claimed.",
+        "The omit205 behavioral control survives the current cache-miss test because later owner checks can produce the same error; no mutation rejection is claimed for it. A focused compiler coverage profile separately confirms execution of the205 error-return branch, and the declaration lookup has no invented cardinality read. The source partial-map false condition remains outside the combined Go record and keeps whole-unit audit incomplete.",
+        "VERIFY on a nonfinite sort reports through the existing diagnostic service even when assertions are disabled and in native builds; GNU native unreachable returns its existing typed undefined-domain guard. Debug Continue leaves source sz uninitialized, so Go stops at that physical read instead of inventing a value. Zero finite metadata after a continued/erased sz>0 assertion preserves defined uint64 subtraction and creates the 64-bit all-ones numeral. Tests construct real sort metadata through the AST API rather than editing private records."
       ]
     },
     {
@@ -140297,11 +140328,13 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/smtcore/theory_dl.go"
+        "pkg/smtcore/theory_dl.go",
+        "pkg/smtcore/theory_dl_lifecycle_test.go"
       ],
       "tests": [
         "TestSMTDatalogStrictOrderReduction",
-        "TestSMTDatalogNumeralOrderAndModel"
+        "TestSMTDatalogNumeralOrderAndModel",
+        "TestSMTDatalogFreshTranslationAndAuxiliaryOwners"
       ],
       "conditionals": [
         {
@@ -140322,6 +140355,17 @@
           "go_target": "pkg/smtcore/theory_dl.go",
           "tests": [
             "TestSMTDatalogStrictOrderReduction"
+          ]
+        },
+        {
+          "name": "Retained factory declaration consumed by destination solver setup: same/cross-manager translation and model-checker auxiliary construction already create fresh independent Datalog owners; no additional unused adapter is needed",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_dl.go",
+            "pkg/smtcore/theory_dl_lifecycle_test.go"
+          ],
+          "tests": [
+            "TestSMTDatalogFreshTranslationAndAuxiliaryOwners"
           ]
         }
       ],
