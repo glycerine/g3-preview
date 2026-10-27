@@ -20,12 +20,14 @@ type enum2BVEntry struct {
 
 type enum2BVConfiguration struct {
 	DefaultConfiguration
-	owner *Enum2BVRewriter
+	owner   *Enum2BVRewriter
+	utility *ast.DatatypeUtil
 }
 
 type Enum2BVRewriter struct {
 	self        *Enum2BVRewriter
 	manager     *ast.ASTManager
+	utility     *ast.DatatypeUtil
 	config      enum2BVConfiguration
 	traversal   *Traversal
 	enum2BV     map[ast.ASTHandle]ast.ASTHandle
@@ -35,11 +37,11 @@ type Enum2BVRewriter struct {
 	scopeLimits []int
 	bounds      []ast.ASTHandle
 	boundRefs   []ast.ASTRef
-	flushedRefs []ast.ASTRef
 	predicate   EnumSortPredicate
 	translated  uint32
 	header      uint64
 	closed      bool
+	closing     bool
 }
 
 func NewEnum2BVRewriter(m *ast.ASTManager) (*Enum2BVRewriter, error) {
@@ -50,29 +52,42 @@ func NewEnum2BVRewriter(m *ast.ASTManager) (*Enum2BVRewriter, error) {
 	if err := m.Budget().Reserve(bytes); err != nil {
 		return nil, err
 	}
-	r := &Enum2BVRewriter{
-		manager: m, header: bytes,
-		enum2BV:  make(map[ast.ASTHandle]ast.ASTHandle),
-		bv2Enum:  make(map[ast.ASTHandle]ast.ASTHandle),
-		enum2Def: make(map[ast.ASTHandle]ast.ASTHandle),
-	}
+	r := &Enum2BVRewriter{manager: m, header: bytes, closing: true}
 	r.self = r
-	r.config.owner = r
-	r.config.defaults.manager = m
-	traversal, err := NewTraversal(m, &r.config)
-	if err != nil {
-		if traversal != nil {
-			_ = traversal.Close()
+	if err := r.initMembers(); err != nil {
+		closeErr := r.Close()
+		if closeErr != nil {
+			return r, errors.Join(err, closeErr)
 		}
-		m.Budget().Release(bytes)
 		return nil, err
 	}
-	r.traversal = traversal
 	return r, nil
 }
 
+func (r *Enum2BVRewriter) initMembers() (err error) {
+	r.enum2BV = make(map[ast.ASTHandle]ast.ASTHandle)
+	r.bv2Enum = make(map[ast.ASTHandle]ast.ASTHandle)
+	r.enum2Def = make(map[ast.ASTHandle]ast.ASTHandle)
+	r.config = enum2BVConfiguration{owner: r}
+	r.config.defaults.manager = r.manager
+	r.utility, err = ast.NewDatatypeUtil(r.manager)
+	if err != nil {
+		return err
+	}
+	r.config.utility, err = ast.NewDatatypeUtil(r.manager)
+	if err != nil {
+		return err
+	}
+	r.traversal, err = NewTraversal(r.manager, &r.config)
+	if err != nil {
+		return err
+	}
+	r.closing = false
+	return nil
+}
+
 func (r *Enum2BVRewriter) open() error {
-	if r == nil || r.self != r || r.closed || r.manager == nil || r.traversal == nil {
+	if r == nil || r.self != r || r.closed || r.closing || r.manager == nil || r.traversal == nil {
 		return ast.ErrASTHandle
 	}
 	_, err := r.manager.ProofsEnabled()
@@ -90,7 +105,7 @@ func enum2BVWidth(count uint32) uint32 {
 func enum2BVPowerOfTwo(value uint32) bool { return value != 0 && value&(value-1) == 0 }
 
 func (r *Enum2BVRewriter) isFinite(sort ast.ASTHandle) (bool, error) {
-	yes, err := r.manager.DatatypeIsEnumSort(sort)
+	yes, err := r.utility.IsEnumSort(sort)
 	if err != nil || !yes || r.predicate == nil {
 		return yes, err
 	}
@@ -199,7 +214,7 @@ func (r *Enum2BVRewriter) reduceArgument(argument ast.ASTHandle) (ast.ASTHandle,
 		r.bounds = append(r.bounds, bound)
 		r.boundRefs = append(r.boundRefs, ref)
 	}
-	constructors, err := m.DatatypeConstructors(sort)
+	constructors, err := r.config.utility.Constructors(sort)
 	if err != nil {
 		return ast.ASTHandle{}, false, err
 	}
@@ -533,8 +548,14 @@ func (r *Enum2BVRewriter) Pop(scopes uint32) error {
 			delete(r.enum2BV, entry.original)
 			delete(r.bv2Enum, entry.bitVector)
 			delete(r.enum2Def, entry.original)
-			for j := 2; j >= 0; j-- {
-				if err := r.manager.DelRef(&entry.owned[j]); err != nil {
+		}
+		for _, column := range []int{0, 2, 1} {
+			for i := limit; i < len(r.entries); i++ {
+				if r.entries[i].owned[column] == (ast.ASTRef{}) {
+					continue
+				}
+				if err := r.manager.DelRef(&r.entries[i].owned[column]); err != nil {
+					r.closing = true
 					return err
 				}
 			}
@@ -545,17 +566,32 @@ func (r *Enum2BVRewriter) Pop(scopes uint32) error {
 	return r.traversal.Reset()
 }
 
-func (r *Enum2BVRewriter) FlushSideConstraints(out *[]ast.ASTHandle) error {
+// FlushSideConstraints appends caller-owned references before resetting the
+// source m_bounds vector. Acquired outputs survive Cleanup and Close.
+func (r *Enum2BVRewriter) FlushSideConstraints(out *[]ast.ASTRef) error {
 	if err := r.open(); err != nil {
 		return err
 	}
 	if out == nil {
 		return ast.ErrASTDomain
 	}
-	*out = append(*out, r.bounds...)
-	r.flushedRefs = append(r.flushedRefs, r.boundRefs...)
-	r.bounds = nil
-	r.boundRefs = nil
+	for _, bound := range r.bounds {
+		ref, err := r.manager.NewRef(bound)
+		if err != nil {
+			return err
+		}
+		*out = append(*out, ref)
+	}
+	for i := range r.boundRefs {
+		if r.boundRefs[i] == (ast.ASTRef{}) {
+			continue
+		}
+		if err := r.manager.DelRef(&r.boundRefs[i]); err != nil {
+			r.closing = true
+			return err
+		}
+	}
+	r.bounds, r.boundRefs = nil, nil
 	return nil
 }
 
@@ -568,35 +604,69 @@ func (r *Enum2BVRewriter) SetSortPredicate(predicate EnumSortPredicate) error {
 }
 func (r *Enum2BVRewriter) UpdateParams() error { return r.open() }
 
-func (r *Enum2BVRewriter) Cleanup() (err error) {
-	if e := r.open(); e != nil {
-		return e
+// The public source cleanup destroys and reconstructs imp, including both
+// datatype utilities, rather than only resetting the traversal.
+func (r *Enum2BVRewriter) Cleanup() error {
+	if r == nil || r.self != r || r.closed {
+		return ast.ErrASTHandle
 	}
-	if e := r.traversal.Cleanup(); e != nil {
-		return e
+	r.closing = true
+	if err := r.releaseMembers(); err != nil {
+		return err
 	}
-	for i := len(r.boundRefs) - 1; i >= 0; i-- {
-		err = errors.Join(err, r.manager.DelRef(&r.boundRefs[i]))
+	r.manager.Budget().Release(r.header)
+	r.header = 0
+	bytes := uint64(reflect.TypeOf(Enum2BVRewriter{}).Size())
+	if err := r.manager.Budget().Reserve(bytes); err != nil {
+		return err
 	}
-	for i := len(r.flushedRefs) - 1; i >= 0; i-- {
-		err = errors.Join(err, r.manager.DelRef(&r.flushedRefs[i]))
+	r.header = bytes
+	return r.initMembers()
+}
+
+// Derived rw_cfg members die before the traversal base, then imp's vectors
+// die in reverse member order. Each project ref_vector retires forward.
+func (r *Enum2BVRewriter) releaseMembers() error {
+	if r.config.utility != nil {
+		if err := r.config.utility.Close(); err != nil {
+			return err
+		}
+		r.config.utility = nil
 	}
-	for i := len(r.entries) - 1; i >= 0; i-- {
-		for j := 2; j >= 0; j-- {
-			err = errors.Join(err, r.manager.DelRef(&r.entries[i].owned[j]))
+	if r.traversal != nil {
+		if err := r.traversal.Close(); err != nil {
+			return err
+		}
+		r.traversal = nil
+	}
+	for _, column := range []int{2, 1, 0} {
+		for i := range r.entries {
+			if r.entries[i].owned[column] == (ast.ASTRef{}) {
+				continue
+			}
+			if err := r.manager.DelRef(&r.entries[i].owned[column]); err != nil {
+				return err
+			}
 		}
 	}
-	clear(r.enum2BV)
-	clear(r.bv2Enum)
-	clear(r.enum2Def)
-	r.entries = nil
-	r.scopeLimits = nil
-	r.bounds = nil
-	r.boundRefs = nil
-	r.flushedRefs = nil
-	r.predicate = nil
-	r.translated = 0
-	return err
+	if r.utility != nil {
+		if err := r.utility.Close(); err != nil {
+			return err
+		}
+		r.utility = nil
+	}
+	for i := range r.boundRefs {
+		if r.boundRefs[i] == (ast.ASTRef{}) {
+			continue
+		}
+		if err := r.manager.DelRef(&r.boundRefs[i]); err != nil {
+			return err
+		}
+	}
+	r.enum2BV, r.bv2Enum, r.enum2Def = nil, nil, nil
+	r.entries, r.scopeLimits, r.bounds, r.boundRefs = nil, nil, nil, nil
+	r.predicate, r.translated = nil, 0
+	return nil
 }
 
 func (r *Enum2BVRewriter) NumTranslated() (uint32, error) {
@@ -633,31 +703,21 @@ func (r *Enum2BVRewriter) EnumDefinitions() map[ast.ASTHandle]ast.ASTHandle {
 	return out
 }
 
-func (r *Enum2BVRewriter) Close() (err error) {
+func (r *Enum2BVRewriter) Close() error {
 	if r == nil || r.self != r {
 		return ast.ErrASTHandle
 	}
 	if r.closed {
 		return nil
 	}
-	if r.traversal != nil {
-		err = errors.Join(err, r.traversal.Close())
-	}
-	for i := len(r.boundRefs) - 1; i >= 0; i-- {
-		err = errors.Join(err, r.manager.DelRef(&r.boundRefs[i]))
-	}
-	for i := len(r.flushedRefs) - 1; i >= 0; i-- {
-		err = errors.Join(err, r.manager.DelRef(&r.flushedRefs[i]))
-	}
-	for i := len(r.entries) - 1; i >= 0; i-- {
-		for j := 2; j >= 0; j-- {
-			err = errors.Join(err, r.manager.DelRef(&r.entries[i].owned[j]))
-		}
+	r.closing = true
+	if err := r.releaseMembers(); err != nil {
+		return err
 	}
 	r.manager.Budget().Release(r.header)
 	r.header = 0
 	r.closed = true
-	return err
+	return nil
 }
 
 var _ Configuration = (*enum2BVConfiguration)(nil)

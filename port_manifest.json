@@ -16461,7 +16461,9 @@
         "pkg/ast/ast_datatype_util_trace.go",
         "pkg/ast/ast_datatype_util_trace_test.go",
         "pkg/ast/ast_datatype_numeric_release_test.go",
-        "pkg/ast/ast_datatype_recursion_source_test.go"
+        "pkg/ast/ast_datatype_recursion_source_test.go",
+        "pkg/ast/ast_datatype_enum_source_test.go",
+        "pkg/ast/rewriter/enum2bv_source_owners_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16497,7 +16499,10 @@
         "TestDatatypeRecursionCachePublishesBeforePinRefusal",
         "TestDatatypeRecursionCacheAssertionOwnerBeforeWarmLookup",
         "TestDatatypeRecursionSourceTraversalSharedDAGAndNestedSorts",
-        "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution"
+        "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution",
+        "TestDatatypeEnumCacheOwnsConstructorsAndBooleanResults",
+        "TestDatatypeEnumCachePublishesBeforeResultPinRefusal",
+        "TestDatatypeEnumPredicateSourceGatesAndWarmCache"
       ],
       "assertions": [
         {
@@ -16809,6 +16814,19 @@
             "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution",
             "TestDatatypeUtilInterruptedTeardown"
           ]
+        },
+        {
+          "name": "datatype::util::is_enum_sort (845-861): non-datatype early return, independent cached true/false result, eager per-utility constructor list, declaration arity short-circuit, enum result publication before its additional sort pin and Reset/Close retirement",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_enum_source_test.go"
+          ],
+          "tests": [
+            "TestDatatypeEnumCacheOwnsConstructorsAndBooleanResults",
+            "TestDatatypeEnumCachePublishesBeforeResultPinRefusal",
+            "TestDatatypeEnumPredicateSourceGatesAndWarmCache"
+          ]
         }
       ],
       "ownership": [
@@ -16817,7 +16835,8 @@
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
         "The concrete DatatypeUtil now has an independent constructor-vector cache owning its datatype sort and every constructor in declaration order, before its separate selected-preference pins. Constructor-local func_decl_ref and permanent cache reference use separate checked ASTRef tokens and actual INC/DEC operations. Partial maps/lists and acquired pins remain until Reset/Close; native Go containers replace STL storage without claiming its allocation ABI.",
         "Datatype trace sort_ref/func_decl_ref temporaries retain real ASTRef inputs until each complete ostream expression ends, with reverse temporary retirement. Each actual sort/declare-fun document has a separate format-manager ASTRef and lexical numeric rendering stream. smt2_printer constructor-local pp_params snapshots/read order/destruction precede document building; PrintFormat owns its own later pp helper. Failed cleanup remains on the utility owning continuation before cached refs. Enabled traces require the actual matching process global-parameter owner; erased/disabled gates never reach it.",
-        "Each successful cold recursion query appends its sort ASTRef to that utility's existing m_asts owner vector. Result publication precedes pin acquisition, so a real Go reference-page refusal leaves a warm result without a pin; later lookup does not retroactively retry it. Reset clears recursion keys before forward reference retirement; Close retains keys while stopped and drops them after successful retirement. Independent callers/utilities own separate pins. This bounded Go owner continuation does not claim full native C++ allocation/throwing-destructor behavior."
+        "Each successful cold recursion query appends its sort ASTRef to that utility's existing m_asts owner vector. Result publication precedes pin acquisition, so a real Go reference-page refusal leaves a warm result without a pin; later lookup does not retroactively retry it. Reset clears recursion keys before forward reference retirement; Close retains keys while stopped and drops them after successful retirement. Independent callers/utilities own separate pins. This bounded Go owner continuation does not claim full native C++ allocation/throwing-destructor behavior.",
+        "An enum predicate utility owns its constructor-list sort/declarations and one additional sort pin after result publication. False results are cached independently. Non-datatype predicates acquire nothing. Result-pin refusal preserves prior constructor owners and the published boolean; warm lookup does not retroactively pin. Independent source enum2bv imp/rw_cfg instances use separate utilities."
       ],
       "deviations": [
         "Private utility memoization maps are omitted because concrete Go queries reconstruct hash-consed declarations and compute recursion/enum properties directly. The unused plugin remove entry point and undeclared get_datatype_size declaration are not ported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed.",
@@ -16827,7 +16846,8 @@
         "The literal unsigned-overflow no-constructor path now preserves the source native/continued-SASSERT prefix: acquire the preference sort pin, append a null ASTRef owner, and cache the null result without treating a warm null entry as found. An aborting debug assertion stops before this publication. The regression covers native null-prefix retention/cache hits and the aborting debug prefix; it does not claim a physical numeric failure campaign for this member.",
         "This is a concrete retained datatype-trace path, not a generic ast_ref stream adapter or whole SMT2-printer audit. Tests cover exact enum text, all recursive trace branches, forbidden-vector order, simultaneous input and format pins, warm cache silence, sticky stream refusal, real PP/global owner closure and allocation refusals before invoke/core-header counter publication. General pretty-printer ownership/failure auditing and physical consumed-numeral cleanup for these temporary owners remain open. Native Go rendering streams replace ostream storage; STL internals are not ported.",
         "A physical consumed-NUM failure is now verified for the retained plugin-owned utility finalizer. The fixture uses a source-valid rational-valued sort parameter (ast.cpp:1904-1932 accepts non-AST parameters), ordinary public NUM/AST construction, actual reference owners and the supported signed-host TLS accounting frontier. It never writes NUM/AST payloads. The initial AST-valued scalar probe hit the actual source is_sort precondition and was rejected as an invalid fixture, not counted as failure-path evidence. Four utility references retire before the real bounds error; four later pins survive until owning retry. Independent caller roots and runtime state prove exact remaining retirement without foreign numeric replay, and final graph cleanup reaches budget0. This is Go owning-cleanup evidence at the actual plugin finalizer, not full C++ throwing-destructor equivalence, a public ASTManager.Close failure campaign, or proof for trace/constructor-local/Reset cleanup frontiers. No production code change was required.",
-        "Recursion queries formerly used an uncached recursive DFS over instantiated constructor domains. The actual source get_def(sort*) returns the named generic definition (header278); core traversal now follows its raw accessor ranges using the source work stack and only the datatype family/kind predicate. Thus a nonrecursive generic Box[T] instantiated with a recursive actual sort remains classified nonrecursive, while a concrete field containing that recursive sort is recursive. Focused tests cover shared descendants, nested array-sort parameters, generic versus instantiated ranges, both cached boolean values, real page-boundary pin refusal and actual assertion/teardown guards. Other utility caches/predicates and broader numerical/constructor failure ownership remain partial."
+        "Recursion queries formerly used an uncached recursive DFS over instantiated constructor domains. The actual source get_def(sort*) returns the named generic definition (header278); core traversal now follows its raw accessor ranges using the source work stack and only the datatype family/kind predicate. Thus a nonrecursive generic Box[T] instantiated with a recursive actual sort remains classified nonrecursive, while a concrete field containing that recursive sort is recursive. Focused tests cover shared descendants, nested array-sort parameters, generic versus instantiated ranges, both cached boolean values, real page-boundary pin refusal and actual assertion/teardown guards. Other utility caches/predicates and broader numerical/constructor failure ownership remain partial.",
+        "Enum predicate classification previously inspected definitions through a stateless manager helper in the retained rewriter. The real utility now materializes the constructor cache and owns the cached result, including false entries and source map-before-pin publication. Tests isolate constructor declarations' own range-sort references with independent caller roots and use real reference-page refusals. This is bounded Go owner-continuation evidence; broader cache/predicate and native exception/destructor audits remain open."
       ]
     },
     {
@@ -16858,7 +16878,9 @@
         "pkg/ast/ast_datatype_util_trace.go",
         "pkg/ast/ast_datatype_util_trace_test.go",
         "pkg/ast/ast_datatype_numeric_release_test.go",
-        "pkg/ast/ast_datatype_recursion_source_test.go"
+        "pkg/ast/ast_datatype_recursion_source_test.go",
+        "pkg/ast/ast_datatype_enum_source_test.go",
+        "pkg/ast/rewriter/enum2bv_source_owners_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16893,7 +16915,10 @@
         "TestDatatypeRecursionCachePublishesBeforePinRefusal",
         "TestDatatypeRecursionCacheAssertionOwnerBeforeWarmLookup",
         "TestDatatypeRecursionSourceTraversalSharedDAGAndNestedSorts",
-        "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution"
+        "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution",
+        "TestDatatypeEnumCacheOwnsConstructorsAndBooleanResults",
+        "TestDatatypeEnumCachePublishesBeforeResultPinRefusal",
+        "TestDatatypeEnumPredicateSourceGatesAndWarmCache"
       ],
       "conditionals": [
         {
@@ -17097,6 +17122,19 @@
             "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution",
             "TestDatatypeUtilInterruptedTeardown"
           ]
+        },
+        {
+          "name": "datatype::util::is_enum_sort (845-861): non-datatype early return, independent cached true/false result, eager per-utility constructor list, declaration arity short-circuit, enum result publication before its additional sort pin and Reset/Close retirement",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_enum_source_test.go"
+          ],
+          "tests": [
+            "TestDatatypeEnumCacheOwnsConstructorsAndBooleanResults",
+            "TestDatatypeEnumCachePublishesBeforeResultPinRefusal",
+            "TestDatatypeEnumPredicateSourceGatesAndWarmCache"
+          ]
         }
       ],
       "ownership": [
@@ -17105,7 +17143,8 @@
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
         "The concrete DatatypeUtil now has an independent constructor-vector cache owning its datatype sort and every constructor in declaration order, before its separate selected-preference pins. Constructor-local func_decl_ref and permanent cache reference use separate checked ASTRef tokens and actual INC/DEC operations. Partial maps/lists and acquired pins remain until Reset/Close; native Go containers replace STL storage without claiming its allocation ABI.",
         "Datatype trace sort_ref/func_decl_ref temporaries retain real ASTRef inputs until each complete ostream expression ends, with reverse temporary retirement. Each actual sort/declare-fun document has a separate format-manager ASTRef and lexical numeric rendering stream. smt2_printer constructor-local pp_params snapshots/read order/destruction precede document building; PrintFormat owns its own later pp helper. Failed cleanup remains on the utility owning continuation before cached refs. Enabled traces require the actual matching process global-parameter owner; erased/disabled gates never reach it.",
-        "Each successful cold recursion query appends its sort ASTRef to that utility's existing m_asts owner vector. Result publication precedes pin acquisition, so a real Go reference-page refusal leaves a warm result without a pin; later lookup does not retroactively retry it. Reset clears recursion keys before forward reference retirement; Close retains keys while stopped and drops them after successful retirement. Independent callers/utilities own separate pins. This bounded Go owner continuation does not claim full native C++ allocation/throwing-destructor behavior."
+        "Each successful cold recursion query appends its sort ASTRef to that utility's existing m_asts owner vector. Result publication precedes pin acquisition, so a real Go reference-page refusal leaves a warm result without a pin; later lookup does not retroactively retry it. Reset clears recursion keys before forward reference retirement; Close retains keys while stopped and drops them after successful retirement. Independent callers/utilities own separate pins. This bounded Go owner continuation does not claim full native C++ allocation/throwing-destructor behavior.",
+        "An enum predicate utility owns its constructor-list sort/declarations and one additional sort pin after result publication. False results are cached independently. Non-datatype predicates acquire nothing. Result-pin refusal preserves prior constructor owners and the published boolean; warm lookup does not retroactively pin. Independent source enum2bv imp/rw_cfg instances use separate utilities."
       ],
       "deviations": [
         "Private utility caches, the unused plugin remove entry point, and the undeclared get_datatype_size implementation are omitted under the retained-consumer rule. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes.",
@@ -17115,7 +17154,8 @@
         "The literal unsigned-overflow no-constructor path now preserves the source native/continued-SASSERT prefix: acquire the preference sort pin, append a null ASTRef owner, and cache the null result without treating a warm null entry as found. An aborting debug assertion stops before this publication. The regression covers native null-prefix retention/cache hits and the aborting debug prefix; it does not claim a physical numeric failure campaign for this member.",
         "This is a concrete retained datatype-trace path, not a generic ast_ref stream adapter or whole SMT2-printer audit. Tests cover exact enum text, all recursive trace branches, forbidden-vector order, simultaneous input and format pins, warm cache silence, sticky stream refusal, real PP/global owner closure and allocation refusals before invoke/core-header counter publication. General pretty-printer ownership/failure auditing and physical consumed-numeral cleanup for these temporary owners remain open. Native Go rendering streams replace ostream storage; STL internals are not ported.",
         "A physical consumed-NUM failure is now verified for the retained plugin-owned utility finalizer. The fixture uses a source-valid rational-valued sort parameter (ast.cpp:1904-1932 accepts non-AST parameters), ordinary public NUM/AST construction, actual reference owners and the supported signed-host TLS accounting frontier. It never writes NUM/AST payloads. The initial AST-valued scalar probe hit the actual source is_sort precondition and was rejected as an invalid fixture, not counted as failure-path evidence. Four utility references retire before the real bounds error; four later pins survive until owning retry. Independent caller roots and runtime state prove exact remaining retirement without foreign numeric replay, and final graph cleanup reaches budget0. This is Go owning-cleanup evidence at the actual plugin finalizer, not full C++ throwing-destructor equivalence, a public ASTManager.Close failure campaign, or proof for trace/constructor-local/Reset cleanup frontiers. No production code change was required.",
-        "Recursion queries formerly used an uncached recursive DFS over instantiated constructor domains. The actual source get_def(sort*) returns the named generic definition (header278); core traversal now follows its raw accessor ranges using the source work stack and only the datatype family/kind predicate. Thus a nonrecursive generic Box[T] instantiated with a recursive actual sort remains classified nonrecursive, while a concrete field containing that recursive sort is recursive. Focused tests cover shared descendants, nested array-sort parameters, generic versus instantiated ranges, both cached boolean values, real page-boundary pin refusal and actual assertion/teardown guards. Other utility caches/predicates and broader numerical/constructor failure ownership remain partial."
+        "Recursion queries formerly used an uncached recursive DFS over instantiated constructor domains. The actual source get_def(sort*) returns the named generic definition (header278); core traversal now follows its raw accessor ranges using the source work stack and only the datatype family/kind predicate. Thus a nonrecursive generic Box[T] instantiated with a recursive actual sort remains classified nonrecursive, while a concrete field containing that recursive sort is recursive. Focused tests cover shared descendants, nested array-sort parameters, generic versus instantiated ranges, both cached boolean values, real page-boundary pin refusal and actual assertion/teardown guards. Other utility caches/predicates and broader numerical/constructor failure ownership remain partial.",
+        "Enum predicate classification previously inspected definitions through a stateless manager helper in the retained rewriter. The real utility now materializes the constructor cache and owns the cached result, including false entries and source map-before-pin publication. Tests isolate constructor declarations' own range-sort references with independent caller roots and use real reference-page refusals. This is bounded Go owner-continuation evidence; broader cache/predicate and native exception/destructor audits remain open."
       ]
     },
     {
@@ -33088,14 +33128,22 @@
       "path": "src/ast/rewriter/enum2bv_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/enum2bv_rewriter.go",
-        "pkg/ast/rewriter/enum2bv_rewriter_test.go"
+        "pkg/ast/rewriter/enum2bv_rewriter_test.go",
+        "pkg/ast/ast_datatype_util.go",
+        "pkg/ast/rewriter/enum2bv_source_owners_test.go"
       ],
       "tests": [
         "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
-        "TestEnum2BVQuantifierSortAndBound"
+        "TestEnum2BVQuantifierSortAndBound",
+        "TestEnum2BVIndependentUtilityCachesAndCleanupReconstruction",
+        "TestEnum2BVFlushedBoundsOwnedByCaller",
+        "TestEnum2BVFlushFailurePreservesCallerPrefix",
+        "TestEnum2BVCloseStopsAtConfigurationUtility",
+        "TestEnum2BVConstructionAndCleanupAllocationRefusals",
+        "TestEnum2BVTranslationWarmsConfigurationCache"
       ],
       "assertions": [
         {
@@ -33111,38 +33159,76 @@
           "text": "SASSERT(num_scopes <= m_enum_consts_lim.size());"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
-          "name": "complete enum2bv_rewriter implementation",
-          "status": "ported",
+          "name": "Retained enum2bv algorithms: constants, recognizers, bounds, quantifier sorts, maps and scopes; whole source lexical ownership/diagnostic/exceptional audit remains open",
+          "status": "partial",
           "go_target": "pkg/ast/rewriter/enum2bv_rewriter.go",
           "tests": [
             "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
             "TestEnum2BVQuantifierSortAndBound"
           ]
+        },
+        {
+          "name": "Independent imp and rw_cfg datatype utility owners; source enum cache before every external sort-predicate call; configuration constructor cache on translation; cfg-before-traversal and reverse-member/forward-vector normal retirement; public Cleanup destroys/reconstructs owners with retained Go cleanup on refusal",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/enum2bv_rewriter.go",
+            "pkg/ast/rewriter/enum2bv_source_owners_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVIndependentUtilityCachesAndCleanupReconstruction",
+            "TestEnum2BVTranslationWarmsConfigurationCache",
+            "TestEnum2BVCloseStopsAtConfigurationUtility",
+            "TestEnum2BVConstructionAndCleanupAllocationRefusals"
+          ]
+        },
+        {
+          "name": "Caller-owned flush_side_constraints append-before-reset output protocol, preserving acquired output prefix on append failure; normal Pop retires const/definition/BV vectors in source group order",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/enum2bv_rewriter.go",
+            "pkg/ast/rewriter/enum2bv_rewriter_test.go",
+            "pkg/ast/rewriter/enum2bv_source_owners_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVFlushedBoundsOwnedByCaller",
+            "TestEnum2BVFlushFailurePreservesCallerPrefix",
+            "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes"
+          ]
         }
       ],
       "ownership": [
-        "Typed Go maps preserve enum declaration, fresh bit-vector declaration, and inverse-definition relationships. Explicit ASTRef owners retain all mapped declarations, definitions, pending bounds, and flushed bounds until scope removal, cleanup, or close. Traversal ownership is closed before retained AST references."
+        "Each rewriter owns two independent DatatypeUtil members. The rw_cfg utility retires before the traversal base; imp definitions, BV declarations and original constants retire by vector group in forward insertion order, then the outer datatype utility, then bounds. Interrupted Go Close retains remaining tokens/header and blocks operations until retry. Cleanup releases the old imp header before reserving/constructing its replacement.",
+        "FlushSideConstraints appends concrete caller-owned ASTRef tokens, then retires the original bound refs. Acquired outputs survive rewriter Cleanup/Close, including an append-failure prefix. The former rewriter-lifetime flushedRefs cache and borrowed slice output are removed; retained Go callers are updated, with no raw-handle compatibility adapter."
       ],
       "deviations": [
-        "The source parameter update is behaviorally empty and the Go UpdateParams method therefore performs only the owner-state validation. Map accessors return native Go map snapshots instead of exposing mutable C++ obj_map storage."
+        "The source parameter update is behaviorally empty and the Go UpdateParams method therefore performs only the owner-state validation. Map accessors return native Go map snapshots instead of exposing mutable C++ obj_map storage.",
+        "Whole-unit ported/audited claims are withdrawn on concrete retained C++ evidence. Previously missing enum utility members/caches, source destruction/reconstruction, vector group order and caller-owned side-constraint output are corrected in this bounded increment. Retained C++ consumers are dt2bv_tactic and enum2bv_solver; their complete Go integrations remain separate work. Reduce-app/argument/quantifier expr_ref lexical ownership, detailed throw_non_fd pretty-print operands, all assertion sites, source input params_ref ownership and full native exceptional destruction are not established by existing algorithm tests or these normal owner/prefix checks. Initial guard tests that reentered during ordinary sort registration timed out and are rejected setup, not passing failure evidence; the final regression uses the actual numerical mutation guard."
       ]
     },
     {
       "path": "src/ast/rewriter/enum2bv_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/enum2bv_rewriter.go",
-        "pkg/ast/rewriter/enum2bv_rewriter_test.go"
+        "pkg/ast/rewriter/enum2bv_rewriter_test.go",
+        "pkg/ast/ast_datatype_util.go",
+        "pkg/ast/rewriter/enum2bv_source_owners_test.go"
       ],
       "tests": [
         "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
-        "TestEnum2BVQuantifierSortAndBound"
+        "TestEnum2BVQuantifierSortAndBound",
+        "TestEnum2BVIndependentUtilityCachesAndCleanupReconstruction",
+        "TestEnum2BVFlushedBoundsOwnedByCaller",
+        "TestEnum2BVFlushFailurePreservesCallerPrefix",
+        "TestEnum2BVCloseStopsAtConfigurationUtility",
+        "TestEnum2BVConstructionAndCleanupAllocationRefusals",
+        "TestEnum2BVTranslationWarmsConfigurationCache"
       ],
       "conditionals": [
         {
@@ -33154,24 +33240,54 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
-          "name": "complete enum2bv_rewriter public interface",
-          "status": "ported",
+          "name": "Retained enum2bv public operations with concrete caller-owned bound outputs; source parameter and exceptional interface audit remains open",
+          "status": "partial",
           "go_target": "pkg/ast/rewriter/enum2bv_rewriter.go",
           "tests": [
             "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
             "TestEnum2BVQuantifierSortAndBound"
           ]
+        },
+        {
+          "name": "Independent imp and rw_cfg datatype utility owners; source enum cache before every external sort-predicate call; configuration constructor cache on translation; cfg-before-traversal and reverse-member/forward-vector normal retirement; public Cleanup destroys/reconstructs owners with retained Go cleanup on refusal",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/enum2bv_rewriter.go",
+            "pkg/ast/rewriter/enum2bv_source_owners_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVIndependentUtilityCachesAndCleanupReconstruction",
+            "TestEnum2BVTranslationWarmsConfigurationCache",
+            "TestEnum2BVCloseStopsAtConfigurationUtility",
+            "TestEnum2BVConstructionAndCleanupAllocationRefusals"
+          ]
+        },
+        {
+          "name": "Caller-owned flush_side_constraints append-before-reset output protocol, preserving acquired output prefix on append failure; normal Pop retires const/definition/BV vectors in source group order",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/enum2bv_rewriter.go",
+            "pkg/ast/rewriter/enum2bv_rewriter_test.go",
+            "pkg/ast/rewriter/enum2bv_source_owners_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVFlushedBoundsOwnedByCaller",
+            "TestEnum2BVFlushFailurePreservesCallerPrefix",
+            "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes"
+          ]
         }
       ],
       "ownership": [
-        "Enum2BVRewriter owns its traversal, persistent AST reference sets, native maps, scope limits, and arena-accounted header. Close and Cleanup release retained references in reverse order."
+        "Enum2BVRewriter owns its traversal, persistent AST reference sets, native maps, scope limits, and arena-accounted header. Close and Cleanup release retained references in reverse order.",
+        "Each rewriter owns two independent DatatypeUtil members. The rw_cfg utility retires before the traversal base; imp definitions, BV declarations and original constants retire by vector group in forward insertion order, then the outer datatype utility, then bounds. Interrupted Go Close retains remaining tokens/header and blocks operations until retry. Cleanup releases the old imp header before reserving/constructing its replacement.",
+        "FlushSideConstraints appends concrete caller-owned ASTRef tokens, then retires the original bound refs. Acquired outputs survive rewriter Cleanup/Close, including an append-failure prefix. The former rewriter-lifetime flushedRefs cache and borrowed slice output are removed; retained Go callers are updated, with no raw-handle compatibility adapter."
       ],
       "deviations": [
-        "The Go sort predicate is a concrete function type returning a checked error. Returned map snapshots and flushed side-constraint slices contain borrowed AST handles retained by the rewriter through its lifetime."
+        "Whole-unit ported/audited claims are withdrawn on concrete retained C++ evidence. Previously missing enum utility members/caches, source destruction/reconstruction, vector group order and caller-owned side-constraint output are corrected in this bounded increment. Retained C++ consumers are dt2bv_tactic and enum2bv_solver; their complete Go integrations remain separate work. Reduce-app/argument/quantifier expr_ref lexical ownership, detailed throw_non_fd pretty-print operands, all assertion sites, source input params_ref ownership and full native exceptional destruction are not established by existing algorithm tests or these normal owner/prefix checks. Initial guard tests that reentered during ordinary sort registration timed out and are rejected setup, not passing failure evidence; the final regression uses the actual numerical mutation guard."
       ]
     },
     {

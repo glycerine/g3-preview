@@ -16,6 +16,7 @@ type DatatypeUtil struct {
 	constructors map[ASTHandle]ASTHandle
 	lists        map[ASTHandle]*datatypeConstructorList
 	recursive    map[ASTHandle]bool
+	enum         map[ASTHandle]bool
 	lexical      ASTRef // interrupted constructor-local cleanup, separate from m_asts
 	refs         []ASTRef
 	tracePending []*datatypeTraceWriter
@@ -46,9 +47,57 @@ func (manager *ASTManager) newDatatypeUtil() (*DatatypeUtil, error) {
 	if err = datatypeUtilAssert(745, "m_plugin", func() bool { return manager.datatypePlugin != nil && manager.datatypePlugin.published }); err != nil {
 		return nil, err
 	}
-	u := &DatatypeUtil{manager: manager, constructors: make(map[ASTHandle]ASTHandle), lists: make(map[ASTHandle]*datatypeConstructorList), recursive: make(map[ASTHandle]bool)}
+	u := &DatatypeUtil{manager: manager, constructors: make(map[ASTHandle]ASTHandle), lists: make(map[ASTHandle]*datatypeConstructorList), recursive: make(map[ASTHandle]bool), enum: make(map[ASTHandle]bool)}
 	u.self = u
 	return u, nil
+}
+
+// IsEnumSort follows source is_enum_sort: non-datatypes return before any
+// cache work; datatype constructor lists are materialized before the result.
+func (u *DatatypeUtil) IsEnumSort(sort ASTHandle) (bool, error) {
+	if u == nil || u.self != u || u.manager == nil || u.operation != 0 {
+		return false, ErrASTHandle
+	}
+	m := u.manager
+	if err := m.lock(); err != nil {
+		return false, err
+	}
+	defer m.mu.Unlock()
+	if u.lexical != (ASTRef{}) || len(u.tracePending) != 0 {
+		return false, ErrASTPending
+	}
+	r, err := m.requireKind(sort, ASTSort)
+	if err != nil {
+		return false, err
+	}
+	if !m.datatypeUtilIsDatatype(r) {
+		return false, nil
+	}
+	if value, found := u.enum[sort]; found {
+		return value, nil
+	}
+	constructors, err := u.constructorList(r)
+	if err != nil {
+		return false, err
+	}
+	value := true
+	for _, constructor := range constructors {
+		c, err := m.requireKind(constructor, ASTFuncDecl)
+		if err != nil {
+			return false, err
+		}
+		if m.declAt(c.slot).arity != 0 {
+			value = false
+			break
+		}
+	}
+	u.enum[sort] = value
+	ref, err := m.newRef(sort)
+	if err != nil {
+		return false, err
+	}
+	u.refs = append(u.refs, ref)
+	return value, nil
 }
 
 // IsRecursive retains one source m_is_recursive entry and sort pin per utility.
@@ -165,6 +214,7 @@ func (u *DatatypeUtil) Reset() error {
 		clear(u.constructors)
 		clear(u.lists)
 		clear(u.recursive)
+		clear(u.enum)
 		u.operation = 1
 	}
 	if err := u.releasePreferences(); err != nil {
@@ -246,6 +296,7 @@ func (u *DatatypeUtil) closeLocked() error {
 	u.constructors = nil
 	u.lists = nil
 	u.recursive = nil
+	u.enum = nil
 	u.manager = nil
 	return nil
 }

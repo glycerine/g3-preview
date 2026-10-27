@@ -76,7 +76,12 @@ func TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes(t *testing.T) {
 	if len(r.EnumToBitVector()) != 1 || len(r.BitVectorToEnum()) != 1 || len(r.EnumDefinitions()) != 1 {
 		t.Fatal("conversion maps", r.EnumToBitVector(), r.BitVectorToEnum(), r.EnumDefinitions())
 	}
-	var bounds []ast.ASTHandle
+	var bounds []ast.ASTRef
+	t.Cleanup(func() {
+		for i := range bounds {
+			astTestMust(t, m.DelRef(&bounds[i]))
+		}
+	})
 	astTestMust(t, r.FlushSideConstraints(&bounds))
 	if len(bounds) != 1 {
 		t.Fatal("three-value enum bound", len(bounds))
