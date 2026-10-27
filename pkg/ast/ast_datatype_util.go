@@ -11,6 +11,7 @@ type DatatypeUtil struct {
 	start        uint32
 	constructors map[ASTHandle]ASTHandle
 	refs         []ASTRef
+	operation    uint8 // 0 ready, 1 interrupted Reset, 2 closing
 }
 
 func NewDatatypeUtil(manager *ASTManager) (*DatatypeUtil, error) {
@@ -26,7 +27,7 @@ func NewDatatypeUtil(manager *ASTManager) (*DatatypeUtil, error) {
 }
 
 func (u *DatatypeUtil) NonRecursiveConstructor(sort ASTHandle) (ASTHandle, bool, error) {
-	if u == nil || u.self != u || u.manager == nil {
+	if u == nil || u.self != u || u.manager == nil || u.operation != 0 {
 		return ASTHandle{}, false, ErrASTHandle
 	}
 	m := u.manager
@@ -61,31 +62,36 @@ func (u *DatatypeUtil) NonRecursiveConstructor(sort ASTHandle) (ASTHandle, bool,
 	return constructor, true, nil
 }
 
-// Reset implements datatype::util::reset: release cached owners and advance
-// the starting constructor preference, preserving this utility instance.
+// Reset clears the preference map before retiring m_asts, then advances the
+// unsigned preference once. An interrupted reset cannot republish preferences.
 func (u *DatatypeUtil) Reset() error {
-	if u == nil || u.self != u || u.manager == nil {
+	if u == nil || u.self != u || u.manager == nil || u.operation == 2 {
 		return ErrASTHandle
 	}
-	if _, err := u.manager.ProofsEnabled(); err != nil {
-		return err
+	if u.operation == 0 {
+		clear(u.constructors)
+		u.operation = 1
 	}
 	if err := u.releasePreferences(); err != nil {
 		return err
 	}
-	clear(u.constructors)
 	u.start++
+	u.operation = 0
 	return nil
 }
 
+// Source ref_vector dec_range walks forward. Retired zero tokens identify
+// actual completed decrements; owning retries never replay them.
 func (u *DatatypeUtil) releasePreferences() error {
-	for len(u.refs) != 0 {
-		i := len(u.refs) - 1
+	for i := range u.refs {
+		if u.refs[i] == (ASTRef{}) {
+			continue
+		}
 		if err := u.manager.DelRef(&u.refs[i]); err != nil {
 			return err
 		}
-		u.refs = u.refs[:i]
 	}
+	u.refs = nil
 	return nil
 }
 
@@ -96,6 +102,7 @@ func (u *DatatypeUtil) Close() error {
 	if u.manager == nil {
 		return nil
 	}
+	u.operation = 2
 	if err := u.releasePreferences(); err != nil {
 		return err
 	}

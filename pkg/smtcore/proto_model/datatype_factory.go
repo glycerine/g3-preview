@@ -1,14 +1,12 @@
 package protomodel
 
-import (
-	"errors"
-	"github.com/glycerine/g3/pkg/ast"
-)
+import "github.com/glycerine/g3/pkg/ast"
 
 type DatatypeFactory struct {
 	structuredFactory
 	last    map[ast.ASTHandle]ast.ASTHandle
 	utility *ast.DatatypeUtil
+	closing bool
 }
 
 func NewDatatypeFactory(md *ProtoModel) (*DatatypeFactory, error) {
@@ -55,6 +53,9 @@ func (f *DatatypeFactory) constructorArguments(c ast.ASTHandle, fresh func(ast.A
 	return args, used, nil
 }
 func (f *DatatypeFactory) SomeValue(s ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := f.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
 	set, err := f.valueSet(s)
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -217,6 +218,9 @@ func (f *DatatypeFactory) almostFresh(s ast.ASTHandle) (ast.ASTHandle, error) {
 	return ast.ASTHandle{}, nil
 }
 func (f *DatatypeFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := f.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
 	set, err := f.valueSet(s)
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -318,13 +322,37 @@ func (f *DatatypeFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	}
 }
 func (f *DatatypeFactory) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
+	if err := f.open(); err != nil {
+		return false, err
+	}
 	return f.structuredFactory.SomeValues(s, f, first, second)
 }
-func (f *DatatypeFactory) Close() error {
-	f.last = nil
-	var err error
-	if f.utility != nil {
-		err = f.utility.Close()
+func (f *DatatypeFactory) open() error {
+	if f == nil || f.closing {
+		return ast.ErrASTHandle
 	}
-	return errors.Join(err, f.structuredFactory.Close())
+	return f.structuredFactory.open()
+}
+
+func (f *DatatypeFactory) RegisterValue(value ast.ASTHandle) error {
+	if err := f.open(); err != nil {
+		return err
+	}
+	return f.structuredFactory.RegisterValue(value)
+}
+
+// Source destroys m_last_fresh_value and m_util before the struct_factory
+// base. A stopped utility remains the active member on the owning retry.
+func (f *DatatypeFactory) Close() error {
+	if f == nil {
+		return nil
+	}
+	f.closing = true
+	f.last = nil
+	if f.utility != nil {
+		if err := f.utility.Close(); err != nil {
+			return err
+		}
+	}
+	return f.structuredFactory.Close()
 }

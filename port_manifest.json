@@ -16391,7 +16391,8 @@
         "pkg/ast/ast_datatype_plugin_source_test.go",
         "pkg/ast/ast_datatype_util.go",
         "pkg/ast/ast_datatype_util_test.go",
-        "pkg/ast/ast_datatype_util_reset_test.go"
+        "pkg/ast/ast_datatype_util_reset_test.go",
+        "pkg/ast/ast_datatype_util_teardown_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16406,7 +16407,8 @@
         "TestASTTranslationInheritsDatatypeDefinitions",
         "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
         "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
-        "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference"
+        "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
+        "TestDatatypeUtilInterruptedTeardown"
       ],
       "assertions": [
         {
@@ -16609,7 +16611,8 @@
           ],
           "tests": [
             "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
-            "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
+            "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
+            "TestDatatypeUtilInterruptedTeardown"
           ]
         },
         {
@@ -16621,18 +16624,19 @@
             "pkg/ast/ast_datatype_util_reset_test.go"
           ],
           "tests": [
-            "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference"
+            "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
+            "TestDatatypeUtilInterruptedTeardown"
           ]
         }
       ],
       "ownership": [
         "The plugin owns datatype definition maps and pins every retained definition sort, formal parameter, and accessor range. Finalization releases those pins in reverse acquisition order before clearing the native Go maps and slices. Translation snapshots definitions without retaining source pointers, then destination definitions acquire their own translated sort references. Declaration and description query results remain borrowed manager nodes.",
-        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in reverse order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache.",
+        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in forward source ref_vector order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache.",
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
       ],
       "deviations": [
         "Private utility memoization maps are omitted because concrete Go queries reconstruct hash-consed declarations and compute recursion/enum properties directly. The unused plugin remove entry point and undeclared get_datatype_size declaration are not ported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed.",
-        "Corrective retained-consumer review withdraws whole-unit audited completion: the concrete DatatypeFactory utility member reaches Go DatatypeUtil.releasePreferences, which still releases references in reverse order instead of the source m_asts forward ref_vector order and can revisit a zero token after a consumed failure. Source reset clears caches before m_asts.reset, while Go clears the constructor cache afterward. DatatypeFactory.Close also joins a utility error with base destruction rather than modeling an explicit member-before-base continuation. These specific utility/order/failure prefixes remain unported and are not closed by the separate normal struct_factory base teardown increment. Read-only evidence: /mnt/oldrog/tmp/g3-structured-teardown-evidence/next-datatype-util-owner-review.json."
+        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: utility construction/get_non_rec_constructor source assertions, util_bug trace, pin-publication failure prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself."
       ]
     },
     {
@@ -16655,7 +16659,8 @@
         "pkg/ast/ast_datatype_plugin.go",
         "pkg/ast/ast_datatype_util.go",
         "pkg/ast/ast_datatype_util_test.go",
-        "pkg/ast/ast_datatype_util_reset_test.go"
+        "pkg/ast/ast_datatype_util_reset_test.go",
+        "pkg/ast/ast_datatype_util_teardown_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16669,7 +16674,8 @@
         "TestASTTranslationInheritsDatatypeDefinitions",
         "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
         "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
-        "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference"
+        "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
+        "TestDatatypeUtilInterruptedTeardown"
       ],
       "conditionals": [
         {
@@ -16764,7 +16770,8 @@
           ],
           "tests": [
             "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
-            "TestDatatypeUtilStoppedPinPrefixesAreNotPublished"
+            "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
+            "TestDatatypeUtilInterruptedTeardown"
           ]
         },
         {
@@ -16776,18 +16783,19 @@
             "pkg/ast/ast_datatype_util_reset_test.go"
           ],
           "tests": [
-            "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference"
+            "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
+            "TestDatatypeUtilInterruptedTeardown"
           ]
         }
       ],
       "ownership": [
         "Datatype declaration parameters and domain/range handles are borrowed. Definition records pin their retained sorts; AST factories copy declaration information and own the resulting nodes through the manager. Exported definition descriptions contain borrowed handles and copied native slices.",
-        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in reverse order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache.",
+        "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in forward source ref_vector order. Copied Go owners are rejected. The AST plugin owns its separate cache and node pins through its existing plugin-owned reference vector; finalization releases those pins and clears the cache.",
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query."
       ],
       "deviations": [
         "Private utility caches, the unused plugin remove entry point, and the undeclared get_datatype_size implementation are omitted under the retained-consumer rule. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes.",
-        "Corrective retained-consumer review withdraws whole-unit audited completion: the concrete DatatypeFactory utility member reaches Go DatatypeUtil.releasePreferences, which still releases references in reverse order instead of the source m_asts forward ref_vector order and can revisit a zero token after a consumed failure. Source reset clears caches before m_asts.reset, while Go clears the constructor cache afterward. DatatypeFactory.Close also joins a utility error with base destruction rather than modeling an explicit member-before-base continuation. These specific utility/order/failure prefixes remain unported and are not closed by the separate normal struct_factory base teardown increment. Read-only evidence: /mnt/oldrog/tmp/g3-structured-teardown-evidence/next-datatype-util-owner-review.json."
+        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: utility construction/get_non_rec_constructor source assertions, util_bug trace, pin-publication failure prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself."
       ]
     },
     {
@@ -113628,7 +113636,7 @@
       "path": "src/smt/proto_model/datatype_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/proto_model/datatype_factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
@@ -113640,7 +113648,8 @@
         "pkg/smtcore/proto_model/array_factory.go",
         "pkg/smtcore/proto_model/factory_release_order_source_test.go",
         "pkg/smtcore/proto_model/factory_release_failure_source_test.go",
-        "pkg/smtcore/proto_model/structured_teardown_source_test.go"
+        "pkg/smtcore/proto_model/structured_teardown_source_test.go",
+        "pkg/smtcore/proto_model/datatype_teardown_source_test.go"
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
@@ -113659,7 +113668,8 @@
         "TestFactoryRealNumeralReleaseFailureRetry",
         "TestStructuredFactoryClosedRegistryCannotRevive",
         "TestStructuredFactoryValueSetActualAssertionOwner",
-        "TestStructuredFactoryRetryRetainsUnconsumedReferences"
+        "TestStructuredFactoryRetryRetainsUnconsumedReferences",
+        "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown"
       ],
       "assertions": [
         {
@@ -113691,8 +113701,8 @@
           "text": "SASSERT(!m_util.is_recursive(s));"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "nonrecursive representatives, fresh argument search, recursive sibling growth, almost-fresh construction, and subterm guard",
@@ -113754,6 +113764,14 @@
             "TestStructuredFactoryValueSetActualAssertionOwner",
             "TestStructuredFactoryRetryRetainsUnconsumedReferences"
           ]
+        },
+        {
+          "name": "Datatype utility member-before-base destruction barrier and explicit Go owning Close continuation; closing registry operations reject use before utility completion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/datatype_factory.go",
+          "tests": [
+            "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown"
+          ]
         }
       ],
       "ownership": [
@@ -113761,14 +113779,15 @@
         "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime."
       ],
       "deviations": [
-        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment."
+        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
+        "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations."
       ]
     },
     {
       "path": "src/smt/proto_model/datatype_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/proto_model/datatype_factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
@@ -113780,7 +113799,8 @@
         "pkg/smtcore/proto_model/array_factory.go",
         "pkg/smtcore/proto_model/factory_release_order_source_test.go",
         "pkg/smtcore/proto_model/factory_release_failure_source_test.go",
-        "pkg/smtcore/proto_model/structured_teardown_source_test.go"
+        "pkg/smtcore/proto_model/structured_teardown_source_test.go",
+        "pkg/smtcore/proto_model/datatype_teardown_source_test.go"
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
@@ -113799,7 +113819,8 @@
         "TestFactoryRealNumeralReleaseFailureRetry",
         "TestStructuredFactoryClosedRegistryCannotRevive",
         "TestStructuredFactoryValueSetActualAssertionOwner",
-        "TestStructuredFactoryRetryRetainsUnconsumedReferences"
+        "TestStructuredFactoryRetryRetainsUnconsumedReferences",
+        "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown"
       ],
       "conditionals": [
         {
@@ -113811,8 +113832,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "datatype factory construction and some/fresh value interface",
@@ -113874,6 +113895,14 @@
             "TestStructuredFactoryValueSetActualAssertionOwner",
             "TestStructuredFactoryRetryRetainsUnconsumedReferences"
           ]
+        },
+        {
+          "name": "Datatype utility member-before-base destruction barrier and explicit Go owning Close continuation; closing registry operations reject use before utility completion",
+          "status": "ported",
+          "go_target": "pkg/smtcore/proto_model/datatype_factory.go",
+          "tests": [
+            "TestDatatypeFactoryUtilityStopsBeforeBaseTeardown"
+          ]
         }
       ],
       "ownership": [
@@ -113881,7 +113910,8 @@
         "DatatypeFactory owns its DatatypeUtil independently of AST-plugin and SMT-theory utilities and closes it before its structuredFactory base. The utility cache retains sort/declaration pins for the factory lifetime."
       ],
       "deviations": [
-        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment."
+        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
+        "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations."
       ]
     },
     {
