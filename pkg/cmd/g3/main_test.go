@@ -338,7 +338,11 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
- "dt2bv_models_scopes.smt2": "sat\n((x green))\nunsat\n(chosen clash)\nsat\n((x green))\nsat\n((x amber))\n",
+	"fd_weighted_pb.smt2":                          "sat\n((p true) (q true) (r false))\nunsat\nsat\n",
+	"fd_unbounded_unknown.smt2":                    "unknown\n",
+	"fd_wide_offset_model.smt2":                    "sat\n((x 36893488147419103233))\n",
+	"fd_mixed_scopes_models.smt2":                  "sat\n((n 2) (colour green) (p true) (q true) (r false))\nunsat\n(too-small)\nsat\n((n 2) (colour green))\nsat\nunsat\nsat\n",
+	"dt2bv_models_scopes.smt2":                     "sat\n((x green))\nunsat\n(chosen clash)\nsat\n((x green))\nsat\n((x amber))\n",
 	"fpa_canonical_model_scopes.smt2":              "sat\n(((= (fp.to_ieee_bv x) #b1011001) true)\n ((fp.isNormal x) true)\n ((= rm RNA) true))\nunsat\nsat\n(((fp.isZero x) true)\n ((fp.isNegative x) true))\nsat\n(((fp.isNaN x) true)\n ((= rm RNA) true))\n",
 	"user_universe_factory_scopes.smt2":            "sat\n(((distinct a b c) true)\n ((= (f a) b) true)\n ((= (f b) c) true)\n ((= (f c) a) true))\nunsat\nsat\n(((distinct a b c) true)\n ((= (f a) b) true))\n",
 	"bv_native_operator_models.smt2":               "sat\n((a #xa)\n ((bvadd a b c) #xe)\n ((bvsub a b) #x7)\n ((bvmul a b c) #xe)\n ((bvudiv a b) #x3)\n ((bvurem a b) #x1)\n ((bvsdiv a b) #xe)\n ((bvsrem a b) #x0)\n ((bvsmod a b) #x0)\n ((bvshl a b) #x0)\n ((bvlshr a b) #x1)\n ((bvashr a b) #xf)\n ((ext_rotate_left a b) #x5)\n ((ext_rotate_right a b) #x5)\n ((bvumul_noovfl a b) false)\n ((bvsmul_noovfl a b) false)\n ((bvsmul_noudfl a b) false)\n ((bvredor a) #b1)\n ((bvredand a) #b0))\nunsat\nsat\nunsat\nsat\n",

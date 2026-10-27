@@ -1,0 +1,8 @@
+(set-option :produce-models true)
+(set-logic QF_FD)
+(declare-const x Int)
+(assert (>= x 36893488147419103232))
+(assert (<= x 36893488147419103235))
+(assert (= x 36893488147419103233))
+(check-sat)
+(get-value (x))

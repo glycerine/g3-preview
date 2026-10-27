@@ -345,6 +345,20 @@ func (c *Context) mkSolver(m *ast.ASTManager) error {
 		return err
 	}
 	switch c.logic {
+	case "QF_FD", "SAT":
+		enabled, e := m.ProofsEnabled()
+		if e != nil {
+			return e
+		}
+		if !enabled {
+			c.solver, err = portfolio.NewFDSolverWithOutput(m, &c.params, c.config.ModelEvaluator, contextRegularOutput{c})
+		} else {
+			var direct *smtcore.SMTSolver
+			direct, err = smtcore.NewSMTSolver(m, &c.params, c.logic, c.config)
+			if err == nil {
+				c.solver = direct
+			}
+		}
 	case "UFNIA":
 		c.solver, err = portfolio.NewUFNIAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "UFLRA":
@@ -771,6 +785,10 @@ func (c *Context) Reset() error {
 // Also used by Close, including partial context construction where valid()
 // cannot succeed yet. Parameter services belong to the enclosing context.
 func (c *Context) resetManagerState() error {
+	var construction *portfolio.FDConstructionFailure
+	if errors.As(c.initializationError, &construction) && construction.CleanupPending() {
+		return construction
+	}
 	if err := c.clearCheckSatResult(); err != nil {
 		return err
 	}

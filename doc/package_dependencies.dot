@@ -518,6 +518,7 @@ digraph packages {
   "tactic/portfolio" -> "ast";
   "tactic/portfolio" -> "ast/rewriter";
   "tactic/portfolio" -> "model";
+  "tactic/portfolio" -> "sat/sat_solver";
   "tactic/portfolio" -> "smtcore";
   "tactic/portfolio" -> "solver";
   "tactic/portfolio" -> "tactic";

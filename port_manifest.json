@@ -41588,7 +41588,14 @@
         "pkg/smtcore/smt_setup_lra_backend_test.go",
         "pkg/cmd_context/statistics_test.go",
         "pkg/cmd/g3/lra_backend_test.go",
-        "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2",
+        "pkg/tactic/portfolio/fd_solver.go",
+        "pkg/tactic/portfolio/fd_solver_test.go",
+        "pkg/cmd_context/fd_solver_test.go",
+        "pkg/cmd/g3/test_vectors/fd_mixed_scopes_models.smt2",
+        "pkg/cmd/g3/test_vectors/fd_weighted_pb.smt2",
+        "pkg/cmd/g3/test_vectors/fd_wide_offset_model.smt2",
+        "pkg/cmd/g3/test_vectors/fd_unbounded_unknown.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -41673,7 +41680,13 @@
         "TestSMTLibRunnerConcreteLRASmoke",
         "TestSMTLibRunnerConcreteLRAIsIntNormalization",
         "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
-        "TestSMTLibRunnerConcreteLRADefaultSelection"
+        "TestSMTLibRunnerConcreteLRADefaultSelection",
+        "TestFDSolverRetainedMixedStackAndScopes",
+        "TestFDSolverConstructorRefusals",
+        "TestFDSolverMixedConsequencesAndModelAfterClose",
+        "TestFDSolverWideWeightedPseudoBooleanTruthTable",
+        "TestCommandContextFiniteDomainSolverProofGate",
+        "TestCommandContextFiniteDomainStoppedConstructorPreservesManager"
       ],
       "conditionals": [
         {
@@ -42470,6 +42483,21 @@
           ],
           "tests": [
             "TestSMT2LogicValidationCPP",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained QF_FD special solver selection uses actual FD stack when manager proofs are disabled; retain pending factory cleanup before command manager retirement",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/portfolio/fd_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/fd_solver_test.go"
+          ],
+          "tests": [
+            "TestCommandContextFiniteDomainSolverProofGate",
+            "TestCommandContextFiniteDomainStoppedConstructorPreservesManager",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -167233,7 +167261,7 @@
       ],
       "deviations": [
         "Uses native Go slices/maps and exact big.Rat arithmetic; no STL implementation or generic adapter. max_bv_size is read by the concrete context constructor only. Source parameter updates copy base values and forward to backend, without refreshing that constructor scalar. Source left-tail conjunction flattening, lazy flush boundaries, failed forwarding prefixes, Pop0 behavior, source width formula and zero-offset range-guard omission are retained. Consequences use actual num+offset, despite the source explanatory comment describing subtraction. Translate only translates backend and starts a fresh wrapper, without flushing/copying pending input or source mappings.",
-        "Executable wrapper is available for explicit composition and passes bounded model/core/scope/oracle checks, but the FD default dispatcher/inc_sat consumer is not yet connected. Source TRACE/SASSERT/VERIFY gates, exact source lexical rational/ref local lifetimes and physical vector/map allocation/refusal behavior remain unaudited; therefore both whole-unit audit flags stay false. Call scopes currently retain AST intermediates through output handoff and preserve failed numeral cleanup, without claiming exact source local lifetimes. Shared symbol/numeral-service translation is tested; arbitrary service-remapping translation is not claimed. Prebuilt C++ QF_FD comparisons cover 24 bounded nonlinear cases, not complete solver equivalence."
+        "The FD factory now composes this wrapper with PB, enum and the existing incremental SAT implementation; QF_FD command routing selects that stack without proofs. Source TRACE/SASSERT/VERIFY gates, exact source lexical rational/ref local lifetimes and physical vector/map allocation/refusal behavior remain unaudited; therefore both whole-unit audit flags stay false. Call scopes currently retain AST intermediates through output handoff and preserve failed numeral cleanup, without claiming exact source local lifetimes. Shared symbol/numeral-service translation is tested; arbitrary service-remapping translation is not claimed. Prebuilt C++ QF_FD comparisons cover 24 bounded nonlinear cases, not complete solver equivalence."
       ]
     },
     {
@@ -167287,7 +167315,7 @@
       ],
       "deviations": [
         "Uses native Go slices/maps and exact big.Rat arithmetic; no STL implementation or generic adapter. max_bv_size is read by the concrete context constructor only. Source parameter updates copy base values and forward to backend, without refreshing that constructor scalar. Source left-tail conjunction flattening, lazy flush boundaries, failed forwarding prefixes, Pop0 behavior, source width formula and zero-offset range-guard omission are retained. Consequences use actual num+offset, despite the source explanatory comment describing subtraction. Translate only translates backend and starts a fresh wrapper, without flushing/copying pending input or source mappings.",
-        "Executable wrapper is available for explicit composition and passes bounded model/core/scope/oracle checks, but the FD default dispatcher/inc_sat consumer is not yet connected. Source TRACE/SASSERT/VERIFY gates, exact source lexical rational/ref local lifetimes and physical vector/map allocation/refusal behavior remain unaudited; therefore both whole-unit audit flags stay false. Call scopes currently retain AST intermediates through output handoff and preserve failed numeral cleanup, without claiming exact source local lifetimes. Shared symbol/numeral-service translation is tested; arbitrary service-remapping translation is not claimed. Prebuilt C++ QF_FD comparisons cover 24 bounded nonlinear cases, not complete solver equivalence."
+        "The FD factory now composes this wrapper with PB, enum and the existing incremental SAT implementation; QF_FD command routing selects that stack without proofs. Source TRACE/SASSERT/VERIFY gates, exact source lexical rational/ref local lifetimes and physical vector/map allocation/refusal behavior remain unaudited; therefore both whole-unit audit flags stay false. Call scopes currently retain AST intermediates through output handoff and preserve failed numeral cleanup, without claiming exact source local lifetimes. Shared symbol/numeral-service translation is tested; arbitrary service-remapping translation is not claimed. Prebuilt C++ QF_FD comparisons cover 24 bounded nonlinear cases, not complete solver equivalence."
       ]
     },
     {
@@ -167387,7 +167415,7 @@
         "The nonvirtual check_sat_result status remains owned by the wrapper base and starts Undef. Explicit SetStatus affects only that base; backend checks/SetStatus do not mutate it. Other virtual result operations remain forwarded as in enum2bv_solver.cpp. Tests distinguish this from the former accidental status forwarding."
       ],
       "deviations": [
-        "The source fd_solver pipeline also requires inc_sat_solver, pb2bv_solver and bounded_int2bv_solver integration. This increment exposes the concrete enum wrapper but does not redirect QF_FD/SAT defaults to an incomplete replacement pipeline. C++ QF_FD oracle cases compare this wrapper plus the actual Go SMT backend against the C++ full FD pipeline only on pure enum/Boolean scenarios. Status/model/consequence text matches canonically; named cores compare exact membership because the actual backends return opposite label order.",
+        "The source FD pipeline is now composed by fd_solver.go and selected by proof-disabled QF_FD command sessions. The following earlier standalone-wrapper oracle scope remains narrower than the dedicated FD integration evidence. C++ QF_FD oracle cases compare this wrapper plus the actual Go SMT backend against the C++ full FD pipeline only on pure enum/Boolean scenarios. Status/model/consequence text matches canonically; named cores compare exact membership because the actual backends return opposite label order.",
         "Go errors retain actual reached prefixes and provide explicit Close continuation. Whole-unit audit remains partial for inherited NamedAssertions lexical/diagnostic/exception details, cross-runtime translation, source VERIFY failure transport, arbitrary backend consumed-decrement behavior and physical numerical cleanup. Non-implication consequence outputs are rejected at the source defined VERIFY precondition; ordinary retained backends return implication-shaped results."
       ]
     },
@@ -167452,7 +167480,7 @@
         "The nonvirtual check_sat_result status remains owned by the wrapper base and starts Undef. Explicit SetStatus affects only that base; backend checks/SetStatus do not mutate it. Other virtual result operations remain forwarded as in enum2bv_solver.cpp. Tests distinguish this from the former accidental status forwarding."
       ],
       "deviations": [
-        "The source fd_solver pipeline also requires inc_sat_solver, pb2bv_solver and bounded_int2bv_solver integration. This increment exposes the concrete enum wrapper but does not redirect QF_FD/SAT defaults to an incomplete replacement pipeline. C++ QF_FD oracle cases compare this wrapper plus the actual Go SMT backend against the C++ full FD pipeline only on pure enum/Boolean scenarios. Status/model/consequence text matches canonically; named cores compare exact membership because the actual backends return opposite label order.",
+        "The source FD pipeline is now composed by fd_solver.go and selected by proof-disabled QF_FD command sessions. The following earlier standalone-wrapper oracle scope remains narrower than the dedicated FD integration evidence. C++ QF_FD oracle cases compare this wrapper plus the actual Go SMT backend against the C++ full FD pipeline only on pure enum/Boolean scenarios. Status/model/consequence text matches canonically; named cores compare exact membership because the actual backends return opposite label order.",
         "Go errors retain actual reached prefixes and provide explicit Close continuation. Whole-unit audit remains partial for inherited NamedAssertions lexical/diagnostic/exception details, cross-runtime translation, source VERIFY failure transport, arbitrary backend consumed-decrement behavior and physical numerical cleanup. Non-implication consequence outputs are rejected at the source defined VERIFY precondition; ordinary retained backends return implication-shaped results."
       ]
     },
@@ -167460,22 +167488,83 @@
       "path": "src/tactic/portfolio/fd_solver.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/fd_solver.go",
+        "pkg/tactic/portfolio/fd_solver_test.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/fd_solver_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/fd_mixed_scopes_models.smt2",
+        "pkg/cmd/g3/test_vectors/fd_weighted_pb.smt2",
+        "pkg/cmd/g3/test_vectors/fd_wide_offset_model.smt2",
+        "pkg/cmd/g3/test_vectors/fd_unbounded_unknown.smt2"
+      ],
+      "tests": [
+        "TestFDSolverRetainedMixedStackAndScopes",
+        "TestFDSolverConstructorRefusals",
+        "TestFDSolverMixedConsequencesAndModelAfterClose",
+        "TestFDSolverWideWeightedPseudoBooleanTruthTable",
+        "TestCommandContextFiniteDomainSolverProofGate",
+        "TestCommandContextFiniteDomainStoppedConstructorPreservesManager",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestFDSolverSortingNetworkStatisticsAndFiltering"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mk_fd_solver composes retained incremental SAT, enum, PB and bounded integer wrappers in source order",
+          "status": "ported",
+          "go_target": "pkg/tactic/portfolio/fd_solver.go",
+          "tests": [
+            "TestFDSolverRetainedMixedStackAndScopes",
+            "TestFDSolverConstructorRefusals",
+            "TestFDSolverMixedConsequencesAndModelAfterClose",
+            "TestFDSolverWideWeightedPseudoBooleanTruthTable",
+            "TestCommandContextFiniteDomainSolverProofGate",
+            "TestCommandContextFiniteDomainStoppedConstructorPreservesManager",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestFDSolverSortingNetworkStatisticsAndFiltering"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each wrapper constructor retains the previous solver. Factory returns the outer bounded wrapper; on failure the latest constructed owner is closed or retained in FDConstructionFailure. Explicit Cleanup acknowledges an observed concrete incremental-SAT destructor receipt before retrying its wrapper; ordinary construction/Close does not suppress the original failure. Command context preserves manager/services while that receipt owns pending state. Constructor reservation-prefix census checks exact budget/parameter reference balance through successful construction in native and tagged profiles."
+      ],
+      "deviations": [
+        "Uses existing concrete NewIncrementalSolver implementation, already present in pkg/sat/sat_solver before this increment, rather than substituting the general SMT backend. Earlier progress notes claiming it still required porting were stale. QF_FD command routing now selects the retained stack only when manager proofs are disabled; proof-enabled sessions retain their previous SMT route. The source special factory also recognizes internal SAT logic, but source supported_logic and the C++ command context reject set-logic SAT; CLI recognition was not broadened. Full strategic-factory/API/Horn/optimization integration and audit of underlying partial wrapper units remain open; no whole-engine completion claim."
+      ]
     },
     {
       "path": "src/tactic/portfolio/fd_solver.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/fd_solver.go",
+        "pkg/tactic/portfolio/fd_solver_test.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/fd_solver_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/fd_mixed_scopes_models.smt2",
+        "pkg/cmd/g3/test_vectors/fd_weighted_pb.smt2",
+        "pkg/cmd/g3/test_vectors/fd_wide_offset_model.smt2",
+        "pkg/cmd/g3/test_vectors/fd_unbounded_unknown.smt2"
+      ],
+      "tests": [
+        "TestFDSolverRetainedMixedStackAndScopes",
+        "TestFDSolverConstructorRefusals",
+        "TestFDSolverMixedConsequencesAndModelAfterClose",
+        "TestFDSolverWideWeightedPseudoBooleanTruthTable",
+        "TestCommandContextFiniteDomainSolverProofGate",
+        "TestCommandContextFiniteDomainStoppedConstructorPreservesManager",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestFDSolverSortingNetworkStatisticsAndFiltering"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -167488,9 +167577,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mk_fd_solver composes retained incremental SAT, enum, PB and bounded integer wrappers in source order",
+          "status": "ported",
+          "go_target": "pkg/tactic/portfolio/fd_solver.go",
+          "tests": [
+            "TestFDSolverRetainedMixedStackAndScopes",
+            "TestFDSolverConstructorRefusals",
+            "TestFDSolverMixedConsequencesAndModelAfterClose",
+            "TestFDSolverWideWeightedPseudoBooleanTruthTable",
+            "TestCommandContextFiniteDomainSolverProofGate",
+            "TestCommandContextFiniteDomainStoppedConstructorPreservesManager",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference",
+            "TestFDSolverSortingNetworkStatisticsAndFiltering"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each wrapper constructor retains the previous solver. Factory returns the outer bounded wrapper; on failure the latest constructed owner is closed or retained in FDConstructionFailure. Explicit Cleanup acknowledges an observed concrete incremental-SAT destructor receipt before retrying its wrapper; ordinary construction/Close does not suppress the original failure. Command context preserves manager/services while that receipt owns pending state. Constructor reservation-prefix census checks exact budget/parameter reference balance through successful construction in native and tagged profiles."
+      ],
+      "deviations": [
+        "Uses existing concrete NewIncrementalSolver implementation, already present in pkg/sat/sat_solver before this increment, rather than substituting the general SMT backend. Earlier progress notes claiming it still required porting were stale. QF_FD command routing now selects the retained stack only when manager proofs are disabled; proof-enabled sessions retain their previous SMT route. The source special factory also recognizes internal SAT logic, but source supported_logic and the C++ command context reject set-logic SAT; CLI recognition was not broadened. Full strategic-factory/API/Horn/optimization integration and audit of underlying partial wrapper units remain open; no whole-engine completion claim."
+      ]
     },
     {
       "path": "src/tactic/portfolio/pb2bv_solver.cpp",
@@ -167708,7 +167818,14 @@
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
         "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2",
+        "pkg/tactic/portfolio/fd_solver.go",
+        "pkg/tactic/portfolio/fd_solver_test.go",
+        "pkg/cmd_context/fd_solver_test.go",
+        "pkg/cmd/g3/test_vectors/fd_mixed_scopes_models.smt2",
+        "pkg/cmd/g3/test_vectors/fd_weighted_pb.smt2",
+        "pkg/cmd/g3/test_vectors/fd_wide_offset_model.smt2",
+        "pkg/cmd/g3/test_vectors/fd_unbounded_unknown.smt2"
       ],
       "tests": [
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
@@ -167744,7 +167861,13 @@
         "TestAUFLIAQICostTraceAndClosedOutput",
         "TestQuantifiedArithmeticTranslatedProofAndCore",
         "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
-        "TestSMTLibRunnerAUFLIAExpressionLimit"
+        "TestSMTLibRunnerAUFLIAExpressionLimit",
+        "TestFDSolverRetainedMixedStackAndScopes",
+        "TestFDSolverConstructorRefusals",
+        "TestFDSolverMixedConsequencesAndModelAfterClose",
+        "TestFDSolverWideWeightedPseudoBooleanTruthTable",
+        "TestCommandContextFiniteDomainSolverProofGate",
+        "TestCommandContextFiniteDomainStoppedConstructorPreservesManager"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -168030,6 +168153,21 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Retained QF_FD special solver selection uses actual FD stack when manager proofs are disabled; retain pending factory cleanup before command manager retirement",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/portfolio/fd_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/fd_solver_test.go"
+          ],
+          "tests": [
+            "TestCommandContextFiniteDomainSolverProofGate",
+            "TestCommandContextFiniteDomainStoppedConstructorPreservesManager",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
@@ -168077,7 +168215,14 @@
         "pkg/cmd/g3/test_vectors/quant_uflra_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/quant_uflra_proof.smt2",
         "pkg/cmd/g3/test_vectors/quant_ufnia_models_scopes.smt2",
-        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2"
+        "pkg/cmd/g3/test_vectors/quant_ufnia_core.smt2",
+        "pkg/tactic/portfolio/fd_solver.go",
+        "pkg/tactic/portfolio/fd_solver_test.go",
+        "pkg/cmd_context/fd_solver_test.go",
+        "pkg/cmd/g3/test_vectors/fd_mixed_scopes_models.smt2",
+        "pkg/cmd/g3/test_vectors/fd_weighted_pb.smt2",
+        "pkg/cmd/g3/test_vectors/fd_wide_offset_model.smt2",
+        "pkg/cmd/g3/test_vectors/fd_unbounded_unknown.smt2"
       ],
       "tests": [
         "TestCommandContextQFLIACombinedSolverProofResult",
@@ -168090,7 +168235,13 @@
         "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
         "TestSMTLibRunnerAUFLIAExpressionLimit",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestFDSolverRetainedMixedStackAndScopes",
+        "TestFDSolverConstructorRefusals",
+        "TestFDSolverMixedConsequencesAndModelAfterClose",
+        "TestFDSolverWideWeightedPseudoBooleanTruthTable",
+        "TestCommandContextFiniteDomainSolverProofGate",
+        "TestCommandContextFiniteDomainStoppedConstructorPreservesManager"
       ],
       "conditionals": [
         {
@@ -168193,6 +168344,21 @@
             "TestQuantifiedArithmeticAllocationFrontiers",
             "TestQuantifiedArithmeticTranslatedProofAndCore",
             "TestSMTLibRunnerQuantifiedArithmeticBranchEvidence",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained QF_FD special solver selection uses actual FD stack when manager proofs are disabled; retain pending factory cleanup before command manager retirement",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/portfolio/fd_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/fd_solver_test.go"
+          ],
+          "tests": [
+            "TestCommandContextFiniteDomainSolverProofGate",
+            "TestCommandContextFiniteDomainStoppedConstructorPreservesManager",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]

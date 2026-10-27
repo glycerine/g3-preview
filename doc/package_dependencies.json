@@ -3268,6 +3268,7 @@
         "ast",
         "ast/rewriter",
         "model",
+        "sat/sat_solver",
         "smtcore",
         "solver",
         "tactic",
@@ -3285,6 +3286,7 @@
         "bounded_int2bv_conversion.go",
         "bounded_int2bv_solver.go",
         "enum2bv_solver.go",
+        "fd_solver.go",
         "pb2bv_solver.go",
         "smt_strategic_solver.go"
       ]
