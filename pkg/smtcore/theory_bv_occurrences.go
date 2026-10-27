@@ -254,29 +254,8 @@ func (t *SMTBitVectorTheory) internalizeBitProjection(expression ast.ASTHandle) 
 	if err = t.addBitOccurrence(variable, node.TheoryVar(t.FamilyID()), index); err != nil {
 		return false, err
 	}
-	definition := bits[index]
-	if definition != expression {
-		if err = s.Internalize(definition, true); err != nil {
-			return false, err
-		}
-		defined, err := s.Literal(definition)
-		if err != nil {
-			return false, err
-		}
-		literal := NewSMTLiteral(variable, false)
-		if err = s.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal.Negated(), defined}); err != nil {
-			return false, err
-		}
-		if err = s.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()}); err != nil {
-			return false, err
-		}
-		t.statistics.bit2core++
-		if s.relevancy != nil {
-			if err = s.relevancy.AddDependency(expression, definition); err != nil {
-				return false, err
-			}
-		}
-	}
+	// Native mk_bit2bool publishes an atom/occurrence only. Canonical
+	// bits and retained callers supply their own native equality axioms.
 	return true, nil
 }
 

@@ -64,16 +64,25 @@ func TestSMTBitVectorNumeralEquality(t *testing.T) {
 }
 
 func TestSMTBitVectorNumeralBit2Bool(t *testing.T) {
-	m, _, solver := smtBVSolver(t)
+	m, state, theory := bvOccurrenceFixture(t)
 	value, err := m.BitVectorNumeralUint64(2, 3)
 	astTestMust(t, err)
 	zeroBit, err := m.MkBitVectorBit2Bool(0, value)
 	astTestMust(t, err)
-	astTestMust(t, solver.Assert(zeroBit))
-	status, err := solver.CheckSat(nil)
+	astTestMust(t, state.Internalize(zeroBit, true))
+	literal, err := state.Literal(zeroBit)
 	astTestMust(t, err)
-	if status != lbool.False {
-		t.Fatal("false numeral bit", status)
+	assignment, err := state.Assignment(literal)
+	astTestMust(t, err)
+	variable := state.context.enodes[value].TheoryVar(theory.FamilyID())
+	want := []SMTLiteral{SMTFalseLiteral, SMTTrueLiteral, SMTFalseLiteral}
+	if assignment != lbool.Undef || len(state.clauses) != 0 || theory.statistics.bit2core != 0 {
+		t.Fatal("source internal numeral projection creates an atom without eager semantic bridge", assignment, len(state.clauses), theory.statistics)
+	}
+	for index, bit := range want {
+		if theory.bitLiterals[variable][index] != bit {
+			t.Fatal("numeral canonical bits changed", theory.bitLiterals[variable])
+		}
 	}
 }
 

@@ -75,9 +75,7 @@ func (t *SMTBitVectorTheory) findWatchedPosition(variable SMTTheoryVar) error {
 			return nil
 		}
 	}
-	// The watched-position scan is native. The existing fixed-value consumer
-	// remains pending the separate fixed_var_table/fixed_eq_justification port.
-	return t.discoverFixedEqualities()
+	return t.fixedVariable(variable)
 }
 
 func (t *SMTBitVectorTheory) propagateBits() error {
