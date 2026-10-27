@@ -17,6 +17,7 @@ type DatatypeUtil struct {
 	lists        map[ASTHandle]*datatypeConstructorList
 	lexical      ASTRef // interrupted constructor-local cleanup, separate from m_asts
 	refs         []ASTRef
+	tracePending []*datatypeTraceWriter
 	operation    uint8 // 0 ready, 1 interrupted Reset, 2 closing
 }
 
@@ -62,7 +63,7 @@ func (u *DatatypeUtil) NonRecursiveConstructor(sort ASTHandle) (ASTHandle, bool,
 }
 
 func (u *DatatypeUtil) nonRecursiveConstructor(sort ASTHandle) (ASTHandle, bool, error) {
-	if u.lexical != (ASTRef{}) {
+	if u.lexical != (ASTRef{}) || len(u.tracePending) != 0 {
 		return ASTHandle{}, false, ErrASTPending
 	}
 	m := u.manager
@@ -80,6 +81,15 @@ func (u *DatatypeUtil) nonRecursiveConstructor(sort ASTHandle) (ASTHandle, bool,
 	var found bool
 	if err == nil {
 		forbidden := []astNodeRef{r}
+		if err = u.traceDatatype(914, func(w *datatypeTraceWriter) error {
+			w.text("invoke get-non-rec: ")
+			if err := w.ast(r); err != nil {
+				return err
+			}
+			return w.end("\n")
+		}); err != nil {
+			return ASTHandle{}, false, err
+		}
 		c, found, err = m.datatypeNonRecursiveConstructorCore(r, forbidden, &u.start, u)
 		if err == nil {
 			err = datatypeUtilAssert(916, "forbidden_set.back() == ty", func() bool { return forbidden[len(forbidden)-1] == r })
@@ -137,6 +147,13 @@ func (u *DatatypeUtil) releasePreferences() error {
 }
 
 func (u *DatatypeUtil) releasePreferencesLocked() error {
+	for len(u.tracePending) != 0 {
+		i := len(u.tracePending) - 1
+		if err := u.tracePending[i].close(true); err != nil {
+			return err
+		}
+		u.tracePending = u.tracePending[:i]
+	}
 	if u.lexical != (ASTRef{}) {
 		if err := u.manager.delRef(&u.lexical); err != nil {
 			return err
@@ -258,7 +275,7 @@ func (u *DatatypeUtil) constructorList(sort astNodeRef) ([]ASTHandle, error) {
 	if err := datatypeUtilAssert(753, "is_datatype(ty)", func() bool { return m.datatypeUtilIsDatatype(sort) }); err != nil {
 		return nil, err
 	}
-	if u.lexical != (ASTRef{}) {
+	if u.lexical != (ASTRef{}) || len(u.tracePending) != 0 {
 		return nil, ErrASTPending
 	}
 	h := m.external(sort)

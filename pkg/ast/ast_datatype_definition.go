@@ -4,6 +4,7 @@ package ast
 
 import (
 	"errors"
+	"strconv"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -800,10 +801,55 @@ func (m *ASTManager) datatypeNonRecursiveConstructorCore(sort astNodeRef, forbid
 		return astNodeRef{}, false, err
 	}
 	n := uint32(len(constructors))
+	if err := utility.traceDatatype(937, func(w *datatypeTraceWriter) error {
+		w.text("get-non-rec constructor: ")
+		if err := w.ast(sort); err != nil {
+			return err
+		}
+		if err := w.end("\n"); err != nil {
+			return err
+		}
+		w.text("forbidden: ")
+		for _, s := range forbidden {
+			if err := w.ast(s); err != nil {
+				return err
+			}
+			if err := w.end(" "); err != nil {
+				return err
+			}
+		}
+		w.text("\nconstructors: ")
+		w.text(strconv.FormatUint(uint64(n), 10))
+		w.text("\n")
+		for _, h := range constructors {
+			if err := w.ast(astNodeRef{slot: h.slot, generation: h.generation}); err != nil {
+				return err
+			}
+			if err := w.end("\n"); err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		return astNodeRef{}, false, err
+	}
 	*counter++
 	start := *counter
 	for j := uint32(0); j < n; j++ {
 		h := constructors[(j+start)%n]
+		if err := utility.traceDatatype(948, func(w *datatypeTraceWriter) error {
+			w.text("checking ")
+			if err := w.ast(sort); err != nil {
+				return err
+			}
+			w.text(": ")
+			if err := w.ast(astNodeRef{slot: h.slot, generation: h.generation}); err != nil {
+				return err
+			}
+			return w.end("\n")
+		}); err != nil {
+			return astNodeRef{}, false, err
+		}
 		c := m.declAt(h.slot)
 		i := uint32(0)
 		for ; i < c.arity; i++ {
@@ -816,11 +862,31 @@ func (m *ASTManager) datatypeNonRecursiveConstructorCore(sort astNodeRef, forbid
 			}
 		}
 		if i == c.arity {
+			if err := utility.traceDatatype(953, func(w *datatypeTraceWriter) error {
+				w.text("found non-rec ")
+				if err := w.ast(astNodeRef{slot: h.slot, generation: h.generation}); err != nil {
+					return err
+				}
+				return w.end("\n")
+			}); err != nil {
+				return astNodeRef{}, false, err
+			}
 			return astNodeRef{slot: h.slot, generation: h.generation}, true, nil
 		}
 	}
 	for j := uint32(0); j < n; j++ {
 		h := constructors[(j+start)%n]
+		if err := utility.traceDatatype(960, func(w *datatypeTraceWriter) error {
+			w.text("non_rec_constructor c: ")
+			w.text(strconv.FormatUint(uint64(j), 10))
+			w.text(" ")
+			if err := w.ast(astNodeRef{slot: h.slot, generation: h.generation}); err != nil {
+				return err
+			}
+			return w.end("\n")
+		}); err != nil {
+			return astNodeRef{}, false, err
+		}
 		c := *m.declAt(h.slot)
 		i := uint32(0)
 		for ; i < c.arity; i++ {
@@ -828,14 +894,41 @@ func (m *ASTManager) datatypeNonRecursiveConstructorCore(sort astNodeRef, forbid
 			if err != nil {
 				return astNodeRef{}, false, err
 			}
+			if err := utility.traceDatatype(965, func(w *datatypeTraceWriter) error {
+				w.text("c: ")
+				w.text(strconv.FormatUint(uint64(i), 10))
+				w.text(" ")
+				if err := w.ast(field); err != nil {
+					return err
+				}
+				return w.end("\n")
+			}); err != nil {
+				return astNodeRef{}, false, err
+			}
 			if !m.datatypeUtilIsDatatype(field) {
+				if err := utility.traceDatatype(967, func(w *datatypeTraceWriter) error {
+					if err := w.ast(field); err != nil {
+						return err
+					}
+					return w.end(" is not a datatype\n")
+				}); err != nil {
+					return astNodeRef{}, false, err
+				}
 				continue
 			}
 			if datatypeForbiddenContains(forbidden, field) {
+				if err := utility.traceDatatype(971, func(w *datatypeTraceWriter) error {
+					if err := w.ast(field); err != nil {
+						return err
+					}
+					return w.end(" is in forbidden_set\n")
+				}); err != nil {
+					return astNodeRef{}, false, err
+				}
 				break
 			}
 			forbidden = append(forbidden, field)
-			_, found, err := m.datatypeNonRecursiveConstructorCore(field, forbidden, counter, utility)
+			nested, found, err := m.datatypeNonRecursiveConstructorCore(field, forbidden, counter, utility)
 			if err == nil {
 				err = datatypeUtilAssert(976, "forbidden_set.back() == T_i", func() bool { return forbidden[len(forbidden)-1] == field })
 			}
@@ -845,6 +938,17 @@ func (m *ASTManager) datatypeNonRecursiveConstructorCore(sort astNodeRef, forbid
 			}
 			if !found {
 				break
+			}
+			if err := utility.traceDatatype(980, func(w *datatypeTraceWriter) error {
+				w.text("nested_c: ")
+				name, err := m.Symbols.Display(m.declAt(nested.slot).name)
+				if err != nil {
+					return err
+				}
+				w.text(name)
+				return w.end("\n")
+			}); err != nil {
+				return astNodeRef{}, false, err
 			}
 		}
 		if i == c.arity {

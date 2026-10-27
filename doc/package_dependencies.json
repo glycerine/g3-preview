@@ -269,6 +269,7 @@
         "ast_datatype_names.go",
         "ast_datatype_plugin.go",
         "ast_datatype_util.go",
+        "ast_datatype_util_trace.go",
         "ast_datatype_utility.go",
         "ast_datatype_values.go",
         "ast_debug_ref_count.go",
