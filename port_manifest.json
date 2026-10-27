@@ -107810,12 +107810,13 @@
       "path": "src/smt/arith_eq_adapter.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_arith_eq_adapter.go",
         "pkg/smtcore/smt_arith_eq_adapter_test.go",
         "pkg/smtcore/theory_lra_bound_axioms.go",
-        "pkg/smtcore/theory_lra_eq_adapter.go"
+        "pkg/smtcore/theory_lra_eq_adapter.go",
+        "pkg/smtcore/smt_arith_eq_adapter_display_test.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
@@ -107832,7 +107833,11 @@
         "TestSMTLRABoundNearestNeighborsAndUnitAxis",
         "TestSMTLRAAxiomProofOwnershipAndPhase",
         "TestSMTLRABoundAxiomAllocationRefusalAndRetry",
-        "TestSMTLRAEqualityNativeScopeOracle"
+        "TestSMTLRAEqualityNativeScopeOracle",
+        "TestSMTArithmeticAdapterDisplayProcessedPairsAndScopes",
+        "TestSMTArithmeticAdapterDisplayEveryWriterPrefixAndGuards",
+        "TestSMTArithmeticAdapterFinalCheckTracePrecedesPropagation",
+        "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases"
       ],
       "assertions": [
         {
@@ -107883,30 +107888,62 @@
           ]
         },
         {
-          "name": "diagnostic display without a retained caller (src/smt/arith_eq_adapter.cpp:269-279)",
-          "status": "dead_deleted"
+          "name": "display_already_processed: borrowed canonical owner-ID pair records and retained final_check_eh trace caller (arith_eq_adapter.cpp:269-279; theory_arith_core.h:1475)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_adapter.go",
+          "tests": [
+            "TestSMTArithmeticAdapterDisplayProcessedPairsAndScopes",
+            "TestSMTArithmeticAdapterDisplayEveryWriterPrefixAndGuards",
+            "TestSMTArithmeticAdapterFinalCheckTracePrecedesPropagation",
+            "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases"
+          ]
         },
-        {"name": "Concrete retained LRA equality triangles and bound axioms: normalized arithmetic equality/disequality callbacks, ordered scoped pair cache, true-first phase forwarding, pair relevancy, eager restart reconstruction, cached triangle-eq proof hint, immediate four-neighbor selection and deferred grouped/sorted bound publication with Farkas coefficients and integer adjacency. Complete LRA propagation/model/setup remain open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_bound_axioms.go", "pkg/smtcore/theory_lra_eq_adapter.go", "pkg/smtcore/theory_lra_axioms_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRABoundAxiomsKindsAndIntegerAdjacency", "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict", "TestSMTLRAEqualityRestartAndRelevancy", "TestSMTLRABoundNearestNeighborsAndUnitAxis", "TestSMTLRAAxiomProofOwnershipAndPhase", "TestSMTLRABoundAxiomAllocationRefusalAndRetry", "TestSMTLRAEqualityNativeScopeOracle"]}
+        {
+          "name": "Concrete retained LRA equality triangles and bound axioms: normalized arithmetic equality/disequality callbacks, ordered scoped pair cache, true-first phase forwarding, pair relevancy, eager restart reconstruction, cached triangle-eq proof hint, immediate four-neighbor selection and deferred grouped/sorted bound publication with Farkas coefficients and integer adjacency. Complete LRA propagation/model/setup remain open.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_lra_bound_axioms.go",
+            "pkg/smtcore/theory_lra_eq_adapter.go",
+            "pkg/smtcore/theory_lra_axioms_test.go",
+            "pkg/smtcore/theory_lra_numeric_reference_test.go"
+          ],
+          "tests": [
+            "TestSMTLRABoundAxiomsKindsAndIntegerAdjacency",
+            "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict",
+            "TestSMTLRAEqualityRestartAndRelevancy",
+            "TestSMTLRABoundNearestNeighborsAndUnitAxis",
+            "TestSMTLRAAxiomProofOwnershipAndPhase",
+            "TestSMTLRABoundAxiomAllocationRefusalAndRetry",
+            "TestSMTLRAEqualityNativeScopeOracle"
+          ]
+        },
+        {
+          "name": "Remaining retained equality-adapter TRACE/SASSERT diagnostics, including mk_axioms context::display operands (arith_eq_adapter.cpp:84-236)",
+          "status": "unported"
+        }
       ],
       "ownership": [
         "The adapter borrows its owning SMTTheoryBase and enodes, owns canonical AST-handle pairs, and removes pairs when their theory scope is popped.",
-        "The typed LRA equality adapter owns its cached triangle-eq parameter and temporary AST references; the context owns internalized expressions, scoped clauses and their copied proof parameters. The adapter caches ordered owner-id pairs before recursive equality internalization, removes scoped pairs at pop and recreates eager search axioms at restart. Pending bound batches remain owned after allocation refusal and can be retried; scoped Farkas parameters retire with the clause region. Tests separate plugin-owned small-numeral cache growth from proof ownership and verify that only the cached hint survives pop, then releases on Close."
+        "The typed LRA equality adapter owns its cached triangle-eq parameter and temporary AST references; the context owns internalized expressions, scoped clauses and their copied proof parameters. The adapter caches ordered owner-id pairs before recursive equality internalization, removes scoped pairs at pop and recreates eager search axioms at restart. Pending bound batches remain owned after allocation refusal and can be retried; scoped Farkas parameters retire with the clause region. Tests separate plugin-owned small-numeral cache growth from proof ownership and verify that only the cached hint survives pop, then releases on Close.",
+        "Processed-pair display borrows the existing scoped enode AST handles without adding AST roots or cache payloads; records resolve actual owner IDs. Scope pop removes child records. Trace emission precedes general arithmetic propagation, preserves operand errors after stream badbit, and erases operands in native builds."
       ],
       "deviations": [
         "The adapter installs pair dependencies in the shared SMT relevancy propagator instead of allocating a polymorphic C++ relevancy callback.",
-        "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags."
+        "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags.",
+        "Corrected historical dead/no-caller classification: theory_arith_core.h:1475 calls display_already_processed. Pair canonicalization now compares actual owner IDs instead of Go handle slots. Native hash iteration order is unspecified, so multi-pair checks assert membership rather than STL iteration order. Direct writer prefix/short-write tests and actual final-check propagation/stream refusal/native erasure checks pass. Adapter units remain partial pending other retained diagnostics, notably full context display operands; this does not complete smtcore."
       ]
     },
     {
       "path": "src/smt/arith_eq_adapter.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/smt_arith_eq_adapter.go",
         "pkg/smtcore/smt_arith_eq_adapter_test.go",
         "pkg/smtcore/theory_lra_bound_axioms.go",
-        "pkg/smtcore/theory_lra_eq_adapter.go"
+        "pkg/smtcore/theory_lra_eq_adapter.go",
+        "pkg/smtcore/smt_arith_eq_adapter_display_test.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
@@ -107922,7 +107959,11 @@
         "TestSMTLRABoundNearestNeighborsAndUnitAxis",
         "TestSMTLRAAxiomProofOwnershipAndPhase",
         "TestSMTLRABoundAxiomAllocationRefusalAndRetry",
-        "TestSMTLRAEqualityNativeScopeOracle"
+        "TestSMTLRAEqualityNativeScopeOracle",
+        "TestSMTArithmeticAdapterDisplayProcessedPairsAndScopes",
+        "TestSMTArithmeticAdapterDisplayEveryWriterPrefixAndGuards",
+        "TestSMTArithmeticAdapterFinalCheckTracePrecedesPropagation",
+        "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases"
       ],
       "conditionals": [
         {
@@ -107956,18 +107997,49 @@
           ]
         },
         {
-          "name": "debug display surface without a retained caller",
-          "status": "dead_deleted"
+          "name": "display_already_processed: borrowed canonical owner-ID pair records and retained final_check_eh trace caller (arith_eq_adapter.cpp:269-279; theory_arith_core.h:1475)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_adapter.go",
+          "tests": [
+            "TestSMTArithmeticAdapterDisplayProcessedPairsAndScopes",
+            "TestSMTArithmeticAdapterDisplayEveryWriterPrefixAndGuards",
+            "TestSMTArithmeticAdapterFinalCheckTracePrecedesPropagation",
+            "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases"
+          ]
         },
-        {"name": "Concrete retained LRA equality triangles and bound axioms: normalized arithmetic equality/disequality callbacks, ordered scoped pair cache, true-first phase forwarding, pair relevancy, eager restart reconstruction, cached triangle-eq proof hint, immediate four-neighbor selection and deferred grouped/sorted bound publication with Farkas coefficients and integer adjacency. Complete LRA propagation/model/setup remain open.", "status": "ported", "go_targets": ["pkg/smtcore/theory_lra_bound_axioms.go", "pkg/smtcore/theory_lra_eq_adapter.go", "pkg/smtcore/theory_lra_axioms_test.go", "pkg/smtcore/theory_lra_numeric_reference_test.go"], "tests": ["TestSMTLRABoundAxiomsKindsAndIntegerAdjacency", "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict", "TestSMTLRAEqualityRestartAndRelevancy", "TestSMTLRABoundNearestNeighborsAndUnitAxis", "TestSMTLRAAxiomProofOwnershipAndPhase", "TestSMTLRABoundAxiomAllocationRefusalAndRetry", "TestSMTLRAEqualityNativeScopeOracle"]}
+        {
+          "name": "Concrete retained LRA equality triangles and bound axioms: normalized arithmetic equality/disequality callbacks, ordered scoped pair cache, true-first phase forwarding, pair relevancy, eager restart reconstruction, cached triangle-eq proof hint, immediate four-neighbor selection and deferred grouped/sorted bound publication with Farkas coefficients and integer adjacency. Complete LRA propagation/model/setup remain open.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_lra_bound_axioms.go",
+            "pkg/smtcore/theory_lra_eq_adapter.go",
+            "pkg/smtcore/theory_lra_axioms_test.go",
+            "pkg/smtcore/theory_lra_numeric_reference_test.go"
+          ],
+          "tests": [
+            "TestSMTLRABoundAxiomsKindsAndIntegerAdjacency",
+            "TestSMTLRAEqualityTrianglesCacheScopeAndNumericalConflict",
+            "TestSMTLRAEqualityRestartAndRelevancy",
+            "TestSMTLRABoundNearestNeighborsAndUnitAxis",
+            "TestSMTLRAAxiomProofOwnershipAndPhase",
+            "TestSMTLRABoundAxiomAllocationRefusalAndRetry",
+            "TestSMTLRAEqualityNativeScopeOracle"
+          ]
+        },
+        {
+          "name": "Remaining retained equality-adapter TRACE/SASSERT diagnostics, including mk_axioms context::display operands (arith_eq_adapter.cpp:84-236)",
+          "status": "unported"
+        }
       ],
       "ownership": [
         "The adapter owns its Go map, insertion trail, scope limits, and counter and borrows the owner theory.",
-        "The typed LRA equality adapter owns its cached triangle-eq parameter and temporary AST references; the context owns internalized expressions, scoped clauses and their copied proof parameters. The adapter caches ordered owner-id pairs before recursive equality internalization, removes scoped pairs at pop and recreates eager search axioms at restart. Pending bound batches remain owned after allocation refusal and can be retried; scoped Farkas parameters retire with the clause region. Tests separate plugin-owned small-numeral cache growth from proof ownership and verify that only the cached hint survives pop, then releases on Close."
+        "The typed LRA equality adapter owns its cached triangle-eq parameter and temporary AST references; the context owns internalized expressions, scoped clauses and their copied proof parameters. The adapter caches ordered owner-id pairs before recursive equality internalization, removes scoped pairs at pop and recreates eager search axioms at restart. Pending bound batches remain owned after allocation refusal and can be retried; scoped Farkas parameters retire with the clause region. Tests separate plugin-owned small-numeral cache growth from proof ownership and verify that only the cached hint survives pop, then releases on Close.",
+        "Processed-pair display borrows the existing scoped enode AST handles without adding AST roots or cache payloads; records resolve actual owner IDs. Scope pop removes child records. Trace emission precedes general arithmetic propagation, preserves operand errors after stream badbit, and erases operands in native builds."
       ],
       "deviations": [
         "A concrete non-template adapter serves the retained integer and real difference theories.",
-        "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags."
+        "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags.",
+        "Corrected historical dead/no-caller classification: theory_arith_core.h:1475 calls display_already_processed. Pair canonicalization now compares actual owner IDs instead of Go handle slots. Native hash iteration order is unspecified, so multi-pair checks assert membership rather than STL iteration order. Direct writer prefix/short-write tests and actual final-check propagation/stream refusal/native erasure checks pass. Adapter units remain partial pending other retained diagnostics, notably full context display operands; this does not complete smtcore."
       ]
     },
     {
@@ -129457,7 +129529,9 @@
         "pkg/smtcore/smt_internalizer.go",
         "pkg/smtcore/theory_arith_max_min.go",
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
-        "pkg/smtcore/smt_setup_basic_arithmetic.go"
+        "pkg/smtcore/smt_setup_basic_arithmetic.go",
+        "pkg/smtcore/smt_arith_eq_adapter.go",
+        "pkg/smtcore/smt_arith_eq_adapter_display_test.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs",
@@ -129531,7 +129605,11 @@
         "TestSMTInfiniteArithmeticSharedModelDeltaSkipsInfinity",
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
         "TestSMTLibRunnerScripts/basic_infinite_arithmetic.smt2",
-        "TestSMTLibRunnerCPPReference/basic_infinite_arithmetic.smt2"
+        "TestSMTLibRunnerCPPReference/basic_infinite_arithmetic.smt2",
+        "TestSMTArithmeticAdapterDisplayProcessedPairsAndScopes",
+        "TestSMTArithmeticAdapterDisplayEveryWriterPrefixAndGuards",
+        "TestSMTArithmeticAdapterFinalCheckTracePrecedesPropagation",
+        "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases"
       ],
       "conditionals": [
         {
@@ -130656,8 +130734,73 @@
             "TestSMTArithmeticEqualityEventsQueueNativeBoundsAndProofs"
           ]
         },
-        {"name": "mk_ge(filter_model_converter&,theory_var,inf_numeral), concrete mi_ext: exact native Boolean name/reuse guard, filtered helper declaration, full infinitesimal bound and integer unit-step complement; immediate/delayed nearest-neighbor bound axioms, integer adjacent cover, Farkas coefficients and scoped parameter ownership; exact infinitesimal row deductions during shared optimization recovery.", "status": "ported", "go_targets": ["pkg/smtcore/theory_arith_objective_bound.go", "pkg/smtcore/theory_arith_bound_axioms.go", "pkg/smtcore/theory_arith_linear.go", "pkg/smtcore/theory_arith_fixed_bounds.go", "pkg/smtcore/theory_arith_grobner.go", "pkg/smtcore/theory_arith_mixed.go", "pkg/smtcore/smt_internalizer.go"], "tests": ["TestSMTObjectiveLowerBoundExistingBooleanAndDomains", "TestSMTObjectiveLowerBoundIntegralRealCastUsesUnitStep", "TestSMTObjectiveLowerBoundRecoversSharedOptimization", "TestSMTObjectiveLowerBoundThresholdAndComplement", "TestSMTObjectiveLowerBoundCompoundOffsetAndName", "TestSMTObjectiveLowerBoundSolverScopesAndModelFilter", "TestSMTObjectiveLowerBoundRejectsImproperSupremum", "TestSMTArithmeticBoundAxiomAllocationFrontiersAndRetry", "TestSMTArithmeticBoundAxiomsKindsAndIntegerAdjacency", "TestSMTArithmeticBoundAxiomsNearestNeighborsAndAxisIdentity", "TestSMTArithmeticBoundAxiomProofParametersAndScopeOwnership"]},
-        {"name": "Retained inf_ext integration through the existing concrete mixed arithmetic tableau: mode5 setup and fresh-plugin copy selection; owned nonstandard lower-bound construction/name/complement; full infinity/rational/epsilon bound normalization, row transport, shared-value equality keys and rational-only polynomial guards; native model projection and refine_epsilon infinity skip. Scope-limited transport credit, not complete arithmetic or higher optimizer coverage.", "status": "ported", "go_targets": ["pkg/smtcore/theory_arith_linear.go", "pkg/smtcore/theory_arith_objective_bound.go", "pkg/smtcore/theory_arith_assume_eq.go", "pkg/smtcore/theory_arith_mutation.go", "pkg/smtcore/theory_arith_fixed_bounds.go", "pkg/smtcore/theory_arith_max_min.go", "pkg/smtcore/theory_arith_grobner.go", "pkg/smtcore/theory_arith_nonlinear.go", "pkg/smtcore/theory_arith_epsilon.go", "pkg/smtcore/smt_arithmetic_lifecycle.go", "pkg/smtcore/smt_setup_basic_arithmetic.go", "pkg/smtcore/theory_arith_infinite_test.go", "pkg/cmd/g3/test_vectors/basic_infinite_arithmetic.smt2"], "tests": ["TestSMTInfiniteArithmeticConfiguredSolverModelAndPop", "TestSMTInfiniteArithmeticThresholdNameComplementAndCopies", "TestSMTInfiniteArithmeticMaximizeKeepsAllCoordinatesAndPop", "TestSMTInfiniteArithmeticEqualityDoesNotProjectInfinity", "TestSMTInfiniteArithmeticCompoundBoundAndRationalRounding", "TestSMTInfiniteArithmeticSharedModelDeltaSkipsInfinity", "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels", "TestSMTLibRunnerScripts/basic_infinite_arithmetic.smt2", "TestSMTLibRunnerCPPReference/basic_infinite_arithmetic.smt2"]}
+        {
+          "name": "mk_ge(filter_model_converter&,theory_var,inf_numeral), concrete mi_ext: exact native Boolean name/reuse guard, filtered helper declaration, full infinitesimal bound and integer unit-step complement; immediate/delayed nearest-neighbor bound axioms, integer adjacent cover, Farkas coefficients and scoped parameter ownership; exact infinitesimal row deductions during shared optimization recovery.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_objective_bound.go",
+            "pkg/smtcore/theory_arith_bound_axioms.go",
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_fixed_bounds.go",
+            "pkg/smtcore/theory_arith_grobner.go",
+            "pkg/smtcore/theory_arith_mixed.go",
+            "pkg/smtcore/smt_internalizer.go"
+          ],
+          "tests": [
+            "TestSMTObjectiveLowerBoundExistingBooleanAndDomains",
+            "TestSMTObjectiveLowerBoundIntegralRealCastUsesUnitStep",
+            "TestSMTObjectiveLowerBoundRecoversSharedOptimization",
+            "TestSMTObjectiveLowerBoundThresholdAndComplement",
+            "TestSMTObjectiveLowerBoundCompoundOffsetAndName",
+            "TestSMTObjectiveLowerBoundSolverScopesAndModelFilter",
+            "TestSMTObjectiveLowerBoundRejectsImproperSupremum",
+            "TestSMTArithmeticBoundAxiomAllocationFrontiersAndRetry",
+            "TestSMTArithmeticBoundAxiomsKindsAndIntegerAdjacency",
+            "TestSMTArithmeticBoundAxiomsNearestNeighborsAndAxisIdentity",
+            "TestSMTArithmeticBoundAxiomProofParametersAndScopeOwnership"
+          ]
+        },
+        {
+          "name": "Retained inf_ext integration through the existing concrete mixed arithmetic tableau: mode5 setup and fresh-plugin copy selection; owned nonstandard lower-bound construction/name/complement; full infinity/rational/epsilon bound normalization, row transport, shared-value equality keys and rational-only polynomial guards; native model projection and refine_epsilon infinity skip. Scope-limited transport credit, not complete arithmetic or higher optimizer coverage.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_linear.go",
+            "pkg/smtcore/theory_arith_objective_bound.go",
+            "pkg/smtcore/theory_arith_assume_eq.go",
+            "pkg/smtcore/theory_arith_mutation.go",
+            "pkg/smtcore/theory_arith_fixed_bounds.go",
+            "pkg/smtcore/theory_arith_max_min.go",
+            "pkg/smtcore/theory_arith_grobner.go",
+            "pkg/smtcore/theory_arith_nonlinear.go",
+            "pkg/smtcore/theory_arith_epsilon.go",
+            "pkg/smtcore/smt_arithmetic_lifecycle.go",
+            "pkg/smtcore/smt_setup_basic_arithmetic.go",
+            "pkg/smtcore/theory_arith_infinite_test.go",
+            "pkg/cmd/g3/test_vectors/basic_infinite_arithmetic.smt2"
+          ],
+          "tests": [
+            "TestSMTInfiniteArithmeticConfiguredSolverModelAndPop",
+            "TestSMTInfiniteArithmeticThresholdNameComplementAndCopies",
+            "TestSMTInfiniteArithmeticMaximizeKeepsAllCoordinatesAndPop",
+            "TestSMTInfiniteArithmeticEqualityDoesNotProjectInfinity",
+            "TestSMTInfiniteArithmeticCompoundBoundAndRationalRounding",
+            "TestSMTInfiniteArithmeticSharedModelDeltaSkipsInfinity",
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTLibRunnerScripts/basic_infinite_arithmetic.smt2",
+            "TestSMTLibRunnerCPPReference/basic_infinite_arithmetic.smt2"
+          ]
+        },
+        {
+          "name": "display_already_processed: borrowed canonical owner-ID pair records and retained final_check_eh trace caller (arith_eq_adapter.cpp:269-279; theory_arith_core.h:1475)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_arith_eq_adapter.go",
+          "tests": [
+            "TestSMTArithmeticAdapterDisplayProcessedPairsAndScopes",
+            "TestSMTArithmeticAdapterDisplayEveryWriterPrefixAndGuards",
+            "TestSMTArithmeticAdapterFinalCheckTracePrecedesPropagation",
+            "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases"
+          ]
+        }
       ],
       "ownership": [
         "Scoped native equality bounds borrow context enodes. Simplex retains opaque premise identifiers and deep-owned coefficients; pop removes child bounds before parent replay. Context justifications own their proof parameters.",
@@ -130672,7 +130815,8 @@
         "ModelValue applies the existing concrete exact-rational floor helper to its newly computed candidate rational before constructing the owning expression-wrapper procedure. No integer numeral constructor guard is weakened and no simplex assignment or solver status is changed. Actual arith.ignore_int searches plus C++ CLI comparisons exercise positive/negative half candidates and integral SAT recovery through scopes.",
         "SetTheoryConflict and arithmetic equality-conflict publication now register completed parameter-owning justifications with ownedJustifications before exposing the conflict. The existing scope limit and reverse pop destruction release copied parameters before enodes are unregistered. Caller-owned parameters may be released immediately after successful publication; an outer conflict stays live through a nested push/pop, and an already-inconsistent report does not construct or register a replacement. Failed parameter-copy prefixes are released and no conflict is published. No allocator behavior or generic adapter is introduced.",
         "Generated bound ASTs are borrowed from the Boolean internalizer; the filter converter owns its declaration references. Stored threshold and offset rationals are copied. Numeric atoms remain registered on axiom-allocation refusal and deferred batches retry. Parameter-bearing axiom justifications have a logical-scope owner even when a clause holds a resolution wrapper. Tests verify actual cold parameter allocation refusal, recovery and zero-budget fixture teardown.",
-        "The existing concrete mixed tableau now selects its inf_ext specialization with an explicit constructor flag. Nonstandard atom thresholds, returned bound values, linear-form arithmetic and fixed-point substitutions own every rational coordinate. Scope removal restores numeric bounds while retaining feasible assignment seeds. Solver copying preserves the selected infinite specialization even when target parameters request another mode; previously acquired models retain independent ownership."
+        "The existing concrete mixed tableau now selects its inf_ext specialization with an explicit constructor flag. Nonstandard atom thresholds, returned bound values, linear-form arithmetic and fixed-point substitutions own every rational coordinate. Scope removal restores numeric bounds while retaining feasible assignment seeds. Solver copying preserves the selected infinite specialization even when target parameters request another mode; previously acquired models retain independent ownership.",
+        "Processed-pair display borrows the existing scoped enode AST handles without adding AST roots or cache payloads; records resolve actual owner IDs. Scope pop removes child records. Trace emission precedes general arithmetic propagation, preserves operand errors after stream badbit, and erases operands in native builds."
       ],
       "deviations": [
         "EqBounds now reaches the native equality-event consumer. Focused checks cover numeral/difference pairs, Int/Real, proofs, nonlinear intervals, weighted explanations and pop cleanup. The congruence conflict/model/pop script brings exact C++ runner comparisons to 106. Other arithmetic/setup work remains partial.",
@@ -130689,7 +130833,8 @@
         "String lower/upper bound readers preserve the native mixed-theory/internalization/attachment gates, to_expr refusal of infinitesimals and String refusal of nonintegral rationals, including on Real terms. Read only logical bounds, never candidate model values or unassigned inequality atoms; recover weaker logical endpoints hidden by candidate fixes. Integer-integration disable flag is constructor-false with no retained setter. This concrete retained consumer specialization does not port unused general arithmetic adapters or establish complete automata-stage dispatch. Units remain partial.",
         "Native internalize_numeral initializes exact bounds/value immediately and native linear definitions enter the live tableau. The Go replay now detects newly created columns and definitions even without Boolean arithmetic assertions. Counts describe the successfully replayed tableau; pop rebuilds and synchronizes them. A deterministic old-code regression exposed numeral7 becoming0 in a sequence model. Positive/negative/rational numerals, later constant definitions and repeated scopes now publish exact values; the Seq Int CLI model satisfies its asserted equality against C++. No model-output rewriting or numeral-only patch bypass is used.",
         "This increment closes the concrete nonstandard mk_ge callback and native bound-axiom subset, not all arithmetic or optimization. Rational-only equality/Grobner shortcuts do not assert equations after discarding a nonzero epsilon; linear row deductions preserve full infinitesimals. General nonnumeral RHS comparisons retain the Go numerical extension without fabricated native axis axioms. Higher opt_solver/optsmt orchestration, mode-5 optimization and SMT-LIB maximize/minimize wiring remain open. Earlier notes listing nonstandard-bound assertion as open are superseded only for this concrete callback.",
-        "This supersedes the earlier disabled-mode5 foundation note: AS_OPTINF now selects the actual three-component backend. Focused nonstandard point/maximize/complement/scope/model tests and a prebuilt-C++ mixed integer/real/nonlinear SMT-LIB vector verify this integration. Native mk_gt and mk_value intentionally use rational/epsilon projections; models are not claimed to be finite witnesses for arbitrary opaque infinite bounds. Rational-only shortcut guards avoid inventing polynomial equalities from infinite values. Source integer floor conversion clears infinity. Whole-unit status, higher optimizer orchestration, source completeness and the known dense strict-model limitation remain open; no CLI maximize/minimize is claimed."
+        "This supersedes the earlier disabled-mode5 foundation note: AS_OPTINF now selects the actual three-component backend. Focused nonstandard point/maximize/complement/scope/model tests and a prebuilt-C++ mixed integer/real/nonlinear SMT-LIB vector verify this integration. Native mk_gt and mk_value intentionally use rational/epsilon projections; models are not claimed to be finite witnesses for arbitrary opaque infinite bounds. Rational-only shortcut guards avoid inventing polynomial equalities from infinite values. Source integer floor conversion clears infinity. Whole-unit status, higher optimizer orchestration, source completeness and the known dense strict-model limitation remain open; no CLI maximize/minimize is claimed.",
+        "Corrected historical dead/no-caller classification: theory_arith_core.h:1475 calls display_already_processed. Pair canonicalization now compares actual owner IDs instead of Go handle slots. Native hash iteration order is unspecified, so multi-pair checks assert membership rather than STL iteration order. Direct writer prefix/short-write tests and actual final-check propagation/stream refusal/native erasure checks pass. Adapter units remain partial pending other retained diagnostics, notably full context display operands; this does not complete smtcore."
       ]
     },
     {

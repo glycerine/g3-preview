@@ -2,7 +2,13 @@
 // arithmetic equality-to-bound adapter.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"fmt"
+	"io"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 type smtArithmeticEqualityPair struct {
 	first, second ast.ASTHandle
@@ -20,6 +26,7 @@ type smtArithmeticEqualityAdapter struct {
 	restart   []smtArithmeticEqualityPair
 	numAxioms uint64
 	lazy      bool
+	trace     *diagnostic.TraceTags
 }
 
 func newSMTArithmeticEqualityAdapter(owner *SMTTheoryBase) (*smtArithmeticEqualityAdapter, error) {
@@ -32,12 +39,19 @@ func newSMTArithmeticEqualityAdapter(owner *SMTTheoryBase) (*smtArithmeticEquali
 	}, nil
 }
 
-func (a *smtArithmeticEqualityAdapter) pair(left, right *SMTEnode) smtArithmeticEqualityPair {
-	first, second := left.Owner(), right.Owner()
-	if first.Slot() > second.Slot() || first.Slot() == second.Slot() && first.Generation() > second.Generation() {
-		first, second = second, first
+func (a *smtArithmeticEqualityAdapter) pair(left, right *SMTEnode) (smtArithmeticEqualityPair, error) {
+	first, err := left.OwnerID()
+	if err != nil {
+		return smtArithmeticEqualityPair{}, err
 	}
-	return smtArithmeticEqualityPair{first: first, second: second}
+	second, err := right.OwnerID()
+	if err != nil {
+		return smtArithmeticEqualityPair{}, err
+	}
+	if first > second {
+		left, right = right, left
+	}
+	return smtArithmeticEqualityPair{first: left.Owner(), second: right.Owner()}, nil
 }
 
 func (a *smtArithmeticEqualityAdapter) MkAxioms(left, right SMTTheoryVar) error {
@@ -70,7 +84,10 @@ func (a *smtArithmeticEqualityAdapter) MkAxioms(left, right SMTTheoryVar) error 
 	if leftValue && rightValue {
 		return nil
 	}
-	pair := a.pair(leftNode, rightNode)
+	pair, err := a.pair(leftNode, rightNode)
+	if err != nil {
+		return err
+	}
 	if _, found := a.processed[pair]; found {
 		return nil
 	}
@@ -184,4 +201,54 @@ func (a *smtArithmeticEqualityAdapter) ResetStatistics() {
 	if a != nil {
 		a.numAxioms = 0
 	}
+}
+
+// Source arith_eq_adapter.cpp:269-279. Its native hash-table iteration order
+// is unspecified; only each canonical pair's literal record is prescribed.
+// Context enodes retain the borrowed AST handles through the pair's scope.
+func (a *smtArithmeticEqualityAdapter) DisplayAlreadyProcessed(out io.Writer) error {
+	if a == nil || a.owner == nil || out == nil {
+		return ast.ErrASTHandle
+	}
+	state, err := a.owner.State()
+	if err != nil {
+		return err
+	}
+	for pair := range a.processed {
+		first, err := state.manager.GetASTID(pair.first)
+		if err != nil {
+			return err
+		}
+		second, err := state.manager.GetASTID(pair.second)
+		if err != nil {
+			return err
+		}
+		if err = smtWriteTheoryText(out, fmt.Sprintf("eq_adapter: #%d #%d\n", first, second)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Source theory_arith_core.h:1475, before propagate_core in final_check_eh.
+func (a *smtArithmeticEqualityAdapter) traceFinalCheckPairs() error {
+	if a == nil {
+		return ast.ErrASTHandle
+	}
+	tags := a.trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	var operandErr error
+	err := tags.EmitConditional("arith_eq_adapter_info", "final_check_eh", "src/smt/theory_arith_core.h", 1475, func() bool { return true }, func(out io.Writer) error {
+		operandErr = a.DisplayAlreadyProcessed(assertedTraceWriter{out})
+		return operandErr
+	})
+	if operandErr != nil {
+		return operandErr
+	}
+	if tags.IsStreamFailure(err) {
+		return nil
+	}
+	return err
 }

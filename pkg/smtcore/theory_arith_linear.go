@@ -1511,6 +1511,9 @@ func (t *SMTLinearArithmeticTheory) PopScopes(count uint32) error {
 }
 
 func (t *SMTLinearArithmeticTheory) FinalCheck() (SMTFinalCheckStatus, error) {
+	if err := t.equalityAdapter.traceFinalCheckPairs(); err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
 	if t.CanPropagate() {
 		if err := t.Propagate(); err != nil {
 			return SMTFinalCheckGiveUp, err
