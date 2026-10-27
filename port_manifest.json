@@ -120661,7 +120661,11 @@
         "pkg/smtcore/smt_context_display_sections.go",
         "pkg/smtcore/smt_context_display_sections_test.go",
         "pkg/smtcore/smt_context_display_definitions.go",
-        "pkg/smtcore/smt_context_display_definitions_test.go"
+        "pkg/smtcore/smt_context_display_definitions_test.go",
+        "pkg/smtcore/theory_fpa_display.go",
+        "pkg/smtcore/theory_fpa_display_test.go",
+        "pkg/smtcore/theory_str_display.go",
+        "pkg/smtcore/theory_str_display_test.go"
       ],
       "tests": [
         "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
@@ -120687,7 +120691,14 @@
         "TestSMTContextDisplayDefinitionsShareVisitedAcrossActualOwners",
         "TestSMTContextDisplayHotVariablesThresholdDecayAndWidths",
         "TestSMTContextDisplayDefinitionsAndActivityWriterPrefixes",
-        "TestSMTContextDisplayDefinitionsAllocationRefusalRetainsInputs"
+        "TestSMTContextDisplayDefinitionsAllocationRefusalRetainsInputs",
+        "TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables",
+        "TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability",
+        "TestSMTFPADisplayMergeRootAndScopeRollback",
+        "TestSMTFPADisplayEmptyGateAndGuards",
+        "TestSMTFPADisplayColdAllocationRefusalAndRetry",
+        "TestSMTStringDisplaySourceLiteralAndContextDispatch",
+        "TestSMTStringDisplayOwnerAndWriterGuards"
       ],
       "conditionals": [
         {
@@ -120839,6 +120850,27 @@
             "TestSMTContextDisplayDefinitionsAndActivityWriterPrefixes",
             "TestSMTContextDisplayDefinitionsAllocationRefusalRetainsInputs"
           ]
+        },
+        {
+          "name": "theory_fpa::display full source family sections in actual context enode order and complete context equality-root section (theory_fpa.cpp:840-892), including conditional first header and source endl flushes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_fpa_display.go",
+          "tests": [
+            "TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables",
+            "TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability",
+            "TestSMTFPADisplayMergeRootAndScopeRollback",
+            "TestSMTFPADisplayEmptyGateAndGuards",
+            "TestSMTFPADisplayColdAllocationRefusalAndRetry"
+          ]
+        },
+        {
+          "name": "theory_str::display literal source body and endl (theory_str.cpp:12422-12424), reached through context display_theories even before string variables exist",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_display.go",
+          "tests": [
+            "TestSMTStringDisplaySourceLiteralAndContextDispatch",
+            "TestSMTStringDisplayOwnerAndWriterGuards"
+          ]
         }
       ],
       "ownership": [
@@ -120848,7 +120880,8 @@
         "Concrete context literal printers borrow the internalizer Boolean-expression directory and manager, preserving source newline separators without a trailing separator. Detailed printing delegates to the existing AST-aware literal renderer; no new AST roots, copied Boolean maps or generic display adapter.",
         "Context section printers borrow actual assignment/enode/Boolean stacks and current equality roots. They preserve source order and scope rollback without owning additional AST roots. SMT2 formatting uses the existing manager-owned formatter and scratch storage; tests warm first-use formatter storage then verify unchanged complete AST statistics through every failed writer prefix.",
         "Section printers borrow existing concrete clause objects, packed watch-list literal regions, scoped relevancy stack and checker declaration buckets without adding roots. Declaration rows retain per-bucket insertion order and sort by actual declaration ID, subtracting the AST declaration namespace bit; unlike the checker lookup index, source display excludes zero-argument/suppressed-argument enodes and equalities. Prefix tests leave complete AST statistics unchanged.",
-        "Definitions borrow live Boolean/enode/assertion roots and use the existing concrete AST low-level printer with one visited set per dump. Its stream is lexical and closes on every return; no additional AST root owner is introduced. Immediate true has no Go boolExpr entry and receives no invented AST definition. Activity rendering borrows current activity and increment scalars. Tests cover repeated dumps, shared ownership, scope pop, every failed writer prefix, short writes, stable warmed manager statistics and cold allocation refusal followed by successful retry."
+        "Definitions borrow live Boolean/enode/assertion roots and use the existing concrete AST low-level printer with one visited set per dump. Its stream is lexical and closes on every return; no additional AST root owner is introduced. Immediate true has no Go boolExpr entry and receives no invented AST definition. Activity rendering borrows current activity and increment scalars. Tests cover repeated dumps, shared ownership, scope pop, every failed writer prefix, short writes, stable warmed manager statistics and cold allocation refusal followed by successful retry.",
+        "Display borrows the initialized theory/context, enode stack, actual family attachments and current core roots. It does not initialize a model, alter queues, merge classes or consume RNG. FPA uses existing converter-registered BV/arithmetic family identities only after the first FPA variable; no FPA variables means no text, lookup/format allocation or flush even with foreign nodes present. SMT2 operands use the existing project printer and retain its error/owner protocol. Optional borrowed Flush is reached at each source endl; direct displays report short writes, refused writes/flushes and operand allocation failures."
       ],
       "deviations": [
         "Theory names are read through the retained optional Name method; unnamed theory implementations preserve the source generic incomplete-theory reason.",
@@ -120858,7 +120891,8 @@
         "Previously deferred context literal renderers now have retained Go LRA propagation/fixed-equality callers. Their scalar/vector/detailed paths are ported; remaining broad context/assignment/enode/clause displays and whole-context completeness remain unproven.",
         "Source ast_pp.h defines mk_pp as mk_ismt2_pp, so literal display now uses the existing SimpleASTPrinterContext SMT2 formatter instead of LegacySMTPrinter. Corrected numeric-symbol test oracles k!24010/k!25010/k!25020 to source k!2401/k!2501/k!2502, and the LRA propagation trace single-use-sum oracle from legacy ?x let output to inline SMT2. Short-write failures remain detected around the formatter. Context pp unit explicitly remains partial: its prior blanket reference_only display record does not prove closure of live context::display callers in arith_eq_adapter.cpp107/226. These four concrete section printers are prerequisites for that complete composition, not a substitute dump.",
         "The native declaration registry is narrower than Go checker byDeclaration: display filters each node independently, so an earlier suppressed application does not hide a later ordinary application of the same declaration. Binary output follows native literal-index duplicate suppression and packed reverse insertion order. Auxiliary-lemma display retains the actual last-undefined watch swaps instead of printing input literal order. Tests create real ordinary/packed/scoped clauses, real mixed declaration buckets and scoped relevance. This completes these children only; full context display and equality-adapter callers requiring it remain open.",
-        "Shared definition output preserves Boolean, enode, then assertion traversal order while suppressing duplicate definitions and retaining duplicate asserted-root IDs. Hot-variable output uses strict activity/increment >10, width5 left-aligned AST IDs, width12 right-aligned defaultfloat values and six significant digits; real activity increments/decays verify both threshold and formatting. Full context dump remains open: source relevance strategies retain persistent queues and head positions, while the Go selection path currently scans relevance state. Reconstructing a queue-shaped dump from a scan would not establish source fidelity; actual queue state/callers need further porting."
+        "Shared definition output preserves Boolean, enode, then assertion traversal order while suppressing duplicate definitions and retaining duplicate asserted-root IDs. Hot-variable output uses strict activity/increment >10, width5 left-aligned AST IDs, width12 right-aligned defaultfloat values and six significant digits; real activity increments/decays verify both threshold and formatting. Full context dump remains open: source relevance strategies retain persistent queues and head positions, while the Go selection path currently scans relevance state. Reconstructing a queue-shaped dump from a scan would not establish source fidelity; actual queue state/callers need further porting.",
+        "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion."
       ]
     },
     {
@@ -139310,7 +139344,7 @@
       "path": "src/smt/theory_fpa.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
         "pkg/smtcore/proto_model/fpa_factory.go",
@@ -139318,7 +139352,9 @@
         "pkg/ast/fpa/fpa2bv_symbols.go",
         "pkg/model/fpa/bv2fpa_model.go",
         "pkg/ast/rewriter/fpa2bv_constructor_frontier_test.go",
-        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+        "pkg/smtcore/theory_fpa_display.go",
+        "pkg/smtcore/theory_fpa_display_test.go"
       ],
       "tests": [
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
@@ -139327,7 +139363,12 @@
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
         "TestSMTFloatingPointModelFinalizesConvertedFunction",
         "TestFPA2BVRewriterConstructorAllocationFrontiers",
-        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+        "TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables",
+        "TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability",
+        "TestSMTFPADisplayMergeRootAndScopeRollback",
+        "TestSMTFPADisplayEmptyGateAndGuards",
+        "TestSMTFPADisplayColdAllocationRefusalAndRetry"
       ],
       "assertions": [
         {
@@ -139559,8 +139600,8 @@
           "text": "SASSERT(res != 0);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "wrapped FP and rounding-mode constants, conversion cache, atom and conversion-term bit-vector definitions, side constraints and scoped rollback",
@@ -139589,35 +139630,57 @@
             "TestSMTFloatingPointModelReconstructsWrappedConstants",
             "TestSMTFloatingPointModelFinalizesConvertedFunction"
           ]
+        },
+        {
+          "name": "theory_fpa::display full source family sections in actual context enode order and complete context equality-root section (theory_fpa.cpp:840-892), including conditional first header and source endl flushes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_fpa_display.go",
+          "tests": [
+            "TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables",
+            "TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability",
+            "TestSMTFPADisplayMergeRootAndScopeRollback",
+            "TestSMTFPADisplayEmptyGateAndGuards",
+            "TestSMTFPADisplayColdAllocationRefusalAndRetry"
+          ]
         }
       ],
       "ownership": [
         "SMTFloatingPointTheory owns its converter, rewriter, scoped conversion references and model-finalization temporaries; FlushExtraAssertions transfers owned assertion references to the theory for assertion and release.",
         "The proto-model owns the registered floating-point value factory, while model procedures borrow context enodes and return manager-owned AST values through the model generator protocol.",
-        "Floating-point theory initialization closes a returned partial FPA2BV rewriter before releasing its converter on failure. Generic SMT backend setup reaches this owner even when the current input uses only UF/BV."
+        "Floating-point theory initialization closes a returned partial FPA2BV rewriter before releasing its converter on failure. Generic SMT backend setup reaches this owner even when the current input uses only UF/BV.",
+        "Display borrows the initialized theory/context, enode stack, actual family attachments and current core roots. It does not initialize a model, alter queues, merge classes or consume RNG. FPA uses existing converter-registered BV/arithmetic family identities only after the first FPA variable; no FPA variables means no text, lookup/format allocation or flush even with foreign nodes present. SMT2 operands use the existing project printer and retain its error/owner protocol. Optional borrowed Flush is reached at each source endl; direct displays report short writes, refused writes/flushes and operand allocation failures."
       ],
       "deviations": [
         "The retained Go internalizer installs an eager biconditional when each FPA atom or structural equality is internalized, so the native assignment callback's polarity-specific implication is redundant.",
         "NewEquality and NewDisequality remain inert because the exact structural-equality bit-vector definition is installed syntactically; creating fresh Boolean circuits during a Go e-graph merge would violate rollback ordering.",
-        "Float operands are reached recursively while translating atoms and equalities; rounding-mode relevancy additionally connects wrappers to finite encodings. Native trace display and fresh-theory allocation have no separate retained consumer."
+        "Float operands are reached recursively while translating atoms and equalities; rounding-mode relevancy additionally connects wrappers to finite encodings. Context display_theories is a retained display consumer and now reaches the complete FPA printer. The previous claim that native trace/display had no separate retained consumer was unsupported: live t_fpa/t_fpa_detail/t_fpa_internalize traces and source assertions remain unported, and fresh-theory reachability still requires revalidation.",
+        "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
+        "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change."
       ]
     },
     {
       "path": "src/smt/theory_fpa.h",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
         "pkg/smtcore/proto_model/fpa_factory.go",
         "pkg/ast/rewriter/fpa2bv_constructor_frontier_test.go",
-        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go"
+        "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
+        "pkg/smtcore/theory_fpa_display.go",
+        "pkg/smtcore/theory_fpa_display_test.go"
       ],
       "tests": [
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
         "TestSMTFloatingPointModelFinalizesConvertedFunction",
         "TestFPA2BVRewriterConstructorAllocationFrontiers",
-        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers"
+        "TestQFUFBVAckrConstructorAndApplyAllocationFrontiers",
+        "TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables",
+        "TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability",
+        "TestSMTFPADisplayMergeRootAndScopeRollback",
+        "TestSMTFPADisplayEmptyGateAndGuards",
+        "TestSMTFPADisplayColdAllocationRefusalAndRetry"
       ],
       "conditionals": [
         {
@@ -139639,8 +139702,8 @@
           "text": "SASSERT(m_util.get_sbits(s) == val.get_sbits());"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "floating-point value factory, model value dependency procedures and SMT theory interface",
@@ -139650,14 +139713,29 @@
             "TestSMTFloatingPointModelReconstructsWrappedConstants",
             "TestSMTFloatingPointModelFinalizesConvertedFunction"
           ]
+        },
+        {
+          "name": "theory_fpa::display full source family sections in actual context enode order and complete context equality-root section (theory_fpa.cpp:840-892), including conditional first header and source endl flushes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_fpa_display.go",
+          "tests": [
+            "TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables",
+            "TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability",
+            "TestSMTFPADisplayMergeRootAndScopeRollback",
+            "TestSMTFPADisplayEmptyGateAndGuards",
+            "TestSMTFPADisplayColdAllocationRefusalAndRetry"
+          ]
         }
       ],
       "ownership": [
         "Concrete Go interfaces replace the nested native callback classes; the theory owns conversion state and the proto-model owns its registered factory.",
-        "Floating-point theory initialization closes a returned partial FPA2BV rewriter before releasing its converter on failure. Generic SMT backend setup reaches this owner even when the current input uses only UF/BV."
+        "Floating-point theory initialization closes a returned partial FPA2BV rewriter before releasing its converter on failure. Generic SMT backend setup reaches this owner even when the current input uses only UF/BV.",
+        "Display borrows the initialized theory/context, enode stack, actual family attachments and current core roots. It does not initialize a model, alter queues, merge classes or consume RNG. FPA uses existing converter-registered BV/arithmetic family identities only after the first FPA variable; no FPA variables means no text, lookup/format allocation or flush even with foreign nodes present. SMT2 operands use the existing project printer and retain its error/owner protocol. Optional borrowed Flush is reached at each source endl; direct displays report short writes, refused writes/flushes and operand allocation failures."
       ],
       "deviations": [
-        "The native fresh-value factory method is itself unimplemented; the Go factory implements the retained canonical-value operations and deliberately reports that it cannot manufacture an unbounded fresh FP value."
+        "The native fresh-value factory method is itself unimplemented; the Go factory implements the retained canonical-value operations and deliberately reports that it cannot manufacture an unbounded fresh FP value.",
+        "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
+        "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change."
       ]
     },
     {
@@ -144167,7 +144245,10 @@
         "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2",
         "pkg/smtcore/smt_sequence_lifecycle.go",
         "pkg/smtcore/smt_sequence_lifecycle_test.go",
-        "pkg/smtcore/smt_solver.go"
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/theory_str_display.go",
+        "pkg/smtcore/theory_str_display_test.go",
+        "pkg/smtcore/theory_fpa_display.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -144409,7 +144490,9 @@
         "TestSMTStringFreeKernelModelAndCPPReference",
         "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic",
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
-        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
+        "TestSMTStringDisplaySourceLiteralAndContextDispatch",
+        "TestSMTStringDisplayOwnerAndWriterGuards"
       ],
       "conditionals": [
         {
@@ -146368,6 +146451,15 @@
             "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
             "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
           ]
+        },
+        {
+          "name": "theory_str::display literal source body and endl (theory_str.cpp:12422-12424), reached through context display_theories even before string variables exist",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_display.go",
+          "tests": [
+            "TestSMTStringDisplaySourceLiteralAndContextDispatch",
+            "TestSMTStringDisplayOwnerAndWriterGuards"
+          ]
         }
       ],
       "ownership": [
@@ -146417,7 +146509,8 @@
         "Concat/unroll definitions borrow ordered AST pair keys and cached formula handles held by existing lifetime roots. Cache misses create the native five word/two count witnesses and retain the complete formula before insertion; every call asserts, but cache hits add no additional explicit trail root. Constructor and immediate range effects retain their own roots before the final definition. Local positive/zero premise vectors and temporary operand roots release forward. Persistent cache survives real scope pop; Fresh/Close initialize/clear the concrete map.",
         "The final free-variable stage mutates only its current dependency-analysis free map, owns temporary concrete relation/set maps and borrows existing AST handles. Private String classes and core enode cycles remain distinct. Generator return roots are consumed by the actual assertion wrapper and close on failures; null roots are legal. Lifetime tester/definition caches retain their established roots and scope behavior. No unused generic map/set adapter or inactive alternative assignment loop is introduced.",
         "Initial production QF_S logic/automatic setup now constructs the actual String owner from parent parameters with mixed arithmetic. Existing nested borrowed-parameter and teardown lifetimes apply; disabled-auto-config default seq remains generic.",
-        "Copied String theory borrows its original scalar String parameter member, retains independent destination AST roots and owns its own nested solver. Chained copies preserve the same owner after source closure; destination nested queries, models and scope recovery are verified. Copy-aware scalar retention does not reopen or destroy original parameter services."
+        "Copied String theory borrows its original scalar String parameter member, retains independent destination AST roots and owns its own nested solver. Chained copies preserve the same owner after source closure; destination nested queries, models and scope recovery are verified. Copy-aware scalar retention does not reopen or destroy original parameter services.",
+        "Display borrows the initialized theory/context, enode stack, actual family attachments and current core roots. It does not initialize a model, alter queues, merge classes or consume RNG. FPA uses existing converter-registered BV/arithmetic family identities only after the first FPA variable; no FPA variables means no text, lookup/format allocation or flush even with foreign nodes present. SMT2 operands use the existing project printer and retain its error/owner protocol. Optional borrowed Flush is reached at each source endl; direct displays report short writes, refused writes/flushes and operand allocation failures."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -146473,7 +146566,8 @@
         "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged.",
         "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial.",
         "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete.",
-        "Read-only continuation audit reconciles stale partial-method descriptions with existing constructor/nested solver, copied-owner, equality/tester/concat/unroll, containment and propagation implementations. No method status is promoted: complete declaration/consumer/trace/diagnostic/lifetime audit remains open. Native private m_str_eq_todo has only its emptiness test, consumer/reset and reset_eh reset in theory_str.cpp/.h, with no retained producer; no unused equality queue is added. Existing ALL negative-containment parity remains pending. This description reconciliation is not new algorithm or whole-unit completion credit."
+        "Read-only continuation audit reconciles stale partial-method descriptions with existing constructor/nested solver, copied-owner, equality/tester/concat/unroll, containment and propagation implementations. No method status is promoted: complete declaration/consumer/trace/diagnostic/lifetime audit remains open. Native private m_str_eq_todo has only its emptiness test, consumer/reset and reset_eh reset in theory_str.cpp/.h, with no retained producer; no unused equality queue is added. Existing ALL negative-containment parity remains pending. This description reconciliation is not new algorithm or whole-unit completion credit.",
+        "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion."
       ]
     },
     {
@@ -146602,7 +146696,10 @@
         "pkg/cmd/g3/test_vectors/qfs_legacy_string_free_models.smt2",
         "pkg/smtcore/smt_sequence_lifecycle.go",
         "pkg/smtcore/smt_sequence_lifecycle_test.go",
-        "pkg/smtcore/smt_solver.go"
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/theory_str_display.go",
+        "pkg/smtcore/theory_str_display_test.go",
+        "pkg/smtcore/theory_fpa_display.go"
       ],
       "tests": [
         "TestSMTStringNFAThompsonLanguage",
@@ -146845,7 +146942,9 @@
         "TestSMTStringFreeKernelModelAndCPPReference",
         "TestSMTQFSSetupInstallsNativeStringAndMixedArithmetic",
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
-        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
+        "TestSMTStringDisplaySourceLiteralAndContextDispatch",
+        "TestSMTStringDisplayOwnerAndWriterGuards"
       ],
       "conditionals": [
         {
@@ -148122,6 +148221,15 @@
             "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
             "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
           ]
+        },
+        {
+          "name": "theory_str::display literal source body and endl (theory_str.cpp:12422-12424), reached through context display_theories even before string variables exist",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_str_display.go",
+          "tests": [
+            "TestSMTStringDisplaySourceLiteralAndContextDispatch",
+            "TestSMTStringDisplayOwnerAndWriterGuards"
+          ]
         }
       ],
       "ownership": [
@@ -148172,7 +148280,8 @@
         "Concat/unroll definitions borrow ordered AST pair keys and cached formula handles held by existing lifetime roots. Cache misses create the native five word/two count witnesses and retain the complete formula before insertion; every call asserts, but cache hits add no additional explicit trail root. Constructor and immediate range effects retain their own roots before the final definition. Local positive/zero premise vectors and temporary operand roots release forward. Persistent cache survives real scope pop; Fresh/Close initialize/clear the concrete map.",
         "The final free-variable stage mutates only its current dependency-analysis free map, owns temporary concrete relation/set maps and borrows existing AST handles. Private String classes and core enode cycles remain distinct. Generator return roots are consumed by the actual assertion wrapper and close on failures; null roots are legal. Lifetime tester/definition caches retain their established roots and scope behavior. No unused generic map/set adapter or inactive alternative assignment loop is introduced.",
         "Initial production QF_S logic/automatic setup now constructs the actual String owner from parent parameters with mixed arithmetic. Existing nested borrowed-parameter and teardown lifetimes apply; disabled-auto-config default seq remains generic.",
-        "Copied String theory borrows its original scalar String parameter member, retains independent destination AST roots and owns its own nested solver. Chained copies preserve the same owner after source closure; destination nested queries, models and scope recovery are verified. Copy-aware scalar retention does not reopen or destroy original parameter services."
+        "Copied String theory borrows its original scalar String parameter member, retains independent destination AST roots and owns its own nested solver. Chained copies preserve the same owner after source closure; destination nested queries, models and scope recovery are verified. Copy-aware scalar retention does not reopen or destroy original parameter services.",
+        "Display borrows the initialized theory/context, enode stack, actual family attachments and current core roots. It does not initialize a model, alter queues, merge classes or consume RNG. FPA uses existing converter-registered BV/arithmetic family identities only after the first FPA variable; no FPA variables means no text, lookup/format allocation or flush even with foreign nodes present. SMT2 operands use the existing project printer and retain its error/owner protocol. Optional borrowed Flush is reached at each source endl; direct displays report short writes, refused writes/flushes and operand allocation failures."
       ],
       "deviations": [
         "Started the distinct theory_str backend with retained helper algorithms only. The legacy nfa consumer is live in new_eq_check -> check_regex_in when RegexAutomata is false (theory_str.cpp:2051-2053,6542-6591); it is not dead code despite the default automata setting. The byte NFA preserves the source supported operator set, reversed range endpoints, all 256 byte transitions, epsilon-cycle behavior and invalid/nonconstant refusal; it does not silently delegate unsupported operators to the broader sequence regex engine. Native C++ ordered maps/sets are replaced by concrete Go maps/slices because only membership affects these methods. The standalone helper increment did not include owner callbacks. Subsequent owner work implements typed internalization, basic axiom routines and model callbacks, while remaining constructor services, equality/constraint handling, regex cache/consumer integration, final checking and setup_QF_S/string_solver routing are still incomplete. The helpers are not registered with the existing Go sequence backend, and no end-to-end solver/C++ comparison is credited by their unit checks.",
@@ -148229,7 +148338,8 @@
         "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged.",
         "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial.",
         "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete.",
-        "Read-only continuation audit reconciles stale partial-method descriptions with existing constructor/nested solver, copied-owner, equality/tester/concat/unroll, containment and propagation implementations. No method status is promoted: complete declaration/consumer/trace/diagnostic/lifetime audit remains open. Native private m_str_eq_todo has only its emptiness test, consumer/reset and reset_eh reset in theory_str.cpp/.h, with no retained producer; no unused equality queue is added. Existing ALL negative-containment parity remains pending. This description reconciliation is not new algorithm or whole-unit completion credit."
+        "Read-only continuation audit reconciles stale partial-method descriptions with existing constructor/nested solver, copied-owner, equality/tester/concat/unroll, containment and propagation implementations. No method status is promoted: complete declaration/consumer/trace/diagnostic/lifetime audit remains open. Native private m_str_eq_todo has only its emptiness test, consumer/reset and reset_eh reset in theory_str.cpp/.h, with no retained producer; no unused equality queue is added. Existing ALL negative-containment parity remains pending. This description reconciliation is not new algorithm or whole-unit completion credit.",
+        "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion."
       ]
     },
     {

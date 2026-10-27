@@ -1,0 +1,214 @@
+package smtcore
+
+import (
+	"bytes"
+	"errors"
+	"fmt"
+	"io"
+	"strings"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/ast"
+)
+
+func fpaDisplayFixture(t *testing.T) (*ast.ASTManager, *SMTInternalizerState, *SMTFloatingPointTheory, []ast.ASTHandle, string) {
+	t.Helper()
+
+	m, cfg := smtModelGeneratorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	family, err := m.RegisterFloatingPointPlugin()
+	astTestMust(t, err)
+	sort, err := m.FloatingPointSort(2, 2)
+	astTestMust(t, err)
+	solver, err := NewSMTSolver(m, nil, "", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	s := solver.kernel.internalizer
+	fp := s.theories[family].(*SMTFloatingPointTheory)
+	a, err := m.MkConst(astTestSymbol(t, m, "first fpa"), sort)
+	astTestMust(t, err)
+	b, err := m.MkConst(astTestSymbol(t, m, "second-fpa"), sort)
+	astTestMust(t, err)
+	an, err := s.MkEnode(a, false, false, true)
+	astTestMust(t, err)
+	bn, err := s.MkEnode(b, false, false, true)
+	astTestMust(t, err)
+	// Use real sort-constraint callbacks, deliberately attaching in the reverse
+	// order from AST creation and enode registration.
+	astTestMust(t, fp.ApplySortConstraint(bn, sort))
+	astTestMust(t, fp.ApplySortConstraint(an, sort))
+	integerFamily, err := m.ArithmeticFamilyID()
+	astTestMust(t, err)
+	integerSort, err := m.MkFamilySort(integerFamily, 1, nil)
+	astTestMust(t, err)
+	integer, err := m.MkConst(astTestSymbol(t, m, "integer-var"), integerSort)
+	astTestMust(t, err)
+	astTestMust(t, s.Internalize(integer, false))
+	bvSort, err := m.BitVectorSort(3)
+	astTestMust(t, err)
+	bv, err := m.MkConst(astTestSymbol(t, m, "bits-var"), bvSort)
+	astTestMust(t, err)
+	astTestMust(t, s.Internalize(bv, false))
+	_, foreign := smtUFConstants(t, m, "foreign-", 1)
+	astTestMust(t, s.Internalize(foreign[0], false))
+	terms := []ast.ASTHandle{a, b, integer, bv, foreign[0]}
+	want := "fpa theory variables:\n1 -> |first fpa|\n0 -> second-fpa\nbv theory variables:\n0 -> bits-var\narith theory variables:\n0 -> integer-var\nequivalence classes:\n"
+	for i, name := range []string{"|first fpa|", "second-fpa", "integer-var", "bits-var", "foreign-a"} {
+		id, err := m.GetASTID(terms[i])
+		astTestMust(t, err)
+		want += fmt.Sprintf("%d --> %s\n", id, name)
+	}
+	return m, s, fp, terms, want
+}
+
+func TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables(t *testing.T) {
+	_, s, fp, _, want := fpaDisplayFixture(t)
+	var out bytes.Buffer
+	astTestMust(t, fp.Display(&out))
+	if out.String() != want {
+		t.Fatal("FPA source display", out.String(), want)
+	}
+	out.Reset()
+	astTestMust(t, s.DisplayTheories(&out))
+	if out.String() != want {
+		t.Fatal("context omitted FPA display", out.String(), want)
+	}
+}
+
+type theoryDisplayFlushWriter struct {
+	output  bytes.Buffer
+	flushes int
+	refuse  bool
+}
+
+func (w *theoryDisplayFlushWriter) Write(p []byte) (int, error) { return w.output.Write(p) }
+func (w *theoryDisplayFlushWriter) Flush() error {
+	w.flushes++
+	if w.refuse {
+		return io.ErrClosedPipe
+	}
+	return nil
+}
+
+func TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability(t *testing.T) {
+	m, s, fp, _, want := fpaDisplayFixture(t)
+	w := &theoryDisplayFlushWriter{}
+	astTestMust(t, fp.Display(w))
+	// Three section headings, four variable lines and five equivalence lines
+	// use endl. The equivalence heading has an ordinary newline.
+	if w.output.String() != want || w.flushes != 12 {
+		t.Fatal(w.output.String(), w.flushes)
+	}
+	before := m.Stats()
+	rng := s.random
+	for cut := 0; cut < len(want); cut++ {
+		out := &smtLRAOutputPrefix{remaining: cut}
+		err := fp.Display(out)
+		if !errors.Is(err, io.ErrClosedPipe) || out.text.String() != want[:cut] {
+			t.Fatal("FPA writer prefix", cut, err, out.text.String(), want[:cut])
+		}
+	}
+	if err := fp.Display(smtLRAShortOutput{}); !errors.Is(err, io.ErrShortWrite) {
+		t.Fatal(err)
+	}
+	refused := &theoryDisplayFlushWriter{refuse: true}
+	if err := fp.Display(refused); !errors.Is(err, io.ErrClosedPipe) || refused.output.String() != "fpa theory variables:\n" || refused.flushes != 1 {
+		t.Fatal("endl refusal", err, refused.output.String(), refused.flushes)
+	}
+	if before != m.Stats() || s.random != rng {
+		t.Fatal("display changed owners or RNG", before, m.Stats())
+	}
+}
+
+func TestSMTFPADisplayMergeRootAndScopeRollback(t *testing.T) {
+	m, s, fp, terms, base := fpaDisplayFixture(t)
+	astTestMust(t, s.PushScope())
+	astTestMust(t, s.addEquality(s.context.enodes[terms[0]], s.context.enodes[terms[1]], NewSMTEqualityAxiom()))
+	extra, err := m.MkConst(astTestSymbol(t, m, "scoped-fpa"), mustFPASort(t, m, terms[0]))
+	astTestMust(t, err)
+	astTestMust(t, s.Internalize(extra, false))
+	var out bytes.Buffer
+	astTestMust(t, fp.Display(&out))
+	root, err := s.context.enodes[terms[0]].Root().OwnerID()
+	astTestMust(t, err)
+	firstID, err := m.GetASTID(terms[0])
+	astTestMust(t, err)
+	secondID, err := m.GetASTID(terms[1])
+	astTestMust(t, err)
+	want := strings.Replace(base, fmt.Sprintf("%d --> |first fpa|\n", firstID), fmt.Sprintf("%d --> |first fpa|\n", root), 1)
+	want = strings.Replace(want, fmt.Sprintf("%d --> second-fpa\n", secondID), fmt.Sprintf("%d --> second-fpa\n", root), 1)
+	want = strings.Replace(want, "bv theory variables:\n", "2 -> scoped-fpa\nbv theory variables:\n", 1)
+	id, err := m.GetASTID(extra)
+	astTestMust(t, err)
+	want += fmt.Sprintf("%d --> scoped-fpa\n", id)
+	if out.String() != want {
+		t.Fatal("context root/late scope order", out.String(), want)
+	}
+	astTestMust(t, s.PopScopes(1))
+	out.Reset()
+	astTestMust(t, s.DisplayTheories(&out))
+	if out.String() != base {
+		t.Fatal("FPA display rollback", out.String(), base)
+	}
+}
+
+func mustFPASort(t *testing.T, m *ast.ASTManager, value ast.ASTHandle) ast.ASTHandle {
+	t.Helper()
+	sort, err := m.GetSort(value)
+	astTestMust(t, err)
+	return sort
+}
+
+func TestSMTFPADisplayEmptyGateAndGuards(t *testing.T) {
+	m, family, _, solver := smtFloatingPointSolver(t)
+	fp := solver.kernel.internalizer.theories[family].(*SMTFloatingPointTheory)
+	bvSort, err := m.BitVectorSort(3)
+	astTestMust(t, err)
+	foreign, err := m.MkConst(astTestSymbol(t, m, "unused-fpa-bits"), bvSort)
+	astTestMust(t, err)
+	astTestMust(t, solver.kernel.internalizer.Internalize(foreign, false))
+	var out bytes.Buffer
+	before := m.Stats()
+	m.Budget().FailAfter(0)
+	err = fp.Display(&out)
+	m.Budget().FailAfter(-1)
+	astTestMust(t, err)
+	if out.Len() != 0 || before != m.Stats() {
+		t.Fatal("unused FPA owner printed or allocated")
+	}
+	if err = fp.Display(nil); !errors.Is(err, ast.ErrASTHandle) {
+		t.Fatal(err)
+	}
+	if err = (*SMTFloatingPointTheory)(nil).Display(&out); !errors.Is(err, ast.ErrASTHandle) {
+		t.Fatal(err)
+	}
+	uninitialized, err := NewSMTFloatingPointTheory(family)
+	astTestMust(t, err)
+	if err = uninitialized.Display(&out); !errors.Is(err, ast.ErrASTHandle) {
+		t.Fatal(err)
+	}
+}
+
+func TestSMTFPADisplayColdAllocationRefusalAndRetry(t *testing.T) {
+	m, _, fp, _, want := fpaDisplayFixture(t)
+	var out bytes.Buffer
+	m.Budget().FailAfter(0)
+	err := fp.Display(&out)
+	m.Budget().FailAfter(-1)
+	if !errors.Is(err, arena.ErrInjectedFailure) {
+		t.Fatal("cold format allocation did not refuse", err)
+	}
+	// The section and numeric prefix are inserted before the source pp operand.
+	if out.String() != "fpa theory variables:\n1 -> " {
+		t.Fatal("format refusal prefix", out.String())
+	}
+	out.Reset()
+	astTestMust(t, fp.Display(&out))
+	if out.String() != want {
+		t.Fatal("format refusal destroyed borrowed input", out.String(), want)
+	}
+}
