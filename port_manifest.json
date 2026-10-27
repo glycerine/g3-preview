@@ -138163,7 +138163,8 @@
         "pkg/smtcore/theory_lra_propagation_trace_test.go",
         "pkg/smtcore/theory_lra_registration_trace_test.go",
         "pkg/smtcore/theory_lra_assertions.go",
-        "pkg/smtcore/theory_lra_assertions_test.go"
+        "pkg/smtcore/theory_lra_assertions_test.go",
+        "pkg/smtcore/theory_lra_justification_ownership_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -138306,7 +138307,11 @@
         "TestSMTLRASourceAssertionAtomAndRawValueGates",
         "TestSMTLRASourceAssertionBoundAndEvidenceGates",
         "TestSMTLRASourceAssertionReusedVariableBounds",
-        "TestSMTLRASourceAssertionsActualLPAndScopePath"
+        "TestSMTLRASourceAssertionsActualLPAndScopePath",
+        "TestSMTLRAConflictUsesScopedExtendedSourceJustification",
+        "TestSMTLRABasicExternalReasonKeepsFarkasWithoutProofs",
+        "TestSMTLRABasicTautologyRetiresParametersWithoutProofs",
+        "TestSMTLRABasicNoProofParameterRefusalKeepsOwners"
       ],
       "conditionals": [
         {
@@ -138574,6 +138579,17 @@
             "TestSMTLRASourceAssertionReusedVariableBounds",
             "TestSMTLRASourceAssertionsActualLPAndScopePath"
           ]
+        },
+        {
+          "name": "source set_conflict extended justification identity and unconditional basic-bound Farkas parameter ownership across proof modes, propagation branch and scope retirement",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_lra_propagation.go",
+          "tests": [
+            "TestSMTLRAConflictUsesScopedExtendedSourceJustification",
+            "TestSMTLRABasicExternalReasonKeepsFarkasWithoutProofs",
+            "TestSMTLRABasicTautologyRetiresParametersWithoutProofs",
+            "TestSMTLRABasicNoProofParameterRefusalKeepsOwners"
+          ]
         }
       ],
       "ownership": [
@@ -138600,7 +138616,8 @@
         "Frontend traces borrow existing AST expressions without adding final expression roots. Assignment expression lookup and printing occur only inside the enabled trace body. Source counter tracing precedes each update in atom/objective registration and basic/LP propagation; existing context/scope restoration owns the counter trail. No dictionary, solver, equality-adapter or scope owner is replaced.",
         "LP implied-bound traces borrow the active propagator/implied-bound and use the existing LAR printer owners; source ostream badbit continues numerical printing and the propagator closes on success. Fixed-equality evidence is emitted after justification ownership is published and before validation/assignment. The trace-only has_lower_bound call remains inside its enabled trace body, including nested has_bound trace ordering.",
         "Numerical bound creation and inequality-source publication are concrete sequential phases: assert_bound trace observes the new actual LAR constraint before inequality directory/row-stat publication, then add_ineq_constraint prints after metadata publication. Direct numerical callers retain a wrapper that executes both phases. Term traces borrow current LAR terms and print before numeral fixed-cache insertion. Bound batches retain retry ownership after failed computation; trace IO refusal continues real numerical operands.",
-        "LRA mk_var now follows the source publication order: append the borrowed enode variable slot, check/extend bound directories, then attach its theory variable to the context. The bounds invariant fails before egraph attachment. A failed attachment retains the slot for Close and stops numerical reuse. Existing other theories retain SMTTheoryBase.CreateVariable semantics. Raw-value assertion gates inspect registered mappings only in checked enabled builds, then use the existing concrete LAR reader. Conflict/fixed/LP evidence passes through the same concrete inequality consumer; direct numerical guard behavior remains explicit."
+        "LRA mk_var now follows the source publication order: append the borrowed enode variable slot, check/extend bound directories, then attach its theory variable to the context. The bounds invariant fails before egraph attachment. A failed attachment retains the slot for Close and stops numerical reuse. Existing other theories retain SMTTheoryBase.CreateVariable semantics. Raw-value assertion gates inspect registered mappings only in checked enabled builds, then use the existing concrete LAR reader. Conflict/fixed/LP evidence passes through the same concrete inequality consumer; direct numerical guard behavior remains explicit.",
+        "LRA numerical conflicts now own the source SMTExtTheoryConflictJustification with original literal premises, empty immediate equality vector and empty parameter vector, registered once in the logical context scope. Basic-bound propagation always constructs Farkas/unit/unit parameters; an external reason retains its own parameter copies even with proof production disabled, while lexical originals and discarded small self-premise lemmas retire their parameters. Scope pop invalidates every retained parameter handle. Failed cold parameter creation publishes no reason and preserves owned-parameter counts."
       ],
       "deviations": [
         "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open.",
@@ -138626,7 +138643,8 @@
         "Nine live frontend trace sites preserve source timing: failed atom trace precedes found_not_handled mutation; its Unhandled trace follows marker/underspecified publication. Strict successful atom trace follows bound/Boolean/trail registration and precedes bound axioms. Equality and disequality trace before adapter work, assignment before enqueue, relevancy before operator dispatch, nonzero scope pop after restoration. Native tracing erases operand evaluation, and refused ostream output does not stop callbacks. Dead lazy-path trace sites738/747 remain excluded; whole LRA/smtcore and higher engine completeness remains unproven.",
         "Source CTRACE1316 reports the cumulative implied-bound count, not its delta; its comparison stays after numerical propagation and cancellation. Actual fixtures cover interest rejection, a derived bound, propagation conflict, basic implication, a numeral fixed merge and nested trace-only term-bound query. The cumulative-count, exhausted-count and stale-implied early-return sites1316/1413/1389 are implemented at source positions without a claim that these conditional branches are forced by the fixtures. Checked core assignment assertions use the real process assertion switch at source1425; native/disabled builds do not look up the core. Other live LRA trace sites and full source/owner/consumer completeness remain open.",
         "Seven retained registration/sharing trace sites preserve source ordering, including swapped unsorted bound-batch order before threshold sorting, the source reversed lower_t <= / upper_t >= labels, binary clause output before publication, mapped-term reuse silence, and source context scope/parent counts under shared. A large real coefficient forces an actual numeric printer reservation after a refused trace header; its allocation error is propagated and all owners close after lifting the refusal. doc/smt_lra_trace_audit.json accounts for all51 source TRACE/CTRACE sites:42 live ports and9 exclusions for unused three-literal mk_clause, constructor-disabled delayed registration and commented-out compound/use-list paths. This trace-only inventory does not prove all algorithms/assertions/owner paths or complete LRA/smtcore/higher engines.",
-        "Ten remaining live source SASSERT sites now use actual g3debug and process assertion gates, exact source conditions/locations, and noninteractive throw-capable diagnostic owners in tests. Disabled/native expressions are erased. Duplicate atoms and invalid values/evidence retain Go domain errors outside enabled checked assertions. The old unmapped objective test explicitly disables assertions for its existing domain-error expectation; new enabled checked tests cover the same ObjectiveValue caller and source1027 failure. doc/smt_lra_assertion_audit.json accounts for all27 textual SASSERT occurrences:15 active ports,2 persistent-column checks eliminated by local Go accumulators,9 no-retained-path exclusions and1 commented-out statement. Some predicates are invariants guaranteed by preceding branches, without a fabricated false-path test. Complete source methods/owner/consumer audit and higher engines remain unproven; no whole-unit promotion."
+        "Ten remaining live source SASSERT sites now use actual g3debug and process assertion gates, exact source conditions/locations, and noninteractive throw-capable diagnostic owners in tests. Disabled/native expressions are erased. Duplicate atoms and invalid values/evidence retain Go domain errors outside enabled checked assertions. The old unmapped objective test explicitly disables assertions for its existing domain-error expectation; new enabled checked tests cover the same ObjectiveValue caller and source1027 failure. doc/smt_lra_assertion_audit.json accounts for all27 textual SASSERT occurrences:15 active ports,2 persistent-column checks eliminated by local Go accumulators,9 no-retained-path exclusions and1 commented-out statement. Some predicates are invariants guaranteed by preceding branches, without a fabricated false-path test. Complete source methods/owner/consumer audit and higher engines remain unproven; no whole-unit promotion.",
+        "Whole-method/owner audit found and corrected two prior simplifications: using SetTheoryConflict selected the simple rather than extended source justification; checking ProofsEnabled before basic Farkas construction erased source metadata and its destructor lifetime in the external-reason path. Four new tests verify both proof modes, extended antecedent traversal/proof fact, exact three-parameter ownership and retirement, preserved native self-premise tautology, and an actual physical parameter-frontier refusal. Checked validation lazily creates persistent declaration-plugin parameters; its tautology is warmed before exact owner censuses without weakening the +3/return-to-baseline assertions. Full retained-method/owner/consumer review and complete LRA/smtcore/higher engines remain open; no whole-unit promotion."
       ]
     },
     {
@@ -138672,7 +138690,8 @@
         "pkg/smtcore/theory_lra_display.go",
         "pkg/smtcore/theory_lra_display_test.go",
         "pkg/smtcore/theory_lra_assertions.go",
-        "pkg/smtcore/theory_lra_assertions_test.go"
+        "pkg/smtcore/theory_lra_assertions_test.go",
+        "pkg/smtcore/theory_lra_justification_ownership_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -138781,7 +138800,11 @@
         "TestSMTLRASourceAssertionAtomAndRawValueGates",
         "TestSMTLRASourceAssertionBoundAndEvidenceGates",
         "TestSMTLRASourceAssertionReusedVariableBounds",
-        "TestSMTLRASourceAssertionsActualLPAndScopePath"
+        "TestSMTLRASourceAssertionsActualLPAndScopePath",
+        "TestSMTLRAConflictUsesScopedExtendedSourceJustification",
+        "TestSMTLRABasicExternalReasonKeepsFarkasWithoutProofs",
+        "TestSMTLRABasicTautologyRetiresParametersWithoutProofs",
+        "TestSMTLRABasicNoProofParameterRefusalKeepsOwners"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -138820,6 +138843,17 @@
             "TestSMTLRASourceAssertionReusedVariableBounds",
             "TestSMTLRASourceAssertionsActualLPAndScopePath"
           ]
+        },
+        {
+          "name": "source set_conflict extended justification identity and unconditional basic-bound Farkas parameter ownership across proof modes, propagation branch and scope retirement",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_lra_propagation.go",
+          "tests": [
+            "TestSMTLRAConflictUsesScopedExtendedSourceJustification",
+            "TestSMTLRABasicExternalReasonKeepsFarkasWithoutProofs",
+            "TestSMTLRABasicTautologyRetiresParametersWithoutProofs",
+            "TestSMTLRABasicNoProofParameterRefusalKeepsOwners"
+          ]
         }
       ],
       "ownership": [
@@ -138839,7 +138873,8 @@
         "Concrete smtLRAAxiomCall roots temporary coefficient/numeral/product expressions. A final blocker or strict NOT result is returned unrooted for immediate caller pinning and owns its arguments; it is never destroyed by retiring its lexical argument roots. The Boolean internalizer owns registered bound bases; the filter owns comparison declarations. Failed lexical cleanup moves roots to pendingAxiomRoots until theory Close. As existing InternalizeAtom, typed bound ownership is published before fallible bound-axiom work and refused work is queued in newBounds. Failed numeric string conversion stops its owner. Eight physical reference-budget frontiers verify refusal/success and zero explicit AST references after context/filter/caller cleanup.",
         "Initial constructor placeholders remain until first setup/check, when a concrete LRA owns its private numerical/rational services under the existing internalizer lifetime. Failed setup candidates are closed and a refused destructor remains in the kernel pendingSetupLRA slot until Close; ordinary retry cannot overwrite that owner. A concrete source stopwatch is cold context metadata and closes at every direct/tactic check exit. Statistics append caller-owned scalar contributions and borrow the active result or live solver, with source process/allocator getters sampled before lazy manager initialization; no model/numeral reference or synthetic OS memory count is created.",
         "Diagnostic output borrows AST heads/parameters and existing solver/cache owners. Rational parameter insertion uses the retained numeral service; Go character/formatting slices acquire no fictitious charged source owner. Exact writer prefixes, nil/closed guards and successful cleanup are checked. Cached term display can insert zero-valued missing proper columns, matching source.",
-        "LRA mk_var now follows the source publication order: append the borrowed enode variable slot, check/extend bound directories, then attach its theory variable to the context. The bounds invariant fails before egraph attachment. A failed attachment retains the slot for Close and stops numerical reuse. Existing other theories retain SMTTheoryBase.CreateVariable semantics. Raw-value assertion gates inspect registered mappings only in checked enabled builds, then use the existing concrete LAR reader. Conflict/fixed/LP evidence passes through the same concrete inequality consumer; direct numerical guard behavior remains explicit."
+        "LRA mk_var now follows the source publication order: append the borrowed enode variable slot, check/extend bound directories, then attach its theory variable to the context. The bounds invariant fails before egraph attachment. A failed attachment retains the slot for Close and stops numerical reuse. Existing other theories retain SMTTheoryBase.CreateVariable semantics. Raw-value assertion gates inspect registered mappings only in checked enabled builds, then use the existing concrete LAR reader. Conflict/fixed/LP evidence passes through the same concrete inequality consumer; direct numerical guard behavior remains explicit.",
+        "LRA numerical conflicts now own the source SMTExtTheoryConflictJustification with original literal premises, empty immediate equality vector and empty parameter vector, registered once in the logical context scope. Basic-bound propagation always constructs Farkas/unit/unit parameters; an external reason retains its own parameter copies even with proof production disabled, while lexical originals and discarded small self-premise lemmas retire their parameters. Scope pop invalidates every retained parameter handle. Failed cold parameter creation publishes no reason and preserves owned-parameter counts."
       ],
       "deviations": [
         "The retained setup selects the shared exact Go linear solver for QF_LRA and QF_UFLRA.",
@@ -138859,7 +138894,8 @@
         "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage.",
         "Bounded diagnostic increment only: source flags/status remain unchanged. Go io.Writer errors/short writes stop the current display. Associative flattening preserves native LIFO deferral, private parameters are included and foreign nonconstants use AST IDs. Source trace call sites/display_evidence and checked validation routines remain outside this increment; no whole LRA/smtcore completion credit.",
         "Removed two superseded aggregate method records: the historical theory_arith_linear platform-replacement mapping predates the actual LAR frontend, and unported theory_opt callbacks predates the audited objective implementation. Current bounded method entries already document those ports. Whole LRA status/audit flags remain unchanged. Added lifecycle traces preserve source cache effects, native erasure and duplicated candidate equality lines; remaining trace sites and complete retained-source audit remain open.",
-        "Ten remaining live source SASSERT sites now use actual g3debug and process assertion gates, exact source conditions/locations, and noninteractive throw-capable diagnostic owners in tests. Disabled/native expressions are erased. Duplicate atoms and invalid values/evidence retain Go domain errors outside enabled checked assertions. The old unmapped objective test explicitly disables assertions for its existing domain-error expectation; new enabled checked tests cover the same ObjectiveValue caller and source1027 failure. doc/smt_lra_assertion_audit.json accounts for all27 textual SASSERT occurrences:15 active ports,2 persistent-column checks eliminated by local Go accumulators,9 no-retained-path exclusions and1 commented-out statement. Some predicates are invariants guaranteed by preceding branches, without a fabricated false-path test. Complete source methods/owner/consumer audit and higher engines remain unproven; no whole-unit promotion."
+        "Ten remaining live source SASSERT sites now use actual g3debug and process assertion gates, exact source conditions/locations, and noninteractive throw-capable diagnostic owners in tests. Disabled/native expressions are erased. Duplicate atoms and invalid values/evidence retain Go domain errors outside enabled checked assertions. The old unmapped objective test explicitly disables assertions for its existing domain-error expectation; new enabled checked tests cover the same ObjectiveValue caller and source1027 failure. doc/smt_lra_assertion_audit.json accounts for all27 textual SASSERT occurrences:15 active ports,2 persistent-column checks eliminated by local Go accumulators,9 no-retained-path exclusions and1 commented-out statement. Some predicates are invariants guaranteed by preceding branches, without a fabricated false-path test. Complete source methods/owner/consumer audit and higher engines remain unproven; no whole-unit promotion.",
+        "Whole-method/owner audit found and corrected two prior simplifications: using SetTheoryConflict selected the simple rather than extended source justification; checking ProofsEnabled before basic Farkas construction erased source metadata and its destructor lifetime in the external-reason path. Four new tests verify both proof modes, extended antecedent traversal/proof fact, exact three-parameter ownership and retirement, preserved native self-premise tautology, and an actual physical parameter-frontier refusal. Checked validation lazily creates persistent declaration-plugin parameters; its tautology is warmed before exact owner censuses without weakening the +3/return-to-baseline assertions. Full retained-method/owner/consumer review and complete LRA/smtcore/higher engines remain open; no whole-unit promotion."
       ]
     },
     {

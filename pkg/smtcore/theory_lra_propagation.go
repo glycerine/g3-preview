@@ -44,7 +44,26 @@ func (t *SMTLRATheory) setLRAConflict() error {
 	if err := t.checkValidation(smtLRAValidateConflict, core, SMTFalseLiteral, nil, nil); err != nil {
 		return err
 	}
-	return t.state.SetTheoryConflict(t.FamilyID(), core)
+	s := t.state
+	if s.inconsistent {
+		return nil
+	}
+	// Source set_conflict always allocates the extended justification,
+	// including the immediate path with an empty equality-premise vector.
+	owner, err := NewSMTExtTheoryConflictJustification(s.manager, t.FamilyID(), core, nil, nil)
+	if err != nil {
+		return err
+	}
+	wrapped, err := NewSMTBooleanJustification(owner)
+	if err != nil {
+		return errors.Join(err, owner.Release(s.manager))
+	}
+	s.ownedJustifications = append(s.ownedJustifications, owner)
+	s.inconsistent = true
+	s.conflict = wrapped
+	s.conflictLiteral = SMTNullLiteral
+	s.statistics.NumConflicts++
+	return nil
 }
 
 func (t *SMTLRATheory) impliedBoundLiteral(kind lp.LConstraintKind, value *big.Rat, b *smtLRABound) SMTLiteral {
@@ -340,19 +359,15 @@ func (t *SMTLRATheory) propagateBasicBound(b *smtLRABound, truth bool) (result e
 		return err
 	}
 	t.basicPropagations++
-	proofs, err := t.state.manager.ProofsEnabled()
+	// Source m_params is populated independently of proof production. The
+	// external-justification branch owns its copy even when proofs are off.
+	antecedents := smtArithmeticAntecedents{literalCoefficients: []*big.Rat{big.NewRat(1, 1), big.NewRat(1, 1)}}
+	parameters, err := antecedents.parameters(t.state.manager, "farkas")
 	if err != nil {
 		return err
 	}
-	var parameters []ast.ASTParameter
-	if proofs {
-		antecedents := smtArithmeticAntecedents{literalCoefficients: []*big.Rat{big.NewRat(1, 1), big.NewRat(1, 1)}}
-		parameters, err = antecedents.parameters(t.state.manager, "farkas")
-		if err != nil {
-			return err
-		}
-		defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(t.state.manager, parameters)) }()
-	}
+	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(t.state.manager, parameters)) }()
+
 	// Preserve the source quirk: m_core contains lit2, not lit1. In the
 	// small-lemma path this creates a tautology, not a new implication.
 	if err = t.assignLRABound(literal, []SMTLiteral{literal}, parameters); err != nil {
