@@ -32,10 +32,36 @@ func (m *ASTManager) mkFPASpecialOfSort(sort ASTHandle, kind int32) (ASTHandle, 
 	previous := m.formatExecuting
 	m.formatExecuting = true
 	defer func() { m.formatExecuting = previous }()
-	decl, err := m.floatingPointSpecialDecl(kind, nil, sort)
+	ref, err := m.requireKind(sort, ASTSort)
 	if err != nil {
 		return ASTHandle{}, err
 	}
-	app, err := m.mkApp(decl, nil)
-	return m.external(app), err
+	p := m.floatingPointPlugin
+	if p == nil || !p.published || p.sourceEnded {
+		return ASTHandle{}, ErrASTHandle
+	}
+	if kind == astFPAPlusZero || kind == astFPAMinusZero {
+		node, err := p.mkSignedZeroFromSort(ref, kind == astFPAMinusZero)
+		return m.external(node), err
+	}
+	ebits, err := m.fpaUtilExponentBits(ref)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	sbits, err := m.fpaUtilSignificandBits(ref)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	class := astFloatNaN
+	switch kind {
+	case astFPANaN:
+	case astFPAPlusInf:
+		class = astFloatPInf
+	case astFPAMinusInf:
+		class = astFloatNInf
+	default:
+		return ASTHandle{}, ErrASTDomain
+	}
+	node, err := p.mkSpecialNumeral(ebits, sbits, class)
+	return m.external(node), err
 }

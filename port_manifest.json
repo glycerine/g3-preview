@@ -20987,7 +20987,14 @@
         "pkg/ast/rewriter/fpa_bv_wrap_test.go",
         "pkg/model/model_evaluator_fpa_test.go",
         "pkg/ast/ast_fpa_translation.go",
-        "pkg/util/numeral/mpf_value_copy_owner.go"
+        "pkg/util/numeral/mpf_value_copy_owner.go",
+        "pkg/ast/ast_fpa_util_width.go",
+        "pkg/ast/ast_fpa_nan_sort.go",
+        "pkg/ast/ast_fpa_model_factory.go",
+        "pkg/ast/ast_fpa_model_factory_test.go",
+        "pkg/ast/ast_fpa_util_width.go",
+        "pkg/smtcore/proto_model/fpa_factory.go",
+        "pkg/smtcore/proto_model/fpa_factory_source_test.go"
       ],
       "tests": [
         "TestASTFPABV2RMDeclarationSortsAndImplicitRange",
@@ -21037,7 +21044,17 @@
         "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals",
         "TestASTFPAToFPIEEEBVExactFieldsAndRefusals",
         "TestASTTranslationCopiesFloatingPointExternalParameters",
-        "TestArbitraryFloatDirectCopyFromExplicitForeignOwner"
+        "TestArbitraryFloatDirectCopyFromExplicitForeignOwner",
+        "TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues",
+        "TestFloatingPointFactoryRejectsNonFloatSortsWithSourceAssertion",
+        "TestFloatingPointFactoryFreshValueSourceFailure",
+        "TestFloatingPointFactoryClosedAndNilGuards",
+        "TestFloatingPointFactoryArrayRangeConsumer",
+        "TestFloatingPointFactoryFreshContinueExitChild",
+        "TestFloatingPointFactoryFreshContinueExit",
+        "TestFloatingPointFactoryColdAllocationPrefixes",
+        "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
+        "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
       ],
       "assertions": [
         {
@@ -21108,40 +21125,62 @@
           "name": "bv_wrap declaration accepts FP or RM sort and derives BV result width (fpa_decl_plugin.cpp:689-710)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_bv_wrap_decl.go",
-          "go_targets": ["pkg/ast/rewriter/fpa_bv_wrap_test.go"],
-          "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
+          "go_targets": [
+            "pkg/ast/rewriter/fpa_bv_wrap_test.go"
+          ],
+          "tests": [
+            "TestFPABVWrapSourceExtractIdentityAndRefusals"
+          ]
         },
         {
           "name": "bv2rm declaration validates a three-bit BV domain and RoundingMode range (fpa_decl_plugin.cpp:675-686)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_bv2rm_decl.go",
-          "tests": ["TestASTFPABV2RMDeclarationSortsAndImplicitRange"]
+          "tests": [
+            "TestASTFPABV2RMDeclarationSortsAndImplicitRange"
+          ]
         },
         {
           "name": "fp three-bit-vector declaration with one-bit sign and derived floating-point format (fpa_decl_plugin.cpp:591-606)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_fp_decl.go",
-          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+          "tests": [
+            "TestASTFPAFPComponentsNumeralsAndTrace"
+          ]
         },
         {
           "name": "FPA classification unary relation declarations and applications: seven exact kinds, names, floating-point domain and Boolean range (fpa_decl_plugin.cpp:313-331,731-738)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_classification_decl.go",
-          "tests": ["TestASTFloatingPointClassificationDeclarationsAndApplications"]
+          "tests": [
+            "TestASTFloatingPointClassificationDeclarationsAndApplications"
+          ]
         },
         {
           "name": "FPA fp.eq/lt/gt/leq/geq binary relation declarations: equal floating-point domains, chainable Boolean results, source kinds and application dispatch (fpa_decl_plugin.cpp:292-311,724-730)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_equality_decl.go",
-          "go_targets": ["pkg/ast/rewriter/fpa_comparisons_test.go", "pkg/ast/rewriter/fpa_ieee_equality_test.go"],
-          "tests": ["TestASTFPAIEEEEqualityDeclarationAndDomainValidation", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches"]
+          "go_targets": [
+            "pkg/ast/rewriter/fpa_comparisons_test.go",
+            "pkg/ast/rewriter/fpa_ieee_equality_test.go"
+          ],
+          "tests": [
+            "TestASTFPAIEEEEqualityDeclarationAndDomainValidation",
+            "TestFPAIEEEEqualityDiffersFromSMTEquality",
+            "TestFPAOrderedComparisonSourceSpecialAndNumericBranches"
+          ]
         },
         {
           "name": "FPA fp.neg/fp.abs unary declarations: one FloatingPoint domain, same-sort range and exact source kinds (fpa_decl_plugin.cpp:333-350,738-742)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_unary_decl.go",
-          "go_targets": ["pkg/ast/rewriter/fpa_unary_test.go"],
-          "tests": ["TestASTFPAUnaryNegAbsDeclarationsAndApplications", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg"]
+          "go_targets": [
+            "pkg/ast/rewriter/fpa_unary_test.go"
+          ],
+          "tests": [
+            "TestASTFPAUnaryNegAbsDeclarationsAndApplications",
+            "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg"
+          ]
         },
         {
           "name": "ast_fpa_plugin concrete reached source counterpart (fpa_decl_plugin.cpp:23-49,182-231)",
@@ -21337,7 +21376,9 @@
           "name": "Reached fpa_decl_plugin::get_some_value FloatingPoint NaN and RoundingMode toward-zero defaults (fpa_decl_plugin.cpp:856-870), with MPF construction, numeral registration and local deletion in source order",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_some_value.go",
-          "go_targets": ["pkg/model/model_evaluator_fpa_test.go"],
+          "go_targets": [
+            "pkg/model/model_evaluator_fpa_test.go"
+          ],
           "tests": [
             "TestASTFloatingPointSomeValueSourceDefaults",
             "TestASTFloatingPointSomeValueRefusedMPFConstruction",
@@ -21356,7 +21397,9 @@
           "name": "fpa_decl_plugin::translate cross-manager external numeral value-table copy (fpa_decl_plugin.cpp:176-180)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_translation.go",
-          "go_targets": ["pkg/util/numeral/mpf_value_copy_owner.go"],
+          "go_targets": [
+            "pkg/util/numeral/mpf_value_copy_owner.go"
+          ],
           "tests": [
             "TestASTTranslationCopiesFloatingPointExternalParameters",
             "TestArbitraryFloatDirectCopyFromExplicitForeignOwner"
@@ -21387,6 +21430,34 @@
           "go_target": "pkg/ast/ast_fpa_contains.go",
           "tests": [
             "TestASTContainsFloatingPointTraversesEverySourceNodeShape"
+          ]
+        },
+        {
+          "name": "Concrete fpa_util get_ebits/get_sbits (cpp:940-948): real runtime SASSERT941/946 and literal integer parameter reads, consumed by model factory and native NaN/infinity/signed-zero sort overloads. Public utility calls now use their scoped MPF setters/canonical registration, independently of the declaration-plugin special-constant path.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/ast_fpa_util_width.go",
+            "pkg/ast/ast_fpa_nan_sort.go",
+            "pkg/ast/ast_fpa_numeral_probe.go",
+            "pkg/ast/ast_fpa_numeral_probe_test.go",
+            "pkg/ast/ast_fpa_model_factory.go",
+            "pkg/ast/ast_fpa_model_factory_test.go",
+            "pkg/ast/ast_fpa_util_width.go",
+            "pkg/smtcore/proto_model/fpa_factory.go",
+            "pkg/smtcore/proto_model/fpa_factory_source_test.go"
+          ],
+          "tests": [
+            "TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues",
+            "TestFloatingPointFactoryRejectsNonFloatSortsWithSourceAssertion",
+            "TestFloatingPointFactoryFreshValueSourceFailure",
+            "TestFloatingPointFactoryClosedAndNilGuards",
+            "TestFloatingPointFactoryArrayRangeConsumer",
+            "TestFloatingPointFactoryFreshContinueExitChild",
+            "TestFloatingPointFactoryFreshContinueExit",
+            "TestFloatingPointFactoryColdAllocationPrefixes",
+            "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
+            "TestASTFPAModelFactoryUsesOneLiveNumericalScope",
+            "TestASTFloatingPointSignedZeroSortOverloads"
           ]
         }
       ],
@@ -21423,7 +21494,14 @@
         "pkg/ast/ast_fpa_numeral_probe_test.go",
         "pkg/ast/ast_fpa_rounding_read.go",
         "pkg/ast/rewriter/fpa_bv_wrap_test.go",
-        "pkg/model/model_evaluator_fpa_test.go"
+        "pkg/model/model_evaluator_fpa_test.go",
+        "pkg/ast/ast_fpa_util_width.go",
+        "pkg/ast/ast_fpa_nan_sort.go",
+        "pkg/ast/ast_fpa_model_factory.go",
+        "pkg/ast/ast_fpa_model_factory_test.go",
+        "pkg/ast/ast_fpa_util_width.go",
+        "pkg/smtcore/proto_model/fpa_factory.go",
+        "pkg/smtcore/proto_model/fpa_factory_source_test.go"
       ],
       "tests": [
         "TestASTFPABV2RMDeclarationSortsAndImplicitRange",
@@ -21445,7 +21523,17 @@
         "TestASTFloatingPointConstructorDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads",
-        "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup"
+        "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
+        "TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues",
+        "TestFloatingPointFactoryRejectsNonFloatSortsWithSourceAssertion",
+        "TestFloatingPointFactoryFreshValueSourceFailure",
+        "TestFloatingPointFactoryClosedAndNilGuards",
+        "TestFloatingPointFactoryArrayRangeConsumer",
+        "TestFloatingPointFactoryFreshContinueExitChild",
+        "TestFloatingPointFactoryFreshContinueExit",
+        "TestFloatingPointFactoryColdAllocationPrefixes",
+        "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
+        "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
       ],
       "conditionals": [
         {
@@ -21502,26 +21590,36 @@
           "name": "bv_wrap retained declaration kind and FP/RM domain (fpa_decl_plugin.h:89,159; fpa_decl_plugin.cpp:689-710)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_bv_wrap_decl.go",
-          "go_targets": ["pkg/ast/rewriter/fpa_bv_wrap_test.go"],
-          "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
+          "go_targets": [
+            "pkg/ast/rewriter/fpa_bv_wrap_test.go"
+          ],
+          "tests": [
+            "TestFPABVWrapSourceExtractIdentityAndRefusals"
+          ]
         },
         {
           "name": "bv2rm retained declaration kind and three-bit BV to RoundingMode sort contract (fpa_decl_plugin.h:90,159; fpa_decl_plugin.cpp:675-686)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_bv2rm_decl.go",
-          "tests": ["TestASTFPABV2RMDeclarationSortsAndImplicitRange"]
+          "tests": [
+            "TestASTFPABV2RMDeclarationSortsAndImplicitRange"
+          ]
         },
         {
           "name": "fp constructor declaration for retained three-BV application (fpa_decl_plugin.h; fpa_decl_plugin.cpp:591-606)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_fp_decl.go",
-          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+          "tests": [
+            "TestASTFPAFPComponentsNumeralsAndTrace"
+          ]
         },
         {
           "name": "Reached fpa_decl_plugin::get_some_value declaration and two source sort defaults (fpa_decl_plugin.h:183; fpa_decl_plugin.cpp:856-870)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_some_value.go",
-          "go_targets": ["pkg/model/model_evaluator_fpa_test.go"],
+          "go_targets": [
+            "pkg/model/model_evaluator_fpa_test.go"
+          ],
           "tests": [
             "TestASTFloatingPointSomeValueSourceDefaults",
             "TestASTFloatingPointSomeValueRefusedMPFConstruction",
@@ -21624,6 +21722,34 @@
           "tests": [
             "TestASTContainsFloatingPointTraversesEverySourceNodeShape",
             "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointSignedZeroSortOverloads"
+          ]
+        },
+        {
+          "name": "Concrete fpa_util get_ebits/get_sbits (cpp:940-948): real runtime SASSERT941/946 and literal integer parameter reads, consumed by model factory and native NaN/infinity/signed-zero sort overloads. Public utility calls now use their scoped MPF setters/canonical registration, independently of the declaration-plugin special-constant path.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/ast_fpa_util_width.go",
+            "pkg/ast/ast_fpa_nan_sort.go",
+            "pkg/ast/ast_fpa_numeral_probe.go",
+            "pkg/ast/ast_fpa_numeral_probe_test.go",
+            "pkg/ast/ast_fpa_model_factory.go",
+            "pkg/ast/ast_fpa_model_factory_test.go",
+            "pkg/ast/ast_fpa_util_width.go",
+            "pkg/smtcore/proto_model/fpa_factory.go",
+            "pkg/smtcore/proto_model/fpa_factory_source_test.go"
+          ],
+          "tests": [
+            "TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues",
+            "TestFloatingPointFactoryRejectsNonFloatSortsWithSourceAssertion",
+            "TestFloatingPointFactoryFreshValueSourceFailure",
+            "TestFloatingPointFactoryClosedAndNilGuards",
+            "TestFloatingPointFactoryArrayRangeConsumer",
+            "TestFloatingPointFactoryFreshContinueExitChild",
+            "TestFloatingPointFactoryFreshContinueExit",
+            "TestFloatingPointFactoryColdAllocationPrefixes",
+            "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
+            "TestASTFPAModelFactoryUsesOneLiveNumericalScope",
             "TestASTFloatingPointSignedZeroSortOverloads"
           ]
         }
@@ -140612,7 +140738,11 @@
         "pkg/ast/ast_fpa_model_value.go",
         "pkg/ast/ast_fpa_model_value_test.go",
         "pkg/smtcore/theory_fpa_model_source_test.go",
-        "pkg/util/numeral/mpf_borrowed_power.go"
+        "pkg/util/numeral/mpf_borrowed_power.go",
+        "pkg/ast/ast_fpa_model_factory.go",
+        "pkg/ast/ast_fpa_model_factory_test.go",
+        "pkg/ast/ast_fpa_util_width.go",
+        "pkg/smtcore/proto_model/fpa_factory_source_test.go"
       ],
       "tests": [
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
@@ -140632,7 +140762,17 @@
         "TestASTFPAModelWideBiasedExponent",
         "TestSMTFPANativeModelProcedureCanonicalComponents",
         "TestSMTFPAModelWidthAssertionsAndActions",
-        "TestSMTFPAModelNumeralVerification"
+        "TestSMTFPAModelNumeralVerification",
+        "TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues",
+        "TestFloatingPointFactoryRejectsNonFloatSortsWithSourceAssertion",
+        "TestFloatingPointFactoryFreshValueSourceFailure",
+        "TestFloatingPointFactoryClosedAndNilGuards",
+        "TestFloatingPointFactoryArrayRangeConsumer",
+        "TestFloatingPointFactoryFreshContinueExitChild",
+        "TestFloatingPointFactoryFreshContinueExit",
+        "TestFloatingPointFactoryColdAllocationPrefixes",
+        "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
+        "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
       ],
       "assertions": [
         {
@@ -140924,6 +141064,29 @@
             "TestSMTFPAModelWidthAssertionsAndActions",
             "TestSMTFPAModelNumeralVerification"
           ]
+        },
+        {
+          "name": "fpa_value_factory numerical bodies (theory_fpa.h:48-62,65-66): one actual scoped MPF, native machine-int setter0 then canonical registration, same MPF setter1 for the pair, no retained factory values, real NOT_IMPLEMENTED_YET/UNREACHABLE fresh-value behavior and ignored register_value. Source expr_ref output ownership remains a separate open interface audit.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/ast_fpa_model_factory.go",
+            "pkg/ast/ast_fpa_model_factory_test.go",
+            "pkg/ast/ast_fpa_util_width.go",
+            "pkg/smtcore/proto_model/fpa_factory.go",
+            "pkg/smtcore/proto_model/fpa_factory_source_test.go"
+          ],
+          "tests": [
+            "TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues",
+            "TestFloatingPointFactoryRejectsNonFloatSortsWithSourceAssertion",
+            "TestFloatingPointFactoryFreshValueSourceFailure",
+            "TestFloatingPointFactoryClosedAndNilGuards",
+            "TestFloatingPointFactoryArrayRangeConsumer",
+            "TestFloatingPointFactoryFreshContinueExitChild",
+            "TestFloatingPointFactoryFreshContinueExit",
+            "TestFloatingPointFactoryColdAllocationPrefixes",
+            "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
+            "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
+          ]
         }
       ],
       "ownership": [
@@ -140938,7 +141101,8 @@
         "Float operands are reached recursively while translating atoms and equalities; rounding-mode relevancy additionally connects wrappers to finite encodings. Context display_theories is a retained display consumer and now reaches the complete FPA printer. The previous claim that native trace/display had no separate retained consumer was unsupported: live t_fpa/t_fpa_detail/t_fpa_internalize traces and source assertions remain unported, and fresh-theory reachability still requires revalidation.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
         "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change.",
-        "The former broad model/factory ported claim is withdrawn: the factory still supplies signed zeros instead of source numeric 0/1; fresh-value fatal behavior, rounding-mode factory extensions, model fallback paths, source input/result TRACE, numerical destructor failure prefixes and full lifecycle audit remain open. Native model reconstruction now uses the actual plugin MPF/MPZ owners and canonical registration instead of math/big extraction followed by a raw fp constructor. The selected small-format C++ SMT-LIB comparison is integration evidence, not whole-unit completion. Ebits64 also reaches the source signed top-exponent helper limit (2^63); the tested multi-limb boundary is ebits63."
+        "The former broad model/factory ported claim remains withdrawn. Factory numerical0/1 and fatal fresh behavior now use the retained native owners/macros; invented RM defaults are removed. The shared model factory interface still returns raw AST handles rather than source get_some_values expr_ref outputs, so caller output-reference publication/error-prefix ownership remains unclosed. Model fallback paths, source model input/result TRACE, numerical destructor failure prefixes and full lifecycle audit remain open. Native model reconstruction uses actual plugin MPF/MPZ owners and canonical registration. The small-format prebuilt C++ SMT-LIB comparison is integration evidence, not whole-unit completion. Ebits64 reaches the source signed top-exponent helper limit (2^63); the tested multi-limb boundary remains ebits63.",
+        "The native cold factory reservation sweep reaches failures and completion with fixture budget0 cleanup, but no later refusal after publishing zero was observed in this preallocated-arena profile. It is not evidence for all source allocator/destructor/output-reference failure prefixes. Native NOT_IMPLEMENTED_YET stops at the existing explicit GNU-unreachable guard; checked Continue is separately verified to exit107 in an actual child process. The source factory is not an RM value enumerator: width assertions fire before absent parameter reads, and erased/continued assertions retain literal parameter semantics when real foreign sort metadata provides them."
       ]
     },
     {
@@ -140956,7 +141120,11 @@
         "pkg/ast/ast_fpa_model_value.go",
         "pkg/ast/ast_fpa_model_value_test.go",
         "pkg/smtcore/theory_fpa_model_source_test.go",
-        "pkg/util/numeral/mpf_borrowed_power.go"
+        "pkg/util/numeral/mpf_borrowed_power.go",
+        "pkg/ast/ast_fpa_model_factory.go",
+        "pkg/ast/ast_fpa_model_factory_test.go",
+        "pkg/ast/ast_fpa_util_width.go",
+        "pkg/smtcore/proto_model/fpa_factory_source_test.go"
       ],
       "tests": [
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
@@ -140973,7 +141141,17 @@
         "TestASTFPAModelWideBiasedExponent",
         "TestSMTFPANativeModelProcedureCanonicalComponents",
         "TestSMTFPAModelWidthAssertionsAndActions",
-        "TestSMTFPAModelNumeralVerification"
+        "TestSMTFPAModelNumeralVerification",
+        "TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues",
+        "TestFloatingPointFactoryRejectsNonFloatSortsWithSourceAssertion",
+        "TestFloatingPointFactoryFreshValueSourceFailure",
+        "TestFloatingPointFactoryClosedAndNilGuards",
+        "TestFloatingPointFactoryArrayRangeConsumer",
+        "TestFloatingPointFactoryFreshContinueExitChild",
+        "TestFloatingPointFactoryFreshContinueExit",
+        "TestFloatingPointFactoryColdAllocationPrefixes",
+        "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
+        "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
       ],
       "conditionals": [
         {
@@ -141036,6 +141214,29 @@
             "TestSMTFPAModelWidthAssertionsAndActions",
             "TestSMTFPAModelNumeralVerification"
           ]
+        },
+        {
+          "name": "fpa_value_factory numerical bodies (theory_fpa.h:48-62,65-66): one actual scoped MPF, native machine-int setter0 then canonical registration, same MPF setter1 for the pair, no retained factory values, real NOT_IMPLEMENTED_YET/UNREACHABLE fresh-value behavior and ignored register_value. Source expr_ref output ownership remains a separate open interface audit.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/ast/ast_fpa_model_factory.go",
+            "pkg/ast/ast_fpa_model_factory_test.go",
+            "pkg/ast/ast_fpa_util_width.go",
+            "pkg/smtcore/proto_model/fpa_factory.go",
+            "pkg/smtcore/proto_model/fpa_factory_source_test.go"
+          ],
+          "tests": [
+            "TestFloatingPointFactoryNumericZeroOneAndNoRetainedValues",
+            "TestFloatingPointFactoryRejectsNonFloatSortsWithSourceAssertion",
+            "TestFloatingPointFactoryFreshValueSourceFailure",
+            "TestFloatingPointFactoryClosedAndNilGuards",
+            "TestFloatingPointFactoryArrayRangeConsumer",
+            "TestFloatingPointFactoryFreshContinueExitChild",
+            "TestFloatingPointFactoryFreshContinueExit",
+            "TestFloatingPointFactoryColdAllocationPrefixes",
+            "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
+            "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
+          ]
         }
       ],
       "ownership": [
@@ -141047,7 +141248,8 @@
         "The native fresh-value factory method is itself unimplemented; the Go factory implements the retained canonical-value operations and deliberately reports that it cannot manufacture an unbounded fresh FP value.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
         "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change.",
-        "The former broad model/factory ported claim is withdrawn: the factory still supplies signed zeros instead of source numeric 0/1; fresh-value fatal behavior, rounding-mode factory extensions, model fallback paths, source input/result TRACE, numerical destructor failure prefixes and full lifecycle audit remain open. Native model reconstruction now uses the actual plugin MPF/MPZ owners and canonical registration instead of math/big extraction followed by a raw fp constructor. The selected small-format C++ SMT-LIB comparison is integration evidence, not whole-unit completion. Ebits64 also reaches the source signed top-exponent helper limit (2^63); the tested multi-limb boundary is ebits63."
+        "The former broad model/factory ported claim remains withdrawn. Factory numerical0/1 and fatal fresh behavior now use the retained native owners/macros; invented RM defaults are removed. The shared model factory interface still returns raw AST handles rather than source get_some_values expr_ref outputs, so caller output-reference publication/error-prefix ownership remains unclosed. Model fallback paths, source model input/result TRACE, numerical destructor failure prefixes and full lifecycle audit remain open. Native model reconstruction uses actual plugin MPF/MPZ owners and canonical registration. The small-format prebuilt C++ SMT-LIB comparison is integration evidence, not whole-unit completion. Ebits64 reaches the source signed top-exponent helper limit (2^63); the tested multi-limb boundary remains ebits63.",
+        "The native cold factory reservation sweep reaches failures and completion with fixture budget0 cleanup, but no later refusal after publishing zero was observed in this preallocated-arena profile. It is not evidence for all source allocator/destructor/output-reference failure prefixes. Native NOT_IMPLEMENTED_YET stops at the existing explicit GNU-unreachable guard; checked Continue is separately verified to exit107 in an actual child process. The source factory is not an RM value enumerator: width assertions fire before absent parameter reads, and erased/continued assertions retain literal parameter semantics when real foreign sort metadata provides them."
       ]
     },
     {

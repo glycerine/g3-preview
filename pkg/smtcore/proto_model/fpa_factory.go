@@ -1,10 +1,12 @@
 // Source: src/smt/theory_fpa.h fpa_value_factory.
 package protomodel
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
-// FloatingPointFactory supplies canonical values for floating-point and
-// rounding-mode sorts while the SMT model is assembled.
+// FloatingPointFactory supplies numeric zero and one for FP sorts.
 type FloatingPointFactory struct {
 	manager *ast.ASTManager
 	family  ast.FamilyID
@@ -23,46 +25,20 @@ func (f *FloatingPointFactory) SomeValue(sort ast.ASTHandle) (ast.ASTHandle, err
 	if f == nil || f.manager == nil {
 		return ast.ASTHandle{}, ast.ErrASTHandle
 	}
-	if _, _, floating, err := f.manager.FloatingPointSortShape(sort); err != nil {
-		return ast.ASTHandle{}, err
-	} else if floating {
-		return f.manager.MkFPAZeroOfSort(sort, false)
-	}
-	if rounding, err := f.manager.IsRoundingModeSort(sort); err != nil {
-		return ast.ASTHandle{}, err
-	} else if rounding {
-		return f.manager.MkFamilyApp(f.family, ast.FPAOpRMTowardZero, nil, nil)
-	}
-	return ast.ASTHandle{}, ast.ErrASTDomain
+	return f.manager.MkFPAModelFactoryValue(sort)
 }
 
 func (f *FloatingPointFactory) SomeValues(sort ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
-	if _, _, floating, err := f.manager.FloatingPointSortShape(sort); err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
-	} else if floating {
-		first, err := f.manager.MkFPAZeroOfSort(sort, false)
-		if err != nil {
-			return ast.ASTHandle{}, ast.ASTHandle{}, false, err
-		}
-		second, err := f.manager.MkFPAZeroOfSort(sort, true)
-		return first, second, err == nil, err
+	if f == nil || f.manager == nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, ast.ErrASTHandle
 	}
-	if rounding, err := f.manager.IsRoundingModeSort(sort); err != nil {
-		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
-	} else if rounding {
-		first, err := f.manager.MkFamilyApp(f.family, ast.FPAOpRMNearestEven, nil, nil)
-		if err != nil {
-			return ast.ASTHandle{}, ast.ASTHandle{}, false, err
-		}
-		second, err := f.manager.MkFamilyApp(f.family, ast.FPAOpRMTowardZero, nil, nil)
-		return first, second, err == nil, err
-	}
-	return ast.ASTHandle{}, ast.ASTHandle{}, false, ast.ErrASTDomain
+	first, second, err := f.manager.MkFPAModelFactoryPair(sort)
+	return first, second, err == nil, err
 }
 
-// The source factory does not synthesize fresh FPA values.
+// Source get_fresh_value is a fatal NOT_IMPLEMENTED_YET, not a null value.
 func (*FloatingPointFactory) FreshValue(ast.ASTHandle) (ast.ASTHandle, error) {
-	return ast.ASTHandle{}, nil
+	return ast.ASTHandle{}, diagnostic.BorrowProcessDebugContext().NotImplementedYet("src/smt/theory_fpa.h", 65)
 }
 
 func (*FloatingPointFactory) RegisterValue(ast.ASTHandle) error { return nil }

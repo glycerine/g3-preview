@@ -245,33 +245,11 @@ func (p *astFloatingPointPluginOwner) mkSignedZeroFromSort(sort astNodeRef, nega
 		return astNodeRef{}, ErrASTHandle
 	}
 	m := p.owner
-	if e := m.validNode(sort); e != nil {
-		return astNodeRef{}, e
-	}
-	if m.nodeAt(sort.slot).kind != ASTSort {
-		return astNodeRef{}, ErrASTDomain
-	}
-	info, e := m.sortInfo(m.sortAt(sort.slot).info)
+	ebits, e := m.fpaUtilExponentBits(sort)
 	if e != nil {
 		return astNodeRef{}, e
 	}
-	if info.family != p.family || info.kind != 0 {
-		return astNodeRef{}, ErrASTDomain
-	}
-	eParam, e := m.infoParameter(info, 0)
-	if e != nil {
-		return astNodeRef{}, e
-	}
-	eValue, e := m.parameterOfKind(eParam, ASTParameterInt)
-	if e != nil {
-		return astNodeRef{}, e
-	}
-	ebits := uint32(eValue.integer)
-	sParam, e := m.infoParameter(info, 1)
-	if e != nil {
-		return astNodeRef{}, e
-	}
-	sValue, e := m.parameterOfKind(sParam, ASTParameterInt)
+	sbits, e := m.fpaUtilSignificandBits(sort)
 	if e != nil {
 		return astNodeRef{}, e
 	}
@@ -279,5 +257,5 @@ func (p *astFloatingPointPluginOwner) mkSignedZeroFromSort(sort astNodeRef, nega
 	if negative {
 		class = astFloatNZero
 	}
-	return p.mkSpecialNumeral(ebits, uint32(sValue.integer), class)
+	return p.mkSpecialNumeral(ebits, sbits, class)
 }

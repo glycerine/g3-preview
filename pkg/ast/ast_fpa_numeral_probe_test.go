@@ -5,7 +5,9 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestASTFloatingPointClassificationDestructorFailureClearsResult(t *testing.T) {
@@ -278,6 +280,10 @@ func TestASTFloatingPointSpecialNaNFailureRetainsScalar(t *testing.T) {
 }
 
 func TestASTFloatingPointSignedZeroSortOverloads(t *testing.T) {
+	_, _, d, _, _ := astDebugActionFixture(t, "T")
+	previous, err := diagnostic.BindProcessDebugContext(d)
+	astTestMust(t, err)
+	t.Cleanup(func() { _, err := diagnostic.BindProcessDebugContext(previous); astTestMust(t, err) })
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
@@ -308,8 +314,18 @@ func TestASTFloatingPointSignedZeroSortOverloads(t *testing.T) {
 			t.Fatal("sort overload lost sign", negative)
 		}
 	}
-	if n, e := p.mkSignedZeroFromSort(m.boolSort, false); e != ErrASTDomain || n.slot != 0 || p.numeralProbeFrames != nil {
-		t.Fatal("nonfloating sort entered local MPF constructor", n, e, p.numeralProbeFrames)
+	n, e := p.mkSignedZeroFromSort(m.boolSort, false)
+	if diagnostic.DebugBuild {
+		var ex z3exception.DefaultException
+		if !errors.As(e, &ex) || ex.Message() != "assertion violation" {
+			t.Fatal("nonfloating source width assertion", e)
+		}
+	} else if e != ErrASTDomain {
+		t.Fatal("nonfloating source parameter read", e)
 	}
+	if n.slot != 0 || p.numeralProbeFrames != nil {
+		t.Fatal("nonfloating sort entered local MPF constructor", n, p.numeralProbeFrames)
+	}
+
 	astTestMust(t, m.Close())
 }
