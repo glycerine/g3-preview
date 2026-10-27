@@ -229,9 +229,17 @@ func (f *DatalogFactory) Close() (err error) {
 	}
 	f.sets = nil
 	for i := range f.sorts {
+		// DelRef may consume the token before returning a numerical error.
+		if f.sorts[i] == (ast.ASTRef{}) {
+			continue
+		}
 		err = errors.Join(err, f.manager.DelRef(&f.sorts[i]))
 	}
 	for i := range f.values {
+		// DelRef may consume the token before returning a numerical error.
+		if f.values[i] == (ast.ASTRef{}) {
+			continue
+		}
 		err = errors.Join(err, f.manager.DelRef(&f.values[i]))
 	}
 	if err == nil {
