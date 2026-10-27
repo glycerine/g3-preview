@@ -11,6 +11,10 @@ import (
 )
 
 func TestLPRationalDualAdvanceIndependentExchanges(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	b := [][]int64{{2, 1, 0}, {0, 4, 2}, {0, 0, 8}}
 	inverse := [][]*big.Rat{{big.NewRat(1, 2), big.NewRat(-1, 8), big.NewRat(1, 32)}, {new(big.Rat), big.NewRat(1, 4), big.NewRat(-1, 16)}, {new(big.Rat), new(big.Rat), big.NewRat(1, 8)}}
 	for world := 0; world < 120; world++ {

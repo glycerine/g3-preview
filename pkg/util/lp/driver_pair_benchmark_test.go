@@ -25,6 +25,10 @@ func lpPairBenchmarkOracle(seed, iterations uint32) ([]*big.Rat, string, string,
 }
 
 func TestLPPairBenchmarkIndependentInputsProductsAndReport(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for seed := uint32(0); seed < 30; seed++ {
 		t.Run(fmt.Sprint(seed), func(t *testing.T) {
 			h := newLPPairHarness(t)
@@ -65,6 +69,10 @@ func TestLPPairBenchmarkIndependentInputsProductsAndReport(t *testing.T) {
 }
 
 func TestLPPairBenchmarkEveryReportByteAndEndlRefusal(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	_, prefix, result, _ := lpPairBenchmarkOracle(17, 1)
 	report := prefix + "operation with rationals 2\n" + result + "\n"
 	for _, cause := range []error{nil, lpErrResidualWrite} {

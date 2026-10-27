@@ -897,6 +897,10 @@ func TestLPRationalDualOuterCostAliasesAndLifetime(t *testing.T) {
 }
 
 func TestLPRationalDualOuterCopyCompletedPrefix(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		success, witness := false, false
 		for ordinal := int64(0); ordinal < 1000; ordinal++ {

@@ -508,6 +508,10 @@ func TestLARSolveOnSignatureTableauPhysicalOwnership(t *testing.T) {
 }
 
 func TestLARSolveOnSignatureTableauPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {

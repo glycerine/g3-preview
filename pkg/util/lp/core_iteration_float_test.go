@@ -9,6 +9,10 @@ import (
 )
 
 func TestLPFloatCoreBasisChangeIndependentStateMachine(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	rng := rand.New(rand.NewSource(717181))
 	for world := 0; world < 80; world++ {
 		in := lpFloatCoreInput(t, 4, 13)

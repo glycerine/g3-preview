@@ -79,6 +79,10 @@ func lpCheckConflictCertificate(t *testing.T, h *lpPairHarness, s *LARSolver, e 
 }
 
 func TestLARConflictCertificateActualSolves(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, strategy := range []SimplexStrategy{StrategyLU, StrategyTableauRows, StrategyTableauCosts} {
 		for world := 0; world < 30; world++ {
 			for _, strict := range []bool{false, true} {
@@ -461,6 +465,10 @@ func TestLARConflictCertificateClosedDiagnostic(t *testing.T) {
 }
 
 func TestLARConflictCertificatePreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {

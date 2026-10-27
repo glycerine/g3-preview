@@ -63,6 +63,10 @@ func TestLPRationalPrimalBreakpointCollectIndependentDelta(t *testing.T) {
 }
 
 func TestLPRationalPrimalBreakpointCollectIndependentModel(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 300; world++ {
 		h := newLPPairHarness(t)
 		f, m := lpRationalPricingFixture(t, h, 2, 3)

@@ -56,6 +56,10 @@ func lpMPSDriverArguments(t *testing.T, exact, dual, minimum, compare bool) *Dri
 }
 
 func TestLPMPSDriverIndependentFileMinMax(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 40; world++ {
 		cx, cy, u, v, rhs := int64(1+world%7), int64(1+world%9), int64(3+world%5), int64(5+world%4), int64(3+world%8)
 		// Independent continuous knapsack oracle, with both box bounds.
@@ -326,6 +330,10 @@ func TestLPMPSDriverRationalCostLifetime(t *testing.T) {
 }
 
 func TestLPMPSDriverReportByteAndFlushFailures(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	name := lpMPSDriverFile(t, lpMPSDriverModel(3, 2, 4, 5, 3))
 	for _, exact := range []bool{false, true} {
 		h := newLPPairHarness(t)

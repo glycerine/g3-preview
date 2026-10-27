@@ -8,6 +8,10 @@ import (
 )
 
 func TestLPExactCostSwitchIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 240; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewPairCoreFixture(t, h, 2, 4)
@@ -403,6 +407,10 @@ func TestLPExactCostSwitchSourcePrefixes(t *testing.T) {
 }
 
 func TestLPExactCostSwitchLeavesOlderComparisonOwned(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, op := range []string{"backup", "restore"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

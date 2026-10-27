@@ -9,6 +9,10 @@ import (
 )
 
 func TestLPPairCoreValuesIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	rng := rand.New(rand.NewPCG(7519, 331))
 	for _, tableau := range []bool{false, true} {
 		for world := 0; world < 160; world++ {

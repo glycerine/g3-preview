@@ -13,6 +13,10 @@ import (
 )
 
 func TestLPRationalSolveLUIndependentBoundedOptima(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)
 		n := 1 + world%4

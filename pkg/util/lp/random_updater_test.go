@@ -79,6 +79,10 @@ func lpPairText(t *testing.T, h *lpPairHarness, p *RationalPair) [2]string {
 }
 
 func TestLARRandomUpdaterActualSolveFeasibility(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, strategy := range []SimplexStrategy{StrategyTableauRows, StrategyTableauCosts, StrategyLU} {
 		for world := 0; world < 30; world++ {
 			for _, strict := range []bool{false, true} {
@@ -355,6 +359,10 @@ func TestLARRandomUpdaterPhysicalOwnership(t *testing.T) {
 }
 
 func TestLARRandomUpdaterIndependentBoundedShifts(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 60; world++ {
 		for _, strategy := range []SimplexStrategy{StrategyTableauRows, StrategyTableauCosts, StrategyLU} {
 			h := newLPPairHarness(t)
@@ -565,6 +573,10 @@ func TestLARRandomUpdaterReachedGuardsAndPrefixes(t *testing.T) {
 }
 
 func TestLARRandomUpdaterPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {

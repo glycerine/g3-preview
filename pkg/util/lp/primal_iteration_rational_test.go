@@ -98,6 +98,10 @@ func TestLPRationalIterationPricingAndAdvance(t *testing.T) {
 // unique maximizing x. Drive the actual repeated iteration path, including
 // InitRun, pricing after exchange and the no-entering optimal decision.
 func TestLPRationalIterationIndependentBoundedOptima(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)
 		n := 1 + world%4

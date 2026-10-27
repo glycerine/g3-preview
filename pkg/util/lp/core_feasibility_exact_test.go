@@ -14,6 +14,10 @@ import (
 )
 
 func TestLPPairMakeFeasibleIndependentLexicographicOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	f := lpNewPairCoreFixture(t, h, 0, 1)
 	m, err := NewPairCoreSolverBase(f.input())
@@ -326,6 +330,10 @@ func TestLPPairMakeFeasiblePhysicalOwnership(t *testing.T) {
 }
 
 func TestLPPairMakeFeasibleLeavesOlderComparisonOwned(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, zero := range []bool{false, true} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

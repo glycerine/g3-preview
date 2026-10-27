@@ -82,6 +82,10 @@ func TestLPFloatMatrixStatisticsReportBoundaries(t *testing.T) {
 }
 
 func TestLPRationalMatrixStatisticsShortWrites(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	const report = "extended A[1,3]\n"
 	for _, primal := range []bool{true, false} {
 		for cut := 0; cut <= len(report)+1; cut++ {

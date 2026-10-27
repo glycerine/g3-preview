@@ -45,6 +45,10 @@ func TestLPExactAdvanceDifferentLiveSteps(t *testing.T) {
 }
 
 func TestLPExactAdvanceDifferentOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		h := newLPPairHarness(t)
@@ -89,6 +93,10 @@ func TestLPExactAdvanceDifferentOlderComparison(t *testing.T) {
 }
 
 func TestLPExactAdvanceDifferentIndependentSystems(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 160; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewPairCoreFixture(t, h, 2, 4)
@@ -521,6 +529,10 @@ func TestLPExactAdvanceDifferentSourcePrefixes(t *testing.T) {
 }
 
 func TestLPExactAdvanceDifferentCostSwitchPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		success, restoringFailure := false, false
 		for ordinal := int64(0); ordinal < 1200; ordinal++ {

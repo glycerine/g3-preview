@@ -563,6 +563,10 @@ func TestLPExactStaticMatrixTinyPivotAndBorrowedAliases(t *testing.T) {
 }
 
 func TestLPExactStaticMatrixLeavesOlderRawInvocationOwned(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	p := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
 	q := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")

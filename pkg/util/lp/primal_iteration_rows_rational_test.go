@@ -36,6 +36,10 @@ func lpRationalRowIterationFixture(t *testing.T, h *lpPairHarness, initial, boun
 }
 
 func TestLPRationalRowIterationIndependentFeasibleModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	kinds := []ColumnType{ColumnFixed, ColumnLowBound, ColumnUpperBound, ColumnBoxed}
 	for world := 0; world < 320; world++ {
 		h := newLPPairHarness(t)

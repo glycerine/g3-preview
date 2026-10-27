@@ -127,6 +127,10 @@ func TestLPRationalPriorityQueueIndependentExactOracle(t *testing.T) {
 	}
 }
 func TestLPRationalPriorityQueueExactLifetimeAndPrefixContracts(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	v := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
 	q := NewRationalPriorityQueue(h.m, 4)
@@ -271,6 +275,10 @@ func TestLPPairPriorityQueueIndependentExactOracle(t *testing.T) {
 	}
 }
 func TestLPPairPriorityQueueExactLifetimeAndPrefixContracts(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	v := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/11")
 	q := NewPairPriorityQueue(h.m, 4)
@@ -435,6 +443,10 @@ func TestLPRationalPriorityQueueAllocationFailureCensus(t *testing.T) {
 }
 
 func TestLPRationalPriorityQueueOlderComparisonIdentity(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
 	b := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")
@@ -565,6 +577,10 @@ func TestLPPairPriorityQueueAllocationFailureCensus(t *testing.T) {
 }
 
 func TestLPPairPriorityQueueOlderComparisonIdentity(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
 	b := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")

@@ -194,6 +194,10 @@ func TestLPLARSMTFileReportFailures(t *testing.T) {
 }
 
 func TestLPLARSMTFilePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	// This MPS value is reparsed for every fault ordinal; twenty blocks retain
 	// the multi-limb allocation path exercised by the file driver.
 	large := strings.Repeat("1234567890", 20) + "7/13"

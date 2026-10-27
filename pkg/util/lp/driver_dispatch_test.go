@@ -143,6 +143,10 @@ func TestLPDriverPreparationReportFailurePrefixes(t *testing.T) {
 }
 
 func TestLPDriverPreparationShortWritePublication(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, args := range [][]string{{"--test_int_set"}, {"--unknown"}, {"--file"}} {
 		var full bytes.Buffer
 		good, err := PrepareLPDriver(args, &full)

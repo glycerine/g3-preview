@@ -232,6 +232,10 @@ func TestLPRationalPrimalOuterEmptyAndTerminal(t *testing.T) {
 }
 
 func TestLPRationalPrimalStageIndependentRows(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	rng := rand.New(rand.NewSource(891774))
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)

@@ -170,6 +170,10 @@ func TestLARLUExtendDenseAndDegeneratedLifecycle(t *testing.T) {
 }
 
 func TestLARLUExtendPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"initial", "refactor", "extend"} {
 			success, failures := false, 0

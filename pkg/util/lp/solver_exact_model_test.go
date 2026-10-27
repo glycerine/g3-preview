@@ -151,6 +151,10 @@ func TestLPRationalInputModelSourceReplacementAndNames(t *testing.T) {
 }
 
 func TestLPRationalInputModelPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"coefficient", "replacement", "constraint", "constraint-replacement", "cost", "low", "upper", "fixed"} {
 			done, failures := false, 0

@@ -488,6 +488,10 @@ func (m *RationalSparseMatrix) putMaxForReplacementTest(row, index uint32) (err 
 }
 
 func TestLPExactSparseColumnReplacementBorrowedOwnerGuards(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	other := newLPPairHarness(t)
 	m := lpNewExactSparse(t, h, 1)

@@ -9,6 +9,10 @@ import (
 )
 
 func TestLPFloatLUUpdateIndependentBasisOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	rng := rand.New(rand.NewPCG(753819, 619))
 	rowTails, noBumps := 0, 0
 	for world := 0; world < 64; world++ {

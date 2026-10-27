@@ -28,6 +28,10 @@ func lpPairVectorStrings(t *testing.T, v *StackedPairVector) []string {
 	return out
 }
 func TestLPStackedPairVectorIndependentSnapshots(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	v := NewStackedPairVector(h.m)
 	t.Cleanup(func() { h.must(v.Close()) })
@@ -255,6 +259,10 @@ func TestLPStackedPairVectorAllocationFailureOwnership(t *testing.T) {
 // manager. A vector must neither acquire nor release that older root. Likewise,
 // consuming its own receipt does not authorize cleanup of a replacement root.
 func TestLPStackedPairVectorPendingAllocationIdentity(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, replace := range []bool{false, true} {
 		t.Run(fmt.Sprint(replace), func(t *testing.T) {
 			h := newLPPairHarness(t)
@@ -350,6 +358,10 @@ func TestLPStackedPairVectorBorrowedElementAssignmentAndTailRestore(t *testing.T
 }
 
 func TestLPStackedPairVectorPreservesActualOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	found := false
 	for ordinal := int64(0); ordinal < 40 && !found; ordinal++ {
 		h := newLPPairHarness(t)

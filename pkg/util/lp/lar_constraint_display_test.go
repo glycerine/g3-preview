@@ -84,6 +84,10 @@ func lpLARDisplayFixture(t *testing.T, h *lpPairHarness, profile string) (*LARSo
 }
 
 func TestLARConstraintDisplaySourceText(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, profile := range []string{"variable", "signs", "first-negative", "positive", "zero", "term-negative", "term-positive", "empty-general", "empty-term", "large", "term-large"} {
 		for _, kind := range []LConstraintKind{LConstraintLE, LConstraintLT, LConstraintGE, LConstraintGT, LConstraintEQ} {
 			t.Run(fmt.Sprintf("%s/%d", profile, kind), func(t *testing.T) {

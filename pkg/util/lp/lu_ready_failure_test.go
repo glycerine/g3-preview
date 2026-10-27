@@ -107,6 +107,10 @@ func TestLPLUPreparedSolvesFailurePrefixes(t *testing.T) {
 }
 
 func TestLPExactLUPreparedSolvesAllocationCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, pair := range []bool{false, true} {
 		for _, op := range []string{"X", "T", "indexed"} {
 			for _, direct := range []bool{false, true} {

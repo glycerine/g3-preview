@@ -95,6 +95,10 @@ func TestLARSignatureExtractionIndependentModels(t *testing.T) {
 }
 
 func TestLARSignaturePreparationIndependentSystems(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 160; world++ {
 		for _, floating := range []bool{false, true} {
 			h := newLPPairHarness(t)
@@ -291,6 +295,10 @@ func TestLARSignatureReachedPrefixes(t *testing.T) {
 }
 
 func TestLARSignaturePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		success, failures := false, 0
 		for ordinal := int64(0); ordinal < 1000; ordinal++ {

@@ -67,6 +67,10 @@ func lpCheckExactSparse(t *testing.T, h *lpPairHarness, v *IndexedRationalVector
 	}
 }
 func TestLPExactEtaIndependentMatrixProducts(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	p := h.pair("0", "0")
 	r := rand.New(rand.NewPCG(828, 2026))
@@ -556,6 +560,10 @@ func TestLPExactEtaReachedGuardsAndConjugationPrefixes(t *testing.T) {
 }
 
 func TestLPExactEtaStoppedDestinationOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	a := h.pair(strings.Repeat("1234567890", 100)+"/7", "1")
 	b := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")
@@ -590,6 +598,10 @@ func TestLPExactEtaStoppedDestinationOwnership(t *testing.T) {
 }
 
 func TestLPExactEtaLeavesOlderDivisionOwned(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

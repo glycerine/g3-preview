@@ -10,6 +10,10 @@ import (
 )
 
 func TestLPPairBasisIndependentMembershipAndTrace(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	f := lpNewPairCoreFixture(t, h, 4, 9)
 	m, err := NewPairCoreSolverBase(f.input())

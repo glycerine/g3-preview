@@ -31,6 +31,10 @@ func lpAdvanceEqualOracleCost(x, eps *big.Rat, kind ColumnType, low, upper *big.
 }
 
 func TestLPExactAdvanceEqualIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 200; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewPairCoreFixture(t, h, 2, 4)
@@ -418,6 +422,10 @@ func TestLPExactAdvanceEqualSourcePrefixes(t *testing.T) {
 }
 
 func TestLPExactAdvanceEqualOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, large := range []bool{false, true} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

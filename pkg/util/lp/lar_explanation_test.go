@@ -269,6 +269,10 @@ func (c *lpExplanationOwningConsumer) Consume(value *numeral.Rational, witness u
 }
 
 func TestLARExplanationLeavesConsumerDivisionOwned(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		matched := false
 		for ordinal := int64(0); ordinal < 50 && !matched; ordinal++ {
@@ -372,6 +376,10 @@ func TestLARExplanationMetadataOwnerAndZeroGuards(t *testing.T) {
 }
 
 func TestLARExplanationLeavesPartialBoundOwned(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		var h *lpPairHarness
 		if direct {

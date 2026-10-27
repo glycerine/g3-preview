@@ -42,6 +42,10 @@ func lpBenchmarkClock() func() (uint64, error) {
 }
 
 func TestLPRationalBenchmarkIndependentArithmeticAndInputs(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, plus := range []bool{false, true} {
 		for seed := uint32(0); seed < 20; seed++ {
 			t.Run(fmt.Sprintf("plus=%v/seed=%d", plus, seed), func(t *testing.T) {
@@ -168,6 +172,10 @@ func TestLPRationalBenchmarkClockAndOwnerBoundaries(t *testing.T) {
 }
 
 func TestLPRationalBenchmarkPhysicalRefusalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		for _, plus := range []bool{false, true} {
 			done, failures := false, 0

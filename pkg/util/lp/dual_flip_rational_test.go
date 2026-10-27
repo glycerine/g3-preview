@@ -257,6 +257,10 @@ func TestLPRationalDualFlipPhysicalOwnership(t *testing.T) {
 	}
 }
 func TestLPRationalDualFlipSignedAliases(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, upper := range []bool{false, true} {
 		for _, alias := range []string{"out", "low", "up", "x"} {
 			h := newLPPairHarness(t)

@@ -441,6 +441,10 @@ func lpDenseDeterminantByPermutations(a [][]*big.Rat) *big.Rat {
 }
 
 func TestLPSparseEtaRepeatedPivotIndependentDeterminant(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	rng := rand.New(rand.NewPCG(11317, 825))
 	for world := 0; world < 120; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {
@@ -569,6 +573,10 @@ func TestLPSparseEtaRepeatedPivotIndependentDeterminant(t *testing.T) {
 }
 
 func TestLPExactSparseEtaConstructionOlderComparisonOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -634,6 +642,10 @@ func TestLPExactSparseEtaConstructionUnitWithoutCopies(t *testing.T) {
 }
 
 func TestLPExactSparseEtaConstructionZeroDiagonalDestroysLargePrefix(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		t.Run(fmt.Sprint(direct), func(t *testing.T) {
 			var h *lpPairHarness

@@ -45,6 +45,10 @@ func lpLARSourceDouble(r *big.Rat) float64 {
 }
 
 func TestLARStrategyIndependentThresholdModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 100; world++ {
 		for _, materialized := range []bool{false, true} {
 			for _, offset := range []int{-1, 0, 1} {
@@ -248,6 +252,10 @@ func TestLARStrategyReachedErrorPrefixes(t *testing.T) {
 }
 
 func TestLARStrategyDeferredRowsPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		done, failures := false, 0
 		for ordinal := int64(0); ordinal < 1200 && !done; ordinal++ {

@@ -154,6 +154,10 @@ func TestLPMPSKnownFloatMissingEmptyInfeasibleAndThreshold(t *testing.T) {
 }
 
 func TestLPMPSKnownFloatReportFailures(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, profile := range []string{"ordinary", "wrong-status", "wrong-value", "missing"} {
 		name := lpMPSDriverFile(t, lpMPSDriverModel(3, 2, 2, 4, 3))
 		if profile == "missing" {

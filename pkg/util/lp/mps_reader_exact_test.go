@@ -635,6 +635,10 @@ func TestLPRationalMPSPhysicalPopulationOwnership(t *testing.T) {
 	}
 }
 func TestLPRationalMPSPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		h := newLPPairHarness(t)

@@ -182,6 +182,10 @@ func TestLPRationalMPSOuterIndependentOptima(t *testing.T) {
 }
 
 func TestLPRationalMPSOuterIndependentClones(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 40; world++ {
 		h := newLPPairHarness(t)
 		value := new(big.Rat).SetFrac(new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), uint(80+world)), big.NewInt(3)), big.NewInt(19))

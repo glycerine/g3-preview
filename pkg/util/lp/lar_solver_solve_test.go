@@ -55,6 +55,10 @@ func lpLARFullSolveNumericFixture(t *testing.T, h *lpPairHarness, strategy Simpl
 }
 
 func TestLARFullSolveIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, strategy := range []SimplexStrategy{StrategyTableauRows, StrategyTableauCosts, StrategyLU} {
 		for world := 0; world < 30; world++ {
 			for _, impossible := range []bool{false, true} {
@@ -382,6 +386,10 @@ func TestLARFullSolveInfeasibleEarlyReturnAndSelection(t *testing.T) {
 }
 
 func TestLARFullSolvePreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {

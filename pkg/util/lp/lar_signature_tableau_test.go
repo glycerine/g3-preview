@@ -22,6 +22,10 @@ func lpLARSignatureTableauFixture(t *testing.T, h *lpPairHarness) *LARCoreSolver
 }
 
 func TestLARTableauSignatureUpdateIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	type profile struct {
 		position      NonBasicColumnValuePosition
 		kind          ColumnType
@@ -111,6 +115,10 @@ func TestLARTableauSignatureUpdateIndependentModels(t *testing.T) {
 }
 
 func TestLARTableauSignaturePreparationIndependentSystems(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 240; world++ {
 		h := newLPPairHarness(t)
 		c := lpLARSignatureTableauFixture(t, h)
@@ -416,6 +424,10 @@ func TestLARTableauSignatureRemovePendingCore(t *testing.T) {
 }
 
 func TestLARTableauSignaturePreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -460,6 +472,10 @@ func TestLARTableauSignaturePreservesOlderComparison(t *testing.T) {
 }
 
 func TestLARTableauSignaturePreparationMultipleRows(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)
 		rows, cols := 1+world%3, 6

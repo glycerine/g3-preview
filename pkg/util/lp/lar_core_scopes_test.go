@@ -476,6 +476,10 @@ func TestLARCoreScopesActualTableauBindings(t *testing.T) {
 }
 
 func TestLARCoreScopesStoppedChildAndMatrixPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	large := "1" + strings.Repeat("0", 999) + "7"
 	for _, mode := range []string{"push-primal", "pop-primal", "push-matrix", "pop-matrix", "pop-r-links", "pop-d-links"} {
 		h := newLPPairHarness(t)

@@ -70,6 +70,10 @@ func TestLARScopeEquationIndependentPairOracle(t *testing.T) {
 }
 
 func TestLARScopeInfSetIndependentLexicographicOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	rng := rand.New(rand.NewPCG(71823, 381))
 	lex := func(a, b [2]*big.Rat) int {

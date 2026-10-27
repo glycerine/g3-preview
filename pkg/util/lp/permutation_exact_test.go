@@ -217,6 +217,10 @@ func TestLPRationalPermutationDenseAllocationFailureCensus(t *testing.T) {
 }
 
 func TestLPRationalPermutationResizeAndGuardContracts(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	p, err := lpTestRationalPermutation(h.m, 3, []uint32{2, 0, 1})
 	h.must(err)
@@ -408,6 +412,10 @@ func TestLPPairPermutationDenseAllocationFailureCensus(t *testing.T) {
 }
 
 func TestLPPairPermutationResizeAndGuardContracts(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	p, err := lpTestPairPermutation(h.m, 3, []uint32{2, 0, 1})
 	h.must(err)
@@ -1037,6 +1045,10 @@ func TestLPPairPermutationAllDenseGuardProfiles(t *testing.T) {
 }
 
 func TestLPRationalPermutationStoppedDestinationOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
 	b := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")
@@ -1067,6 +1079,10 @@ func TestLPRationalPermutationStoppedDestinationOwnership(t *testing.T) {
 }
 
 func TestLPPairPermutationStoppedDestinationOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	a := h.pair(strings.Repeat("1234567890", 100)+"/7", "0")
 	b := h.pair(strings.Repeat("9876543210", 100)+"/13", "0")

@@ -244,6 +244,10 @@ func TestLPLARMPSFileReportFailures(t *testing.T) {
 }
 
 func TestLPLARMPSFilePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	// The reader itself parses this value on every fault ordinal. Twenty
 	// blocks still force multi-limb arithmetic and physical allocations.
 	large := strings.Repeat("1234567890", 20) + "7/13"

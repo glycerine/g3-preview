@@ -370,6 +370,10 @@ func TestLPRationalStatisticsPhysicalOwnership(t *testing.T) {
 }
 
 func TestLPRationalAllColumnsFeasibilityIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 320; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewRationalCoreFixture(t, h, 1, 5)

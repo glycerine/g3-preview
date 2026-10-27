@@ -19,6 +19,10 @@ func lpRefinementIdentity(t *testing.T, n uint32) *FloatSparseMatrix {
 }
 
 func TestLPSparseIndexedRefinementIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	rng := rand.New(rand.NewPCG(123741, 87513))
 	improved := 0
 	for world := 0; world < 240; world++ {

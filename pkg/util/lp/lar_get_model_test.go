@@ -42,6 +42,10 @@ func lpLARGetModelCheck(t *testing.T, h *lpPairHarness, model *LARRationalModel,
 }
 
 func TestLARGetModelIndependentCollisionChains(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 160; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {
 			h := newLPPairHarness(t)
@@ -242,6 +246,10 @@ func TestLARGetModelRetryAndLateErrorPublication(t *testing.T) {
 }
 
 func TestLARGetModelPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {

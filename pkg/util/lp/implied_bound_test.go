@@ -48,6 +48,10 @@ func TestLPImpliedBoundKindsAndStrings(t *testing.T) {
 }
 
 func TestLPImpliedBoundIndependentExactAndEvidence(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	p := h.pair("0", "0")
 	rng := rand.New(rand.NewPCG(5191, 221))

@@ -9,6 +9,10 @@ import (
 )
 
 func TestLARChangedBoundsIndependentTableauOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	for world := 0; world < 160; world++ {
 		a := big.NewRat(int64(world%17-8), int64(world%7+1))

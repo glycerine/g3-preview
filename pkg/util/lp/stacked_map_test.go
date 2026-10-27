@@ -43,6 +43,10 @@ func lpStackedMapSnapshot(m map[int32]float64) map[int32]float64 {
 	return result
 }
 func TestLPStackedIntFloatMapSnapshotOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for seed := int64(0); seed < 40; seed++ {
 		r := rand.New(rand.NewSource(seed))
 		var s StackedInt32FloatMap

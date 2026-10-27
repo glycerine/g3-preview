@@ -42,6 +42,10 @@ func lpNilpotentSolve(a [][]*big.Rat, b []*big.Rat, left bool) []*big.Rat {
 }
 
 func TestLPSparseIndexedSolveIndependentNilpotentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	rng := rand.New(rand.NewPCG(12571, 1933))
 	for world := 0; world < 240; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {
@@ -611,6 +615,10 @@ func TestLPSparseIndexedSolveBoundsAndPublication(t *testing.T) {
 }
 
 func TestLPExactSparseIndexedSolveBorrowedOwnerGuards(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	other := newLPPairHarness(t)
 	m := lpNewExactSparse(t, h, 1)

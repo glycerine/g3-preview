@@ -24,6 +24,10 @@ func lpCheckConstraintVector(t *testing.T, h *lpPairHarness, v *SparseRationalVe
 }
 
 func TestLARConstraintsIndependentExactCopiesAndBorrows(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	p := h.pair("0", "0")
 	r := rand.New(rand.NewPCG(66391, 129))

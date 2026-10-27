@@ -13,6 +13,10 @@ import (
 // Recompute y from the exchanged basis, independently of the incremental dq
 // formula. Exercise real LU pivot rows, both leaving rows and stored feasibility.
 func TestLPPairPivotCostIndependentBasisOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 240; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewPairCoreFixture(t, h, 2, 6)
@@ -271,6 +275,10 @@ func TestLPPairPivotCostReachedPrefixes(t *testing.T) {
 }
 
 func TestLPPairPivotPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, op := range []string{"compare", "cost"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

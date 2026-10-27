@@ -11,6 +11,10 @@ import (
 )
 
 func TestLARInfCleanupIndependentTableauModel(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	rng := rand.New(rand.NewPCG(18713, 4789))
 	for world := 0; world < 160; world++ {

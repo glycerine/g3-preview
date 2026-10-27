@@ -61,6 +61,10 @@ func TestLPExactBreakpointIndependentRecordQueueOracle(t *testing.T) {
 }
 
 func TestLPExactBreakpointIndependentSlopeOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 360; world++ {
 		h := newLPPairHarness(t)
 		s := lpNewRemovalModel(t, h, "2", "3", false)

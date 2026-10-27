@@ -77,6 +77,10 @@ func TestLPRationalColumnAliasedFixedParameterPreservesSource(t *testing.T) {
 }
 
 func TestLPRationalColumnAdjustedExpressionPhysicalPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		done, sawCopiedLeft := false, false
 		for ordinal := int64(0); ordinal < 150 && !done; ordinal++ {

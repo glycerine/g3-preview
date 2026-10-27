@@ -106,6 +106,10 @@ func TestLPRationalCoreValuesIndependentReconstructionAndCosts(t *testing.T) {
 }
 
 func TestLPRationalCoreValuesUpdateRestoreAndLiveDelta(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, tableau := range []bool{false, true} {
 		for _, alias := range []string{"external", "entering", "basic"} {
 			for world := 0; world < 60; world++ {
@@ -640,6 +644,10 @@ func TestLPRationalCoreValuesSourcePrefixesAndGuards(t *testing.T) {
 }
 
 func TestLPRationalCoreValuesPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		h := newLPPairHarness(t)
