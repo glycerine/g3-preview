@@ -138119,7 +138119,8 @@
         "pkg/smtcore/theory_lra_validate.go",
         "pkg/smtcore/theory_lra_validate_test.go",
         "pkg/smtcore/theory_lra_axioms_test.go",
-        "pkg/smtcore/theory_lra_lifecycle_trace_test.go"
+        "pkg/smtcore/theory_lra_lifecycle_trace_test.go",
+        "pkg/smtcore/theory_lra_objective_trace_test.go"
       ],
       "tests": [
         "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -138238,7 +138239,12 @@
         "TestSMTLRAValidatorAssertionGatesAndSourceLocations",
         "TestSMTLRALifecycleTraceFeasibilityCacheAndFactoryOrdering",
         "TestSMTLRALifecycleTraceSharedCandidateOrderAndCacheEffects",
-        "TestSMTLRALifecycleTraceInconclusiveStatus"
+        "TestSMTLRALifecycleTraceInconclusiveStatus",
+        "TestSMTLRAObjectiveTraceBlockerPairFormatAndLiveReturn",
+        "TestSMTLRAObjectiveTraceMappedAndUnmappedInfinity",
+        "TestSMTLRAObjectiveTraceLowerBoundRegistrationReuseAndPolarity",
+        "TestSMTLRAObjectiveTraceActualStrictMaximizeAndBadbit",
+        "TestSMTLRAObjectiveTraceLowerBoundBadbit"
       ],
       "conditionals": [
         {
@@ -138447,6 +138453,18 @@
             "TestSMTLRALifecycleTraceSharedCandidateOrderAndCacheEffects",
             "TestSMTLRALifecycleTraceInconclusiveStatus"
           ]
+        },
+        {
+          "name": "optimization TRACE2361/2392/2444/2449: mapped infinity, raw numeric_pair point/rounded blocker, first registration and post-negation lower-bound output",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_lra_objective.go",
+          "tests": [
+            "TestSMTLRAObjectiveTraceBlockerPairFormatAndLiveReturn",
+            "TestSMTLRAObjectiveTraceMappedAndUnmappedInfinity",
+            "TestSMTLRAObjectiveTraceLowerBoundRegistrationReuseAndPolarity",
+            "TestSMTLRAObjectiveTraceActualStrictMaximizeAndBadbit",
+            "TestSMTLRAObjectiveTraceLowerBoundBadbit"
+          ]
         }
       ],
       "ownership": [
@@ -138468,7 +138486,8 @@
         "Diagnostic output borrows AST heads/parameters and existing solver/cache owners. Rational parameter insertion uses the retained numeral service; Go character/formatting slices acquire no fictitious charged source owner. Exact writer prefixes, nil/closed guards and successful cleanup are checked. Cached term display can insert zero-valued missing proper columns, matching source.",
         "Conflict evidence retains zero coefficients through the copied raw explanation for the second diagnostic pass, while conflict-premise publication filters them independently. Signed-expression refs borrow the AST manager and remain in pendingTraceRoots on failed retirement; Close retires them. Trace tags are borrowed, default to the process owner, and source operands continue after ostream badbit through the existing concrete assertedTraceWriter.",
         "Fresh LRA validation context owns its kernel and temporary expression root; configured callers borrow the actual parent fparams and copy current context params. Raw internalizers create and own genuine default params/catalog/globals/fparams. Every partial constructor remains in the typed theory.validation owner until Close completes, before parent parameter/numeral retirement. Existing source nested-kernel borrowing is preserved.",
-        "Trace control is borrowed and tag-specific. Numeric feasibility now exposes concrete counter/start and solve/sample phases to place source display between them; direct numeric callers preserve their previous operation. Pre-search display can populate zero-column term cache entries and init_model preserves existing term entries after updating proper columns. Display writer refusal keeps later operands alive; operand errors still propagate."
+        "Trace control is borrowed and tag-specific. Numeric feasibility now exposes concrete counter/start and solve/sample phases to place source display between them; direct numeric callers preserve their previous operation. Pre-search display can populate zero-column term cache entries and init_model preserves existing term entries after updating proper columns. Display writer refusal keeps later operands alive; operand errors still propagate.",
+        "Objective traces borrow the returned blocker/lower-bound handles while printing; callers still pin only after callback return. Final blockers and NOT expressions are not temporarily rooted then destroyed. Existing lexical argument refs and Boolean-internalizer ownership remain unchanged. Ostream refusal preserves return handles, strictness, Boolean registration and actual numerical maximization."
       ],
       "deviations": [
         "Go uses the shared exact linear-arithmetic implementation for the source theory_lra selection. The source's specialized bound/use-list data structures and propagation heuristics are algorithmic optimizations; theory_opt objective callbacks remain open.",
@@ -138489,7 +138508,8 @@
         "Bounded diagnostic increment only: source flags/status remain unchanged. Go io.Writer errors/short writes stop the current display. Associative flattening preserves native LIFO deferral, private parameters are included and foreign nonconstants use AST IDs. Source trace call sites/display_evidence and checked validation routines remain outside this increment; no whole LRA/smtcore completion credit.",
         "Only live immediate inequality sources are implemented in display_evidence. Equality/definition producers are behind constructor-only m_delay_constraints=false and are excluded. Source zero-coefficient SASSERT uses the actual debug context; disabled assertions skip zero entries in the expression pass while retaining zero rows in the weighted pass. Native trace erasure, actual tagged emission, sticky writer failure, later Display cache side effects and preserved actual conflicts are checked. Source validate_assign/validate_conflict/validate_eq/add_background, remaining trace sites and context lemma-dump transport remain open; no whole-source status or audit promotion.",
         "Source predicate l_true != nctx.check() admits UNKNOWN; no substitute arithmetic checker or silent missing-config skip is used. Generic logic-free context setup follows the native call sites rather than inheriting parent logic. Dump StreamError is reported to direct Go API callers but ignored by native validators, while OperandError propagates. Enabled/disabled/native assertion gates and exact source conditions/locations are checked. Equality/definition background sources are excluded with the constructor-disabled delayed registration path. Remaining trace sites/whole retained-source audit and higher engines remain open; all whole-unit statuses/audit flags unchanged.",
-        "Removed two superseded aggregate method records: the historical theory_arith_linear platform-replacement mapping predates the actual LAR frontend, and unported theory_opt callbacks predates the audited objective implementation. Current bounded method entries already document those ports. Whole LRA status/audit flags remain unchanged. Added lifecycle traces preserve source cache effects, native erasure and duplicated candidate equality lines; remaining trace sites and complete retained-source audit remain open."
+        "Removed two superseded aggregate method records: the historical theory_arith_linear platform-replacement mapping predates the actual LAR frontend, and unported theory_opt callbacks predates the audited objective implementation. Current bounded method entries already document those ports. Whole LRA status/audit flags remain unchanged. Added lifecycle traces preserve source cache effects, native erasure and duplicated candidate equality lines; remaining trace sites and complete retained-source audit remain open.",
+        "Source optimization output uses numeric_pair::to_string `(main, epsilon)`, not inf_rational formatting; mk_gt reports the rounded comparison numeral separately. Unmapped infinity has no Unbounded trace, while the mapped failed-maximize branch does. First lower-bound registration emits its unnegated base only once, then every call emits the final expression after strict negation. Four sites only; no higher optimizer integration or whole LRA/smtcore completion claim."
       ]
     },
     {

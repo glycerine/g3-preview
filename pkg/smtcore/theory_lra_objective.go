@@ -3,6 +3,8 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -78,7 +80,21 @@ func (t *SMTLRATheory) objectiveBlocker(v SMTTheoryVar, value simplex.Infinitesi
 	}
 	// Keep the final application unrooted for the caller to pin. It owns its
 	// numeral argument while the lexical argument reference is retired.
-	return t.state.manager.MkFamilyApp(t.FamilyID(), op, nil, []ast.ASTHandle{node.owner, bound})
+	result, err = t.state.manager.MkFamilyApp(t.FamilyID(), op, nil, []ast.ASTHandle{node.owner, bound})
+	if err != nil {
+		return result, err
+	}
+	err = t.emitLRATag("opt", "mk_gt", 2392, func(out io.Writer) error {
+		// The source operand is lp::impq (numeric_pair), not inf_rational.
+		if err := smtWriteTheoryText(out, fmt.Sprintf("v%d (%s, %s) %s ", v, value.Main.RatString(), value.Epsilon.RatString(), r.RatString())); err != nil {
+			return err
+		}
+		if err := t.displayLRAExpression(out, result); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, "\n")
+	})
+	return result, err
 }
 
 func (t *SMTLRATheory) MaximizeObjective(v SMTTheoryVar) (value SMTArithmeticObjectiveValue, blocker ast.ASTHandle, hasShared bool, resultErr error) {
@@ -92,6 +108,14 @@ func (t *SMTLRATheory) MaximizeObjective(v SMTTheoryVar) (value SMTArithmeticObj
 	// The retained C++ caller initializes has_shared=false. LRA only writes
 	// false on infinity paths and leaves it untouched for bounded results.
 	if value.Unbounded {
+		// An absent mapping takes the earlier, untraced infinity branch.
+		if _, mapped := t.numeric.index(v); mapped {
+			if resultErr = t.emitLRA("maximize", 2361, func(out io.Writer) error {
+				return smtWriteTheoryText(out, fmt.Sprintf("Unbounded %d\n", v))
+			}); resultErr != nil {
+				return
+			}
+		}
 		blocker, resultErr = t.state.manager.MkFalse()
 		return
 	}
@@ -236,9 +260,27 @@ func (t *SMTLRATheory) MakeObjectiveLowerBound(filter *tactic.FilterModelConvert
 			t.newBounds = append(t.newBounds, b)
 			return result, err
 		}
+		if err = t.emitLRA("mk_ge", 2444, func(out io.Writer) error {
+			if err := t.displayLRAExpression(out, base); err != nil {
+				return err
+			}
+			return smtWriteTheoryText(out, "\n")
+		}); err != nil {
+			return result, err
+		}
 	}
+	result = base
 	if strict {
-		return t.state.manager.MkNot(base)
+		result, err = t.state.manager.MkNot(base)
+		if err != nil {
+			return result, err
+		}
 	}
-	return base, nil // The Boolean internalizer owns this base expression.
+	err = t.emitLRA("mk_ge", 2449, func(out io.Writer) error {
+		if err := t.displayLRAExpression(out, result); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, "\n")
+	})
+	return result, err // The internalizer owns base; a final NOT is caller-pinned.
 }
