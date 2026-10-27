@@ -16437,7 +16437,8 @@
         "pkg/ast/ast_datatype_constructor_cache_test.go",
         "pkg/ast/ast_ref.go",
         "pkg/ast/ast_datatype_util_trace.go",
-        "pkg/ast/ast_datatype_util_trace_test.go"
+        "pkg/ast/ast_datatype_util_trace_test.go",
+        "pkg/ast/ast_datatype_numeric_release_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16467,7 +16468,8 @@
         "TestDatatypeUtilTraceStickyStreamStillEvaluatesOperands",
         "TestDatatypeUtilTraceComputationFailureStopsBeforeCounterAndCache",
         "TestDatatypeUtilRecursiveSourceTracePreservesForbiddenOrder",
-        "TestDatatypeUtilTraceConsultsActualPPGlobalOwner"
+        "TestDatatypeUtilTraceConsultsActualPPGlobalOwner",
+        "TestDatatypePluginRealNumeralReleaseFailureRetry"
       ],
       "assertions": [
         {
@@ -16749,6 +16751,18 @@
             "TestDatatypeUtilRecursiveSourceTracePreservesForbiddenOrder",
             "TestDatatypeUtilTraceConsultsActualPPGlobalOwner"
           ]
+        },
+        {
+          "name": "Plugin-owned concrete utility consumed-NUM cleanup failure: real 1<<1600000 rational sort parameter, definition-before-utility retirement, first four references consumed before ErrBounds, later cache/preference pins preserved, owning retry skips retired tokens without replaying borrowed numeric deletion",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_numeric_release_test.go",
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_plugin.go"
+          ],
+          "tests": [
+            "TestDatatypePluginRealNumeralReleaseFailureRetry"
+          ]
         }
       ],
       "ownership": [
@@ -16760,11 +16774,12 @@
       ],
       "deviations": [
         "Private utility memoization maps are omitted because concrete Go queries reconstruct hash-consed declarations and compute recursion/enum properties directly. The unused plugin remove entry point and undeclared get_datatype_size declaration are not ported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed.",
-        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: remaining utility/plugin assertion and publication prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself.",
+        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: remaining utility/plugin assertion and publication prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. The plugin-owned utility consumed-NUM finalizer is now verified; other member cleanup paths remain open.",
         "The next source review corrects eager constructor materialization, literal uint32 candidate-index overflow, ordered forbidden-stack search, reached utility assertions, constructor family registration and first-pin retention before a second preference acquisition failure. Declaration AST-ID ordering and a cold node-page allocation refusal verify the counter frontier; a valid recursive sort exposes the native unsigned-overflow no-result/SASSERT(r) behavior. The subsequent concrete utility increment restores get_datatype_constructors cache pins and ordered owner prefixes. The manager-plugin utility now shares the concrete cache representation with independent ownership; util_bug trace statements and normal pretty-printer temporary ownership are now implemented; physical cleanup-failure paths and other utility methods remain open. These are retained source obligations, not dead code, and prevent whole-unit completion.",
-        "Both DatatypeFactory/theory utilities and the manager-plugin default-value utility now use the same concrete constructor-cache owner with independent instances. The manager plugin creates its utility lazily and retires definition owners before closing it. The actual SMT datatype restart regression exposed constructor identity loss when this plugin cache was missing; restoring the source owner preserves declarations across an independent theory Reset. No test lifetime was weakened. Utility util_bug trace statements and normal temporary ownership are implemented; physical consumed-NUM failure prefixes for this member remain open. Locked newRef/delRef leaves share the existing checked public implementation; constructors/maps/slices use native Go allocation rather than an STL allocation ABI.",
+        "Both DatatypeFactory/theory utilities and the manager-plugin default-value utility now use the same concrete constructor-cache owner with independent instances. The manager plugin creates its utility lazily and retires definition owners before closing it. The actual SMT datatype restart regression exposed constructor identity loss when this plugin cache was missing; restoring the source owner preserves declarations across an independent theory Reset. No test lifetime was weakened. Utility util_bug trace statements and normal temporary ownership are implemented; the plugin-owned consumed-NUM finalizer is verified, while other member cleanup prefixes remain open. Locked newRef/delRef leaves share the existing checked public implementation; constructors/maps/slices use native Go allocation rather than an STL allocation ABI.",
         "The literal unsigned-overflow no-constructor path now preserves the source native/continued-SASSERT prefix: acquire the preference sort pin, append a null ASTRef owner, and cache the null result without treating a warm null entry as found. An aborting debug assertion stops before this publication. The regression covers native null-prefix retention/cache hits and the aborting debug prefix; it does not claim a physical numeric failure campaign for this member.",
-        "This is a concrete retained datatype-trace path, not a generic ast_ref stream adapter or whole SMT2-printer audit. Tests cover exact enum text, all recursive trace branches, forbidden-vector order, simultaneous input and format pins, warm cache silence, sticky stream refusal, real PP/global owner closure and allocation refusals before invoke/core-header counter publication. General pretty-printer ownership/failure auditing and physical consumed-numeral cleanup for these temporary owners remain open. Native Go rendering streams replace ostream storage; STL internals are not ported."
+        "This is a concrete retained datatype-trace path, not a generic ast_ref stream adapter or whole SMT2-printer audit. Tests cover exact enum text, all recursive trace branches, forbidden-vector order, simultaneous input and format pins, warm cache silence, sticky stream refusal, real PP/global owner closure and allocation refusals before invoke/core-header counter publication. General pretty-printer ownership/failure auditing and physical consumed-numeral cleanup for these temporary owners remain open. Native Go rendering streams replace ostream storage; STL internals are not ported.",
+        "A physical consumed-NUM failure is now verified for the retained plugin-owned utility finalizer. The fixture uses a source-valid rational-valued sort parameter (ast.cpp:1904-1932 accepts non-AST parameters), ordinary public NUM/AST construction, actual reference owners and the supported signed-host TLS accounting frontier. It never writes NUM/AST payloads. The initial AST-valued scalar probe hit the actual source is_sort precondition and was rejected as an invalid fixture, not counted as failure-path evidence. Four utility references retire before the real bounds error; four later pins survive until owning retry. Independent caller roots and runtime state prove exact remaining retirement without foreign numeric replay, and final graph cleanup reaches budget0. This is Go owning-cleanup evidence at the actual plugin finalizer, not full C++ throwing-destructor equivalence, a public ASTManager.Close failure campaign, or proof for trace/constructor-local/Reset cleanup frontiers. No production code change was required."
       ]
     },
     {
@@ -16793,7 +16808,8 @@
         "pkg/ast/ast_datatype_constructor_cache_test.go",
         "pkg/ast/ast_ref.go",
         "pkg/ast/ast_datatype_util_trace.go",
-        "pkg/ast/ast_datatype_util_trace_test.go"
+        "pkg/ast/ast_datatype_util_trace_test.go",
+        "pkg/ast/ast_datatype_numeric_release_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16822,7 +16838,8 @@
         "TestDatatypeUtilTraceStickyStreamStillEvaluatesOperands",
         "TestDatatypeUtilTraceComputationFailureStopsBeforeCounterAndCache",
         "TestDatatypeUtilRecursiveSourceTracePreservesForbiddenOrder",
-        "TestDatatypeUtilTraceConsultsActualPPGlobalOwner"
+        "TestDatatypeUtilTraceConsultsActualPPGlobalOwner",
+        "TestDatatypePluginRealNumeralReleaseFailureRetry"
       ],
       "conditionals": [
         {
@@ -16996,6 +17013,18 @@
             "TestDatatypeUtilRecursiveSourceTracePreservesForbiddenOrder",
             "TestDatatypeUtilTraceConsultsActualPPGlobalOwner"
           ]
+        },
+        {
+          "name": "Plugin-owned concrete utility consumed-NUM cleanup failure: real 1<<1600000 rational sort parameter, definition-before-utility retirement, first four references consumed before ErrBounds, later cache/preference pins preserved, owning retry skips retired tokens without replaying borrowed numeric deletion",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_numeric_release_test.go",
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_plugin.go"
+          ],
+          "tests": [
+            "TestDatatypePluginRealNumeralReleaseFailureRetry"
+          ]
         }
       ],
       "ownership": [
@@ -17007,11 +17036,12 @@
       ],
       "deviations": [
         "Private utility caches, the unused plugin remove entry point, and the undeclared get_datatype_size implementation are omitted under the retained-consumer rule. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes.",
-        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: remaining utility/plugin assertion and publication prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself.",
+        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: remaining utility/plugin assertion and publication prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. The plugin-owned utility consumed-NUM finalizer is now verified; other member cleanup paths remain open.",
         "The next source review corrects eager constructor materialization, literal uint32 candidate-index overflow, ordered forbidden-stack search, reached utility assertions, constructor family registration and first-pin retention before a second preference acquisition failure. Declaration AST-ID ordering and a cold node-page allocation refusal verify the counter frontier; a valid recursive sort exposes the native unsigned-overflow no-result/SASSERT(r) behavior. The subsequent concrete utility increment restores get_datatype_constructors cache pins and ordered owner prefixes. The manager-plugin utility now shares the concrete cache representation with independent ownership; util_bug trace statements and normal pretty-printer temporary ownership are now implemented; physical cleanup-failure paths and other utility methods remain open. These are retained source obligations, not dead code, and prevent whole-unit completion.",
-        "Both DatatypeFactory/theory utilities and the manager-plugin default-value utility now use the same concrete constructor-cache owner with independent instances. The manager plugin creates its utility lazily and retires definition owners before closing it. The actual SMT datatype restart regression exposed constructor identity loss when this plugin cache was missing; restoring the source owner preserves declarations across an independent theory Reset. No test lifetime was weakened. Utility util_bug trace statements and normal temporary ownership are implemented; physical consumed-NUM failure prefixes for this member remain open. Locked newRef/delRef leaves share the existing checked public implementation; constructors/maps/slices use native Go allocation rather than an STL allocation ABI.",
+        "Both DatatypeFactory/theory utilities and the manager-plugin default-value utility now use the same concrete constructor-cache owner with independent instances. The manager plugin creates its utility lazily and retires definition owners before closing it. The actual SMT datatype restart regression exposed constructor identity loss when this plugin cache was missing; restoring the source owner preserves declarations across an independent theory Reset. No test lifetime was weakened. Utility util_bug trace statements and normal temporary ownership are implemented; the plugin-owned consumed-NUM finalizer is verified, while other member cleanup prefixes remain open. Locked newRef/delRef leaves share the existing checked public implementation; constructors/maps/slices use native Go allocation rather than an STL allocation ABI.",
         "The literal unsigned-overflow no-constructor path now preserves the source native/continued-SASSERT prefix: acquire the preference sort pin, append a null ASTRef owner, and cache the null result without treating a warm null entry as found. An aborting debug assertion stops before this publication. The regression covers native null-prefix retention/cache hits and the aborting debug prefix; it does not claim a physical numeric failure campaign for this member.",
-        "This is a concrete retained datatype-trace path, not a generic ast_ref stream adapter or whole SMT2-printer audit. Tests cover exact enum text, all recursive trace branches, forbidden-vector order, simultaneous input and format pins, warm cache silence, sticky stream refusal, real PP/global owner closure and allocation refusals before invoke/core-header counter publication. General pretty-printer ownership/failure auditing and physical consumed-numeral cleanup for these temporary owners remain open. Native Go rendering streams replace ostream storage; STL internals are not ported."
+        "This is a concrete retained datatype-trace path, not a generic ast_ref stream adapter or whole SMT2-printer audit. Tests cover exact enum text, all recursive trace branches, forbidden-vector order, simultaneous input and format pins, warm cache silence, sticky stream refusal, real PP/global owner closure and allocation refusals before invoke/core-header counter publication. General pretty-printer ownership/failure auditing and physical consumed-numeral cleanup for these temporary owners remain open. Native Go rendering streams replace ostream storage; STL internals are not ported.",
+        "A physical consumed-NUM failure is now verified for the retained plugin-owned utility finalizer. The fixture uses a source-valid rational-valued sort parameter (ast.cpp:1904-1932 accepts non-AST parameters), ordinary public NUM/AST construction, actual reference owners and the supported signed-host TLS accounting frontier. It never writes NUM/AST payloads. The initial AST-valued scalar probe hit the actual source is_sort precondition and was rejected as an invalid fixture, not counted as failure-path evidence. Four utility references retire before the real bounds error; four later pins survive until owning retry. Independent caller roots and runtime state prove exact remaining retirement without foreign numeric replay, and final graph cleanup reaches budget0. This is Go owning-cleanup evidence at the actual plugin finalizer, not full C++ throwing-destructor equivalence, a public ASTManager.Close failure campaign, or proof for trace/constructor-local/Reset cleanup frontiers. No production code change was required."
       ]
     },
     {
