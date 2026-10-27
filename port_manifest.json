@@ -33133,7 +33133,9 @@
         "pkg/ast/rewriter/enum2bv_rewriter.go",
         "pkg/ast/rewriter/enum2bv_rewriter_test.go",
         "pkg/ast/ast_datatype_util.go",
-        "pkg/ast/rewriter/enum2bv_source_owners_test.go"
+        "pkg/ast/rewriter/enum2bv_source_owners_test.go",
+        "pkg/ast/rewriter/enum2bv_expr_scope.go",
+        "pkg/ast/rewriter/enum2bv_expr_scope_test.go"
       ],
       "tests": [
         "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
@@ -33143,7 +33145,12 @@
         "TestEnum2BVFlushFailurePreservesCallerPrefix",
         "TestEnum2BVCloseStopsAtConfigurationUtility",
         "TestEnum2BVConstructionAndCleanupAllocationRefusals",
-        "TestEnum2BVTranslationWarmsConfigurationCache"
+        "TestEnum2BVTranslationWarmsConfigurationCache",
+        "TestEnum2BVApplicationArgumentOwnersBeforeNextPredicate",
+        "TestEnum2BVDefinitionOwnerAndPublishedReferencePrefix",
+        "TestEnum2BVArgumentAssertionConsultsActualOwner",
+        "TestEnum2BVStoppedLexicalCleanupPrecedesMembers",
+        "TestEnum2BVNonFiniteApplicationNeedsNoReferenceReservation"
       ],
       "assertions": [
         {
@@ -33198,15 +33205,47 @@
             "TestEnum2BVFlushFailurePreservesCallerPrefix",
             "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes"
           ]
+        },
+        {
+          "name": "Concrete reduce_app a0/a1 and _args, reduce_args tmp, reduce_arg caller result and f_def owners: initially null locals acquire slots on first assignment, ordered SetRef publication, vector pins before next predicate, lexical destruction in source order and retained inner-before-outer cleanup before members",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/enum2bv_rewriter.go",
+            "pkg/ast/rewriter/enum2bv_expr_scope.go",
+            "pkg/ast/rewriter/enum2bv_expr_scope_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVApplicationArgumentOwnersBeforeNextPredicate",
+            "TestEnum2BVDefinitionOwnerAndPublishedReferencePrefix",
+            "TestEnum2BVArgumentAssertionConsultsActualOwner",
+            "TestEnum2BVStoppedLexicalCleanupPrecedesMembers",
+            "TestEnum2BVNonFiniteApplicationNeedsNoReferenceReservation"
+          ]
+        },
+        {
+          "name": "Fresh constant conversion publishes result before bounds/definition, owns successive f_def expressions, publishes def/BV/reverse maps before const/BV/definition pin vectors, retains acquired pin prefixes without rollback and advances translated only after definition cleanup; source SASSERT103 consults actual process debug owner",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/enum2bv_rewriter.go",
+            "pkg/ast/rewriter/enum2bv_expr_scope.go",
+            "pkg/ast/rewriter/enum2bv_expr_scope_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVDefinitionOwnerAndPublishedReferencePrefix",
+            "TestEnum2BVArgumentAssertionConsultsActualOwner"
+          ]
         }
       ],
       "ownership": [
         "Each rewriter owns two independent DatatypeUtil members. The rw_cfg utility retires before the traversal base; imp definitions, BV declarations and original constants retire by vector group in forward insertion order, then the outer datatype utility, then bounds. Interrupted Go Close retains remaining tokens/header and blocks operations until retry. Cleanup releases the old imp header before reserving/constructing its replacement.",
-        "FlushSideConstraints appends concrete caller-owned ASTRef tokens, then retires the original bound refs. Acquired outputs survive rewriter Cleanup/Close, including an append-failure prefix. The former rewriter-lifetime flushedRefs cache and borrowed slice output are removed; retained Go callers are updated, with no raw-handle compatibility adapter."
+        "FlushSideConstraints appends concrete caller-owned ASTRef tokens, then retires the original bound refs. Acquired outputs survive rewriter Cleanup/Close, including an append-failure prefix. The former rewriter-lifetime flushedRefs cache and borrowed slice output are removed; retained Go callers are updated, with no raw-handle compatibility adapter.",
+        "Application a0/a1 locals start null without reserving Go reference records, then acquire concrete ASTRefs on assignment. Distinct tmp replacement and immediate vector pins preserve both owners before the next predicate. App destruction retires _args forward, then a1 and a0. f_def owns each intermediate definition until its later replacement and retires before the fresh counter advances. Failed lexical retirement is retained in observed inner-before-outer order and drained before configuration/imp members.",
+        "Fresh result assignment precedes bound and dictionary work. Borrowed def/BV/reverse mappings publish before const, BV and definition vector pins. A later pin failure preserves earlier acquired tokens; stopped APIs hide borrowed mapping snapshots and cannot resume reduction. Close retires the actual pin prefix without replaying consumed tokens. Supported Go reference-reservation/owning-continuation paths do not establish full native C++ vector-allocation or throwing-destructor behavior."
       ],
       "deviations": [
         "The source parameter update is behaviorally empty and the Go UpdateParams method therefore performs only the owner-state validation. Map accessors return native Go map snapshots instead of exposing mutable C++ obj_map storage.",
-        "Whole-unit ported/audited claims are withdrawn on concrete retained C++ evidence. Previously missing enum utility members/caches, source destruction/reconstruction, vector group order and caller-owned side-constraint output are corrected in this bounded increment. Retained C++ consumers are dt2bv_tactic and enum2bv_solver; their complete Go integrations remain separate work. Reduce-app/argument/quantifier expr_ref lexical ownership, detailed throw_non_fd pretty-print operands, all assertion sites, source input params_ref ownership and full native exceptional destruction are not established by existing algorithm tests or these normal owner/prefix checks. Initial guard tests that reentered during ordinary sort registration timed out and are rejected setup, not passing failure evidence; the final regression uses the actual numerical mutation guard."
+        "Whole-unit ported/audited claims are withdrawn on concrete retained C++ evidence. Previously missing enum utility members/caches, source destruction/reconstruction, vector group order and caller-owned side-constraint output are corrected in this bounded increment. Retained C++ consumers are dt2bv_tactic and enum2bv_solver; their complete Go integrations remain separate work. Remaining quantifier expr_ref lexical ownership, broader application/native destructor exception prefixes, detailed throw_non_fd pretty-print operands, all assertion sites, source input params_ref ownership and full native exceptional destruction are not established by existing algorithm tests or these normal owner/prefix checks. Initial guard tests that reentered during ordinary sort registration timed out and are rejected setup, not passing failure evidence; the final regression uses the actual numerical mutation guard.",
+        "Application and argument conversion previously returned raw handles, lacked local f_def ownership, published maps after vector pins and rolled back acquired registration pins. Concrete lexical owners and ordered publication now match the retained source paths, with initially null locals avoiding artificial reference reservations on ordinary non-enum applications. Physical allocation census verifies definition retirement and a later mapping-vector refusal with the actual result/map/owning prefixes. Reference-page frontiers differ across build profiles, so the portable definition-cleanup assertion uses the publication refusal reachable in all profiles. Equality/distinct tests observe prior scalar/tmp/vector pins through the actual external sort predicate, then prove retirement on predicate failure. An actual numerical mutation guard verifies unconsumed lexical cleanup and member barriers. Whole units remain partial for quantifier locals, pretty-print errors, params_ref and general native exception/NUM destruction auditing."
       ]
     },
     {
@@ -33218,7 +33257,9 @@
         "pkg/ast/rewriter/enum2bv_rewriter.go",
         "pkg/ast/rewriter/enum2bv_rewriter_test.go",
         "pkg/ast/ast_datatype_util.go",
-        "pkg/ast/rewriter/enum2bv_source_owners_test.go"
+        "pkg/ast/rewriter/enum2bv_source_owners_test.go",
+        "pkg/ast/rewriter/enum2bv_expr_scope.go",
+        "pkg/ast/rewriter/enum2bv_expr_scope_test.go"
       ],
       "tests": [
         "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes",
@@ -33228,7 +33269,12 @@
         "TestEnum2BVFlushFailurePreservesCallerPrefix",
         "TestEnum2BVCloseStopsAtConfigurationUtility",
         "TestEnum2BVConstructionAndCleanupAllocationRefusals",
-        "TestEnum2BVTranslationWarmsConfigurationCache"
+        "TestEnum2BVTranslationWarmsConfigurationCache",
+        "TestEnum2BVApplicationArgumentOwnersBeforeNextPredicate",
+        "TestEnum2BVDefinitionOwnerAndPublishedReferencePrefix",
+        "TestEnum2BVArgumentAssertionConsultsActualOwner",
+        "TestEnum2BVStoppedLexicalCleanupPrecedesMembers",
+        "TestEnum2BVNonFiniteApplicationNeedsNoReferenceReservation"
       ],
       "conditionals": [
         {
@@ -33279,15 +33325,47 @@
             "TestEnum2BVFlushFailurePreservesCallerPrefix",
             "TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes"
           ]
+        },
+        {
+          "name": "Concrete reduce_app a0/a1 and _args, reduce_args tmp, reduce_arg caller result and f_def owners: initially null locals acquire slots on first assignment, ordered SetRef publication, vector pins before next predicate, lexical destruction in source order and retained inner-before-outer cleanup before members",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/enum2bv_rewriter.go",
+            "pkg/ast/rewriter/enum2bv_expr_scope.go",
+            "pkg/ast/rewriter/enum2bv_expr_scope_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVApplicationArgumentOwnersBeforeNextPredicate",
+            "TestEnum2BVDefinitionOwnerAndPublishedReferencePrefix",
+            "TestEnum2BVArgumentAssertionConsultsActualOwner",
+            "TestEnum2BVStoppedLexicalCleanupPrecedesMembers",
+            "TestEnum2BVNonFiniteApplicationNeedsNoReferenceReservation"
+          ]
+        },
+        {
+          "name": "Fresh constant conversion publishes result before bounds/definition, owns successive f_def expressions, publishes def/BV/reverse maps before const/BV/definition pin vectors, retains acquired pin prefixes without rollback and advances translated only after definition cleanup; source SASSERT103 consults actual process debug owner",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/rewriter/enum2bv_rewriter.go",
+            "pkg/ast/rewriter/enum2bv_expr_scope.go",
+            "pkg/ast/rewriter/enum2bv_expr_scope_test.go"
+          ],
+          "tests": [
+            "TestEnum2BVDefinitionOwnerAndPublishedReferencePrefix",
+            "TestEnum2BVArgumentAssertionConsultsActualOwner"
+          ]
         }
       ],
       "ownership": [
         "Enum2BVRewriter owns its traversal, persistent AST reference sets, native maps, scope limits, and arena-accounted header. Close and Cleanup release retained references in reverse order.",
         "Each rewriter owns two independent DatatypeUtil members. The rw_cfg utility retires before the traversal base; imp definitions, BV declarations and original constants retire by vector group in forward insertion order, then the outer datatype utility, then bounds. Interrupted Go Close retains remaining tokens/header and blocks operations until retry. Cleanup releases the old imp header before reserving/constructing its replacement.",
-        "FlushSideConstraints appends concrete caller-owned ASTRef tokens, then retires the original bound refs. Acquired outputs survive rewriter Cleanup/Close, including an append-failure prefix. The former rewriter-lifetime flushedRefs cache and borrowed slice output are removed; retained Go callers are updated, with no raw-handle compatibility adapter."
+        "FlushSideConstraints appends concrete caller-owned ASTRef tokens, then retires the original bound refs. Acquired outputs survive rewriter Cleanup/Close, including an append-failure prefix. The former rewriter-lifetime flushedRefs cache and borrowed slice output are removed; retained Go callers are updated, with no raw-handle compatibility adapter.",
+        "Application a0/a1 locals start null without reserving Go reference records, then acquire concrete ASTRefs on assignment. Distinct tmp replacement and immediate vector pins preserve both owners before the next predicate. App destruction retires _args forward, then a1 and a0. f_def owns each intermediate definition until its later replacement and retires before the fresh counter advances. Failed lexical retirement is retained in observed inner-before-outer order and drained before configuration/imp members.",
+        "Fresh result assignment precedes bound and dictionary work. Borrowed def/BV/reverse mappings publish before const, BV and definition vector pins. A later pin failure preserves earlier acquired tokens; stopped APIs hide borrowed mapping snapshots and cannot resume reduction. Close retires the actual pin prefix without replaying consumed tokens. Supported Go reference-reservation/owning-continuation paths do not establish full native C++ vector-allocation or throwing-destructor behavior."
       ],
       "deviations": [
-        "Whole-unit ported/audited claims are withdrawn on concrete retained C++ evidence. Previously missing enum utility members/caches, source destruction/reconstruction, vector group order and caller-owned side-constraint output are corrected in this bounded increment. Retained C++ consumers are dt2bv_tactic and enum2bv_solver; their complete Go integrations remain separate work. Reduce-app/argument/quantifier expr_ref lexical ownership, detailed throw_non_fd pretty-print operands, all assertion sites, source input params_ref ownership and full native exceptional destruction are not established by existing algorithm tests or these normal owner/prefix checks. Initial guard tests that reentered during ordinary sort registration timed out and are rejected setup, not passing failure evidence; the final regression uses the actual numerical mutation guard."
+        "Whole-unit ported/audited claims are withdrawn on concrete retained C++ evidence. Previously missing enum utility members/caches, source destruction/reconstruction, vector group order and caller-owned side-constraint output are corrected in this bounded increment. Retained C++ consumers are dt2bv_tactic and enum2bv_solver; their complete Go integrations remain separate work. Remaining quantifier expr_ref lexical ownership, broader application/native destructor exception prefixes, detailed throw_non_fd pretty-print operands, all assertion sites, source input params_ref ownership and full native exceptional destruction are not established by existing algorithm tests or these normal owner/prefix checks. Initial guard tests that reentered during ordinary sort registration timed out and are rejected setup, not passing failure evidence; the final regression uses the actual numerical mutation guard.",
+        "Application and argument conversion previously returned raw handles, lacked local f_def ownership, published maps after vector pins and rolled back acquired registration pins. Concrete lexical owners and ordered publication now match the retained source paths, with initially null locals avoiding artificial reference reservations on ordinary non-enum applications. Physical allocation census verifies definition retirement and a later mapping-vector refusal with the actual result/map/owning prefixes. Reference-page frontiers differ across build profiles, so the portable definition-cleanup assertion uses the publication refusal reachable in all profiles. Equality/distinct tests observe prior scalar/tmp/vector pins through the actual external sort predicate, then prove retirement on predicate failure. An actual numerical mutation guard verifies unconsumed lexical cleanup and member barriers. Whole units remain partial for quantifier locals, pretty-print errors, params_ref and general native exception/NUM destruction auditing."
       ]
     },
     {

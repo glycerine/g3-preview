@@ -42,6 +42,7 @@ type Enum2BVRewriter struct {
 	header      uint64
 	closed      bool
 	closing     bool
+	pending     []enum2BVPending
 }
 
 func NewEnum2BVRewriter(m *ast.ASTManager) (*Enum2BVRewriter, error) {
@@ -112,156 +113,199 @@ func (r *Enum2BVRewriter) isFinite(sort ast.ASTHandle) (bool, error) {
 	return r.predicate(sort)
 }
 
-func (r *Enum2BVRewriter) retain(handle ast.ASTHandle) (ast.ASTRef, error) {
-	return r.manager.NewRef(handle)
-}
-
-func (r *Enum2BVRewriter) reduceArgument(argument ast.ASTHandle) (ast.ASTHandle, bool, error) {
+func (r *Enum2BVRewriter) reduceArgument(argument ast.ASTHandle, result *ast.ASTRef) (bool, error) {
 	m := r.manager
 	sort, err := m.GetSort(argument)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return false, err
 	}
 	finite, err := r.isFinite(sort)
 	if err != nil || !finite {
-		return ast.ASTHandle{}, false, err
+		return false, err
 	}
 	count, err := m.DatatypeNumConstructors(sort)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return false, err
 	}
 	width := enum2BVWidth(count)
 	kind, err := m.GetKind(argument)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return false, err
 	}
 	if kind == ast.ASTVar {
-		index, e := m.GetVarIndex(argument)
-		if e != nil {
-			return ast.ASTHandle{}, false, e
+		index, err := m.GetVarIndex(argument)
+		if err != nil {
+			return false, err
 		}
-		bvSort, e := m.BitVectorSort(width)
-		if e != nil {
-			return ast.ASTHandle{}, false, e
+		bvSort, err := m.BitVectorSort(width)
+		if err != nil {
+			return false, err
 		}
-		value, e := m.MkVar(index, bvSort)
-		return value, e == nil, e
+		value, err := m.MkVar(index, bvSort)
+		if err != nil {
+			return false, err
+		}
+		err = enum2BVAssign(m, result, value)
+		return err == nil, err
+	}
+	if err = enum2BVAppAssertion(kind); err != nil {
+		return false, err
 	}
 	if kind != ast.ASTApp {
-		return ast.ASTHandle{}, false, fmt.Errorf("unable to handle nested data-type expression")
+		return false, fmt.Errorf("unable to handle nested data-type expression")
 	}
 	decl, err := m.GetDecl(argument)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return false, err
 	}
-	if index, matched, e := m.DatatypeConstructorIndex(decl); e != nil {
-		return ast.ASTHandle{}, false, e
+	if index, matched, err := m.DatatypeConstructorIndex(decl); err != nil {
+		return false, err
 	} else if matched {
-		value, e := m.BitVectorNumeralUnsigned(index, width)
-		if e == nil {
-			r.translated++
+		value, err := m.BitVectorNumeralUnsigned(index, width)
+		if err != nil {
+			return false, err
 		}
-		return value, e == nil, e
+		if err = enum2BVAssign(m, result, value); err != nil {
+			return false, err
+		}
+		r.translated++
+		return true, nil
 	}
-	declFamily, err := m.GetFamilyID(decl)
+	family, err := m.GetFamilyID(decl)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return false, err
 	}
 	arity, err := m.GetArity(decl)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return false, err
 	}
-	if declFamily != ast.NullFamilyID || arity != 0 {
-		return ast.ASTHandle{}, false, fmt.Errorf("unable to handle nested data-type expression")
+	if family != ast.NullFamilyID || arity != 0 {
+		return false, fmt.Errorf("unable to handle nested data-type expression")
 	}
 	if fresh, found := r.enum2BV[decl]; found {
-		value, e := m.MkApp(fresh, nil)
-		return value, e == nil, e
+		value, err := m.MkApp(fresh, nil)
+		if err != nil {
+			return false, err
+		}
+		err = enum2BVAssign(m, result, value)
+		return err == nil, err
 	}
+	if err = r.reduceFreshConstant(decl, sort, result, count, width); err != nil {
+		return false, err
+	}
+	r.translated++
+	return true, nil
+}
+
+func (r *Enum2BVRewriter) reduceFreshConstant(decl, sort ast.ASTHandle, result *ast.ASTRef, count, width uint32) (err error) {
+	m := r.manager
 	bvSort, err := m.BitVectorSort(width)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return err
 	}
 	name, err := m.GetASTName(decl)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return err
 	}
 	text, err := m.Symbols.Display(name)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return err
 	}
-	freshApp, err := m.MkFreshConst(text, bvSort)
+	fresh, err := m.MkFreshConst(text, bvSort)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return err
 	}
-	freshDecl, err := m.GetDecl(freshApp)
+	if err = enum2BVAssign(m, result, fresh); err != nil {
+		return err
+	}
+	freshDecl, err := m.GetDecl(fresh)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return err
 	}
 	if !enum2BVPowerOfTwo(count) || count == 1 {
-		upper, e := m.BitVectorNumeralUnsigned(count-1, width)
-		if e != nil {
-			return ast.ASTHandle{}, false, e
+		upper, err := m.BitVectorNumeralUnsigned(count-1, width)
+		if err != nil {
+			return err
 		}
-		bound, e := m.MkBitVectorULE(freshApp, upper)
-		if e != nil {
-			return ast.ASTHandle{}, false, e
+		bound, err := m.MkBitVectorULE(fresh, upper)
+		if err != nil {
+			return err
 		}
-		ref, e := r.retain(bound)
-		if e != nil {
-			return ast.ASTHandle{}, false, e
+		ref, err := m.NewRef(bound)
+		if err != nil {
+			return err
 		}
 		r.bounds = append(r.bounds, bound)
 		r.boundRefs = append(r.boundRefs, ref)
 	}
+	definition := &enum2BVScalarScope{manager: m}
+	defer r.finishScalar(definition, &err)
 	constructors, err := r.config.utility.Constructors(sort)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return err
 	}
-	definition, err := m.MkApp(constructors[count-1], nil)
+	value, err := m.MkApp(constructors[count-1], nil)
 	if err != nil {
-		return ast.ASTHandle{}, false, err
+		return err
+	}
+	if err = enum2BVAssign(m, &definition.ref, value); err != nil {
+		return err
 	}
 	for i := count - 1; i > 0; {
 		i--
-		numeral, e := m.BitVectorNumeralUnsigned(i, width)
-		if e != nil {
-			return ast.ASTHandle{}, false, e
-		}
-		equal, e := m.MkEq(freshApp, numeral)
-		if e != nil {
-			return ast.ASTHandle{}, false, e
-		}
-		constructor, e := m.MkApp(constructors[i], nil)
-		if e != nil {
-			return ast.ASTHandle{}, false, e
-		}
-		definition, e = m.MkIte(equal, constructor, definition)
-		if e != nil {
-			return ast.ASTHandle{}, false, e
-		}
-	}
-	entry := enum2BVEntry{original: decl, bitVector: freshDecl, definition: definition}
-	for i, handle := range []ast.ASTHandle{decl, freshDecl, definition} {
-		entry.owned[i], err = r.retain(handle)
+		numeral, err := m.BitVectorNumeralUnsigned(i, width)
 		if err != nil {
-			for j := i - 1; j >= 0; j-- {
-				_ = m.DelRef(&entry.owned[j])
-			}
-			return ast.ASTHandle{}, false, err
+			return err
+		}
+		equal, err := m.MkEq(fresh, numeral)
+		if err != nil {
+			return err
+		}
+		constructor, err := m.MkApp(constructors[i], nil)
+		if err != nil {
+			return err
+		}
+		old, err := m.RefGet(definition.ref)
+		if err != nil {
+			return err
+		}
+		value, err = m.MkIte(equal, constructor, old)
+		if err != nil {
+			return err
+		}
+		if err = enum2BVAssign(m, &definition.ref, value); err != nil {
+			return err
 		}
 	}
-	r.entries = append(r.entries, entry)
+	value, err = m.RefGet(definition.ref)
+	if err != nil {
+		return err
+	}
+	// The source publishes all borrowed maps before pinning consts, BVs,
+	// then definitions. A later refusal retains its actual owning prefix.
+	r.enum2Def[decl] = value
 	r.enum2BV[decl] = freshDecl
 	r.bv2Enum[freshDecl] = decl
-	r.enum2Def[decl] = definition
-	r.translated++
-	return freshApp, true, nil
+	r.entries = append(r.entries, enum2BVEntry{original: decl, bitVector: freshDecl, definition: value})
+	entry := &r.entries[len(r.entries)-1]
+	for i, h := range []ast.ASTHandle{decl, freshDecl, value} {
+		entry.owned[i], err = m.NewRef(h)
+		if err != nil {
+			r.closing = true
+			return err
+		}
+	}
+	return nil
 }
 
-func (c *enum2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArguments, out, _ ast.ASTRef) (RewriteStatus, error) {
+func (c *enum2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArguments, out, _ ast.ASTRef) (status RewriteStatus, err error) {
 	r := c.owner
 	m := r.manager
+	if err = r.open(); err != nil {
+		return RewriteFailed, err
+	}
+	scope := &enum2BVAppScope{manager: m}
+	defer r.finishApp(scope, &err)
 	family, err := m.GetFamilyID(decl)
 	if err != nil {
 		return RewriteFailed, err
@@ -271,106 +315,105 @@ func (c *enum2BVConfiguration) ReduceApp(decl ast.ASTHandle, args ast.AppArgumen
 		return RewriteFailed, err
 	}
 	if family == 0 && kind == ast.ASTOpEq && args.Count() == 2 {
-		a, e := args.At(0)
-		if e != nil {
-			return RewriteFailed, e
+		a, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
 		}
-		b, e := args.At(1)
-		if e != nil {
-			return RewriteFailed, e
+		yes, err := r.reduceArgument(a, &scope.a0)
+		if err != nil {
+			return RewriteFailed, err
 		}
-		ra, ma, e := r.reduceArgument(a)
-		if e != nil {
-			return RewriteFailed, fmt.Errorf("enum2bv equality left: %w", e)
-		}
-		if ma {
-			rb, mb, e := r.reduceArgument(b)
-			if e != nil {
-				return RewriteFailed, fmt.Errorf("enum2bv equality right: %w", e)
+		if yes {
+			b, err := args.At(1)
+			if err != nil {
+				return RewriteFailed, err
 			}
-			if mb {
-				value, e := m.MkEq(ra, rb)
-				if e != nil {
-					return RewriteFailed, e
+			yes, err = r.reduceArgument(b, &scope.a1)
+			if err != nil {
+				return RewriteFailed, err
+			}
+			if yes {
+				a, err = m.RefGet(scope.a0)
+				if err != nil {
+					return RewriteFailed, err
+				}
+				b, err = m.RefGet(scope.a1)
+				if err != nil {
+					return RewriteFailed, err
+				}
+				value, err := m.MkEq(a, b)
+				if err != nil {
+					return RewriteFailed, err
 				}
 				return RewriteDone, m.SetRef(out, value)
 			}
 		}
-	}
-	if family == 0 && kind == ast.ASTOpDistinct {
-		converted := make([]ast.ASTHandle, args.Count())
-		for i := range converted {
-			a, e := args.At(uint32(i))
-			if e != nil {
-				return RewriteFailed, e
-			}
-			converted[i], _, e = r.reduceArgument(a)
-			if e != nil {
-				return RewriteFailed, e
-			}
-			if converted[i].IsNull() {
-				break
-			}
+	} else if family == 0 && kind == ast.ASTOpDistinct {
+		yes, err := r.reduceArguments(args, scope)
+		if err != nil {
+			return RewriteFailed, err
 		}
-		complete := true
-		for _, h := range converted {
-			complete = complete && !h.IsNull()
-		}
-		if complete {
-			value, e := m.MkDistinct(converted)
-			if e != nil {
-				return RewriteFailed, e
+		if yes {
+			value, err := m.MkDistinct(scope.values)
+			if err != nil {
+				return RewriteFailed, err
 			}
 			return RewriteDone, m.SetRef(out, value)
 		}
-	}
-	if _, matched, e := m.DatatypeRecognizerConstructor(decl); e != nil {
-		return RewriteFailed, e
-	} else if matched && args.Count() == 1 {
-		a, e := args.At(0)
-		if e != nil {
-			return RewriteFailed, e
+	} else if _, yes, err := m.DatatypeRecognizerConstructor(decl); err != nil {
+		return RewriteFailed, err
+	} else if yes && args.Count() == 1 {
+		a, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
 		}
-		ra, yes, e := r.reduceArgument(a)
-		if e != nil {
-			return RewriteFailed, e
+		yes, err = r.reduceArgument(a, &scope.a0)
+		if err != nil {
+			return RewriteFailed, err
 		}
 		if yes {
-			index, _, e := m.DatatypeRecognizerConstructorIndex(decl)
-			if e != nil {
-				return RewriteFailed, e
+			index, _, err := m.DatatypeRecognizerConstructorIndex(decl)
+			if err != nil {
+				return RewriteFailed, err
 			}
-			sort, e := m.GetSort(ra)
-			if e != nil {
-				return RewriteFailed, e
+			a, err = m.RefGet(scope.a0)
+			if err != nil {
+				return RewriteFailed, err
 			}
-			width, e := m.BitVectorSize(sort)
-			if e != nil {
-				return RewriteFailed, e
+			sort, err := m.GetSort(a)
+			if err != nil {
+				return RewriteFailed, err
 			}
-			numeral, e := m.BitVectorNumeralUnsigned(index, width)
-			if e != nil {
-				return RewriteFailed, e
+			width, err := m.BitVectorSize(sort)
+			if err != nil {
+				return RewriteFailed, err
 			}
-			value, e := m.MkEq(ra, numeral)
-			if e != nil {
-				return RewriteFailed, e
+			numeral, err := m.BitVectorNumeralUnsigned(index, width)
+			if err != nil {
+				return RewriteFailed, err
+			}
+			if err = enum2BVAssign(m, &scope.a1, numeral); err != nil {
+				return RewriteFailed, err
+			}
+			value, err := m.MkEq(a, numeral)
+			if err != nil {
+				return RewriteFailed, err
 			}
 			return RewriteDone, m.SetRef(out, value)
 		}
 	}
 	for i := uint32(0); i < args.Count(); i++ {
-		a, e := args.At(i)
-		if e != nil {
-			return RewriteFailed, e
+		a, err := args.At(i)
+		if err != nil {
+			return RewriteFailed, err
 		}
-		s, e := m.GetSort(a)
-		if e != nil {
-			return RewriteFailed, e
+		sort, err := m.GetSort(a)
+		if err != nil {
+			return RewriteFailed, err
 		}
-		finite, e := r.isFinite(s)
-		if e != nil {
-			return RewriteFailed, e
+		finite, err := r.isFinite(sort)
+		if err != nil {
+			return RewriteFailed, err
 		}
 		if finite {
 			return RewriteFailed, fmt.Errorf("unable to handle nested data-type expression")
@@ -627,6 +670,20 @@ func (r *Enum2BVRewriter) Cleanup() error {
 // Derived rw_cfg members die before the traversal base, then imp's vectors
 // die in reverse member order. Each project ref_vector retires forward.
 func (r *Enum2BVRewriter) releaseMembers() error {
+	for len(r.pending) != 0 {
+		p := &r.pending[0]
+		var err error
+		if p.scalar != nil {
+			err = p.scalar.close()
+		} else {
+			err = p.app.close()
+		}
+		if err != nil {
+			return err
+		}
+		r.pending = r.pending[1:]
+	}
+
 	if r.config.utility != nil {
 		if err := r.config.utility.Close(); err != nil {
 			return err
@@ -682,6 +739,9 @@ func (r *Enum2BVRewriter) NumSteps() (uint32, error) {
 	return r.traversal.NumSteps()
 }
 func (r *Enum2BVRewriter) EnumToBitVector() map[ast.ASTHandle]ast.ASTHandle {
+	if r == nil || r.closed || r.closing {
+		return nil
+	}
 	out := make(map[ast.ASTHandle]ast.ASTHandle, len(r.enum2BV))
 	for k, v := range r.enum2BV {
 		out[k] = v
@@ -689,6 +749,9 @@ func (r *Enum2BVRewriter) EnumToBitVector() map[ast.ASTHandle]ast.ASTHandle {
 	return out
 }
 func (r *Enum2BVRewriter) BitVectorToEnum() map[ast.ASTHandle]ast.ASTHandle {
+	if r == nil || r.closed || r.closing {
+		return nil
+	}
 	out := make(map[ast.ASTHandle]ast.ASTHandle, len(r.bv2Enum))
 	for k, v := range r.bv2Enum {
 		out[k] = v
@@ -696,6 +759,9 @@ func (r *Enum2BVRewriter) BitVectorToEnum() map[ast.ASTHandle]ast.ASTHandle {
 	return out
 }
 func (r *Enum2BVRewriter) EnumDefinitions() map[ast.ASTHandle]ast.ASTHandle {
+	if r == nil || r.closed || r.closing {
+		return nil
+	}
 	out := make(map[ast.ASTHandle]ast.ASTHandle, len(r.enum2Def))
 	for k, v := range r.enum2Def {
 		out[k] = v
