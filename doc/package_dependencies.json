@@ -2677,6 +2677,7 @@
         "smt_quantifier_stat.go",
         "smt_quick_checker.go",
         "smt_recursive_functions.go",
+        "smt_relevance_case_split_queue.go",
         "smt_relevancy.go",
         "smt_relevant_expr.go",
         "smt_restart.go",

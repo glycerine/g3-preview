@@ -200,6 +200,9 @@ func (s *SMTInternalizerState) PropagateTheoryAssignments() error {
 // Source context::relevant_eh is called by set_relevant immediately,
 // before assignment propagation and at the scope where the mark was made.
 func (s *SMTInternalizerState) notifyRelevant(expression ast.ASTHandle) error {
+	if err := s.admitRelevanceCaseSplit(expression); err != nil {
+		return err
+	}
 	kind, err := s.manager.GetKind(expression)
 	if err != nil {
 		return err

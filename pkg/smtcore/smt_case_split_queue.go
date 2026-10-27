@@ -174,7 +174,7 @@ func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error)
 		variable, err := q.state.theoryAwareBranching.next(q.randomVariableFrequency)
 		return variable, lbool.Undef, err
 	case 3:
-		next, phase, err := q.relevantVariable(false, false)
+		next, phase, err := q.nextRelevanceFIFO()
 		if err == nil && next != SMTNullBoolVar && phase != lbool.False && q.lookaheadDiseq && q.selectedEqualityDisequal(next) {
 			phase = lbool.False
 		}

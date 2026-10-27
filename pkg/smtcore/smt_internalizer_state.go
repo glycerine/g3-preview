@@ -14,6 +14,7 @@ import (
 )
 
 type smtInternalizerScope struct {
+	relevanceFIFO        smtRelevanceFIFOScope
 	trueFirstLimit       int
 	theoryCaseSplitLimit int
 	booleanLimit         int
@@ -103,6 +104,7 @@ type smtPendingEquality struct {
 }
 
 type SMTInternalizerState struct {
+	relevanceFIFO              smtRelevanceFIFO
 	lemmaProblem               *smtLemmaProblem // Interrupted lexical roots, retired before the manager.
 	theoryProgress             uint64
 	manager                    *ast.ASTManager
@@ -208,6 +210,7 @@ func NewSMTInternalizerState(manager *ast.ASTManager, context *SMTCheckerContext
 		activityInverseDecay:  1.052,
 		randomInitialActivity: 1,
 		caseSplitStrategy:     1,
+		relevanceFIFO:         smtRelevanceFIFO{baseBooleanLimit: -1},
 		activityCache:         make(map[ast.ASTHandle]float64),
 		clauseMaintenance:     defaultSMTClauseMaintenanceConfig(),
 		lemmaGCThreshold:      5000,
@@ -673,6 +676,7 @@ func (s *SMTInternalizerState) PushScope() error {
 		reasons[key] = literal
 	}
 	s.scopes = append(s.scopes, smtInternalizerScope{
+		relevanceFIFO:        s.relevanceFIFO.snapshot(),
 		trueFirstLimit:       len(s.trueFirstTrail),
 		theoryCaseSplitLimit: len(s.theoryCaseSplitSets),
 		booleanLimit:         len(s.booleanStack), enodeLimit: len(s.enodeStack), pendingLimit: len(s.pending), pendingHead: s.pendingHead,
@@ -765,6 +769,9 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 }
 
 func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
+	if err := s.relevanceFIFO.restore(scope.relevanceFIFO); err != nil {
+		return err
+	}
 	if err := s.undoTheoryCaseSplits(scope.theoryCaseSplitLimit); err != nil {
 		return err
 	}
