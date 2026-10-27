@@ -114,10 +114,21 @@ func (r *BV2RealRewriter) MkAppCore(decl ast.ASTHandle, args ast.AppArguments, o
 		}
 	}
 	var h ast.ASTHandle
+	if !r.eliminate {
+		if err = u.traceApp(decl, values); err != nil {
+			return rewriter.RewriteFailed, err
+		}
+	}
 	if r.eliminate {
 		if sig, ok := u.reverse[decl]; ok {
+			if err = bv2RealSourceAssert(55, "num_args == 2", len(values) == 2); err != nil {
+				return rewriter.RewriteFailed, err
+			}
 			if len(values) != 2 {
 				return rewriter.RewriteFailed, ast.ErrASTDomain
+			}
+			if err = c.checkSignature(values[0], values[1], &sig); err != nil {
+				return rewriter.RewriteFailed, err
 			}
 			h = c.reduced(values[0], values[1], &sig.divisor, &sig.root)
 			status = rewriter.RewriteFull
@@ -132,6 +143,9 @@ func (r *BV2RealRewriter) MkAppCore(decl ast.ASTHandle, args ast.AppArguments, o
 	}
 	if !h.IsNull() {
 		err = u.manager.SetRef(out, h)
+		if err == nil && c.traceLine != 0 {
+			err = u.traceLE(c.traceLine, "\n")
+		}
 	}
 	return status, err
 }
@@ -202,6 +216,12 @@ func (c *bv2RealCall) negate(s ast.ASTHandle) (ast.ASTHandle, bool) {
 	return c.wrap(c.bv(3, a), c.bv(3, b), &d, &r)
 }
 func (c *bv2RealCall) approxLE(s, t ast.ASTHandle, positive, negative bool) (ast.ASTHandle, bool) {
+	if c.err == nil {
+		c.err = bv2RealSourceAssert(408, "is_pos || is_neg", positive || negative)
+	}
+	if c.err != nil {
+		return ast.ASTHandle{}, false
+	}
 	a, b, x, y, d1, d2, r, ok := c.pair(s, t)
 	if !ok || r.Cmp(big.NewRat(2, 1)) != 0 {
 		return ast.ASTHandle{}, false
@@ -247,6 +267,9 @@ func (c *bv2RealCall) approxLE(s, t ast.ASTHandle, positive, negative bool) (ast
 		c.side(c.basic(ast.ASTOpImplies, c.basic(ast.ASTOpAnd, gt, c.basic(ast.ASTOpNot, nonpos)), c.basic(ast.ASTOpNot, leUnder)))
 		c.side(c.basic(ast.ASTOpImplies, c.basic(ast.ASTOpAnd, gt, nonpos), c.basic(ast.ASTOpNot, leOver)))
 	}
+	if c.err == nil {
+		c.err = c.u.traceLE(464, "mk_le\n")
+	}
 	if positive {
 		return le, true
 	}
@@ -273,6 +296,7 @@ func (c *bv2RealCall) le(s, t ast.ASTHandle) (ast.ASTHandle, bool) {
 	e1 := c.basic(ast.ASTOpOr, gz1, gz2)
 	e2 := c.basic(ast.ASTOpOr, c.basic(ast.ASTOpNot, gz1), c.basic(ast.ASTOpNot, lz2), ge)
 	e3 := c.basic(ast.ASTOpOr, c.basic(ast.ASTOpNot, gz2), c.basic(ast.ASTOpNot, lz1), le)
+	c.traceLine = 541
 	return c.basic(ast.ASTOpAnd, e1, e2, e3), true
 }
 func (c *bv2RealCall) reduce(decl ast.ASTHandle, a []ast.ASTHandle) (h ast.ASTHandle, status rewriter.RewriteStatus) {
@@ -286,6 +310,9 @@ func (c *bv2RealCall) reduce(decl ast.ASTHandle, a []ast.ASTHandle) (h ast.ASTHa
 	kind, err := m.GetDeclKind(decl)
 	if err != nil {
 		c.err = err
+		return
+	}
+	if c.err = c.assertArity(family, kind, len(a)); c.err != nil {
 		return
 	}
 	ok := false
@@ -354,6 +381,13 @@ func (c *bv2RealCall) reduce(decl ast.ASTHandle, a []ast.ASTHandle) (h ast.ASTHa
 			return
 		}
 		if decl == lt || decl == le {
+			line := int32(398)
+			if decl == lt {
+				line = 394
+			}
+			if c.err = bv2RealSourceAssert(line, "num_args == 2", len(a) == 2); c.err != nil {
+				return
+			}
 			if len(a) != 2 {
 				c.err = ast.ErrASTDomain
 				return

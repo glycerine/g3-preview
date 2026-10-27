@@ -155895,11 +155895,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/arith/bv2real_util.go",
-        "pkg/tactic/arith/bv2real_rewriter.go"
+        "pkg/tactic/arith/bv2real_rewriter.go",
+        "pkg/tactic/arith/bv2real_diagnostics.go"
       ],
       "tests": [
         "pkg/tactic/arith/bv2real_util_test.go",
-        "pkg/tactic/arith/bv2real_rewriter_test.go"
+        "pkg/tactic/arith/bv2real_rewriter_test.go",
+        "pkg/tactic/arith/bv2real_diagnostics_test.go"
       ],
       "assertions": [
         {
@@ -156041,6 +156043,20 @@
             "TestBV2RealRewriterPositivePredicatesAndStrictStatus",
             "TestBV2RealRewriterComparisonsPrebuiltCPPOracle"
           ]
+        },
+        {
+          "name": "source assertion profiles and actual TRACE359/318/339/464/541 dispatch, divisibility and comparison publication order with sticky stream behavior",
+          "status": "partial",
+          "go_target": "pkg/tactic/arith/bv2real_diagnostics.go",
+          "tests": [
+            "TestBV2RealSourceAssertionProfilesAndClosedDiagnostic",
+            "TestBV2RealSourcePrimitiveAssertionsAndDisabledGate",
+            "TestBV2RealSourceCachedSignatureAssertions",
+            "TestBV2RealTraceComparisonPublicationAndErasure",
+            "TestBV2RealTraceDivisibilityPrefixes",
+            "TestBV2RealTraceStreamFailureStillEvaluatesOperands",
+            "TestBV2RealTraceFormattingAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
@@ -156049,7 +156065,8 @@
       "deviations": [
         "Only the actual retained nla2bv uint default-root/divisor instantiation is exposed; no unused generic adapters or STL are ported. Native Go maps and slices implement signature caches and traversal. Exact big.Rat metadata is used in both caches without duplicating source project-numeral owners for each signature copy; cache ownership/allocation audit remains open.",
         "Source sqrt(2) comparisons are under-approximations, not equivalences. Tests check both side-condition feasibility and exclusion of incorrect polarity against the prebuilt C++ executable for 72 closed comparisons, plus 18 arithmetic/elimination and 18 signed real interpretation equivalences. No whole-source completion claim follows from these bounded checks.",
-        "Source assertion and TRACE sites remain to be connected. NLA2BV consumer integration, symbolic/quantified reducer campaigns and full source lexical ownership/refusal audit remain open. Whole-unit methods_audited and ownership_audited stay false."
+        "Source assertion and TRACE sites are connected through actual source-profile gates and retained formatting services. Full action-bound C/T assertion transport is not established by the legacy explicit Go assertion fixtures. NLA2BV consumer integration, symbolic/quantified reducer campaigns and full source lexical ownership/refusal audit remain open. Whole-unit methods_audited and ownership_audited stay false.",
+        "Trace formatting uses project module-parameter helpers, owned format documents and numeric streams; stopped cleanup is attached to the utility and blocks reset/new operations until Close. Source ast pointers are additionally pinned during each trace record by the Go owner. Exact per-expression source printer/local allocation lifetime and project-numeral rational insertion audits remain open; native integer spelling currently formats divisibility overflow. No whole-unit audit promotion."
       ]
     },
     {
@@ -156059,11 +156076,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/arith/bv2real_util.go",
-        "pkg/tactic/arith/bv2real_rewriter.go"
+        "pkg/tactic/arith/bv2real_rewriter.go",
+        "pkg/tactic/arith/bv2real_diagnostics.go"
       ],
       "tests": [
         "pkg/tactic/arith/bv2real_util_test.go",
-        "pkg/tactic/arith/bv2real_rewriter_test.go"
+        "pkg/tactic/arith/bv2real_rewriter_test.go",
+        "pkg/tactic/arith/bv2real_diagnostics_test.go"
       ],
       "conditionals": [
         {
@@ -156105,6 +156124,20 @@
             "TestBV2RealRewriterPositivePredicatesAndStrictStatus",
             "TestBV2RealRewriterComparisonsPrebuiltCPPOracle"
           ]
+        },
+        {
+          "name": "source assertion profiles and actual TRACE359/318/339/464/541 dispatch, divisibility and comparison publication order with sticky stream behavior",
+          "status": "partial",
+          "go_target": "pkg/tactic/arith/bv2real_diagnostics.go",
+          "tests": [
+            "TestBV2RealSourceAssertionProfilesAndClosedDiagnostic",
+            "TestBV2RealSourcePrimitiveAssertionsAndDisabledGate",
+            "TestBV2RealSourceCachedSignatureAssertions",
+            "TestBV2RealTraceComparisonPublicationAndErasure",
+            "TestBV2RealTraceDivisibilityPrefixes",
+            "TestBV2RealTraceStreamFailureStillEvaluatesOperands",
+            "TestBV2RealTraceFormattingAllocationFrontiers"
+          ]
         }
       ],
       "ownership": [
@@ -156113,7 +156146,8 @@
       "deviations": [
         "Only the actual retained nla2bv uint default-root/divisor instantiation is exposed; no unused generic adapters or STL are ported. Native Go maps and slices implement signature caches and traversal. Exact big.Rat metadata is used in both caches without duplicating source project-numeral owners for each signature copy; cache ownership/allocation audit remains open.",
         "Source sqrt(2) comparisons are under-approximations, not equivalences. Tests check both side-condition feasibility and exclusion of incorrect polarity against the prebuilt C++ executable for 72 closed comparisons, plus 18 arithmetic/elimination and 18 signed real interpretation equivalences. No whole-source completion claim follows from these bounded checks.",
-        "Source assertion and TRACE sites remain to be connected. NLA2BV consumer integration, symbolic/quantified reducer campaigns and full source lexical ownership/refusal audit remain open. Whole-unit methods_audited and ownership_audited stay false."
+        "Source assertion and TRACE sites are connected through actual source-profile gates and retained formatting services. Full action-bound C/T assertion transport is not established by the legacy explicit Go assertion fixtures. NLA2BV consumer integration, symbolic/quantified reducer campaigns and full source lexical ownership/refusal audit remain open. Whole-unit methods_audited and ownership_audited stay false.",
+        "Trace formatting uses project module-parameter helpers, owned format documents and numeric streams; stopped cleanup is attached to the utility and blocks reset/new operations until Close. Source ast pointers are additionally pinned during each trace record by the Go owner. Exact per-expression source printer/local allocation lifetime and project-numeral rational insertion audits remain open; native integer spelling currently formats divisibility overflow. No whole-unit audit promotion."
       ]
     },
     {

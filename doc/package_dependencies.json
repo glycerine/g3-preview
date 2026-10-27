@@ -3132,6 +3132,7 @@
         "bv2int_rewriter.go",
         "bv2int_rewriter_diagnostics.go",
         "bv2int_rules.go",
+        "bv2real_diagnostics.go",
         "bv2real_rewriter.go",
         "bv2real_util.go",
         "card2bv_tactic.go",

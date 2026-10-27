@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -34,6 +35,8 @@ type BV2RealUtil struct {
 	forward                                 map[bv2RealKey]ast.ASTHandle
 	reverse                                 map[ast.ASTHandle]bv2RealSignature
 	pending                                 []*bv2RealCall
+	trace                                   *diagnostic.TraceTags
+	tracePending                            []*bv2RealTrace
 	maxBits                                 uint32
 	header                                  uint64
 	resetting, closing, closed              bool
@@ -124,7 +127,7 @@ func (u *BV2RealUtil) open() error {
 	if err := u.owner(); err != nil {
 		return err
 	}
-	if !u.ready || u.closing || u.resetting || len(u.pending) > 0 {
+	if !u.ready || u.closing || u.resetting || len(u.pending) > 0 || len(u.tracePending) > 0 {
 		return ast.ErrASTPending
 	}
 	return nil
@@ -214,7 +217,7 @@ func (u *BV2RealUtil) Reset() error {
 	if err := u.owner(); err != nil {
 		return err
 	}
-	if u.closing || len(u.pending) > 0 {
+	if u.closing || len(u.pending) > 0 || len(u.tracePending) > 0 {
 		return ast.ErrASTPending
 	}
 	u.resetting = true
@@ -232,6 +235,12 @@ func (u *BV2RealUtil) Close() error {
 		return err
 	}
 	u.closing = true
+	for len(u.tracePending) > 0 {
+		if err := u.tracePending[0].close(); err != nil {
+			return err
+		}
+		u.tracePending = u.tracePending[1:]
+	}
 	for len(u.pending) > 0 {
 		c := u.pending[0]
 		if err := c.close(); err != nil {
@@ -268,10 +277,11 @@ func (u *BV2RealUtil) Close() error {
 }
 
 type bv2RealCall struct {
-	u       *BV2RealUtil
-	refs    []ast.ASTRef
-	numbers []*unumeral.OwnedRational
-	err     error
+	u         *BV2RealUtil
+	refs      []ast.ASTRef
+	numbers   []*unumeral.OwnedRational
+	err       error
+	traceLine int
 }
 
 func (c *bv2RealCall) close() error {
@@ -394,6 +404,9 @@ func (c *bv2RealCall) signedNumeral(q *big.Rat) ast.ASTHandle {
 	if c.err != nil {
 		return ast.ASTHandle{}
 	}
+	if c.err = bv2RealSourceAssert(245, "n.is_int()", q.IsInt()); c.err != nil {
+		return ast.ASTHandle{}
+	}
 	if !q.IsInt() {
 		c.err = ast.ErrASTDomain
 		return ast.ASTHandle{}
@@ -441,6 +454,11 @@ func (c *bv2RealCall) align(a, b ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle) {
 	return a, b
 }
 func (c *bv2RealCall) add(a, b ast.ASTHandle) ast.ASTHandle {
+	c.assertBV(a, 217, "m_bv.is_bv(s)")
+	c.assertBV(b, 218, "m_bv.is_bv(t)")
+	if c.err != nil {
+		return ast.ASTHandle{}
+	}
 	if q, ok := c.bvNumeral(a); ok && q.Sign() == 0 {
 		return b
 	}
@@ -460,6 +478,11 @@ func (c *bv2RealCall) side(h ast.ASTHandle) {
 	}
 }
 func (c *bv2RealCall) mul(a, b ast.ASTHandle) ast.ASTHandle {
+	c.assertBV(a, 179, "m_bv.is_bv(s)")
+	c.assertBV(b, 180, "m_bv.is_bv(t)")
+	if c.err != nil {
+		return ast.ASTHandle{}
+	}
 	if q, ok := c.bvNumeral(a); ok && q.Sign() == 0 {
 		return a
 	}
@@ -523,9 +546,25 @@ func (c *bv2RealCall) divisible(h ast.ASTHandle, overflow *big.Rat) (ast.ASTHand
 	if c.err != nil {
 		return ast.ASTHandle{}, false
 	}
+	for _, check := range []struct {
+		line int32
+		text string
+		ok   bool
+	}{
+		{315, "overflow.is_int()", overflow.IsInt()},
+		{316, "overflow.is_pos()", overflow.Sign() > 0},
+		{317, "!overflow.is_one()", overflow.Cmp(big.NewRat(1, 1)) != 0},
+	} {
+		if c.err = bv2RealSourceAssert(check.line, check.text, check.ok); c.err != nil {
+			return ast.ASTHandle{}, false
+		}
+	}
 	if !overflow.IsInt() || overflow.Sign() <= 0 || overflow.Cmp(big.NewRat(1, 1)) == 0 {
 		c.err = ast.ErrASTDomain
 		return ast.ASTHandle{}, false
+	}
+	if c.err = c.u.traceDivisible(h, overflow.Num(), 318); c.err != nil {
+		return h, false
 	}
 	rest := new(big.Int).Set(overflow.Num())
 	power := uint32(rest.TrailingZeroBits())
@@ -540,6 +579,9 @@ func (c *bv2RealCall) divisible(h ast.ASTHandle, overflow *big.Rat) (ast.ASTHand
 			c.side(c.basic(ast.ASTOpEq, low, c.numeral(big.NewRat(0, 1), power)))
 			h = c.extract(width-1, power, h)
 		}
+	}
+	if c.err == nil {
+		c.err = c.u.traceDivisible(h, rest, 339)
 	}
 	return h, rest.Cmp(big.NewInt(1)) == 0
 }
@@ -729,6 +771,14 @@ func (c *bv2RealCall) match(h ast.ASTHandle) (a, b ast.ASTHandle, d, r big.Rat, 
 			return
 		}
 		if sig, ok := c.u.reverse[decl]; ok {
+			count, err := m.GetNumArgs(h)
+			if err != nil {
+				c.err = err
+				return
+			}
+			if c.err = bv2RealSourceAssert(55, "num_args == 2", count == 2); c.err != nil {
+				return
+			}
 			a, err = m.GetArg(h, 0)
 			if err != nil {
 				c.err = err
@@ -741,6 +791,9 @@ func (c *bv2RealCall) match(h ast.ASTHandle) (a, b ast.ASTHandle, d, r big.Rat, 
 			}
 			d.Set(&sig.divisor)
 			r.Set(&sig.root)
+			if c.err = c.checkSignature(a, b, &sig); c.err != nil {
+				return
+			}
 			found = true
 			return
 		}
