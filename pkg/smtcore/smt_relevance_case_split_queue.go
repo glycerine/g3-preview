@@ -63,6 +63,9 @@ func (s *SMTInternalizerState) admitRelevanceCaseSplit(expression ast.ASTHandle)
 			return nil
 		}
 	}
+	if err := s.admitRelevanceGoal(expression, variable, internalized); err != nil {
+		return err
+	}
 	if (!internalized && !s.searching) || (internalized && variable < s.relevanceFIFO.baseBooleanLimit) {
 		s.relevanceActivity.entries = append(s.relevanceActivity.entries, expression)
 	}

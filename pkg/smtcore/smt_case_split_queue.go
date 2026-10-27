@@ -3,23 +3,20 @@
 package smtcore
 
 import (
-	"sort"
-
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
 
 // SMTActivityCaseSplitQueue selects the retained search strategy. Activity
-// and relevancy strategies scan Go slices; strategy 6 uses the context's
-// persistent concrete priority heap and its variable lifecycle callbacks.
+// strategies scan Go slices; relevance strategies use context-owned scoped
+// queues and typed heaps. Strategy 6 uses the theory-aware priority heap.
 type SMTActivityCaseSplitQueue struct {
 	state                                 *SMTInternalizerState
 	phaseSelection, cachingOn, cachingOff uint32
 	randomVariableFrequency               float64
 	strategy                              uint32
 	activeCreationLimit                   uint64
-	relevantInitialCount                  int
 	relCaseSplitOrder                     uint32
 	lookaheadDiseq                        bool
 	phaseCounter                          uint32
@@ -48,13 +45,12 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.activeCreationLimit = q.state.nextBooleanCreation
 	q.relCaseSplitOrder = state.RelCaseSplitOrder
 	q.lookaheadDiseq = state.LookaheadDiseq
-	q.relevantInitialCount = 0
-	if q.state.relevancy != nil {
-		q.relevantInitialCount = len(q.state.relevancy.RelevantExpressions())
-	}
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
+	if q.strategy == 5 {
+		return q.state.ensureRelevanceGoalQueue()
+	}
 	if q.strategy == 4 {
 		return q.state.ensureRelevanceActivityQueue()
 	}
@@ -185,7 +181,7 @@ func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error)
 	case 4:
 		return q.nextRelevanceActivity()
 	case 5:
-		return q.relevantVariable(false, true)
+		return q.nextRelevanceGoal()
 	default:
 		next, err := q.randomVariable(q.randomVariableFrequency)
 		if err != nil || next != SMTNullBoolVar {
@@ -333,60 +329,6 @@ func (q *SMTActivityCaseSplitQueue) randomVariable(frequency float64) (int32, er
 	return candidate, nil
 }
 
-type smtRelevantCaseSplit struct {
-	expression ast.ASTHandle
-	index      int
-	generation uint32
-	search     bool
-}
-
-func (q *SMTActivityCaseSplitQueue) relevantVariable(baseOnly, generationOrder bool) (int32, lbool.LBool, error) {
-	if q.state.relevancy == nil {
-		return SMTNullBoolVar, lbool.Undef, nil
-	}
-	expressions := q.state.relevancy.RelevantExpressions()
-	entries := make([]smtRelevantCaseSplit, 0, len(expressions))
-	for index, expression := range expressions {
-		search := index >= q.relevantInitialCount
-		if variable, found := q.state.BoolVar(expression); found {
-			search = q.state.booleanCreation[variable] > q.activeCreationLimit
-		}
-		if baseOnly && search {
-			continue
-		}
-		entry := smtRelevantCaseSplit{expression: expression, index: index, search: search}
-		if generationOrder && search {
-			generation, err := q.expressionGeneration(expression)
-			if err != nil {
-				return SMTNullBoolVar, lbool.Undef, err
-			}
-			entry.generation = generation
-		}
-		entries = append(entries, entry)
-	}
-	if generationOrder {
-		sort.SliceStable(entries, func(i, j int) bool {
-			if entries[i].search != entries[j].search {
-				return !entries[i].search
-			}
-			if entries[i].search && entries[i].generation != entries[j].generation {
-				return entries[i].generation < entries[j].generation
-			}
-			return entries[i].index < entries[j].index
-		})
-	}
-	for _, entry := range entries {
-		next, phase, usable, err := q.relevantCandidate(entry.expression)
-		if err != nil {
-			return SMTNullBoolVar, lbool.Undef, err
-		}
-		if usable {
-			return next, phase, nil
-		}
-	}
-	return SMTNullBoolVar, lbool.Undef, nil
-}
-
 func (q *SMTActivityCaseSplitQueue) relevantCandidate(expression ast.ASTHandle) (int32, lbool.LBool, bool, error) {
 	boolean, err := q.state.isBoolean(expression)
 	if err != nil || !boolean {
@@ -472,7 +414,7 @@ func (q *SMTActivityCaseSplitQueue) relevantChild(parent ast.ASTHandle, parentVa
 	return undefined[len(undefined)-1], true, nil
 }
 
-func (q *SMTActivityCaseSplitQueue) expressionGeneration(expression ast.ASTHandle) (uint32, error) {
+func (s *SMTInternalizerState) expressionGeneration(expression ast.ASTHandle) (uint32, error) {
 	stack := []ast.ASTHandle{expression}
 	seen := make(map[ast.ASTHandle]bool)
 	var maximum uint32
@@ -483,25 +425,25 @@ func (q *SMTActivityCaseSplitQueue) expressionGeneration(expression ast.ASTHandl
 			continue
 		}
 		seen[current] = true
-		if node := q.state.context.enodes[current]; node != nil {
+		if node := s.context.enodes[current]; node != nil {
 			if node.Generation() > maximum {
 				maximum = node.Generation()
 			}
 			continue
 		}
-		kind, err := q.state.manager.GetKind(current)
+		kind, err := s.manager.GetKind(current)
 		if err != nil {
 			return 0, err
 		}
 		if kind != ast.ASTApp {
 			continue
 		}
-		count, err := q.state.manager.GetNumArgs(current)
+		count, err := s.manager.GetNumArgs(current)
 		if err != nil {
 			return 0, err
 		}
 		for index := uint32(0); index < count; index++ {
-			child, err := q.state.manager.GetArg(current, index)
+			child, err := s.manager.GetArg(current, index)
 			if err != nil {
 				return 0, err
 			}

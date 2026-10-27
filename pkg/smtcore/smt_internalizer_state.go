@@ -14,6 +14,7 @@ import (
 )
 
 type smtInternalizerScope struct {
+	goalQueue            smtRelevanceGoalScope
 	relActLimit          int
 	relActHead           int
 	relevanceFIFO        smtRelevanceFIFOScope
@@ -106,6 +107,7 @@ type smtPendingEquality struct {
 }
 
 type SMTInternalizerState struct {
+	relevanceGoal              smtRelevanceGoalQueue
 	relevanceActivity          smtRelevanceActivityQueue
 	relevanceFIFO              smtRelevanceFIFO
 	lemmaProblem               *smtLemmaProblem // Interrupted lexical roots, retired before the manager.
@@ -682,6 +684,7 @@ func (s *SMTInternalizerState) PushScope() error {
 		reasons[key] = literal
 	}
 	s.scopes = append(s.scopes, smtInternalizerScope{
+		goalQueue:     s.relevanceGoal.snapshot(s.scopeLevel),
 		relevanceFIFO: s.relevanceFIFO.snapshot(),
 		relActLimit:   len(s.relevanceActivity.entries), relActHead: s.relevanceActivity.head,
 		trueFirstLimit:       len(s.trueFirstTrail),
@@ -776,6 +779,9 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 }
 
 func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
+	if err := s.relevanceGoal.restore(scope.goalQueue); err != nil {
+		return err
+	}
 	if scope.relActLimit < 0 || scope.relActLimit > len(s.relevanceActivity.entries) || scope.relActHead < 0 || scope.relActHead > scope.relActLimit {
 		return ast.ErrASTDomain
 	}
@@ -1097,6 +1103,13 @@ func (s *SMTInternalizerState) Close() error {
 	if s.theoryAwareBranching != nil {
 		result = errors.Join(result, s.theoryAwareBranching.heap.Close())
 		s.theoryAwareBranching = nil
+	}
+	if s.relevanceGoal.heap != nil {
+		if err := s.relevanceGoal.heap.Close(); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			s.relevanceGoal.heap = nil
+		}
 	}
 	if s.relevanceActivity.delayed != nil {
 		if err := s.relevanceActivity.delayed.Close(); err != nil {

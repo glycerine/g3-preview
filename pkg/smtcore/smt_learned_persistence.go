@@ -29,6 +29,9 @@ func (s *SMTInternalizerState) beginSearchPersistence(base uint32, params SMTPar
 		return ast.ErrASTDomain
 	}
 	s.relevanceFIFO.baseBooleanLimit = int32(len(s.boolExpr))
+	if s.relevanceGoal.heap != nil {
+		s.generation = 0
+	}
 	s.searching = true
 	s.searchBaseLevel = base
 	s.searchUserBaseLevel = base

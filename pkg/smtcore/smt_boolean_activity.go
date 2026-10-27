@@ -43,6 +43,9 @@ func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState)
 	s.caseSplitStrategy = params.CaseSplitStrategy
 	s.theoryCaseSplit = params.TheoryCaseSplit
 	s.activityInverseDecay = params.InvDecay
+	if params.CaseSplitStrategy == 5 && params.RelevancyLvl >= 2 && !params.AutoConfig {
+		return s.ensureRelevanceGoalQueue()
+	}
 	if params.CaseSplitStrategy == 6 {
 		return s.ensureTheoryAwareBranching()
 	}
