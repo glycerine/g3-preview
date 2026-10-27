@@ -2774,6 +2774,7 @@
         "theory_dummy.go",
         "theory_fpa.go",
         "theory_lra.go",
+        "theory_lra_assertions.go",
         "theory_lra_bound_axioms.go",
         "theory_lra_display.go",
         "theory_lra_eq_adapter.go",

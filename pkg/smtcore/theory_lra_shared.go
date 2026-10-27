@@ -82,11 +82,11 @@ func (t *SMTLRATheory) delayedAssumeEqualities() (bool, error) {
 			}
 		}
 		if t.lraTraceTags().ShouldTrace("arith") {
-			a, err := t.numeric.value(pair.left)
+			a, err := t.rawLRAValue(pair.left)
 			if err != nil {
 				return false, err
 			}
-			b, err := t.numeric.value(pair.right)
+			b, err := t.rawLRAValue(pair.right)
 			if err != nil {
 				return false, err
 			}
@@ -98,11 +98,11 @@ func (t *SMTLRATheory) delayedAssumeEqualities() (bool, error) {
 				}
 			}
 		}
-		a, err := t.numeric.value(pair.left)
+		a, err := t.rawLRAValue(pair.left)
 		if err != nil {
 			return false, err
 		}
-		b, err := t.numeric.value(pair.right)
+		b, err := t.rawLRAValue(pair.right)
 		if err != nil {
 			return false, err
 		}
@@ -187,7 +187,7 @@ func (t *SMTLRATheory) assumeSharedEqualities() (progress bool, err error) {
 		if !ok || !t.numeric.solver.VarIsRegistered(index) {
 			continue
 		}
-		value, err := t.numeric.value(v)
+		value, err := t.rawLRAValue(v)
 		if err != nil {
 			return false, err
 		}

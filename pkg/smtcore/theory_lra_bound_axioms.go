@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func (t *SMTLRATheory) mkBoundAxioms(bound *smtLRABound) error {
@@ -25,6 +26,11 @@ func (t *SMTLRATheory) mkBoundAxioms(bound *smtLRABound) error {
 		cmp := other.value.Cmp(&bound.value)
 		if cmp == 0 && other.upper == bound.upper {
 			continue
+		}
+		if d, enabled, err := lraAssertionContext(); err != nil {
+			return err
+		} else if enabled && !(cmp != 0 || other.upper != bound.upper) {
+			return diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 1517, "k1 != k2 || kind1 != kind2")
 		}
 		slot := 0
 		if other.upper {
@@ -49,12 +55,22 @@ func (t *SMTLRATheory) mkBoundAxioms(bound *smtLRABound) error {
 }
 
 func (t *SMTLRATheory) mkBoundAxiom(a, b *smtLRABound) error {
+	if d, enabled, err := lraAssertionContext(); err != nil {
+		return err
+	} else if enabled && a.variable != b.variable {
+		return diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 1553, "v == b2.get_var()")
+	}
 	if a.variable != b.variable {
 		return ast.ErrASTDomain
 	}
 	cmp := a.value.Cmp(&b.value)
 	if cmp == 0 && a.upper == b.upper {
 		return nil
+	}
+	if d, enabled, err := lraAssertionContext(); err != nil {
+		return err
+	} else if enabled && !(cmp != 0 || a.upper != b.upper) {
+		return diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 1555, "k1 != k2 || kind1 != kind2")
 	}
 	node, err := t.Enode(a.variable)
 	if err != nil {

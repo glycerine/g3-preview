@@ -32,12 +32,15 @@ func (t *SMTLRATheory) setLRAConflict() error {
 	if err = t.emitLRA("set_conflict", 2223, t.Display); err != nil {
 		return err
 	}
-	var core []SMTLiteral
+	hook := smtLRABoundPropagation{owner: t}
 	for _, e := range evidence {
 		if e.coefficient.Sign() != 0 {
-			core = append(core, e.literal)
+			if err := hook.Consume(nil, e.constraint); err != nil {
+				return err
+			}
 		}
 	}
+	core := hook.core
 	if err := t.checkValidation(smtLRAValidateConflict, core, SMTFalseLiteral, nil, nil); err != nil {
 		return err
 	}
@@ -110,7 +113,15 @@ func (p *smtLRABoundPropagation) Consume(_ *numeral.Rational, witness uint32) er
 		return nil
 	}
 	s := p.owner.numeric
-	if uint64(witness) >= uint64(len(s.inequalities)) || s.inequalities[witness] == SMTNullLiteral {
+	if uint64(witness) >= uint64(len(s.inequalities)) {
+		return ast.ErrASTDomain
+	}
+	if d, enabled, err := lraAssertionContext(); err != nil {
+		return err
+	} else if enabled && s.inequalities[witness] == SMTNullLiteral {
+		return diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 2187, "lit != null_literal")
+	}
+	if s.inequalities[witness] == SMTNullLiteral {
 		return ast.ErrASTDomain
 	}
 	p.core = append(p.core, s.inequalities[witness])
@@ -276,7 +287,15 @@ func (t *SMTLRATheory) propagateBasicBounds() error {
 }
 
 func (t *SMTLRATheory) propagateBasicBound(b *smtLRABound, truth bool) (result error) {
-	if !t.propagationEnabled() || len(t.bounds[b.variable]) == 1 || t.unassigned[b.variable] == 0 {
+	if !t.propagationEnabled() {
+		return nil
+	}
+	if d, enabled, err := lraAssertionContext(); err != nil {
+		return err
+	} else if enabled && len(t.bounds[b.variable]) == 0 {
+		return diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 1758, "!bounds.empty()")
+	}
+	if len(t.bounds[b.variable]) == 1 || t.unassigned[b.variable] == 0 {
 		return nil
 	}
 	findLower := truth != b.upper

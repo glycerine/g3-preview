@@ -97,6 +97,10 @@ func TestSMTLRAObjectiveRetainsLocalImprovementAndScope(t *testing.T) {
 }
 
 func TestSMTLRAObjectiveUnmappedAndUnsupportedRegistration(t *testing.T) {
+	d, _ := newLRASourceAssertionContext(t)
+	// This test retains the native/disabled Go domain-error contract. The
+	// enabled checked source assertion is covered by the dedicated gate test.
+	astTestMust(t, d.EnableAssertions(false))
 	f := newLRAFrontendFixture(t, true)
 	x := f.variable("lra-objective-unmapped")
 	v, err := f.a.AddObjective(x)

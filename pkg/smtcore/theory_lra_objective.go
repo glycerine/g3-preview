@@ -45,7 +45,7 @@ func (t *SMTLRATheory) ObjectiveValue(v SMTTheoryVar) (SMTArithmeticObjectiveVal
 	if _, err := t.State(); err != nil {
 		return SMTArithmeticObjectiveValue{}, err
 	}
-	value, err := t.numeric.value(v)
+	value, err := t.rawLRAValue(v)
 	return SMTArithmeticObjectiveValue{Finite: value}, err
 }
 
@@ -119,7 +119,7 @@ func (t *SMTLRATheory) MaximizeObjective(v SMTTheoryVar) (value SMTArithmeticObj
 		blocker, resultErr = t.state.manager.MkFalse()
 		return
 	}
-	current, err := t.numeric.value(v)
+	current, err := t.rawLRAValue(v)
 	if err != nil {
 		resultErr = err
 		return

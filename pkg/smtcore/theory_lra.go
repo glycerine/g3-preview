@@ -273,16 +273,31 @@ func (t *SMTLRATheory) mkVar(h ast.ASTHandle) (SMTTheoryVar, error) {
 	if node == nil {
 		return SMTNullTheoryVar, ast.ErrASTDomain
 	}
-	if t.IsAttachedToVariable(node) {
-		return node.TheoryVar(t.FamilyID()), nil
+	v := node.TheoryVar(t.FamilyID())
+	if !t.IsAttachedToVariable(node) {
+		// Source th.mk_var publishes the borrowed enode slot first; context
+		// attachment follows the bounds invariant and directory extension.
+		v = SMTTheoryVar(len(t.variables))
+		t.variables = append(t.variables, node)
+		if d, enabled, err := lraAssertionContext(); err != nil {
+			return SMTNullTheoryVar, err
+		} else if enabled && !(len(t.bounds) <= int(v) || len(t.bounds[v]) == 0) {
+			return SMTNullTheoryVar, diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 476, "m_bounds.size() <= static_cast<unsigned>(v) || m_bounds[v].empty()")
+		}
+		for len(t.bounds) <= int(v) {
+			t.bounds = append(t.bounds, nil)
+			t.unassigned = append(t.unassigned, 0)
+		}
+		if err := t.state.attachTheoryVariable(node, t.FamilyID(), v); err != nil {
+			// The allocated source variable remains owned until pop/Close.
+			t.numeric.stopped = true
+			return SMTNullTheoryVar, err
+		}
 	}
-	v, err := t.SMTTheoryBase.CreateVariable(node)
-	if err != nil {
+	if d, enabled, err := lraAssertionContext(); err != nil {
 		return SMTNullTheoryVar, err
-	}
-	for len(t.bounds) <= int(v) {
-		t.bounds = append(t.bounds, nil)
-		t.unassigned = append(t.unassigned, 0)
+	} else if enabled && v == SMTNullTheoryVar {
+		return SMTNullTheoryVar, diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 486, "null_theory_var != v")
 	}
 	return v, nil
 }
@@ -317,6 +332,11 @@ func (t *SMTLRATheory) linearize(term ast.ASTHandle) (smtLRALinearization, error
 	var st smtLRALinearization
 	st.push(term, big.NewRat(1, 1))
 	for index := 0; index < len(st.terms); {
+		if d, enabled, err := lraAssertionContext(); err != nil {
+			return st, err
+		} else if enabled && index < len(st.variables) {
+			return st, diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 343, "index >= vars.size()")
+		}
 		h := st.terms[index]
 		st.toInternalize = append(st.toInternalize, h)
 		op, own, err := t.operation(h)
@@ -539,6 +559,13 @@ func (t *SMTLRATheory) InternalizeTerm(term ast.ASTHandle) (bool, error) {
 func (t *SMTLRATheory) InternalizeAtom(atom ast.ASTHandle, _ bool) (bool, error) {
 	if _, err := t.State(); err != nil {
 		return false, err
+	}
+	if d, enabled, err := lraAssertionContext(); err != nil {
+		return false, err
+	} else if enabled {
+		if _, found := t.state.BoolVar(atom); found {
+			return false, diagnostic.DebugAssertionFailure(d, "src/smt/theory_lra.cpp", 689, "!ctx().b_internalized(atom)")
+		}
 	}
 	bv, err := t.state.MkBoolVar(atom)
 	if err != nil {

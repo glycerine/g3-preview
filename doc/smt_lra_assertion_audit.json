@@ -1,0 +1,178 @@
+{
+  "source": "src/smt/theory_lra.cpp",
+  "scope": "SASSERT statements only; source method bodies, ownership, retained consumers and complete LRA/smtcore/higher engines still require their own audit. Native Go domain guards remain explicit in addition to source checked-build assertions.",
+  "counts": {
+    "total_text_occurrences": 27,
+    "active_source_assertions": 26,
+    "ported": 15,
+    "eliminated_by_Go_representation": 2,
+    "excluded_no_retained_path": 9,
+    "commented_out": 1
+  },
+  "sites": [
+    {
+      "line": 343,
+      "source_statement": "SASSERT(index >= vars.size());",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 476,
+      "source_statement": "SASSERT(m_bounds.size() <= static_cast<unsigned>(v) || m_bounds[v].empty());",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 486,
+      "source_statement": "SASSERT(null_theory_var != v);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 505,
+      "source_statement": "SASSERT(all_zeros(m_columns));",
+      "disposition": "eliminated_by_Go_representation",
+      "go_target": "pkg/smtcore/theory_lra_numeric.go",
+      "reason": "init_left_side starts with a new local typed sums map and explicit input-order slice in smtLRANumeric.leftSide; no persistent m_columns vector exists to carry nonzero values into a later invocation."
+    },
+    {
+      "line": 528,
+      "source_statement": "SASSERT(all_zeros(m_columns));",
+      "disposition": "eliminated_by_Go_representation",
+      "go_target": "pkg/smtcore/theory_lra_numeric.go",
+      "reason": "The local sums map and order slice cease to exist after smtLRANumeric.leftSide; no persistent coefficient accumulator requires explicit zeroing before reuse."
+    },
+    {
+      "line": 611,
+      "source_statement": "SASSERT(null_theory_var != v);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "Only internalize_def(term, scoped_internalize_state) uses this assertion; its sole caller is constructor-disabled internalize_atom_lazy."
+    },
+    {
+      "line": 689,
+      "source_statement": "SASSERT(!ctx().b_internalized(atom));",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra.go"
+    },
+    {
+      "line": 721,
+      "source_statement": "SASSERT(!ctx().b_internalized(atom));",
+      "disposition": "excluded_no_retained_path",
+      "reason": "internalize_atom_lazy is gated by m_delay_constraints at680, initialized false at659 with no retained writer."
+    },
+    {
+      "line": 761,
+      "source_statement": "SASSERT(ctx().e_internalized(term));",
+      "disposition": "excluded_no_retained_path",
+      "reason": "Delayed internalize_term branch requires m_delay_constraints, initialized false at659 with no retained writer."
+    },
+    {
+      "line": 1027,
+      "source_statement": "SASSERT(can_get_ivalue(v));",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_assertions.go"
+    },
+    {
+      "line": 1425,
+      "source_statement": "SASSERT(ctx().get_assignment(lit) == l_true);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go"
+    },
+    {
+      "line": 1435,
+      "source_statement": "SASSERT(validate_assign(lit));",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_validate.go"
+    },
+    {
+      "line": 1517,
+      "source_statement": "SASSERT(k1 != k2 || kind1 != kind2);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_bound_axioms.go"
+    },
+    {
+      "line": 1553,
+      "source_statement": "SASSERT(v == b2.get_var());",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_bound_axioms.go"
+    },
+    {
+      "line": 1555,
+      "source_statement": "SASSERT(k1 != k2 || kind1 != kind2);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_bound_axioms.go"
+    },
+    {
+      "line": 1758,
+      "source_statement": "SASSERT(!bounds.empty());",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go"
+    },
+    {
+      "line": 1836,
+      "source_statement": "SASSERT(m_use_list[w].back() == b);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "del_use_lists has only a commented-out call at587; use-list population at716 and compound propagation at1279-1284 are commented out."
+    },
+    {
+      "line": 1917,
+      "source_statement": "SASSERT(m_solver->is_term(vi));",
+      "disposition": "excluded_no_retained_path",
+      "reason": "get_bound is called only by get_lub/get_glb inside compound propagation, whose sole call is commented out at1279-1284."
+    },
+    {
+      "line": 2129,
+      "source_statement": "SASSERT(validate_eq(x, y));",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_validate.go"
+    },
+    {
+      "line": 2161,
+      "source_statement": "//                SASSERT(m_solver->all_constraints_hold());",
+      "disposition": "commented_out",
+      "reason": "This SASSERT is commented out in the C++ source, not an active checked-build requirement."
+    },
+    {
+      "line": 2187,
+      "source_statement": "SASSERT(lit != null_literal);",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_propagation.go"
+    },
+    {
+      "line": 2192,
+      "source_statement": "SASSERT(m_equalities[idx].first  != nullptr);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "Equality-source constraints are produced only by delayed internalize_eq at567; immediate new_eq_eh uses the equality adapter and the direct internalize_eq call at796 is commented out."
+    },
+    {
+      "line": 2193,
+      "source_statement": "SASSERT(m_equalities[idx].second != nullptr);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "Equality-source constraints are produced only by constructor-disabled delayed internalize_eq; immediate consumers carry inequality sources only."
+    },
+    {
+      "line": 2229,
+      "source_statement": "SASSERT(validate_conflict());",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_validate.go"
+    },
+    {
+      "line": 2278,
+      "source_statement": "SASSERT(v1 != null_theory_var);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "validate_eq_in_model has no retained caller: global source references are declarations/implementations and the theory_lra wrapper only."
+    },
+    {
+      "line": 2279,
+      "source_statement": "SASSERT(v2 != null_theory_var);",
+      "disposition": "excluded_no_retained_path",
+      "reason": "validate_eq_in_model has no retained caller: global source references are declarations/implementations and the theory_lra wrapper only."
+    },
+    {
+      "line": 2473,
+      "source_statement": "SASSERT(!ev.first.is_zero());",
+      "disposition": "ported",
+      "go_target": "pkg/smtcore/theory_lra_trace.go"
+    }
+  ]
+}
