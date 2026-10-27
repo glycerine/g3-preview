@@ -3127,6 +3127,8 @@
         "bound_propagation.go",
         "bound_trace.go",
         "bound_values.go",
+        "bv2int_context.go",
+        "bv2int_context_trace.go",
         "card2bv_tactic.go",
         "card2bv_trace.go",
         "diff_neq_compile.go",

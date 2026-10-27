@@ -155623,9 +155623,14 @@
       "path": "src/tactic/arith/bv2int_rewriter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/bv2int_context.go",
+        "pkg/tactic/arith/bv2int_context_trace.go"
+      ],
+      "tests": [
+        "pkg/tactic/arith/bv2int_context_test.go"
+      ],
       "conditionals": [
         {
           "line": 255,
@@ -155724,17 +155729,46 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "bv2int_rewriter_ctx constructor, update_params, side conditions, power2 lookup and collect_power2",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bv2int_context.go",
+          "tests": [
+            "TestBV2IntContextConsecutivePowersAndWidths",
+            "TestBV2IntContextRejectsNonPowerDisjunctions",
+            "TestBV2IntContextParametersSideOwnershipAndReset",
+            "TestBV2IntContextAllowsExpressionKeysAndIgnoresSizeLimitDuringCollection",
+            "TestBV2IntContextConstructorRefusalAndCopiedOwner",
+            "TestBV2IntContextTracePublicationOrderAndErasure"
+          ]
+        },
+        {
+          "name": "bv2int_rewriter arithmetic rules, predicates, size alignment and concrete traversal configuration",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Side conditions and every generated exponent own AST references; power2 keys and map values are borrowed. Repeated collection replaces a map value without retiring older trail entries. Explicit reset releases side conditions then trail then clears the map; destruction releases trail then map then side conditions. Consumed decrements are remembered for cleanup retries. ParamsContext and process printing services are borrowed; max_bv_size is read once and no ParamsRef is retained."
+      ],
+      "deviations": [
+        "Uses Go slices/maps and standard-library sorting, not C++ container or STL implementations. Exact Go big.Rat temporaries implement source rational comparisons and doubling; project numeral-local ownership and physical vector allocation/refusal audits remain open. The source TRACE is compile/tag gated and occurs after trail publication and before map insertion; io.Writer stream failures do not prevent insertion. Arithmetic reducer/traversal and retained bounded_int2bv/nla2bv consumer integration remain unported; no complete source-unit or end-to-end equivalence claim."
+      ]
     },
     {
       "path": "src/tactic/arith/bv2int_rewriter.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/bv2int_context.go",
+        "pkg/tactic/arith/bv2int_context_trace.go"
+      ],
+      "tests": [
+        "pkg/tactic/arith/bv2int_context_test.go"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -155747,9 +155781,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "bv2int_rewriter_ctx constructor, update_params, side conditions, power2 lookup and collect_power2",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bv2int_context.go",
+          "tests": [
+            "TestBV2IntContextConsecutivePowersAndWidths",
+            "TestBV2IntContextRejectsNonPowerDisjunctions",
+            "TestBV2IntContextParametersSideOwnershipAndReset",
+            "TestBV2IntContextAllowsExpressionKeysAndIgnoresSizeLimitDuringCollection",
+            "TestBV2IntContextConstructorRefusalAndCopiedOwner",
+            "TestBV2IntContextTracePublicationOrderAndErasure"
+          ]
+        },
+        {
+          "name": "bv2int_rewriter arithmetic rules, predicates, size alignment and concrete traversal configuration",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Side conditions and every generated exponent own AST references; power2 keys and map values are borrowed. Repeated collection replaces a map value without retiring older trail entries. Explicit reset releases side conditions then trail then clears the map; destruction releases trail then map then side conditions. Consumed decrements are remembered for cleanup retries. ParamsContext and process printing services are borrowed; max_bv_size is read once and no ParamsRef is retained."
+      ],
+      "deviations": [
+        "Uses Go slices/maps and standard-library sorting, not C++ container or STL implementations. Exact Go big.Rat temporaries implement source rational comparisons and doubling; project numeral-local ownership and physical vector allocation/refusal audits remain open. The source TRACE is compile/tag gated and occurs after trail publication and before map insertion; io.Writer stream failures do not prevent insertion. Arithmetic reducer/traversal and retained bounded_int2bv/nla2bv consumer integration remain unported; no complete source-unit or end-to-end equivalence claim."
+      ]
     },
     {
       "path": "src/tactic/arith/bv2real_rewriter.cpp",
