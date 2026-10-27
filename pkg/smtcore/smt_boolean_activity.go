@@ -3,8 +3,6 @@
 package smtcore
 
 import (
-	"errors"
-
 	"github.com/glycerine/g3/pkg/ast"
 )
 
@@ -48,6 +46,9 @@ func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState)
 	s.caseSplitStrategy = params.CaseSplitStrategy
 	s.theoryCaseSplit = params.TheoryCaseSplit
 	s.activityInverseDecay = params.InvDecay
+	if params.CaseSplitStrategy == 2 {
+		return s.ensureCachedActivityQueue()
+	}
 	if params.CaseSplitStrategy == 0 || params.CaseSplitStrategy >= 3 && params.CaseSplitStrategy <= 5 && (params.RelevancyLvl < 2 || params.AutoConfig) {
 		return s.ensureBasicActivityQueue()
 	}
@@ -60,31 +61,54 @@ func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState)
 	return nil
 }
 
+// Source cact_case_split_queue: map values overwrite, but every positive
+// search-time deletion pushes another owning reference into cache_domain.
 func (s *SMTInternalizerState) cacheBooleanActivity(expression ast.ASTHandle, activity float64) error {
-	if _, found := s.activityCache[expression]; !found {
-		if err := s.manager.IncRef(expression); err != nil {
-			return err
-		}
+	if s.activityCacheRetiring {
+		return ast.ErrASTPending
+	}
+	if err := s.manager.IncRef(expression); err != nil {
+		return err
 	}
 	s.activityCache[expression] = activity
+	s.activityCacheDomain = append(s.activityCacheDomain, expression)
 	return nil
 }
 
-func (s *SMTInternalizerState) releaseBooleanActivityCache() (result error) {
-	for expression := range s.activityCache {
-		result = errors.Join(result, s.manager.DecRef(expression))
+func (s *SMTInternalizerState) releaseActivityCacheDomain() error {
+	s.activityCacheRetiring = true
+	for s.activityCacheDrop < len(s.activityCacheDomain) {
+		consumed, err := s.manager.DecRefConsumed(s.activityCacheDomain[s.activityCacheDrop])
+		if consumed {
+			s.activityCacheDomain[s.activityCacheDrop] = ast.ASTHandle{}
+			s.activityCacheDrop++
+		}
+		if err != nil {
+			return err
+		}
+		if !consumed {
+			return ast.ErrASTPending
+		}
 	}
-	s.activityCache = nil
-	return result
+	s.activityCacheDomain = s.activityCacheDomain[:0]
+	s.activityCacheDrop = 0
+	s.activityCacheRetiring = false
+	return nil
 }
 
-// resetBooleanActivityCache implements cact_case_split_queue::init_search_eh:
-// cached activity only connects variables deleted and recreated during one
-// search. Each subsequent search starts with an empty cache.
-func (s *SMTInternalizerState) resetBooleanActivityCache() (result error) {
-	for expression := range s.activityCache {
-		result = errors.Join(result, s.manager.DecRef(expression))
+func (s *SMTInternalizerState) releaseBooleanActivityCache() error {
+	// Native clears the nonowning map before retiring domain references.
+	s.activityCache = nil
+	if err := s.releaseActivityCacheDomain(); err != nil {
+		return err
 	}
+	s.activityCacheDomain = nil
+	return nil
+}
+
+// Source init_search_eh resets both map and ordered reference domain. The
+// cache connects deletions/reinternalizations within a search, not searches.
+func (s *SMTInternalizerState) resetBooleanActivityCache() error {
 	s.activityCache = make(map[ast.ASTHandle]float64)
-	return result
+	return s.releaseActivityCacheDomain()
 }

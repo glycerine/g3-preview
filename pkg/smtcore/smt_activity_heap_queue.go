@@ -130,3 +130,12 @@ func (s *SMTInternalizerState) DisplayBasicActivityQueue(out io.Writer) error {
 	}
 	return nil
 }
+
+// Source cact_case_split_queue inherits the ordinary consuming heap.
+func (s *SMTInternalizerState) ensureCachedActivityQueue() error {
+	if err := s.ensureBasicActivityQueue(); err != nil {
+		return err
+	}
+	s.cachedActivity = true
+	return nil
+}

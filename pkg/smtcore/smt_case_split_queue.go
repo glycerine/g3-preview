@@ -8,9 +8,9 @@ import (
 	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
 
-// SMTActivityCaseSplitQueue selects the retained search strategy. Basic
-// activity and relevance strategies use context-owned queues/heaps; delayed
-// and cached activity still scan slices. Strategy 6 uses theory priorities.
+// SMTActivityCaseSplitQueue selects the retained search strategy. Basic,
+// cached and relevance strategies use context-owned queues/heaps; delayed
+// activity still scans slices. Strategy 6 uses theory priorities.
 type SMTActivityCaseSplitQueue struct {
 	state                                 *SMTInternalizerState
 	phaseSelection, cachingOn, cachingOff uint32
@@ -48,6 +48,9 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
+	if q.strategy == 2 {
+		return q.state.ensureCachedActivityQueue()
+	}
 	if q.strategy == 0 {
 		return q.state.ensureBasicActivityQueue()
 	}
@@ -172,7 +175,7 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 
 func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error) {
 	switch q.strategy {
-	case 0:
+	case 0, 2:
 		return q.nextBasicActivity()
 	case 6:
 		variable, err := q.state.theoryAwareBranching.next(q.randomVariableFrequency)
@@ -217,7 +220,7 @@ func (q *SMTActivityCaseSplitQueue) hasCaseSplit() (bool, error) {
 	if err := q.state.open(); err != nil {
 		return false, err
 	}
-	if q.strategy == 0 {
+	if q.strategy == 0 || q.strategy == 2 {
 		values, err := q.state.basicActivity.AppendValues(nil)
 		if err != nil {
 			return false, err

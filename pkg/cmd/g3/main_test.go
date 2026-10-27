@@ -359,6 +359,7 @@ var scriptResults = map[string]string{
 	"theory_aware_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
 	"relevance_fifo_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
 	"basic_activity_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
+	"cached_activity_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
 	"relevance_goal_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
 	"relevance_activity_case_split_scopes.smt2":          "sat\n(((or a b) true)\n (c true))\nunsat\nsat\nsat\n((b true)\n (c true))\nunsat\nsat\n",
 	"quant_seq_symbolic_int_prefix.smt2":           "sat\n(((= x (str.++ (int.to.str n) \"a\")) true))\nunsat\nsat\n(((= x \"7a\") true))\nsat\n",

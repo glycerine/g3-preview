@@ -108,6 +108,10 @@ type smtPendingEquality struct {
 }
 
 type SMTInternalizerState struct {
+	activityCacheRetiring      bool
+	cachedActivity             bool
+	activityCacheDomain        []ast.ASTHandle
+	activityCacheDrop          int
 	basicActivity              *uheap.Int
 	relevanceGoal              smtRelevanceGoalQueue
 	relevanceActivity          smtRelevanceActivityQueue
@@ -470,7 +474,7 @@ func (s *SMTInternalizerState) MkBoolVar(expression ast.ASTHandle) (int32, error
 	if s.randomInitialActivity == 2 || s.randomInitialActivity == 1 && s.searching {
 		initialActivity = -float64(s.random.Next()%1000) / 1000
 	}
-	if s.caseSplitStrategy == 2 {
+	if s.cachedActivity || s.caseSplitStrategy == 2 {
 		if cached, found := s.activityCache[expression]; found {
 			initialActivity = cached
 		}
@@ -964,6 +968,11 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	for len(s.booleanStack) > scope.booleanLimit {
 		expression := s.booleanStack[len(s.booleanStack)-1]
 		variable := s.boolVar[expression]
+		if (s.cachedActivity || s.caseSplitStrategy == 2) && s.searching && s.activity[variable] > 0 {
+			if err := s.cacheBooleanActivity(expression, s.activity[variable]); err != nil {
+				return err
+			}
+		}
 		if err := s.basicActivityDeleted(variable); err != nil {
 			return err
 		}
@@ -972,11 +981,6 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		}
 		if s.theoryAwareBranching != nil {
 			if err := s.theoryAwareBranching.deleted(variable); err != nil {
-				return err
-			}
-		}
-		if s.caseSplitStrategy == 2 && s.searching && s.activity[variable] > 0 {
-			if err := s.cacheBooleanActivity(expression, s.activity[variable]); err != nil {
 				return err
 			}
 		}
