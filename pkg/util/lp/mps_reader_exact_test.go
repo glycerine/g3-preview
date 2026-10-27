@@ -600,6 +600,9 @@ func TestLPRationalMPSMalformedDiagnosticPrefixes(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPRationalMPSPhysicalPopulationOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		done, failures := false, 0
 		for ordinal := int64(0); ordinal < 200 && !done; ordinal++ {

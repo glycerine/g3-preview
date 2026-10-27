@@ -114,6 +114,9 @@ func TestLPDriverPreparationSolveOptionsAndParseFailure(t *testing.T) {
 }
 
 func TestLPDriverPreparationReportFailurePrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	worlds := [][]string{nil, {"--unknown"}, {"--file"}, {"--lar"}, {"--density", "25", "--partial_pivot", "40", "--term"}}
 	for _, args := range worlds {
 		var full bytes.Buffer

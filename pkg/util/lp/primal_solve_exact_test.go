@@ -422,6 +422,9 @@ func TestLPExactSolveUnboundedIndependentRays(t *testing.T) {
 }
 
 func TestLPExactSolveFeasibilitySearchIndependentSolutions(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, strategy := range []SimplexStrategy{StrategyLU, StrategyTableauCosts} {
 		for world := 0; world < 80; world++ {
 			h := newLPPairHarness(t)

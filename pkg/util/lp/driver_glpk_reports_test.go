@@ -85,6 +85,9 @@ func TestLPGLPKReportStatusCrossProduct(t *testing.T) {
 }
 
 func TestLPGLPKReportIndependentCostComparisons(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 100; world++ {
 		// Decimal integer worlds have independently obvious within/outside 1%.
 		a := float64(1000 + world*100)

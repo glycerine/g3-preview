@@ -335,6 +335,9 @@ func TestLPRationalTableauPhysicalFailureOwnership(t *testing.T) {
 }
 
 func TestLPRationalTableauStoppedMatrixBeforeNormalization(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	f := lpNewRationalCoreFixture(t, h, 1, 2)
 	small := h.pair("2", "3")

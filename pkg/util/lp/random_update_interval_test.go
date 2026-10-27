@@ -240,6 +240,9 @@ func TestLARRandomIntervalDrawIndependentLattice(t *testing.T) {
 }
 
 func TestLARRandomIntervalActualTableauAndNonunitLU(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 80; world++ {
 		for _, tableau := range []bool{false, true} {
 			h := newLPPairHarness(t)

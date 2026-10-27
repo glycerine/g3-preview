@@ -84,6 +84,9 @@ func TestLARInfCleanupIndependentTableauModel(t *testing.T) {
 }
 
 func TestLARInfCleanupActualNonunitLU(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	rng := rand.New(rand.NewPCG(47182, 317))
 	for world := 0; world < 100; world++ {

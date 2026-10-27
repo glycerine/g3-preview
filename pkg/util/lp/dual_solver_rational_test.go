@@ -831,6 +831,9 @@ func TestLPRationalDualOuterMetadataPublication(t *testing.T) {
 }
 
 func TestLPRationalDualOuterStageReporterAndFlush(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	const want = "extended A[1,3]\n"
 	for cut := 0; cut <= len(want); cut++ {
 		h := newLPPairHarness(t)

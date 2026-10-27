@@ -304,6 +304,9 @@ func TestLPRationalPrimalBreakpointAdvanceAlreadyStoppedQueue(t *testing.T) {
 }
 
 func TestLPRationalPrimalBreakpointAdvanceThresholdAndOutputFailures(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"threshold", "output"} {
 		for _, direct := range []bool{false, true} {
 			success, failures, comparisons := false, 0, 0

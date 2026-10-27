@@ -22,6 +22,9 @@ func lpSparseRationalCheck(t *testing.T, h *lpPairHarness, value *numeral.Ration
 }
 
 func TestLPSparseRationalVectorIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	v := NewSparseRationalVector(h.m)
 	t.Cleanup(func() { h.must(v.Close()) })
@@ -240,6 +243,9 @@ func TestLPSparseRationalVectorLeavesOlderDivisionOwned(t *testing.T) {
 }
 
 func TestLPExactEtaCallsRetainedIntegerDivision(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	matched := false
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {

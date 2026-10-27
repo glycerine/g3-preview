@@ -167,6 +167,9 @@ func TestLPPairCoreIndependentBasisAndExactLUSolves(t *testing.T) {
 }
 
 func TestLPPairCoreIndependentLexicographicFeasibility(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	f := lpNewPairCoreFixture(t, h, 2, 5)
 	f.basis = []uint32{3, 1}

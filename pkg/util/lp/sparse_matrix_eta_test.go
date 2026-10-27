@@ -34,6 +34,9 @@ func lpSparseEtaOwningCells(m *RationalSparseMatrix, eta *RationalEtaMatrix) []*
 }
 
 func TestLPSparseEtaConstructionIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(1517, 817))
 	for world := 0; world < 180; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

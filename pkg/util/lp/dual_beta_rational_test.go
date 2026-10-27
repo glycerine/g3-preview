@@ -161,6 +161,9 @@ func TestLPRationalDualBetaIndependentRecurrence(t *testing.T) {
 	}
 }
 func TestLPRationalDualBetaPreparedDiagonalStage(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 100; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewRationalCoreFixture(t, h, 3, 4)

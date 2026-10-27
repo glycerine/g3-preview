@@ -240,6 +240,9 @@ func TestLPExecutionEveryReportByteAndFlushPrefix(t *testing.T) {
 }
 
 func TestLPExecutionMPSPhysicalFailureOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	input := strings.Replace(lpMPSDriverModel(3, 2, 2, 4, 3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", strings.Repeat("1234567890", 8)+"7/13"), 1)
 	name := lpMPSDriverFile(t, input)
 	for _, direct := range []bool{false, true} {

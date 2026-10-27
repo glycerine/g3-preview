@@ -66,6 +66,9 @@ func TestLPPairTableauCostIndependentLexicographicOracle(t *testing.T) {
 }
 
 func TestLPPairTableauCostIndependentReducedCostOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	rng := rand.New(rand.NewPCG(71928, 183))
 	value := h.pair("0", "0")

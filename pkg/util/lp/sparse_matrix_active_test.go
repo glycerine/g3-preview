@@ -34,6 +34,9 @@ func lpCheckActiveQueue(t *testing.T, q *UintPairPriorityQueue, want map[IndexPa
 }
 
 func TestLPSparseActiveShorteningIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(771, 911))
 	for world := 0; world < 160; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {
@@ -301,6 +304,9 @@ func TestLPSparseActiveSignedScoreProfiles(t *testing.T) {
 }
 
 func TestLPSparseActiveEtaEliminationIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(1177, 293))
 	for world := 0; world < 100; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

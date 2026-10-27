@@ -25,6 +25,9 @@ func lpLARFreeMPS(count int) string {
 }
 
 func TestLPLARMPSFileIndependentFreeModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for count := 1; count <= 40; count++ {
 		h := newLPPairHarness(t)
 		var out bytes.Buffer

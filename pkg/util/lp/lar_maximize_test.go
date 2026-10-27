@@ -35,6 +35,9 @@ func lpLARMaximizeBox(t *testing.T, h *lpPairHarness, strategy SimplexStrategy, 
 }
 
 func TestLARMaximizeIndependentBoxVertices(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, strategy := range []SimplexStrategy{StrategyTableauRows, StrategyTableauCosts} {
 		for world := 0; world < 40; world++ {
 			for _, strict := range []bool{false, true} {
@@ -139,6 +142,9 @@ func TestLARMaximizeUnboundedAndUnsupportedModes(t *testing.T) {
 }
 
 func TestLARMaximizeBasicTermAndPivot(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, strategy := range []SimplexStrategy{StrategyTableauRows, StrategyTableauCosts} {
 		for world := 0; world < 60; world++ {
 			h := newLPPairHarness(t)

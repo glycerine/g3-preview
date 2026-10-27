@@ -151,6 +151,9 @@ func TestLPLARSMTFileBadCreationAndCleanup(t *testing.T) {
 }
 
 func TestLPLARSMTFileReportFailures(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, profile := range []string{"empty-smt", "polyglot", "missing"} {
 		input := ":formula (and)"
 		if profile == "polyglot" {

@@ -506,6 +506,9 @@ func TestLPRationalPrimalOuterPreservesOlderComparison(t *testing.T) {
 }
 
 func TestLPRationalPrimalStageMetadataPublication(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, phase := range []string{"matrix", "row-map", "constraint-map", "basis", "rhs", "x", "types", "low", "upper", "relation", "bound-index", "bound-scale", "nil-column", "acceptable-x", "nil-cost-output"} {
 		t.Run(phase, func(t *testing.T) {
 			h := newLPPairHarness(t)
@@ -613,6 +616,9 @@ func TestLPRationalPrimalStageMetadataPublication(t *testing.T) {
 }
 
 func TestLPRationalPrimalStageReporterAndFlush(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	const want = "extended A[1,3]\n"
 	for cut := 0; cut <= len(want); cut++ {
 		h := newLPPairHarness(t)

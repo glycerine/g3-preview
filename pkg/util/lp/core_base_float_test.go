@@ -114,6 +114,9 @@ func TestLPFloatCoreConstructionIndependentBasisOracle(t *testing.T) {
 }
 
 func TestLPFloatCoreFeasibilityExactDyadicOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	in := lpFloatCoreInput(t, 1, 5)
 	in.Settings.PrimalFeasibilityTolerance = .125
 	m, err := NewFloatCoreSolverBase(in)

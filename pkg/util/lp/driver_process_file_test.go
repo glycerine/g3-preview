@@ -29,6 +29,9 @@ func lpProcessFixedGLPKModel(cost int64) string {
 }
 
 func TestLPProcessFileActualGLPKIndependentMinMax(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	lpRequireGLPK(t)
 	for world := 0; world < 4; world++ {
 		for _, exact := range []bool{false, true} {

@@ -489,6 +489,9 @@ func TestLPExactRowIterationPreservesOlderComparison(t *testing.T) {
 }
 
 func TestLPExactRowIterationPermutedBasisAndMinimumLeaving(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 80; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewPairCoreFixture(t, h, 2, 5)

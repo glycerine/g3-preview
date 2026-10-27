@@ -69,6 +69,9 @@ func TestLARInfeasibilityReducedCostIndependentModels(t *testing.T) {
 }
 
 func TestLARInfeasibilityStoredRowIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 240; world++ {
 		h := newLPPairHarness(t)
 		c := lpNewCoreScopeFixture(t, h)
@@ -174,6 +177,9 @@ func TestLARInfeasibilityPhysicalOwnership(t *testing.T) {
 }
 
 func TestLARInfeasibilityActualSolveExplanation(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, strategy := range []SimplexStrategy{StrategyLU, StrategyTableauCosts, StrategyTableauRows} {
 		for world := 0; world < 60; world++ {
 			h := newLPPairHarness(t)

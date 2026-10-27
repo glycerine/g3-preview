@@ -50,6 +50,9 @@ func lpImpliedDisplayFixture(t *testing.T, h *lpPairHarness, term, large bool, l
 }
 
 func TestLARImpliedDisplaySourceText(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, term := range []bool{false, true} {
 		for _, large := range []bool{false, true} {
 			for _, low := range []bool{false, true} {
@@ -120,6 +123,9 @@ func TestLARImpliedDisplayEveryOutputPrefix(t *testing.T) {
 }
 
 func TestLARImpliedDisplayPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		done, failures := false, 0
 		for ordinal := int64(0); ordinal < 1200 && !done; ordinal++ {

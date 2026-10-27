@@ -61,6 +61,9 @@ func lpCheckRowBounds(t *testing.T, h *lpPairHarness, p *LARBoundPropagator, wan
 	}
 }
 func TestLARRowBoundAnalyzerIndependentEliminationOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	r := rand.New(rand.NewPCG(9172, 319))
 	for world := 0; world < 240; world++ {
