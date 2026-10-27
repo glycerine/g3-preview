@@ -2084,6 +2084,7 @@
         "math/polynomial",
         "sat",
         "util/diagnostic",
+        "util/hash",
         "util/memory",
         "util/numeral",
         "util/params",
@@ -2091,9 +2092,11 @@
       ],
       "production_files": [
         "assignment.go",
+        "atom.go",
         "gparams_catalog_collectors.go",
         "interval_set.go",
-        "interval_set_operations.go"
+        "interval_set_operations.go",
+        "sign_table.go"
       ]
     },
     {

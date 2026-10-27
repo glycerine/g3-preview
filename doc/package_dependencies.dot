@@ -282,6 +282,7 @@ digraph packages {
   "nlsat" -> "math/polynomial";
   "nlsat" -> "sat";
   "nlsat" -> "util/diagnostic";
+  "nlsat" -> "util/hash";
   "nlsat" -> "util/memory";
   "nlsat" -> "util/numeral";
   "nlsat" -> "util/params";
