@@ -8,15 +8,14 @@ import (
 	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
 
-// SMTActivityCaseSplitQueue selects the retained search strategy. Basic,
-// cached and relevance strategies use context-owned queues/heaps; delayed
-// activity still scans slices. Strategy 6 uses theory priorities.
+// SMTActivityCaseSplitQueue selects the retained search strategy. All
+// variants use concrete context-owned queues/heaps and lifecycle callbacks;
+// strategy 6 adds theory priorities.
 type SMTActivityCaseSplitQueue struct {
 	state                                 *SMTInternalizerState
 	phaseSelection, cachingOn, cachingOff uint32
 	randomVariableFrequency               float64
 	strategy                              uint32
-	activeCreationLimit                   uint64
 	relCaseSplitOrder                     uint32
 	lookaheadDiseq                        bool
 	phaseCounter                          uint32
@@ -42,12 +41,14 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	if q.strategy >= 3 && q.strategy <= 5 && (state.RelevancyLvl < 2 || state.AutoConfig) {
 		q.strategy = 0
 	}
-	q.activeCreationLimit = q.state.nextBooleanCreation
 	q.relCaseSplitOrder = state.RelCaseSplitOrder
 	q.lookaheadDiseq = state.LookaheadDiseq
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
+	if q.strategy == 1 {
+		return q.state.ensureDelayedActivityQueue()
+	}
 	if q.strategy == 2 {
 		return q.state.ensureCachedActivityQueue()
 	}
@@ -177,6 +178,8 @@ func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error)
 	switch q.strategy {
 	case 0, 2:
 		return q.nextBasicActivity()
+	case 1:
+		return q.nextDelayedActivity()
 	case 6:
 		variable, err := q.state.theoryAwareBranching.next(q.randomVariableFrequency)
 		return variable, lbool.Undef, err
@@ -191,23 +194,7 @@ func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error)
 	case 5:
 		return q.nextRelevanceGoal()
 	default:
-		next, err := q.randomVariable(q.randomVariableFrequency)
-		if err != nil || next != SMTNullBoolVar {
-			return next, lbool.Undef, err
-		}
-		creationLimit := ^uint64(0)
-		if q.strategy == 1 {
-			creationLimit = q.activeCreationLimit
-		}
-		next, err = q.highestActivity(creationLimit)
-		if err != nil {
-			return SMTNullBoolVar, lbool.Undef, err
-		}
-		if next == SMTNullBoolVar && q.strategy == 1 && q.activeCreationLimit < q.state.nextBooleanCreation {
-			q.activeCreationLimit = q.state.nextBooleanCreation
-			next, err = q.highestActivity(q.activeCreationLimit)
-		}
-		return next, lbool.Undef, err
+		return q.nextBasicActivity()
 	}
 }
 
@@ -220,7 +207,7 @@ func (q *SMTActivityCaseSplitQueue) hasCaseSplit() (bool, error) {
 	if err := q.state.open(); err != nil {
 		return false, err
 	}
-	if q.strategy == 0 || q.strategy == 2 {
+	if q.strategy <= 2 {
 		values, err := q.state.basicActivity.AppendValues(nil)
 		if err != nil {
 			return false, err
@@ -232,6 +219,21 @@ func (q *SMTActivityCaseSplitQueue) hasCaseSplit() (bool, error) {
 			}
 			if value == lbool.Undef {
 				return true, nil
+			}
+		}
+		if q.strategy == 1 {
+			values, err := q.state.delayedActivity.AppendValues(nil)
+			if err != nil {
+				return false, err
+			}
+			for _, v := range values {
+				value, err := q.state.Assignment(NewSMTLiteral(v, false))
+				if err != nil {
+					return false, err
+				}
+				if value == lbool.Undef {
+					return true, nil
+				}
 			}
 		}
 		// Random selection may reach an unassigned variable already erased
@@ -488,31 +490,4 @@ func (s *SMTInternalizerState) expressionGeneration(expression ast.ASTHandle) (u
 		}
 	}
 	return maximum, nil
-}
-
-func (q *SMTActivityCaseSplitQueue) highestActivity(creationLimit uint64) (int32, error) {
-	return q.highestActivityRange(0, creationLimit)
-}
-
-func (q *SMTActivityCaseSplitQueue) highestActivityRange(creationAfter, creationLimit uint64) (int32, error) {
-	next := SMTNullBoolVar
-	best := 0.0
-	for variable := int32(SMTFirstBoolVar); int(variable) < len(q.state.boolExpr); variable++ {
-		creation := q.state.booleanCreation[variable]
-		if creation <= creationAfter || creation > creationLimit {
-			continue
-		}
-		value, err := q.state.Assignment(NewSMTLiteral(variable, false))
-		if err != nil {
-			return SMTNullBoolVar, err
-		}
-		if value != lbool.Undef {
-			continue
-		}
-		activity := q.state.activity[variable]
-		if next == SMTNullBoolVar || activity > best {
-			next, best = variable, activity
-		}
-	}
-	return next, nil
 }

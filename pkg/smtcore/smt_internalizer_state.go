@@ -108,6 +108,7 @@ type smtPendingEquality struct {
 }
 
 type SMTInternalizerState struct {
+	delayedActivity            *uheap.Int
 	activityCacheRetiring      bool
 	cachedActivity             bool
 	activityCacheDomain        []ast.ASTHandle
@@ -1123,6 +1124,13 @@ func (s *SMTInternalizerState) Close() error {
 	if s.theoryAwareBranching != nil {
 		result = errors.Join(result, s.theoryAwareBranching.heap.Close())
 		s.theoryAwareBranching = nil
+	}
+	if s.delayedActivity != nil {
+		if err := s.delayedActivity.Close(); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			s.delayedActivity = nil
+		}
 	}
 	if s.basicActivity != nil {
 		if err := s.basicActivity.Close(); err != nil {

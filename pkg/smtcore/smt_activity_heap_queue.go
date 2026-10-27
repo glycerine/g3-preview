@@ -44,6 +44,14 @@ func (s *SMTInternalizerState) basicActivityCreated(v int32) error {
 	if err := s.basicActivity.Reserve(v + 1); err != nil {
 		return err
 	}
+	if s.delayedActivity != nil {
+		if err := s.delayedActivity.Reserve(v + 1); err != nil {
+			return err
+		}
+		if s.searching {
+			return s.delayedActivity.Insert(v)
+		}
+	}
 	return s.basicActivity.Insert(v)
 }
 
@@ -56,7 +64,12 @@ func (s *SMTInternalizerState) basicActivityUnassigned(v int32) error {
 
 func (s *SMTInternalizerState) basicActivityDeleted(v int32) error {
 	if s.basicActivity != nil && s.basicActivity.Contains(v) {
-		return s.basicActivity.Erase(v)
+		if err := s.basicActivity.Erase(v); err != nil {
+			return err
+		}
+	}
+	if s.delayedActivity != nil && s.delayedActivity.Contains(v) {
+		return s.delayedActivity.Erase(v)
 	}
 	return nil
 }
@@ -72,12 +85,17 @@ func (q *SMTActivityCaseSplitQueue) nextBasicActivity() (int32, lbool.LBool, err
 	if v, err := q.randomVariable(q.randomVariableFrequency); err != nil || v != SMTNullBoolVar {
 		return v, lbool.Undef, err
 	}
+	return q.state.popBasicActivityHeap()
+}
+
+func (s *SMTInternalizerState) popBasicActivityHeap() (int32, lbool.LBool, error) {
+	h := s.basicActivity
 	for !h.Empty() {
 		v, err := h.EraseMin()
 		if err != nil {
 			return SMTNullBoolVar, lbool.Undef, err
 		}
-		value, err := q.state.Assignment(NewSMTLiteral(v, false))
+		value, err := s.Assignment(NewSMTLiteral(v, false))
 		if err != nil {
 			return SMTNullBoolVar, lbool.Undef, err
 		}

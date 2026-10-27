@@ -72,8 +72,8 @@ func (p *SMTRelevancyPropagator) IsRelevant(expression ast.ASTHandle) bool {
 }
 
 func (p *SMTRelevancyPropagator) assignment(expression ast.ASTHandle) lbool.LBool {
-	// Source context::find_assignment reads the positive internalized atom
-	// beneath a NOT; NOT applications do not have their own Boolean variable.
+	// Source find_assignment reads the atom beneath a NOT. A nongate NOT
+	// can also own a Boolean variable; assignment events use its direct value.
 	if p.context.manager.IsFalse(expression) {
 		return lbool.False
 	}
@@ -900,7 +900,13 @@ func (p *SMTRelevancyPropagator) AssignmentEvent(expression ast.ASTHandle, value
 		return nil
 	}
 	want := lbool.FromBool(value)
-	if assignment := p.assignment(expression); assignment != want {
+	// context::propagate_relevancy passes bool_var2expr and the assigned
+	// literal's value, not find_assignment's normalized NOT-child value.
+	assignment, direct := p.context.assignments[expression]
+	if !direct {
+		assignment = p.assignment(expression)
+	}
+	if assignment != want {
 		return ast.ErrASTDomain
 	}
 	if p.context.relevant[expression] {

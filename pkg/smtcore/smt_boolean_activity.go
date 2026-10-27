@@ -27,6 +27,19 @@ func (s *SMTInternalizerState) incrementBooleanActivity(variable int32) error {
 			return err
 		}
 	}
+	// dact calls the base update, then repeats the primary Decreased call.
+	if s.delayedActivity != nil {
+		if s.basicActivity.Contains(variable) {
+			if err := s.basicActivity.Decreased(variable); err != nil {
+				return err
+			}
+		}
+		if s.delayedActivity.Contains(variable) {
+			if err := s.delayedActivity.Decreased(variable); err != nil {
+				return err
+			}
+		}
+	}
 	if s.theoryAwareBranching != nil {
 		return s.theoryAwareBranching.activityIncreased(variable)
 	}
@@ -46,6 +59,9 @@ func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState)
 	s.caseSplitStrategy = params.CaseSplitStrategy
 	s.theoryCaseSplit = params.TheoryCaseSplit
 	s.activityInverseDecay = params.InvDecay
+	if params.CaseSplitStrategy == 1 {
+		return s.ensureDelayedActivityQueue()
+	}
 	if params.CaseSplitStrategy == 2 {
 		return s.ensureCachedActivityQueue()
 	}
