@@ -14,7 +14,7 @@ func TestEnum2BVApplicationArgumentOwnersBeforeNextPredicate(t *testing.T) {
 	for _, mode := range []string{"equality", "distinct"} {
 		t.Run(mode, func(t *testing.T) {
 			m, sort, cs := enum2BVFixture(t)
-			r, err := NewEnum2BVRewriter(m)
+			r, err := enum2BVNewForTest(t, m)
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, r.Close()) })
 			apps := make([]ast.ASTHandle, 3)
@@ -130,7 +130,7 @@ func TestEnum2BVDefinitionOwnerAndPublishedReferencePrefix(t *testing.T) {
 	for ordinal := int64(0); ordinal < 96 && successes == 0; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m, sort, cs := enum2BVFixture(t)
-			r, err := NewEnum2BVRewriter(m)
+			r, err := enum2BVNewForTest(t, m)
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, r.Close()) })
 			_, err = r.utility.IsEnumSort(sort)
@@ -213,7 +213,7 @@ func TestEnum2BVDefinitionOwnerAndPublishedReferencePrefix(t *testing.T) {
 
 func TestEnum2BVArgumentAssertionConsultsActualOwner(t *testing.T) {
 	m, sort, cs := enum2BVFixture(t)
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	_, err = r.utility.IsEnumSort(sort)
@@ -262,7 +262,7 @@ func TestEnum2BVStoppedLexicalCleanupPrecedesMembers(t *testing.T) {
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, m.Close()) })
 	astTestMust(t, m.RegisterDeclarationPlugins())
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	truth, err := m.MkTrue()
@@ -321,7 +321,7 @@ func TestEnum2BVStoppedLexicalCleanupPrecedesMembers(t *testing.T) {
 
 func TestEnum2BVNonFiniteApplicationNeedsNoReferenceReservation(t *testing.T) {
 	m, _, _ := enum2BVFixture(t)
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	truth, err := m.MkTrue()

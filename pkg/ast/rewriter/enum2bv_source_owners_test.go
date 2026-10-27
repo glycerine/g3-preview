@@ -20,7 +20,7 @@ func TestEnum2BVIndependentUtilityCachesAndCleanupReconstruction(t *testing.T) {
 		before[i], err = m.GetRefCount(h)
 		astTestMust(t, err)
 	}
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	outer, inner := r.utility, r.config.utility
@@ -88,7 +88,7 @@ func TestEnum2BVIndependentUtilityCachesAndCleanupReconstruction(t *testing.T) {
 func enum2BVBoundFixture(t *testing.T) (*ast.ASTManager, *Enum2BVRewriter) {
 	t.Helper()
 	m, sort, _ := enum2BVFixture(t)
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	a, err := m.MkConst(astTestSymbol(t, m, "enum-output-a"), sort)
@@ -218,7 +218,7 @@ func TestEnum2BVCloseStopsAtConfigurationUtility(t *testing.T) {
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, m.Close()) })
 	astTestMust(t, m.RegisterDeclarationPlugins())
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	traversal := r.traversal
@@ -247,20 +247,25 @@ func TestEnum2BVCloseStopsAtConfigurationUtility(t *testing.T) {
 
 func TestEnum2BVConstructionAndCleanupAllocationRefusals(t *testing.T) {
 	m, _, _ := enum2BVFixture(t)
-	warm, err := NewEnum2BVRewriter(m)
+	c, p := enum2BVParameters(t, m)
+	astTestMust(t, c.SetUInt(p, astTestSymbol(t, m, "constructor-owned-params"), 17))
+	warm, err := NewEnum2BVRewriter(m, c, p)
 	astTestMust(t, err)
 	astTestMust(t, warm.Close())
 	baseline := m.Budget().Used()
 	completed := false
 	for ordinal := int64(0); ordinal < 64; ordinal++ {
 		m.Budget().FailAfter(ordinal)
-		r, err := NewEnum2BVRewriter(m)
+		r, err := NewEnum2BVRewriter(m, c, p)
 		m.Budget().FailAfter(-1)
 		if r != nil {
 			astTestMust(t, r.Close())
 		}
 		if m.Budget().Used() != baseline {
 			t.Fatal("constructor refusal retained partial owners", ordinal, m.Budget().Used(), baseline)
+		}
+		if c.Stats().References != 1 {
+			t.Fatal("constructor refusal lost parameter member prefix", ordinal, c.Stats())
 		}
 		if err == nil {
 			completed = true
@@ -273,7 +278,7 @@ func TestEnum2BVConstructionAndCleanupAllocationRefusals(t *testing.T) {
 	if !completed {
 		t.Fatal("constructor allocation census did not complete")
 	}
-	r, err := NewEnum2BVRewriter(m)
+	r, err := NewEnum2BVRewriter(m, c, p)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	m.Budget().FailAfter(0)

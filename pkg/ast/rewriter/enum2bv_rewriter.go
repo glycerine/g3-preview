@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -25,37 +26,45 @@ type enum2BVConfiguration struct {
 }
 
 type Enum2BVRewriter struct {
-	self        *Enum2BVRewriter
-	manager     *ast.ASTManager
-	utility     *ast.DatatypeUtil
-	config      enum2BVConfiguration
-	traversal   *Traversal
-	enum2BV     map[ast.ASTHandle]ast.ASTHandle
-	bv2Enum     map[ast.ASTHandle]ast.ASTHandle
-	enum2Def    map[ast.ASTHandle]ast.ASTHandle
-	entries     []enum2BVEntry
-	scopeLimits []int
-	bounds      []ast.ASTHandle
-	boundRefs   []ast.ASTRef
-	predicate   EnumSortPredicate
-	translated  uint32
-	header      uint64
-	closed      bool
-	closing     bool
-	pending     []enum2BVPending
+	self                *Enum2BVRewriter
+	paramsContext       *uparams.ParamsContext
+	parameters          uparams.ParamsRef
+	parametersDecrement uparams.ParamsDecrementReceipt
+	cleanupParameters   uparams.ParamsRef
+	cleanupDecrement    uparams.ParamsDecrementReceipt
+	manager             *ast.ASTManager
+	utility             *ast.DatatypeUtil
+	config              enum2BVConfiguration
+	traversal           *Traversal
+	enum2BV             map[ast.ASTHandle]ast.ASTHandle
+	bv2Enum             map[ast.ASTHandle]ast.ASTHandle
+	enum2Def            map[ast.ASTHandle]ast.ASTHandle
+	entries             []enum2BVEntry
+	scopeLimits         []int
+	bounds              []ast.ASTHandle
+	boundRefs           []ast.ASTRef
+	predicate           EnumSortPredicate
+	translated          uint32
+	header              uint64
+	closed              bool
+	closing             bool
+	pending             []enum2BVPending
 }
 
-func NewEnum2BVRewriter(m *ast.ASTManager) (*Enum2BVRewriter, error) {
+func NewEnum2BVRewriter(m *ast.ASTManager, c *uparams.ParamsContext, p *uparams.ParamsRef) (*Enum2BVRewriter, error) {
 	if m == nil {
 		return nil, ast.ErrASTHandle
+	}
+	if c == nil || c.SymbolsField != m.Symbols || c.NumeralsField != m.NumeralService() || c.BudgetField != m.Budget() {
+		return nil, uparams.ErrParamsOwner
 	}
 	bytes := uint64(reflect.TypeOf(Enum2BVRewriter{}).Size())
 	if err := m.Budget().Reserve(bytes); err != nil {
 		return nil, err
 	}
-	r := &Enum2BVRewriter{manager: m, header: bytes, closing: true}
+	r := &Enum2BVRewriter{manager: m, paramsContext: c, header: bytes, closing: true}
 	r.self = r
-	if err := r.initMembers(); err != nil {
+	if err := r.initMembers(p); err != nil {
 		closeErr := r.Close()
 		if closeErr != nil {
 			return r, errors.Join(err, closeErr)
@@ -65,7 +74,14 @@ func NewEnum2BVRewriter(m *ast.ASTManager) (*Enum2BVRewriter, error) {
 	return r, nil
 }
 
-func (r *Enum2BVRewriter) initMembers() (err error) {
+func (r *Enum2BVRewriter) initMembers(p *uparams.ParamsRef) (err error) {
+	r.parameters, err = r.paramsContext.NewValue()
+	if err != nil {
+		return err
+	}
+	if err = r.paramsContext.Assign(&r.parameters, p); err != nil {
+		return err
+	}
 	r.enum2BV = make(map[ast.ASTHandle]ast.ASTHandle)
 	r.bv2Enum = make(map[ast.ASTHandle]ast.ASTHandle)
 	r.enum2Def = make(map[ast.ASTHandle]ast.ASTHandle)
@@ -682,7 +698,7 @@ func (r *Enum2BVRewriter) SetSortPredicate(predicate EnumSortPredicate) error {
 	r.predicate = predicate
 	return nil
 }
-func (r *Enum2BVRewriter) UpdateParams() error { return r.open() }
+func (r *Enum2BVRewriter) UpdateParams(_ *uparams.ParamsRef) error { return r.open() }
 
 // The public source cleanup destroys and reconstructs imp, including both
 // datatype utilities, rather than only resetting the traversal.
@@ -691,6 +707,17 @@ func (r *Enum2BVRewriter) Cleanup() error {
 		return ast.ErrASTHandle
 	}
 	r.closing = true
+	// Public cleanup's local params_ref outlives destruction of the old imp.
+	if r.cleanupParameters == (uparams.ParamsRef{}) {
+		var err error
+		r.cleanupParameters, err = r.paramsContext.NewValue()
+		if err != nil {
+			return err
+		}
+		if err = r.paramsContext.Assign(&r.cleanupParameters, &r.parameters); err != nil {
+			return errors.Join(err, r.endParameters(&r.cleanupParameters, &r.cleanupDecrement))
+		}
+	}
 	if err := r.releaseMembers(); err != nil {
 		return err
 	}
@@ -701,7 +728,15 @@ func (r *Enum2BVRewriter) Cleanup() error {
 		return err
 	}
 	r.header = bytes
-	return r.initMembers()
+	if err := r.initMembers(&r.cleanupParameters); err != nil {
+		return err
+	}
+	r.closing = true
+	if err := r.endParameters(&r.cleanupParameters, &r.cleanupDecrement); err != nil {
+		return err
+	}
+	r.closing = false
+	return nil
 }
 
 // Derived rw_cfg members die before the traversal base, then imp's vectors
@@ -766,7 +801,7 @@ func (r *Enum2BVRewriter) releaseMembers() error {
 	r.enum2BV, r.bv2Enum, r.enum2Def = nil, nil, nil
 	r.entries, r.scopeLimits, r.bounds, r.boundRefs = nil, nil, nil, nil
 	r.predicate, r.translated = nil, 0
-	return nil
+	return r.endParameters(&r.parameters, &r.parametersDecrement)
 }
 
 func (r *Enum2BVRewriter) NumTranslated() (uint32, error) {
@@ -825,8 +860,28 @@ func (r *Enum2BVRewriter) Close() error {
 	}
 	r.manager.Budget().Release(r.header)
 	r.header = 0
+	if err := r.endParameters(&r.cleanupParameters, &r.cleanupDecrement); err != nil {
+		return err
+	}
 	r.closed = true
 	return nil
 }
 
 var _ Configuration = (*enum2BVConfiguration)(nil)
+
+// A receipt continues only the exact parameter destruction already reached.
+func (r *Enum2BVRewriter) endParameters(p *uparams.ParamsRef, receipt *uparams.ParamsDecrementReceipt) error {
+	if *p == (uparams.ParamsRef{}) {
+		return nil
+	}
+	var err error
+	if receipt.Invocation() != 0 {
+		err = r.paramsContext.CompleteDecrement(p, *receipt)
+	} else {
+		err = r.paramsContext.DelTracked(p, receipt)
+	}
+	if err == nil {
+		*receipt = uparams.ParamsDecrementReceipt{}
+	}
+	return err
+}

@@ -58,7 +58,7 @@ func enum2BVBound(t *testing.T, m *ast.ASTManager, index uint32) ast.ASTHandle {
 
 func TestEnum2BVQuantifierBoundsOwnedBeforeNextPredicate(t *testing.T) {
 	m, sort, _ := enum2BVFixture(t)
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	body := enum2BVQuantBody(t, m)
@@ -105,7 +105,7 @@ func TestEnum2BVQuantifierOwnersMetadataAndProofClear(t *testing.T) {
 			m, sort, _ := enum2BVFixture(t)
 			body := enum2BVQuantBody(t, m)
 			oldProof := enum2BVQuantProof(t, m, body)
-			r, err := NewEnum2BVRewriter(m)
+			r, err := enum2BVNewForTest(t, m)
 			astTestMust(t, err)
 			t.Cleanup(func() { astTestMust(t, r.Close()) })
 			q := enum2BVQuantifier(t, m, sort, 1, forall, body)
@@ -182,7 +182,7 @@ func TestEnum2BVQuantifierNoBoundsStillOwnsBody(t *testing.T) {
 	sort := sorts[0]
 	body := enum2BVQuantBody(t, m)
 	oldProof := enum2BVQuantProof(t, m, body)
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	q := enum2BVQuantifier(t, m, sort, 1, true, body)
@@ -301,7 +301,7 @@ func TestEnum2BVQuantifierStoppedCleanupBeforeMembers(t *testing.T) {
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, m.Close()) })
 	astTestMust(t, m.RegisterDeclarationPlugins())
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	body := enum2BVQuantBody(t, m)

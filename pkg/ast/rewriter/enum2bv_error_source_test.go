@@ -41,7 +41,7 @@ func enum2BVErrorFixture(t *testing.T) (*ast.ASTManager, *Enum2BVRewriter, *upar
 	astTestMust(t, m.RegisterDeclarationPlugins())
 	sorts, err := m.MkDatatypes([]ast.DatatypeDefinition{{Name: astTestSymbol(t, m, "ErrorEnum"), Constructors: []ast.DatatypeConstructorDefinition{{Name: astTestSymbol(t, m, "ee0"), Recognizer: astTestSymbol(t, m, "is-ee0")}, {Name: astTestSymbol(t, m, "ee1"), Recognizer: astTestSymbol(t, m, "is-ee1")}}}})
 	astTestMust(t, err)
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	_, err = r.utility.IsEnumSort(sorts[0])
@@ -254,7 +254,7 @@ func TestEnum2BVPopSourceAssertionsAndNativeGate(t *testing.T) {
 	})
 	t.Run("scope-limit", func(t *testing.T) {
 		m, _, _ := enum2BVFixture(t)
-		r, err := NewEnum2BVRewriter(m)
+		r, err := enum2BVNewForTest(t, m)
 		astTestMust(t, err)
 		t.Cleanup(func() { astTestMust(t, r.Close()) })
 		astTestMust(t, r.Push())

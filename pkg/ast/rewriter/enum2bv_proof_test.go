@@ -15,7 +15,7 @@ func TestEnum2BVProofModeCapturedUntilCleanup(t *testing.T) {
 	astTestMust(t, err)
 	astTestPin(t, m, old)
 	astTestMust(t, m.ToggleProofMode(ast.ASTProofDisabled))
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	out, proof := enum2BVRefs(t, m)
@@ -41,7 +41,7 @@ func TestEnum2BVProofModeCapturedUntilCleanup(t *testing.T) {
 func TestEnum2BVProofComposesRewrittenChild(t *testing.T) {
 	m, sort, constructors := enum2BVFixture(t)
 	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	out, proof := enum2BVRefs(t, m)
@@ -90,7 +90,7 @@ func TestEnum2BVProofComposesRewrittenChild(t *testing.T) {
 func TestEnum2BVProofComposesQuantifierBody(t *testing.T) {
 	m, sort, constructors := enum2BVFixture(t)
 	astTestMust(t, m.ToggleProofMode(ast.ASTProofEnabled))
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	out, proof := enum2BVRefs(t, m)

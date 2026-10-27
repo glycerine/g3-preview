@@ -42,7 +42,7 @@ func enum2BVRefs(t *testing.T, m *ast.ASTManager) (ast.ASTRef, ast.ASTRef) {
 
 func TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes(t *testing.T) {
 	m, enumSort, constructors := enum2BVFixture(t)
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	out, proof := enum2BVRefs(t, m)
@@ -106,7 +106,7 @@ func TestEnum2BVConstantsRecognizersMappingsBoundsAndScopes(t *testing.T) {
 
 func TestEnum2BVQuantifierSortAndBound(t *testing.T) {
 	m, enumSort, constructors := enum2BVFixture(t)
-	r, err := NewEnum2BVRewriter(m)
+	r, err := enum2BVNewForTest(t, m)
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, r.Close()) })
 	out, proof := enum2BVRefs(t, m)
