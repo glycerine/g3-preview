@@ -3,11 +3,10 @@ package smtcore
 
 import (
 	"errors"
-	"math/bits"
 
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
-	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 type smtDatalogDeclarations struct {
@@ -16,17 +15,17 @@ type smtDatalogDeclarations struct {
 	bits uint32
 }
 
-type smtDatalogScope struct{ constrained int }
+type smtDatalogScope struct{ declarations, references int }
 
 // SMTDatalogTheory injects each retained finite datalog sort into a bit-vector
-// wide enough for its domain and defines strict order by unsigned comparison.
+// at the source width of 64 bits and defines strict order by unsigned comparison.
 type SMTDatalogTheory struct {
 	*SMTTheoryBase
-	declarations    map[ast.ASTHandle]smtDatalogDeclarations
-	declarationRefs []ast.ASTRef
-	constrained     map[ast.ASTHandle]bool
-	constraintTrail []ast.ASTHandle
-	scopes          []smtDatalogScope
+	declarations     map[ast.ASTHandle]smtDatalogDeclarations
+	declarationRefs  []ast.ASTRef
+	declarationTrail []ast.ASTHandle
+	scopes           []smtDatalogScope
+	trace            *diagnostic.TraceTags
 }
 
 func NewSMTDatalogTheory(family ast.FamilyID) (*SMTDatalogTheory, error) {
@@ -37,7 +36,6 @@ func NewSMTDatalogTheory(family ast.FamilyID) (*SMTDatalogTheory, error) {
 	return &SMTDatalogTheory{
 		SMTTheoryBase: base,
 		declarations:  make(map[ast.ASTHandle]smtDatalogDeclarations),
-		constrained:   make(map[ast.ASTHandle]bool),
 	}, nil
 }
 
@@ -56,10 +54,7 @@ func (t *SMTDatalogTheory) declarationsFor(sort ast.ASTHandle) (smtDatalogDeclar
 		}
 		return smtDatalogDeclarations{}, ast.ErrASTDomain
 	}
-	width := uint32(bits.Len64(size - 1))
-	if width == 0 {
-		width = 1
-	}
+	const width uint32 = 64
 	bitVector, err := state.manager.BitVectorSort(width)
 	if err != nil {
 		return smtDatalogDeclarations{}, err
@@ -82,6 +77,7 @@ func (t *SMTDatalogTheory) declarationsFor(sort ast.ASTHandle) (smtDatalogDeclar
 	}
 	declarations := smtDatalogDeclarations{rep: rep, abs: abs, bits: width}
 	t.declarations[sort] = declarations
+	t.declarationTrail = append(t.declarationTrail, sort)
 	t.declarationRefs = append(t.declarationRefs, repRef, absRef)
 	return declarations, nil
 }
@@ -155,6 +151,9 @@ func (t *SMTDatalogTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bo
 	if err != nil {
 		return false, err
 	}
+	if _, found := state.BoolVar(expression); found {
+		return true, nil
+	}
 	less, err := state.manager.IsDatalogLT(expression)
 	if err != nil || !less {
 		return false, err
@@ -201,13 +200,28 @@ func (t *SMTDatalogTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bo
 	if err != nil {
 		return false, err
 	}
-	if err = state.Internalize(reverseLE, true); err != nil {
+	if err = state.Internalize(expression, false); err != nil {
+		return false, err
+	}
+	if err = state.Internalize(reverseLE, false); err != nil {
 		return false, err
 	}
 	lessLiteral := NewSMTLiteral(variable, false)
 	leLiteral, err := state.Literal(reverseLE)
 	if err != nil {
 		return false, err
+	}
+	if err = state.markRelevant(expression); err != nil {
+		return false, err
+	}
+	if leLiteral.Var() != SMTTrueBoolVar {
+		atom, e := state.BoolExpression(leLiteral.Var())
+		if e != nil {
+			return false, e
+		}
+		if e = state.markRelevant(atom); e != nil {
+			return false, e
+		}
 	}
 	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{lessLiteral, leLiteral}); err != nil {
 		return false, err
@@ -237,16 +251,11 @@ func (t *SMTDatalogTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHandl
 	if err != nil || !finite {
 		return err
 	}
-	if !t.IsAttachedToVariable(node) {
-		_, err = t.CreateVariable(node)
-	}
+	_, err = t.ensureVariable(node.owner)
 	return err
 }
 
 func (t *SMTDatalogTheory) Relevant(expression ast.ASTHandle) error {
-	if t.constrained[expression] {
-		return nil
-	}
 	state, err := t.State()
 	if err != nil {
 		return err
@@ -268,8 +277,6 @@ func (t *SMTDatalogTheory) Relevant(expression ast.ASTHandle) error {
 		return err
 	}
 	if declaration == declarations.abs {
-		t.constrained[expression] = true
-		t.constraintTrail = append(t.constraintTrail, expression)
 		return nil
 	}
 	representative, err := t.rep(expression)
@@ -318,8 +325,6 @@ func (t *SMTDatalogTheory) Relevant(expression ast.ASTHandle) error {
 	if err = t.assertConstraint(constraint); err != nil {
 		return err
 	}
-	t.constrained[expression] = true
-	t.constraintTrail = append(t.constraintTrail, expression)
 	return nil
 }
 
@@ -335,6 +340,15 @@ func (t *SMTDatalogTheory) assertConstraint(expression ast.ASTHandle) error {
 	if err != nil {
 		return err
 	}
+	if literal.Var() != SMTTrueBoolVar {
+		atom, e := state.BoolExpression(literal.Var())
+		if e != nil {
+			return e
+		}
+		if e = state.markRelevant(atom); e != nil {
+			return e
+		}
+	}
 	return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal})
 }
 
@@ -342,7 +356,7 @@ func (t *SMTDatalogTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {
 		return err
 	}
-	t.scopes = append(t.scopes, smtDatalogScope{constrained: len(t.constraintTrail)})
+	t.scopes = append(t.scopes, smtDatalogScope{declarations: len(t.declarationTrail), references: len(t.declarationRefs)})
 	return nil
 }
 
@@ -351,11 +365,18 @@ func (t *SMTDatalogTheory) PopScopes(count uint32) error {
 		return ast.ErrASTDomain
 	}
 	level := len(t.scopes) - int(count)
-	limit := t.scopes[level].constrained
-	for _, expression := range t.constraintTrail[limit:] {
-		delete(t.constrained, expression)
+	declarationLimit := t.scopes[level].declarations
+	for _, sort := range t.declarationTrail[declarationLimit:] {
+		delete(t.declarations, sort)
 	}
-	t.constraintTrail = t.constraintTrail[:limit]
+	t.declarationTrail = t.declarationTrail[:declarationLimit]
+	referenceLimit := t.scopes[level].references
+	for i := len(t.declarationRefs) - 1; i >= referenceLimit; i-- {
+		if err := t.state.manager.DelRef(&t.declarationRefs[i]); err != nil {
+			return err
+		}
+	}
+	t.declarationRefs = t.declarationRefs[:referenceLimit]
 	t.scopes = t.scopes[:level]
 	return t.SMTTheoryBase.PopScopes(count)
 }
@@ -375,66 +396,16 @@ func (t *SMTDatalogTheory) InitializeModel(generator *SMTModelGenerator) error {
 	return generator.RegisterFactory(factory)
 }
 
+// Source mk_value only creates the deferred dl_value_proc.
 func (t *SMTDatalogTheory) ModelValue(node *SMTEnode, generator *SMTModelGenerator) (SMTModelValueProcedure, error) {
-	if node == nil || generator == nil || !t.IsAttachedToVariable(node) {
-		return nil, ast.ErrASTDomain
-	}
 	state, err := t.State()
 	if err != nil {
 		return nil, err
 	}
-	representative, err := t.rep(node.owner)
-	if err != nil {
-		return nil, err
-	}
-	if err = state.Internalize(representative, false); err != nil {
-		return nil, err
-	}
-	bitVectorFamily, err := state.manager.BitVectorUtilityFamilyID()
-	if err != nil {
-		return nil, err
-	}
-	bitVectorTheory, ok := state.theories[bitVectorFamily].(*SMTBitVectorTheory)
-	if !ok || bitVectorTheory == nil {
+	if node == nil || generator == nil || generator.manager != state.manager || !t.IsAttachedToVariable(node) {
 		return nil, ast.ErrASTDomain
 	}
-	bits, err := bitVectorTheory.bitsFor(representative)
-	if err != nil {
-		return nil, err
-	}
-	var value uint64
-	for i, bit := range bits {
-		literal, literalErr := state.Literal(bit)
-		if literalErr != nil {
-			return nil, literalErr
-		}
-		assignment, assignmentErr := state.Assignment(literal)
-		if assignmentErr != nil {
-			return nil, assignmentErr
-		}
-		if assignment == lbool.True {
-			value |= uint64(1) << uint(i)
-		}
-	}
-	sort, err := state.manager.GetSort(node.owner)
-	if err != nil {
-		return nil, err
-	}
-	size, matched, err := state.manager.DatalogFiniteSortSize(sort)
-	if err != nil || !matched || size == 0 {
-		if err != nil {
-			return nil, err
-		}
-		return nil, ast.ErrASTDomain
-	}
-	if value >= size {
-		value = 0
-	}
-	numeral, err := state.manager.MkDatalogNumeral(value, sort)
-	if err != nil {
-		return nil, err
-	}
-	return NewSMTExpressionValueProcedure(numeral)
+	return &smtDatalogValueProcedure{theory: t, node: node}, nil
 }
 
 func (t *SMTDatalogTheory) Close() (result error) {
@@ -450,9 +421,8 @@ func (t *SMTDatalogTheory) Close() (result error) {
 	}
 	if result == nil {
 		t.declarationRefs = nil
+		t.declarationTrail = nil
 		t.declarations = nil
-		t.constrained = nil
-		t.constraintTrail = nil
 		t.scopes = nil
 	}
 	return result

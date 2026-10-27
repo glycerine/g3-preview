@@ -136259,7 +136259,9 @@
         "pkg/smtcore/theory_bv_operators_test.go",
         "pkg/cmd/g3/test_vectors/bv_native_operator_models.smt2",
         "pkg/smtcore/theory_bv_invariants.go",
-        "pkg/smtcore/theory_bv_invariants_test.go"
+        "pkg/smtcore/theory_bv_invariants_test.go",
+        "pkg/smtcore/theory_dl_model.go",
+        "pkg/smtcore/theory_dl_model_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -136344,7 +136346,15 @@
         "TestSMTBVInvariantNonBVSummaryAndNativeErasure",
         "TestSMTBVInvariantContinueActionPreservesSourceReturn",
         "TestSMTBVModelValueRuntimeAssertionsAndActions",
-        "TestSMTBVModelValueVariableAssertionPrecedesValueAndFactory"
+        "TestSMTBVModelValueVariableAssertionPrecedesValueAndFactory",
+        "TestSMTDatalogNativeModelDeferredNoLateInternalization",
+        "TestSMTDatalogNativeModelUnfixedSignedBitsAndRange",
+        "TestSMTDatalogNativeModelMissingBVAssertionAndFallback",
+        "TestSMTDatalogNativeModelSignedConversionAndTrace",
+        "TestSMTDatalogNativeModelGeneratorAndScopedProcedureLifetime",
+        "TestSMTDatalogNativeModelRefusalAndRetry",
+        "TestSMTDatalogNativeDeclarationWidthAndScopedMap",
+        "TestSMTDatalogNativeOrderBridgeTermContextAndRelevance"
       ],
       "conditionals": [
         {
@@ -137005,6 +137015,24 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Concrete expression get_fixed_value overload (theory_bv.cpp:508-514), consumed by deferred finite-domain model construction: missing enode returns unfixed, existing enode reads native signed theory-variable literals without internalization or cached AST reconstruction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_dl_model.go",
+            "pkg/smtcore/theory_dl_model_test.go"
+          ],
+          "tests": [
+            "TestSMTDatalogNativeModelDeferredNoLateInternalization",
+            "TestSMTDatalogNativeModelUnfixedSignedBitsAndRange",
+            "TestSMTDatalogNativeModelMissingBVAssertionAndFallback",
+            "TestSMTDatalogNativeModelSignedConversionAndTrace",
+            "TestSMTDatalogNativeModelGeneratorAndScopedProcedureLifetime",
+            "TestSMTDatalogNativeModelRefusalAndRetry",
+            "TestSMTDatalogNativeDeclarationWidthAndScopedMap",
+            "TestSMTDatalogNativeOrderBridgeTermContextAndRelevance"
+          ]
         }
       ],
       "ownership": [
@@ -137072,7 +137100,9 @@
         "pkg/smtcore/theory_bv_operators_test.go",
         "pkg/cmd/g3/test_vectors/bv_native_operator_models.smt2",
         "pkg/smtcore/theory_bv_invariants.go",
-        "pkg/smtcore/theory_bv_invariants_test.go"
+        "pkg/smtcore/theory_bv_invariants_test.go",
+        "pkg/smtcore/theory_dl_model.go",
+        "pkg/smtcore/theory_dl_model_test.go"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -137156,7 +137186,15 @@
         "TestSMTBVInvariantNonBVSummaryAndNativeErasure",
         "TestSMTBVInvariantContinueActionPreservesSourceReturn",
         "TestSMTBVModelValueRuntimeAssertionsAndActions",
-        "TestSMTBVModelValueVariableAssertionPrecedesValueAndFactory"
+        "TestSMTBVModelValueVariableAssertionPrecedesValueAndFactory",
+        "TestSMTDatalogNativeModelDeferredNoLateInternalization",
+        "TestSMTDatalogNativeModelUnfixedSignedBitsAndRange",
+        "TestSMTDatalogNativeModelMissingBVAssertionAndFallback",
+        "TestSMTDatalogNativeModelSignedConversionAndTrace",
+        "TestSMTDatalogNativeModelGeneratorAndScopedProcedureLifetime",
+        "TestSMTDatalogNativeModelRefusalAndRetry",
+        "TestSMTDatalogNativeDeclarationWidthAndScopedMap",
+        "TestSMTDatalogNativeOrderBridgeTermContextAndRelevance"
       ],
       "conditionals": [
         {
@@ -137460,6 +137498,24 @@
             "TestSMTBVModelValueSignedLiteralsAndFactoryPipeline",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Concrete expression get_fixed_value overload (theory_bv.cpp:508-514), consumed by deferred finite-domain model construction: missing enode returns unfixed, existing enode reads native signed theory-variable literals without internalization or cached AST reconstruction",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_dl_model.go",
+            "pkg/smtcore/theory_dl_model_test.go"
+          ],
+          "tests": [
+            "TestSMTDatalogNativeModelDeferredNoLateInternalization",
+            "TestSMTDatalogNativeModelUnfixedSignedBitsAndRange",
+            "TestSMTDatalogNativeModelMissingBVAssertionAndFallback",
+            "TestSMTDatalogNativeModelSignedConversionAndTrace",
+            "TestSMTDatalogNativeModelGeneratorAndScopedProcedureLifetime",
+            "TestSMTDatalogNativeModelRefusalAndRetry",
+            "TestSMTDatalogNativeDeclarationWidthAndScopedMap",
+            "TestSMTDatalogNativeOrderBridgeTermContextAndRelevance"
           ]
         }
       ],
@@ -139667,14 +139723,24 @@
       "path": "src/smt/theory_dl.cpp",
       "component": "smt",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_dl.go",
-        "pkg/smtcore/proto_model/datalog_factory.go"
+        "pkg/smtcore/proto_model/datalog_factory.go",
+        "pkg/smtcore/theory_dl_model.go",
+        "pkg/smtcore/theory_dl_model_test.go"
       ],
       "tests": [
         "TestSMTDatalogStrictOrderReduction",
-        "TestSMTDatalogNumeralOrderAndModel"
+        "TestSMTDatalogNumeralOrderAndModel",
+        "TestSMTDatalogNativeModelDeferredNoLateInternalization",
+        "TestSMTDatalogNativeModelUnfixedSignedBitsAndRange",
+        "TestSMTDatalogNativeModelMissingBVAssertionAndFallback",
+        "TestSMTDatalogNativeModelSignedConversionAndTrace",
+        "TestSMTDatalogNativeModelGeneratorAndScopedProcedureLifetime",
+        "TestSMTDatalogNativeModelRefusalAndRetry",
+        "TestSMTDatalogNativeDeclarationWidthAndScopedMap",
+        "TestSMTDatalogNativeOrderBridgeTermContextAndRelevance"
       ],
       "assertions": [
         {
@@ -139694,24 +139760,44 @@
           "text": "SASSERT(sz > 0);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "finite-sort variable attachment, representative and abstraction declarations, numeral and inverse axioms, range bounds, strict-order reduction, scoped constraint rollback, model factory and model values",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/smtcore/theory_dl.go",
           "tests": [
             "TestSMTDatalogStrictOrderReduction",
             "TestSMTDatalogNumeralOrderAndModel"
           ]
+        },
+        {
+          "name": "Deferred dl_value_proc (70-103,165-167): borrowed theory/enode, no dependencies, read only already-internalized representative through signed native BV literals, zero only when unfixed/missing, source signed conversion, actual line90 assertion service and line99 trace; source64-bit representatives, scoped declaration maps and AST references, term-context order bridge and relevant-before-axiom protocol",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_dl.go",
+            "pkg/smtcore/theory_dl_model.go",
+            "pkg/smtcore/theory_dl_model_test.go"
+          ],
+          "tests": [
+            "TestSMTDatalogNativeModelDeferredNoLateInternalization",
+            "TestSMTDatalogNativeModelUnfixedSignedBitsAndRange",
+            "TestSMTDatalogNativeModelMissingBVAssertionAndFallback",
+            "TestSMTDatalogNativeModelSignedConversionAndTrace",
+            "TestSMTDatalogNativeModelGeneratorAndScopedProcedureLifetime",
+            "TestSMTDatalogNativeModelRefusalAndRetry",
+            "TestSMTDatalogNativeDeclarationWidthAndScopedMap",
+            "TestSMTDatalogNativeOrderBridgeTermContextAndRelevance"
+          ]
         }
       ],
       "ownership": [
-        "The Go theory owns per-sort declaration handles, scoped constraint markers and theory variables. The datalog model factory pins its registered sorts and values until Close; SMT state, enodes and model generators remain borrowed."
+        "Per-sort declarations hold independent AST references; scoped map entries and references are retired on scope pop. Deferred model procedures borrow their theory/enode and own no AST reference. Each evaluation owns its temporary representative reference and numeral until return. The existing model factory owns its registered sorts/values; its complete source ownership audit remains open."
       ],
       "deviations": [
-        "The Go reduction uses the minimum nonzero bit-vector width that represents the declared finite domain instead of an unconditional 64 bits. This preserves every finite-domain value and order while avoiding unused Boolean circuitry. Checked Go errors replace source assertions."
+        "Corrective source audit removes the minimum-width approximation: representatives and finite-domain BV constants use the source width of64 bits. Model evaluation neither internalizes missing representatives nor sums partially assigned bits nor clamps invalid values to zero. The missing-BV assertion uses the actual runtime debug notification/input/action owners; signed conversion uses the existing MPQ/MPZ service. Physical invalid Go handles return checked errors.",
+        "Whole-unit completion and earlier audit flags are withdrawn. Other TRACE/SASSERT/VERIFY sites, fresh-copy and factory behavior, and full lifecycle/error-prefix fidelity still require audit. The prebuilt C++ executable has no FiniteDomain sort parser registration, so new finite-domain cases use the retained typed API; existing SMT-LIB C++ differential checks remain separate integration evidence."
       ]
     },
     {
