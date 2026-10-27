@@ -524,6 +524,9 @@ func lpSetLARCatchUpExactCell(t *testing.T, h *lpPairHarness, c *LARCoreSolver, 
 }
 
 func TestLARCatchUpPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, path := range []string{"incremental", "rebuild", "reverse"} {
 			success, failures := false, 0

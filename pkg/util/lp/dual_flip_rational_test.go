@@ -204,6 +204,9 @@ func lpRationalDualFlipOperation(m *RationalDualCoreSolver, op string, out *nume
 	panic(op)
 }
 func TestLPRationalDualFlipPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"signed", "wave", "process", "xb", "update", "apply", "beta"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

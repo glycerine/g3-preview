@@ -207,6 +207,9 @@ func TestLPExactInitRunIndependentModels(t *testing.T) {
 }
 
 func TestLPExactInitRunPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"feasible-opt", "infeasible-opt", "infeasible-only"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

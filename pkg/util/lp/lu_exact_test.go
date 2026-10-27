@@ -85,6 +85,9 @@ func lpExactLUCheckSource(t *testing.T, h *lpPairHarness, a *RationalStaticMatri
 }
 
 func TestLPExactLUIndependentFactorizationAndSolves(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(192311, 711319))
 	denseCount, rowSwaps, columnSwaps := 0, 0, 0
 	for world := 0; world < 56; world++ {

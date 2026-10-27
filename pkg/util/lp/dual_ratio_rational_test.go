@@ -234,6 +234,9 @@ func lpRationalDualRatioLargeFixture(t *testing.T, h *lpPairHarness) (*lpRationa
 	return f, m
 }
 func TestLPRationalDualRatioPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"span", "loss", "ratio"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

@@ -262,6 +262,9 @@ func TestLPExactStaticMatrixLiteralStorageAndAliases(t *testing.T) {
 }
 
 func TestLPExactStaticMatrixAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"set", "new", "element", "remove", "row", "column", "pivot", "pivot-existing"} {
 		failures, successes := 0, 0
 		for ordinal := int64(0); ordinal < 220; ordinal++ {

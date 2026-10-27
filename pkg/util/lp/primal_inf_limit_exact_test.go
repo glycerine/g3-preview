@@ -8,6 +8,9 @@ import (
 )
 
 func TestLPExactInfLimitIndependentPairOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	for _, op := range []string{"negative", "positive", "low-positive"} {
 		for world := 0; world < 480; world++ {

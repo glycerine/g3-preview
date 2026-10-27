@@ -179,6 +179,9 @@ func TestLPSparseColumnReplacementLiteralInput(t *testing.T) {
 }
 
 func TestLPExactSparseColumnReplacementAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	totalReceipts := 0
 	for _, op := range []string{"existing-head", "existing-head-grow", "existing-other", "remove-head", "new"} {
 		for _, direct := range []bool{false, true} {

@@ -55,6 +55,9 @@ func lpTermOracleAdd(want map[uint32]*big.Rat, order []uint32, j uint32, x *big.
 	return append(order, j)
 }
 func TestLARTermIndependentArithmeticAndOrderOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	p := h.pair("0", "17/19")
 	term := NewLARTerm(h.m)

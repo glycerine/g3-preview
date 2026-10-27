@@ -196,6 +196,9 @@ func TestLPExactTableauPricingSortAndReachedPrefixes(t *testing.T) {
 }
 
 func TestLPExactTableauPricingPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, profile := range []string{"bound", "epsilon", "breakpoint"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

@@ -136,6 +136,9 @@ func TestLPPairPivotCostLiveAliases(t *testing.T) {
 }
 
 func TestLPPairPivotCostPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, correction := range []bool{false, true} {
 			success, failures := false, 0

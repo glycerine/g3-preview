@@ -160,6 +160,9 @@ func TestLPExactSparseBasisIndependentOracle(t *testing.T) {
 }
 
 func TestLPExactSparseBasisAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, mode := range []string{"single", "duplicate"} {
 		failures, successes, columnOnly, receipts := 0, 0, 0, 0
 		for ordinal := int64(0); ordinal < 180; ordinal++ {

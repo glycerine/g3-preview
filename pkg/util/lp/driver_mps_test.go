@@ -519,6 +519,9 @@ func lpMPSDriverFixedObjective(t *testing.T, h *lpPairHarness, dual, minimum boo
 }
 
 func TestLPMPSDriverObjectivePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, dual := range []bool{false, true} {
 		for _, minimum := range []bool{false, true} {
 			for _, direct := range []bool{false, true} {
@@ -566,6 +569,9 @@ func TestLPMPSDriverObjectivePhysicalOwnership(t *testing.T) {
 }
 
 func TestLPMPSDriverFullRunPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	// This magnitude must overflow the driver's float64 cost display to inf.
 	large := strings.Repeat("1234567890", 100) + "7/13"
 	input := strings.Replace(lpMPSDriverModel(3, 2, 4, 5, 3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", large), 1)

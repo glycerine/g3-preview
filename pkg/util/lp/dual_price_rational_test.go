@@ -222,6 +222,9 @@ func TestLPRationalDualPriceRowBudgetAndStatus(t *testing.T) {
 }
 
 func TestLPRationalDualPricePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"low-edge", "upper-edge", "row", "delta", "upper-delta", "sign"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

@@ -415,6 +415,9 @@ func TestLPRationalPresolveCleanupPassesAndDiagnostics(t *testing.T) {
 }
 
 func TestLPRationalPresolvePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, phase := range []string{"minimum", "maximum", "pin", "obsolete-low", "obsolete-up", "remove", "cleanup"} {
 			done, failures := false, 0

@@ -119,6 +119,9 @@ func TestLPRationalPermutationIndependentDenseProducts(t *testing.T) {
 // Direct allocation exposes copy prefixes that pooled storage may reuse; both
 // profiles must preserve the caller coordinates and release the owner roots.
 func TestLPRationalPermutationDenseAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"left", "right", "reverse-left-T", "reverse-left-X", "reverse-right-T", "reverse-right-X"} {
 			failures, successes := 0, 0
@@ -304,6 +307,9 @@ func TestLPPairPermutationIndependentDenseProducts(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPPairPermutationDenseAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"left", "right", "reverse-left-T", "reverse-left-X", "reverse-right-T", "reverse-right-X"} {
 			failures, successes := 0, 0
@@ -498,6 +504,9 @@ func TestLPRationalPermutationIndependentSparseProducts(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPRationalPermutationSparseAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
 			failures, successes := 0, 0
@@ -718,6 +727,9 @@ func TestLPPairPermutationIndependentSparseProducts(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPPairPermutationSparseAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"left", "right", "reverse-left", "reverse-right"} {
 			failures, successes := 0, 0

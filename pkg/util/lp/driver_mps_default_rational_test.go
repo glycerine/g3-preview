@@ -180,6 +180,9 @@ func TestLPMPSDefaultRationalPreparedDualCost(t *testing.T) {
 }
 
 func TestLPMPSDefaultRationalNumberPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, dual := range []bool{false, true} {
 		for _, named := range []bool{false, true} {
 			for _, direct := range []bool{false, true} {

@@ -127,6 +127,9 @@ func TestLPExactStaticScopesIndependentDimensionOracle(t *testing.T) {
 }
 
 func TestLPExactStaticTransposeAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"distinct", "self", "empty-first", "empty-second"} {
 		failures, successes := 0, 0
 		stages := [3]int{}

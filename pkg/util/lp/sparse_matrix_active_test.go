@@ -437,6 +437,9 @@ func TestLPSparseActiveEtaEarlyEmptyTarget(t *testing.T) {
 }
 
 func TestLPExactSparseActiveEtaAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		t.Run(fmt.Sprint(direct), func(t *testing.T) {
 			failures, successes, receipts := 0, 0, 0

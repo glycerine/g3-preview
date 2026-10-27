@@ -379,6 +379,9 @@ func TestLPPairMakeFeasibleLeavesOlderComparisonOwned(t *testing.T) {
 }
 
 func TestLPPairMakeFeasibleDeltaBeforeFinalCopyRefusal(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		failures, finalCopies := 0, 0
 		success := false

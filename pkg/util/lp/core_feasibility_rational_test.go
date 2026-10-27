@@ -171,6 +171,9 @@ func TestLPRationalFeasibilityDiagnosticsAndGuards(t *testing.T) {
 }
 
 func TestLPRationalFeasibilityPhysicalComparisons(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, phase := range []string{"update", "all", "validate"} {
 			done, failures := false, 0

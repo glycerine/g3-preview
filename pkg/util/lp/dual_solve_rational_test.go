@@ -476,6 +476,9 @@ func lpRationalDualSolveLargeFixture(t *testing.T, h *lpPairHarness) (*lpRationa
 	return f, m
 }
 func TestLPRationalDualSolvePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"price", "iteration", "solve"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

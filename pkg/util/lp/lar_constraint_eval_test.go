@@ -166,6 +166,9 @@ func TestLARConstraintEvalReachedPrefixes(t *testing.T) {
 }
 
 func TestLARConstraintEvalPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, variant := range []string{"variable", "term", "general"} {
 		for _, direct := range []bool{false, true} {
 			for _, export := range []bool{false, true} {

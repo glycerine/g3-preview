@@ -223,6 +223,9 @@ func TestLPExactPrimalPricingSortSourcesAndCounter(t *testing.T) {
 }
 
 func TestLPExactPrimalPricingPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"bound", "epsilon-positive", "epsilon-negative", "breakpoint-low", "breakpoint-boxed", "choose"} {
 			success, failures := false, 0

@@ -258,6 +258,9 @@ func TestLPSparseIndexedGraphLiteralOrderAndFlags(t *testing.T) {
 }
 
 func TestLPExactSparseIndexedSolveAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	receipts := 0
 	for _, left := range []bool{false, true} {
 		for _, direct := range []bool{false, true} {

@@ -245,6 +245,9 @@ func TestLPExactTableauAdvancePivotIndependentModels(t *testing.T) {
 }
 
 func TestLPExactTableauAdvancePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"equal-positive", "equal-negative", "equal-zero", "restore", "pivot-positive", "pivot-negative", "pivot-zero", "min-negation"} {
 		for _, direct := range []bool{false, true} {
 			success, failures, childStops := false, 0, 0

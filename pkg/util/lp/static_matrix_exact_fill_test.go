@@ -188,6 +188,9 @@ func TestLPExactStaticFillLiteralWorkspaceAndPublication(t *testing.T) {
 }
 
 func TestLPExactStaticFillAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, mode := range []string{"eliminate", "publish", "cancel"} {
 		failures, successes, iteratorStops, workspaceStops, matrixStops, linkStops := 0, 0, 0, 0, 0, 0
 		for ordinal := int64(0); ordinal < 280; ordinal++ {

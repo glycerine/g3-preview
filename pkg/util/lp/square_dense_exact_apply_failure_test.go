@@ -9,6 +9,9 @@ import (
 )
 
 func TestLPExactDenseBlockApplicationAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	receipts, pairPrefixes, assignPrefixes := 0, 0, 0
 	for _, op := range []string{"left", "right", "left-indexed", "right-indexed", "pair", "pair-constructor", "left-prefix", "right-prefix", "left-indexed-prefix", "right-indexed-prefix", "pair-prefix"} {
 		for _, direct := range []bool{false, true} {
