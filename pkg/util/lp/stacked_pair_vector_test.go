@@ -169,6 +169,10 @@ func TestLPStackedPairVectorBigOwnership(t *testing.T) {
 }
 
 func TestLPStackedPairVectorAllocationFailureOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, operation := range []string{"append", "replace", "replace-grow", "restore"} {
 		failed, succeeded := false, false
 		for fail := int64(0); fail < 30; fail++ {
@@ -435,6 +439,10 @@ func TestLPStackedPairVectorPreservesActualOlderComparison(t *testing.T) {
 }
 
 func TestLPStackedPairVectorDirectPhysicalRefusals(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, operation := range []string{"append", "replace", "replace-grow", "restore"} {
 		failures, succeeded := 0, false
 		for ordinal := int64(0); ordinal < 48 && !succeeded; ordinal++ {

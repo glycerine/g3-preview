@@ -597,6 +597,10 @@ func lpRationalDualOuterOperation(m *RationalDualSimplex, op string, out *numera
 	panic(op)
 }
 func TestLPRationalDualOuterPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, op := range []string{"find", "copy", "restore", "fix", "stage1", "stage2", "cost", "value"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

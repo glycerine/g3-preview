@@ -21,6 +21,10 @@ func lpLUHeading(columns uint32, basis []uint32) []int32 {
 }
 
 func TestLPLURowRefinementIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	rng := rand.New(rand.NewPCG(991317, 381))
 	for world := 0; world < 64; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

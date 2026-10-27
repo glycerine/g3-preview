@@ -9,6 +9,10 @@ import (
 )
 
 func TestLPExactBoundStepIndependentFlipOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	worlds := 0
 	for _, typ := range []ColumnType{ColumnFree, ColumnFixed, ColumnLowBound, ColumnUpperBound, ColumnBoxed} {

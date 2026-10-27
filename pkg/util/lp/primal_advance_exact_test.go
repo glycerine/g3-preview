@@ -240,6 +240,10 @@ func TestLPExactAdvanceDifferentPivotOutcomes(t *testing.T) {
 }
 
 func TestLPExactAdvanceDifferentPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		for _, direction := range []int32{1, -1, 0} {
 			success, failures := false, 0

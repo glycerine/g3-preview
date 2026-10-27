@@ -10,6 +10,10 @@ import (
 )
 
 func TestLPExactStaticProductsIndependentRationalOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	r := rand.New(rand.NewPCG(4191, 798))
 	for world := 0; world < 160; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

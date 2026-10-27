@@ -195,6 +195,10 @@ func TestLPSMTReaderFileAndDiagnosticFailures(t *testing.T) {
 }
 
 func TestLPSMTReaderPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	input := ":formula (and (<= (+ " + strings.Repeat("(* (~ -2147483648) x) ", 24) + "2147483647 2147483647 (~ 5)) 999))"
 	for _, phase := range []string{"read", "prepared-factory"} {
 		for _, direct := range []bool{false, true} {

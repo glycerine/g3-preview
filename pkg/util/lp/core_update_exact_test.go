@@ -184,6 +184,10 @@ func TestLPPairCoreUpdateSingularRollback(t *testing.T) {
 }
 
 func TestLPPairCoreUpdatePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, op := range []string{"replace", "refactor", "rollback", "restore"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

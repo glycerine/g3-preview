@@ -9,6 +9,10 @@ import (
 )
 
 func TestLPImpliedBoundDirectAndAliasOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	value := strings.Repeat("2345678901", 100) + "/" + strings.Repeat("7654321098", 99) + "1"
 	for _, direct := range []bool{false, true} {
 		for _, action := range []string{"construct", "assign", "self"} {

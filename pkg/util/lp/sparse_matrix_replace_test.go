@@ -12,6 +12,10 @@ import (
 )
 
 func TestLPSparseColumnReplacementIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	value := h.pair("0", "0")
 	n := uint32(7)

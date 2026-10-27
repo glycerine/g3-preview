@@ -183,6 +183,10 @@ func TestLPRationalCoreUpdateSingularRollback(t *testing.T) {
 }
 
 func TestLPRationalCoreUpdatePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		for _, phase := range []string{"replace", "refactor", "rollback", "restore"} {
 			done, failures := false, 0

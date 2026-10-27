@@ -111,6 +111,10 @@ func TestLPExactBasisDispatchMultiplierOutputAlias(t *testing.T) {
 }
 
 func TestLPExactBasisDispatchIndependentPairOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, kind := range []ColumnType{ColumnFree, ColumnLowBound, ColumnUpperBound, ColumnBoxed, ColumnFixed} {
 		for _, feasible := range []bool{false, true} {
 			for _, positive := range []bool{false, true} {

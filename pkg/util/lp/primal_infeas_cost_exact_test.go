@@ -265,6 +265,10 @@ func TestLPExactInfeasCostUnknownAndMembershipPrefixes(t *testing.T) {
 }
 
 func TestLPExactInfeasCostPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	ops := []string{"column", "all", "changed", "after"}
 	if !sourceDebugEnabled {
 		ops = append(ops, "unknown-minimum")

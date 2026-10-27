@@ -138,6 +138,10 @@ func TestLPRationalPrimalBreakpointCollectIndependentModel(t *testing.T) {
 }
 
 func TestLPRationalPrimalBreakpointCollectPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, op := range []string{"delta", "row", "fill-positive", "fill-negative"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

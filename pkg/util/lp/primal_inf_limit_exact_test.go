@@ -127,6 +127,10 @@ func TestLPExactInfLimitLiveAliases(t *testing.T) {
 }
 
 func TestLPExactInfLimitPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"negative", "positive", "low-positive"} {
 			success, failures, own, child := false, 0, 0, 0

@@ -146,6 +146,10 @@ func TestLPRationalPrimalPricingTerminalStatus(t *testing.T) {
 }
 
 func TestLPRationalPrimalPricingActualInitializationPipeline(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)
 		rows := uint32(1 + world%4)

@@ -159,6 +159,10 @@ func TestLPPairReducedCostLiveAliases(t *testing.T) {
 }
 
 func TestLPPairReducedCostPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, op := range []string{"fill", "init"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

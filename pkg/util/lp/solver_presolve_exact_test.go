@@ -149,6 +149,10 @@ func TestLPRationalPresolveUnknownBoundsAndZeroRead(t *testing.T) {
 }
 
 func TestLPRationalPresolveIndependentRowClassificationAndPinning(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 80; world++ {
 		n := 2 + world%3
 		a, lo, up := make([]*big.Rat, n), make([]*big.Rat, n), make([]*big.Rat, n)

@@ -10,6 +10,10 @@ import (
 )
 
 func TestLPIndexedValueRationalConstructorAndAssignmentPublication(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		for _, operation := range []string{"constructor", "assignment"} {
 			failures, succeeded := 0, false

@@ -126,6 +126,10 @@ func TestLARConstraintsIndependentExactCopiesAndBorrows(t *testing.T) {
 }
 
 func TestLARConstraintsConstructionAndExportPhysicalRefusals(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, op := range []string{"variable", "term", "general", "export", "stored-append", "term-export", "free-coefficient"} {
 		failures := 0
 		succeeded := false

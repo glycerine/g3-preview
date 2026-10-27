@@ -408,6 +408,10 @@ func lpRationalPrimalOuterOperation(m *RationalPrimalSimplex, op string, out *nu
 	panic(op)
 }
 func TestLPRationalPrimalOuterPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, op := range []string{"find", "prepare", "row", "bounds", "solve", "cost", "value"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

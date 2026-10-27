@@ -125,6 +125,10 @@ func TestLPRationalPrimalInfeasCostUnknownAndMembershipPrefixes(t *testing.T) {
 }
 
 func TestLPRationalPrimalInfeasCostPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	ops := []string{"column", "all", "changed", "after"}
 	if !sourceDebugEnabled {
 		ops = append(ops, "unknown-minimum")
@@ -333,6 +337,10 @@ func TestLPRationalPrimalInfeasCostMetadataBoundaries(t *testing.T) {
 }
 
 func TestLPRationalPrimalInfeasCostIndependentStateOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, op := range []string{"column", "all", "changed", "after"} {
 		for world := 0; world < 160; world++ {
 			h := newLPPairHarness(t)

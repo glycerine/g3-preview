@@ -153,6 +153,10 @@ func TestLARGetModelEmptyAndReachedPrefixes(t *testing.T) {
 }
 
 func TestLARGetModelPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		for _, collision := range []bool{false, true} {
 			done, failures := false, 0

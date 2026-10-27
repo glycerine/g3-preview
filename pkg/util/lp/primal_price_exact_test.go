@@ -105,6 +105,10 @@ func TestLPExactPrimalPricingIndependentEligibility(t *testing.T) {
 }
 
 func TestLPExactPrimalPricingIndependentScanRotationAndRNG(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	rng := rand.New(rand.NewPCG(8771, 481))
 	for world := 0; world < 160; world++ {

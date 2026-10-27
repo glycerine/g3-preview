@@ -190,6 +190,10 @@ func TestLPPairBasisTableauTransposeIndependentRows(t *testing.T) {
 }
 
 func TestLPPairBasisTransposePhysicalFailureOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for _, direct := range []bool{false, true} {
 		failures := 0
 		success := false

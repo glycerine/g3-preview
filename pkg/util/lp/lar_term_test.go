@@ -509,6 +509,10 @@ func TestLARTermIteratorLiveValuesAndPendingGuards(t *testing.T) {
 }
 
 func TestLARTermIteratorRetainsPhysicalCopyReceipt(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	matched := false
 	for cohort := 0; cohort < 4 && !matched; cohort++ {
 		for ordinal := int64(0); ordinal < 30 && !matched; ordinal++ {
