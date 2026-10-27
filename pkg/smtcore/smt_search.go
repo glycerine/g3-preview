@@ -167,13 +167,15 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 	if err := k.manager.ResetRef(k.unsatProof); err != nil {
 		return lbool.Undef, err
 	}
-	queue, err := NewSMTActivityCaseSplitQueue(k.internalizer)
-	if err != nil {
-		return lbool.Undef, err
+	queue := k.caseSplitQueue
+	if queue == nil {
+		if err := k.configureQueueHeuristics(k.smtState, false); err != nil {
+			return lbool.Undef, err
+		}
+		queue = k.caseSplitQueue
 	}
-	if err := queue.ConfigurePhases(k.smtState); err != nil {
-		return lbool.Undef, err
-	}
+	// Source init_search resets only the default phase, not cache counters.
+	queue.phaseDefault = false
 	baseLevel := k.internalizer.scopeLevel
 	conflictBase := k.internalizer.statistics.NumConflicts
 	restarts := newSMTRestartState(k.smtState)
@@ -284,7 +286,9 @@ func (k *SMTKernel) search() (result lbool.LBool, resultErr error) {
 				return lbool.Undef, fmt.Errorf("smt search collect learned clauses: %w", err)
 			}
 			k.internalizer.decayBooleanActivity()
-			queue.RecordConflict()
+			if err = queue.RecordConflict(); err != nil {
+				return lbool.Undef, fmt.Errorf("smt phase cache counter: %w", err)
+			}
 			restarts.conflicts++
 			if k.internalizer.statistics.NumConflicts-conflictBase > k.smtState.MaxConflicts {
 				k.lastFailure = SMTFailureConflictLimit

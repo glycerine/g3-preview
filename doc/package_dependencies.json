@@ -2677,6 +2677,7 @@
         "smt_quantifier_manager.go",
         "smt_quantifier_registry.go",
         "smt_quantifier_stat.go",
+        "smt_queue_lifetime.go",
         "smt_quick_checker.go",
         "smt_recursive_functions.go",
         "smt_relevance_activity_queue.go",

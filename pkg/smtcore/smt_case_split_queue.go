@@ -12,6 +12,7 @@ import (
 // variants use concrete context-owned queues/heaps and lifecycle callbacks;
 // strategy 6 adds theory priorities.
 type SMTActivityCaseSplitQueue struct {
+	liveParams                            *SMTParams
 	state                                 *SMTInternalizerState
 	phaseSelection, cachingOn, cachingOff uint32
 	randomVariableFrequency               float64
@@ -33,16 +34,10 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	if q == nil || q.state == nil || state.PhaseSelection > 6 {
 		return ast.ErrASTDomain
 	}
-	q.phaseSelection = state.PhaseSelection
-	q.cachingOn = state.PhaseCachingOn
-	q.cachingOff = state.PhaseCachingOff
-	q.randomVariableFrequency = state.RandomVarFreq
-	q.strategy = state.CaseSplitStrategy
-	if q.strategy >= 3 && q.strategy <= 5 && (state.RelevancyLvl < 2 || state.AutoConfig) {
-		q.strategy = 0
+	if err := q.updateLivePhases(&state); err != nil {
+		return err
 	}
-	q.relCaseSplitOrder = state.RelCaseSplitOrder
-	q.lookaheadDiseq = state.LookaheadDiseq
+	q.strategy = effectiveSMTCaseSplitStrategy(state)
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
@@ -67,25 +62,44 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	return nil
 }
 
-func (q *SMTActivityCaseSplitQueue) RecordConflict() {
+func (q *SMTActivityCaseSplitQueue) updateLivePhases(state *SMTParamsState) error {
+	if state.PhaseSelection > 6 {
+		return ast.ErrASTDomain
+	}
+	q.phaseSelection = state.PhaseSelection
+	q.cachingOn, q.cachingOff = state.PhaseCachingOn, state.PhaseCachingOff
+	q.randomVariableFrequency = state.RandomVarFreq
+	q.relCaseSplitOrder = state.RelCaseSplitOrder
+	q.lookaheadDiseq = state.LookaheadDiseq
+	return nil
+}
+
+func (q *SMTActivityCaseSplitQueue) RecordConflict() error {
+	if err := q.refreshLivePhases(); err != nil {
+		return err
+	}
 	q.phaseCounter++
 	limit := q.cachingOff
 	if q.cacheEnabled {
 		limit = q.cachingOn
 	}
 	if q.phaseCounter < limit {
-		return
+		return nil
 	}
 	q.phaseCounter = 0
 	q.cacheEnabled = !q.cacheEnabled
 	if q.phaseSelection == 4 {
 		q.phaseDefault = !q.phaseDefault
 	}
+	return nil
 }
 
 func (q *SMTActivityCaseSplitQueue) PrepareConflict() error {
 	if q == nil || q.state == nil {
 		return ast.ErrASTHandle
+	}
+	if err := q.refreshLivePhases(); err != nil {
+		return err
 	}
 	if q.phaseSelection != 3 && q.phaseSelection != 4 {
 		return nil
@@ -132,6 +146,9 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 		return SMTNullBoolVar, lbool.Undef, ast.ErrASTHandle
 	}
 	if err := q.state.open(); err != nil {
+		return SMTNullBoolVar, lbool.Undef, err
+	}
+	if err := q.refreshLivePhases(); err != nil {
 		return SMTNullBoolVar, lbool.Undef, err
 	}
 	next, preferred, err := q.selectVariable()
@@ -205,6 +222,9 @@ func (q *SMTActivityCaseSplitQueue) hasCaseSplit() (bool, error) {
 		return false, ast.ErrASTHandle
 	}
 	if err := q.state.open(); err != nil {
+		return false, err
+	}
+	if err := q.refreshLivePhases(); err != nil {
 		return false, err
 	}
 	if q.strategy <= 2 {

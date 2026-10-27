@@ -51,27 +51,32 @@ func (s *SMTInternalizerState) decayBooleanActivity() {
 }
 
 func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState) error {
+	return s.configureBooleanHeuristicsForQueue(params, effectiveSMTCaseSplitStrategy(params), true)
+}
+
+func (s *SMTInternalizerState) configureBooleanHeuristicsForQueue(params SMTParamsState, strategy uint32, reseed bool) error {
 	if params.RandomInitialActivity > 2 || params.CaseSplitStrategy > 6 || params.InvDecay <= 0 {
 		return ast.ErrASTDomain
 	}
-	s.random.SetSeed(params.RandomSeed)
+	if reseed {
+		s.random.SetSeed(params.RandomSeed)
+	}
 	s.randomInitialActivity = params.RandomInitialActivity
-	s.caseSplitStrategy = params.CaseSplitStrategy
+	s.caseSplitStrategy = strategy
 	s.theoryCaseSplit = params.TheoryCaseSplit
 	s.activityInverseDecay = params.InvDecay
-	if params.CaseSplitStrategy == 1 {
-		return s.ensureDelayedActivityQueue()
-	}
-	if params.CaseSplitStrategy == 2 {
-		return s.ensureCachedActivityQueue()
-	}
-	if params.CaseSplitStrategy == 0 || params.CaseSplitStrategy >= 3 && params.CaseSplitStrategy <= 5 && (params.RelevancyLvl < 2 || params.AutoConfig) {
+	switch strategy {
+	case 0:
 		return s.ensureBasicActivityQueue()
-	}
-	if params.CaseSplitStrategy == 5 && params.RelevancyLvl >= 2 && !params.AutoConfig {
+	case 1:
+		return s.ensureDelayedActivityQueue()
+	case 2:
+		return s.ensureCachedActivityQueue()
+	case 4:
+		return s.ensureRelevanceActivityQueue()
+	case 5:
 		return s.ensureRelevanceGoalQueue()
-	}
-	if params.CaseSplitStrategy == 6 {
+	case 6:
 		return s.ensureTheoryAwareBranching()
 	}
 	return nil

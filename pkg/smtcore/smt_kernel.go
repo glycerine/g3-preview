@@ -28,7 +28,9 @@ type SMTKernelAssertion struct {
 }
 
 type SMTKernel struct {
-	smtParamsBorrowed bool
+	caseSplitQueue     *SMTActivityCaseSplitQueue
+	booleanSetupSeeded bool
+	smtParamsBorrowed  bool
 
 	manager          *ast.ASTManager
 	checker          *SMTCheckerContext
@@ -281,7 +283,7 @@ func (k *SMTKernel) configurePreprocessingParams(context *uparams.ParamsContext,
 	if err = k.internalizer.ConfigureClauseMaintenance(maintenance); err != nil {
 		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
-	if err = k.internalizer.configureBooleanHeuristics(fullState); err != nil {
+	if err = k.configureQueueHeuristics(fullState, false); err != nil {
 		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
 	}
 	k.relevancy.enabled = fullState.RelevancyLvl > 0
@@ -290,6 +292,7 @@ func (k *SMTKernel) configurePreprocessingParams(context *uparams.ParamsContext,
 	k.smtParams = full
 	k.smtParamsBorrowed = borrowSource
 	k.internalizer.smtParams = full
+	k.caseSplitQueue.liveParams = full
 	k.internalizer.contextParams = &k.assertedParams
 	k.patternInference, err = pattern.NewInferenceRewriterWithOptions(k.manager, patternOptions)
 	if err != nil {
@@ -492,7 +495,7 @@ func (k *SMTKernel) UpdateParams(params *uparams.ParamsRef) error {
 	if err = k.internalizer.UpdateDynamicAck(dynamic); err != nil {
 		return err
 	}
-	if err = k.internalizer.configureBooleanHeuristics(paramsState); err != nil {
+	if err = k.configureQueueHeuristics(paramsState, false); err != nil {
 		return err
 	}
 	if !k.relevancy.enabled && paramsState.RelevancyLvl > 0 {
@@ -815,6 +818,10 @@ func (k *SMTKernel) Push() error {
 	if err := k.setupAssertedBounds(false); err != nil {
 		return err
 	}
+	if err := k.configureQueueHeuristics(k.smtState, !k.booleanSetupSeeded); err != nil {
+		return err
+	}
+	k.booleanSetupSeeded = true
 	if err := k.internalizer.SetupTheories(); err != nil {
 		return err
 	}
@@ -941,9 +948,10 @@ func (k *SMTKernel) configureCheck(useStaticFeatures bool) error {
 	if err := k.setupAssertedBounds(useStaticFeatures); err != nil {
 		return fmt.Errorf("smt kernel configure asserted bounds: %w", err)
 	}
-	if err := k.internalizer.configureBooleanHeuristics(k.smtState); err != nil {
+	if err := k.configureQueueHeuristics(k.smtState, !k.booleanSetupSeeded); err != nil {
 		return fmt.Errorf("smt kernel configure Boolean heuristics: %w", err)
 	}
+	k.booleanSetupSeeded = true
 	if err := k.internalizer.SetupTheories(); err != nil {
 		return fmt.Errorf("smt kernel setup theories: %w", err)
 	}
@@ -1319,6 +1327,8 @@ func (k *SMTKernel) Close() error {
 		k.scopes = nil
 		k.assertedScopeConflicts = nil
 		k.assertedInconsistent = false
+		k.caseSplitQueue = nil
+		k.booleanSetupSeeded = false
 		k.internalizer = nil
 		k.checker = nil
 		k.relevancy = nil
