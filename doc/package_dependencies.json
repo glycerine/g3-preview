@@ -2767,6 +2767,7 @@
         "theory_array_sorts.go",
         "theory_bv.go",
         "theory_bv_boolean_gates.go",
+        "theory_bv_occurrences.go",
         "theory_datatype.go",
         "theory_datatype_conflicts.go",
         "theory_datatype_display.go",

@@ -22,6 +22,7 @@ const (
 
 type smtBVScope struct {
 	bits, lazyBridges, fixedEqualities int
+	atoms, occurrences                 int
 	unsupported                        bool
 }
 
@@ -37,21 +38,24 @@ type smtBVStatistics struct {
 // without a bit definition makes final-check report incompleteness.
 type SMTBitVectorTheory struct {
 	*SMTTheoryBase
-	bits             map[ast.ASTHandle][]ast.ASTHandle
-	bitExpressions   map[ast.ASTHandle][]ast.ASTHandle
-	bitOwners        map[ast.ASTHandle]ast.ASTRef
-	bitTrail         []ast.ASTHandle
-	lazyBridges      map[ast.ASTHandle]ast.ASTRef
-	lazyBridgeTrail  []ast.ASTHandle
-	fixedEqualities  map[smtBVFixedPair]bool
-	fixedTrail       []smtBVFixedPair
-	temporary        []ast.ASTRef
-	scopes           []smtBVScope
-	unsupported      bool
-	statistics       smtBVStatistics
-	config           SMTBVState
-	bitBlasterParams bit_blaster.SMTBitBlasterParams
-	discoveringFixed bool
+	bits               map[ast.ASTHandle][]ast.ASTHandle
+	bitAtoms           map[int32][]smtBVBitOccurrence
+	bitAtomTrail       []int32
+	bitOccurrenceTrail []smtBVBitOccurrenceTrail
+	bitLiterals        [][]SMTLiteral
+	bitOwners          map[ast.ASTHandle]ast.ASTRef
+	bitTrail           []ast.ASTHandle
+	lazyBridges        map[ast.ASTHandle]ast.ASTRef
+	lazyBridgeTrail    []ast.ASTHandle
+	fixedEqualities    map[smtBVFixedPair]bool
+	fixedTrail         []smtBVFixedPair
+	temporary          []ast.ASTRef
+	scopes             []smtBVScope
+	unsupported        bool
+	statistics         smtBVStatistics
+	config             SMTBVState
+	bitBlasterParams   bit_blaster.SMTBitBlasterParams
+	discoveringFixed   bool
 }
 
 func (t *SMTBitVectorTheory) ConfigureBitVector(config SMTBVState) error {
@@ -70,7 +74,7 @@ func NewSMTBitVectorTheory(family ast.FamilyID) (*SMTBitVectorTheory, error) {
 	return &SMTBitVectorTheory{
 		SMTTheoryBase:   base,
 		bits:            make(map[ast.ASTHandle][]ast.ASTHandle),
-		bitExpressions:  make(map[ast.ASTHandle][]ast.ASTHandle),
+		bitAtoms:        make(map[int32][]smtBVBitOccurrence),
 		bitOwners:       make(map[ast.ASTHandle]ast.ASTRef),
 		lazyBridges:     make(map[ast.ASTHandle]ast.ASTRef),
 		fixedEqualities: make(map[smtBVFixedPair]bool),
@@ -1196,70 +1200,9 @@ func (t *SMTBitVectorTheory) bitsFor(expression ast.ASTHandle) ([]ast.ASTHandle,
 	// Publish before internalizing bit2bool atoms, whose owner lookup comes
 	// back through this method.
 	t.bits[expression] = bits
-	for _, bit := range bits {
-		bit, err = t.bitAtom(bit)
-		if err != nil {
-			return nil, err
-		}
-		if !state.manager.IsTrue(bit) && !state.manager.IsFalse(bit) {
-			t.bitExpressions[bit] = append(t.bitExpressions[bit], expression)
-		}
-	}
 	t.bitOwners[expression] = owner
 	t.bitTrail = append(t.bitTrail, expression)
 	return bits, nil
-}
-
-func (t *SMTBitVectorTheory) publishStaticDisequalities(expression ast.ASTHandle) error {
-	state, err := t.State()
-	if err != nil {
-		return err
-	}
-	bits := t.bits[expression]
-	if len(bits) == 0 {
-		return nil
-	}
-	for other, otherBits := range t.bits {
-		if other == expression || len(otherBits) != len(bits) {
-			continue
-		}
-		complementary := false
-		available := true
-		for i := range bits {
-			left, literalErr := state.Literal(bits[i])
-			if literalErr != nil {
-				if errors.Is(literalErr, ast.ErrASTDomain) {
-					available = false
-					break
-				}
-				return literalErr
-			}
-			right, literalErr := state.Literal(otherBits[i])
-			if literalErr != nil {
-				if errors.Is(literalErr, ast.ErrASTDomain) {
-					available = false
-					break
-				}
-				return literalErr
-			}
-			if left == right.Negated() {
-				complementary = true
-				break
-			}
-		}
-		if !available || !complementary {
-			continue
-		}
-		equality, equalityErr := t.MkEqualityLiteral(expression, other, true)
-		if equalityErr != nil {
-			return equalityErr
-		}
-		if equalityErr = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{equality.Negated()}); equalityErr != nil {
-			return equalityErr
-		}
-		t.statistics.diseqStatic++
-	}
-	return nil
 }
 
 func (t *SMTBitVectorTheory) bit2BoolIndex(expression ast.ASTHandle) (uint32, error) {
@@ -1342,70 +1285,7 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, gateConte
 		}
 		return t.bridgeAtom(expression, definition, true)
 	}
-	state, _ := t.State()
-	owner, err := state.manager.GetArg(expression, 0)
-	if err != nil {
-		return false, err
-	}
-	variable, found := state.boolVar[expression]
-	if !found {
-		variable, err = state.MkBoolVar(expression)
-		if err != nil {
-			return false, err
-		}
-	}
-	data, err := state.BooleanData(variable)
-	if err != nil {
-		return false, err
-	}
-	if !data.IsTheoryAtom() {
-		if err = state.SetVariableTheory(variable, t.FamilyID()); err != nil {
-			return false, err
-		}
-	}
-	// Publish this atom before internalizing its owner. If the owner creates
-	// this same bit while building its circuit, the recursive visit observes
-	// the existing Boolean variable and terminates.
-	if err = state.Internalize(owner, false); err != nil {
-		return false, err
-	}
-	bits, err := t.bitsFor(owner)
-	if err != nil {
-		return false, err
-	}
-	index, err := t.bit2BoolIndex(expression)
-	if err != nil || uint64(index) >= uint64(len(bits)) {
-		if err != nil {
-			return false, err
-		}
-		return false, ast.ErrASTDomain
-	}
-	definition := bits[index]
-	if definition != expression {
-		if err = state.Internalize(definition, true); err != nil {
-			return false, err
-		}
-	}
-	if definition != expression {
-		defined, err := state.Literal(definition)
-		if err != nil {
-			return false, err
-		}
-		literal := NewSMTLiteral(variable, false)
-		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal.Negated(), defined}); err != nil {
-			return false, err
-		}
-		if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal, defined.Negated()}); err != nil {
-			return false, err
-		}
-		t.statistics.bit2core++
-		if state.relevancy != nil {
-			if err = state.relevancy.AddDependency(expression, definition); err != nil {
-				return false, err
-			}
-		}
-	}
-	return true, nil
+	return t.internalizeBitProjection(expression)
 }
 
 // Source approximate_term checks both argument and result widths.
@@ -1555,22 +1435,9 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 		if literalErr != nil {
 			return false, literalErr
 		}
-		if literal.Var() != SMTTrueBoolVar {
-			data, dataErr := state.BooleanData(literal.Var())
-			if dataErr != nil {
-				return false, dataErr
-			}
-			// Source add_bit subscribes gate literals as well as bit2bool
-			// atoms, so completion of an interpreted term triggers equality.
-			if !data.IsTheoryAtom() {
-				if err = state.SetVariableTheory(literal.Var(), t.FamilyID()); err != nil {
-					return false, err
-				}
-			}
+		if err = t.registerBitLiteral(expression, uint32(index), literal); err != nil {
+			return false, err
 		}
-	}
-	if err = t.publishStaticDisequalities(expression); err != nil {
-		return false, err
 	}
 	if op == 57 {
 		argument, argErr := state.manager.GetArg(expression, 0)
@@ -1704,8 +1571,15 @@ func (t *SMTBitVectorTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHan
 	if err != nil {
 		return err
 	}
-	for _, bit := range bits {
+	for index, bit := range bits {
 		if err = state.Internalize(bit, true); err != nil {
+			return err
+		}
+		literal, readErr := state.Literal(bit)
+		if readErr != nil {
+			return readErr
+		}
+		if err = t.registerBitLiteral(node.owner, uint32(index), literal); err != nil {
 			return err
 		}
 	}
@@ -1872,19 +1746,20 @@ func (t *SMTBitVectorTheory) Assign(variable int32, _ bool) (result error) {
 	if t.discoveringFixed {
 		return nil
 	}
-	state, err := t.State()
-	if err != nil {
-		return err
-	}
-	bit, err := state.BoolExpression(variable)
+	_, err := t.State()
 	if err != nil {
 		return err
 	}
 	completed := false
-	for _, expression := range t.bitExpressions[bit] {
-		_, _, fixed, fixedErr := t.fixedAssignment(t.bits[expression])
+	occurrences := t.bitAtoms[variable]
+	for i := len(occurrences) - 1; i >= 0; i-- {
+		node, err := t.Enode(occurrences[i].variable)
+		if err != nil {
+			return err
+		}
+		_, _, fixed, fixedErr := t.fixedAssignment(t.bits[node.owner])
 		if fixedErr != nil {
-			return fmt.Errorf("bit-vector completion check for %d: %w", expression.Slot(), fixedErr)
+			return fmt.Errorf("bit-vector completion check for %d: %w", node.owner.Slot(), fixedErr)
 		}
 		if fixed {
 			completed = true
@@ -1972,6 +1847,7 @@ func (t *SMTBitVectorTheory) PushScope() error {
 	}
 	t.scopes = append(t.scopes, smtBVScope{
 		bits: len(t.bitTrail), lazyBridges: len(t.lazyBridgeTrail),
+		atoms: len(t.bitAtomTrail), occurrences: len(t.bitOccurrenceTrail),
 		fixedEqualities: len(t.fixedTrail), unsupported: t.unsupported,
 	})
 	return nil
@@ -1987,24 +1863,10 @@ func (t *SMTBitVectorTheory) PopScopes(count uint32) error {
 	}
 	level := len(t.scopes) - int(count)
 	scope := t.scopes[level]
+	if err = t.restoreBitOccurrences(scope); err != nil {
+		return err
+	}
 	for _, expression := range t.bitTrail[scope.bits:] {
-		for _, bit := range t.bits[expression] {
-			bit, err = t.bitAtom(bit)
-			if err != nil {
-				return err
-			}
-			owners := t.bitExpressions[bit]
-			for i := len(owners) - 1; i >= 0; i-- {
-				if owners[i] == expression {
-					owners = append(owners[:i], owners[i+1:]...)
-				}
-			}
-			if len(owners) == 0 {
-				delete(t.bitExpressions, bit)
-			} else {
-				t.bitExpressions[bit] = owners
-			}
-		}
 		delete(t.bits, expression)
 		owner := t.bitOwners[expression]
 		if err := state.manager.DelRef(&owner); err != nil {
@@ -2030,7 +1892,11 @@ func (t *SMTBitVectorTheory) PopScopes(count uint32) error {
 	t.fixedTrail = t.fixedTrail[:scope.fixedEqualities]
 	t.unsupported = scope.unsupported
 	t.scopes = t.scopes[:level]
-	return t.SMTTheoryBase.PopScopes(count)
+	if err = t.SMTTheoryBase.PopScopes(count); err != nil {
+		return err
+	}
+	t.bitLiterals = t.bitLiterals[:len(t.variables)]
+	return nil
 }
 
 func (t *SMTBitVectorTheory) FinalCheck() (SMTFinalCheckStatus, error) {
@@ -2075,7 +1941,10 @@ func (t *SMTBitVectorTheory) Close() (result error) {
 		delete(t.bitOwners, expression)
 		delete(t.bits, expression)
 	}
-	t.bitExpressions = nil
+	t.bitAtoms = nil
+	t.bitAtomTrail = nil
+	t.bitOccurrenceTrail = nil
+	t.bitLiterals = nil
 	t.fixedEqualities = nil
 	t.fixedTrail = nil
 	for expression, owner := range t.lazyBridges {
