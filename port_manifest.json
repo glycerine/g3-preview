@@ -113399,7 +113399,9 @@
         "pkg/smtcore/proto_model/scalar_factory_source_test.go",
         "pkg/smtcore/proto_model/proto_model.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2",
+        "pkg/smtcore/proto_model/datalog_factory.go",
+        "pkg/smtcore/proto_model/factory_release_order_source_test.go"
       ],
       "tests": [
         "TestValueFactoriesSomeFreshFreezeAndNumericValues",
@@ -113413,7 +113415,8 @@
         "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
         "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestFactorySourceForwardReferenceDestruction"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -113453,14 +113456,29 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Normal destruction of retained unsigned datalog/user-sort and rational arith/BV factory AST owners: class-member selection releases sorts before values, and each owned vector releases entries in forward insertion order; ref_vector.h:38-41,49-51 describes the project AST reference protocol only, with native Go slices retained. Constructor/publication and interrupted destruction fidelity remain outside this increment.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datalog_factory.go",
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/factory_release_order_source_test.go"
+          ],
+          "tests": [
+            "TestFactorySourceForwardReferenceDestruction"
+          ]
         }
       ],
       "ownership": [
         "Concrete numeralFactory implements the retained rational Number specialization, with a copied big.Rat enumeration cursor and independent AST references; arith/BV classes borrow the AST manager and select their existing canonical numeral utilities.",
-        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record."
+        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record.",
+        "Existing AST source deletion traces verify forward destruction of sole-owned values in all four concrete factories, and sole-owned empty datalog/user-sort sort sets verify sort-vector order and sort-before-value member order. An independent older value reference survives factory destruction; repeated Close emits no replay. The test uses actual AST IDs/refcounts and source trace records, without a mock destructor callback or private-payload edits."
       ],
       "deviations": [
-        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it."
+        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it.",
+        "The normal within-vector release ordering gap is corrected. This bounded check does not close constructor/map-publication or interrupted-destructor failure-prefix fidelity; whole value_factory.h and theory_dl.cpp remain partial. No C++ container implementation, generic adapter, or additional native full-suite checkpoint is introduced."
       ]
     },
     {
@@ -113478,7 +113496,9 @@
         "pkg/smtcore/proto_model/scalar_factory_source_test.go",
         "pkg/smtcore/proto_model/proto_model.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2",
+        "pkg/smtcore/proto_model/datalog_factory.go",
+        "pkg/smtcore/proto_model/factory_release_order_source_test.go"
       ],
       "tests": [
         "TestValueFactoriesSomeFreshFreezeAndNumericValues",
@@ -113492,7 +113512,8 @@
         "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
         "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestFactorySourceForwardReferenceDestruction"
       ],
       "conditionals": [
         {
@@ -113542,14 +113563,29 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Normal destruction of retained unsigned datalog/user-sort and rational arith/BV factory AST owners: class-member selection releases sorts before values, and each owned vector releases entries in forward insertion order; ref_vector.h:38-41,49-51 describes the project AST reference protocol only, with native Go slices retained. Constructor/publication and interrupted destruction fidelity remain outside this increment.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datalog_factory.go",
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/factory_release_order_source_test.go"
+          ],
+          "tests": [
+            "TestFactorySourceForwardReferenceDestruction"
+          ]
         }
       ],
       "ownership": [
         "Concrete numeralFactory implements the retained rational Number specialization, with a copied big.Rat enumeration cursor and independent AST references; arith/BV classes borrow the AST manager and select their existing canonical numeral utilities.",
-        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record."
+        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record.",
+        "Existing AST source deletion traces verify forward destruction of sole-owned values in all four concrete factories, and sole-owned empty datalog/user-sort sort sets verify sort-vector order and sort-before-value member order. An independent older value reference survives factory destruction; repeated Close emits no replay. The test uses actual AST IDs/refcounts and source trace records, without a mock destructor callback or private-payload edits."
       ],
       "deviations": [
-        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it."
+        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it.",
+        "The normal within-vector release ordering gap is corrected. This bounded check does not close constructor/map-publication or interrupted-destructor failure-prefix fidelity; whole value_factory.h and theory_dl.cpp remain partial. No C++ container implementation, generic adapter, or additional native full-suite checkpoint is introduced."
       ]
     },
     {
@@ -113713,7 +113749,9 @@
         "pkg/smtcore/proto_model/scalar_factory_source_test.go",
         "pkg/smtcore/proto_model/proto_model.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2",
+        "pkg/smtcore/proto_model/datalog_factory.go",
+        "pkg/smtcore/proto_model/factory_release_order_source_test.go"
       ],
       "tests": [
         "TestValueFactoriesSomeFreshFreezeAndNumericValues",
@@ -113726,7 +113764,8 @@
         "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
         "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestFactorySourceForwardReferenceDestruction"
       ],
       "assertions": [
         {
@@ -113782,14 +113821,29 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Normal destruction of retained unsigned datalog/user-sort and rational arith/BV factory AST owners: class-member selection releases sorts before values, and each owned vector releases entries in forward insertion order; ref_vector.h:38-41,49-51 describes the project AST reference protocol only, with native Go slices retained. Constructor/publication and interrupted destruction fidelity remain outside this increment.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datalog_factory.go",
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/factory_release_order_source_test.go"
+          ],
+          "tests": [
+            "TestFactorySourceForwardReferenceDestruction"
+          ]
         }
       ],
       "ownership": [
         "The user-sort factory owns canonical value and sort AST references; returned handles are borrowed.",
-        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record."
+        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record.",
+        "Existing AST source deletion traces verify forward destruction of sole-owned values in all four concrete factories, and sole-owned empty datalog/user-sort sort sets verify sort-vector order and sort-before-value member order. An independent older value reference survives factory destruction; repeated Close emits no replay. The test uses actual AST IDs/refcounts and source trace records, without a mock destructor callback or private-payload edits."
       ],
       "deviations": [
-        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it."
+        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it.",
+        "The normal within-vector release ordering gap is corrected. This bounded check does not close constructor/map-publication or interrupted-destructor failure-prefix fidelity; whole value_factory.h and theory_dl.cpp remain partial. No C++ container implementation, generic adapter, or additional native full-suite checkpoint is introduced."
       ]
     },
     {
@@ -113808,7 +113862,8 @@
         "pkg/smtcore/proto_model/scalar_factory_source_test.go",
         "pkg/smtcore/proto_model/proto_model.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/user_universe_factory_scopes.smt2",
+        "pkg/smtcore/proto_model/factory_release_order_source_test.go"
       ],
       "tests": [
         "TestValueFactoriesSomeFreshFreezeAndNumericValues",
@@ -113828,7 +113883,8 @@
         "TestScalarFactorySourceBasicRejectsOtherSortFamilies",
         "TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner",
         "TestSMTLibRunnerScripts",
-        "TestSMTLibRunnerCPPReference"
+        "TestSMTLibRunnerCPPReference",
+        "TestFactorySourceForwardReferenceDestruction"
       ],
       "conditionals": [
         {
@@ -113919,18 +113975,33 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "Normal destruction of retained unsigned datalog/user-sort and rational arith/BV factory AST owners: class-member selection releases sorts before values, and each owned vector releases entries in forward insertion order; ref_vector.h:38-41,49-51 describes the project AST reference protocol only, with native Go slices retained. Constructor/publication and interrupted destruction fidelity remain outside this increment.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datalog_factory.go",
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/factory_release_order_source_test.go"
+          ],
+          "tests": [
+            "TestFactorySourceForwardReferenceDestruction"
+          ]
         }
       ],
       "ownership": [
         "Concrete typed Go implementations cover the retained unsigned and rational instantiations; native maps and slices replace C++ object tables and vectors.",
         "The concrete datalog factory owns one reference per registered/generated value and sort; duplicate registration acquires no extra reference. Ordinary Close releases sort references before values, preserving independent AST owners. Real cold descriptor-frontier failures leave the fresh cursor unchanged and allow retry. Whole constructor/publication and interrupted teardown prefix audit remains open.",
-        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record."
+        "User-sort state has a concrete uint32 cursor; numeral state has a copied big.Rat cursor. Both own canonical AST value/sort references and release sorts before values on ordinary Close. Duplicate registration retains once. Cold reference-descriptor allocation campaigns prove failed value construction leaves the cursor unchanged. Caller references survive model teardown. Whole template constructor/publication and interrupted teardown fidelity remains open in the partial value_factory.h record.",
+        "Existing AST source deletion traces verify forward destruction of sole-owned values in all four concrete factories, and sole-owned empty datalog/user-sort sort sets verify sort-vector order and sort-before-value member order. An independent older value reference survives factory destruction; repeated Close emits no replay. The test uses actual AST IDs/refcounts and source trace records, without a mock destructor callback or private-payload edits."
       ],
       "deviations": [
         "Retained unsigned user-sort and datalog specializations use concrete uint32 state; arithmetic and bit-vector subclasses share only the concrete rational-number specialization. Native maps/slices replace unordered C++ container layout; no any-valued template adapter, generic code or STL implementation is added.",
         "The previous mixed scalarFactory implementation has been removed. The actual retained unsigned and rational algorithms now have separate Go state, and insertion errors precede cursor advancement. Whole-header status and both audit flags remain partial/false because constructor/map-publication and interrupted destruction prefixes and complete numerical-owner composition remain unproven.",
         "Go slices and a membership map replace C++ unordered-table layout. SomeValue/SomeValues select existing values in stable insertion order; no STL hash-table implementation is ported. Checked Go errors represent invalid physical owners and the finite-domain numeral bounds exception. No billions-of-iterations uint32 wrap campaign or complete whole-unit factory/lifecycle closure is claimed.",
-        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it."
+        "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it.",
+        "The normal within-vector release ordering gap is corrected. This bounded check does not close constructor/map-publication or interrupted-destructor failure-prefix fidelity; whole value_factory.h and theory_dl.cpp remain partial. No C++ container implementation, generic adapter, or additional native full-suite checkpoint is introduced."
       ]
     },
     {
@@ -140018,7 +140089,10 @@
         "pkg/smtcore/proto_model/datalog_factory.go",
         "pkg/smtcore/theory_dl_model.go",
         "pkg/smtcore/theory_dl_model_test.go",
-        "pkg/smtcore/proto_model/datalog_factory_source_test.go"
+        "pkg/smtcore/proto_model/datalog_factory_source_test.go",
+        "pkg/smtcore/proto_model/user_sort_factory.go",
+        "pkg/smtcore/proto_model/numeral_factory.go",
+        "pkg/smtcore/proto_model/factory_release_order_source_test.go"
       ],
       "tests": [
         "TestSMTDatalogStrictOrderReduction",
@@ -140037,7 +140111,8 @@
         "TestDatalogFactorySourceRegistrationOwnershipAndCursor",
         "TestDatalogFactorySourceFreshAllocationRefusalRetry",
         "TestDatalogFactorySourceAssertionOwnerAndWarmSelection",
-        "TestDatalogFactorySourceProtoModelDispatch"
+        "TestDatalogFactorySourceProtoModelDispatch",
+        "TestFactorySourceForwardReferenceDestruction"
       ],
       "assertions": [
         {
@@ -140104,16 +140179,31 @@
             "TestDatalogFactorySourceAssertionOwnerAndWarmSelection",
             "TestDatalogFactorySourceProtoModelDispatch"
           ]
+        },
+        {
+          "name": "Normal destruction of retained unsigned datalog/user-sort and rational arith/BV factory AST owners: class-member selection releases sorts before values, and each owned vector releases entries in forward insertion order; ref_vector.h:38-41,49-51 describes the project AST reference protocol only, with native Go slices retained. Constructor/publication and interrupted destruction fidelity remain outside this increment.",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datalog_factory.go",
+            "pkg/smtcore/proto_model/user_sort_factory.go",
+            "pkg/smtcore/proto_model/numeral_factory.go",
+            "pkg/smtcore/proto_model/factory_release_order_source_test.go"
+          ],
+          "tests": [
+            "TestFactorySourceForwardReferenceDestruction"
+          ]
         }
       ],
       "ownership": [
         "Per-sort declarations hold independent AST references; scoped map entries and references are retired on scope pop. Deferred model procedures borrow their theory/enode and own no AST reference. Each evaluation owns its temporary representative reference and numeral until return. The existing model factory owns its registered sorts/values; its complete source ownership audit remains open.",
-        "The concrete datalog factory owns one reference per registered/generated value and sort; duplicate registration acquires no extra reference. Ordinary Close releases sort references before values, preserving independent AST owners. Real cold descriptor-frontier failures leave the fresh cursor unchanged and allow retry. Whole constructor/publication and interrupted teardown prefix audit remains open."
+        "The concrete datalog factory owns one reference per registered/generated value and sort; duplicate registration acquires no extra reference. Ordinary Close releases sort references before values, preserving independent AST owners. Real cold descriptor-frontier failures leave the fresh cursor unchanged and allow retry. Whole constructor/publication and interrupted teardown prefix audit remains open.",
+        "Existing AST source deletion traces verify forward destruction of sole-owned values in all four concrete factories, and sole-owned empty datalog/user-sort sort sets verify sort-vector order and sort-before-value member order. An independent older value reference survives factory destruction; repeated Close emits no replay. The test uses actual AST IDs/refcounts and source trace records, without a mock destructor callback or private-payload edits."
       ],
       "deviations": [
         "Corrective source audit removes the minimum-width approximation: representatives and finite-domain BV constants use the source width of64 bits. Model evaluation neither internalizes missing representatives nor sums partially assigned bits nor clamps invalid values to zero. The missing-BV assertion uses the actual runtime debug notification/input/action owners; signed conversion uses the existing MPQ/MPZ service. Physical invalid Go handles return checked errors.",
         "Whole-unit completion remains unproven. The concrete datalog factory algorithm is now mapped separately, while constructor/publication and interrupted teardown prefixes, other theory TRACE/SASSERT/VERIFY sites and fresh-copy/display lifecycle consumers still require audit. The prebuilt C++ executable has no FiniteDomain sort parser registration; typed API tests and existing CLI differential checks remain distinct evidence.",
-        "Go slices and a membership map replace C++ unordered-table layout. SomeValue/SomeValues select existing values in stable insertion order; no STL hash-table implementation is ported. Checked Go errors represent invalid physical owners and the finite-domain numeral bounds exception. No billions-of-iterations uint32 wrap campaign or complete whole-unit factory/lifecycle closure is claimed."
+        "Go slices and a membership map replace C++ unordered-table layout. SomeValue/SomeValues select existing values in stable insertion order; no STL hash-table implementation is ported. Checked Go errors represent invalid physical owners and the finite-domain numeral bounds exception. No billions-of-iterations uint32 wrap campaign or complete whole-unit factory/lifecycle closure is claimed.",
+        "The normal within-vector release ordering gap is corrected. This bounded check does not close constructor/map-publication or interrupted-destructor failure-prefix fidelity; whole value_factory.h and theory_dl.cpp remain partial. No C++ container implementation, generic adapter, or additional native full-suite checkpoint is introduced."
       ]
     },
     {

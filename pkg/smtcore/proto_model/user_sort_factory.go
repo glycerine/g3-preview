@@ -214,15 +214,16 @@ func (f *userSortFactory) RegisterValue(value ast.ASTHandle) error {
 
 // Member destruction releases sorts before the value vector. Values keep
 // their own sort references alive until the later value-vector release.
+// Each vector decrements its entries in forward insertion order (ref_vector.h).
 func (f *userSortFactory) Close() (err error) {
 	if f == nil || f.manager == nil {
 		return nil
 	}
 	f.sets, f.finite = nil, nil
-	for i := len(f.sorts) - 1; i >= 0; i-- {
+	for i := range f.sorts {
 		err = errors.Join(err, f.manager.DelRef(&f.sorts[i]))
 	}
-	for i := len(f.values) - 1; i >= 0; i-- {
+	for i := range f.values {
 		err = errors.Join(err, f.manager.DelRef(&f.values[i]))
 	}
 	if err == nil {
