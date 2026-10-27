@@ -3195,6 +3195,7 @@
         "bv_size_reduction_bounds.go",
         "bv_size_reduction_tactic.go",
         "bv_size_reduction_trace.go",
+        "dt2bv_tactic.go",
         "max_bv_sharing_goal.go",
         "max_bv_sharing_reduce.go",
         "max_bv_sharing_tactic.go",

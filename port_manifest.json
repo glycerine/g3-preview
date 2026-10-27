@@ -18988,14 +18988,17 @@
       "path": "src/ast/for_each_expr.h",
       "component": "ast",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_for_each_expr.go",
         "pkg/ast/ast_for_each_expr_source_test.go",
         "pkg/smtcore/smt_model_finder_hint_cycle.go",
         "pkg/tactic/core/reduce_args_analysis.go",
         "pkg/tactic/core/reduce_args_cpp_test.go",
-        "pkg/tactic/core/reduce_args_tactic_test.go"
+        "pkg/tactic/core/reduce_args_tactic_test.go",
+        "pkg/tactic/bv/dt2bv_tactic.go",
+        "pkg/tactic/bv/dt2bv_tactic_test.go",
+        "pkg/tactic/bv/dt2bv_cpp_test.go"
       ],
       "tests": [
         "TestASTExprVisitorSourceCountSharedAndAllMarks",
@@ -19014,7 +19017,12 @@
         "TestReduceArgsExactGoalsCPP",
         "TestReduceArgsModelLifetimeFilteringAndVariables",
         "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
-        "TestReduceArgsConstructorAndApplicationAllocationFrontiers"
+        "TestReduceArgsConstructorAndApplicationAllocationFrontiers",
+        "TestDT2BVGoalsCPP",
+        "TestDT2BVSMTLIBModelsAndCoresCPP",
+        "TestDT2BVModelReconstructionProofsAndDependencies",
+        "TestDT2BVClassificationPersistsUntilCleanupAndAppendsGoals",
+        "TestDT2BVApplicationAllocationPrefixes"
       ],
       "conditionals": [
         {
@@ -19026,8 +19034,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "Concrete counter and has-skolem iterative source traversal (src/ast/for_each_expr.h:27-105,120-139)",
@@ -19070,6 +19078,18 @@
             "TestReduceArgsGuardsCancellationParametersTranslationAndTrace",
             "TestReduceArgsConstructorAndApplicationAllocationFrontiers"
           ]
+        },
+        {
+          "name": "dt2bv check_fd concrete quick_for_each_expr instantiation with actual fast-mark owner, shared-only marks, child-before-parent app/var callbacks and quantifier annotations",
+          "status": "partial",
+          "go_target": "pkg/tactic/bv/dt2bv_tactic.go",
+          "tests": [
+            "TestDT2BVGoalsCPP",
+            "TestDT2BVSMTLIBModelsAndCoresCPP",
+            "TestDT2BVModelReconstructionProofsAndDependencies",
+            "TestDT2BVClassificationPersistsUntilCleanupAndAppendsGoals",
+            "TestDT2BVApplicationAllocationPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -19081,7 +19101,8 @@
         "Source completed lexical stack/marks cleanup is separate from exact manager-owned pending-mark cleanup. Mark-owner scalar metadata is stamped at actual leaves in both profiles for owning authority; release source reads remain bit-only. Arbitrary template/proc adapters, IgnorePatterns=true and for_each_expr_args are omitted because no retained concrete consumer requires them.",
         "Real public AST Close may acknowledge younger lexical marks then stop on an older NUM formatting destructor. Original archived tuples/body/source/first-own causes remain charged and attached after ACK; retries skip the acknowledged leaf without reading later foreign marks. Exact history metadata is refunded only by actual final owning manager storage/header teardown. Current unlisted diagnostics remain in the charged header, and a later call archives source-ended acknowledged diagnostics before overwriting lexical storage. Independent fresh-context ordinal campaigns preserve every original source mark-trail reservation; private child ACK is not represented as enclosing owner end.",
         "Native MPN formatting scratch removes the former numerical scratch-constructor refusal and younger-local destructor-stop scenario. The associated huge-numeral Runtime fault fixtures are retired; existing expression visitor mark/history ownership tests remain, and low-level printing now verifies independent big-integer output plus clean frame/source/own teardown with native scratch. This does not claim the removed later-numeral-stop scenario is still exercised.",
-        "The retained goal NumExprs caller uses GetNumExprsWithVisited with a concrete native map[ASTHandle]bool and native traversal frames while reusing visitExprCore/visitExprProc. Root/shared-node deduplication, postorder argument/body/pattern/no-pattern traversal and associative weight remain. Legacy explicit mark overloads and their stopped source ownership remain separate; no universal callback adapter or generic container is added."
+        "The retained goal NumExprs caller uses GetNumExprsWithVisited with a concrete native map[ASTHandle]bool and native traversal frames while reusing visitExprCore/visitExprProc. Root/shared-node deduplication, postorder argument/body/pattern/no-pattern traversal and associative weight remain. Legacy explicit mark overloads and their stopped source ownership remain separate; no universal callback adapter or generic container is added.",
+        "New retained dt2bv check_fd instantiation is implemented with concrete Go frames and actual ASTFastMark1. Existing counter/skolem checks do not establish all new classification-callback/exception frontiers, so whole-template-unit completion/audit claims remain partial pending that concrete audit; existing bounded method evidence is retained."
       ]
     },
     {
@@ -161254,9 +161275,25 @@
       "path": "src/tactic/bv/dt2bv_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/bv/dt2bv_tactic.go",
+        "pkg/tactic/bv/dt2bv_tactic_test.go",
+        "pkg/tactic/bv/dt2bv_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/test_vectors/dt2bv_models_scopes.smt2",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestDT2BVGoalsCPP",
+        "TestDT2BVSMTLIBModelsAndCoresCPP",
+        "TestDT2BVModelReconstructionProofsAndDependencies",
+        "TestDT2BVClassificationPersistsUntilCleanupAndAppendsGoals",
+        "TestDT2BVApplicationAllocationPrefixes",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestDT2BVConstructorParameterSnapshotAndRefusals"
+      ],
       "assertions": [
         {
           "line": 177,
@@ -161265,17 +161302,60 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained dt2bv classification across all formulas, unsupported-use exclusion, source persistent sort tables/cleanup, enum2bv goal/proof/dependency rewriting, side constraints and extension-before-filter model reconstruction; command tactic integration",
+          "status": "partial",
+          "go_targets": [
+            "pkg/tactic/bv/dt2bv_tactic.go",
+            "pkg/tactic/bv/dt2bv_tactic_test.go",
+            "pkg/tactic/bv/dt2bv_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/test_vectors/dt2bv_models_scopes.smt2",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestDT2BVGoalsCPP",
+            "TestDT2BVSMTLIBModelsAndCoresCPP",
+            "TestDT2BVModelReconstructionProofsAndDependencies",
+            "TestDT2BVClassificationPersistsUntilCleanupAndAppendsGoals",
+            "TestDT2BVApplicationAllocationPrefixes",
+            "TestDT2BVConstructorParameterSnapshotAndRefusals"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns an actual constructor ParamsRef and DatatypeUtil. Borrowed classification tables persist until Cleanup. Each invocation owns the real fast mark, converter refs, enum2bv rewriter, current/proof refs and caller-owned bound refs; normal reverse lexical retirement occurs before utility/parameter members. Interrupted cleanup remains in a concrete pending invocation, with consumed converter-decrement and parameter-destructor receipts. Returned concat converters retain extension/filter independently of tactic/rewriter destruction. Allocation-refusal census covers supported project reservations; full physical NUM/throwing-destructor auditing remains open."
+      ],
+      "deviations": [
+        "Go slices/maps implement stack and classification storage; no STL internals or universal callback adapters are ported. The concrete quick walk preserves postorder, shared-only marking and quantifier body/pattern/no-pattern traversal. Native Go model-map snapshots use unspecified iteration as source obj_map does; enum definitions do not depend on one another.",
+        "C++ internal command goal display prints quantified BV binder sorts as (_ bv N), while existing Go DisplayWithAttributes uses SMT2 (_ BitVec N). C++ goal comparisons normalize only this explicit sort spelling plus whitespace/fresh names; this is not exact printer parity. The separate SMT-LIB model/core/scope vector compares exact canonical outputs without that normalization.",
+        "Whole source remains partial: retained native exception/physical NUM retirement, translation across independently owned runtime services, broader trace/assertion frontiers and source printer parity are not established. Enum2bv solver wrapper integration remains separate."
+      ]
     },
     {
       "path": "src/tactic/bv/dt2bv_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/bv/dt2bv_tactic.go",
+        "pkg/tactic/bv/dt2bv_tactic_test.go",
+        "pkg/tactic/bv/dt2bv_cpp_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/test_vectors/dt2bv_models_scopes.smt2",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestDT2BVGoalsCPP",
+        "TestDT2BVSMTLIBModelsAndCoresCPP",
+        "TestDT2BVModelReconstructionProofsAndDependencies",
+        "TestDT2BVClassificationPersistsUntilCleanupAndAppendsGoals",
+        "TestDT2BVApplicationAllocationPrefixes",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference",
+        "TestDT2BVConstructorParameterSnapshotAndRefusals"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -161288,9 +161368,36 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained dt2bv classification across all formulas, unsupported-use exclusion, source persistent sort tables/cleanup, enum2bv goal/proof/dependency rewriting, side constraints and extension-before-filter model reconstruction; command tactic integration",
+          "status": "partial",
+          "go_targets": [
+            "pkg/tactic/bv/dt2bv_tactic.go",
+            "pkg/tactic/bv/dt2bv_tactic_test.go",
+            "pkg/tactic/bv/dt2bv_cpp_test.go",
+            "pkg/cmd_context/tactic_commands.go",
+            "pkg/cmd/g3/test_vectors/dt2bv_models_scopes.smt2",
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestDT2BVGoalsCPP",
+            "TestDT2BVSMTLIBModelsAndCoresCPP",
+            "TestDT2BVModelReconstructionProofsAndDependencies",
+            "TestDT2BVClassificationPersistsUntilCleanupAndAppendsGoals",
+            "TestDT2BVApplicationAllocationPrefixes",
+            "TestDT2BVConstructorParameterSnapshotAndRefusals"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns an actual constructor ParamsRef and DatatypeUtil. Borrowed classification tables persist until Cleanup. Each invocation owns the real fast mark, converter refs, enum2bv rewriter, current/proof refs and caller-owned bound refs; normal reverse lexical retirement occurs before utility/parameter members. Interrupted cleanup remains in a concrete pending invocation, with consumed converter-decrement and parameter-destructor receipts. Returned concat converters retain extension/filter independently of tactic/rewriter destruction. Allocation-refusal census covers supported project reservations; full physical NUM/throwing-destructor auditing remains open."
+      ],
+      "deviations": [
+        "Go slices/maps implement stack and classification storage; no STL internals or universal callback adapters are ported. The concrete quick walk preserves postorder, shared-only marking and quantifier body/pattern/no-pattern traversal. Native Go model-map snapshots use unspecified iteration as source obj_map does; enum definitions do not depend on one another.",
+        "C++ internal command goal display prints quantified BV binder sorts as (_ bv N), while existing Go DisplayWithAttributes uses SMT2 (_ BitVec N). C++ goal comparisons normalize only this explicit sort spelling plus whitespace/fresh names; this is not exact printer parity. The separate SMT-LIB model/core/scope vector compares exact canonical outputs without that normalization.",
+        "Whole source remains partial: retained native exception/physical NUM retirement, translation across independently owned runtime services, broader trace/assertion frontiers and source printer parity are not established. Enum2bv solver wrapper integration remains separate."
+      ]
     },
     {
       "path": "src/tactic/bv/elim_small_bv_tactic.cpp",
