@@ -11,7 +11,6 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/ast/rewriter/bit_blaster"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -1805,41 +1804,25 @@ func (t *SMTBitVectorTheory) ModelValue(node *SMTEnode, generator *SMTModelGener
 	if err != nil {
 		return nil, err
 	}
-	bits, err := t.bitsFor(node.owner)
+	// Source mk_value always evaluates get_fixed_value. Debug requires a
+	// fixed word; release uses the prefix accumulated before the first undef.
+	variable := node.TheoryVar(t.FamilyID())
+	value, fixed, err := t.fixedLiteralValue(variable)
 	if err != nil {
 		return nil, err
 	}
-	value := new(big.Int)
-	for i, bit := range bits {
-		if state.manager.IsFalse(bit) {
-			continue
-		}
-		if state.manager.IsTrue(bit) {
-			value.SetBit(value, i, 1)
-			continue
-		}
-		if _, found := state.BoolVar(bit); !found {
-			// A late theory witness can expose a symbolic bit after relevancy
-			// propagation has finished. It is unconstrained, so choose zero.
-			continue
-		}
-		literal, literalErr := state.Literal(bit)
-		if literalErr != nil {
-			return nil, literalErr
-		}
-		assignment, assignmentErr := state.Assignment(literal)
-		if assignmentErr != nil {
-			return nil, assignmentErr
-		}
-		if assignment == lbool.True {
-			value.SetBit(value, i, 1)
-		}
+	if smtcoreSourceDebug && !fixed {
+		return nil, ast.ErrASTDomain
+	}
+	width, err := state.manager.BitVectorSize(node.owner)
+	if err != nil {
+		return nil, err
 	}
 	factory, ok := generator.model.Factory(t.FamilyID()).(*protomodel.BitVectorFactory)
 	if !ok || factory == nil {
 		return nil, ast.ErrASTDomain
 	}
-	numeral, err := factory.MkNumValue(new(big.Rat).SetInt(value), uint32(len(bits)))
+	numeral, err := factory.MkNumValue(new(big.Rat).SetInt(value), width)
 	if err != nil {
 		return nil, err
 	}
