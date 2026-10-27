@@ -64,6 +64,22 @@ func (v *AlgebraicVector) Get(i uint32) (Algebraic, error) {
 	_, e := v.core.location(&a)
 	return a, e
 }
+
+// Borrow returns the actual owning element for retained callers passing an
+// anum& to operations that may refine or replace it. Get returns a scalar
+// snapshot and cannot publish a replaced cell back into this vector. The
+// borrowed pointer is invalidated by vector growth, reset or close.
+func (v *AlgebraicVector) Borrow(i uint32) (*Algebraic, error) {
+	if e := v.check(); e != nil {
+		return nil, e
+	}
+	if uint64(i) >= uint64(len(v.values)) {
+		return nil, arena.ErrBounds
+	}
+	a := &v.values[i]
+	_, e := v.core.location(a)
+	return a, e
+}
 func (v *AlgebraicVector) pushTake(a *Algebraic) error {
 	if e := v.check(); e != nil {
 		return e

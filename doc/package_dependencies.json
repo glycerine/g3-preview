@@ -2093,6 +2093,10 @@
       "production_files": [
         "assignment.go",
         "atom.go",
+        "evaluator.go",
+        "evaluator_interval_ref.go",
+        "evaluator_intervals.go",
+        "evaluator_polynomial.go",
         "gparams_catalog_collectors.go",
         "interval_set.go",
         "interval_set_operations.go",

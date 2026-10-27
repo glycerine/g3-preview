@@ -89857,12 +89857,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/nlsat/sign_table.go"
+        "pkg/nlsat/evaluator.go",
+        "pkg/nlsat/evaluator_intervals.go",
+        "pkg/nlsat/evaluator_interval_ref.go",
+        "pkg/nlsat/evaluator_polynomial.go",
+        "pkg/nlsat/sign_table.go",
+        "pkg/math/polynomial/algebraic_vector.go"
       ],
       "tests": [
+        "pkg/nlsat/evaluator_test.go",
+        "pkg/nlsat/evaluator_ownership_test.go",
+        "pkg/nlsat/evaluator_cpp_test.go",
         "pkg/nlsat/sign_table_test.go",
         "pkg/nlsat/sign_table_cpp_test.go",
-        "pkg/nlsat/atom_diagnostics_test.go"
+        "pkg/nlsat/atom_diagnostics_test.go",
+        "pkg/math/polynomial/algebraic_vector_borrow_test.go"
       ],
       "assertions": [
         {
@@ -89998,34 +90007,65 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "evaluator::imp::sign_table distinct-root merge, stable section IDs, normalized polynomial interval signs, linear/binary cell lookup, reset and diagnostic displays",
+          "name": "evaluator::imp::sign_table distinct-root merge, stable section IDs, normalized polynomial interval signs, linear/binary cell lookup, reset and displays",
           "status": "partial",
           "go_target": "pkg/nlsat/sign_table.go",
           "tests": [
             "TestSignTableMergedRootsIndependentCellSigns",
             "TestSignTableStableIDsDisplayAndIrrationalCopies",
-            "TestSignTableAllocationRefusalsResetAndRetry",
-            "TestSignTablePrebuiltCPPCellSignOracle",
-            "TestSignTableSourceAssertionsAndOwnerGuards"
+            "TestSignTablePrebuiltCPPCellSignOracle"
+          ]
+        },
+        {
+          "name": "concrete inequality/root literal evaluation, source polynomial_ref call temporaries, masked maximal-variable root isolation and infeasible-interval construction, no-op push/pop and owner lifecycle",
+          "status": "partial",
+          "go_target": "pkg/nlsat/evaluator.go",
+          "go_targets": [
+            "pkg/nlsat/evaluator_intervals.go",
+            "pkg/nlsat/evaluator_interval_ref.go",
+            "pkg/nlsat/evaluator_polynomial.go"
+          ],
+          "tests": [
+            "TestEvaluatorInequalityProjectionAndEvaluationIndependentModels",
+            "TestEvaluatorRootProjectionAndEvaluationIndependentModels",
+            "TestEvaluatorProjectionAllocationCleanupAndRetry",
+            "TestEvaluatorBorrowedOwnersLiveSetsAndEarlyZero",
+            "TestEvaluatorConstructorReservationOwnership",
+            "TestEvaluatorProjectionAndValuesPrebuiltCPPOracle"
           ]
         }
       ],
       "ownership": [
-        "The sign table borrows the actual AlgebraicManager and budget, owns independent algebraic copies at stable section-record addresses, and charges native arrays/records. Reset deletes roots in section creation order and retains array capacity; close releases native backing capacities. Interrupted additions block queries until explicit reset; reset records retired section cells so cleanup can resume after the numerical callee is acknowledged."
+        "Evaluator borrows the actual assignment, polynomial manager, algebraic manager and allocator. It owns its interval manager, distinct-root sign table and root scratch vectors. Concrete PolynomialRef temporaries acquire real polynomial references across numerical calls; stopped callees retain an accepted temporary until explicit numerical acknowledgement and evaluator cleanup. Source interval_set_ref locals increment replacement references before decrementing old references, track accepted replacements and consumed last decrements, and transfer one owned result reference to the caller. Outstanding caller sets prevent close. Normal close retires the sign table, addition scratch, evaluation scratch and interval manager in reverse source member order. AlgebraicVector.Borrow exposes actual owning elements for comparisons that may replace/refine them; scalar Get snapshots cannot publish such replacements."
       ],
       "deviations": [
-        "This implements the retained sign_table subobject, not evaluator atom evaluation/infeasible-interval construction or the nonlinear search engine. Native Go slice capacities and record addresses replace C++ svector allocation/layout; no C++ standard-library container is ported.",
-        "Source root/cell/binary-search/invariant assertions and decimal/raw table displays are connected. Complete diagnostic erasure/re-entrance, allocator/destructor and lexical audits remain pending; whole-source audit flags remain false.",
-        "Independent cell checks span16 sequences of12 polynomial additions, including zero, one, seven, eight, nine and16 roots, shared/shifted sections, nonunit signs and irrational copied owners. Seventeen allocation-stop samples reset/retry successfully. All116 exact cell-sign disagreement queries against the prebuilt build/z3 are unsat. These checks establish the sign-table algorithms only, not complete evaluator/search/tactic integration."
+        "Constructor currently binds the real assignment/polynomial/allocator services directly. The source solver reference is used only by evaluator TRACE atom display and cannot be bound until the actual NLSAT solver is ported; no stub solver or substitute backend is introduced. All own evaluator TRACE sites and the complete assertion/diagnostic erasure audit remain pending. The unused m_inf_tmp buffer has no retained reads/elements and is not duplicated in Go.",
+        "Native Go headers, typed handles, arrays and capacities replace C++ layouts. PolynomialRef call owners have native charged headers; exact source stack/header allocation equivalence, all numerical/checkpoint/callback/destructor frontiers and lexical stop ownership remain unaudited. Explicit numerical CleanupRetained precedes evaluator Cleanup after a stopped child; unrelated numerical stops are not automatically acknowledged. Both whole-source audit flags stay false.",
+        "Independent inequality checks cover144 parity/relation/polarity projections with13 rational points each, lower-variable substitutions and already-assigned maximal-variable masking. Root checks cover120 projections including missing/repeated/irrational roots and all five root relations. All528 exact projected-set/value disagreement formulas are unsat in the existing prebuilt build/z3. Twenty-eight sampled projection allocation stops and seven constructor reservation positions recover/retire; eight behavioral mutations are rejected. Prior4356 interval-pair,240 composite and116 sign-cell C++ checks remain separate. This does not complete atom solver factories/caches, assumptions/clauses, nonlinear explanation/search, goal conversion or tactics."
       ]
     },
     {
       "path": "src/nlsat/nlsat_evaluator.h",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/evaluator.go",
+        "pkg/nlsat/evaluator_intervals.go",
+        "pkg/nlsat/evaluator_interval_ref.go",
+        "pkg/nlsat/evaluator_polynomial.go",
+        "pkg/nlsat/sign_table.go",
+        "pkg/math/polynomial/algebraic_vector.go"
+      ],
+      "tests": [
+        "pkg/nlsat/evaluator_test.go",
+        "pkg/nlsat/evaluator_ownership_test.go",
+        "pkg/nlsat/evaluator_cpp_test.go",
+        "pkg/nlsat/sign_table_test.go",
+        "pkg/nlsat/sign_table_cpp_test.go",
+        "pkg/nlsat/atom_diagnostics_test.go",
+        "pkg/math/polynomial/algebraic_vector_borrow_test.go"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -90038,9 +90078,44 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "evaluator::imp::sign_table distinct-root merge, stable section IDs, normalized polynomial interval signs, linear/binary cell lookup, reset and displays",
+          "status": "partial",
+          "go_target": "pkg/nlsat/sign_table.go",
+          "tests": [
+            "TestSignTableMergedRootsIndependentCellSigns",
+            "TestSignTableStableIDsDisplayAndIrrationalCopies",
+            "TestSignTablePrebuiltCPPCellSignOracle"
+          ]
+        },
+        {
+          "name": "concrete inequality/root literal evaluation, source polynomial_ref call temporaries, masked maximal-variable root isolation and infeasible-interval construction, no-op push/pop and owner lifecycle",
+          "status": "partial",
+          "go_target": "pkg/nlsat/evaluator.go",
+          "go_targets": [
+            "pkg/nlsat/evaluator_intervals.go",
+            "pkg/nlsat/evaluator_interval_ref.go",
+            "pkg/nlsat/evaluator_polynomial.go"
+          ],
+          "tests": [
+            "TestEvaluatorInequalityProjectionAndEvaluationIndependentModels",
+            "TestEvaluatorRootProjectionAndEvaluationIndependentModels",
+            "TestEvaluatorProjectionAllocationCleanupAndRetry",
+            "TestEvaluatorBorrowedOwnersLiveSetsAndEarlyZero",
+            "TestEvaluatorConstructorReservationOwnership",
+            "TestEvaluatorProjectionAndValuesPrebuiltCPPOracle"
+          ]
+        }
+      ],
+      "ownership": [
+        "Evaluator borrows the actual assignment, polynomial manager, algebraic manager and allocator. It owns its interval manager, distinct-root sign table and root scratch vectors. Concrete PolynomialRef temporaries acquire real polynomial references across numerical calls; stopped callees retain an accepted temporary until explicit numerical acknowledgement and evaluator cleanup. Source interval_set_ref locals increment replacement references before decrementing old references, track accepted replacements and consumed last decrements, and transfer one owned result reference to the caller. Outstanding caller sets prevent close. Normal close retires the sign table, addition scratch, evaluation scratch and interval manager in reverse source member order. AlgebraicVector.Borrow exposes actual owning elements for comparisons that may replace/refine them; scalar Get snapshots cannot publish such replacements."
+      ],
+      "deviations": [
+        "Constructor currently binds the real assignment/polynomial/allocator services directly. The source solver reference is used only by evaluator TRACE atom display and cannot be bound until the actual NLSAT solver is ported; no stub solver or substitute backend is introduced. All own evaluator TRACE sites and the complete assertion/diagnostic erasure audit remain pending. The unused m_inf_tmp buffer has no retained reads/elements and is not duplicated in Go.",
+        "Native Go headers, typed handles, arrays and capacities replace C++ layouts. PolynomialRef call owners have native charged headers; exact source stack/header allocation equivalence, all numerical/checkpoint/callback/destructor frontiers and lexical stop ownership remain unaudited. Explicit numerical CleanupRetained precedes evaluator Cleanup after a stopped child; unrelated numerical stops are not automatically acknowledged. Both whole-source audit flags stay false.",
+        "Independent inequality checks cover144 parity/relation/polarity projections with13 rational points each, lower-variable substitutions and already-assigned maximal-variable masking. Root checks cover120 projections including missing/repeated/irrational roots and all five root relations. All528 exact projected-set/value disagreement formulas are unsat in the existing prebuilt build/z3. Twenty-eight sampled projection allocation stops and seven constructor reservation positions recover/retire; eight behavioral mutations are rejected. Prior4356 interval-pair,240 composite and116 sign-cell C++ checks remain separate. This does not complete atom solver factories/caches, assumptions/clauses, nonlinear explanation/search, goal conversion or tactics."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_explain.cpp",
@@ -91262,7 +91337,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/nlsat/atom.go"
+        "pkg/nlsat/atom.go",
+        "pkg/nlsat/evaluator.go"
       ],
       "tests": [
         "pkg/nlsat/atom_test.go",
@@ -91332,7 +91408,7 @@
       ],
       "deviations": [
         "Tagged polynomial pointers become concrete Polynomial handles plus bool parity. Source hashes preserve polynomial IDs, source composite-child order, parity omission, uint32 index shifts and kind/index OR collisions; equality retains handle identity, factor order and parity. Native factor storage must be reserved and supplied by the retained solver factory, which remains unported; no replacement factory or stub solver is introduced.",
-        "Constructor, header decrement, factor-index and kind-flip assertions use actual source diagnostic locations. Header-to-concrete atom dispatch, retained assumption types and full allocator/lexical and diagnostic audits await evaluator/solver integration. Both whole-source audit flags remain false."
+        "Constructor, header decrement, factor-index and kind-flip assertions use actual source diagnostic locations. The evaluator uses a sealed concrete inequality/root interface for atom dispatch. Retained assumption types and full allocator/lexical and diagnostic audits await solver integration. Both whole-source audit flags remain false."
       ]
     },
     {

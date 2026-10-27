@@ -166,11 +166,11 @@ func (t *signTable) merge(roots *polynomial.AlgebraicVector) error {
 	for i1 < sz1 && i2 < sz2 {
 		id := t.sorted[i1]
 		s := t.sections[id]
-		r, err := roots.Get(i2)
+		r, err := roots.Borrow(i2)
 		if err != nil {
 			return err
 		}
-		c, err := t.am.Compare(&s.root, &r)
+		c, err := t.am.Compare(&s.root, r)
 		if err != nil {
 			return err
 		}
@@ -191,7 +191,7 @@ func (t *signTable) merge(roots *polynomial.AlgebraicVector) error {
 			s.position = j
 			i1++
 		} else {
-			newID, err := t.mkSection(&r, j)
+			newID, err := t.mkSection(r, j)
 			if err != nil {
 				return err
 			}
@@ -218,11 +218,11 @@ func (t *signTable) merge(roots *polynomial.AlgebraicVector) error {
 		j++
 	}
 	for i2 < sz2 {
-		r, err := roots.Get(i2)
+		r, err := roots.Borrow(i2)
 		if err != nil {
 			return err
 		}
-		id, err := t.mkSection(&r, j)
+		id, err := t.mkSection(r, j)
 		if err != nil {
 			return err
 		}
