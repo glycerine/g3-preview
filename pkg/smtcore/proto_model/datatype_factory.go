@@ -36,7 +36,7 @@ func (f *DatatypeFactory) assertNonrecursive(s ast.ASTHandle, line int32) error 
 	var queryErr error
 	err := datatypeFactoryAssert(line, "!m_util.is_recursive(s)", func() bool {
 		var recursive bool
-		recursive, queryErr = f.manager.DatatypeIsRecursive(s)
+		recursive, queryErr = f.utility.IsRecursive(s)
 		return !recursive
 	})
 	return errors.Join(queryErr, err)
@@ -103,7 +103,7 @@ func (f *DatatypeFactory) freshConstructorArguments(scope *datatypeFactoryScope,
 			return false, err
 		}
 		if !used {
-			recursive, err := f.manager.DatatypeIsRecursive(s)
+			recursive, err := f.utility.IsRecursive(s)
 			if err != nil {
 				return false, err
 			}
@@ -163,7 +163,7 @@ func (f *DatatypeFactory) lastValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	recursive, err := f.manager.DatatypeIsRecursive(s)
+	recursive, err := f.utility.IsRecursive(s)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
@@ -244,7 +244,7 @@ func (f *DatatypeFactory) almostFresh(s ast.ASTHandle) (ast.ASTHandle, error) {
 		if err = datatypeFactoryAssert(83, "val", func() bool { return !value.IsNull() }); err != nil {
 			return ast.ASTHandle{}, err
 		}
-		recursive, err := f.manager.DatatypeIsRecursive(s)
+		recursive, err := f.utility.IsRecursive(s)
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
@@ -332,7 +332,7 @@ func (f *DatatypeFactory) almostConstructor(s, c ast.ASTHandle, set *factoryValu
 	if err = f.RegisterValue(value); err != nil {
 		return value, false, err
 	}
-	rec, err := f.manager.DatatypeIsRecursive(s)
+	rec, err := f.utility.IsRecursive(s)
 	if err != nil {
 		return value, false, err
 	}
@@ -380,7 +380,7 @@ func (f *DatatypeFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
-		recursive, err := f.manager.DatatypeIsRecursive(s)
+		recursive, err := f.utility.IsRecursive(s)
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
@@ -407,7 +407,7 @@ func (f *DatatypeFactory) FreshValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 			return value, err
 		}
 	}
-	recursive, err := f.manager.DatatypeIsRecursive(s)
+	recursive, err := f.utility.IsRecursive(s)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
@@ -472,7 +472,7 @@ func (f *DatatypeFactory) freshConstructor(s, c ast.ASTHandle, set *factoryValue
 	if err = f.RegisterValue(value); err != nil {
 		return value, false, err
 	}
-	recursive, err := f.manager.DatatypeIsRecursive(s)
+	recursive, err := f.utility.IsRecursive(s)
 	if err != nil {
 		return value, false, err
 	}

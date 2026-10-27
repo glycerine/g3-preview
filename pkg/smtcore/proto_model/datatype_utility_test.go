@@ -47,3 +47,18 @@ func TestDatatypeFactoryUsesIndependentCachedConstructorUtility(t *testing.T) {
 		}
 	}
 }
+
+func TestDatatypeFactoryUsesOwnedRecursionCache(t *testing.T) {
+	m, f, _, sort, _ := datatypeFactoryBVFixture(t, 0)
+	_, err := f.FreshValue(sort)
+	protoMust(t, err)
+	before, err := m.GetRefCount(sort)
+	protoMust(t, err)
+	recursive, err := f.utility.IsRecursive(sort)
+	protoMust(t, err)
+	after, err := m.GetRefCount(sort)
+	protoMust(t, err)
+	if recursive || before != after {
+		t.Fatal("factory bypassed its independent recursive-result owner", recursive, before, after)
+	}
+}

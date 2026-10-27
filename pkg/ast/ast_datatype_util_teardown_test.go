@@ -49,6 +49,8 @@ func TestDatatypeUtilInterruptedTeardown(t *testing.T) {
 			if !found {
 				t.Fatal("missing constructor")
 			}
+			_, err = u.IsRecursive(sorts[0])
+			astTestMust(t, err)
 			allConstructors, err := m.DatatypeConstructors(sorts[0])
 			astTestMust(t, err)
 			for _, c := range allConstructors {
@@ -81,17 +83,23 @@ func TestDatatypeUtilInterruptedTeardown(t *testing.T) {
 				t.Fatal("interruption consumed references or advanced preference")
 			}
 			if mode == "close" {
+				if _, found := u.recursive[sorts[0]]; !found {
+					t.Fatal("Close destroyed recursion map before its reference member")
+				}
 				if u.constructors[sorts[0]] != constructor {
 					t.Fatal("close destroyed the map before its reference member")
 				}
 				if !errors.Is(u.Reset(), ErrASTHandle) {
 					t.Fatal("closing utility accepted Reset")
 				}
-			} else if len(u.constructors) != 0 {
+			} else if len(u.constructors) != 0 || len(u.recursive) != 0 {
 				t.Fatal("reset did not clear the map before reference retirement")
 			}
 			if _, _, err = u.NonRecursiveConstructor(sorts[0]); !errors.Is(err, ErrASTHandle) {
 				t.Fatal("interrupted utility accepted a query", err)
+			}
+			if _, err = u.IsRecursive(sorts[0]); !errors.Is(err, ErrASTHandle) {
+				t.Fatal("interrupted recursion cache accepted a query", err)
 			}
 			if mode == "reset" {
 				astTestMust(t, u.Reset())
@@ -105,14 +113,14 @@ func TestDatatypeUtilInterruptedTeardown(t *testing.T) {
 					t.Fatal("close replayed Reset or retained manager")
 				}
 			}
-			if len(u.refs) != 0 || len(u.constructors) != 0 {
+			if len(u.refs) != 0 || len(u.constructors) != 0 || len(u.recursive) != 0 {
 				t.Fatal("retry retained cached owners")
 			}
 			afterSort, err := m.GetRefCount(sorts[0])
 			astTestMust(t, err)
 			afterConstructor, err := m.GetRefCount(constructor)
 			astTestMust(t, err)
-			if afterSort+2 != beforeSort || afterConstructor+2 != beforeConstructor {
+			if afterSort+3 != beforeSort || afterConstructor+2 != beforeConstructor {
 				t.Fatal("retry lost or duplicated a decrement")
 			}
 			if mode == "reset" {

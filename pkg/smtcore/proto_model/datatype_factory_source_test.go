@@ -271,8 +271,15 @@ func TestDatatypeFactorySourceFreshDistinctnessAssertion(t *testing.T) {
 			t.Fatal("erased assertion changed duplicate membership")
 		}
 	}
-	if m.Stats().LiveReferences != before || len(f.pending) != 0 {
-		t.Fatal("assertion exit retained argument/candidate references")
+	// The cold source is_recursive query owns one persistent sort pin;
+	// only the argument/candidate references must retire on this exit.
+	if m.Stats().LiveReferences != before+1 || len(f.pending) != 0 {
+		t.Fatal("assertion exit lost recursion owner or retained lexical references")
+	}
+	_, err = f.utility.IsRecursive(sort)
+	protoMust(t, err)
+	if m.Stats().LiveReferences != before+1 {
+		t.Fatal("assertion-path recursion result was not already cached")
 	}
 }
 

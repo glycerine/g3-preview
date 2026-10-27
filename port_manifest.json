@@ -16460,7 +16460,8 @@
         "pkg/ast/ast_ref.go",
         "pkg/ast/ast_datatype_util_trace.go",
         "pkg/ast/ast_datatype_util_trace_test.go",
-        "pkg/ast/ast_datatype_numeric_release_test.go"
+        "pkg/ast/ast_datatype_numeric_release_test.go",
+        "pkg/ast/ast_datatype_recursion_source_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16491,7 +16492,12 @@
         "TestDatatypeUtilTraceComputationFailureStopsBeforeCounterAndCache",
         "TestDatatypeUtilRecursiveSourceTracePreservesForbiddenOrder",
         "TestDatatypeUtilTraceConsultsActualPPGlobalOwner",
-        "TestDatatypePluginRealNumeralReleaseFailureRetry"
+        "TestDatatypePluginRealNumeralReleaseFailureRetry",
+        "TestDatatypeRecursionCacheIndependentPinsAndReset",
+        "TestDatatypeRecursionCachePublishesBeforePinRefusal",
+        "TestDatatypeRecursionCacheAssertionOwnerBeforeWarmLookup",
+        "TestDatatypeRecursionSourceTraversalSharedDAGAndNestedSorts",
+        "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution"
       ],
       "assertions": [
         {
@@ -16785,6 +16791,24 @@
           "tests": [
             "TestDatatypePluginRealNumeralReleaseFailureRetry"
           ]
+        },
+        {
+          "name": "datatype::util::is_recursive (834-843): source assertion835 before warm lookup, independent true/false result cache, map-before-sort-pin publication, Reset clearing before stopped reference retirement and Close member ownership; is_recursive_core (527-569) uses the source work stack, gray/black states and generic definition accessor ranges before actual parameter substitution",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_definition.go",
+            "pkg/ast/ast_datatype_recursion_source_test.go",
+            "pkg/ast/ast_datatype_util_teardown_test.go"
+          ],
+          "tests": [
+            "TestDatatypeRecursionCacheIndependentPinsAndReset",
+            "TestDatatypeRecursionCachePublishesBeforePinRefusal",
+            "TestDatatypeRecursionCacheAssertionOwnerBeforeWarmLookup",
+            "TestDatatypeRecursionSourceTraversalSharedDAGAndNestedSorts",
+            "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution",
+            "TestDatatypeUtilInterruptedTeardown"
+          ]
         }
       ],
       "ownership": [
@@ -16792,7 +16816,8 @@
         "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in forward source ref_vector order. Copied Go owners are rejected. The AST plugin lazily owns a separate instance of the same concrete DatatypeUtil, including full constructor-cache and preference pins. Plugin finalization retires definition owners before closing the utility in forward source reference-vector order.",
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
         "The concrete DatatypeUtil now has an independent constructor-vector cache owning its datatype sort and every constructor in declaration order, before its separate selected-preference pins. Constructor-local func_decl_ref and permanent cache reference use separate checked ASTRef tokens and actual INC/DEC operations. Partial maps/lists and acquired pins remain until Reset/Close; native Go containers replace STL storage without claiming its allocation ABI.",
-        "Datatype trace sort_ref/func_decl_ref temporaries retain real ASTRef inputs until each complete ostream expression ends, with reverse temporary retirement. Each actual sort/declare-fun document has a separate format-manager ASTRef and lexical numeric rendering stream. smt2_printer constructor-local pp_params snapshots/read order/destruction precede document building; PrintFormat owns its own later pp helper. Failed cleanup remains on the utility owning continuation before cached refs. Enabled traces require the actual matching process global-parameter owner; erased/disabled gates never reach it."
+        "Datatype trace sort_ref/func_decl_ref temporaries retain real ASTRef inputs until each complete ostream expression ends, with reverse temporary retirement. Each actual sort/declare-fun document has a separate format-manager ASTRef and lexical numeric rendering stream. smt2_printer constructor-local pp_params snapshots/read order/destruction precede document building; PrintFormat owns its own later pp helper. Failed cleanup remains on the utility owning continuation before cached refs. Enabled traces require the actual matching process global-parameter owner; erased/disabled gates never reach it.",
+        "Each successful cold recursion query appends its sort ASTRef to that utility's existing m_asts owner vector. Result publication precedes pin acquisition, so a real Go reference-page refusal leaves a warm result without a pin; later lookup does not retroactively retry it. Reset clears recursion keys before forward reference retirement; Close retains keys while stopped and drops them after successful retirement. Independent callers/utilities own separate pins. This bounded Go owner continuation does not claim full native C++ allocation/throwing-destructor behavior."
       ],
       "deviations": [
         "Private utility memoization maps are omitted because concrete Go queries reconstruct hash-consed declarations and compute recursion/enum properties directly. The unused plugin remove entry point and undeclared get_datatype_size declaration are not ported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed.",
@@ -16801,7 +16826,8 @@
         "Both DatatypeFactory/theory utilities and the manager-plugin default-value utility now use the same concrete constructor-cache owner with independent instances. The manager plugin creates its utility lazily and retires definition owners before closing it. The actual SMT datatype restart regression exposed constructor identity loss when this plugin cache was missing; restoring the source owner preserves declarations across an independent theory Reset. No test lifetime was weakened. Utility util_bug trace statements and normal temporary ownership are implemented; the plugin-owned consumed-NUM finalizer is verified, while other member cleanup prefixes remain open. Locked newRef/delRef leaves share the existing checked public implementation; constructors/maps/slices use native Go allocation rather than an STL allocation ABI.",
         "The literal unsigned-overflow no-constructor path now preserves the source native/continued-SASSERT prefix: acquire the preference sort pin, append a null ASTRef owner, and cache the null result without treating a warm null entry as found. An aborting debug assertion stops before this publication. The regression covers native null-prefix retention/cache hits and the aborting debug prefix; it does not claim a physical numeric failure campaign for this member.",
         "This is a concrete retained datatype-trace path, not a generic ast_ref stream adapter or whole SMT2-printer audit. Tests cover exact enum text, all recursive trace branches, forbidden-vector order, simultaneous input and format pins, warm cache silence, sticky stream refusal, real PP/global owner closure and allocation refusals before invoke/core-header counter publication. General pretty-printer ownership/failure auditing and physical consumed-numeral cleanup for these temporary owners remain open. Native Go rendering streams replace ostream storage; STL internals are not ported.",
-        "A physical consumed-NUM failure is now verified for the retained plugin-owned utility finalizer. The fixture uses a source-valid rational-valued sort parameter (ast.cpp:1904-1932 accepts non-AST parameters), ordinary public NUM/AST construction, actual reference owners and the supported signed-host TLS accounting frontier. It never writes NUM/AST payloads. The initial AST-valued scalar probe hit the actual source is_sort precondition and was rejected as an invalid fixture, not counted as failure-path evidence. Four utility references retire before the real bounds error; four later pins survive until owning retry. Independent caller roots and runtime state prove exact remaining retirement without foreign numeric replay, and final graph cleanup reaches budget0. This is Go owning-cleanup evidence at the actual plugin finalizer, not full C++ throwing-destructor equivalence, a public ASTManager.Close failure campaign, or proof for trace/constructor-local/Reset cleanup frontiers. No production code change was required."
+        "A physical consumed-NUM failure is now verified for the retained plugin-owned utility finalizer. The fixture uses a source-valid rational-valued sort parameter (ast.cpp:1904-1932 accepts non-AST parameters), ordinary public NUM/AST construction, actual reference owners and the supported signed-host TLS accounting frontier. It never writes NUM/AST payloads. The initial AST-valued scalar probe hit the actual source is_sort precondition and was rejected as an invalid fixture, not counted as failure-path evidence. Four utility references retire before the real bounds error; four later pins survive until owning retry. Independent caller roots and runtime state prove exact remaining retirement without foreign numeric replay, and final graph cleanup reaches budget0. This is Go owning-cleanup evidence at the actual plugin finalizer, not full C++ throwing-destructor equivalence, a public ASTManager.Close failure campaign, or proof for trace/constructor-local/Reset cleanup frontiers. No production code change was required.",
+        "Recursion queries formerly used an uncached recursive DFS over instantiated constructor domains. The actual source get_def(sort*) returns the named generic definition (header278); core traversal now follows its raw accessor ranges using the source work stack and only the datatype family/kind predicate. Thus a nonrecursive generic Box[T] instantiated with a recursive actual sort remains classified nonrecursive, while a concrete field containing that recursive sort is recursive. Focused tests cover shared descendants, nested array-sort parameters, generic versus instantiated ranges, both cached boolean values, real page-boundary pin refusal and actual assertion/teardown guards. Other utility caches/predicates and broader numerical/constructor failure ownership remain partial."
       ]
     },
     {
@@ -16831,7 +16857,8 @@
         "pkg/ast/ast_ref.go",
         "pkg/ast/ast_datatype_util_trace.go",
         "pkg/ast/ast_datatype_util_trace_test.go",
-        "pkg/ast/ast_datatype_numeric_release_test.go"
+        "pkg/ast/ast_datatype_numeric_release_test.go",
+        "pkg/ast/ast_datatype_recursion_source_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16861,7 +16888,12 @@
         "TestDatatypeUtilTraceComputationFailureStopsBeforeCounterAndCache",
         "TestDatatypeUtilRecursiveSourceTracePreservesForbiddenOrder",
         "TestDatatypeUtilTraceConsultsActualPPGlobalOwner",
-        "TestDatatypePluginRealNumeralReleaseFailureRetry"
+        "TestDatatypePluginRealNumeralReleaseFailureRetry",
+        "TestDatatypeRecursionCacheIndependentPinsAndReset",
+        "TestDatatypeRecursionCachePublishesBeforePinRefusal",
+        "TestDatatypeRecursionCacheAssertionOwnerBeforeWarmLookup",
+        "TestDatatypeRecursionSourceTraversalSharedDAGAndNestedSorts",
+        "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution"
       ],
       "conditionals": [
         {
@@ -17047,6 +17079,24 @@
           "tests": [
             "TestDatatypePluginRealNumeralReleaseFailureRetry"
           ]
+        },
+        {
+          "name": "datatype::util::is_recursive (834-843): source assertion835 before warm lookup, independent true/false result cache, map-before-sort-pin publication, Reset clearing before stopped reference retirement and Close member ownership; is_recursive_core (527-569) uses the source work stack, gray/black states and generic definition accessor ranges before actual parameter substitution",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_definition.go",
+            "pkg/ast/ast_datatype_recursion_source_test.go",
+            "pkg/ast/ast_datatype_util_teardown_test.go"
+          ],
+          "tests": [
+            "TestDatatypeRecursionCacheIndependentPinsAndReset",
+            "TestDatatypeRecursionCachePublishesBeforePinRefusal",
+            "TestDatatypeRecursionCacheAssertionOwnerBeforeWarmLookup",
+            "TestDatatypeRecursionSourceTraversalSharedDAGAndNestedSorts",
+            "TestDatatypeRecursionUsesDefinitionRangesBeforeParameterSubstitution",
+            "TestDatatypeUtilInterruptedTeardown"
+          ]
         }
       ],
       "ownership": [
@@ -17054,7 +17104,8 @@
         "DatatypeUtil owns checked ASTRef pins for each cached sort and constructor, publishes only after both pins succeed and releases in forward source ref_vector order. Copied Go owners are rejected. The AST plugin lazily owns a separate instance of the same concrete DatatypeUtil, including full constructor-cache and preference pins. Plugin finalization retires definition owners before closing the utility in forward source reference-vector order.",
         "Datatype utility reset releases cached AST pins without closing its manager or sharing another utility cache. The selection counter advances on every source reset, including a restart before the first preference query.",
         "The concrete DatatypeUtil now has an independent constructor-vector cache owning its datatype sort and every constructor in declaration order, before its separate selected-preference pins. Constructor-local func_decl_ref and permanent cache reference use separate checked ASTRef tokens and actual INC/DEC operations. Partial maps/lists and acquired pins remain until Reset/Close; native Go containers replace STL storage without claiming its allocation ABI.",
-        "Datatype trace sort_ref/func_decl_ref temporaries retain real ASTRef inputs until each complete ostream expression ends, with reverse temporary retirement. Each actual sort/declare-fun document has a separate format-manager ASTRef and lexical numeric rendering stream. smt2_printer constructor-local pp_params snapshots/read order/destruction precede document building; PrintFormat owns its own later pp helper. Failed cleanup remains on the utility owning continuation before cached refs. Enabled traces require the actual matching process global-parameter owner; erased/disabled gates never reach it."
+        "Datatype trace sort_ref/func_decl_ref temporaries retain real ASTRef inputs until each complete ostream expression ends, with reverse temporary retirement. Each actual sort/declare-fun document has a separate format-manager ASTRef and lexical numeric rendering stream. smt2_printer constructor-local pp_params snapshots/read order/destruction precede document building; PrintFormat owns its own later pp helper. Failed cleanup remains on the utility owning continuation before cached refs. Enabled traces require the actual matching process global-parameter owner; erased/disabled gates never reach it.",
+        "Each successful cold recursion query appends its sort ASTRef to that utility's existing m_asts owner vector. Result publication precedes pin acquisition, so a real Go reference-page refusal leaves a warm result without a pin; later lookup does not retroactively retry it. Reset clears recursion keys before forward reference retirement; Close retains keys while stopped and drops them after successful retirement. Independent callers/utilities own separate pins. This bounded Go owner continuation does not claim full native C++ allocation/throwing-destructor behavior."
       ],
       "deviations": [
         "Private utility caches, the unused plugin remove entry point, and the undeclared get_datatype_size implementation are omitted under the retained-consumer rule. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes.",
@@ -17063,7 +17114,8 @@
         "Both DatatypeFactory/theory utilities and the manager-plugin default-value utility now use the same concrete constructor-cache owner with independent instances. The manager plugin creates its utility lazily and retires definition owners before closing it. The actual SMT datatype restart regression exposed constructor identity loss when this plugin cache was missing; restoring the source owner preserves declarations across an independent theory Reset. No test lifetime was weakened. Utility util_bug trace statements and normal temporary ownership are implemented; the plugin-owned consumed-NUM finalizer is verified, while other member cleanup prefixes remain open. Locked newRef/delRef leaves share the existing checked public implementation; constructors/maps/slices use native Go allocation rather than an STL allocation ABI.",
         "The literal unsigned-overflow no-constructor path now preserves the source native/continued-SASSERT prefix: acquire the preference sort pin, append a null ASTRef owner, and cache the null result without treating a warm null entry as found. An aborting debug assertion stops before this publication. The regression covers native null-prefix retention/cache hits and the aborting debug prefix; it does not claim a physical numeric failure campaign for this member.",
         "This is a concrete retained datatype-trace path, not a generic ast_ref stream adapter or whole SMT2-printer audit. Tests cover exact enum text, all recursive trace branches, forbidden-vector order, simultaneous input and format pins, warm cache silence, sticky stream refusal, real PP/global owner closure and allocation refusals before invoke/core-header counter publication. General pretty-printer ownership/failure auditing and physical consumed-numeral cleanup for these temporary owners remain open. Native Go rendering streams replace ostream storage; STL internals are not ported.",
-        "A physical consumed-NUM failure is now verified for the retained plugin-owned utility finalizer. The fixture uses a source-valid rational-valued sort parameter (ast.cpp:1904-1932 accepts non-AST parameters), ordinary public NUM/AST construction, actual reference owners and the supported signed-host TLS accounting frontier. It never writes NUM/AST payloads. The initial AST-valued scalar probe hit the actual source is_sort precondition and was rejected as an invalid fixture, not counted as failure-path evidence. Four utility references retire before the real bounds error; four later pins survive until owning retry. Independent caller roots and runtime state prove exact remaining retirement without foreign numeric replay, and final graph cleanup reaches budget0. This is Go owning-cleanup evidence at the actual plugin finalizer, not full C++ throwing-destructor equivalence, a public ASTManager.Close failure campaign, or proof for trace/constructor-local/Reset cleanup frontiers. No production code change was required."
+        "A physical consumed-NUM failure is now verified for the retained plugin-owned utility finalizer. The fixture uses a source-valid rational-valued sort parameter (ast.cpp:1904-1932 accepts non-AST parameters), ordinary public NUM/AST construction, actual reference owners and the supported signed-host TLS accounting frontier. It never writes NUM/AST payloads. The initial AST-valued scalar probe hit the actual source is_sort precondition and was rejected as an invalid fixture, not counted as failure-path evidence. Four utility references retire before the real bounds error; four later pins survive until owning retry. Independent caller roots and runtime state prove exact remaining retirement without foreign numeric replay, and final graph cleanup reaches budget0. This is Go owning-cleanup evidence at the actual plugin finalizer, not full C++ throwing-destructor equivalence, a public ASTManager.Close failure campaign, or proof for trace/constructor-local/Reset cleanup frontiers. No production code change was required.",
+        "Recursion queries formerly used an uncached recursive DFS over instantiated constructor domains. The actual source get_def(sort*) returns the named generic definition (header278); core traversal now follows its raw accessor ranges using the source work stack and only the datatype family/kind predicate. Thus a nonrecursive generic Box[T] instantiated with a recursive actual sort remains classified nonrecursive, while a concrete field containing that recursive sort is recursive. Focused tests cover shared descendants, nested array-sort parameters, generic versus instantiated ranges, both cached boolean values, real page-boundary pin refusal and actual assertion/teardown guards. Other utility caches/predicates and broader numerical/constructor failure ownership remain partial."
       ]
     },
     {
@@ -113958,7 +114010,8 @@
         "TestDatatypeFactoryConditionalTracePrecedesDistinctnessAssertion",
         "TestDatatypeFactoryTraceFiniteSiblingFallback",
         "TestDatatypeFactoryTraceBorrowsInputAndOwnsDocument",
-        "TestDatatypeFactoryFreshArgumentsOwnBeforeNextProvider"
+        "TestDatatypeFactoryFreshArgumentsOwnBeforeNextProvider",
+        "TestDatatypeFactoryUsesOwnedRecursionCache"
       ],
       "assertions": [
         {
@@ -114124,6 +114177,18 @@
             "TestDatatypeFactoryColdArgumentFailureLeavesRegistryUnpublished",
             "TestDatatypeFactoryFreshArgumentsOwnBeforeNextProvider"
           ]
+        },
+        {
+          "name": "All reached datatype factory recursion queries, including source assertion operands, use the factory-owned utility result cache and sort owner rather than the uncached manager query",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/datatype_utility_test.go",
+            "pkg/ast/ast_datatype_util.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryUsesOwnedRecursionCache"
+          ]
         }
       ],
       "ownership": [
@@ -114136,7 +114201,8 @@
         "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
         "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations.",
         "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Fresh-path tests observe a real argument pin during the next provider call; cold get_some_value tests require the unchanged borrowed-input count and unpublished registry and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. All fourteen datatype_factory TRACE/CTRACE sites now execute with their source gates, operand order and actual process printer parameters, including enabled-trace get_last_fresh_value cache publication in approach2. Remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial.",
-        "Corrected an over-owning port and its earlier regression: get_some_value uses ptr_vector<expr> at source line34, whereas fresh/almost use expr_ref_vector. Cold construction now borrows provider values without reference reservations or lexical DelRef; fresh scopes retain their existing pins. The source-correct cold regression rejects the previous implementation. This bounded correction does not close broader utility caches or exceptional destruction obligations."
+        "Corrected an over-owning port and its earlier regression: get_some_value uses ptr_vector<expr> at source line34, whereas fresh/almost use expr_ref_vector. Cold construction now borrows provider values without reference reservations or lexical DelRef; fresh scopes retain their existing pins. The source-correct cold regression rejects the previous implementation. This bounded correction does not close broader utility caches or exceptional destruction obligations.",
+        "The independent utility now owns recursion results and one sort pin per successfully pinned cold query. All eight Go query sites (covering repeated calls inside constructor loops and debug-only source operands) use that utility. A public reference-count check after cold FreshValue proves a later utility query is already warm. Broader utility caches and general constructor/exceptional lexical cleanup remain separate partial obligations."
       ]
     },
     {
@@ -114197,7 +114263,8 @@
         "TestDatatypeFactoryConditionalTracePrecedesDistinctnessAssertion",
         "TestDatatypeFactoryTraceFiniteSiblingFallback",
         "TestDatatypeFactoryTraceBorrowsInputAndOwnsDocument",
-        "TestDatatypeFactoryFreshArgumentsOwnBeforeNextProvider"
+        "TestDatatypeFactoryFreshArgumentsOwnBeforeNextProvider",
+        "TestDatatypeFactoryUsesOwnedRecursionCache"
       ],
       "conditionals": [
         {
@@ -114343,6 +114410,18 @@
             "TestDatatypeFactoryColdArgumentFailureLeavesRegistryUnpublished",
             "TestDatatypeFactoryFreshArgumentsOwnBeforeNextProvider"
           ]
+        },
+        {
+          "name": "All reached datatype factory recursion queries, including source assertion operands, use the factory-owned utility result cache and sort owner rather than the uncached manager query",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/datatype_factory.go",
+            "pkg/smtcore/proto_model/datatype_utility_test.go",
+            "pkg/ast/ast_datatype_util.go"
+          ],
+          "tests": [
+            "TestDatatypeFactoryUsesOwnedRecursionCache"
+          ]
         }
       ],
       "ownership": [
@@ -114355,7 +114434,8 @@
         "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
         "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations.",
         "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Fresh-path tests observe a real argument pin during the next provider call; cold get_some_value tests require the unchanged borrowed-input count and unpublished registry and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. All fourteen datatype_factory TRACE/CTRACE sites now execute with their source gates, operand order and actual process printer parameters, including enabled-trace get_last_fresh_value cache publication in approach2. Remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial.",
-        "Corrected an over-owning port and its earlier regression: get_some_value uses ptr_vector<expr> at source line34, whereas fresh/almost use expr_ref_vector. Cold construction now borrows provider values without reference reservations or lexical DelRef; fresh scopes retain their existing pins. The source-correct cold regression rejects the previous implementation. This bounded correction does not close broader utility caches or exceptional destruction obligations."
+        "Corrected an over-owning port and its earlier regression: get_some_value uses ptr_vector<expr> at source line34, whereas fresh/almost use expr_ref_vector. Cold construction now borrows provider values without reference reservations or lexical DelRef; fresh scopes retain their existing pins. The source-correct cold regression rejects the previous implementation. This bounded correction does not close broader utility caches or exceptional destruction obligations.",
+        "The independent utility now owns recursion results and one sort pin per successfully pinned cold query. All eight Go query sites (covering repeated calls inside constructor loops and debug-only source operands) use that utility. A public reference-count check after cold FreshValue proves a later utility query is already warm. Broader utility caches and general constructor/exceptional lexical cleanup remain separate partial obligations."
       ]
     },
     {

@@ -6,15 +6,16 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-// DatatypeUtil owns the constructor preferences of one retained source utility
-// instance. Its caches pin datatype sorts, all constructors and selected
-// preferences until Reset or Close.
+// DatatypeUtil owns one retained source utility instance. Its caches pin
+// datatype sorts for constructor lists, selected preferences and recursion
+// results, plus all cached constructors, until Reset or Close.
 type DatatypeUtil struct {
 	self         *DatatypeUtil
 	manager      *ASTManager
 	start        uint32
 	constructors map[ASTHandle]ASTHandle
 	lists        map[ASTHandle]*datatypeConstructorList
+	recursive    map[ASTHandle]bool
 	lexical      ASTRef // interrupted constructor-local cleanup, separate from m_asts
 	refs         []ASTRef
 	tracePending []*datatypeTraceWriter
@@ -45,9 +46,47 @@ func (manager *ASTManager) newDatatypeUtil() (*DatatypeUtil, error) {
 	if err = datatypeUtilAssert(745, "m_plugin", func() bool { return manager.datatypePlugin != nil && manager.datatypePlugin.published }); err != nil {
 		return nil, err
 	}
-	u := &DatatypeUtil{manager: manager, constructors: make(map[ASTHandle]ASTHandle), lists: make(map[ASTHandle]*datatypeConstructorList)}
+	u := &DatatypeUtil{manager: manager, constructors: make(map[ASTHandle]ASTHandle), lists: make(map[ASTHandle]*datatypeConstructorList), recursive: make(map[ASTHandle]bool)}
 	u.self = u
 	return u, nil
+}
+
+// IsRecursive retains one source m_is_recursive entry and sort pin per utility.
+// Publication precedes the pin: a stopped pin leaves the result cached, just
+// as is_recursive's map insertion precedes m_asts.push_back in the source.
+func (u *DatatypeUtil) IsRecursive(sort ASTHandle) (bool, error) {
+	if u == nil || u.self != u || u.manager == nil || u.operation != 0 {
+		return false, ErrASTHandle
+	}
+	m := u.manager
+	if err := m.lock(); err != nil {
+		return false, err
+	}
+	defer m.mu.Unlock()
+	if u.lexical != (ASTRef{}) || len(u.tracePending) != 0 {
+		return false, ErrASTPending
+	}
+	r, err := m.requireKind(sort, ASTSort)
+	if err != nil {
+		return false, err
+	}
+	if err = datatypeUtilAssert(835, "is_datatype(ty)", func() bool { return m.datatypeUtilIsDatatype(r) }); err != nil {
+		return false, err
+	}
+	if value, found := u.recursive[sort]; found {
+		return value, nil
+	}
+	value, err := m.datatypeRecursive(r)
+	if err != nil {
+		return false, err
+	}
+	u.recursive[sort] = value
+	ref, err := m.newRef(sort)
+	if err != nil {
+		return false, err
+	}
+	u.refs = append(u.refs, ref)
+	return value, nil
 }
 
 func (u *DatatypeUtil) NonRecursiveConstructor(sort ASTHandle) (ASTHandle, bool, error) {
@@ -125,6 +164,7 @@ func (u *DatatypeUtil) Reset() error {
 	if u.operation == 0 {
 		clear(u.constructors)
 		clear(u.lists)
+		clear(u.recursive)
 		u.operation = 1
 	}
 	if err := u.releasePreferences(); err != nil {
@@ -205,6 +245,7 @@ func (u *DatatypeUtil) closeLocked() error {
 	}
 	u.constructors = nil
 	u.lists = nil
+	u.recursive = nil
 	u.manager = nil
 	return nil
 }

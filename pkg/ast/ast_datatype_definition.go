@@ -728,40 +728,52 @@ func (m *ASTManager) datatypeSubsorts(sort astNodeRef, result *[]astNodeRef) err
 	return nil
 }
 
-func (m *ASTManager) datatypeRecursive(sort astNodeRef, marks map[astNodeRef]uint8) (bool, error) {
-	if marks[sort] == 1 {
-		return true, nil
-	}
-	if marks[sort] == 2 {
-		return false, nil
-	}
-	definition, err := m.datatypeDefinitionForSort(sort)
-	if err != nil {
-		return false, err
-	}
-	marks[sort] = 1
-	for ci := range definition.constructors {
-		ranges, e := m.datatypeInstantiatedRanges(sort, definition, &definition.constructors[ci])
-		if e != nil {
-			return false, e
+// Source datatype::util::is_recursive_core: process the last queued sort,
+// revisit its fields after queued descendants, and distinguish gray/black.
+func (m *ASTManager) datatypeRecursive(sort astNodeRef) (bool, error) {
+	marks := make(map[astNodeRef]uint8)
+	todo := []astNodeRef{sort}
+	var subsorts []astNodeRef
+	for len(todo) != 0 {
+		sort := todo[len(todo)-1]
+		if marks[sort] == 2 {
+			todo = todo[:len(todo)-1]
+			continue
 		}
-		for _, field := range ranges {
-			var subsorts []astNodeRef
-			if e = m.datatypeSubsorts(field, &subsorts); e != nil {
-				return false, e
-			}
-			for _, nested := range subsorts {
-				if _, e = m.datatypeDefinitionForSort(nested); e != nil {
-					continue
+		marks[sort] = 1
+		definition, err := m.datatypeDefinitionForSort(sort)
+		if err != nil {
+			return false, err
+		}
+		canProcess := true
+		// Source get_def(s) returns the named definition, not instantiated
+		// constructor domains. Its accessor ranges still contain formals.
+		for ci := range definition.constructors {
+			for _, field := range definition.constructors[ci].ranges {
+				subsorts = subsorts[:0]
+				if err = m.datatypeSubsorts(field, &subsorts); err != nil {
+					return false, err
 				}
-				recursive, e := m.datatypeRecursive(nested, marks)
-				if e != nil || recursive {
-					return recursive, e
+				for _, nested := range subsorts {
+					if !m.datatypeUtilIsDatatype(nested) {
+						continue
+					}
+					if mark, found := marks[nested]; found {
+						if mark == 1 {
+							return true, nil
+						}
+					} else {
+						todo = append(todo, nested)
+						canProcess = false
+					}
 				}
 			}
 		}
+		if canProcess {
+			marks[sort] = 2
+			todo = todo[:len(todo)-1]
+		}
 	}
-	marks[sort] = 2
 	return false, nil
 }
 
@@ -774,7 +786,7 @@ func (m *ASTManager) DatatypeIsRecursive(sort ASTHandle) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return m.datatypeRecursive(r, make(map[astNodeRef]uint8))
+	return m.datatypeRecursive(r)
 }
 
 func (m *ASTManager) datatypeNonRecursiveConstructor(sort astNodeRef) (astNodeRef, bool, error) {
