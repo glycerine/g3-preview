@@ -114109,7 +114109,12 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/cmd/g3/test_vectors/queue_parameter_lifetime_scopes.smt2",
         "pkg/smtcore/smt_case_split_trace.go",
-        "pkg/smtcore/smt_case_split_trace_test.go"
+        "pkg/smtcore/smt_case_split_trace_test.go",
+        "pkg/smtcore/smt_case_split_factory.go",
+        "pkg/smtcore/smt_case_split_factory_test.go",
+        "pkg/cmd/g3/test_vectors/queue_factory_fallback_scopes.smt2",
+        "pkg/smtcore/smt_case_split_assertions.go",
+        "pkg/smtcore/smt_case_split_assertions_test.go"
       ],
       "tests": [
         "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
@@ -114166,7 +114171,17 @@
         "TestSMTCaseSplitTraceErasureAndOperandsAfterWriterRefusal",
         "TestSMTCaseSplitGoalAssignmentTraceBeforeGoalPublication",
         "TestSMTCaseSplitSecondaryGoalTraceBeforeDecisionAndReinsert",
-        "TestSMTCaseSplitASTStreamOwnerRefusalPrecedesLiteralSelection"
+        "TestSMTCaseSplitASTStreamOwnerRefusalPrecedesLiteralSelection",
+        "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+        "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+        "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+        "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+        "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext",
+        "TestSMTCaseSplitSourceCreationAssertionsBeforeHeapMutation",
+        "TestSMTCaseSplitSourceAdmissionAndCandidateAssertions",
+        "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
+        "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
+        "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
       ],
       "conditionals": [
         {
@@ -114496,6 +114511,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_case_split_queue sequential warning/fparams fallback and default numeric strategy; constructor RNG before warning, queue allocation before solver full update (case_split_queue.cpp:1229-1262; context.cpp:44-92; solver.cpp:44-78)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_factory.go",
+          "tests": [
+            "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+            "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+            "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+            "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+            "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "All31 retained queue SASSERT source sites: lazy build/runtime gates, exact source file/line/condition, creation membership, relevance admission/candidates, scoped heads/counts, secondary-goal membership/index/last_decided, and theory random thresholds",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_assertions.go",
+          "tests": [
+            "TestSMTCaseSplitSourceCreationAssertionsBeforeHeapMutation",
+            "TestSMTCaseSplitSourceAdmissionAndCandidateAssertions",
+            "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
+            "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
+            "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
+          ]
         }
       ],
       "ownership": [
@@ -114508,7 +114549,9 @@
         "The nonowning expression-to-activity map stores the latest value, while a typed Go slice retains one actual AST reference for every positive search deletion, including repeated deletions of the same expression. Native forward cache-domain retirement clears the map first and uses DecRefConsumed to acknowledge accepted releases even if a later destructor fails; an owning cursor retains the remaining domain and rejects new cache admissions during retirement. Search end preserves the domain; search initialization releases all occurrences. The cached selector owns/uses the existing concrete basic heap lifecycle and no longer scans variables.",
         "Context owns two concrete project heap.Int owners over borrowed Boolean activity. Derived constructor refusal unwinds a newly constructed primary owner and leaves the budget unchanged; a previously owned primary is preserved. Creation reserves both heaps and inserts according to actual searching state. Promotion swaps values/inverse-position storage, not owner pointers or context roots. Unassignment inherits primary insertion even when delayed membership exists; deletion erases both memberships before Boolean storage retirement. Context closes both owners.",
         "Kernel owns one queue for its context lifetime. The queue borrows the actual SMTParams owner and refreshes phase fields only after validating that owner is open and not stopped/running. Parameter updates retain the installed concrete strategy, all heap owners, phase counter/cache-on state and current RNG stream. First component setup, reached by check or user push, reseeds the stream once using the current owner. Search initialization resets only phase_default. Kernel close releases the borrowed queue pointer; existing internalizer owners retain their established close paths.",
-        "Internalizer borrows optional queue-specific TraceTags for source consumers, falling back to process tags. Trace emitters retain static source headers and lazy operands. Sticky ostream failure does not prevent later operand evaluation, selected-variable return, secondary-goal reinsertion, goal publication or theory-priority mutation; operand-computation errors still propagate. Explicit theory-priority endl flush precedes the footer flush. Profiles3/5 borrow the manager NumericTextStream for unconditional decide-and-or records; profile4 intentionally omits them. No new trace owner or universal adapter is introduced."
+        "Internalizer borrows optional queue-specific TraceTags for source consumers, falling back to process tags. Trace emitters retain static source headers and lazy operands. Sticky ostream failure does not prevent later operand evaluation, selected-variable return, secondary-goal reinsertion, goal publication or theory-priority mutation; operand-computation errors still propagate. Explicit theory-priority endl flush precedes the footer flush. Profiles3/5 borrow the manager NumericTextStream for unconditional decide-and-or records; profile4 intentionally omits them. No new trace owner or universal adapter is introduced.",
+        "Factory receives the actual borrowed SMTParamsState field, emits its warning before strategy mutation and heap allocation, and leaves that mutation visible even if queue allocation refuses. Source solver full updt_params follows context construction, so requested case_split can be restored without replacing the installed queue. Borrowed nested owners retain fallback mutation; owned copies isolate it from the source owner. Already constructed raw contexts retain their queue when parameter services are later installed. RNG is seeded before warning callbacks and is not restarted after a callback advances it.",
+        "Queue assertions borrow the process DebugContext and obey SourceAssertionsEnabled before evaluating predicates. Failure uses DebugAssertionFailure, retaining bound notification/action behavior instead of a Boolean-only domain substitute. Native/disabled builds retain existing Go bounds/domain safeguards. Queue heads are restored before their source assertions; goal primary/head/current restore before secondary removal/reinsertion, then the secondary queue shrinks before final head assertion. Native index guard protects the source-undefined out-of-range access after an erased/continuing assertion."
       ],
       "deviations": [
         "The retained activity and generation strategies scan Go slices instead of porting the C++ heap implementations; deterministic source insertion or variable order resolves equal priorities.",
@@ -114523,7 +114566,9 @@
         "Corrected the previous one-reference-per-map-key implementation: native m_cache_domain.push_back executes on every qualifying deletion, even when m_cache.insert overwrites an existing key. Cache retention now precedes inherited heap deletion, and cached priority is restored before actual heap insertion. Three semantic groups verify exact live AST reference counts over three deletion/reinternalization cycles, map overwrite independent of domain multiplicity, unchanged references at search end, complete reset/new zero activity, restored-priority ordering and consuming equal-priority heap behavior. An overlay restoring one root per key fails the real reference-count oracle. Registered six-check scoped SMT-LIB/model vector matches prebuilt C++. Delayed activity profile1 remains a scan pending its concrete two-heap port; remaining diagnostics/context composition remain open. No whole-unit promotion.",
         "Removed the last creation-threshold activity scan. Delayed selection runs the inherited random/primary drain, swaps exhausted primary with delayed, then drains without another RNG draw. Source duplicate primary Decreased call is preserved, followed by delayed Decreased. Heap ordering exposed an existing relevance guard bug in the initial BV solve of the translation lifecycle test: nongate NOT owns a direct Boolean variable whose child can still be undefined. AssignmentEvent now validates the direct callback value as context::propagate_relevancy passes it; normalized find_assignment remains for other reads. A regression drives actual NOT-before-child decision and clause propagation, and all original BV translation/model/scope assertions pass unchanged. Five groups cover swaps/new post-promotion variables, RNG count, dual membership/delete, pure availability, both constructor refusal prefixes with exact budget rollback, and NOT callback semantics. Old selector and old NOT guard overlays each fail their intended semantic oracles. Registered six-check SMT-LIB scope/model vector matches prebuilt C++. All seven selectors now use concrete state; remaining TRACE/SASSERT consumers, parameter-owner lifetime review and full context display composition still need work. No whole-unit promotion.",
         "Replaced per-search selector construction and per-update/per-check RNG restart with retained context lifetime. Five regression groups cover all 49 initial/current queue-mode combinations, actual repeated searches and user scopes, setup via check or push, borrowed phase updates and stopped-owner refusal, fresh-context selection, and continued strategy6 priority admission after case_split changes. Source theory-aware successful selection returns before consulting the phase-hint map; regression requires the hinted second variable to win while retaining the default false phase. Source defaults phase_caching_on=400, phase_caching_off=100 and random_var_freq=0.01 have no retained public update in smt_params.cpp; no dynamic setters were invented. Two overlay negative controls reject queue recreation and repeated RNG reseeding. Registered scoped SMT-LIB option-update vector matches prebuilt C++. This closes the bounded queue lifetime discrepancy only; remaining diagnostics, full context display composition and broader context/engine closure remain partial.",
-        "Audited56 raw diagnostic occurrences:24 live TRACE sites now wired,1 commented TRACE excluded,31 SASSERT sites still require exact per-site assertion closure. Random traces include reserved true-variable selections before normal fallback. Relevance events trace candidate IDs and actual queue snapshots; push/pop cursors, secondary-goal erase-before-decision, labeled goal before publication and theory priority before mutation are emitted at retained call sites. Nine groups verify exact source bytes/headers across all consumer profiles, independent AST stream with native TRACE erased, every physical candidate-trace refusal prefix, lazy erasure, operand evaluation after refused headers, explicit endl, closed manager stream, and read-only availability. Go final-check availability previously invoked NextCaseSplit for profiles3/5, advancing random child selection and emitting duplicate decision records; now scans retained members without consuming RNG, cursor, heap or traces. Overlay controls reject the old decision probe and removal of mandatory AST records. Factory fallback warning/parameter-mutation fidelity (cpp1230-1240), the31 assertion mappings, full context display composition and whole-unit closure remain open; no partial-unit promotion."
+        "Audited56 raw diagnostic occurrences:24 live TRACE sites now wired,1 commented TRACE excluded,31 SASSERT sites still require exact per-site assertion closure. Random traces include reserved true-variable selections before normal fallback. Relevance events trace candidate IDs and actual queue snapshots; push/pop cursors, secondary-goal erase-before-decision, labeled goal before publication and theory priority before mutation are emitted at retained call sites. Nine groups verify exact source bytes/headers across all consumer profiles, independent AST stream with native TRACE erased, every physical candidate-trace refusal prefix, lazy erasure, operand evaluation after refused headers, explicit endl, closed manager stream, and read-only availability. Go final-check availability previously invoked NextCaseSplit for profiles3/5, advancing random child selection and emitting duplicate decision records; now scans retained members without consuming RNG, cursor, heap or traces. Overlay controls reject the old decision probe and removal of mandatory AST records. Factory fallback warning/parameter-mutation fidelity (cpp1230-1240), the31 assertion mappings, full context display composition and whole-unit closure remain open; no partial-unit promotion.",
+        "Factory now emits exactly one source-priority warning when relevancy and auto_config both disallow modes3-5; disabled or refused warning streams still permit mutation. Unknown numeric strategies use the source switch default activity queue while retaining the parameter value (tested7,61,UINT_MAX; scoped C++ vector includes61). Five factory groups verify all7 modes plus defaults, both fallback conditions, solver-update restoration versus borrowed/copy ownership, warning/RNG/mutation/allocation prefix with an actual allocation refusal, runtime warning controls and existing-context retention. Registered six-check scoped vector matches prebuilt C++ exactly on both stdout and warning stderr. No whole-unit promotion.",
+        "The previous31 pending SASSERT sites now have concrete call-site mappings (85,173,174,208,343,354,391,399,411,418,436,514,542,585,591,603,610,625,775,786,831,841,850,859,867,874,892,916,918,1167,1169). Five assertion groups exercise enabled/disabled/native profiles, exact diagnostic identity and action, duplicate heap admission, relevance candidate/admission guards, scope counts/restoration order, goal secondary inconsistencies/indices and recovery, and negative/empty random-selection preconditions. Two overlays reject missing borrowed factory mutation and bypassed source assertion gates. All24 TRACE sites were mapped previously; complete queue method/owner closure and full context display composition still require the remaining audit. Source-unit statuses and audit flags stay unchanged."
       ]
     },
     {
@@ -114566,7 +114611,12 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/cmd/g3/test_vectors/queue_parameter_lifetime_scopes.smt2",
         "pkg/smtcore/smt_case_split_trace.go",
-        "pkg/smtcore/smt_case_split_trace_test.go"
+        "pkg/smtcore/smt_case_split_trace_test.go",
+        "pkg/smtcore/smt_case_split_factory.go",
+        "pkg/smtcore/smt_case_split_factory_test.go",
+        "pkg/cmd/g3/test_vectors/queue_factory_fallback_scopes.smt2",
+        "pkg/smtcore/smt_case_split_assertions.go",
+        "pkg/smtcore/smt_case_split_assertions_test.go"
       ],
       "tests": [
         "TestSMTActivityCaseSplitQueueUsesActivityAssignmentAndPhase",
@@ -114629,7 +114679,17 @@
         "TestSMTCaseSplitTraceErasureAndOperandsAfterWriterRefusal",
         "TestSMTCaseSplitGoalAssignmentTraceBeforeGoalPublication",
         "TestSMTCaseSplitSecondaryGoalTraceBeforeDecisionAndReinsert",
-        "TestSMTCaseSplitASTStreamOwnerRefusalPrecedesLiteralSelection"
+        "TestSMTCaseSplitASTStreamOwnerRefusalPrecedesLiteralSelection",
+        "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+        "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+        "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+        "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+        "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext",
+        "TestSMTCaseSplitSourceCreationAssertionsBeforeHeapMutation",
+        "TestSMTCaseSplitSourceAdmissionAndCandidateAssertions",
+        "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
+        "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
+        "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
       ],
       "conditionals": [
         {
@@ -114810,6 +114870,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_case_split_queue sequential warning/fparams fallback and default numeric strategy; constructor RNG before warning, queue allocation before solver full update (case_split_queue.cpp:1229-1262; context.cpp:44-92; solver.cpp:44-78)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_factory.go",
+          "tests": [
+            "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+            "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+            "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+            "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+            "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "All31 retained queue SASSERT source sites: lazy build/runtime gates, exact source file/line/condition, creation membership, relevance admission/candidates, scoped heads/counts, secondary-goal membership/index/last_decided, and theory random thresholds",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_assertions.go",
+          "tests": [
+            "TestSMTCaseSplitSourceCreationAssertionsBeforeHeapMutation",
+            "TestSMTCaseSplitSourceAdmissionAndCandidateAssertions",
+            "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
+            "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
+            "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
+          ]
         }
       ],
       "ownership": [
@@ -114822,7 +114908,9 @@
         "The nonowning expression-to-activity map stores the latest value, while a typed Go slice retains one actual AST reference for every positive search deletion, including repeated deletions of the same expression. Native forward cache-domain retirement clears the map first and uses DecRefConsumed to acknowledge accepted releases even if a later destructor fails; an owning cursor retains the remaining domain and rejects new cache admissions during retirement. Search end preserves the domain; search initialization releases all occurrences. The cached selector owns/uses the existing concrete basic heap lifecycle and no longer scans variables.",
         "Context owns two concrete project heap.Int owners over borrowed Boolean activity. Derived constructor refusal unwinds a newly constructed primary owner and leaves the budget unchanged; a previously owned primary is preserved. Creation reserves both heaps and inserts according to actual searching state. Promotion swaps values/inverse-position storage, not owner pointers or context roots. Unassignment inherits primary insertion even when delayed membership exists; deletion erases both memberships before Boolean storage retirement. Context closes both owners.",
         "Kernel owns one queue for its context lifetime. The queue borrows the actual SMTParams owner and refreshes phase fields only after validating that owner is open and not stopped/running. Parameter updates retain the installed concrete strategy, all heap owners, phase counter/cache-on state and current RNG stream. First component setup, reached by check or user push, reseeds the stream once using the current owner. Search initialization resets only phase_default. Kernel close releases the borrowed queue pointer; existing internalizer owners retain their established close paths.",
-        "Internalizer borrows optional queue-specific TraceTags for source consumers, falling back to process tags. Trace emitters retain static source headers and lazy operands. Sticky ostream failure does not prevent later operand evaluation, selected-variable return, secondary-goal reinsertion, goal publication or theory-priority mutation; operand-computation errors still propagate. Explicit theory-priority endl flush precedes the footer flush. Profiles3/5 borrow the manager NumericTextStream for unconditional decide-and-or records; profile4 intentionally omits them. No new trace owner or universal adapter is introduced."
+        "Internalizer borrows optional queue-specific TraceTags for source consumers, falling back to process tags. Trace emitters retain static source headers and lazy operands. Sticky ostream failure does not prevent later operand evaluation, selected-variable return, secondary-goal reinsertion, goal publication or theory-priority mutation; operand-computation errors still propagate. Explicit theory-priority endl flush precedes the footer flush. Profiles3/5 borrow the manager NumericTextStream for unconditional decide-and-or records; profile4 intentionally omits them. No new trace owner or universal adapter is introduced.",
+        "Factory receives the actual borrowed SMTParamsState field, emits its warning before strategy mutation and heap allocation, and leaves that mutation visible even if queue allocation refuses. Source solver full updt_params follows context construction, so requested case_split can be restored without replacing the installed queue. Borrowed nested owners retain fallback mutation; owned copies isolate it from the source owner. Already constructed raw contexts retain their queue when parameter services are later installed. RNG is seeded before warning callbacks and is not restarted after a callback advances it.",
+        "Queue assertions borrow the process DebugContext and obey SourceAssertionsEnabled before evaluating predicates. Failure uses DebugAssertionFailure, retaining bound notification/action behavior instead of a Boolean-only domain substitute. Native/disabled builds retain existing Go bounds/domain safeguards. Queue heads are restored before their source assertions; goal primary/head/current restore before secondary removal/reinsertion, then the secondary queue shrinks before final head assertion. Native index guard protects the source-undefined out-of-range access after an erased/continuing assertion."
       ],
       "deviations": [
         "Go exposes one concrete selector over the retained strategies instead of the C++ virtual queue hierarchy.",
@@ -114836,7 +114924,9 @@
         "Corrected the previous one-reference-per-map-key implementation: native m_cache_domain.push_back executes on every qualifying deletion, even when m_cache.insert overwrites an existing key. Cache retention now precedes inherited heap deletion, and cached priority is restored before actual heap insertion. Three semantic groups verify exact live AST reference counts over three deletion/reinternalization cycles, map overwrite independent of domain multiplicity, unchanged references at search end, complete reset/new zero activity, restored-priority ordering and consuming equal-priority heap behavior. An overlay restoring one root per key fails the real reference-count oracle. Registered six-check scoped SMT-LIB/model vector matches prebuilt C++. Delayed activity profile1 remains a scan pending its concrete two-heap port; remaining diagnostics/context composition remain open. No whole-unit promotion.",
         "Removed the last creation-threshold activity scan. Delayed selection runs the inherited random/primary drain, swaps exhausted primary with delayed, then drains without another RNG draw. Source duplicate primary Decreased call is preserved, followed by delayed Decreased. Heap ordering exposed an existing relevance guard bug in the initial BV solve of the translation lifecycle test: nongate NOT owns a direct Boolean variable whose child can still be undefined. AssignmentEvent now validates the direct callback value as context::propagate_relevancy passes it; normalized find_assignment remains for other reads. A regression drives actual NOT-before-child decision and clause propagation, and all original BV translation/model/scope assertions pass unchanged. Five groups cover swaps/new post-promotion variables, RNG count, dual membership/delete, pure availability, both constructor refusal prefixes with exact budget rollback, and NOT callback semantics. Old selector and old NOT guard overlays each fail their intended semantic oracles. Registered six-check SMT-LIB scope/model vector matches prebuilt C++. All seven selectors now use concrete state; remaining TRACE/SASSERT consumers, parameter-owner lifetime review and full context display composition still need work. No whole-unit promotion.",
         "Replaced per-search selector construction and per-update/per-check RNG restart with retained context lifetime. Five regression groups cover all 49 initial/current queue-mode combinations, actual repeated searches and user scopes, setup via check or push, borrowed phase updates and stopped-owner refusal, fresh-context selection, and continued strategy6 priority admission after case_split changes. Source theory-aware successful selection returns before consulting the phase-hint map; regression requires the hinted second variable to win while retaining the default false phase. Source defaults phase_caching_on=400, phase_caching_off=100 and random_var_freq=0.01 have no retained public update in smt_params.cpp; no dynamic setters were invented. Two overlay negative controls reject queue recreation and repeated RNG reseeding. Registered scoped SMT-LIB option-update vector matches prebuilt C++. This closes the bounded queue lifetime discrepancy only; remaining diagnostics, full context display composition and broader context/engine closure remain partial.",
-        "Audited56 raw diagnostic occurrences:24 live TRACE sites now wired,1 commented TRACE excluded,31 SASSERT sites still require exact per-site assertion closure. Random traces include reserved true-variable selections before normal fallback. Relevance events trace candidate IDs and actual queue snapshots; push/pop cursors, secondary-goal erase-before-decision, labeled goal before publication and theory priority before mutation are emitted at retained call sites. Nine groups verify exact source bytes/headers across all consumer profiles, independent AST stream with native TRACE erased, every physical candidate-trace refusal prefix, lazy erasure, operand evaluation after refused headers, explicit endl, closed manager stream, and read-only availability. Go final-check availability previously invoked NextCaseSplit for profiles3/5, advancing random child selection and emitting duplicate decision records; now scans retained members without consuming RNG, cursor, heap or traces. Overlay controls reject the old decision probe and removal of mandatory AST records. Factory fallback warning/parameter-mutation fidelity (cpp1230-1240), the31 assertion mappings, full context display composition and whole-unit closure remain open; no partial-unit promotion."
+        "Audited56 raw diagnostic occurrences:24 live TRACE sites now wired,1 commented TRACE excluded,31 SASSERT sites still require exact per-site assertion closure. Random traces include reserved true-variable selections before normal fallback. Relevance events trace candidate IDs and actual queue snapshots; push/pop cursors, secondary-goal erase-before-decision, labeled goal before publication and theory priority before mutation are emitted at retained call sites. Nine groups verify exact source bytes/headers across all consumer profiles, independent AST stream with native TRACE erased, every physical candidate-trace refusal prefix, lazy erasure, operand evaluation after refused headers, explicit endl, closed manager stream, and read-only availability. Go final-check availability previously invoked NextCaseSplit for profiles3/5, advancing random child selection and emitting duplicate decision records; now scans retained members without consuming RNG, cursor, heap or traces. Overlay controls reject the old decision probe and removal of mandatory AST records. Factory fallback warning/parameter-mutation fidelity (cpp1230-1240), the31 assertion mappings, full context display composition and whole-unit closure remain open; no partial-unit promotion.",
+        "Factory now emits exactly one source-priority warning when relevancy and auto_config both disallow modes3-5; disabled or refused warning streams still permit mutation. Unknown numeric strategies use the source switch default activity queue while retaining the parameter value (tested7,61,UINT_MAX; scoped C++ vector includes61). Five factory groups verify all7 modes plus defaults, both fallback conditions, solver-update restoration versus borrowed/copy ownership, warning/RNG/mutation/allocation prefix with an actual allocation refusal, runtime warning controls and existing-context retention. Registered six-check scoped vector matches prebuilt C++ exactly on both stdout and warning stderr. No whole-unit promotion.",
+        "The previous31 pending SASSERT sites now have concrete call-site mappings (85,173,174,208,343,354,391,399,411,418,436,514,542,585,591,603,610,625,775,786,831,841,850,859,867,874,892,916,918,1167,1169). Five assertion groups exercise enabled/disabled/native profiles, exact diagnostic identity and action, duplicate heap admission, relevance candidate/admission guards, scope counts/restoration order, goal secondary inconsistencies/indices and recovery, and negative/empty random-selection preconditions. Two overlays reject missing borrowed factory mutation and bypassed source assertion gates. All24 TRACE sites were mapped previously; complete queue method/owner closure and full context display composition still require the remaining audit. Source-unit statuses and audit flags stay unchanged."
       ]
     },
     {
@@ -116433,7 +116523,12 @@
         "pkg/smtcore/smt_queue_lifetime_test.go",
         "pkg/cmd/g3/test_vectors/queue_parameter_lifetime_scopes.smt2",
         "pkg/smtcore/smt_case_split_trace.go",
-        "pkg/smtcore/smt_case_split_trace_test.go"
+        "pkg/smtcore/smt_case_split_trace_test.go",
+        "pkg/smtcore/smt_case_split_factory.go",
+        "pkg/smtcore/smt_case_split_factory_test.go",
+        "pkg/cmd/g3/test_vectors/queue_factory_fallback_scopes.smt2",
+        "pkg/smtcore/smt_case_split_assertions.go",
+        "pkg/smtcore/smt_case_split_assertions_test.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -116693,7 +116788,17 @@
         "TestSMTCaseSplitTraceErasureAndOperandsAfterWriterRefusal",
         "TestSMTCaseSplitGoalAssignmentTraceBeforeGoalPublication",
         "TestSMTCaseSplitSecondaryGoalTraceBeforeDecisionAndReinsert",
-        "TestSMTCaseSplitASTStreamOwnerRefusalPrecedesLiteralSelection"
+        "TestSMTCaseSplitASTStreamOwnerRefusalPrecedesLiteralSelection",
+        "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+        "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+        "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+        "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+        "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext",
+        "TestSMTCaseSplitSourceCreationAssertionsBeforeHeapMutation",
+        "TestSMTCaseSplitSourceAdmissionAndCandidateAssertions",
+        "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
+        "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
+        "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
       ],
       "conditionals": [
         {
@@ -118711,6 +118816,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_case_split_queue sequential warning/fparams fallback and default numeric strategy; constructor RNG before warning, queue allocation before solver full update (case_split_queue.cpp:1229-1262; context.cpp:44-92; solver.cpp:44-78)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_factory.go",
+          "tests": [
+            "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+            "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+            "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+            "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+            "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "All31 retained queue SASSERT source sites: lazy build/runtime gates, exact source file/line/condition, creation membership, relevance admission/candidates, scoped heads/counts, secondary-goal membership/index/last_decided, and theory random thresholds",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_assertions.go",
+          "tests": [
+            "TestSMTCaseSplitSourceCreationAssertionsBeforeHeapMutation",
+            "TestSMTCaseSplitSourceAdmissionAndCandidateAssertions",
+            "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
+            "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
+            "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
+          ]
         }
       ],
       "ownership": [
@@ -118747,7 +118878,9 @@
         "The nonowning expression-to-activity map stores the latest value, while a typed Go slice retains one actual AST reference for every positive search deletion, including repeated deletions of the same expression. Native forward cache-domain retirement clears the map first and uses DecRefConsumed to acknowledge accepted releases even if a later destructor fails; an owning cursor retains the remaining domain and rejects new cache admissions during retirement. Search end preserves the domain; search initialization releases all occurrences. The cached selector owns/uses the existing concrete basic heap lifecycle and no longer scans variables.",
         "Context owns two concrete project heap.Int owners over borrowed Boolean activity. Derived constructor refusal unwinds a newly constructed primary owner and leaves the budget unchanged; a previously owned primary is preserved. Creation reserves both heaps and inserts according to actual searching state. Promotion swaps values/inverse-position storage, not owner pointers or context roots. Unassignment inherits primary insertion even when delayed membership exists; deletion erases both memberships before Boolean storage retirement. Context closes both owners.",
         "Kernel owns one queue for its context lifetime. The queue borrows the actual SMTParams owner and refreshes phase fields only after validating that owner is open and not stopped/running. Parameter updates retain the installed concrete strategy, all heap owners, phase counter/cache-on state and current RNG stream. First component setup, reached by check or user push, reseeds the stream once using the current owner. Search initialization resets only phase_default. Kernel close releases the borrowed queue pointer; existing internalizer owners retain their established close paths.",
-        "Internalizer borrows optional queue-specific TraceTags for source consumers, falling back to process tags. Trace emitters retain static source headers and lazy operands. Sticky ostream failure does not prevent later operand evaluation, selected-variable return, secondary-goal reinsertion, goal publication or theory-priority mutation; operand-computation errors still propagate. Explicit theory-priority endl flush precedes the footer flush. Profiles3/5 borrow the manager NumericTextStream for unconditional decide-and-or records; profile4 intentionally omits them. No new trace owner or universal adapter is introduced."
+        "Internalizer borrows optional queue-specific TraceTags for source consumers, falling back to process tags. Trace emitters retain static source headers and lazy operands. Sticky ostream failure does not prevent later operand evaluation, selected-variable return, secondary-goal reinsertion, goal publication or theory-priority mutation; operand-computation errors still propagate. Explicit theory-priority endl flush precedes the footer flush. Profiles3/5 borrow the manager NumericTextStream for unconditional decide-and-or records; profile4 intentionally omits them. No new trace owner or universal adapter is introduced.",
+        "Factory receives the actual borrowed SMTParamsState field, emits its warning before strategy mutation and heap allocation, and leaves that mutation visible even if queue allocation refuses. Source solver full updt_params follows context construction, so requested case_split can be restored without replacing the installed queue. Borrowed nested owners retain fallback mutation; owned copies isolate it from the source owner. Already constructed raw contexts retain their queue when parameter services are later installed. RNG is seeded before warning callbacks and is not restarted after a callback advances it.",
+        "Queue assertions borrow the process DebugContext and obey SourceAssertionsEnabled before evaluating predicates. Failure uses DebugAssertionFailure, retaining bound notification/action behavior instead of a Boolean-only domain substitute. Native/disabled builds retain existing Go bounds/domain safeguards. Queue heads are restored before their source assertions; goal primary/head/current restore before secondary removal/reinsertion, then the secondary queue shrinks before final head assertion. Native index guard protects the source-undefined out-of-range access after an erased/continuing assertion."
       ],
       "deviations": [
         "Array models now use the retained source default-sharing partition and propagated select tables instead of reconstructing store/map/const terms through constructor dependencies. This fixes a reproducible model-build failure for a = store(a,true,true). Defaults are shared across store edges; explicit defaults, finite values, shared infinite-sort fresh placeholders and unspecified fallbacks follow separate source branches. Observed reads propagate transitively to non-overwriting store parents while existing store-side entries win. Full constructors initialize default axioms, and private map/const/as-array lists plus delayed upward maps provide the constraints needed by table models. Context model construction now completes partial functions after quantifier adjustment. Focused tests exhaust Boolean map indices and finite/infinite fallback sharing. Native incremental evaluation also leaves some map equalities symbolic; the Go API regression verifies the actual map equation pointwise over the complete Boolean domain. Three new strict scripts validate cyclic stores, store chains and constructor defaults with scope recovery, raising C++ agreement to 135. Full equality-cache/canonical-default fidelity and diagnostic integration remain partial.",
@@ -118793,7 +118926,9 @@
         "Corrected the previous one-reference-per-map-key implementation: native m_cache_domain.push_back executes on every qualifying deletion, even when m_cache.insert overwrites an existing key. Cache retention now precedes inherited heap deletion, and cached priority is restored before actual heap insertion. Three semantic groups verify exact live AST reference counts over three deletion/reinternalization cycles, map overwrite independent of domain multiplicity, unchanged references at search end, complete reset/new zero activity, restored-priority ordering and consuming equal-priority heap behavior. An overlay restoring one root per key fails the real reference-count oracle. Registered six-check scoped SMT-LIB/model vector matches prebuilt C++. Delayed activity profile1 remains a scan pending its concrete two-heap port; remaining diagnostics/context composition remain open. No whole-unit promotion.",
         "Removed the last creation-threshold activity scan. Delayed selection runs the inherited random/primary drain, swaps exhausted primary with delayed, then drains without another RNG draw. Source duplicate primary Decreased call is preserved, followed by delayed Decreased. Heap ordering exposed an existing relevance guard bug in the initial BV solve of the translation lifecycle test: nongate NOT owns a direct Boolean variable whose child can still be undefined. AssignmentEvent now validates the direct callback value as context::propagate_relevancy passes it; normalized find_assignment remains for other reads. A regression drives actual NOT-before-child decision and clause propagation, and all original BV translation/model/scope assertions pass unchanged. Five groups cover swaps/new post-promotion variables, RNG count, dual membership/delete, pure availability, both constructor refusal prefixes with exact budget rollback, and NOT callback semantics. Old selector and old NOT guard overlays each fail their intended semantic oracles. Registered six-check SMT-LIB scope/model vector matches prebuilt C++. All seven selectors now use concrete state; remaining TRACE/SASSERT consumers, parameter-owner lifetime review and full context display composition still need work. No whole-unit promotion.",
         "Replaced per-search selector construction and per-update/per-check RNG restart with retained context lifetime. Five regression groups cover all 49 initial/current queue-mode combinations, actual repeated searches and user scopes, setup via check or push, borrowed phase updates and stopped-owner refusal, fresh-context selection, and continued strategy6 priority admission after case_split changes. Source theory-aware successful selection returns before consulting the phase-hint map; regression requires the hinted second variable to win while retaining the default false phase. Source defaults phase_caching_on=400, phase_caching_off=100 and random_var_freq=0.01 have no retained public update in smt_params.cpp; no dynamic setters were invented. Two overlay negative controls reject queue recreation and repeated RNG reseeding. Registered scoped SMT-LIB option-update vector matches prebuilt C++. This closes the bounded queue lifetime discrepancy only; remaining diagnostics, full context display composition and broader context/engine closure remain partial.",
-        "Audited56 raw diagnostic occurrences:24 live TRACE sites now wired,1 commented TRACE excluded,31 SASSERT sites still require exact per-site assertion closure. Random traces include reserved true-variable selections before normal fallback. Relevance events trace candidate IDs and actual queue snapshots; push/pop cursors, secondary-goal erase-before-decision, labeled goal before publication and theory priority before mutation are emitted at retained call sites. Nine groups verify exact source bytes/headers across all consumer profiles, independent AST stream with native TRACE erased, every physical candidate-trace refusal prefix, lazy erasure, operand evaluation after refused headers, explicit endl, closed manager stream, and read-only availability. Go final-check availability previously invoked NextCaseSplit for profiles3/5, advancing random child selection and emitting duplicate decision records; now scans retained members without consuming RNG, cursor, heap or traces. Overlay controls reject the old decision probe and removal of mandatory AST records. Factory fallback warning/parameter-mutation fidelity (cpp1230-1240), the31 assertion mappings, full context display composition and whole-unit closure remain open; no partial-unit promotion."
+        "Audited56 raw diagnostic occurrences:24 live TRACE sites now wired,1 commented TRACE excluded,31 SASSERT sites still require exact per-site assertion closure. Random traces include reserved true-variable selections before normal fallback. Relevance events trace candidate IDs and actual queue snapshots; push/pop cursors, secondary-goal erase-before-decision, labeled goal before publication and theory priority before mutation are emitted at retained call sites. Nine groups verify exact source bytes/headers across all consumer profiles, independent AST stream with native TRACE erased, every physical candidate-trace refusal prefix, lazy erasure, operand evaluation after refused headers, explicit endl, closed manager stream, and read-only availability. Go final-check availability previously invoked NextCaseSplit for profiles3/5, advancing random child selection and emitting duplicate decision records; now scans retained members without consuming RNG, cursor, heap or traces. Overlay controls reject the old decision probe and removal of mandatory AST records. Factory fallback warning/parameter-mutation fidelity (cpp1230-1240), the31 assertion mappings, full context display composition and whole-unit closure remain open; no partial-unit promotion.",
+        "Factory now emits exactly one source-priority warning when relevancy and auto_config both disallow modes3-5; disabled or refused warning streams still permit mutation. Unknown numeric strategies use the source switch default activity queue while retaining the parameter value (tested7,61,UINT_MAX; scoped C++ vector includes61). Five factory groups verify all7 modes plus defaults, both fallback conditions, solver-update restoration versus borrowed/copy ownership, warning/RNG/mutation/allocation prefix with an actual allocation refusal, runtime warning controls and existing-context retention. Registered six-check scoped vector matches prebuilt C++ exactly on both stdout and warning stderr. No whole-unit promotion.",
+        "The previous31 pending SASSERT sites now have concrete call-site mappings (85,173,174,208,343,354,391,399,411,418,436,514,542,585,591,603,610,625,775,786,831,841,850,859,867,874,892,916,918,1167,1169). Five assertion groups exercise enabled/disabled/native profiles, exact diagnostic identity and action, duplicate heap admission, relevance candidate/admission guards, scope counts/restoration order, goal secondary inconsistencies/indices and recovery, and negative/empty random-selection preconditions. Two overlays reject missing borrowed factory mutation and bypassed source assertion gates. All24 TRACE sites were mapped previously; complete queue method/owner closure and full context display composition still require the remaining audit. Source-unit statuses and audit flags stay unchanged."
       ]
     },
     {
@@ -118940,7 +119075,12 @@
         "pkg/smtcore/smt_queue_lifetime_test.go",
         "pkg/cmd/g3/test_vectors/queue_parameter_lifetime_scopes.smt2",
         "pkg/smtcore/smt_case_split_trace.go",
-        "pkg/smtcore/smt_case_split_trace_test.go"
+        "pkg/smtcore/smt_case_split_trace_test.go",
+        "pkg/smtcore/smt_case_split_factory.go",
+        "pkg/smtcore/smt_case_split_factory_test.go",
+        "pkg/cmd/g3/test_vectors/queue_factory_fallback_scopes.smt2",
+        "pkg/smtcore/smt_case_split_assertions.go",
+        "pkg/smtcore/smt_case_split_assertions_test.go"
       ],
       "tests": [
         "TestSMTInternalizerWatchedClausePropagationAndRollback",
@@ -119150,7 +119290,17 @@
         "TestSMTCaseSplitTraceErasureAndOperandsAfterWriterRefusal",
         "TestSMTCaseSplitGoalAssignmentTraceBeforeGoalPublication",
         "TestSMTCaseSplitSecondaryGoalTraceBeforeDecisionAndReinsert",
-        "TestSMTCaseSplitASTStreamOwnerRefusalPrecedesLiteralSelection"
+        "TestSMTCaseSplitASTStreamOwnerRefusalPrecedesLiteralSelection",
+        "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+        "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+        "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+        "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+        "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext",
+        "TestSMTCaseSplitSourceCreationAssertionsBeforeHeapMutation",
+        "TestSMTCaseSplitSourceAdmissionAndCandidateAssertions",
+        "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
+        "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
+        "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
       ],
       "conditionals": [
         {
@@ -120132,6 +120282,32 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "mk_case_split_queue sequential warning/fparams fallback and default numeric strategy; constructor RNG before warning, queue allocation before solver full update (case_split_queue.cpp:1229-1262; context.cpp:44-92; solver.cpp:44-78)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_factory.go",
+          "tests": [
+            "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+            "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+            "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+            "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+            "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "All31 retained queue SASSERT source sites: lazy build/runtime gates, exact source file/line/condition, creation membership, relevance admission/candidates, scoped heads/counts, secondary-goal membership/index/last_decided, and theory random thresholds",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_assertions.go",
+          "tests": [
+            "TestSMTCaseSplitSourceCreationAssertionsBeforeHeapMutation",
+            "TestSMTCaseSplitSourceAdmissionAndCandidateAssertions",
+            "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
+            "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
+            "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands"
+          ]
         }
       ],
       "ownership": [
@@ -120168,7 +120344,9 @@
         "The nonowning expression-to-activity map stores the latest value, while a typed Go slice retains one actual AST reference for every positive search deletion, including repeated deletions of the same expression. Native forward cache-domain retirement clears the map first and uses DecRefConsumed to acknowledge accepted releases even if a later destructor fails; an owning cursor retains the remaining domain and rejects new cache admissions during retirement. Search end preserves the domain; search initialization releases all occurrences. The cached selector owns/uses the existing concrete basic heap lifecycle and no longer scans variables.",
         "Context owns two concrete project heap.Int owners over borrowed Boolean activity. Derived constructor refusal unwinds a newly constructed primary owner and leaves the budget unchanged; a previously owned primary is preserved. Creation reserves both heaps and inserts according to actual searching state. Promotion swaps values/inverse-position storage, not owner pointers or context roots. Unassignment inherits primary insertion even when delayed membership exists; deletion erases both memberships before Boolean storage retirement. Context closes both owners.",
         "Kernel owns one queue for its context lifetime. The queue borrows the actual SMTParams owner and refreshes phase fields only after validating that owner is open and not stopped/running. Parameter updates retain the installed concrete strategy, all heap owners, phase counter/cache-on state and current RNG stream. First component setup, reached by check or user push, reseeds the stream once using the current owner. Search initialization resets only phase_default. Kernel close releases the borrowed queue pointer; existing internalizer owners retain their established close paths.",
-        "Internalizer borrows optional queue-specific TraceTags for source consumers, falling back to process tags. Trace emitters retain static source headers and lazy operands. Sticky ostream failure does not prevent later operand evaluation, selected-variable return, secondary-goal reinsertion, goal publication or theory-priority mutation; operand-computation errors still propagate. Explicit theory-priority endl flush precedes the footer flush. Profiles3/5 borrow the manager NumericTextStream for unconditional decide-and-or records; profile4 intentionally omits them. No new trace owner or universal adapter is introduced."
+        "Internalizer borrows optional queue-specific TraceTags for source consumers, falling back to process tags. Trace emitters retain static source headers and lazy operands. Sticky ostream failure does not prevent later operand evaluation, selected-variable return, secondary-goal reinsertion, goal publication or theory-priority mutation; operand-computation errors still propagate. Explicit theory-priority endl flush precedes the footer flush. Profiles3/5 borrow the manager NumericTextStream for unconditional decide-and-or records; profile4 intentionally omits them. No new trace owner or universal adapter is introduced.",
+        "Factory receives the actual borrowed SMTParamsState field, emits its warning before strategy mutation and heap allocation, and leaves that mutation visible even if queue allocation refuses. Source solver full updt_params follows context construction, so requested case_split can be restored without replacing the installed queue. Borrowed nested owners retain fallback mutation; owned copies isolate it from the source owner. Already constructed raw contexts retain their queue when parameter services are later installed. RNG is seeded before warning callbacks and is not restarted after a callback advances it.",
+        "Queue assertions borrow the process DebugContext and obey SourceAssertionsEnabled before evaluating predicates. Failure uses DebugAssertionFailure, retaining bound notification/action behavior instead of a Boolean-only domain substitute. Native/disabled builds retain existing Go bounds/domain safeguards. Queue heads are restored before their source assertions; goal primary/head/current restore before secondary removal/reinsertion, then the secondary queue shrinks before final head assertion. Native index guard protects the source-undefined out-of-range access after an erased/continuing assertion."
       ],
       "deviations": [
         "The complete context interface, structural subsumption, model state, and remaining lifecycle operations remain unported.",
@@ -120200,7 +120378,9 @@
         "Corrected the previous one-reference-per-map-key implementation: native m_cache_domain.push_back executes on every qualifying deletion, even when m_cache.insert overwrites an existing key. Cache retention now precedes inherited heap deletion, and cached priority is restored before actual heap insertion. Three semantic groups verify exact live AST reference counts over three deletion/reinternalization cycles, map overwrite independent of domain multiplicity, unchanged references at search end, complete reset/new zero activity, restored-priority ordering and consuming equal-priority heap behavior. An overlay restoring one root per key fails the real reference-count oracle. Registered six-check scoped SMT-LIB/model vector matches prebuilt C++. Delayed activity profile1 remains a scan pending its concrete two-heap port; remaining diagnostics/context composition remain open. No whole-unit promotion.",
         "Removed the last creation-threshold activity scan. Delayed selection runs the inherited random/primary drain, swaps exhausted primary with delayed, then drains without another RNG draw. Source duplicate primary Decreased call is preserved, followed by delayed Decreased. Heap ordering exposed an existing relevance guard bug in the initial BV solve of the translation lifecycle test: nongate NOT owns a direct Boolean variable whose child can still be undefined. AssignmentEvent now validates the direct callback value as context::propagate_relevancy passes it; normalized find_assignment remains for other reads. A regression drives actual NOT-before-child decision and clause propagation, and all original BV translation/model/scope assertions pass unchanged. Five groups cover swaps/new post-promotion variables, RNG count, dual membership/delete, pure availability, both constructor refusal prefixes with exact budget rollback, and NOT callback semantics. Old selector and old NOT guard overlays each fail their intended semantic oracles. Registered six-check SMT-LIB scope/model vector matches prebuilt C++. All seven selectors now use concrete state; remaining TRACE/SASSERT consumers, parameter-owner lifetime review and full context display composition still need work. No whole-unit promotion.",
         "Replaced per-search selector construction and per-update/per-check RNG restart with retained context lifetime. Five regression groups cover all 49 initial/current queue-mode combinations, actual repeated searches and user scopes, setup via check or push, borrowed phase updates and stopped-owner refusal, fresh-context selection, and continued strategy6 priority admission after case_split changes. Source theory-aware successful selection returns before consulting the phase-hint map; regression requires the hinted second variable to win while retaining the default false phase. Source defaults phase_caching_on=400, phase_caching_off=100 and random_var_freq=0.01 have no retained public update in smt_params.cpp; no dynamic setters were invented. Two overlay negative controls reject queue recreation and repeated RNG reseeding. Registered scoped SMT-LIB option-update vector matches prebuilt C++. This closes the bounded queue lifetime discrepancy only; remaining diagnostics, full context display composition and broader context/engine closure remain partial.",
-        "Audited56 raw diagnostic occurrences:24 live TRACE sites now wired,1 commented TRACE excluded,31 SASSERT sites still require exact per-site assertion closure. Random traces include reserved true-variable selections before normal fallback. Relevance events trace candidate IDs and actual queue snapshots; push/pop cursors, secondary-goal erase-before-decision, labeled goal before publication and theory priority before mutation are emitted at retained call sites. Nine groups verify exact source bytes/headers across all consumer profiles, independent AST stream with native TRACE erased, every physical candidate-trace refusal prefix, lazy erasure, operand evaluation after refused headers, explicit endl, closed manager stream, and read-only availability. Go final-check availability previously invoked NextCaseSplit for profiles3/5, advancing random child selection and emitting duplicate decision records; now scans retained members without consuming RNG, cursor, heap or traces. Overlay controls reject the old decision probe and removal of mandatory AST records. Factory fallback warning/parameter-mutation fidelity (cpp1230-1240), the31 assertion mappings, full context display composition and whole-unit closure remain open; no partial-unit promotion."
+        "Audited56 raw diagnostic occurrences:24 live TRACE sites now wired,1 commented TRACE excluded,31 SASSERT sites still require exact per-site assertion closure. Random traces include reserved true-variable selections before normal fallback. Relevance events trace candidate IDs and actual queue snapshots; push/pop cursors, secondary-goal erase-before-decision, labeled goal before publication and theory priority before mutation are emitted at retained call sites. Nine groups verify exact source bytes/headers across all consumer profiles, independent AST stream with native TRACE erased, every physical candidate-trace refusal prefix, lazy erasure, operand evaluation after refused headers, explicit endl, closed manager stream, and read-only availability. Go final-check availability previously invoked NextCaseSplit for profiles3/5, advancing random child selection and emitting duplicate decision records; now scans retained members without consuming RNG, cursor, heap or traces. Overlay controls reject the old decision probe and removal of mandatory AST records. Factory fallback warning/parameter-mutation fidelity (cpp1230-1240), the31 assertion mappings, full context display composition and whole-unit closure remain open; no partial-unit promotion.",
+        "Factory now emits exactly one source-priority warning when relevancy and auto_config both disallow modes3-5; disabled or refused warning streams still permit mutation. Unknown numeric strategies use the source switch default activity queue while retaining the parameter value (tested7,61,UINT_MAX; scoped C++ vector includes61). Five factory groups verify all7 modes plus defaults, both fallback conditions, solver-update restoration versus borrowed/copy ownership, warning/RNG/mutation/allocation prefix with an actual allocation refusal, runtime warning controls and existing-context retention. Registered six-check scoped vector matches prebuilt C++ exactly on both stdout and warning stderr. No whole-unit promotion.",
+        "The previous31 pending SASSERT sites now have concrete call-site mappings (85,173,174,208,343,354,391,399,411,418,436,514,542,585,591,603,610,625,775,786,831,841,850,859,867,874,892,916,918,1167,1169). Five assertion groups exercise enabled/disabled/native profiles, exact diagnostic identity and action, duplicate heap admission, relevance candidate/admission guards, scope counts/restoration order, goal secondary inconsistencies/indices and recovery, and negative/empty random-selection preconditions. Two overlays reject missing borrowed factory mutation and bypassed source assertion gates. All24 TRACE sites were mapped previously; complete queue method/owner closure and full context display composition still require the remaining audit. Source-unit statuses and audit flags stay unchanged."
       ]
     },
     {
@@ -128000,7 +128180,12 @@
         "pkg/smtcore/smt_setup_check_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/smtcore/smt_sequence_lifecycle.go",
-        "pkg/smtcore/smt_sequence_lifecycle_test.go"
+        "pkg/smtcore/smt_sequence_lifecycle_test.go",
+        "pkg/smtcore/smt_case_split_factory.go",
+        "pkg/smtcore/smt_case_split_factory_test.go",
+        "pkg/smtcore/smt_queue_lifetime.go",
+        "pkg/smtcore/smt_boolean_activity.go",
+        "pkg/cmd/g3/test_vectors/queue_factory_fallback_scopes.smt2"
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
@@ -128031,7 +128216,12 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
-        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
+        "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner",
+        "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+        "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+        "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+        "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+        "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext"
       ],
       "assertions": [
         {
@@ -128218,11 +128408,26 @@
             "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
             "TestSMTSequenceAuxiliaryCopyKeepsInstalledBackendAndOwner"
           ]
+        },
+        {
+          "name": "mk_case_split_queue sequential warning/fparams fallback and default numeric strategy; constructor RNG before warning, queue allocation before solver full update (case_split_queue.cpp:1229-1262; context.cpp:44-92; solver.cpp:44-78)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_case_split_factory.go",
+          "tests": [
+            "TestSMTCaseSplitFactoryWarningsSequentialAndSolverUpdate",
+            "TestSMTCaseSplitFactoryBorrowedMutationAndOwnedCopy",
+            "TestSMTCaseSplitFactoryWarningBeforeMutationAndAllocationRefusal",
+            "TestSMTCaseSplitFactoryWarningDisabledOrRefusedStillMutates",
+            "TestSMTCaseSplitFactoryDoesNotReplaceAlreadyConstructedRawContext",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         }
       ],
       "ownership": [
         "SMTSolver owns its SMTKernel, named-assertion adapter, current check result, copied parameter reference, and retained tracked-formula references; it borrows the AST manager, parameter context, quantifier registry, and progress callback.",
-        "Preprocessing publishes a returned partial TheoryRewriter into the actual kernel owner before inspecting its construction error; solver/kernel teardown therefore closes the allocated configuration on every reached reservation failure."
+        "Preprocessing publishes a returned partial TheoryRewriter into the actual kernel owner before inspecting its construction error; solver/kernel teardown therefore closes the allocated configuration on every reached reservation failure.",
+        "Factory receives the actual borrowed SMTParamsState field, emits its warning before strategy mutation and heap allocation, and leaves that mutation visible even if queue allocation refuses. Source solver full updt_params follows context construction, so requested case_split can be restored without replacing the installed queue. Borrowed nested owners retain fallback mutation; owned copies isolate it from the source owner. Already constructed raw contexts retain their queue when parameter services are later installed. RNG is seeded before warning callbacks and is not restarted after a callback advances it."
       ],
       "deviations": [
         "BV plugin copying now creates independent concrete bit-vector state and borrows both source theory_bv_params and bit_blaster_params. Same-manager and cross-manager symbolic modular add/sub tests check typed models, scoped contradiction/pop recovery, source updates, destination update isolation, source close, chained translation and the pre-setup placeholder boundary. Other theory families and broader context-copy learned-state fidelity remain incomplete.",
@@ -128232,7 +128437,8 @@
         "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "Unavailable kernel result facilities return empty ordinary result fields or an explicit domain error; they are not simulated by a universal adapter.",
         "Cross-manager translation obtains manager-bound parameter and quantifier services through TargetConfig and preserves the source's duplicate named-implication assertion after copying kernel formulas. The earlier claim that reconstruction from destination settings replaces retained plugin copying was incorrect: an installed concrete source plugin survives destination setup, even when the destination arithmetic mode differs. Retained arithmetic types now preserve this behavior; other theory families remain incomplete, so this unit is partial. The source MUS branch is unreachable because m_minimizing_core is initialized false and is set true only inside that branch; the live pattern-extension policies are ported.",
-        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
+        "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths.",
+        "Factory now emits exactly one source-priority warning when relevancy and auto_config both disallow modes3-5; disabled or refused warning streams still permit mutation. Unknown numeric strategies use the source switch default activity queue while retaining the parameter value (tested7,61,UINT_MAX; scoped C++ vector includes61). Five factory groups verify all7 modes plus defaults, both fallback conditions, solver-update restoration versus borrowed/copy ownership, warning/RNG/mutation/allocation prefix with an actual allocation refusal, runtime warning controls and existing-context retention. Registered six-check scoped vector matches prebuilt C++ exactly on both stdout and warning stderr. No whole-unit promotion."
       ]
     },
     {

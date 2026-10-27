@@ -25,15 +25,23 @@ func (f *smtRelevanceFIFO) snapshot() smtRelevanceFIFOScope {
 	return smtRelevanceFIFOScope{len(f.first), len(f.second), f.firstHead, f.secondHead}
 }
 
-func (f *smtRelevanceFIFO) restore(scope smtRelevanceFIFOScope) error {
+func (f *smtRelevanceFIFO) restore(scope smtRelevanceFIFOScope, assertHead bool) error {
 	if scope.firstLimit < 0 || scope.firstLimit > len(f.first) || scope.secondLimit < 0 || scope.secondLimit > len(f.second) ||
-		scope.firstHead < 0 || scope.firstHead > scope.firstLimit || scope.secondHead < 0 || scope.secondHead > scope.secondLimit {
+		scope.firstHead < 0 || scope.secondHead < 0 || scope.secondHead > scope.secondLimit {
 		return ast.ErrASTDomain
 	}
 	clear(f.first[scope.firstLimit:])
 	clear(f.second[scope.secondLimit:])
 	f.first, f.second = f.first[:scope.firstLimit], f.second[:scope.secondLimit]
 	f.firstHead, f.secondHead = scope.firstHead, scope.secondHead
+	if assertHead {
+		if err := smtCaseSplitAssert(399, "m_head <= m_queue.size()", func() bool { return f.firstHead <= len(f.first) }); err != nil {
+			return err
+		}
+	}
+	if f.firstHead > len(f.first) {
+		return ast.ErrASTDomain
+	}
 	return nil
 }
 
@@ -55,12 +63,20 @@ func (s *SMTInternalizerState) admitRelevanceCaseSplit(expression ast.ASTHandle)
 			return nil
 		}
 	} else {
+		if err := s.assertCaseSplitAdmissionVar(variable); err != nil {
+			return err
+		}
 		value, err := s.Assignment(NewSMTLiteral(variable, false))
 		if err != nil {
 			return err
 		}
 		if value != lbool.Undef && !(isOr && value == lbool.True) && !(isAnd && value == lbool.False) {
 			return nil
+		}
+	}
+	if !internalized && s.searching {
+		if err := s.assertCaseSplitAdmissionOr(isOr); err != nil {
+			return err
 		}
 	}
 	if err := s.admitRelevanceGoal(expression, variable, internalized); err != nil {

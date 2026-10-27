@@ -17,6 +17,7 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -28,6 +29,7 @@ type SMTKernelAssertion struct {
 }
 
 type SMTKernel struct {
+	queueWarnings      *diagnostic.WarningService // Borrowed factory diagnostics; nil uses process warnings.
 	caseSplitQueue     *SMTActivityCaseSplitQueue
 	booleanSetupSeeded bool
 	smtParamsBorrowed  bool
@@ -233,6 +235,14 @@ func (k *SMTKernel) configurePreprocessingParams(context *uparams.ParamsContext,
 	patternOptions, err := full.preprocess.pattern.InferenceOptions(nil)
 	if err != nil {
 		return errors.Join(err, closeSMTKernelParams(full, borrowSource))
+	}
+
+	// context constructs its queue against the borrowed constructor fparams.
+	// The later solver update can restore case_split without replacing that queue.
+	if k.caseSplitQueue == nil {
+		if err = k.initializeQueueHeuristics(&full.state); err != nil {
+			return errors.Join(err, closeSMTKernelParams(full, borrowSource))
+		}
 	}
 	// smt_solver constructs smt_params and its context first, then invokes the
 	// full updt_params overload. That second step updates embedded bases such as
@@ -1328,6 +1338,7 @@ func (k *SMTKernel) Close() error {
 		k.assertedScopeConflicts = nil
 		k.assertedInconsistent = false
 		k.caseSplitQueue = nil
+		k.queueWarnings = nil
 		k.booleanSetupSeeded = false
 		k.internalizer = nil
 		k.checker = nil

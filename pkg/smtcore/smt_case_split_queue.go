@@ -433,10 +433,19 @@ func (q *SMTActivityCaseSplitQueue) relevantCandidate(expression ast.ASTHandle) 
 	}
 	isOr, isAnd := basic && op == ast.ASTOpOr, basic && op == ast.ASTOpAnd
 	variable, internalized := q.state.BoolVar(expression)
+	internLine, orLine, varLine := q.candidateAssertionLines()
+	if err := smtCaseSplitAssert(internLine, "intern || is_or", func() bool { return internalized || isOr }); err != nil {
+		return SMTNullBoolVar, lbool.Undef, false, err
+	}
 	if !internalized && !isOr {
 		return SMTNullBoolVar, lbool.Undef, false, nil
 	}
 	value := lbool.True
+	if !internalized {
+		if err := smtCaseSplitAssert(orLine, "is_or", func() bool { return isOr }); err != nil {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
+	}
 	if internalized {
 		value, err = q.state.Assignment(NewSMTLiteral(variable, false))
 		if err != nil {
@@ -474,6 +483,12 @@ func (q *SMTActivityCaseSplitQueue) relevantCandidate(expression ast.ASTHandle) 
 		return literal.Var(), phase, true, nil
 	}
 	if internalized && value == lbool.Undef {
+		if err = smtCaseSplitAssert(varLine, "intern && m_context.get_bool_var(curr) == next", func() bool {
+			checked, ok := q.state.BoolVar(expression)
+			return internalized && ok && checked == variable
+		}); err != nil {
+			return SMTNullBoolVar, lbool.Undef, false, err
+		}
 		if err = q.traceCaseSplitCandidate(expression, ast.ASTHandle{}); err != nil {
 			return SMTNullBoolVar, lbool.Undef, false, err
 		}

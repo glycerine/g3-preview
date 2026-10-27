@@ -78,12 +78,18 @@ func (f *smtRelevanceGoalQueue) snapshot(level uint32) smtRelevanceGoalScope {
 	return smtRelevanceGoalScope{len(f.first), len(f.second), f.head, level, f.current}
 }
 
-func (f *smtRelevanceGoalQueue) restore(scope smtRelevanceGoalScope) error {
-	if scope.firstLimit < 0 || scope.firstLimit > len(f.first) || scope.secondLimit < 0 || scope.secondLimit > len(f.second) || scope.head < 0 || scope.head > scope.firstLimit {
+func (f *smtRelevanceGoalQueue) restore(scope smtRelevanceGoalScope, assertHead bool) error {
+	if scope.firstLimit < 0 || scope.firstLimit > len(f.first) || scope.secondLimit < 0 || scope.secondLimit > len(f.second) || scope.head < 0 {
 		return ast.ErrASTDomain
 	}
+	clear(f.first[scope.firstLimit:])
+	f.first = f.first[:scope.firstLimit]
+	f.head, f.current = scope.head, scope.goal
 	if f.heap != nil {
 		for i := scope.secondLimit; i < len(f.second); i++ {
+			if err := smtCaseSplitAssert(841, "(m_queue2[i].m_last_decided == -1) == m_priority_queue2.contains(i)", func() bool { return (f.second[i].lastDecided == -1) == f.heap.Contains(int32(i)) }); err != nil {
+				return err
+			}
 			if f.heap.Contains(int32(i)) {
 				if err := f.heap.Erase(int32(i)); err != nil {
 					return err
@@ -92,6 +98,9 @@ func (f *smtRelevanceGoalQueue) restore(scope smtRelevanceGoalScope) error {
 		}
 		for i := 0; i < scope.secondLimit; i++ {
 			if f.second[i].lastDecided > int32(scope.level) {
+				if err := smtCaseSplitAssert(850, "!m_priority_queue2.contains(i)", func() bool { return !f.heap.Contains(int32(i)) }); err != nil {
+					return err
+				}
 				if err := f.heap.Insert(int32(i)); err != nil {
 					return err
 				}
@@ -99,10 +108,16 @@ func (f *smtRelevanceGoalQueue) restore(scope smtRelevanceGoalScope) error {
 			}
 		}
 	}
-	clear(f.first[scope.firstLimit:])
 	clear(f.second[scope.secondLimit:])
-	f.first, f.second = f.first[:scope.firstLimit], f.second[:scope.secondLimit]
-	f.head, f.current = scope.head, scope.goal
+	f.second = f.second[:scope.secondLimit]
+	if assertHead {
+		if err := smtCaseSplitAssert(859, "m_head <= m_queue.size()", func() bool { return f.head <= len(f.first) }); err != nil {
+			return err
+		}
+	}
+	if f.head > len(f.first) {
+		return ast.ErrASTDomain
+	}
 	return nil
 }
 
@@ -125,6 +140,15 @@ func (q *SMTActivityCaseSplitQueue) nextRelevanceGoal() (int32, lbool.LBool, err
 		if err = q.state.emitCaseSplitTrace("case_split", "next_case_split", 915, func(out io.Writer) error {
 			return smtWriteTheoryText(out, fmt.Sprintf("q %d idx %d\n", len(f.second), index))
 		}); err != nil {
+			return SMTNullBoolVar, lbool.Undef, err
+		}
+		if err = smtCaseSplitAssert(916, "idx < m_queue2.size()", func() bool { return index >= 0 && int(index) < len(f.second) }); err != nil {
+			return SMTNullBoolVar, lbool.Undef, err
+		}
+		if index < 0 || int(index) >= len(f.second) {
+			return SMTNullBoolVar, lbool.Undef, ast.ErrASTDomain
+		}
+		if err = smtCaseSplitAssert(918, "e.m_last_decided == -1", func() bool { return f.second[index].lastDecided == -1 }); err != nil {
 			return SMTNullBoolVar, lbool.Undef, err
 		}
 		f.second[index].lastDecided = int32(q.state.scopeLevel)

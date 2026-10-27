@@ -799,16 +799,24 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 }
 
 func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
-	if err := s.relevanceGoal.restore(scope.goalQueue); err != nil {
+	if err := s.relevanceGoal.restore(scope.goalQueue, s.caseSplitStrategy == 5); err != nil {
 		return err
 	}
-	if scope.relActLimit < 0 || scope.relActLimit > len(s.relevanceActivity.entries) || scope.relActHead < 0 || scope.relActHead > scope.relActLimit {
+	if scope.relActLimit < 0 || scope.relActLimit > len(s.relevanceActivity.entries) || scope.relActHead < 0 {
 		return ast.ErrASTDomain
 	}
 	clear(s.relevanceActivity.entries[scope.relActLimit:])
 	s.relevanceActivity.entries = s.relevanceActivity.entries[:scope.relActLimit]
 	s.relevanceActivity.head = scope.relActHead
-	if err := s.relevanceFIFO.restore(scope.relevanceFIFO); err != nil {
+	if s.caseSplitStrategy == 4 {
+		if err := smtCaseSplitAssert(591, "m_head <= m_queue.size()", func() bool { return s.relevanceActivity.head <= len(s.relevanceActivity.entries) }); err != nil {
+			return err
+		}
+	}
+	if s.relevanceActivity.head > len(s.relevanceActivity.entries) {
+		return ast.ErrASTDomain
+	}
+	if err := s.relevanceFIFO.restore(scope.relevanceFIFO, s.caseSplitStrategy == 3); err != nil {
 		return err
 	}
 	if err := s.traceCaseSplitScope(true); err != nil {
@@ -1041,6 +1049,9 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 
 func (s *SMTInternalizerState) PopScopes(count uint32) error {
 	if err := s.open(); err != nil {
+		return err
+	}
+	if err := s.assertCaseSplitPopCount(count); err != nil {
 		return err
 	}
 	if count == 0 || count > uint32(len(s.scopes)) {

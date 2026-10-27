@@ -47,5 +47,8 @@ func (q *SMTActivityCaseSplitQueue) nextDelayedActivity() (int32, lbool.LBool, e
 	if err = q.state.basicActivity.Swap(q.state.delayedActivity); err != nil {
 		return SMTNullBoolVar, lbool.Undef, err
 	}
+	if err = smtCaseSplitAssert(208, "m_delayed_queue.empty()", func() bool { return q.state.delayedActivity.Empty() }); err != nil {
+		return SMTNullBoolVar, lbool.Undef, err
+	}
 	return q.state.popBasicActivityHeap()
 }

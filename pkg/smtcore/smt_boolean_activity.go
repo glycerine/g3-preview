@@ -55,7 +55,7 @@ func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState)
 }
 
 func (s *SMTInternalizerState) configureBooleanHeuristicsForQueue(params SMTParamsState, strategy uint32, reseed bool) error {
-	if params.RandomInitialActivity > 2 || params.CaseSplitStrategy > 6 || params.InvDecay <= 0 {
+	if params.RandomInitialActivity > 2 || strategy > 6 || params.InvDecay <= 0 {
 		return ast.ErrASTDomain
 	}
 	if reseed {

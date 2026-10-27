@@ -36,6 +36,9 @@ func (s *SMTInternalizerState) relevanceActivityCreated(variable int32) error {
 	if h == nil || !s.searching {
 		return nil
 	}
+	if err := smtCaseSplitAssert(514, "v >= m_bs_num_bool_vars", func() bool { return variable >= s.relevanceFIFO.baseBooleanLimit }); err != nil {
+		return err
+	}
 	if err := h.Reserve(variable + 1); err != nil {
 		return err
 	}

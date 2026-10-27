@@ -108,7 +108,13 @@ func (s *SMTInternalizerState) AddTheoryAwareBranchingInfo(variable int32, prior
 
 func (q *smtTheoryAwareBranchingQueue) next(frequency float64) (int32, error) {
 	threshold := int(frequency * float64(z3rand.Max))
+	if err := smtCaseSplitAssert(1167, "threshold >= 0", func() bool { return threshold >= 0 }); err != nil {
+		return SMTNullBoolVar, err
+	}
 	if int(q.state.random.Next()) < threshold {
+		if err := smtCaseSplitAssert(1169, "m_context.get_num_b_internalized() > 0", func() bool { return len(q.state.boolExpr) > 0 }); err != nil {
+			return SMTNullBoolVar, err
+		}
 		if len(q.state.boolExpr) == 0 {
 			return SMTNullBoolVar, ast.ErrASTDomain
 		}

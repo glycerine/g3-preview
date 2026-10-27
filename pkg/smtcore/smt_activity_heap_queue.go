@@ -48,9 +48,18 @@ func (s *SMTInternalizerState) basicActivityCreated(v int32) error {
 		if err := s.delayedActivity.Reserve(v + 1); err != nil {
 			return err
 		}
+
+		if err := smtCaseSplitAssert(173, "!m_delayed_queue.contains(v)", func() bool { return !s.delayedActivity.Contains(v) }); err != nil {
+			return err
+		}
+		if err := smtCaseSplitAssert(174, "!m_queue.contains(v)", func() bool { return !s.basicActivity.Contains(v) }); err != nil {
+			return err
+		}
 		if s.searching {
 			return s.delayedActivity.Insert(v)
 		}
+	} else if err := smtCaseSplitAssert(85, "!m_queue.contains(v)", func() bool { return !s.basicActivity.Contains(v) }); err != nil {
+		return err
 	}
 	return s.basicActivity.Insert(v)
 }

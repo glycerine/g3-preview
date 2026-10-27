@@ -2592,6 +2592,8 @@
         "smt_boolean_propagation.go",
         "smt_bv_lifecycle.go",
         "smt_candidate_validation.go",
+        "smt_case_split_assertions.go",
+        "smt_case_split_factory.go",
         "smt_case_split_queue.go",
         "smt_case_split_trace.go",
         "smt_cg_table.go",
