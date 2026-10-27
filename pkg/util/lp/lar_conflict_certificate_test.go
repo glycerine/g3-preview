@@ -203,6 +203,9 @@ func TestLARConflictCertificateRelationOrientation(t *testing.T) {
 }
 
 func TestLARConflictCertificatePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, op := range []string{"extract", "validate", "inf-validate", "left", "sum", "sum-constant", "diagnostic"} {
 			done, failures := false, 0

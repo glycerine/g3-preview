@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPRationalMPSCommonModelIndependentPopulation(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 100; world++ {
 		h := newLPPairHarness(t)
 		coeff := new(big.Rat).SetFrac(new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), uint(81+world)), big.NewInt(3)), big.NewInt(17))
@@ -87,6 +90,9 @@ func TestLPRationalMPSCommonModelIndependentPopulation(t *testing.T) {
 }
 
 func TestLPRationalMPSCommonModelPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, phase := range []string{"cost", "row", "bounds"} {
 			done, failures := false, 0

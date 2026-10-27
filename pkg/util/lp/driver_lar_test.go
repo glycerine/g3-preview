@@ -287,6 +287,9 @@ func TestLPLARDriverReportFlushAndLiveFields(t *testing.T) {
 }
 
 func TestLPLARDriverPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	// The comparison phase reparses this field on every fault ordinal. The
 	// shorter value still exercises multi-limb reader and driver allocations.
 	input := strings.Replace(lpMPSDriverModel(3, 2, 2, 4, 3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", strings.Repeat("1234567890", 20)+"7/13"), 1)

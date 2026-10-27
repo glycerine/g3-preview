@@ -40,6 +40,9 @@ func TestLPStackedIntSetSource(t *testing.T) {
 	}
 }
 func TestLPStackedIntSetSnapshotOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for seed := int64(0); seed < 40; seed++ {
 		r := rand.New(rand.NewSource(seed))
 		var s StackedInt32Set

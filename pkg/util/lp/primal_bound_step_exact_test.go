@@ -132,6 +132,9 @@ func TestLPExactBoundStepIndependentLimitAndAliases(t *testing.T) {
 }
 
 func TestLPExactBoundStepLeavingRowsIndependentMembership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	for world := 0; world < 160; world++ {
 		s := lpNewLARLUPreparedModel(t, h, lpExactIdentity(4))
@@ -420,6 +423,9 @@ func TestLPExactBoundStepSourcePrefixesAndGuards(t *testing.T) {
 }
 
 func TestLPExactBoundStepPreservesOlderComparisonOwner(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"jump", "unlimited", "limit", "leaving"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

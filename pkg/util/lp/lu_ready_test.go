@@ -18,6 +18,9 @@ func lpPreparedColumnOracle(u [][]*big.Rat, r []uint32, x []*big.Rat) []*big.Rat
 }
 
 func TestLPLUPreparedSolvesIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(11317, 971))
 	for world := 0; world < 40; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

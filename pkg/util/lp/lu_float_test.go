@@ -103,6 +103,9 @@ func lpFloatLUCheckFactorization(t *testing.T, m *FloatLU, b [][]*big.Rat) {
 }
 
 func TestLPFloatLUIndependentFactorizationAndSolves(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(792173, 619313))
 	denseCount, rowSwaps, columnSwaps := 0, 0, 0
 	for world := 0; world < 180; world++ {

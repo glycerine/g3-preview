@@ -59,6 +59,9 @@ func lpLARConstraintEvalFixture(t *testing.T, h *lpPairHarness, variant string, 
 }
 
 func TestLARConstraintEvalIndependentRelations(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 40; world++ {
 		for _, variant := range []string{"variable", "term", "general"} {
 			for _, kind := range []LConstraintKind{LConstraintLE, LConstraintLT, LConstraintGE, LConstraintGT, LConstraintEQ} {

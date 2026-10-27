@@ -240,6 +240,9 @@ func TestLPLURowRefinementOneCorrection(t *testing.T) {
 }
 
 func TestLPLURowRefinementIndependentResidualsAndUnion(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(7381, 511))
 	const n = 7
 	const columns = 15

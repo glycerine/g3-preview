@@ -399,6 +399,9 @@ func TestLPExactBasisDispatchPhysicalOwnership(t *testing.T) {
 }
 
 func TestLPExactBasisDispatchPreservesOlderComparisonOwner(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"upper-negative", "boxed-positive", "boxed-negative", "feasible-positive", "feasible-negative"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

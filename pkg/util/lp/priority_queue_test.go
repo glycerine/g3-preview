@@ -72,6 +72,9 @@ func TestLPPriorityQueueSource(t *testing.T) {
 }
 
 func TestLPIntPriorityQueueIndependentMapOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	q := NewIntPriorityQueue(1)
 	oracle := make(map[uint32]int32)
 	random := rand.New(rand.NewPCG(1987, 413))

@@ -53,6 +53,9 @@ func TestLPPairPivotCompareIndependentOracle(t *testing.T) {
 }
 
 func TestLPPairPivotComparePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, kind := range []string{"equal-positive", "equal-negative", "drift-positive", "drift-negative", "minimum"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

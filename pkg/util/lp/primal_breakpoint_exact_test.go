@@ -106,6 +106,9 @@ func TestLPExactBreakpointIndependentSlopeOracle(t *testing.T) {
 }
 
 func TestLPExactBreakpointPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"enqueue", "enqueue-minimum", "enqueue-epsilon-minimum", "slope-minimum", "slope-fixed", "slope-bound", "slope-entering"} {
 		for _, direct := range []bool{false, true} {
 			success, failures, queue := false, 0, 0

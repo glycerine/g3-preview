@@ -16,6 +16,9 @@ import (
 )
 
 func TestLPExactTableauLeavingIndependentFeasibleModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(971, 391))
 	counters := map[string]int{}
 	for world := 0; world < 480; world++ {

@@ -24,6 +24,9 @@ func lpLAROuterSolveFixture(t *testing.T, h *lpPairHarness, strategy SimplexStra
 }
 
 func TestLAROuterSolveIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, strategy := range []SimplexStrategy{StrategyLU, StrategyTableauRows, StrategyTableauCosts} {
 		for world := 0; world < 100; world++ {
 			for _, profile := range []string{"feasible", "early", "optimize", "infeasible"} {
@@ -240,6 +243,9 @@ func TestLAROuterSolvePreservesUnbounded(t *testing.T) {
 }
 
 func TestLAROuterSolvePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, strategy := range []SimplexStrategy{StrategyLU, StrategyTableauRows, StrategyTableauCosts} {
 		for _, direct := range []bool{false, true} {
 			for _, infeasible := range []bool{false, true} {

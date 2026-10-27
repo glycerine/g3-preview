@@ -412,6 +412,9 @@ func TestLARSolveOnSignatureTableauPostSolvePublication(t *testing.T) {
 }
 
 func TestLARSolveOnSignatureTableauPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, strategy := range []SimplexStrategy{StrategyTableauRows, StrategyTableauCosts} {
 		for _, direct := range []bool{false, true} {
 			for _, path := range []string{"catch", "prepare", "solve", "fallback", "rounded"} {

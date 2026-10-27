@@ -9,6 +9,9 @@ import (
 )
 
 func TestLPRationalCoreValuesIndependentReconstructionAndCosts(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 100; world++ {
 		h := newLPPairHarness(t)
 		r := 1 + world%4

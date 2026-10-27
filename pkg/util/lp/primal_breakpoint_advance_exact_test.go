@@ -220,6 +220,9 @@ func TestLPExactBreakpointAdvanceWrapperAndGuards(t *testing.T) {
 }
 
 func TestLPExactBreakpointAdvancePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"full", "threshold", "output"} {
 		for _, direct := range []bool{false, true} {
 			success, failures, queueReceipts, primalReceipts := false, 0, 0, 0

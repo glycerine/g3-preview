@@ -165,6 +165,9 @@ func TestLPRationalDualCorePartialOwners(t *testing.T) {
 }
 
 func TestLPRationalDualCorePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"construct", "recalculate", "start", "adjust", "place", "feasible"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

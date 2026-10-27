@@ -238,6 +238,9 @@ func TestLPRationalObjectiveSourceLookupAndFixedPrefixes(t *testing.T) {
 }
 
 func TestLPRationalObjectivePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, phase := range []string{"flip", "scaled", "scaled-flipped", "free", "low", "upper", "fixed"} {
 			done, failures := false, 0

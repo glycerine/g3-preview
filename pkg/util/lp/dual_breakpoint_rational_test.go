@@ -70,6 +70,9 @@ func TestLPRationalDualBreakpointEligibilityExactOracle(t *testing.T) {
 }
 
 func TestLPRationalDualBreakpointHarrisIndependentWindows(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(33171))
 	for world := 0; world < 240; world++ {
 		h := newLPPairHarness(t)
@@ -393,6 +396,9 @@ func TestLPRationalDualBreakpointMetadataPrefixes(t *testing.T) {
 }
 
 func TestLPRationalDualBreakpointPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"eligible", "harris", "tight", "q", "combined"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

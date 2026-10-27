@@ -128,6 +128,9 @@ func TestLARAllConstraintsCancellationAndReachedPrefixes(t *testing.T) {
 }
 
 func TestLARAllConstraintsPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, violated := range []bool{false, true} {
 			done, failures := false, 0

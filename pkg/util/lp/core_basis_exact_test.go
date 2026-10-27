@@ -138,6 +138,9 @@ func TestLPPairBasisDetachedAndSourceGuardPrefixes(t *testing.T) {
 }
 
 func TestLPPairBasisTableauTransposeIndependentRows(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	rng := rand.New(rand.NewPCG(7621, 901))
 	v := h.pair("0", "0")

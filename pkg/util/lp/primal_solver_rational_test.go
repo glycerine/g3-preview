@@ -20,6 +20,9 @@ func lpRationalPrimal(t *testing.T, h *lpPairHarness) *RationalPrimalSimplex {
 	return m
 }
 func TestLPRationalPrimalOuterIndependentVertices(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(169271))
 	sourceFlipDiscrepancies := 0
 	for world := 0; world < 120; world++ {
@@ -454,6 +457,9 @@ func TestLPRationalPrimalOuterPhysicalOwnership(t *testing.T) {
 	}
 }
 func TestLPRationalPrimalOuterPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"find", "prepare", "row", "bounds", "solve", "cost", "value"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

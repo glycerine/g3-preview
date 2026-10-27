@@ -46,6 +46,9 @@ func TestLPPairPriorityQueueSource(t *testing.T) {
 }
 
 func TestLPIntPairPriorityQueueIndependentMapOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	q := NewIntPairPriorityQueue(2)
 	oracle := make(map[IndexPair]int32)
 	random := rand.New(rand.NewPCG(1997, 651))
@@ -212,6 +215,9 @@ func TestLPIntPairPriorityQueueSlotAndFailurePrefixes(t *testing.T) {
 }
 
 func TestLPUintPairPriorityQueueIndependentMapOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	q := NewUintPairPriorityQueue(2)
 	oracle := make(map[IndexPair]uint32)
 	random := rand.New(rand.NewPCG(1997, 651))

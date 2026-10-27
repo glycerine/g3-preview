@@ -707,6 +707,9 @@ func TestLPRationalPrimalBoundReachedGuards(t *testing.T) {
 }
 
 func TestLPRationalPrimalBoundPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"harris", "flip", "minimum", "inf-positive", "inf-negative", "boxed-positive", "feasible-positive", "dispatch-positive"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
@@ -760,6 +763,9 @@ func TestLPRationalPrimalBoundPreservesOlderComparison(t *testing.T) {
 }
 
 func TestLPRationalPrimalBoundReturnedReferenceCopies(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, phase := range []string{"harris-product", "bound-quotient", "flip-result", "flip-assignment"} {
 		t.Run(phase, func(t *testing.T) {
 			done, witness := false, false

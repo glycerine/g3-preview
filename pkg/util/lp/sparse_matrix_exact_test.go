@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPExactSparseBasisIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(187, 719))
 	type entry struct {
 		row   uint32

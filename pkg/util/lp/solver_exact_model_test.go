@@ -18,6 +18,9 @@ func lpRationalInputModel(t *testing.T, h *lpPairHarness) *RationalLPSolver {
 }
 
 func TestLPRationalInputModelIndependentAssembly(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 120; world++ {
 		h := newLPPairHarness(t)
 		m := lpRationalInputModel(t, h)

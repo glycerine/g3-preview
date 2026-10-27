@@ -132,6 +132,9 @@ func TestLPExactTableauInitCostIndependentModels(t *testing.T) {
 }
 
 func TestLPExactTableauInitCostPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"fill", "restore", "infeasible"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

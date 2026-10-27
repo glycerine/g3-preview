@@ -14,6 +14,9 @@ type lpRationalIteratorTerm struct {
 }
 
 func TestLPRationalIteratorsIndependentCursorOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	xtext := strings.Repeat("1234567890", 30) + "/7"
 	ytext := strings.Repeat("9876543210", 30) + "/13"
@@ -143,6 +146,9 @@ func TestLPRationalIteratorsIndependentCursorOracle(t *testing.T) {
 }
 
 func TestLPRationalIteratorsCopyFailureOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, kind := range []string{"row", "column", "indexed", "pivot"} {
 		failures, successes := 0, 0
 		for ordinal := int64(0); ordinal < 60; ordinal++ {

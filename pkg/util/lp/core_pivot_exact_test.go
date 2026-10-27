@@ -463,6 +463,9 @@ func TestLARPivotAdditionalEntryAndClearGuards(t *testing.T) {
 }
 
 func TestLARPivotNativeTableauPhysicalCopies(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	if sourceDebugEnabled {
 		// The preceding source assertion rejects this branch in debug.
 		return

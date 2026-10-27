@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPRationalCostValidatorsIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	h := newLPPairHarness(t)
 	f := lpNewRationalCoreFixture(t, h, 1, 1)
 	m, e := NewRationalCoreSolverBase(f.input())

@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPRationalDualFlipIndependentSystems(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewSource(661738))
 	for world := 0; world < 180; world++ {
 		h := newLPPairHarness(t)
@@ -335,6 +338,9 @@ func TestLPRationalDualFlipEmptyAndNoFlips(t *testing.T) {
 	lpExactVectorNamedCensus(t, h, nil)
 }
 func TestLPRationalDualFlipPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"signed", "wave", "process", "xb", "update", "apply", "beta"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {

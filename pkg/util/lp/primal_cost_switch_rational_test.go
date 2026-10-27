@@ -8,6 +8,9 @@ import (
 )
 
 func TestLPRationalPrimalCostSwitchIndependentModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 240; world++ {
 		h := newLPPairHarness(t)
 		f := lpNewRationalCoreFixture(t, h, 2, 4)

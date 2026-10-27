@@ -46,6 +46,9 @@ func TestLPRationalStatisticsIndependentCostOracle(t *testing.T) {
 }
 
 func TestLPRationalStatisticsPreservesOlderComparison(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"cost", "print", "combined", "feasible"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
@@ -295,6 +298,9 @@ func TestLPRationalStatisticsLiveLocalReentryGuard(t *testing.T) {
 }
 
 func TestLPRationalStatisticsPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"cost", "print", "combined", "feasible"} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

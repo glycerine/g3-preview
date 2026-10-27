@@ -310,6 +310,9 @@ func TestLPRationalEnterIndependentModels(t *testing.T) {
 }
 
 func TestLPRationalEnterPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, phase := range []string{"pivot", "flip", "unbounded", "iteration-pivot", "iteration-flip", "iteration-unbounded"} {
 			success, borrowedFailure := false, false

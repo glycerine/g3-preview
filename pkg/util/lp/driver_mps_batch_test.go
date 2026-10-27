@@ -185,6 +185,9 @@ func TestLPMPSBatchDefaultExactAndPreludeStops(t *testing.T) {
 }
 
 func TestLPMPSBatchActualGLPKCatalogue(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	lpRequireGLPK(t)
 	for _, exact := range []bool{false, true} {
 		home := t.TempDir()

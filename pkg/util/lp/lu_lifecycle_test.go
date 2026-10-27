@@ -12,6 +12,9 @@ import (
 )
 
 func TestLPLUFactorizationReplacementIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for world := 0; world < 12; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {
 			h := newLPPairHarness(t)
@@ -100,6 +103,9 @@ func TestLPLUFactorizationReplacementIndependentOracle(t *testing.T) {
 }
 
 func TestLPExactLUFactorizationReplacementAllocationCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, pair := range []bool{false, true} {
 		for _, direct := range []bool{false, true} {
 			t.Run(fmt.Sprint(pair, "/", direct), func(t *testing.T) {

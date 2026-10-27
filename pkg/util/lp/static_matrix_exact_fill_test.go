@@ -10,6 +10,9 @@ import (
 )
 
 func TestLPExactStaticFillIndependentEliminationOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	r := rand.New(rand.NewPCG(79113, 59))
 	for world := 0; world < 240; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

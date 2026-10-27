@@ -25,6 +25,9 @@ func lpCallExactBasisLimit(m *PairPrimalCoreSolver, op string, d *numeral.Ration
 }
 
 func TestLPExactBasisLimitIndependentPairOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"upper-negative", "boxed-positive", "boxed-negative", "feasible-positive", "feasible-negative"} {
 		h := newLPPairHarness(t)
 		for world := 0; world < 240; world++ {
@@ -233,6 +236,9 @@ func TestLPExactBasisLimitPhysicalOwnership(t *testing.T) {
 }
 
 func TestLPExactBasisLimitPreservesOlderComparisonOwner(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, op := range []string{"upper-negative", "boxed-positive", "boxed-negative", "feasible-positive", "feasible-negative"} {
 		matched := false
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
@@ -364,6 +370,9 @@ func TestLPExactBasisLimitScalarOutputAlias(t *testing.T) {
 }
 
 func TestLPExactBasisLimitBoxedComparisonPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, profile := range []string{"positive-below-low", "positive-above-upper", "negative-inside", "negative-below-low"} {
 		success, child := false, 0
 		for ordinal := int64(0); ordinal < 500; ordinal++ {

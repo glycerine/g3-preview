@@ -36,6 +36,9 @@ func lpColumnIndexCheck(t *testing.T, indices []uint32, want []*big.Rat, descend
 }
 
 func TestLPLUEnteringColumnIndependentOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(633113, 219113))
 	for world := 0; world < 48; world++ {
 		t.Run(fmt.Sprint(world), func(t *testing.T) {

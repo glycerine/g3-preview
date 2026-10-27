@@ -580,6 +580,9 @@ func TestLPExactSolveStoppedAndInitializationPrefixes(t *testing.T) {
 }
 
 func TestLPExactSolvePhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, strategy := range []SimplexStrategy{StrategyLU, StrategyTableauCosts} {
 		for _, direct := range []bool{false, true} {
 			success, failures := false, 0

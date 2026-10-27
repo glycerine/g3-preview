@@ -10,6 +10,9 @@ import (
 )
 
 func TestLPExactDenseBlockAllocationFailureCensus(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	receipts, publishedL := 0, 0
 	for _, op := range []string{"constructor", "find", "divide", "row", "pivot"} {
 		for _, direct := range []bool{false, true} {

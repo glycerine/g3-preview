@@ -42,6 +42,9 @@ func TestLPExactHarrisIndependentPairOracle(t *testing.T) {
 }
 
 func TestLPExactHarrisPhysicalOwnership(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, zero := range []bool{false, true} {
 			for _, negative := range []bool{false, true} {

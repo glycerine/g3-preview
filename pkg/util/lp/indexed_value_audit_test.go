@@ -105,6 +105,9 @@ func TestLPIndexedValueRationalConstructorAndAssignmentPublication(t *testing.T)
 }
 
 func TestLPIndexedValueByValueSetterAndAliasedArgument(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	for _, direct := range []bool{false, true} {
 		for _, alias := range []bool{false, true} {
 			failures, succeeded := 0, false

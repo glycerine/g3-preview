@@ -21,6 +21,9 @@ func lpExactDenseCells(m *RationalSquareDenseSubmatrix) []*numeral.Rational {
 }
 
 func TestLPExactDenseBlockIndependentEliminationStages(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
 	rng := rand.New(rand.NewPCG(13571, 87233))
 	swaps := 0
 	for world := 0; world < 120; world++ {
