@@ -37,7 +37,7 @@ func (m *ASTManager) datatypeValue(root astNodeRef) (bool, error) {
 }
 
 func (m *ASTManager) datatypeSomeValue(sort astNodeRef) (ASTHandle, error) {
-	constructor, found, err := m.datatypeNonRecursiveConstructor(sort, map[astNodeRef]bool{sort: true})
+	constructor, found, err := m.datatypeNonRecursiveConstructor(sort, []astNodeRef{sort})
 	if err != nil {
 		return ASTHandle{}, err
 	}

@@ -78,7 +78,7 @@ func TestDatatypeUtilCachesPinnedPreferencesPerInstance(t *testing.T) {
 	}
 }
 
-func TestDatatypeUtilStoppedPinPrefixesAreNotPublished(t *testing.T) {
+func TestDatatypeUtilStoppedPinPrefixesRetainSourceOwners(t *testing.T) {
 	for _, prefix := range []uint32{0, 1} {
 		t.Run(fmt.Sprint(prefix), func(t *testing.T) {
 			m := astTestManager(t)
@@ -112,17 +112,17 @@ func TestDatatypeUtilStoppedPinPrefixesAreNotPublished(t *testing.T) {
 			m.BudgetField.FailAfter(0)
 			_, _, err = u.NonRecursiveConstructor(sorts[0])
 			m.BudgetField.FailAfter(-1)
-			if !errors.Is(err, arena.ErrInjectedFailure) || len(u.refs) != 0 || len(u.constructors) != 0 {
-				t.Fatal("failed preference published an owner", err)
+			if !errors.Is(err, arena.ErrInjectedFailure) || len(u.refs) != int(prefix) || len(u.constructors) != 0 {
+				t.Fatal("failed preference lost source pin prefix or published cache", err)
 			}
 			after, err := m.GetRefCount(sorts[0])
 			astTestMust(t, err)
-			if before != after {
-				t.Fatal("failed preference retained its sort pin", before, after)
+			if before+prefix != after {
+				t.Fatal("failed preference did not retain its acquired sort pin", before, after)
 			}
 			_, found, err := u.NonRecursiveConstructor(sorts[0])
 			astTestMust(t, err)
-			if !found || len(u.refs) != 2 {
+			if !found || len(u.refs) != 2+int(prefix) {
 				t.Fatal("stopped preference could not retry")
 			}
 		})

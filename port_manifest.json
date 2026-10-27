@@ -16392,7 +16392,8 @@
         "pkg/ast/ast_datatype_util.go",
         "pkg/ast/ast_datatype_util_test.go",
         "pkg/ast/ast_datatype_util_reset_test.go",
-        "pkg/ast/ast_datatype_util_teardown_test.go"
+        "pkg/ast/ast_datatype_util_teardown_test.go",
+        "pkg/ast/ast_datatype_selection_source_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16406,9 +16407,12 @@
         "TestASTDatatypeValueAndSomeValueCallbacks",
         "TestASTTranslationInheritsDatatypeDefinitions",
         "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
-        "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
+        "TestDatatypeUtilStoppedPinPrefixesRetainSourceOwners",
         "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
-        "TestDatatypeUtilInterruptedTeardown"
+        "TestDatatypeUtilInterruptedTeardown",
+        "TestDatatypeSelectionInstantiatesAllConstructorsBeforeCounter",
+        "TestDatatypeSelectionUnsignedIndexWrap",
+        "TestDatatypeUtilSourceAssertionsConsultActualOwner"
       ],
       "assertions": [
         {
@@ -16611,7 +16615,7 @@
           ],
           "tests": [
             "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
-            "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
+            "TestDatatypeUtilStoppedPinPrefixesRetainSourceOwners",
             "TestDatatypeUtilInterruptedTeardown"
           ]
         },
@@ -16627,6 +16631,21 @@
             "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
             "TestDatatypeUtilInterruptedTeardown"
           ]
+        },
+        {
+          "name": "Retained constructor selection: instantiate full declaration list before counter increment; use literal unsigned j+start wrap; ordered forbidden stack and reached source utility assertions (745,753,907,916,917,976); retain first preference pin when second acquisition fails",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_definition.go",
+            "pkg/ast/ast_datatype_selection_source_test.go"
+          ],
+          "tests": [
+            "TestDatatypeSelectionInstantiatesAllConstructorsBeforeCounter",
+            "TestDatatypeSelectionUnsignedIndexWrap",
+            "TestDatatypeUtilSourceAssertionsConsultActualOwner",
+            "TestDatatypeUtilStoppedPinPrefixesRetainSourceOwners"
+          ]
         }
       ],
       "ownership": [
@@ -16636,7 +16655,8 @@
       ],
       "deviations": [
         "Private utility memoization maps are omitted because concrete Go queries reconstruct hash-consed declarations and compute recursion/enum properties directly. The unused plugin remove entry point and undeclared get_datatype_size declaration are not ported. Size functions are evaluated directly into the existing pointer-free SortSize representation instead of retaining a polymorphic C++ expression tree. Definition metadata uses concrete Go structs, maps, and slices; native container allocation ABI is not claimed.",
-        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: utility construction/get_non_rec_constructor source assertions, util_bug trace, pin-publication failure prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself."
+        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: utility construction/get_non_rec_constructor source assertions, util_bug trace, pin-publication failure prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself.",
+        "The next source review corrects eager constructor materialization, literal uint32 candidate-index overflow, ordered forbidden-stack search, reached utility assertions, constructor family registration and first-pin retention before a second preference acquisition failure. Declaration AST-ID ordering and a cold node-page allocation refusal verify the counter frontier; a valid recursive sort exposes the native unsigned-overflow no-result/SASSERT(r) behavior. Source get_datatype_constructors also owns a per-utility cache that pins the sort and every constructor before preference acquisition. That cache and its ordered owner prefixes are still missing from the concrete Go utility (which currently reconstructs declarations and owns selected preferences); util_bug traces and their pretty-printer lifetimes also remain open. These are retained source obligations, not dead code, and prevent whole-unit completion."
       ]
     },
     {
@@ -16660,7 +16680,8 @@
         "pkg/ast/ast_datatype_util.go",
         "pkg/ast/ast_datatype_util_test.go",
         "pkg/ast/ast_datatype_util_reset_test.go",
-        "pkg/ast/ast_datatype_util_teardown_test.go"
+        "pkg/ast/ast_datatype_util_teardown_test.go",
+        "pkg/ast/ast_datatype_selection_source_test.go"
       ],
       "tests": [
         "TestASTDatatypeSortAndOriginalDeclarations",
@@ -16673,9 +16694,12 @@
         "TestASTDatatypeValueAndSomeValueCallbacks",
         "TestASTTranslationInheritsDatatypeDefinitions",
         "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
-        "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
+        "TestDatatypeUtilStoppedPinPrefixesRetainSourceOwners",
         "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
-        "TestDatatypeUtilInterruptedTeardown"
+        "TestDatatypeUtilInterruptedTeardown",
+        "TestDatatypeSelectionInstantiatesAllConstructorsBeforeCounter",
+        "TestDatatypeSelectionUnsignedIndexWrap",
+        "TestDatatypeUtilSourceAssertionsConsultActualOwner"
       ],
       "conditionals": [
         {
@@ -16770,7 +16794,7 @@
           ],
           "tests": [
             "TestDatatypeUtilCachesPinnedPreferencesPerInstance",
-            "TestDatatypeUtilStoppedPinPrefixesAreNotPublished",
+            "TestDatatypeUtilStoppedPinPrefixesRetainSourceOwners",
             "TestDatatypeUtilInterruptedTeardown"
           ]
         },
@@ -16786,6 +16810,21 @@
             "TestDatatypeUtilResetReleasesPinsAndAdvancesPreference",
             "TestDatatypeUtilInterruptedTeardown"
           ]
+        },
+        {
+          "name": "Retained constructor selection: instantiate full declaration list before counter increment; use literal unsigned j+start wrap; ordered forbidden stack and reached source utility assertions (745,753,907,916,917,976); retain first preference pin when second acquisition fails",
+          "status": "partial",
+          "go_targets": [
+            "pkg/ast/ast_datatype_util.go",
+            "pkg/ast/ast_datatype_definition.go",
+            "pkg/ast/ast_datatype_selection_source_test.go"
+          ],
+          "tests": [
+            "TestDatatypeSelectionInstantiatesAllConstructorsBeforeCounter",
+            "TestDatatypeSelectionUnsignedIndexWrap",
+            "TestDatatypeUtilSourceAssertionsConsultActualOwner",
+            "TestDatatypeUtilStoppedPinPrefixesRetainSourceOwners"
+          ]
         }
       ],
       "ownership": [
@@ -16795,7 +16834,8 @@
       ],
       "deviations": [
         "Private utility caches, the unused plugin remove entry point, and the undeclared get_datatype_size implementation are omitted under the retained-consumer rule. The private size-expression hierarchy is represented by direct checked SortSize evaluation because no retained consumer observes expression nodes.",
-        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: utility construction/get_non_rec_constructor source assertions, util_bug trace, pin-publication failure prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself."
+        "Forward m_asts release and cache-before-reference Reset order now match the retained source. Explicit Go owning retries retain unconsumed tokens, skip already consumed tokens, and advance the reset preference once after completion. Guarded FPA construction supplies an actual public ErrASTPending regression; interrupted Reset rejects constructor queries and Close may supersede it without a Reset increment. DatatypeFactory member cleanup now stops before its structured base on utility failure. Whole-unit completion remains withdrawn: utility construction/get_non_rec_constructor source assertions, util_bug trace, pin-publication failure prefixes, other cache/owner paths and the broader datatype plugin ownership audit remain open. No physical consumed-NUM failure is claimed for the utility member itself.",
+        "The next source review corrects eager constructor materialization, literal uint32 candidate-index overflow, ordered forbidden-stack search, reached utility assertions, constructor family registration and first-pin retention before a second preference acquisition failure. Declaration AST-ID ordering and a cold node-page allocation refusal verify the counter frontier; a valid recursive sort exposes the native unsigned-overflow no-result/SASSERT(r) behavior. Source get_datatype_constructors also owns a per-utility cache that pins the sort and every constructor before preference acquisition. That cache and its ordered owner prefixes are still missing from the concrete Go utility (which currently reconstructs declarations and owns selected preferences); util_bug traces and their pretty-printer lifetimes also remain open. These are retained source obligations, not dead code, and prevent whole-unit completion."
       ]
     },
     {

@@ -1,7 +1,7 @@
 // Source: datatype::util::get_non_rec_constructor and its m_asts/cache owners.
 package ast
 
-import "errors"
+import "github.com/glycerine/g3/pkg/util/diagnostic"
 
 // DatatypeUtil owns the constructor preferences of one retained source utility
 // instance. Its cache pins the sort and selected declaration until Reset or Close.
@@ -18,7 +18,18 @@ func NewDatatypeUtil(manager *ASTManager) (*DatatypeUtil, error) {
 	if manager == nil {
 		return nil, ErrASTHandle
 	}
-	if _, err := manager.ProofsEnabled(); err != nil {
+	if err := manager.lock(); err != nil {
+		return nil, err
+	}
+	defer manager.mu.Unlock()
+	name, err := manager.Symbols.Intern("datatype")
+	if err != nil {
+		return nil, err
+	}
+	if _, err = manager.families.MkID(name); err != nil {
+		return nil, err
+	}
+	if err = datatypeUtilAssert(745, "m_plugin", func() bool { return manager.datatypePlugin != nil && manager.datatypePlugin.published }); err != nil {
 		return nil, err
 	}
 	u := &DatatypeUtil{manager: manager, constructors: make(map[ASTHandle]ASTHandle)}
@@ -34,15 +45,29 @@ func (u *DatatypeUtil) NonRecursiveConstructor(sort ASTHandle) (ASTHandle, bool,
 	if err := m.lock(); err != nil {
 		return ASTHandle{}, false, err
 	}
+	r, err := m.requireKind(sort, ASTSort)
+	if err == nil {
+		err = datatypeUtilAssert(907, "is_datatype(ty)", func() bool { return m.datatypeUtilIsDatatype(r) })
+	}
+	if err != nil {
+		m.mu.Unlock()
+		return ASTHandle{}, false, err
+	}
 	if c, found := u.constructors[sort]; found {
 		m.mu.Unlock()
 		return c, true, nil
 	}
-	r, err := m.requireKind(sort, ASTSort)
 	var c astNodeRef
 	var found bool
 	if err == nil {
-		c, found, err = m.datatypeNonRecursiveConstructorCore(r, map[astNodeRef]bool{r: true}, &u.start)
+		forbidden := []astNodeRef{r}
+		c, found, err = m.datatypeNonRecursiveConstructorCore(r, forbidden, &u.start)
+		if err == nil {
+			err = datatypeUtilAssert(916, "forbidden_set.back() == ty", func() bool { return forbidden[len(forbidden)-1] == r })
+		}
+		if err == nil {
+			err = datatypeUtilAssert(917, "r", func() bool { return found })
+		}
 	}
 	constructor := m.external(c)
 	m.mu.Unlock()
@@ -53,11 +78,12 @@ func (u *DatatypeUtil) NonRecursiveConstructor(sort ASTHandle) (ASTHandle, bool,
 	if err != nil {
 		return ASTHandle{}, false, err
 	}
+	u.refs = append(u.refs, sortRef)
 	constructorRef, err := m.NewRef(constructor)
 	if err != nil {
-		return ASTHandle{}, false, errors.Join(err, m.DelRef(&sortRef))
+		return ASTHandle{}, false, err
 	}
-	u.refs = append(u.refs, sortRef, constructorRef)
+	u.refs = append(u.refs, constructorRef)
 	u.constructors[sort] = constructor
 	return constructor, true, nil
 }
@@ -109,4 +135,38 @@ func (u *DatatypeUtil) Close() error {
 	u.constructors = nil
 	u.manager = nil
 	return nil
+}
+
+// Callers hold the manager lock. Source datatype recognition inspects the
+// plugin family/kind, rather than attempting definition instantiation.
+func (m *ASTManager) datatypeUtilIsDatatype(r astNodeRef) bool {
+	if m.datatypePlugin == nil {
+		return false
+	}
+	info, err := m.sortInfo(m.sortAt(r.slot).info)
+	return err == nil && info.family == m.datatypePlugin.family && info.kind == ASTDatatypeSort
+}
+
+func datatypeForbiddenContains(forbidden []astNodeRef, sort astNodeRef) bool {
+	for _, r := range forbidden {
+		if r == sort {
+			return true
+		}
+	}
+	return false
+}
+
+func datatypeUtilAssert(line int32, condition string, evaluate func() bool) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil || !enabled {
+		return err
+	}
+	if evaluate() {
+		return nil
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/ast/datatype_decl_plugin.cpp", line, condition)
 }
