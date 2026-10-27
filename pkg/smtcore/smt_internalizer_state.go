@@ -655,7 +655,10 @@ func (s *SMTInternalizerState) MkEnode(expression ast.ASTHandle, suppressArgumen
 	} else {
 		node.congruence = node
 	}
-	if err = s.context.RegisterEnode(node, false); err != nil {
+	// Source mk_enode does not reset an expression's existing relevance.
+	// Gate-context Boolean atoms can be marked before a term-context enode
+	// is needed, including during a later search scope.
+	if err = s.context.RegisterEnode(node, s.context.relevant[expression]); err != nil {
 		if node.congruence == node && count != 0 && congruenceEnabled && !node.IsTrueEquality() {
 			_, _ = s.congruence.Erase(node)
 		}
@@ -787,7 +790,11 @@ func (s *SMTInternalizerState) unregisterEnode(node *SMTEnode) error {
 	}
 	delete(s.context.enodes, node.owner)
 	s.context.byDeclaration[node.declaration] = bucket[:len(bucket)-1]
-	delete(s.context.relevant, node.owner)
+	// Source relevancy marks belong to the expression's relevancy scope.
+	// A base mark can precede an enode created only in this retiring scope.
+	if s.relevancy == nil {
+		delete(s.context.relevant, node.owner)
+	}
 	if err := node.Delete(true); err != nil {
 		return fmt.Errorf("delete enode: %w", err)
 	}
@@ -1018,7 +1025,9 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		}
 		delete(s.boolVar, expression)
 		delete(s.context.assignments, expression)
-		delete(s.context.relevant, expression)
+		if s.relevancy == nil {
+			delete(s.context.relevant, expression)
+		}
 		s.boolExpr[variable] = ast.ASTHandle{}
 		s.boolExpr = s.boolExpr[:variable]
 		s.booleanData = s.booleanData[:variable]
