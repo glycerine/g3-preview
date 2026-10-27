@@ -2564,6 +2564,7 @@
         "old_interval_extended.go",
         "param_datatype_refs.go",
         "pattern_inference_rewriter.go",
+        "smt_activity_heap_queue.go",
         "smt_almost_cg_table.go",
         "smt_arith_bound_dependency.go",
         "smt_arith_eq_adapter.go",

@@ -24,6 +24,11 @@ func (s *SMTInternalizerState) incrementBooleanActivity(variable int32) error {
 		}
 		s.activityIncrement *= smtBooleanInverseActivityLimit
 	}
+	if s.basicActivity != nil && s.basicActivity.Contains(variable) {
+		if err := s.basicActivity.Decreased(variable); err != nil {
+			return err
+		}
+	}
 	if s.theoryAwareBranching != nil {
 		return s.theoryAwareBranching.activityIncreased(variable)
 	}
@@ -43,6 +48,9 @@ func (s *SMTInternalizerState) configureBooleanHeuristics(params SMTParamsState)
 	s.caseSplitStrategy = params.CaseSplitStrategy
 	s.theoryCaseSplit = params.TheoryCaseSplit
 	s.activityInverseDecay = params.InvDecay
+	if params.CaseSplitStrategy == 0 || params.CaseSplitStrategy >= 3 && params.CaseSplitStrategy <= 5 && (params.RelevancyLvl < 2 || params.AutoConfig) {
+		return s.ensureBasicActivityQueue()
+	}
 	if params.CaseSplitStrategy == 5 && params.RelevancyLvl >= 2 && !params.AutoConfig {
 		return s.ensureRelevanceGoalQueue()
 	}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	uheap "github.com/glycerine/g3/pkg/util/heap"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	z3rand "github.com/glycerine/g3/pkg/util/random"
@@ -107,6 +108,7 @@ type smtPendingEquality struct {
 }
 
 type SMTInternalizerState struct {
+	basicActivity              *uheap.Int
 	relevanceGoal              smtRelevanceGoalQueue
 	relevanceActivity          smtRelevanceActivityQueue
 	relevanceFIFO              smtRelevanceFIFO
@@ -478,6 +480,9 @@ func (s *SMTInternalizerState) MkBoolVar(expression ast.ASTHandle) (int32, error
 	s.watches = append(s.watches, SMTWatchList{}, SMTWatchList{})
 	s.booleanStack = append(s.booleanStack, expression)
 	s.statistics.NumMkBoolVar++
+	if err := s.basicActivityCreated(variable); err != nil {
+		return SMTNullBoolVar, err
+	}
 	if err := s.relevanceActivityCreated(variable); err != nil {
 		return SMTNullBoolVar, err
 	}
@@ -557,6 +562,11 @@ func (s *SMTInternalizerState) SetAssignment(variable int32, value lbool.LBool) 
 	}
 	s.assignment[positive.Index()] = value
 	s.assignment[positive.Negated().Index()] = value.Negated()
+	if value == lbool.Undef {
+		if err := s.basicActivityUnassigned(variable); err != nil {
+			return err
+		}
+	}
 	if value == lbool.Undef && s.theoryAwareBranching != nil {
 		if err := s.theoryAwareBranching.unassigned(variable); err != nil {
 			return err
@@ -858,6 +868,9 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 		s.booleanData[entry.variable].SetJustification(entry.justification)
 		s.booleanData[entry.variable].ScopeLevel = entry.scopeLevel
 		if entry.value == lbool.Undef {
+			if err := s.basicActivityUnassigned(entry.variable); err != nil {
+				return err
+			}
 			if err := s.relevanceActivityUnassigned(entry.variable); err != nil {
 				return err
 			}
@@ -951,6 +964,9 @@ func (s *SMTInternalizerState) popTo(scope smtInternalizerScope) error {
 	for len(s.booleanStack) > scope.booleanLimit {
 		expression := s.booleanStack[len(s.booleanStack)-1]
 		variable := s.boolVar[expression]
+		if err := s.basicActivityDeleted(variable); err != nil {
+			return err
+		}
 		if err := s.relevanceActivityDeleted(variable); err != nil {
 			return err
 		}
@@ -1103,6 +1119,13 @@ func (s *SMTInternalizerState) Close() error {
 	if s.theoryAwareBranching != nil {
 		result = errors.Join(result, s.theoryAwareBranching.heap.Close())
 		s.theoryAwareBranching = nil
+	}
+	if s.basicActivity != nil {
+		if err := s.basicActivity.Close(); err != nil {
+			result = errors.Join(result, err)
+		} else {
+			s.basicActivity = nil
+		}
 	}
 	if s.relevanceGoal.heap != nil {
 		if err := s.relevanceGoal.heap.Close(); err != nil {

@@ -59,6 +59,10 @@ func TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases(t *testing.T) 
 		t.Fatal("always-true phase", selected, phase)
 	}
 
+	// A native activity selection consumes the entry; real unassignment
+	// makes this variable available for the next independent phase check.
+	astTestMust(t, state.SetAssignment(variable, lbool.True))
+	astTestMust(t, state.SetAssignment(variable, lbool.Undef))
 	config.PhaseSelection = 0
 	astTestMust(t, queue.ConfigurePhases(config))
 	selected, phase, err = queue.NextCaseSplit()
@@ -81,6 +85,10 @@ func TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases(t *testing.T) 
 		t.Fatal("cached phase", selected, phase)
 	}
 
+	// A native activity selection consumes the entry; real unassignment
+	// makes this variable available for the next independent phase check.
+	astTestMust(t, state.SetAssignment(variable, lbool.True))
+	astTestMust(t, state.SetAssignment(variable, lbool.Undef))
 	config.PhaseSelection = 5
 	config.RandomSeed = 0
 	astTestMust(t, queue.ConfigurePhases(config))
@@ -101,6 +109,10 @@ func TestSMTActivityCaseSplitQueueHonorsConfiguredAndCachedPhases(t *testing.T) 
 	peer := NewSMTLiteral(bVariable, false)
 	astTestMust(t, state.addClause([]SMTLiteral{positive, peer}, false, ast.ASTHandle{}))
 	astTestMust(t, state.addClause([]SMTLiteral{positive, peer.Negated()}, false, ast.ASTHandle{}))
+	// A native activity selection consumes the entry; real unassignment
+	// makes this variable available for the next independent phase check.
+	astTestMust(t, state.SetAssignment(variable, lbool.True))
+	astTestMust(t, state.SetAssignment(variable, lbool.Undef))
 	config.PhaseSelection = 6
 	astTestMust(t, queue.ConfigurePhases(config))
 	selected, phase, err = queue.NextCaseSplit()

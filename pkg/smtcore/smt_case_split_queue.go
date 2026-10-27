@@ -8,9 +8,9 @@ import (
 	z3rand "github.com/glycerine/g3/pkg/util/random"
 )
 
-// SMTActivityCaseSplitQueue selects the retained search strategy. Activity
-// strategies scan Go slices; relevance strategies use context-owned scoped
-// queues and typed heaps. Strategy 6 uses the theory-aware priority heap.
+// SMTActivityCaseSplitQueue selects the retained search strategy. Basic
+// activity and relevance strategies use context-owned queues/heaps; delayed
+// and cached activity still scan slices. Strategy 6 uses theory priorities.
 type SMTActivityCaseSplitQueue struct {
 	state                                 *SMTInternalizerState
 	phaseSelection, cachingOn, cachingOff uint32
@@ -48,6 +48,9 @@ func (q *SMTActivityCaseSplitQueue) ConfigurePhases(state SMTParamsState) error 
 	q.phaseCounter = 0
 	q.cacheEnabled = true
 	q.phaseDefault = false
+	if q.strategy == 0 {
+		return q.state.ensureBasicActivityQueue()
+	}
 	if q.strategy == 5 {
 		return q.state.ensureRelevanceGoalQueue()
 	}
@@ -169,6 +172,8 @@ func (q *SMTActivityCaseSplitQueue) NextCaseSplit() (int32, lbool.LBool, error) 
 
 func (q *SMTActivityCaseSplitQueue) selectVariable() (int32, lbool.LBool, error) {
 	switch q.strategy {
+	case 0:
+		return q.nextBasicActivity()
 	case 6:
 		variable, err := q.state.theoryAwareBranching.next(q.randomVariableFrequency)
 		return variable, lbool.Undef, err
@@ -211,6 +216,35 @@ func (q *SMTActivityCaseSplitQueue) hasCaseSplit() (bool, error) {
 	}
 	if err := q.state.open(); err != nil {
 		return false, err
+	}
+	if q.strategy == 0 {
+		values, err := q.state.basicActivity.AppendValues(nil)
+		if err != nil {
+			return false, err
+		}
+		for _, variable := range values {
+			value, err := q.state.Assignment(NewSMTLiteral(variable, false))
+			if err != nil {
+				return false, err
+			}
+			if value == lbool.Undef {
+				return true, nil
+			}
+		}
+		// Random selection may reach an unassigned variable already erased
+		// from the heap, without consuming the heap/RNG in this probe.
+		if int(q.randomVariableFrequency*float64(z3rand.Max)) > 0 {
+			for v := SMTFirstBoolVar; int(v) < len(q.state.boolExpr); v++ {
+				value, err := q.state.Assignment(NewSMTLiteral(v, false))
+				if err != nil {
+					return false, err
+				}
+				if value == lbool.Undef {
+					return true, nil
+				}
+			}
+		}
+		return false, nil
 	}
 	if q.strategy == 4 {
 		// Native's unconditional 2% random branch can select any unassigned
