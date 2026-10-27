@@ -79,7 +79,16 @@ func (r *Enum2BVRewriter) initMembers() (err error) {
 	if err != nil {
 		return err
 	}
-	r.traversal, err = NewTraversal(r.manager, &r.config)
+	proofs, err := r.manager.ProofsEnabled()
+	if err != nil {
+		return err
+	}
+	// rw captures m.proofs_enabled() when its rewriter_tpl base is built.
+	if proofs {
+		r.traversal, err = NewProofTraversal(r.manager, &r.config)
+	} else {
+		r.traversal, err = NewTraversal(r.manager, &r.config)
+	}
 	if err != nil {
 		return err
 	}
@@ -582,27 +591,10 @@ func (r *Enum2BVRewriter) Rewrite(root ast.ASTHandle, out, proof ast.ASTRef) err
 	if err := r.open(); err != nil {
 		return err
 	}
-	if err := r.traversal.Rewrite(root, out); err != nil {
-		return err
+	if r.traversal.engine.core.proofGen {
+		return r.traversal.RewriteWithProof(root, out, proof)
 	}
-	proofs, err := r.manager.ProofsEnabled()
-	if err != nil || !proofs {
-		return err
-	}
-	value, err := r.manager.RefGet(out)
-	if err != nil {
-		return err
-	}
-	var p ast.ASTHandle
-	if value == root {
-		p, err = r.manager.MkProofReflexivity(root)
-	} else {
-		p, err = r.manager.MkProofRewrite(root, value)
-	}
-	if err != nil {
-		return err
-	}
-	return r.manager.SetRef(proof, p)
+	return r.traversal.Rewrite(root, out)
 }
 
 func (r *Enum2BVRewriter) Push() error {
