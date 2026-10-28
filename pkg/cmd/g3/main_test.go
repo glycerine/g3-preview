@@ -828,6 +828,7 @@ var scriptResults = map[string]string{
 	"get_unsat_assumptions.smt2":                   "unsat\n(a)\nunsat\n(b)\nunsat\n((not b))\nunsat\n(a)\n",
 	"get_consequences.smt2":                        "sat\n\n(=> a a)\nsat\n\n(=> a (= x 3))\nsat\n\n(=> true (= y 4))\nsat\n\n(=> true (= y 4))\nunsat\n\n",
 	"get_option.smt2":                              "17\ntrue\nfalse\ntrue\ntrue\ntrue\n123\n0\n2\ncontinued-execution\ntrue\n",
+	"get_info.smt2":                                "(:name \"Z3\")\n(:authors \"Leonardo de Moura, Nikolaj Bjorner and Christoph Wintersteiger\")\n(:version \"4.7.1\")\n(:error-behavior continued-execution)\n(:status unknown)\n(:assertion-stack-levels 0)\n(:status sat)\n(:assertion-stack-levels 2)\n(:status sat)\n(:assertion-stack-levels 0)\n",
 	"labels.smt2":                                  "sat\n(labels)\nunknown\n(labels)\n",
 	"lexicographic_integer_optimization.smt2":      "sat\n(objectives\n (x 3)\n (y 2)\n)\n((x 3)\n (y 2))\nsat\n(objectives\n (x 0)\n (y 5)\n)\n((x 0)\n (y 5))\n",
 	"bit_vector.smt2":                              "sat\n((x #xf))\n",

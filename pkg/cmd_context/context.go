@@ -102,6 +102,7 @@ type Context struct {
 	RandomSeed                       uint32
 	checked                          bool
 	status                           lbool.LBool
+	infoStatus                       lbool.LBool
 	watch                            stopwatch.Stopwatch
 	owned                            *contextServices
 	closed                           bool

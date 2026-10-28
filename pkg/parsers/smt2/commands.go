@@ -250,15 +250,28 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 	case "set-info":
-		// Status and source metadata do not affect solving. Consume the
-		// source s-expression value without interpreting it as a formula.
 		if p.token != KeywordToken {
 			return false, fmt.Errorf("information keyword expected")
 		}
+		key := p.scanner.ID()
 		if err := p.advance(); err != nil {
 			return false, err
 		}
-		if err := p.skipSExpr(); err != nil {
+		if key == ":status" && p.token == SymbolToken {
+			value, e := p.symbol()
+			if e != nil {
+				return false, e
+			}
+			if err = p.context.SetInfoStatus(value); err != nil {
+				return false, err
+			}
+		} else {
+			// Uninterpreted source metadata is accepted and discarded.
+			if err := p.skipSExpr(); err != nil {
+				return false, err
+			}
+		}
+		if err = p.requireEnd(); err != nil {
 			return false, err
 		}
 	case "declare-datatype", "declare-datatypes":
@@ -468,6 +481,9 @@ func (p *commandParser) command() (bool, error) {
 			if _, err = fmt.Fprintln(p.out, text); err != nil {
 				return false, err
 			}
+			if err = p.context.ValidateInfoStatus(status); err != nil {
+				return false, err
+			}
 		}
 		success = false
 	case "get-info":
@@ -487,7 +503,16 @@ func (p *commandParser) command() (bool, error) {
 		case ":reason-unknown":
 			err = p.context.WriteReasonUnknown(p.out)
 		default:
-			return false, fmt.Errorf("unsupported information attribute %s", key)
+			var value string
+			var supported bool
+			value, supported, err = p.context.GetInfo(key)
+			if err == nil {
+				if supported {
+					_, err = fmt.Fprintln(p.out, value)
+				} else {
+					_, err = fmt.Fprintf(p.out, "; %s line: %d position: %d\nunsupported\n", key, commandLine, commandPosition)
+				}
+			}
 		}
 		if err != nil {
 			return false, err

@@ -40841,7 +40841,10 @@
         "pkg/cmd/g3/test_vectors/get_option.smt2",
         "pkg/cmd_context/labels_test.go",
         "pkg/parsers/smt2/labels_test.go",
-        "pkg/cmd/g3/test_vectors/labels.smt2"
+        "pkg/cmd/g3/test_vectors/labels.smt2",
+        "pkg/cmd_context/info.go",
+        "pkg/parsers/smt2/info_test.go",
+        "pkg/cmd/g3/test_vectors/get_info.smt2"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -40888,7 +40891,9 @@
         "TestSMT2NumeralAsRealResetsWithManagerState",
         "TestCommandContextWritesRelevantLabelsWithSMT2Quoting",
         "TestSMT2LabelsCommandAndAvailability",
-        "TestSMT2LabelsCommandGuards"
+        "TestSMT2LabelsCommandGuards",
+        "TestSMT2GetInfoBuiltinsAndPersistentStatus",
+        "TestSMT2InfoStatusValidationAndUnsupportedLocation"
       ],
       "conditionals": [
         {
@@ -41038,18 +41043,24 @@
           ]
         },
         {
-          "name": "Selected get_info_cmd :reason-unknown branch: source escaped quotation and current-result reason; other get-info attributes remain unported",
+          "name": "get_info_cmd built-in name/authors/version/error-behavior/status/assertion-stack-levels, escaped reason-unknown and statistics branches; set_info_cmd persistent status metadata and post-result validation",
           "status": "ported",
-          "go_target": "pkg/cmd_context/reason_unknown.go",
+          "go_target": "pkg/cmd_context/info.go",
           "go_targets": [
+            "pkg/cmd_context/context.go",
             "pkg/cmd_context/reason_unknown.go",
             "pkg/cmd_context/reason_unknown_test.go",
             "pkg/parsers/smt2/commands.go",
+            "pkg/parsers/smt2/tactics.go",
             "pkg/parsers/smt2/commands_test.go",
-            "pkg/cmd/g3/main_test.go"
+            "pkg/parsers/smt2/info_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/get_info.smt2"
           ],
           "tests": [
             "TestCommandContextReasonUnknownStateAndEscaping",
+            "TestSMT2GetInfoBuiltinsAndPersistentStatus",
+            "TestSMT2InfoStatusValidationAndUnsupportedLocation",
             "TestSMT2CommandsRejectMalformedInputBeforeEffects",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"

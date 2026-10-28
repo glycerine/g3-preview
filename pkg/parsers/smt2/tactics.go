@@ -296,6 +296,8 @@ func (p *commandParser) checkSatUsing(execute bool) (err error) {
 	} else if status == lbool.False {
 		text = "unsat"
 	}
-	_, err = fmt.Fprintln(p.out, text)
-	return err
+	if _, err = fmt.Fprintln(p.out, text); err != nil {
+		return err
+	}
+	return p.context.ValidateInfoStatus(status)
 }
