@@ -130,3 +130,67 @@ func TestRuleSetRejectsNegativeDependencyCycle(t *testing.T) {
 		t.Fatal("failed finalization retained derived state", finalized, err)
 	}
 }
+
+func TestRuleSetPredicateMappingsCopiesAndFoundedPartition(t *testing.T) {
+	f := newRuleSetFixture(t, "O", "D", "R", "Q", "L")
+	source, err := base.NewRuleSet(f.rules)
+	ruleMust(t, err)
+	t.Cleanup(func() { ruleMust(t, source.Close()) })
+	ruleMust(t, source.SetOutputPredicate(f.decl["O"]))
+
+	mapped, err := base.NewRuleSet(f.rules)
+	ruleMust(t, err)
+	t.Cleanup(func() { ruleMust(t, mapped.Close()) })
+	ruleMust(t, mapped.InheritPredicate(source, f.decl["O"], f.decl["D"]))
+	output, err := mapped.OutputPredicate()
+	ruleMust(t, err)
+	if output != f.decl["D"] {
+		t.Fatal("derived output predicate", output, f.decl["D"])
+	}
+	original, err := mapped.OriginalPredicate(f.decl["D"])
+	ruleMust(t, err)
+	derived, derivedErr := mapped.DerivedPredicate(f.decl["O"])
+	ruleMust(t, derivedErr)
+	if original != f.decl["O"] || derived != f.decl["D"] {
+		t.Fatal("predicate mapping", original, derived)
+	}
+
+	program, err := base.NewRuleSet(f.rules)
+	ruleMust(t, err)
+	t.Cleanup(func() { ruleMust(t, program.Close()) })
+	for _, rule := range []*base.Rule{
+		f.rule("R", nil, nil),
+		f.rule("Q", []string{"R"}, nil),
+		f.rule("L", []string{"L"}, nil),
+	} {
+		ruleMust(t, program.Add(rule))
+		ruleMust(t, rule.Close())
+	}
+	ruleMust(t, program.InheritPredicates(mapped))
+	founded, nonFounded, err := program.SplitFounded()
+	ruleMust(t, err)
+	if len(founded) != 2 || founded[0] != f.decl["R"] || founded[1] != f.decl["Q"] {
+		t.Fatal("founded predicates", founded)
+	}
+	if len(nonFounded) != 1 || nonFounded[0] != f.decl["L"] {
+		t.Fatal("non-founded predicates", nonFounded)
+	}
+
+	copySet, err := base.NewRuleSet(f.rules)
+	ruleMust(t, err)
+	t.Cleanup(func() { ruleMust(t, copySet.Close()) })
+	ruleMust(t, copySet.AddRules(program))
+	if count, err := copySet.Len(); err != nil || count != 3 {
+		t.Fatal("copied rule count", count, err)
+	}
+	if output, err := copySet.OutputPredicate(); err != nil || output != f.decl["D"] {
+		t.Fatal("copied output", output, err)
+	}
+	ruleMust(t, copySet.Reset())
+	if count, err := copySet.Len(); err != nil || count != 0 {
+		t.Fatal("reset rule count", count, err)
+	}
+	if outputs, err := copySet.OutputPredicates(); err != nil || len(outputs) != 0 {
+		t.Fatal("reset outputs", outputs, err)
+	}
+}

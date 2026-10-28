@@ -80980,7 +80980,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/rule_set.go"],
-      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle"],
+      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition"],
       "assertions": [
         {
           "line": 82,
@@ -81087,10 +81087,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "rule_set retained rule ownership, grouped head index, add/delete/reset lifecycle, dependency population, reopen/finalize, strongly connected component stratification, and stratified-negation rejection (dl_rule_set.cpp:70-157,278-485,570-758); predicate inheritance, output predicates, founded splitting, display, and dependency mutation remain open",
+          "name": "rule_set retained rule ownership, grouped head index, add/delete/copy/replace/reset lifecycle, predicate inheritance and output mappings, dependency population, reopen/finalize, strongly connected component stratification, stratified-negation rejection, and founded splitting (dl_rule_set.cpp:70-485,570-758); display/profile and standalone dependency restrict/remove/sort operations remain open",
           "status": "partial",
           "go_target": "pkg/muz/base/rule_set.go",
-          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle"]
+          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition"]
         }
       ],
       "ownership": [],
@@ -81102,7 +81102,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/rule_set.go"],
-      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle"],
+      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition"],
       "conditionals": [
         {
           "line": 19,
@@ -81131,10 +81131,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete rule_dependencies and rule_set storage/query/finalization surface with explicit retained Rule wrappers; remaining output-predicate mappings and display/profile interfaces stay open",
+          "name": "Concrete rule_dependencies and rule_set storage/query/finalization/copy/output-mapping surface with explicit retained Rule wrappers; remaining display/profile interfaces stay open",
           "status": "partial",
           "go_target": "pkg/muz/base/rule_set.go",
-          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle"]
+          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition"]
         }
       ],
       "ownership": [],

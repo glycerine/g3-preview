@@ -22,13 +22,19 @@ type ruleDependencyEdge struct {
 // dependencies and validates stratified negation; Reopen discards that derived
 // state before mutation.
 type RuleSet struct {
-	manager      *RuleManager
-	rules        []*Rule
-	byHead       map[ast.ASTHandle][]*Rule
-	dependencies map[ast.ASTHandle][]ast.ASTHandle
-	strata       map[ast.ASTHandle]uint32
-	finalized    bool
-	closed       bool
+	manager             *RuleManager
+	rules               []*Rule
+	byHead              map[ast.ASTHandle][]*Rule
+	headOrder           []ast.ASTHandle
+	dependencies        map[ast.ASTHandle][]ast.ASTHandle
+	strata              map[ast.ASTHandle]uint32
+	outputs             map[ast.ASTHandle]ast.ASTRef
+	outputOrder         []ast.ASTHandle
+	originalToPredicate map[ast.ASTHandle]ast.ASTHandle
+	predicateToOriginal map[ast.ASTHandle]ast.ASTHandle
+	mappingReferences   []ast.ASTRef
+	finalized           bool
+	closed              bool
 }
 
 func NewRuleSet(manager *RuleManager) (*RuleSet, error) {
@@ -38,7 +44,12 @@ func NewRuleSet(manager *RuleManager) (*RuleSet, error) {
 	if err := manager.open(); err != nil {
 		return nil, err
 	}
-	return &RuleSet{manager: manager, byHead: make(map[ast.ASTHandle][]*Rule)}, nil
+	return &RuleSet{
+		manager: manager, byHead: make(map[ast.ASTHandle][]*Rule),
+		outputs:             make(map[ast.ASTHandle]ast.ASTRef),
+		originalToPredicate: make(map[ast.ASTHandle]ast.ASTHandle),
+		predicateToOriginal: make(map[ast.ASTHandle]ast.ASTHandle),
+	}, nil
 }
 
 func (s *RuleSet) open() error {
@@ -76,6 +87,9 @@ func (s *RuleSet) Add(rule *Rule) error {
 		return err
 	}
 	s.rules = append(s.rules, owned)
+	if len(s.byHead[declaration]) == 0 {
+		s.headOrder = append(s.headOrder, declaration)
+	}
 	s.byHead[declaration] = append(s.byHead[declaration], owned)
 	return nil
 }
@@ -120,10 +134,39 @@ func (s *RuleSet) Remove(rule *Rule) error {
 	}
 	if len(bucket) == 0 {
 		delete(s.byHead, declaration)
+		for i, head := range s.headOrder {
+			if head == declaration {
+				copy(s.headOrder[i:], s.headOrder[i+1:])
+				s.headOrder = s.headOrder[:len(s.headOrder)-1]
+				break
+			}
+		}
 	} else {
 		s.byHead[declaration] = bucket
 	}
 	return owned.Close()
+}
+
+// AddRules retains every rule and predicate mapping from another set.
+func (s *RuleSet) AddRules(other *RuleSet) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if other == nil || other.closed || other.manager != s.manager {
+		return ErrRuleSetOwner
+	}
+	if other == s {
+		return nil
+	}
+	if s.finalized {
+		return fmt.Errorf("muz/base: reopen rule set before mutation")
+	}
+	for _, rule := range other.rules {
+		if err := s.Add(rule); err != nil {
+			return err
+		}
+	}
+	return s.InheritPredicates(other)
 }
 
 func (s *RuleSet) Len() (int, error) {
@@ -163,6 +206,139 @@ func (s *RuleSet) PredicateRules(declaration ast.ASTHandle) ([]*Rule, error) {
 		result = append(result, owned)
 	}
 	return result, nil
+}
+
+func (s *RuleSet) retainMappingDeclaration(declaration ast.ASTHandle) error {
+	reference, err := s.manager.manager.NewRef(declaration)
+	if err != nil {
+		return err
+	}
+	s.mappingReferences = append(s.mappingReferences, reference)
+	return nil
+}
+
+// SetOutputPredicate retains a predicate declaration as a program output.
+func (s *RuleSet) SetOutputPredicate(declaration ast.ASTHandle) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if _, registered := s.manager.predicates[declaration]; !registered {
+		return fmt.Errorf("muz/base: output predicate is not registered")
+	}
+	if _, found := s.outputs[declaration]; found {
+		return nil
+	}
+	reference, err := s.manager.manager.NewRef(declaration)
+	if err != nil {
+		return err
+	}
+	s.outputs[declaration] = reference
+	s.outputOrder = append(s.outputOrder, declaration)
+	return nil
+}
+
+func (s *RuleSet) IsOutputPredicate(declaration ast.ASTHandle) (bool, error) {
+	if err := s.open(); err != nil {
+		return false, err
+	}
+	_, found := s.outputs[declaration]
+	return found, nil
+}
+
+func (s *RuleSet) OutputPredicates() ([]ast.ASTHandle, error) {
+	if err := s.open(); err != nil {
+		return nil, err
+	}
+	return append([]ast.ASTHandle(nil), s.outputOrder...), nil
+}
+
+func (s *RuleSet) OutputPredicate() (ast.ASTHandle, error) {
+	if err := s.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if len(s.outputOrder) != 1 {
+		return ast.ASTHandle{}, fmt.Errorf("muz/base: expected exactly one output predicate")
+	}
+	return s.outputOrder[0], nil
+}
+
+func (s *RuleSet) OriginalPredicate(predicate ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := s.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if original, found := s.predicateToOriginal[predicate]; found {
+		return original, nil
+	}
+	return predicate, nil
+}
+
+func (s *RuleSet) DerivedPredicate(original ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := s.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if predicate, found := s.originalToPredicate[original]; found {
+		return predicate, nil
+	}
+	return original, nil
+}
+
+// InheritPredicate records a transformed predicate's original declaration and
+// propagates output status from the source program.
+func (s *RuleSet) InheritPredicate(other *RuleSet, original, predicate ast.ASTHandle) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if other == nil || other.closed || other.manager != s.manager {
+		return ErrRuleSetOwner
+	}
+	isOutput, err := other.IsOutputPredicate(original)
+	if err != nil {
+		return err
+	}
+	if isOutput {
+		if err = s.SetOutputPredicate(predicate); err != nil {
+			return err
+		}
+	}
+	original, err = other.OriginalPredicate(original)
+	if err != nil {
+		return err
+	}
+	if err = s.retainMappingDeclaration(original); err != nil {
+		return err
+	}
+	if err = s.retainMappingDeclaration(predicate); err != nil {
+		return err
+	}
+	s.originalToPredicate[original] = predicate
+	s.predicateToOriginal[predicate] = original
+	return nil
+}
+
+// InheritPredicates copies output predicates and original/derived mappings.
+func (s *RuleSet) InheritPredicates(other *RuleSet) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if other == nil || other.closed || other.manager != s.manager {
+		return ErrRuleSetOwner
+	}
+	for _, declaration := range other.outputOrder {
+		if err := s.SetOutputPredicate(declaration); err != nil {
+			return err
+		}
+	}
+	for original, predicate := range other.originalToPredicate {
+		if err := s.retainMappingDeclaration(original); err != nil {
+			return err
+		}
+		if err := s.retainMappingDeclaration(predicate); err != nil {
+			return err
+		}
+		s.originalToPredicate[original] = predicate
+		s.predicateToOriginal[predicate] = original
+	}
+	return nil
 }
 
 func (s *RuleSet) addDependency(order *[]ast.ASTHandle, seen map[ast.ASTHandle]bool, declaration ast.ASTHandle) {
@@ -415,6 +591,114 @@ func (s *RuleSet) PredicateStratum(declaration ast.ASTHandle) (uint32, error) {
 	return s.strata[declaration], nil
 }
 
+// SplitFounded partitions head predicates using the native least fixed point:
+// a predicate is founded when one of its rules depends only on founded
+// predicate tails.
+func (s *RuleSet) SplitFounded() (founded, nonFounded []ast.ASTHandle, err error) {
+	if err = s.open(); err != nil {
+		return nil, nil, err
+	}
+	foundedSet := make(map[ast.ASTHandle]bool, len(s.headOrder))
+	remaining := make(map[ast.ASTHandle]bool, len(s.headOrder))
+	for _, declaration := range s.headOrder {
+		remaining[declaration] = true
+	}
+	changed := true
+	for changed {
+		changed = false
+		for _, declaration := range s.headOrder {
+			if !remaining[declaration] {
+				continue
+			}
+			predicateFounded := false
+			for _, rule := range s.byHead[declaration] {
+				state, e := rule.open()
+				if e != nil {
+					return nil, nil, e
+				}
+				predicateFounded = true
+				for i := 0; i < state.uninterpreted; i++ {
+					dependency, x := state.manager.GetDecl(state.tail[i].handle)
+					if x != nil {
+						return nil, nil, x
+					}
+					if !foundedSet[dependency] {
+						predicateFounded = false
+						break
+					}
+				}
+				if predicateFounded {
+					break
+				}
+			}
+			if predicateFounded {
+				foundedSet[declaration] = true
+				remaining[declaration] = false
+				founded = append(founded, declaration)
+				changed = true
+			}
+		}
+	}
+	for _, declaration := range s.headOrder {
+		if remaining[declaration] {
+			nonFounded = append(nonFounded, declaration)
+		}
+	}
+	return founded, nonFounded, nil
+}
+
+func (s *RuleSet) resetContents() (result error) {
+	for i := len(s.rules) - 1; i >= 0; i-- {
+		result = errors.Join(result, s.rules[i].Close())
+	}
+	for declaration, reference := range s.outputs {
+		ref := reference
+		result = errors.Join(result, s.manager.manager.DelRef(&ref))
+		delete(s.outputs, declaration)
+	}
+	for i := len(s.mappingReferences) - 1; i >= 0; i-- {
+		result = errors.Join(result, s.manager.manager.DelRef(&s.mappingReferences[i]))
+	}
+	s.rules = nil
+	s.byHead = make(map[ast.ASTHandle][]*Rule)
+	s.headOrder = nil
+	s.dependencies = nil
+	s.strata = nil
+	s.outputs = make(map[ast.ASTHandle]ast.ASTRef)
+	s.outputOrder = nil
+	s.originalToPredicate = make(map[ast.ASTHandle]ast.ASTHandle)
+	s.predicateToOriginal = make(map[ast.ASTHandle]ast.ASTHandle)
+	s.mappingReferences = nil
+	s.finalized = false
+	return result
+}
+
+// Reset releases all retained program state while keeping the set reusable.
+func (s *RuleSet) Reset() error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	return s.resetContents()
+}
+
+// ReplaceRules resets this set and retains all rules and predicate mappings
+// from other.
+func (s *RuleSet) ReplaceRules(other *RuleSet) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	if other == s {
+		return nil
+	}
+	if other == nil || other.closed || other.manager != s.manager {
+		return ErrRuleSetOwner
+	}
+	if err := s.resetContents(); err != nil {
+		return err
+	}
+	return s.AddRules(other)
+}
+
 func (s *RuleSet) Close() (result error) {
 	if s == nil || s.manager == nil {
 		return ErrRuleSetOwner
@@ -422,13 +706,7 @@ func (s *RuleSet) Close() (result error) {
 	if s.closed {
 		return nil
 	}
-	for i := len(s.rules) - 1; i >= 0; i-- {
-		result = errors.Join(result, s.rules[i].Close())
-	}
-	s.rules = nil
-	s.byHead = nil
-	s.dependencies = nil
-	s.strata = nil
+	result = s.resetContents()
 	s.closed = true
 	return result
 }
