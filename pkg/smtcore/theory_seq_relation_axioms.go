@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp assign_eh positive prefix, suffix and
 // containment witnesses plus propagate_non_empty guards.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
@@ -17,89 +18,6 @@ func (t *SMTSequenceTheory) relationSkolem(name string, arguments []ast.ASTHandl
 		return ast.ASTHandle{}, err
 	}
 	return state.manager.MkSequenceSkolem(symbol, arguments, sort)
-}
-
-func (t *SMTSequenceTheory) addNegativeContainsStep(expression ast.ASTHandle) error {
-	state, err := t.State()
-	if err != nil {
-		return err
-	}
-	source, needle, matched, err := state.manager.SequenceBinaryOperationArguments(expression, 5)
-	if err != nil || !matched {
-		if err != nil {
-			return err
-		}
-		return ast.ErrASTDomain
-	}
-	sort, err := state.manager.GetSort(source)
-	if err != nil {
-		return err
-	}
-	empty, err := state.manager.MkSequenceEmpty(sort)
-	if err != nil {
-		return err
-	}
-	sourceEmpty, err := state.manager.MkEq(source, empty)
-	if err != nil {
-		return err
-	}
-	if err = state.Internalize(sourceEmpty, false); err != nil {
-		return err
-	}
-	literal, err := state.Literal(sourceEmpty)
-	if err != nil {
-		return err
-	}
-	value, err := state.Assignment(literal)
-	if err != nil || value == lbool.True {
-		return err
-	}
-	if value == lbool.Undef {
-		if err = state.markRelevant(sourceEmpty); err != nil {
-			return err
-		}
-		data, err := state.BooleanData(literal.Var())
-		if err != nil {
-			return err
-		}
-		// Source add_contains2contains forces the empty phase and retries
-		// after that decision, before exposing the recursive tail atom.
-		data.PhaseAvailable, data.Phase = true, !literal.Sign()
-		return nil
-	}
-	if err = t.addSequenceCoherenceAxiom(source); err != nil {
-		return err
-	}
-	zero, err := t.integer(0)
-	if err != nil {
-		return err
-	}
-	tail, err := t.relationSkolem("seq.tail", []ast.ASTHandle{source, zero}, sort)
-	if err != nil {
-		return err
-	}
-	tailContains, err := state.manager.MkSequenceContains(tail, needle)
-	if err != nil {
-		return err
-	}
-	notTailContains, err := state.manager.MkNot(tailContains)
-	if err != nil {
-		return err
-	}
-	step, err := state.manager.MkOr(sourceEmpty, notTailContains)
-	if err != nil {
-		return err
-	}
-	notContains, err := state.manager.MkNot(expression)
-	if err != nil {
-		return err
-	}
-	constraint, err := state.manager.MkImplies(notContains, step)
-	if err != nil {
-		return err
-	}
-	t.trackInternalTerms(tail, tailContains)
-	return t.axioms.Push(constraint)
 }
 
 func (t *SMTSequenceTheory) addNegativePrefixStep(expression ast.ASTHandle) error {
@@ -350,26 +268,5 @@ func (t *SMTSequenceTheory) addRelationAxioms(expression ast.ASTHandle, operatio
 	if operation == 4 {
 		return t.addNegativeSuffixWitness(expression, left, right)
 	}
-	// Existing compatibility consequences, pending the complete source
-	// canonical expansion/frontend integration; not source assign_eh credit.
-	prefix, err := state.manager.MkSequencePrefix(right, left)
-	if err != nil {
-		return err
-	}
-	notPrefix, err := state.manager.MkNot(prefix)
-	if err != nil {
-		return err
-	}
-	if err = t.pushSequenceImplication([]ast.ASTHandle{notRelation}, notPrefix); err != nil {
-		return err
-	}
-	suffix, err := state.manager.MkSequenceSuffix(right, left)
-	if err != nil {
-		return err
-	}
-	notSuffix, err := state.manager.MkNot(suffix)
-	if err != nil {
-		return err
-	}
-	return t.pushSequenceImplication([]ast.ASTHandle{notRelation}, notSuffix)
+	return nil
 }

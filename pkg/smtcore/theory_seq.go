@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp and src/smt/theory_seq.h retained
 // internalization, equality-state, scope, conflict, and model hooks.
-package smtcore
 
 import (
 	"errors"
@@ -672,9 +673,6 @@ func (t *SMTSequenceTheory) Assign(variable int32, value bool) error {
 		return err
 	}
 	if op == 5 && !value {
-		if err = t.addNegativeContainsStep(expression); err != nil {
-			return err
-		}
 		return t.nonContains.Push(expression, dependency)
 	}
 	if op == 3 && !value {
@@ -1108,23 +1106,6 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		}
 		if !value && own && operation == 3 {
 			if err = t.addNegativePrefixStep(expression); err != nil {
-				return SMTFinalCheckGiveUp, err
-			}
-		}
-	}
-	// Compatibility consequences remain pending the rest of the source
-	// expansion and scheduling integration.
-	for i := 0; i < t.nonContains.Len(); i++ {
-		expression, _, err := t.nonContains.At(i)
-		if err != nil {
-			return SMTFinalCheckGiveUp, err
-		}
-		operation, own, err := t.operation(expression)
-		if err != nil {
-			return SMTFinalCheckGiveUp, err
-		}
-		if own && operation == 5 {
-			if err = t.addNegativeContainsStep(expression); err != nil {
 				return SMTFinalCheckGiveUp, err
 			}
 		}
