@@ -1,5 +1,6 @@
-// Initial end-to-end QF_NRA conjunction path. Reuses the ported AST polynomial
-// translator and NLSAT interval/witness engine; other inputs use ordinary SMT.
+// Initial end-to-end QF_NRA Boolean-formula path. Reuses the ported AST
+// polynomial translator and NLSAT interval/witness engine; other inputs use
+// ordinary SMT.
 package smtcore
 
 import (
@@ -25,8 +26,39 @@ type smtNRAAtom struct {
 }
 type smtNRAInput struct {
 	variable  ast.ASTHandle
-	atoms     []smtNRAAtom
+	branches  [][]smtNRAAtom
 	nonlinear bool
+}
+
+const smtNRAMaxBranches = 1024
+
+func smtNRAAnd(left, right [][]smtNRAAtom) ([][]smtNRAAtom, bool) {
+	if len(left) == 0 || len(right) == 0 {
+		return nil, true
+	}
+	if len(left) > smtNRAMaxBranches/len(right) {
+		return nil, false
+	}
+	result := make([][]smtNRAAtom, 0, len(left)*len(right))
+	for _, a := range left {
+		for _, b := range right {
+			branch := make([]smtNRAAtom, 0, len(a)+len(b))
+			branch = append(branch, a...)
+			branch = append(branch, b...)
+			result = append(result, branch)
+		}
+	}
+	return result, true
+}
+
+func smtNRAOr(left, right [][]smtNRAAtom) ([][]smtNRAAtom, bool) {
+	if len(right) > smtNRAMaxBranches || len(left) > smtNRAMaxBranches-len(right) {
+		return nil, false
+	}
+	result := make([][]smtNRAAtom, 0, len(left)+len(right))
+	result = append(result, left...)
+	result = append(result, right...)
+	return result, true
 }
 
 func (in *smtNRAInput) term(m *ast.ASTManager, h ast.ASTHandle, family ast.FamilyID) (bool, bool, error) {
@@ -121,52 +153,198 @@ func (in *smtNRAInput) term(m *ast.ASTManager, h ast.ASTHandle, family ast.Famil
 	}
 	return true, varChildren > 0, nil
 }
-func (in *smtNRAInput) formula(k *SMTKernel, h ast.ASTHandle, negative bool, family ast.FamilyID) (bool, error) {
+func (in *smtNRAInput) formula(k *SMTKernel, h ast.ASTHandle, negative bool, family ast.FamilyID) ([][]smtNRAAtom, bool, error) {
 	m := k.manager
-	if m.IsTrue(h) || m.IsFalse(h) {
-		return false, nil
-	} // ordinary backend handles pure constants
+	if m.IsTrue(h) {
+		if negative {
+			return nil, true, nil
+		}
+		return [][]smtNRAAtom{{}}, true, nil
+	}
+	if m.IsFalse(h) {
+		if negative {
+			return [][]smtNRAAtom{{}}, true, nil
+		}
+		return nil, true, nil
+	}
 	kind, err := m.GetKind(h)
 	if err != nil || kind != ast.ASTApp {
-		return false, err
+		return nil, false, err
 	}
 	op, basic, err := k.internalizer.basicOperation(h)
 	if err != nil {
-		return false, err
+		return nil, false, err
 	}
 	count, err := m.GetNumArgs(h)
 	if err != nil {
-		return false, err
+		return nil, false, err
 	}
 	if basic && op == ast.ASTOpNot && count == 1 {
 		arg, err := m.GetArg(h, 0)
 		if err != nil {
-			return false, err
+			return nil, false, err
 		}
 		return in.formula(k, arg, !negative, family)
 	}
-	if basic && op == ast.ASTOpAnd && !negative {
+	if basic && (op == ast.ASTOpAnd || op == ast.ASTOpOr) {
+		conjunction := op == ast.ASTOpAnd
+		if negative {
+			conjunction = !conjunction
+		}
+		result := [][]smtNRAAtom{{}}
+		if !conjunction {
+			result = nil
+		}
 		for i := uint32(0); i < count; i++ {
 			arg, err := m.GetArg(h, i)
 			if err != nil {
-				return false, err
+				return nil, false, err
 			}
-			ok, err := in.formula(k, arg, false, family)
+			child, ok, err := in.formula(k, arg, negative, family)
 			if err != nil || !ok {
-				return false, err
+				return nil, false, err
+			}
+			if conjunction {
+				result, ok = smtNRAAnd(result, child)
+			} else {
+				result, ok = smtNRAOr(result, child)
+			}
+			if !ok {
+				return nil, false, nil
 			}
 		}
-		return true, nil
+		return result, true, nil
+	}
+	if basic && op == ast.ASTOpImplies && count == 2 {
+		a, err := m.GetArg(h, 0)
+		if err != nil {
+			return nil, false, err
+		}
+		b, err := m.GetArg(h, 1)
+		if err != nil {
+			return nil, false, err
+		}
+		left, ok, err := in.formula(k, a, !negative, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		right, ok, err := in.formula(k, b, negative, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		if negative {
+			left, ok = smtNRAAnd(left, right)
+		} else {
+			left, ok = smtNRAOr(left, right)
+		}
+		return left, ok, nil
+	}
+	booleanComparison := false
+	if basic && (op == ast.ASTOpEq || op == ast.ASTOpDistinct) && count == 2 {
+		a, err := m.GetArg(h, 0)
+		if err != nil {
+			return nil, false, err
+		}
+		booleanComparison, err = k.internalizer.isBoolean(a)
+		if err != nil {
+			return nil, false, err
+		}
+	}
+	if basic && (op == ast.ASTOpIff || op == ast.ASTOpXor || booleanComparison) && count == 2 {
+		a, err := m.GetArg(h, 0)
+		if err != nil {
+			return nil, false, err
+		}
+		b, err := m.GetArg(h, 1)
+		if err != nil {
+			return nil, false, err
+		}
+		equal := op == ast.ASTOpIff || op == ast.ASTOpEq
+		if negative {
+			equal = !equal
+		}
+		ap, ok, err := in.formula(k, a, false, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		an, ok, err := in.formula(k, a, true, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		bp, ok, err := in.formula(k, b, false, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		bn, ok, err := in.formula(k, b, true, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		firstRight, secondRight := bp, bn
+		if !equal {
+			firstRight, secondRight = bn, bp
+		}
+		first, ok := smtNRAAnd(ap, firstRight)
+		if !ok {
+			return nil, false, nil
+		}
+		second, ok := smtNRAAnd(an, secondRight)
+		if !ok {
+			return nil, false, nil
+		}
+		result, ok := smtNRAOr(first, second)
+		return result, ok, nil
+	}
+	if basic && op == ast.ASTOpIte && count == 3 {
+		condition, err := m.GetArg(h, 0)
+		if err != nil {
+			return nil, false, err
+		}
+		thenBranch, err := m.GetArg(h, 1)
+		if err != nil {
+			return nil, false, err
+		}
+		elseBranch, err := m.GetArg(h, 2)
+		if err != nil {
+			return nil, false, err
+		}
+		cp, ok, err := in.formula(k, condition, false, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		cn, ok, err := in.formula(k, condition, true, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		tv, ok, err := in.formula(k, thenBranch, negative, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		ev, ok, err := in.formula(k, elseBranch, negative, family)
+		if err != nil || !ok {
+			return nil, false, err
+		}
+		first, ok := smtNRAAnd(cp, tv)
+		if !ok {
+			return nil, false, nil
+		}
+		second, ok := smtNRAAnd(cn, ev)
+		if !ok {
+			return nil, false, nil
+		}
+		result, ok := smtNRAOr(first, second)
+		return result, ok, nil
 	}
 	relation := nlsat.AtomEQ
-	if !(basic && op == ast.ASTOpEq) {
+	if basic && op == ast.ASTOpDistinct && count == 2 {
+		negative = !negative
+	} else if !(basic && op == ast.ASTOpEq) {
 		fid, err := m.GetFamilyID(h)
 		if err != nil || fid != family {
-			return false, err
+			return nil, false, err
 		}
 		op, err = m.GetDeclKind(h)
 		if err != nil {
-			return false, err
+			return nil, false, err
 		}
 		switch op {
 		case smtArithOpLT:
@@ -180,28 +358,27 @@ func (in *smtNRAInput) formula(k *SMTKernel, h ast.ASTHandle, negative bool, fam
 			relation = nlsat.AtomLT
 			negative = !negative
 		default:
-			return false, nil
+			return nil, false, nil
 		}
 	}
 	if count != 2 {
-		return false, nil
+		return nil, false, nil
 	}
 	a, err := m.GetArg(h, 0)
 	if err != nil {
-		return false, err
+		return nil, false, err
 	}
 	b, err := m.GetArg(h, 1)
 	if err != nil {
-		return false, err
+		return nil, false, err
 	}
 	for _, h := range []ast.ASTHandle{a, b} {
 		ok, _, err := in.term(m, h, family)
 		if err != nil || !ok {
-			return false, err
+			return nil, false, err
 		}
 	}
-	in.atoms = append(in.atoms, smtNRAAtom{a, b, relation, negative})
-	return true, nil
+	return [][]smtNRAAtom{{{a, b, relation, negative}}}, true, nil
 }
 
 type smtNRAWorkspace struct {
@@ -290,14 +467,19 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 		return lbool.Undef, false, err
 	}
 	in := smtNRAInput{}
+	in.branches = [][]smtNRAAtom{{}}
 	for _, a := range k.nraInputs {
 		h, e := k.manager.RefGet(a)
 		if e != nil {
 			return lbool.Undef, false, e
 		}
-		ok, e := in.formula(k, h, false, family)
+		branches, ok, e := in.formula(k, h, false, family)
 		if e != nil || !ok {
 			return lbool.Undef, false, e
+		}
+		in.branches, ok = smtNRAAnd(in.branches, branches)
+		if !ok {
+			return lbool.Undef, false, nil
 		}
 	}
 	if !in.nonlinear || in.variable.IsNull() || k.paramGlobals == nil {
@@ -365,52 +547,61 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 	if err != nil {
 		return
 	}
-	w.conjunction, err = nlsat.NewUnivariateConjunction(w.am, w.pm, 0)
-	if err != nil {
-		return
-	}
-	for _, a := range in.atoms {
-		difference, e := k.manager.MkFamilyApp(family, smtArithOpSub, nil, []ast.ASTHandle{a.left, a.right})
-		if e != nil {
-			err = e
+	sat := false
+	for _, branch := range in.branches {
+		w.conjunction, err = nlsat.NewUnivariateConjunction(w.am, w.pm, 0)
+		if err != nil {
 			return
 		}
-		ref, e := k.manager.NewRef(difference)
-		if e != nil {
-			err = e
-			return
-		}
-		p, d, _, e := w.convert.ToPolynomial(difference)
-		e = errors.Join(e, k.manager.DelRef(&ref))
-		if e != nil {
-			err = e
-			return
-		}
-		value, e := p.Get()
-		if e == nil {
-			denominator, de := d.Get()
-			if de == nil {
-				var sign int32
-				sign, de = w.q.Integers().Sign(denominator)
-				if de == nil && sign <= 0 {
-					de = ast.ErrASTDomain
-				}
+		for _, a := range branch {
+			difference, e := k.manager.MkFamilyApp(family, smtArithOpSub, nil, []ast.ASTHandle{a.left, a.right})
+			if e != nil {
+				err = e
+				return
 			}
-			e = de
+			ref, e := k.manager.NewRef(difference)
+			if e != nil {
+				err = e
+				return
+			}
+			p, d, _, e := w.convert.ToPolynomial(difference)
+			e = errors.Join(e, k.manager.DelRef(&ref))
+			if e != nil {
+				err = e
+				return
+			}
+			value, e := p.Get()
+			if e == nil {
+				denominator, de := d.Get()
+				if de == nil {
+					var sign int32
+					sign, de = w.q.Integers().Sign(denominator)
+					if de == nil && sign <= 0 {
+						de = ast.ErrASTDomain
+					}
+				}
+				e = de
+			}
+			if e == nil {
+				e = w.conjunction.Add(value, a.kind, a.negative)
+			}
+			e = errors.Join(e, d.Close(), p.Close())
+			if e != nil {
+				err = e
+				return
+			}
 		}
-		if e == nil {
-			e = w.conjunction.Add(value, a.kind, a.negative)
-		}
-		e = errors.Join(e, d.Close(), p.Close())
-		if e != nil {
-			err = e
+		sat, err = w.conjunction.Check(&w.witness)
+		if err != nil {
 			return
 		}
-	}
-	sat, e := w.conjunction.Check(&w.witness)
-	if e != nil {
-		err = e
-		return
+		if sat {
+			break
+		}
+		if err = w.conjunction.Close(); err != nil {
+			return
+		}
+		w.conjunction = nil
 	}
 	if !sat {
 		return lbool.False, true, nil
