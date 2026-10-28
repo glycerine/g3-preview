@@ -80766,7 +80766,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained register_predicate/add_rule/close-reopen/query orchestration for finite-domain Horn programs, including implicit-variable binding, HNF ingestion, stratified negation, finite direct guards and ground theory-rewritten guards, dependency-ordered table saturation, tuple answers, and lbool results (dl_context.cpp:344-469,680-738,861-889)",
+          "name": "Retained register_predicate/add_rule/close-reopen/query orchestration for finite-domain Horn programs, including implicit-variable binding, HNF ingestion with computed head terms, stratified negation, finite direct guards and ground theory-rewritten guards, dependency-ordered table saturation, tuple answers, and lbool results (dl_context.cpp:344-469,680-738,861-889)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"]
