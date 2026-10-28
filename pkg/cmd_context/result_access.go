@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -56,6 +57,19 @@ func (c *Context) Consequences(assumptions, variables []ast.ASTHandle) (lbool.LB
 	}
 	c.checked = false
 	return c.solver.GetConsequences(assumptions, variables)
+}
+
+// ImpliedEqualities partitions terms by equalities implied by the current
+// assertions. The query invalidates access to the prior check result.
+func (c *Context) ImpliedEqualities(terms []ast.ASTHandle) (lbool.LBool, []uint32, error) {
+	if err := c.valid(); err != nil {
+		return lbool.Undef, nil, err
+	}
+	if _, err := c.Manager(); err != nil {
+		return lbool.Undef, nil, err
+	}
+	c.checked = false
+	return smtcore.ImpliedEqualities(c.solver, terms)
 }
 
 // UnsatCore returns a borrowed copy of the most recent unsatisfiable result's

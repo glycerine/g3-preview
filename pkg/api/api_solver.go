@@ -212,6 +212,16 @@ func (c *SMTContext) Consequences(assumptions, variables []ast.ASTHandle) (statu
 	return status, result, nil
 }
 
+// ImpliedEqualities returns a class identifier for each term. Terms have the
+// same identifier exactly when the current assertions imply their equality.
+// The query replaces the solver's internal check state.
+func (c *SMTContext) ImpliedEqualities(terms []ast.ASTHandle) (lbool.LBool, []uint32, error) {
+	if err := c.open(); err != nil {
+		return lbool.Undef, nil, err
+	}
+	return c.command.ImpliedEqualities(terms)
+}
+
 func (c *SMTContext) ResetAssertions() error {
 	if err := c.open(); err != nil {
 		return err

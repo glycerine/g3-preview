@@ -192,6 +192,27 @@ func TestSMTContextConsequencesOwnReturnedExpressions(t *testing.T) {
 	}
 }
 
+func TestSMTContextImpliedEqualities(t *testing.T) {
+	f := newSMTAPIFixture(t, "QF_UF", nil)
+	boolean := f.pin(f.m.MkBoolSort())
+	terms := make([]ast.ASTHandle, 3)
+	for i, name := range []string{"api-implied-p", "api-implied-q", "api-implied-r"} {
+		symbol, err := f.m.Symbols.Intern(name)
+		astTestMust(t, err)
+		terms[i] = f.pin(f.m.MkConst(symbol, boolean))
+	}
+	equality := f.pin(f.m.MkEq(terms[0], terms[1]))
+	astTestMust(t, f.c.Assert(equality))
+	status, classes, err := f.c.ImpliedEqualities(terms)
+	astTestMust(t, err)
+	if status != lbool.True || len(classes) != len(terms) {
+		t.Fatal("implied equality result", status, classes)
+	}
+	if classes[0] != classes[1] || classes[0] == classes[2] {
+		t.Fatal("implied equality partition", classes)
+	}
+}
+
 func TestSMTContextUnknownReason(t *testing.T) {
 	f := newSMTAPIFixture(t, "ALL", func(c *SMTContext) {
 		astTestMust(t, c.SetBoolOption("auto_config", false))

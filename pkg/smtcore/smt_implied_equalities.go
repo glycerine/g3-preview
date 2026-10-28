@@ -1,12 +1,14 @@
+package smtcore
+
 // Source: src/smt/smt_implied_equalities.h and the exact basic fallback in
 // src/smt/smt_implied_equalities.cpp.
-package smtcore
 
 import (
 	"errors"
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -48,16 +50,20 @@ func (classes *smtImpliedEqualityClasses) merge(first, second uint32) {
 // identifiers mean the current solver assertions imply equality. Terms of
 // different sorts always remain in separate classes. The solver assertion
 // stack is restored before return.
-func (s *SMTSolver) ImpliedEqualities(terms []ast.ASTHandle) (status lbool.LBool, classIDs []uint32, result error) {
-	if err := s.open(); err != nil {
+func ImpliedEqualities(s solver.Solver, terms []ast.ASTHandle) (status lbool.LBool, classIDs []uint32, result error) {
+	if s == nil {
+		return lbool.Undef, nil, ast.ErrASTHandle
+	}
+	manager, err := s.Manager()
+	if err != nil {
 		return lbool.Undef, nil, err
 	}
 	termRefs := make([]ast.ASTRef, 0, len(terms))
 	for index, term := range terms {
-		ref, err := s.manager.NewRef(term)
+		ref, err := manager.NewRef(term)
 		if err != nil {
 			for held := range termRefs {
-				_ = s.manager.DelRef(&termRefs[held])
+				_ = manager.DelRef(&termRefs[held])
 			}
 			return lbool.Undef, nil, fmt.Errorf("implied equality term %d reference: %w", index, err)
 		}
@@ -65,13 +71,13 @@ func (s *SMTSolver) ImpliedEqualities(terms []ast.ASTHandle) (status lbool.LBool
 	}
 	defer func() {
 		for index := range termRefs {
-			result = errors.Join(result, s.manager.DelRef(&termRefs[index]))
+			result = errors.Join(result, manager.DelRef(&termRefs[index]))
 		}
 	}()
 	classes := newSMTImpliedEqualityClasses(len(terms))
 	bySort := make(map[ast.ASTHandle][]uint32)
 	for index, term := range terms {
-		sort, err := s.manager.GetSort(term)
+		sort, err := manager.GetSort(term)
 		if err != nil {
 			return lbool.Undef, nil, fmt.Errorf("implied equality term %d sort: %w", index, err)
 		}
@@ -98,11 +104,11 @@ func (s *SMTSolver) ImpliedEqualities(terms []ast.ASTHandle) (status lbool.LBool
 			}
 			for priorPosition := 0; priorPosition < position; priorPosition++ {
 				prior := indices[priorPosition]
-				equality, err := s.manager.MkEq(terms[current], terms[prior])
+				equality, err := manager.MkEq(terms[current], terms[prior])
 				if err != nil {
 					return lbool.Undef, nil, fmt.Errorf("implied equality pair %d,%d expression: %w", current, prior, err)
 				}
-				negated, err := s.manager.MkNot(equality)
+				negated, err := manager.MkNot(equality)
 				if err != nil {
 					return lbool.Undef, nil, fmt.Errorf("implied equality pair negation: %w", err)
 				}
@@ -132,4 +138,10 @@ func (s *SMTSolver) ImpliedEqualities(terms []ast.ASTHandle) (status lbool.LBool
 		classIDs[index] = classes.find(uint32(index))
 	}
 	return lbool.True, classIDs, nil
+}
+
+// ImpliedEqualities applies the package-level exact fallback to this concrete
+// SMT solver.
+func (s *SMTSolver) ImpliedEqualities(terms []ast.ASTHandle) (lbool.LBool, []uint32, error) {
+	return ImpliedEqualities(s, terms)
 }
