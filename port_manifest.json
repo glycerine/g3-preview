@@ -82383,8 +82383,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go"],
-      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"],
+      "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2"],
+      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
       "assertions": [
         {
           "line": 305,
@@ -82406,7 +82406,7 @@
           "name": "Narrow declare-rel, rule, and query command execution for positive zero-arity Horn programs (dl_cmds.cpp:64-313)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
-          "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP"]
+          "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
         }
       ],
       "ownership": [
@@ -82421,8 +82421,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
-      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP"],
+      "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2"],
+      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
       "conditionals": [
         {
           "line": 18,
@@ -82440,7 +82440,7 @@
           "name": "Registration surface for the retained declare-rel, rule, and query command subset (dl_cmds.h:23-34)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
-          "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP"]
+          "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
         }
       ],
       "ownership": [

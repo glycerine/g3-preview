@@ -338,6 +338,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 }
 
 var scriptResults = map[string]string{
+	"fixedpoint_propositional.smt2":                "sat\nunsat\n",
 	"array_as_array_combined_fallback_gap.smt2":    "sat\nunsat\nsat\n",
 	"utvpi_mixed_sum_model.smt2":                   "sat\n",
 	"nla2bv_bounded_scopes.smt2":                   "sat\n((x 7))\nunsat\nsat\n((x 7))\n",
