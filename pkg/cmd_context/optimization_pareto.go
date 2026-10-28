@@ -13,18 +13,15 @@ import (
 	"github.com/glycerine/g3/pkg/opt"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (c *Context) paretoNoSoftObjectives() bool {
-	for i := range c.objectives {
-		if c.objectives[i].soft {
-			return false
-		}
-	}
-	return true
+type paretoModelValue struct {
+	measure  big.Rat
+	softCost big.Rat
 }
 
-func (c *Context) evaluateParetoModel(md *model.ModelCore) (values []big.Rat, resultErr error) {
+func (c *Context) evaluateParetoModel(md *model.ModelCore) (values []paretoModelValue, resultErr error) {
 	if md == nil {
 		return nil, ast.ErrASTHandle
 	}
@@ -39,8 +36,36 @@ func (c *Context) evaluateParetoModel(md *model.ModelCore) (values []big.Rat, re
 	if err = evaluator.SetModelCompletion(true); err != nil {
 		return nil, err
 	}
-	values = make([]big.Rat, len(c.objectives))
+	values = make([]paretoModelValue, len(c.objectives))
 	for i := range c.objectives {
+		objective := &c.objectives[i]
+		if objective.soft {
+			for j := range objective.softTerms {
+				term := &objective.softTerms[j]
+				ref, e := evaluator.EvaluateValue(term.expression)
+				if e != nil {
+					return nil, e
+				}
+				resolved, e := c.manager.RefGet(ref)
+				truth := e == nil && c.manager.IsTrue(resolved)
+				e = errors.Join(e, c.manager.DelRef(&ref))
+				if e != nil {
+					return nil, e
+				}
+				weight := new(big.Rat).Set(&term.weight)
+				if weight.Sign() < 0 {
+					values[i].softCost.Add(&values[i].softCost, weight)
+					weight.Neg(weight)
+					truth = !truth
+				}
+				if truth {
+					values[i].measure.Add(&values[i].measure, weight)
+				} else {
+					values[i].softCost.Add(&values[i].softCost, weight)
+				}
+			}
+			continue
+		}
 		ref, e := evaluator.EvaluateValue(c.objectives[i].expression)
 		if e != nil {
 			return nil, e
@@ -58,7 +83,7 @@ func (c *Context) evaluateParetoModel(md *model.ModelCore) (values []big.Rat, re
 				e = ast.ErrASTDomain
 			}
 			if e == nil {
-				if _, matched = values[i].SetString(text); !matched {
+				if _, matched = values[i].measure.SetString(text); !matched {
 					e = ast.ErrASTDomain
 				}
 			}
@@ -69,6 +94,64 @@ func (c *Context) evaluateParetoModel(md *model.ModelCore) (values []big.Rat, re
 		}
 	}
 	return values, nil
+}
+
+func (c *Context) paretoSoftComparison(objective *optimizationObjective, bound *big.Rat, ge bool, hold func(ast.ASTHandle, error) (ast.ASTHandle, error)) (result ast.ASTHandle, resultErr error) {
+	if objective == nil || !objective.soft || bound == nil || hold == nil {
+		return result, ast.ErrASTHandle
+	}
+	service := c.manager.NumeralService()
+	if service == nil {
+		return result, ast.ErrASTHandle
+	}
+	coefficients := make([]unumeral.OwnedRational, 0, len(objective.softTerms))
+	arguments := make([]ast.ASTHandle, 0, len(objective.softTerms))
+	var threshold unumeral.OwnedRational
+	defer func() {
+		if threshold != (unumeral.OwnedRational{}) {
+			resultErr = errors.Join(resultErr, service.Del(&threshold))
+		}
+		for i := len(coefficients) - 1; i >= 0; i-- {
+			resultErr = errors.Join(resultErr, service.Del(&coefficients[i]))
+		}
+	}()
+	for i := range objective.softTerms {
+		term := &objective.softTerms[i]
+		if term.weight.Sign() == 0 {
+			continue
+		}
+		weight := new(big.Rat).Set(&term.weight)
+		argument := term.expression
+		if weight.Sign() < 0 {
+			weight.Neg(weight)
+			var err error
+			argument, err = hold(c.manager.MkNot(argument))
+			if err != nil {
+				return result, err
+			}
+		}
+		coefficient, err := service.NewValue()
+		if err != nil {
+			return result, err
+		}
+		coefficients = append(coefficients, coefficient)
+		if err = service.SetString(&coefficients[len(coefficients)-1], weight.RatString()); err != nil {
+			return result, err
+		}
+		arguments = append(arguments, argument)
+	}
+	var err error
+	threshold, err = service.NewValue()
+	if err != nil {
+		return result, err
+	}
+	if err = service.SetString(&threshold, bound.RatString()); err != nil {
+		return result, err
+	}
+	if ge {
+		return c.manager.MkPseudoBooleanGE(coefficients, arguments, &threshold)
+	}
+	return c.manager.MkPseudoBooleanLE(coefficients, arguments, &threshold)
 }
 
 func (c *Context) paretoBitVectorNumeral(value *big.Rat, width uint32) (result ast.ASTHandle, resultErr error) {
@@ -90,7 +173,7 @@ func (c *Context) paretoBitVectorNumeral(value *big.Rat, width uint32) (result a
 	return c.manager.BitVectorNumeral(&numeral, width)
 }
 
-func (c *Context) assertParetoFormula(backend *smtcore.SMTSolver, values []big.Rat, dominates bool) (resultErr error) {
+func (c *Context) assertParetoFormula(backend *smtcore.SMTSolver, values []paretoModelValue, dominates bool) (resultErr error) {
 	if backend == nil || len(values) != len(c.objectives) {
 		return ast.ErrASTHandle
 	}
@@ -118,8 +201,13 @@ func (c *Context) assertParetoFormula(backend *smtcore.SMTSolver, values []big.R
 		objective := &c.objectives[i]
 		var numeral ast.ASTHandle
 		var err error
-		if objective.bitVector {
-			numeral, err = hold(c.paretoBitVectorNumeral(&values[i], objective.bitWidth))
+		if objective.soft {
+			weak[i], err = hold(c.paretoSoftComparison(objective, &values[i].measure, true, hold))
+			if err == nil {
+				notBetter[i], err = hold(c.paretoSoftComparison(objective, &values[i].measure, false, hold))
+			}
+		} else if objective.bitVector {
+			numeral, err = hold(c.paretoBitVectorNumeral(&values[i].measure, objective.bitWidth))
 		} else {
 			sort, e := c.manager.GetSort(objective.expression)
 			if e != nil {
@@ -130,13 +218,20 @@ func (c *Context) assertParetoFormula(backend *smtcore.SMTSolver, values []big.R
 				return e
 			}
 			if kind == 1 {
-				numeral, err = hold(c.manager.ArithmeticIntegerNumeralText(values[i].RatString()))
+				numeral, err = hold(c.manager.ArithmeticIntegerNumeralText(values[i].measure.RatString()))
 			} else {
-				numeral, err = hold(c.manager.ArithmeticRealNumeralText(values[i].RatString()))
+				numeral, err = hold(c.manager.ArithmeticRealNumeralText(values[i].measure.RatString()))
 			}
 		}
 		if err != nil {
 			return err
+		}
+		if objective.soft {
+			strict[i], err = hold(c.manager.MkNot(notBetter[i]))
+			if err != nil {
+				return err
+			}
+			continue
 		}
 		term := objective.expression
 		if objective.bitVector && objective.maximize {
@@ -219,6 +314,14 @@ func (c *Context) newParetoBackend(assumptions []ast.ASTHandle) (backend *smtcor
 	if err = backend.SetProduceModels(true); err != nil {
 		return nil, err
 	}
+	for i := range c.objectives {
+		if c.objectives[i].soft {
+			if err = backend.EnsurePseudoBooleanTheory(); err != nil {
+				return nil, err
+			}
+			break
+		}
+	}
 	for _, assertion := range c.assertions {
 		if err = backend.Assert(assertion.expression); err != nil {
 			return nil, err
@@ -234,9 +337,6 @@ func (c *Context) newParetoBackend(assumptions []ast.ASTHandle) (backend *smtcor
 }
 
 func (c *Context) checkOptimizePareto(assumptions []ast.ASTHandle, continuation bool) (result *opt.ArithmeticResult, resultErr error) {
-	if !c.paretoNoSoftObjectives() {
-		return nil, ast.ErrASTDomain
-	}
 	if !continuation || !c.optimizationParetoActive {
 		if err := c.closeParetoBackend(); err != nil {
 			return nil, err
@@ -260,7 +360,7 @@ func (c *Context) checkOptimizePareto(assumptions []ast.ASTHandle, continuation 
 		return &opt.ArithmeticResult{Status: status, Values: make([]opt.ObjectiveValue, len(c.objectives)), Optimal: status == lbool.False}, nil
 	}
 	var best *model.ModelCore
-	var values []big.Rat
+	var values []paretoModelValue
 	defer func() {
 		if resultErr != nil && best != nil {
 			resultErr = errors.Join(resultErr, best.DecRef())
@@ -334,15 +434,20 @@ func (c *Context) checkOptimizePareto(assumptions []ast.ASTHandle, continuation 
 	result = &opt.ArithmeticResult{Status: lbool.True, Values: make([]opt.ObjectiveValue, len(c.objectives)), Model: best, Optimal: true}
 	best = nil
 	for i := range values {
+		if c.objectives[i].soft {
+			result.Values[i].SoftCost.Set(&values[i].softCost)
+			result.Values[i].Soft = true
+			continue
+		}
 		if c.objectives[i].bitVector {
-			result.Values[i].SoftCost.Set(&values[i])
+			result.Values[i].SoftCost.Set(&values[i].measure)
 			if c.objectives[i].maximize {
 				maximum := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), uint(c.objectives[i].bitWidth)), big.NewInt(1))
-				result.Values[i].SoftCost.Sub(new(big.Rat).SetInt(maximum), &values[i])
+				result.Values[i].SoftCost.Sub(new(big.Rat).SetInt(maximum), &values[i].measure)
 			}
 			continue
 		}
-		finite := simplex.RationalInfinitesimal(&values[i])
+		finite := simplex.RationalInfinitesimal(&values[i].measure)
 		result.Values[i] = opt.ObjectiveValue{
 			Arithmetic:           smtcore.SMTArithmeticObjectiveValue{Finite: finite},
 			ArithmeticModel:      smtcore.SMTArithmeticObjectiveValue{Finite: finite.Clone()},

@@ -366,3 +366,61 @@ func TestSMT2BitVectorParetoOptimizationEndToEnd(t *testing.T) {
 		}
 	}
 }
+
+func TestSMT2SoftParetoOptimizationEndToEnd(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	script := `(set-option :produce-models true)(set-option :opt.priority pareto)
+(set-logic QF_FD)(declare-const a Bool)(declare-const b Bool)
+(assert (not (and a b)))(assert-soft a :id x)(assert-soft b :weight 1 :id y)
+(check-sat)(get-objectives)(get-value (a b))
+(check-sat)(get-objectives)(get-value (a b))(check-sat)`
+	var output bytes.Buffer
+	if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	got := strings.Join(strings.Fields(output.String()), " ")
+	for _, want := range []string{
+		"(objectives (x 0) (y 1) ) ((a true) (b false))",
+		"(objectives (x 1) (y 0) ) ((a false) (b true))",
+	} {
+		if strings.Count(got, want) != 1 {
+			t.Fatal("soft Pareto frontier point", want, got)
+		}
+	}
+	if !strings.HasSuffix(got, "unsat") {
+		t.Fatal("soft Pareto terminal status", got)
+	}
+}
+
+func TestSMT2NegativeSoftParetoOptimizationEndToEnd(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	script := `(set-option :produce-models true)(set-option :opt.priority pareto)
+(set-logic QF_FD)(declare-const a Bool)
+(assert-soft a :weight -2 :id x)
+(check-sat)(get-objectives)(get-value (a))(check-sat)`
+	var output bytes.Buffer
+	if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	got := strings.Join(strings.Fields(output.String()), " ")
+	want := "sat (objectives (x (- 2)) ) ((a false)) unsat"
+	if got != want {
+		t.Fatal("negative soft Pareto normalization", got, "want", want)
+	}
+}

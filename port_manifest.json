@@ -92865,7 +92865,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/parsers/smt2/commands.go", "pkg/cmd_context/optimization.go", "pkg/cmd_context/optimization_pareto.go"],
-      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMT2BitVectorOptimizationEndToEnd", "TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd", "TestSMT2BoxOptimizationEndToEnd", "TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
+      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMT2BitVectorOptimizationEndToEnd", "TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd", "TestSMT2BoxOptimizationEndToEnd", "TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMT2SoftParetoOptimizationEndToEnd", "TestSMT2NegativeSoftParetoOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
       "assertions": [
         {
           "line": 86,
@@ -92885,7 +92885,7 @@
           "name": "assert-soft Boolean expression, persistent parametric weight/id lifecycle, grouped objective registration and exact assignment display (opt_cmds.cpp:46-107)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
-          "tests": ["TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"]
+          "tests": ["TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMT2SoftParetoOptimizationEndToEnd", "TestSMT2NegativeSoftParetoOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": [],
@@ -92920,7 +92920,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go", "pkg/opt/bound_expression.go", "pkg/opt/bound_expression_test.go", "pkg/opt/arithmetic_value_expression.go", "pkg/cmd_context/optimization.go", "pkg/cmd_context/optimization_pareto.go", "pkg/parsers/smt2/optimization_test.go"],
-      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult", "TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMT2BitVectorOptimizationEndToEnd", "TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd", "TestSMT2BoxOptimizationEndToEnd", "TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
+      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult", "TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMT2BitVectorOptimizationEndToEnd", "TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd", "TestSMT2BoxOptimizationEndToEnd", "TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMT2SoftParetoOptimizationEndToEnd", "TestSMT2NegativeSoftParetoOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
       "conditionals": [
         {
           "line": 271,
@@ -93019,10 +93019,10 @@
           "tests": ["TestSMT2BoxOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         },
         {
-          "name": "arithmetic and unsigned bit-vector Pareto comparison construction, persistent frontier enumeration, objective publication and terminal unsat/reset lifecycle (opt_context.cpp:470-565)",
+          "name": "arithmetic, unsigned bit-vector and normalized weighted-soft Pareto comparison construction, persistent frontier enumeration, objective publication and terminal unsat/reset lifecycle (opt_context.cpp:470-565)",
           "status": "partial",
           "go_target": "pkg/cmd_context/optimization_pareto.go",
-          "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+          "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMT2SoftParetoOptimizationEndToEnd", "TestSMT2NegativeSoftParetoOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": [],
@@ -93135,7 +93135,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/optimization_pareto.go"],
-      "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
+      "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMT2SoftParetoOptimizationEndToEnd", "TestSMT2NegativeSoftParetoOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
       "assertions": [
         {
           "line": 54,
@@ -93146,14 +93146,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "GIA arithmetic and unsigned bit-vector Pareto improvement loop, retained best model and persistent not-dominated blockers across checks (opt_pareto.cpp:31-86)",
+          "name": "GIA arithmetic, unsigned bit-vector and normalized weighted-soft Pareto improvement loop, retained best model and persistent not-dominated blockers across checks (opt_pareto.cpp:31-86)",
           "status": "partial",
           "go_target": "pkg/cmd_context/optimization_pareto.go",
-          "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+          "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMT2SoftParetoOptimizationEndToEnd", "TestSMT2NegativeSoftParetoOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": ["Persistent solver and retained model lifetimes are explicit; temporary dominance AST references are released in reverse order."],
-      "deviations": ["Retained arithmetic and unsigned bit-vector objectives use Pareto enumeration; soft Pareto comparisons and OIA remain unported."]
+      "deviations": ["The retained GIA path covers arithmetic, unsigned bit-vector and normalized weighted-soft objectives; the alternative OIA algorithm remains unported."]
     },
     {
       "path": "src/opt/opt_pareto.h",
@@ -93161,7 +93161,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/optimization_pareto.go"],
-      "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
+      "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMT2SoftParetoOptimizationEndToEnd", "TestSMT2NegativeSoftParetoOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
       "conditionals": [
         {
           "line": 20,
@@ -93176,14 +93176,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "concrete arithmetic and unsigned bit-vector Pareto state and callback lifecycle used by the retained optimizer path (opt_pareto.h:31-109)",
+          "name": "concrete arithmetic, unsigned bit-vector and normalized weighted-soft Pareto state and callback lifecycle used by the retained optimizer path (opt_pareto.h:31-109)",
           "status": "partial",
           "go_target": "pkg/cmd_context/optimization_pareto.go",
-          "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"]
+          "tests": ["TestSMT2ParetoOptimizationEndToEnd", "TestSMT2BitVectorParetoOptimizationEndToEnd", "TestSMT2SoftParetoOptimizationEndToEnd", "TestSMT2NegativeSoftParetoOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": ["Go context owns the persistent Pareto backend and closes it on reset, terminal status, or failure."],
-      "deviations": ["The generic C++ callback interface is represented only by its live concrete arithmetic and unsigned bit-vector uses; soft comparisons, OIA and unused template generality are not ported."]
+      "deviations": ["The generic C++ callback interface is represented only by its live concrete arithmetic, unsigned bit-vector and weighted-soft uses; OIA and unused template generality are not ported."]
     },
     {
       "path": "src/opt/opt_parse.cpp",
