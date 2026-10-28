@@ -37,9 +37,11 @@ type PredicateTransformer struct {
 	levels        [][]ast.ASTHandle
 	invariants    []ast.ASTHandle
 	propertyLevel map[ast.ASTHandle]uint32
+	rules         []*normalizedRule
 	references    []ast.ASTRef
 	propagations  uint32
 	initialized   bool
+	rulesReady    bool
 	closed        bool
 }
 
@@ -479,6 +481,11 @@ func (p *PredicateTransformer) Close() (result error) {
 	if p.solver != nil {
 		result = errors.Join(result, p.solver.Close())
 	}
+	for index := len(p.rules) - 1; index >= 0; index-- {
+		if p.rules[index] != nil && p.rules[index].rule != nil {
+			result = errors.Join(result, p.rules[index].rule.Close())
+		}
+	}
 	for index := len(p.references) - 1; index >= 0; index-- {
 		result = errors.Join(result, p.manager.DelRef(&p.references[index]))
 	}
@@ -491,6 +498,7 @@ func (p *PredicateTransformer) Close() (result error) {
 		p.levels = nil
 		p.invariants = nil
 		p.propertyLevel = nil
+		p.rules = nil
 		p.references = nil
 		p.closed = true
 	}

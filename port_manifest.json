@@ -82772,11 +82772,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/pdr/predicate_transformer.go",
-        "pkg/muz/pdr/predicate_transformer_test.go"
+        "pkg/muz/pdr/predicate_transformer_test.go",
+        "pkg/muz/pdr/predicate_rules.go",
+        "pkg/muz/pdr/predicate_rules_test.go"
       ],
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
-        "TestPredicateTransformerPropagatesGlobalLemmaToInfinity"
+        "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
+        "TestPredicateTransformerNormalizesRulesIntoExecutableSystem"
       ],
       "assertions": [
         {
@@ -82957,7 +82960,15 @@
           ]
         },
         {
-          "name": "rule-to-transition normalization, predecessor assumptions, cover/model conversion, model-node/search, generalization and top-level PDR solve loop",
+          "name": "pred_transformer initialization, rule grounding, variable representatives, transition tags and initial/transition formula construction (pdr_context.cpp:504-705)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/predicate_rules.go",
+          "tests": [
+            "TestPredicateTransformerNormalizesRulesIntoExecutableSystem"
+          ]
+        },
+        {
+          "name": "predecessor assumptions, cover/model conversion, model-node/search, generalization and top-level PDR solve loop",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -82967,7 +82978,7 @@
         "PredicateTransformer owns its head/system/property AST references, PropSolver, and ReachableCache. It closes both context consumers before releasing AST pins; returned signatures, formulas, and cores borrow AST handles while requested models retain explicit ownership."
       ],
       "deviations": [
-        "InitializeSystem accepts already-normalized initial and transition formulas so the frame engine is independently executable while rule normalization remains pending. Typed results replace mutable model/core output pointers."
+        "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers."
       ]
     },
     {
@@ -82977,11 +82988,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/pdr/predicate_transformer.go",
-        "pkg/muz/pdr/predicate_transformer_test.go"
+        "pkg/muz/pdr/predicate_transformer_test.go",
+        "pkg/muz/pdr/predicate_rules.go",
+        "pkg/muz/pdr/predicate_rules_test.go"
       ],
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
-        "TestPredicateTransformerPropagatesGlobalLemmaToInfinity"
+        "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
+        "TestPredicateTransformerNormalizesRulesIntoExecutableSystem"
       ],
       "conditionals": [
         {
@@ -83019,12 +83033,13 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "retained pred_transformer signature, frame/property, reachability, propagation and statistics surface",
+          "name": "retained pred_transformer signature, rule initialization, frame/property, reachability, propagation and statistics surface",
           "status": "ported",
           "go_target": "pkg/muz/pdr/predicate_transformer.go",
           "tests": [
             "TestPredicateTransformerSignatureFramesAndReachability",
-            "TestPredicateTransformerPropagatesGlobalLemmaToInfinity"
+            "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
+            "TestPredicateTransformerNormalizesRulesIntoExecutableSystem"
           ]
         },
         {
