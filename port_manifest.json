@@ -136087,11 +136087,13 @@
         },
         {
           "name": "affine arithmetic term internalization, constant column, scoped definition rows, and equivalent-row equality propagation",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_linear.go",
           "tests": [
             "TestSMTLinearArithmeticStandaloneTermDefinition",
-            "TestSMTLinearArithmeticEqualDefinitionRows"
+            "TestSMTLinearArithmeticEqualDefinitionRows",
+            "TestSMTArithmeticDefinitionsPropagateWithoutBooleanAtoms",
+            "TestSMTArithmeticAffineDefinitionBoundExplanations"
           ]
         },
         {
@@ -136174,7 +136176,7 @@
         },
         {
           "name": "small-row interval bounds and fixed shared-variable equality propagation: unconditional replay fixes arithmetic inputs of UF applications and propagates congruence with scoped premises",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
@@ -136187,7 +136189,7 @@
         },
         {
           "name": "small canonical-row interval bound propagation into nonlinear strategy replay, including equality aliases and comparison rows with scoped unconditional premises",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
           "tests": [
             "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs"
@@ -136203,7 +136205,7 @@
         },
         {
           "name": "final_check shared arithmetic model-equality case splitting before SAT, and preferred-phase inheritance by InternalizeEquality auxiliary bound atoms",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_assume_eq.go",
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
