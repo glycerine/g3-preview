@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp is_shared and
 // src/smt/theory_arith_aux.h arithmetic is_shared override.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

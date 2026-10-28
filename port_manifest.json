@@ -120237,6 +120237,7 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTTheoryAssignmentsWaitForRelevanceAndRestoreOnPop",
         "TestSMTArithmeticSymbolicZeroDivisorGuard",
+        "TestSMTArithmeticUnderspecifiedParentMarksChildShared",
         "TestSMTNonlinearNumericProgressAndScopedStrategies",
         "TestSMTSharedArithmeticFixedRowsScopedProofs",
         "TestSMTAssumeEqualityScopedPhaseAndRelevancy",
@@ -121665,10 +121666,14 @@
         },
         {
           "name": "arithmetic context-sharing query for root theory-variable counts, ite roots, active MAM sharing, foreign-family parents and underspecified arithmetic parents",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_shared.go",
           "tests": [
-            "TestSMTSharedArithmeticFixedRowsScopedProofs"
+            "TestSMTSharedTheoryNodeIteAndUnownedRoots",
+            "TestSMTArraySharedRolesAndScopedInterfaceEqualities",
+            "TestSMTArraySharedValueAndUninterpretedParentRoles",
+            "TestSMTSharedArithmeticFixedRowsScopedProofs",
+            "TestSMTArithmeticUnderspecifiedParentMarksChildShared"
           ]
         },
         {
@@ -133955,6 +133960,7 @@
         "TestSMTArithmeticEqualityBoundAndAccumulation",
         "TestSMTNormalizeArithmeticIntegerBound",
         "TestSMTSharedArithmeticFixedRowsScopedProofs",
+        "TestSMTArithmeticUnderspecifiedParentMarksChildShared",
         "TestArithmeticMaxMinDerivedExtremaAndBestEffort",
         "TestArithmeticMaxMinIntegerGainsAndSharedMovement",
         "TestSMTNonlinearMaxMinBoundsMovementAndScopedProofs",
@@ -134450,10 +134456,11 @@
         },
         {
           "name": "arithmetic is_shared override for underspecified division-family parents and fixed arithmetic equality integration with foreign-family parents",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_shared.go",
           "tests": [
-            "TestSMTSharedArithmeticFixedRowsScopedProofs"
+            "TestSMTSharedArithmeticFixedRowsScopedProofs",
+            "TestSMTArithmeticUnderspecifiedParentMarksChildShared"
           ]
         },
         {

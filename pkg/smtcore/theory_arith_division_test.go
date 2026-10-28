@@ -131,3 +131,43 @@ func TestSMTArithmeticSymbolicZeroDivisorGuard(t *testing.T) {
 		t.Fatal("zero divisor must disable the division equation", status, reason)
 	}
 }
+
+func TestSMTArithmeticUnderspecifiedParentMarksChildShared(t *testing.T) {
+	m, cfg := smtModelGeneratorFixture(t)
+	solver, err := NewSMTSolver(m, nil, "ALL", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, solver.Close()) })
+	smtDisableAutoConfig(t, solver)
+	solver.kernel.preprocess = false
+	family, err := m.ArithmeticFamilyID()
+	astTestMust(t, err)
+	one, err := m.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	sort, err := m.GetSort(one)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "shared-division-child"), sort)
+	astTestMust(t, err)
+	z, err := m.MkConst(astTestSymbol(t, m, "ordinary-arithmetic-child"), sort)
+	astTestMust(t, err)
+	division, err := m.MkFamilyApp(family, smtArithOpIDiv, nil, []ast.ASTHandle{x, one})
+	astTestMust(t, err)
+	ordinary, err := m.MkFamilyApp(family, smtArithOpAdd, nil, []ast.ASTHandle{z, one})
+	astTestMust(t, err)
+	state := solver.kernel.internalizer
+	astTestMust(t, state.Internalize(division, false))
+	astTestMust(t, state.Internalize(ordinary, false))
+	theory, ok := state.theories[family].(*SMTLinearArithmeticTheory)
+	if !ok || len(theory.divisionTerms) == 0 {
+		t.Fatal("division fixture did not reach the underspecified-operator owner")
+	}
+	shared, err := theory.sharedArithmeticNode(state.context.enodes[x])
+	astTestMust(t, err)
+	if !shared {
+		t.Fatal("division child was not marked shared")
+	}
+	shared, err = theory.sharedArithmeticNode(state.context.enodes[z])
+	astTestMust(t, err)
+	if shared {
+		t.Fatal("ordinary single-theory arithmetic child was marked shared")
+	}
+}
