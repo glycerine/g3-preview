@@ -819,6 +819,7 @@ var scriptResults = map[string]string{
 	"linear_integer.smt2":                          "sat\n((x 4))\nunsat\nsat\n",
 	"linear_real.smt2":                             "sat\n((x (/ 3.0 2.0)))\n",
 	"bit_vector.smt2":                              "sat\n((x #xf))\n",
+	"bounded_integer_optimization.smt2":            "sat\n(objectives\n (x 3)\n)\n((x 3))\nsat\n(objectives\n (x 0)\n)\n((x 0))\n",
 	"array_read_store.smt2":                        "unsat\n",
 	"quantified_boolean.smt2":                      "unsat\n",
 	"parallel_let.smt2":                            "sat\n((p true))\n",

@@ -358,6 +358,17 @@ func (p *commandParser) command() (bool, error) {
 		if err = p.context.Assert(expression, named); err != nil {
 			return false, err
 		}
+	case "maximize", "minimize":
+		expression, _, err := p.expression()
+		if err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.AddObjective(expression, name == "maximize"); err != nil {
+			return false, err
+		}
 	case "push", "pop":
 		n := uint32(1)
 		if p.token != RightParenToken {
@@ -440,6 +451,14 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		if err = p.context.WriteModel(p.out); err != nil {
+			return false, err
+		}
+		success = false
+	case "get-objectives":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.WriteObjectives(p.out); err != nil {
 			return false, err
 		}
 		success = false

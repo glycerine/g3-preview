@@ -31,7 +31,14 @@ type assertion struct {
 	expression, tag ast.ASTHandle
 	ref, tagRef     ast.ASTRef
 }
-type scope struct{ functions, sorts, assertions, macros, sortConstructors int }
+type optimizationObjective struct {
+	expression ast.ASTHandle
+	ref        ast.ASTRef
+	value      smtcore.SMTArithmeticObjectiveValue
+	maximize   bool
+	valueReady bool
+}
+type scope struct{ functions, sorts, assertions, objectives, macros, sortConstructors int }
 type builtin struct {
 	family ast.FamilyID
 	kind   int32
@@ -61,6 +68,7 @@ type Context struct {
 	macros                           map[string][]macroDeclaration
 	macroTrail                       []string
 	assertions                       []assertion
+	objectives                       []optimizationObjective
 	scopes                           []scope
 	PrintSuccess, GlobalDeclarations bool
 	checked                          bool
@@ -581,7 +589,7 @@ func (c *Context) Push(count uint32) error {
 		if err := c.solver.Push(); err != nil {
 			return err
 		}
-		c.scopes = append(c.scopes, scope{len(c.functionTrail), len(c.sortTrail), len(c.assertions), len(c.macroTrail), len(c.sortConstructorTrail)})
+		c.scopes = append(c.scopes, scope{len(c.functionTrail), len(c.sortTrail), len(c.assertions), len(c.objectives), len(c.macroTrail), len(c.sortConstructorTrail)})
 	}
 	c.checked = false
 	return nil
@@ -619,6 +627,9 @@ func (c *Context) Pop(count uint32) error {
 		}
 	}
 	if err := c.restoreAssertions(s.assertions); err != nil {
+		return err
+	}
+	if err := c.restoreObjectives(s.objectives); err != nil {
 		return err
 	}
 	c.scopes = c.scopes[:level]
@@ -682,6 +693,9 @@ func (c *Context) CheckSat(assumptions []ast.ASTHandle) (status lbool.LBool, err
 	c.checked = false
 	if err := c.clearCheckSatResult(); err != nil {
 		return lbool.Undef, err
+	}
+	if len(c.objectives) != 0 {
+		return c.checkOptimize(assumptions)
 	}
 	status, err = c.solver.CheckSat(assumptions)
 	if err != nil {
@@ -773,8 +787,12 @@ func (c *Context) ResetAssertions() error {
 	if err := c.restoreAssertions(0); err != nil {
 		return err
 	}
+	if err := c.restoreObjectives(0); err != nil {
+		return err
+	}
 	for i := range c.scopes {
 		c.scopes[i].assertions = 0
+		c.scopes[i].objectives = 0
 		if c.solver != nil {
 			if err := c.solver.Push(); err != nil {
 				c.initializationError = err
@@ -817,6 +835,9 @@ func (c *Context) resetManagerState() error {
 			return err
 		}
 		if err := c.restoreAssertions(0); err != nil {
+			return err
+		}
+		if err := c.restoreObjectives(0); err != nil {
 			return err
 		}
 		if err := c.restoreDeclarations(0, 0); err != nil {

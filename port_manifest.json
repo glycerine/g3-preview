@@ -92854,9 +92854,9 @@
       "path": "src/opt/opt_cmds.cpp",
       "component": "opt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/parsers/smt2/commands.go", "pkg/cmd_context/optimization.go"],
+      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"],
       "assertions": [
         {
           "line": 86,
@@ -92865,7 +92865,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "retained maximize, minimize and get-objectives commands for one arithmetic objective, including scoped rollback (opt_cmds.cpp:115-180)",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -92897,8 +92904,8 @@
       "component": "opt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go", "pkg/opt/bound_expression.go", "pkg/opt/bound_expression_test.go"],
-      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult"],
+      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go", "pkg/opt/bound_expression.go", "pkg/opt/bound_expression_test.go", "pkg/cmd_context/optimization.go", "pkg/parsers/smt2/optimization_test.go"],
+      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult", "TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"],
       "conditionals": [
         {
           "line": 271,
@@ -92965,6 +92972,12 @@
           "status": "ported",
           "go_target": "pkg/opt/bound_expression.go",
           "tests": ["TestOptBoundExpressionSourceBranchesAndOwnedResult"]
+        },
+        {
+          "name": "scoped_state arithmetic objective registration, rollback, bounded single-objective optimize, model publication and assignment display (opt_context.cpp:49-55,109-116,156-165,232-235,255-322,1264-1283)",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/optimization.go",
+          "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"]
         }
       ],
       "ownership": [],
@@ -93188,9 +93201,9 @@
       "path": "src/opt/opt_solver.cpp",
       "component": "opt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/opt/arithmetic_solver.go", "pkg/smtcore/smt_solver_objective.go", "pkg/smtcore/smt_solver_objective_test.go"],
+      "tests": ["TestSMTSolverArithmeticObjectiveFacade", "TestSMT2BoundedIntegerOptimizationEndToEnd"],
       "assertions": [
         {
           "line": 119,
@@ -93223,7 +93236,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "dedicated SMT optimization backend, concrete arithmetic-theory objective dispatch, blocker loop and best-model preservation (opt_solver.cpp:32-53,93-132,195-250,342-431)",
+          "status": "partial",
+          "go_target": "pkg/opt/arithmetic_solver.go",
+          "tests": ["TestSMTSolverArithmeticObjectiveFacade", "TestSMT2BoundedIntegerOptimizationEndToEnd"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -93254,9 +93274,9 @@
       "path": "src/opt/optsmt.cpp",
       "component": "opt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/opt/arithmetic_solver.go", "pkg/parsers/smt2/optimization_test.go"],
+      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd"],
       "assertions": [
         {
           "line": 113,
@@ -93297,7 +93317,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "bounded single arithmetic objective setup and exact blocker iteration for maximize/minimize (optsmt.cpp:93-153,463-521)",
+          "status": "partial",
+          "go_target": "pkg/opt/arithmetic_solver.go",
+          "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },

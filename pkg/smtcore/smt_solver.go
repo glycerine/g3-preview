@@ -33,6 +33,12 @@ type smtTrackedAssertion struct {
 	formula ast.ASTRef
 }
 
+type smtSolverObjective struct {
+	term     ast.ASTRef
+	theory   smtArithmeticObjectiveTheory
+	variable SMTTheoryVar
+}
+
 // SMTSolver exposes the retained SMT kernel through solver.Solver. The result
 // object is replaced on each check, while kernel statistics remain cumulative.
 type SMTSolver struct {
@@ -46,6 +52,7 @@ type SMTSolver struct {
 	logic         usymbol.Symbol
 	tracked       []smtTrackedAssertion
 	trackedScopes []uint32
+	objectives    []smtSolverObjective
 	callback      solver.ProgressCallback
 	references    uint32
 	produceModels bool
@@ -926,6 +933,7 @@ func (s *SMTSolver) Close() error {
 	result = errors.Join(result, s.clearResult())
 	result = errors.Join(result, s.named.Close())
 	result = errors.Join(result, s.restoreTracked(0))
+	result = errors.Join(result, s.ResetObjectives())
 	result = errors.Join(result, s.kernel.Close())
 	result = errors.Join(result, s.config.Params.Del(&s.params))
 	if s.ownedGlobals != nil {

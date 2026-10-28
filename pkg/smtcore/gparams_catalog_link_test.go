@@ -1,4 +1,4 @@
-package smtcore
+package smtcore_test
 
 // These integration tests initialize the complete source parameter catalog.
 // Import its collector owners so their package initializers register the
