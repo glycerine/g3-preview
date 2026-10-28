@@ -4,26 +4,58 @@
       "path": "CMakeLists.txt",
       "component": "CMakeLists.txt",
       "role": "reference_tool",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/muz/base/costs.go", "pkg/muz/base/rule.go"],
+      "tests": ["TestCostsArithmeticThresholdAndOutput", "TestAccountedObjectPropagatesToRetainedRuleParent", "TestCostRecorderSwitchesObjectsAndChargesWholeMilliseconds"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "costs construction, emptiness, reset, strict subtraction, accumulation, threshold comparison, and profile output (dl_costs.cpp:36-66)",
+          "status": "ported",
+          "go_target": "pkg/muz/base/costs.go",
+          "tests": ["TestCostsArithmeticThresholdAndOutput"]
+        },
+        {
+          "name": "accounted_object parent ownership, current/processed/total accounting, propagation, threshold and profile output (dl_costs.cpp:72-119)",
+          "status": "ported",
+          "go_target": "pkg/muz/base/costs.go",
+          "tests": ["TestAccountedObjectPropagatesToRetainedRuleParent"]
+        },
+        {
+          "name": "cost_recorder start/switch/finish lifecycle with whole-millisecond and instruction charging (dl_costs.cpp:126-157)",
+          "status": "ported",
+          "go_target": "pkg/muz/base/costs.go",
+          "tests": ["TestCostRecorderSwitchesObjectsAndChargesWholeMilliseconds"]
+        }
+      ],
+      "ownership": [
+        "AccountedObject retains the concrete parent Rule and releases it on Close; Rule final release closes its own accounting object before releasing AST references. CostRecorder borrows the currently recorded object and must finish before that object closes."
+      ],
+      "deviations": [
+        "The source context pointer exists only to retain the parent rule and read the profile threshold. Go retains the concrete Rule directly and passes the already-resolved millisecond threshold to the comparison, avoiding an unported general context adapter."
+      ]
     },
     {
       "path": "LICENSE.txt",
       "component": "LICENSE.txt",
       "role": "reference_tool",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/base/costs.go", "pkg/muz/base/rule.go"],
+      "tests": ["TestCostsArithmeticThresholdAndOutput", "TestAccountedObjectPropagatesToRetainedRuleParent", "TestCostRecorderSwitchesObjectsAndChargesWholeMilliseconds"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete costs, accounted_object, and cost_recorder declarations and public contracts (dl_costs.h:31-110)",
+          "status": "ported",
+          "go_target": "pkg/muz/base/costs.go",
+          "tests": ["TestCostsArithmeticThresholdAndOutput", "TestAccountedObjectPropagatesToRetainedRuleParent", "TestCostRecorderSwitchesObjectsAndChargesWholeMilliseconds"]
+        }
+      ],
+      "ownership": [
+        "The Go declarations preserve concrete parent-rule ownership and recorder borrowing without porting C++ stopwatch allocation or standard-library machinery."
+      ],
       "deviations": []
     },
     {

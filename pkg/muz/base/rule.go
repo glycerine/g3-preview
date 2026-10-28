@@ -31,6 +31,7 @@ type ruleState struct {
 	uninterpreted int
 	name          string
 	references    uint32
+	accounting    *AccountedObject
 	released      bool
 }
 
@@ -151,7 +152,7 @@ func (m *RuleManager) NewRule(head ast.ASTHandle, tail []ast.ASTHandle, negated 
 	if err := m.validHead(head); err != nil {
 		return nil, err
 	}
-	r := &Rule{state: &ruleState{manager: m.manager, head: head, name: name, references: 1}}
+	r := &Rule{state: &ruleState{manager: m.manager, head: head, name: name, references: 1, accounting: &AccountedObject{}}}
 	var err error
 	r.state.headReference, err = m.manager.NewRef(head)
 	if err != nil {
@@ -307,6 +308,16 @@ func (r *Rule) Head() (ast.ASTHandle, error) {
 		return ast.ASTHandle{}, err
 	}
 	return state.head, nil
+}
+
+// AccountingCosts returns the accumulated concrete instruction costs owned by
+// this rule. Child accounted objects propagate their processed costs here.
+func (r *Rule) AccountingCosts() (Costs, error) {
+	state, err := r.open()
+	if err != nil || state.accounting == nil {
+		return Costs{}, errors.Join(ErrRuleOwner, err)
+	}
+	return state.accounting.TotalCosts()
 }
 
 // HeadDeclaration returns the borrowed predicate declaration of the rule head.
@@ -504,6 +515,10 @@ func (r *Rule) Close() (result error) {
 	state.references--
 	if state.references != 0 {
 		return nil
+	}
+	if state.accounting != nil {
+		result = errors.Join(result, state.accounting.Close())
+		state.accounting = nil
 	}
 	for i := len(state.tail) - 1; i >= 0; i-- {
 		result = errors.Join(result, state.manager.DelRef(&state.tail[i].reference))
