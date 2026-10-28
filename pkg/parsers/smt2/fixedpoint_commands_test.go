@@ -438,7 +438,7 @@ func TestSMT2FixedpointSpacerIntegerQueriesMatchCPP(t *testing.T) {
 (declare-var x Int)
 (rule (P 0))
 (rule (=> (P x) (Q x)))
-(query Q :print-answer false)
+(query Q :print-answer true)
 (query U :print-answer false)
 `
 	var output bytes.Buffer
@@ -446,7 +446,7 @@ func TestSMT2FixedpointSpacerIntegerQueriesMatchCPP(t *testing.T) {
 		t.Fatal(err)
 	}
 	cpp := fixedpointReference(t, script)
-	if output.String() != cpp || cpp != "sat\nunsat\n" {
+	if output.String() != cpp || cpp != "sat\ntrue\nunsat\n" {
 		t.Fatal("spacer integer SMT-LIB differential", output.String(), cpp)
 	}
 }

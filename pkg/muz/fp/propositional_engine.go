@@ -1109,7 +1109,10 @@ func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTR
 		return answer, err
 	}
 	if e.backend == "pdr" {
-		return answer, fmt.Errorf("muz/fp: PDR answer reconstruction is not ported")
+		if e.pdr == nil || !e.queried {
+			return answer, ErrPropositionalEngine
+		}
+		return e.pdr.Answer(declaration)
 	}
 	state := e.predicates[declaration]
 	if state == nil || !e.queried {

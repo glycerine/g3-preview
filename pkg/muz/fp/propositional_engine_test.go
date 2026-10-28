@@ -158,6 +158,18 @@ func TestPDREngineMatchesCPPIntegerHornQueries(t *testing.T) {
 	fpMust(t, engine.AddRule(step, "integer-step"))
 	gotReachable, err := engine.QueryPredicate(declarations["Q"])
 	fpMust(t, err)
+	answer, err := engine.Answer(declarations["Q"])
+	fpMust(t, err)
+	answerHandle, err := manager.RefGet(answer)
+	fpMust(t, err)
+	if !manager.IsTrue(answerHandle) {
+		t.Fatal("PDR existential declaration answer is not true")
+	}
+	fpMust(t, manager.DelRef(&answer))
+	if unexpected, x := engine.Answer(declarations["U"]); x == nil {
+		fpMust(t, manager.DelRef(&unexpected))
+		t.Fatal("PDR answer accepted a declaration other than the latest query")
+	}
 	stats := statistics.New()
 	fpMust(t, engine.CollectStatistics(stats))
 	if stats.Size() == 0 {
@@ -168,6 +180,10 @@ func TestPDREngineMatchesCPPIntegerHornQueries(t *testing.T) {
 	fpMust(t, err)
 	if gotReachable != lbool.True || gotUnreachable != lbool.False {
 		t.Fatal("PDR integer Horn results", gotReachable, gotUnreachable)
+	}
+	if unexpected, x := engine.Answer(declarations["U"]); x == nil {
+		fpMust(t, manager.DelRef(&unexpected))
+		t.Fatal("PDR answer accepted an unsuccessful query")
 	}
 
 	cpp := fpReference(t, `(set-option :fixedpoint.engine spacer)
