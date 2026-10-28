@@ -141302,7 +141302,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; init_bits/find_wpos/fixed_var_eh and equality/assignment/merge source traces are ported, while remaining TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality and bit-propagation source traces are ported, while remaining TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -141318,6 +141318,19 @@
           "tests": [
             "TestSMTBVEqualityAssignmentAndMergeSourceTrace",
             "TestSMTBVEqualityTraceTagGatesOperands"
+          ]
+        },
+        {
+          "name": "propagate_bits/assign_bit and merge inconsistency retained trace path: actual owner IDs, source lbool values, compact literals, propagation class, occurrence roots and conflict diagnostics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv_propagation_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_propagation.go",
+            "pkg/smtcore/theory_bv_propagation_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTBVBitPropagationSourceTrace",
+            "TestSMTBVPropagationAndMergeConflictSourceTrace"
           ]
         },
         {
@@ -141818,7 +141831,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; init_bits/find_wpos/fixed_var_eh and equality/assignment/merge source traces are ported, while remaining TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality and bit-propagation source traces are ported, while remaining TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -141834,6 +141847,19 @@
           "tests": [
             "TestSMTBVEqualityAssignmentAndMergeSourceTrace",
             "TestSMTBVEqualityTraceTagGatesOperands"
+          ]
+        },
+        {
+          "name": "propagate_bits/assign_bit and merge inconsistency retained trace path: actual owner IDs, source lbool values, compact literals, propagation class, occurrence roots and conflict diagnostics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv_propagation_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_propagation.go",
+            "pkg/smtcore/theory_bv_propagation_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTBVBitPropagationSourceTrace",
+            "TestSMTBVPropagationAndMergeConflictSourceTrace"
           ]
         },
         {

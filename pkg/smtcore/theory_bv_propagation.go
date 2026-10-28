@@ -115,6 +115,9 @@ func (t *SMTBitVectorTheory) propagateBits() error {
 		if value == lbool.Undef {
 			continue
 		}
+		if err = t.traceBVPropagating(v, index, value, 1203); err != nil {
+			return err
+		}
 		antecedent := bit
 		if value == lbool.False {
 			antecedent = antecedent.Negated()
@@ -131,6 +134,9 @@ func (t *SMTBitVectorTheory) propagateBits() error {
 			if err != nil {
 				return err
 			}
+			if err = t.traceBVPropagating(other, index, otherValue, 1214); err != nil {
+				return err
+			}
 			if value != otherValue {
 				if value == lbool.False {
 					consequent = consequent.Negated()
@@ -139,6 +145,9 @@ func (t *SMTBitVectorTheory) propagateBits() error {
 					return err
 				}
 				if s.inconsistent {
+					if err = t.traceBVPropagationConflict(bit, t.bitLiterals[other][index]); err != nil {
+						return err
+					}
 					t.propagationQueue = t.propagationQueue[:0]
 					return nil
 				}
@@ -146,7 +155,7 @@ func (t *SMTBitVectorTheory) propagateBits() error {
 		}
 	}
 	t.propagationQueue = t.propagationQueue[:0]
-	return nil
+	return t.traceBVPropagationDone()
 }
 
 func (t *SMTBitVectorTheory) assignBit(consequent SMTLiteral, from, to SMTTheoryVar, index uint32, antecedent SMTLiteral, propagateClass bool) error {
@@ -178,6 +187,9 @@ func (t *SMTBitVectorTheory) assignBit(consequent SMTLiteral, from, to SMTTheory
 		return err
 	}
 	if err = bvAssert(1241, "consequent.var() != antecedent.var()", func() (bool, error) { return consequent.Var() != antecedent.Var(), nil }); err != nil {
+		return err
+	}
+	if err = t.traceBVAssignBit(consequent, antecedent, from, to, index, propagateClass); err != nil {
 		return err
 	}
 	owner := &smtBVBitEqualityJustification{SMTJustificationBase: NewSMTJustificationBase(true), first: first, second: second, theory: t.FamilyID(), consequent: consequent, antecedent: antecedent}
@@ -215,6 +227,9 @@ func (t *SMTBitVectorTheory) assignBit(consequent SMTLiteral, from, to SMTTheory
 	}
 	for i := len(entries) - 1; i >= 0; i-- {
 		entry := entries[i]
+		if err = t.traceBVAssignBitOccurrence(entry, to, index); err != nil {
+			return err
+		}
 		entryRoot, err := t.privateRoot(entry.variable)
 		if err != nil {
 			return err
@@ -276,6 +291,11 @@ func (t *SMTBitVectorTheory) mergeBitClasses(root, child, first, second SMTTheor
 				continue
 			}
 			changed = true
+			if value1 != lbool.Undef && value2 != lbool.Undef {
+				if err = t.traceBVMergeInconsistent(first, second, index); err != nil {
+					return err
+				}
+			}
 			if value1 != lbool.Undef {
 				if value1 == lbool.False {
 					bit1, bit2 = bit1.Negated(), bit2.Negated()
