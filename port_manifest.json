@@ -84879,8 +84879,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_io.go", "pkg/muz/rel/instruction_loop.go", "pkg/muz/rel/instruction_table.go"],
-      "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions", "TestRelationInstructionsLoadCloneAndStoreOwnership", "TestWhileInstructionExecutesUntilControlsEmpty", "TestWhileInstructionPropagatesBodyTerminationAndOwnsBody"],
+      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_construct.go", "pkg/muz/rel/instruction_io.go", "pkg/muz/rel/instruction_loop.go", "pkg/muz/rel/instruction_table.go"],
+      "tests": ["TestFiniteRelationConstructionInstructions", "TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions", "TestRelationInstructionsLoadCloneAndStoreOwnership", "TestUnarySingletonInstructionRejectsOutOfDomainValue", "TestWhileInstructionExecutesUntilControlsEmpty", "TestWhileInstructionPropagatesBodyTerminationAndOwnsBody"],
       "assertions": [
         {
           "line": 103,
@@ -84929,6 +84929,12 @@
           "tests": ["TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions"]
         },
         {
+          "name": "Concrete finite unary-singleton, total-relation including empty-signature truth, and signature-assertion instructions (dl_instruction.cpp:1009-1124)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/instruction_construct.go",
+          "tests": ["TestFiniteRelationConstructionInstructions", "TestUnarySingletonInstructionRejectsOutOfDomainValue"]
+        },
+        {
           "name": "instruction_block ordered ownership, execution with termination checks, cost processing, annotations, statistics, display and reset (dl_instruction.cpp:1127-1190)",
           "status": "ported",
           "go_target": "pkg/muz/rel/instruction.go",
@@ -84939,7 +84945,7 @@
         "ExecutionContext owns register tables and move transfers the exact pointer while clone creates an independent table. Load clones the stored relation; store transfers its register table into RelationManager and empties the register. Relation I/O instructions retain their predicate declarations. InstructionBlock owns and closes instructions in source order; each instruction owns its AccountedObject. WhileInstruction owns and closes its nested body."
       ],
       "deviations": [
-        "The execution context currently retains finite HashTable registers, a borrowed finite RelationManager, and caller-supplied termination only. Timers, operation-function caches, interpreted filters, singleton/total construction, saturation markers, signature assertions, and non-table relation implementations stay open."
+        "The execution context currently retains finite HashTable registers, a borrowed finite RelationManager, and caller-supplied termination only. Timers, operation-function caches, interpreted filters, saturation markers, and non-table relation implementations stay open."
       ]
     },
     {
@@ -84947,8 +84953,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_io.go", "pkg/muz/rel/instruction_loop.go", "pkg/muz/rel/instruction_table.go"],
-      "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions", "TestRelationInstructionsLoadCloneAndStoreOwnership", "TestWhileInstructionExecutesUntilControlsEmpty", "TestWhileInstructionPropagatesBodyTerminationAndOwnsBody"],
+      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_construct.go", "pkg/muz/rel/instruction_io.go", "pkg/muz/rel/instruction_loop.go", "pkg/muz/rel/instruction_table.go"],
+      "tests": ["TestFiniteRelationConstructionInstructions", "TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions", "TestRelationInstructionsLoadCloneAndStoreOwnership", "TestUnarySingletonInstructionRejectsOutOfDomainValue", "TestWhileInstructionExecutesUntilControlsEmpty", "TestWhileInstructionPropagatesBodyTerminationAndOwnsBody"],
       "conditionals": [
         {
           "line": 19,
@@ -84992,7 +84998,7 @@
           "name": "Retained execution_context register surface, concrete instruction contract, and instruction_block surface (dl_instruction.h:48-163,177-365)",
           "status": "partial",
           "go_target": "pkg/muz/rel/instruction.go",
-          "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions", "TestRelationInstructionsLoadCloneAndStoreOwnership", "TestWhileInstructionExecutesUntilControlsEmpty", "TestWhileInstructionPropagatesBodyTerminationAndOwnsBody"]
+          "tests": ["TestFiniteRelationConstructionInstructions", "TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions", "TestRelationInstructionsLoadCloneAndStoreOwnership", "TestUnarySingletonInstructionRejectsOutOfDomainValue", "TestWhileInstructionExecutesUntilControlsEmpty", "TestWhileInstructionPropagatesBodyTerminationAndOwnsBody"]
         },
         {
           "name": "Concrete finite relation load/store constructors and retained predicate ownership contract (dl_instruction.h:251-260)",
@@ -85005,6 +85011,12 @@
           "status": "ported",
           "go_target": "pkg/muz/rel/instruction_loop.go",
           "tests": ["TestWhileInstructionExecutesUntilControlsEmpty", "TestWhileInstructionPropagatesBodyTerminationAndOwnsBody"]
+        },
+        {
+          "name": "Concrete finite unary-singleton, total, and signature-assertion constructors (dl_instruction.h:312-325)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/instruction_construct.go",
+          "tests": ["TestFiniteRelationConstructionInstructions", "TestUnarySingletonInstructionRejectsOutOfDomainValue"]
         }
       ],
       "ownership": [
