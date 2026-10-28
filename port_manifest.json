@@ -4831,14 +4831,34 @@
       "path": "src/api/api_array.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/api/api_arrays.go",
+        "pkg/api/api_arrays_test.go"
+      ],
+      "tests": [
+        "TestSMTContextArrayHelpersNativeAndNested",
+        "TestSMTContextArrayHelpersRejectMalformedRequests",
+        "TestSMTContextArrayHelpersClosedGuards"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "array sort, multi-index select/store and constant-array public context operations (api_array.cpp:26-192)",
+          "status": "ported",
+          "go_target": "pkg/api/api_arrays.go",
+          "tests": [
+            "TestSMTContextArrayHelpersNativeAndNested",
+            "TestSMTContextArrayHelpersRejectMalformedRequests",
+            "TestSMTContextArrayHelpersClosedGuards"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The Go public API accepts complete array sorts for constant arrays, which supports native multi-index arrays directly; NestedArraySort, NestedConstantArray, NestedArraySelect and NestedArrayStore are additive typed conveniences for right-nested arrays. Typed AST handles and Go slices replace C pointer arrays and error codes. Remaining map, default and set API operations keep this source unit partial."
+      ]
     },
     {
       "path": "src/api/api_ast.cpp",
