@@ -1,5 +1,6 @@
-// Source: src/smt/smt_setup.cpp setup_QF_IDL/setup_QF_RDL overloads and is_dense.
 package smtcore
+
+// Source: src/smt/smt_setup.cpp setup_QF_IDL/setup_QF_RDL overloads and is_dense.
 
 import (
 	"errors"
@@ -181,6 +182,13 @@ func (k *SMTKernel) setupRealDifferencePolicy(useStaticFeatures bool) (result er
 	arithmetic.Reflect = false
 	arithmetic.PropagateEqs = false
 	preprocess.NNFCNF = false
+	if features == nil {
+		// The logic-only overload delegates to setup_mi_arith. The static
+		// overload below selects its backend directly and deliberately does not.
+		if err := k.installMixedArithmeticSetup(arithmetic); err != nil {
+			return err
+		}
+	}
 	if features != nil {
 		dense := smtDenseArithmetic(features)
 		if dense {

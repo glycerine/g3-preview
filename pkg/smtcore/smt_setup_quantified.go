@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_setup.cpp setup_AUFLIA, setup_AUFLIRA,
 // setup_UFNIA, setup_AUFNIRA, setup_UFLRA and quantified setup_unknown.
-package smtcore
 
 import (
 	"errors"
@@ -90,6 +91,11 @@ func (k *SMTKernel) setupQuantifiedLogicPolicy(useStaticFeatures bool) (result e
 		// quantifier_manager::imp calls qi_queue::setup in its constructor.
 		// Its eager threshold and parsed expressions stay cached even when
 		// logic setup subsequently changes the owning parameter fields.
+	}
+	if mixed {
+		if err = k.installMixedArithmeticSetup(k.smtParams.arith.state); err != nil {
+			return err
+		}
 	}
 	return k.applySimpleSetupPolicy()
 }

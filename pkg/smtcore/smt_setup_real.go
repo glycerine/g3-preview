@@ -1,5 +1,6 @@
-// Source: src/smt/smt_setup.cpp setup_QF_LRA overloads, setup_LRA and shared setup inputs.
 package smtcore
+
+// Source: src/smt/smt_setup.cpp setup_QF_LRA overloads, setup_LRA and shared setup inputs.
 
 import (
 	"errors"
@@ -62,6 +63,9 @@ func (k *SMTKernel) setupRealLogicPolicy(useStaticFeatures bool) (result error) 
 		arithmetic.Reflect = false
 		arithmetic.PropagateEqs = false
 		preprocess.EliminateTermITE = true
+		if err := k.installMixedArithmeticSetup(arithmetic); err != nil {
+			return err
+		}
 		return k.applyArithmeticSetup(smt, arithmetic, preprocess)
 	}
 	if k.setupLogic != "QF_LRA" {
