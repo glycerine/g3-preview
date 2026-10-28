@@ -80699,7 +80699,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/base/hnf.go", "pkg/muz/dataflow/reachability.go", "pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
-      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"],
+      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP"],
       "assertions": [
         {
           "line": 82,
@@ -80769,7 +80769,14 @@
           "name": "Narrow exact register_predicate/add_rule/close-reopen/query orchestration for positive zero-arity Horn programs, including HNF ingestion, stratification finalization, and lbool reachability results (dl_context.cpp:344-361,456-469,680-738,861-889)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
-          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"]
+          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP"]
+
+        },
+        {
+          "name": "Rule-set push/pop snapshots and native Datalog post-query pop refusal (dl_context.cpp:180-195)",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestPropositionalEngineScopeGuards", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
         }
       ],
       "ownership": [
@@ -80785,7 +80792,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
-      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"],
+      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP"],
       "conditionals": [
         {
           "line": 19,
@@ -80811,7 +80818,14 @@
           "name": "Retained positive-propositional subset of context predicate registration, rule addition, query, and owned lifecycle surface (dl_context.h:127-616)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
-          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"]
+          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP"]
+
+        },
+        {
+          "name": "Retained context push/pop lifecycle for rule snapshots (dl_context.h:142-143,440-441)",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestPropositionalEngineScopeGuards", "TestSMT2FixedpointRuleScopesMatchCPP"]
         }
       ],
       "ownership": [
@@ -82384,7 +82398,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2"],
-      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
+      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestPropositionalEngineScopeGuards", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
       "assertions": [
         {
           "line": 305,
@@ -82407,6 +82421,13 @@
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
           "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
+
+        },
+        {
+          "name": "fixedpoint-push and fixedpoint-pop command dispatch with scoped rule restoration (dl_cmds.cpp:481-525)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": ["TestSMT2FixedpointRuleScopesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
         }
       ],
       "ownership": [
@@ -82422,7 +82443,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2"],
-      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
+      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
       "conditionals": [
         {
           "line": 18,
@@ -82441,6 +82462,13 @@
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
           "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
+
+        },
+        {
+          "name": "Registration surface for retained fixedpoint-push and fixedpoint-pop commands (dl_cmds.h:23-34)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": ["TestSMT2FixedpointRuleScopesMatchCPP"]
         }
       ],
       "ownership": [

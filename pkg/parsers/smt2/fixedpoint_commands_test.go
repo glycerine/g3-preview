@@ -68,3 +68,33 @@ func TestSMT2FixedpointPropositionalQueriesMatchCPP(t *testing.T) {
 		t.Fatal("fixedpoint SMT-LIB differential", output.String(), cpp)
 	}
 }
+
+func TestSMT2FixedpointRuleScopesMatchCPP(t *testing.T) {
+	script := `(set-option :fixedpoint.engine datalog)
+(declare-rel P ())
+(declare-rel Q ())
+(rule P)
+(fixedpoint-push)
+(rule (=> P Q))
+(fixedpoint-pop)
+(query Q)
+`
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	context.PrintSuccess = false
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	if output.String() != cpp || cpp != "unsat\n" {
+		t.Fatal("fixedpoint rule-scope differential", output.String(), cpp)
+	}
+}

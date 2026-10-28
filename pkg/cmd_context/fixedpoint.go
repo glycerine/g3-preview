@@ -60,6 +60,22 @@ func (c *Context) AddFixedpointRule(formula ast.ASTHandle, name string) error {
 	return engine.AddRule(formula, name)
 }
 
+func (c *Context) PushFixedpoint() error {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return err
+	}
+	return engine.Push()
+}
+
+func (c *Context) PopFixedpoint() error {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return err
+	}
+	return engine.Pop()
+}
+
 func (c *Context) QueryFixedpoint(declaration ast.ASTHandle) (lbool.LBool, error) {
 	engine, err := c.fixedpointContext()
 	if err != nil {

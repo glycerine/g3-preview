@@ -25,7 +25,9 @@ type PropositionalEngine struct {
 	manager    *ast.ASTManager
 	rules      *base.RuleManager
 	set        *base.RuleSet
+	scopes     []*base.RuleSet
 	predicates map[ast.ASTHandle]bool
+	queried    bool
 	closed     bool
 }
 
@@ -102,6 +104,44 @@ func (e *PropositionalEngine) AddRule(formula ast.ASTHandle, name string) error 
 	return e.rules.AddFormula(e.set, formula, name)
 }
 
+// Push retains a snapshot of the current rule set. Predicate registrations are
+// intentionally not scoped, matching dl_context::push.
+func (e *PropositionalEngine) Push() error {
+	if err := e.open(); err != nil {
+		return err
+	}
+	snapshot, err := base.NewRuleSet(e.rules)
+	if err != nil {
+		return err
+	}
+	if err = snapshot.AddRules(e.set); err != nil {
+		return errors.Join(err, snapshot.Close())
+	}
+	e.scopes = append(e.scopes, snapshot)
+	return nil
+}
+
+// Pop restores the most recent rule snapshot. The native Datalog engine only
+// permits this before a query creates its execution engine.
+func (e *PropositionalEngine) Pop() error {
+	if err := e.open(); err != nil {
+		return err
+	}
+	if len(e.scopes) == 0 {
+		return fmt.Errorf("muz/fp: there are no backtracking points to pop to")
+	}
+	if e.queried {
+		return fmt.Errorf("muz/fp: pop operation is only supported before a query")
+	}
+	last := len(e.scopes) - 1
+	snapshot := e.scopes[last]
+	if err := e.set.ReplaceRules(snapshot); err != nil {
+		return err
+	}
+	e.scopes = e.scopes[:last]
+	return snapshot.Close()
+}
+
 func (e *PropositionalEngine) validateFragment() error {
 	count, err := e.set.Len()
 	if err != nil {
@@ -172,6 +212,7 @@ func (e *PropositionalEngine) Query(query ast.ASTHandle) (lbool.LBool, error) {
 	if arguments != 0 || !e.predicates[declaration] {
 		return lbool.Undef, ErrPropositionalHorn
 	}
+	e.queried = true
 	finalized, err := e.set.IsFinalized()
 	if err != nil {
 		return lbool.Undef, err
@@ -202,6 +243,10 @@ func (e *PropositionalEngine) Close() (result error) {
 	if e.closed {
 		return nil
 	}
+	for i := len(e.scopes) - 1; i >= 0; i-- {
+		result = errors.Join(result, e.scopes[i].Close())
+	}
+	e.scopes = nil
 	if e.set != nil {
 		result = errors.Join(result, e.set.Close())
 		e.set = nil

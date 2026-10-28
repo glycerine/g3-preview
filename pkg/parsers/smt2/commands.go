@@ -467,6 +467,18 @@ func (p *commandParser) command() (bool, error) {
 		if err = p.context.AddFixedpointRule(expression, name); err != nil {
 			return false, err
 		}
+	case "fixedpoint-push", "fixedpoint-pop":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if name == "fixedpoint-push" {
+			err = p.context.PushFixedpoint()
+		} else {
+			err = p.context.PopFixedpoint()
+		}
+		if err != nil {
+			return false, err
+		}
 	case "assert-soft":
 		expression, _, err := p.expression()
 		if err != nil {

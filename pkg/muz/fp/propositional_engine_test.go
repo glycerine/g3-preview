@@ -149,3 +149,35 @@ func TestPropositionalEngineRefusesRicherHornFragments(t *testing.T) {
 		t.Fatal("negative Horn rule accepted", err)
 	}
 }
+
+func TestPropositionalEngineScopeGuards(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngine(manager)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	if err = engine.Pop(); err == nil || !strings.Contains(err.Error(), "no backtracking points") {
+		t.Fatal("scope underflow accepted", err)
+	}
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	symbol, err := manager.Symbols.Intern("fp-scope-query")
+	fpMust(t, err)
+	declaration, err := manager.MkFuncDecl(symbol, nil, boolean, ast.ASTFuncDeclInfo{})
+	fpMust(t, err)
+	query, err := manager.MkApp(declaration, nil)
+	fpMust(t, err)
+	fpMust(t, engine.RegisterPredicate(declaration))
+	fpMust(t, engine.Push())
+	status, err := engine.Query(query)
+	fpMust(t, err)
+	if status != lbool.False {
+		t.Fatal("unexpected empty-program query", status)
+	}
+	if err = engine.Pop(); err == nil || !strings.Contains(err.Error(), "before a query") {
+		t.Fatal("post-query pop accepted", err)
+	}
+}
