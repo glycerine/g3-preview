@@ -80,6 +80,9 @@ func NewSMTTactic(m *ast.ASTManager, p *uparams.ParamsRef, config SMTSolverConfi
 			return nil, errors.Join(err, t.Close())
 		}
 	}
+	if err = t.traceParams("p: ", "smt_tactic", 53, &t.params); err != nil {
+		return nil, errors.Join(err, t.Close())
+	}
 	return t, nil
 }
 
@@ -160,6 +163,9 @@ func (t *SMTTactic) Apply(in *tactic.Goal, result *tactic.TacticResult) (err err
 			return ast.ErrASTDomain
 		}
 	}
+	if err = t.traceApplyState(in); err != nil {
+		return err
+	}
 	logic := ""
 	if t.logic != (usymbol.Symbol{}) {
 		if logic, err = t.manager.Symbols.String(t.logic); err != nil {
@@ -169,6 +175,9 @@ func (t *SMTTactic) Apply(in *tactic.Goal, result *tactic.TacticResult) (err err
 	local, err := newSMTSolver(t.manager, &t.params, logic, t.config, t.fullParams)
 	if err != nil {
 		return err
+	}
+	if err = t.traceLogic(); err != nil {
+		return errors.Join(err, local.Close())
 	}
 	t.active = local
 	defer func() { t.active = nil; err = errors.Join(err, local.Close()) }()
@@ -195,6 +204,9 @@ func (t *SMTTactic) Apply(in *tactic.Goal, result *tactic.TacticResult) (err err
 			return err
 		}
 		defer func() { err = errors.Join(err, extraction.Close()) }()
+		if err = t.traceMUS(in, extraction); err != nil {
+			return err
+		}
 		if proofs && len(extraction.Assumptions) != 0 {
 			return tactic.NewTacticException("smt tactic does not support simultaneous generation of proofs and unsat cores")
 		}
@@ -264,6 +276,9 @@ func (t *SMTTactic) Apply(in *tactic.Goal, result *tactic.TacticResult) (err err
 		return t.storeModel(in, result, local, filter)
 	case lbool.False:
 		if t.failIfInconclusive && !in.UnsatPreserved() {
+			if err = t.traceApproximationFailure(); err != nil {
+				return err
+			}
 			return tactic.NewTacticException("under-approximated goal found to be unsat")
 		}
 		return t.storeUnsat(in, result, local, extraction, proofs, cores)
@@ -378,6 +393,9 @@ func (t *SMTTactic) UpdateParams(p *uparams.ParamsRef) error {
 	}
 	if p == nil {
 		return uparams.ErrParamsOwner
+	}
+	if err := t.traceParams("updt_params: ", "updt_params", 78, p); err != nil {
+		return err
 	}
 	if err := t.updatePolicy(p); err != nil {
 		return err

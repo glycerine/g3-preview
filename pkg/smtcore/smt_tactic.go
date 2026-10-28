@@ -44,6 +44,9 @@ func NewSMTTacticUsing(m *ast.ASTManager, p *uparams.ParamsRef, logic string, au
 			return nil, errors.Join(e, base.Close())
 		}
 	}
+	if err = base.traceUsingFactory(autoConfig, &params); err != nil {
+		return nil, errors.Join(err, base.Close())
+	}
 	result, err = tactic.NewUsingParamsTactic(config.Params, base, &params)
 	if err != nil {
 		return nil, errors.Join(err, base.Close())

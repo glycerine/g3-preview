@@ -133503,11 +133503,13 @@
       "path": "src/smt/tactic/smt_tactic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_tactic_impl.go",
         "pkg/smtcore/smt_tactic.go",
+        "pkg/smtcore/smt_tactic_trace.go",
         "pkg/smtcore/smt_tactic_test.go",
+        "pkg/smtcore/smt_tactic_trace_source_test.go",
         "pkg/smtcore/smt_tactic_native_test.go",
         "pkg/solver/solver_tactic.go",
         "pkg/smtcore/smt_solver.go",
@@ -133530,6 +133532,8 @@
         "TestSMTTacticPublishesIndependentModelsAcrossApplications",
         "TestSMTTacticCPPApplyReference",
         "TestNewSMTTacticUsingCopiesAndFixesAutoConfig",
+        "TestSMTTacticSourceTraceSitesAndOrdering",
+        "TestSMTTacticTraceBadStreamDoesNotChangeExecution",
         "TestSMTLibRunnerQFIDLBranchEvidence",
         "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
         "TestSMTTacticSelectsSetupOnlyWithoutExtractedAssumptions",
@@ -133637,8 +133641,18 @@
           ]
         },
         {
-          "name": "remaining verbose/trace diagnostic fidelity audit (src/smt/tactic/smt_tactic.cpp)",
-          "status": "unported"
+          "name": "constructor, parameter-update, apply-state, full-parameter, goal-detail, allocator, scoped-context, MUS, approximation-failure and using-factory TRACE sites with native ordering and ostream refusal semantics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_tactic_trace.go",
+          "go_targets": [
+            "pkg/smtcore/smt_tactic_impl.go",
+            "pkg/smtcore/smt_tactic.go",
+            "pkg/smtcore/smt_tactic_trace_source_test.go"
+          ],
+          "tests": [
+            "TestSMTTacticSourceTraceSitesAndOrdering",
+            "TestSMTTacticTraceBadStreamDoesNotChangeExecution"
+          ]
         },
         {
           "name": "Source cpp153-155 entry verbosity marker, converter reset before well-sorted SASSERT, and selected assertion profile",
@@ -133681,7 +133695,9 @@
       ],
       "deviations": [
         "The Go tactic owns the concrete SMT kernel through a temporary SMTSolver for result/model services. It no longer substitutes the generic solver2tactic control flow.",
-        "Managers must share process symbol/numeral services for parameter snapshots; unsupported foreign service owners are rejected."
+        "Managers must share process symbol/numeral services for parameter snapshots; unsupported foreign service owners are rejected.",
+        "The native allocator's get_wasted_size has no Go arena-fragmentation equivalent, so the retained smt_tactic_memory trace reports deterministic wasted_size: 0.",
+        "Native full-parameter tracing reads its otherwise uninitialized m_qi_ematching bit. The Go trace renders that diagnostic-only bit as deterministic zero while leaving solver parameter state unchanged."
       ]
     },
     {
