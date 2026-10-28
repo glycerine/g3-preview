@@ -149145,6 +149145,22 @@
           ]
         },
         {
+          "name": "collect_statistics source-width sequence counters and exact public key order, including retained axiom, reduction, branching, automata, coherence, equality, disequality, extensionality, fixed-length and integer-string writers",
+          "status": "complete",
+          "go_target": "pkg/smtcore/theory_seq_statistics.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq.go",
+            "pkg/smtcore/theory_seq_axioms.go",
+            "pkg/smtcore/theory_seq_solve.go",
+            "pkg/smtcore/theory_seq_statistics_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceStatisticsSourceKeysOrderAndGuards",
+            "TestSMTSequenceStatisticsCountUniqueAxiomsAndReductions",
+            "TestSMTSequenceStatisticsFlowThroughSolverCollection"
+          ]
+        },
+        {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
           "status": "unported",
           "go_target": null,
@@ -149929,6 +149945,19 @@
           "go_target": "pkg/smtcore/theory_seq_model.go",
           "tests": [
             "TestSMTSequenceStructuredModelValues"
+          ]
+        },
+        {
+          "name": "collect_statistics declaration and source-width sequence counters with exact public key order",
+          "status": "complete",
+          "go_target": "pkg/smtcore/theory_seq_statistics.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_statistics_test.go"
+          ],
+          "tests": [
+            "TestSMTSequenceStatisticsSourceKeysOrderAndGuards",
+            "TestSMTSequenceStatisticsCountUniqueAxiomsAndReductions",
+            "TestSMTSequenceStatisticsFlowThroughSolverCollection"
           ]
         },
         {

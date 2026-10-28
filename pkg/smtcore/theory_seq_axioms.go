@@ -13,6 +13,7 @@ type smtSequenceAxiomScope struct{ limit, head int }
 
 type smtSequenceAxiomQueue struct {
 	manager *ast.ASTManager
+	stats   *smtSequenceStatistics
 	values  []ast.ASTRef
 	set     map[ast.ASTHandle]struct{}
 	head    int
@@ -20,11 +21,11 @@ type smtSequenceAxiomQueue struct {
 	closed  bool
 }
 
-func newSMTSequenceAxiomQueue(manager *ast.ASTManager) (*smtSequenceAxiomQueue, error) {
+func newSMTSequenceAxiomQueue(manager *ast.ASTManager, stats *smtSequenceStatistics) (*smtSequenceAxiomQueue, error) {
 	if manager == nil {
 		return nil, ast.ErrASTHandle
 	}
-	return &smtSequenceAxiomQueue{manager: manager, set: make(map[ast.ASTHandle]struct{})}, nil
+	return &smtSequenceAxiomQueue{manager: manager, stats: stats, set: make(map[ast.ASTHandle]struct{})}, nil
 }
 
 func (q *smtSequenceAxiomQueue) open() error {
@@ -50,6 +51,9 @@ func (q *smtSequenceAxiomQueue) Push(expression ast.ASTHandle) error {
 	}
 	q.values = append(q.values, ref)
 	q.set[expression] = struct{}{}
+	if q.stats != nil {
+		q.stats.addAxiom++
+	}
 	return nil
 }
 
@@ -119,6 +123,7 @@ func (q *smtSequenceAxiomQueue) Close() (result error) {
 	q.set = nil
 	q.scopes = nil
 	q.manager = nil
+	q.stats = nil
 	q.closed = true
 	return result
 }

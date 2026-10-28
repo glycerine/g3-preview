@@ -440,7 +440,11 @@ func (t *SMTSequenceTheory) removeEquation(index int) error {
 			return err
 		}
 	}
-	return t.equations.PopBack()
+	if err := t.equations.PopBack(); err != nil {
+		return err
+	}
+	t.statistics.numReductions++
+	return nil
 }
 
 func (t *SMTSequenceTheory) replaceSequenceEquation(index int, left, right []ast.ASTHandle, dependency *smtSequenceDependency) error {
@@ -730,7 +734,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		}
 		reduced, err = t.solveZeroLengthBoundary(left, right, dependency)
 		if err != nil || reduced {
-			return reduced, err
+			return t.recordSequenceBranch(reduced, err)
 		}
 		rejected, err := t.rejectFixedLengthMismatch(left, right, dependency)
 		if err != nil || rejected {
@@ -749,31 +753,31 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		}
 		reduced, err = t.splitFixedLengthEquation(left, right)
 		if err != nil || reduced {
-			return reduced, err
+			return t.recordSequenceBranch(reduced, err)
 		}
 		branched, err := t.branchLeadingVariableOverlap(left, right)
 		if err != nil || branched {
-			return branched, err
+			return t.recordSequenceBranch(branched, err)
 		}
 		rejected, err = t.rejectImpossibleCyclicBinaryEquation(left, right, dependency)
 		if err != nil || rejected {
-			return rejected, err
+			return t.recordSequenceBranch(rejected, err)
 		}
 		constrained, err := t.constrainCyclicUnitEquation(left, right, dependency)
 		if err != nil || constrained {
-			return constrained, err
+			return t.recordSequenceBranch(constrained, err)
 		}
 		branched, err = t.branchVariableFixedUnitWordEquation(left, right)
 		if err != nil || branched {
-			return branched, err
+			return t.recordSequenceBranch(branched, err)
 		}
 		branched, err = t.branchVariableFixedWordEquation(left, right)
 		if err != nil || branched {
-			return branched, err
+			return t.recordSequenceBranch(branched, err)
 		}
 		branched, err = t.branchBinaryUnitEquation(left, right)
 		if err != nil || branched {
-			return branched, err
+			return t.recordSequenceBranch(branched, err)
 		}
 		state, err := t.State()
 		if err != nil {
@@ -796,7 +800,7 @@ func (t *SMTSequenceTheory) solveWordEquations() (bool, error) {
 		}
 		branched, err = t.branchVariablePrefixEquality(id, left, right, dependency)
 		if err != nil || branched {
-			return branched, err
+			return t.recordSequenceBranch(branched, err)
 		}
 	}
 	return false, nil

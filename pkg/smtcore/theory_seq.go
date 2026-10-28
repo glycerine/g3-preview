@@ -19,27 +19,29 @@ import (
 // not yet been installed set unsupported; FinalCheck then reports give-up.
 type SMTSequenceTheory struct {
 	*SMTTheoryBase
-	dependencies  *smtSequenceDependencyManager
-	solutions     *smtSequenceSolutionMap
-	exclusions    *smtSequenceExclusionTable
-	equations     *smtSequenceEquationQueue
-	disequations  *smtSequenceDisequationQueue
-	nonContains   *smtSequenceNonContainsQueue
-	relations     *smtSequenceRelationQueue
-	axioms        *smtSequenceAxiomQueue
-	rewrite       *smtSequenceRewriterOwner
-	internalTerms map[ast.ASTHandle]struct{}
-	internalLog   []ast.ASTHandle
-	internalLim   []int
-	nextEquation  uint32
-	branchStart   map[uint32]int
-	branchLog     []uint32
-	branchLim     []int
-	lengths       map[ast.ASTHandle]struct{}
-	lengthLog     []ast.ASTRef
-	lengthLim     []int
-	unsupported   uint32
-	limits        []uint32
+	dependencies   *smtSequenceDependencyManager
+	solutions      *smtSequenceSolutionMap
+	exclusions     *smtSequenceExclusionTable
+	equations      *smtSequenceEquationQueue
+	disequations   *smtSequenceDisequationQueue
+	nonContains    *smtSequenceNonContainsQueue
+	relations      *smtSequenceRelationQueue
+	axioms         *smtSequenceAxiomQueue
+	rewrite        *smtSequenceRewriterOwner
+	internalTerms  map[ast.ASTHandle]struct{}
+	internalLog    []ast.ASTHandle
+	internalLim    []int
+	nextEquation   uint32
+	branchStart    map[uint32]int
+	branchLog      []uint32
+	branchLim      []int
+	lengths        map[ast.ASTHandle]struct{}
+	lengthLog      []ast.ASTRef
+	lengthLim      []int
+	unsupported    uint32
+	limits         []uint32
+	statistics     smtSequenceStatistics
+	branchProgress bool
 }
 
 func NewSMTSequenceTheory(family ast.FamilyID) (*SMTSequenceTheory, error) {
@@ -113,7 +115,7 @@ func (t *SMTSequenceTheory) Initialize(state *SMTInternalizerState) error {
 		t.solutions = nil
 		return err
 	}
-	t.axioms, err = newSMTSequenceAxiomQueue(state.manager)
+	t.axioms, err = newSMTSequenceAxiomQueue(state.manager, &t.statistics)
 	if err != nil {
 		_ = t.relations.Close()
 		_ = t.nonContains.Close()
@@ -1005,11 +1007,15 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return state.Inconsistent() || state.searchProgress() != before, nil
 	}
 	// Native final_check_eh simplifies equations before reducing m_ncs.
+	t.branchProgress = false
 	progress, err := t.solveWordEquations()
 	if err != nil {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence word equations: %w", err)
 	}
 	if progress {
+		if !t.branchProgress {
+			t.statistics.solveEqualities++
+		}
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.addSolvedTailEmptyMaximum()
@@ -1028,6 +1034,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if progress, err = propagateAxioms(progress); err != nil {
 		return SMTFinalCheckGiveUp, err
 	} else if progress {
+		t.statistics.integerString++
 		return SMTFinalCheckContinue, nil
 	}
 	regexProgress, regexUnresolved, err := t.reduceExpandedRegexMemberships()
@@ -1038,6 +1045,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if regexProgress, err = propagateAxioms(reportedRegexProgress); err != nil {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence regex propagation: %w", err)
 	} else if regexProgress || reportedRegexProgress {
+		t.statistics.propagateAutomata++
 		if !regexProgress {
 			// Source m_new_propagation includes a newly recorded regex
 			// refinement even when its clauses are already satisfied. The
@@ -1053,6 +1061,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if progress, err = propagateAxioms(progress); err != nil {
 		return SMTFinalCheckGiveUp, err
 	} else if progress {
+		t.statistics.checkLengthCoherence++
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.addFixedLengthDecomposition()
@@ -1062,6 +1071,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if progress, err = propagateAxioms(progress); err != nil {
 		return SMTFinalCheckGiveUp, err
 	} else if progress {
+		t.statistics.fixedLength++
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.addFixedLengthDisequalityReduction()
@@ -1071,6 +1081,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if progress, err = propagateAxioms(progress); err != nil {
 		return SMTFinalCheckGiveUp, err
 	} else if progress {
+		t.statistics.solveDisequalities++
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err := t.checkConcreteEquations()
@@ -1078,6 +1089,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence concrete equations: %w", err)
 	}
 	if conflict {
+		t.statistics.solveEqualities++
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err = t.checkConcreteRelations()
@@ -1085,6 +1097,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence concrete relations: %w", err)
 	}
 	if conflict {
+		t.statistics.propagateContains++
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err = t.checkNegativeContains()
@@ -1122,11 +1135,15 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if state.searchProgress() != beforeRetries {
 		return SMTFinalCheckContinue, nil
 	}
+	t.branchProgress = false
 	progress, err = t.solveWordEquations()
 	if err != nil {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence word equations: %w", err)
 	}
 	if progress {
+		if !t.branchProgress {
+			t.statistics.solveEqualities++
+		}
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err = t.checkConcreteDisequations()
@@ -1134,6 +1151,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence concrete disequations: %w", err)
 	}
 	if conflict {
+		t.statistics.solveDisequalities++
 		return SMTFinalCheckContinue, nil
 	}
 	conflict, err = t.checkReducedDisequations()
@@ -1141,6 +1159,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence reduced disequations: %w", err)
 	}
 	if conflict {
+		t.statistics.solveDisequalities++
 		return SMTFinalCheckContinue, nil
 	}
 	progress, err = t.checkTrackedSequenceLengthCoherence()
@@ -1148,6 +1167,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckGiveUp, err
 	}
 	if progress {
+		t.statistics.checkLengthCoherence++
 		if t.axioms.Pending() {
 			if err = t.Propagate(); err != nil {
 				return SMTFinalCheckGiveUp, err
@@ -1160,6 +1180,7 @@ func (t *SMTSequenceTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckGiveUp, fmt.Errorf("sequence extensionality: %w", err)
 	}
 	if progress {
+		t.statistics.extensionality++
 		return SMTFinalCheckContinue, nil
 	}
 	unresolvedEquation, err := t.hasUnresolvedWordEquation()
