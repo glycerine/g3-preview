@@ -145077,7 +145077,7 @@
       "path": "src/smt/theory_fpa.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
         "pkg/smtcore/theory_fpa_assertions.go",
@@ -145397,7 +145397,7 @@
         }
       ],
       "methods_audited": true,
-      "ownership_audited": false,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "theory_fpa::mk_fresh constructs an independent destination-manager theory and context::copy_plugins reaches it during solver translation and auxiliary-context construction",
@@ -145591,13 +145591,13 @@
         "Display borrows the initialized theory/context, enode stack, actual family attachments and current core roots. It does not initialize a model, alter queues, merge classes or consume RNG. FPA uses existing converter-registered BV/arithmetic family identities only after the first FPA variable; no FPA variables means no text, lookup/format allocation or flush even with foreign nodes present. SMT2 operands use the existing project printer and retain its error/owner protocol. Optional borrowed Flush is reached at each source endl; direct displays report short writes, refused writes/flushes and operand allocation failures."
       ],
       "deviations": [
-        "The retained FPA method, assertion and trace audits are complete. Live outer theory sites use the process assertion gate, model VERIFY sites remain assertion-switch independent, and the Go direct rounding-mode BV encoding performs the source width check that native unwrap performs. Whole-unit status remains partial only for the separate numerical ownership/failure-prefix audit.",
+        "The retained FPA method, assertion, trace and ownership audits are complete. Live outer theory sites use the process assertion gate, model VERIFY sites remain assertion-switch independent, and the Go direct rounding-mode BV encoding performs the source width check that native unwrap performs.",
         "The retained Go internalizer installs an eager biconditional when each FPA atom or structural equality is internalized, so the native assignment callback's polarity-specific implication is redundant.",
         "NewEquality and NewDisequality remain inert because the exact structural-equality bit-vector definition is installed syntactically; creating fresh Boolean circuits during a Go e-graph merge would violate rollback ordering.",
         "Float operands are reached recursively while translating atoms and equalities; rounding-mode relevancy additionally connects wrappers to finite encodings. Context display_theories reaches the complete FPA printer. Live t_fpa/t_fpa_detail/t_fpa_internalize traces and source assertions are ported, and fresh-theory reachability is exercised through kernel translation and auxiliary contexts.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
         "The raw TRACE/CTRACE/SASSERT inventory is closed for retained consumers. reset_eh is deliberately absent because the Go backend does not reuse a context through the native reset lifecycle; internalizer Close first restores root scope, then closes theory-owned conversion state. This matches the existing retained-lifecycle decision for array reset_eh.",
-        "Factory numerical0/1, real source fatal fresh behavior and caller-owned ASTRef pair outputs are transcribed, including publication before the next setter/destructor and actual old-output NUM release failure. Model fallback paths and lifecycle are covered; the remaining whole-unit gap is exhaustive numerical destruction/failure-prefix ownership evidence. Native model reconstruction uses actual plugin MPF/MPZ owners. Ebits64 reaches the source signed top-exponent helper limit; the tested multi-limb boundary remains ebits63.",
+        "Factory numerical0/1, real source fatal fresh behavior and caller-owned ASTRef pair outputs are transcribed, including publication before the next setter/destructor and actual old-output NUM release failure. Model fallback paths, exhaustive numerical destruction/failure prefixes and lifecycle are covered. Native model reconstruction uses actual plugin MPF/MPZ owners. Ebits64 reaches the source signed top-exponent helper limit; the tested multi-limb boundary remains ebits63.",
         "Cold factory allocation sweeps construct caller output references before fault injection and lift faults before reading/closing those outputs. The earlier preallocated-arena census did not reach a refusal after zero publication; it was not whole failure-prefix evidence. New checked/debug physical NUM tests independently reach a consumed old-output release, prove the exact incoming acquisition remains caller-owned, keep the second output unchanged, and finish all actual owners at budget0. Native GNU-unreachable versus checked Continue exit107 behavior remains separately characterized."
       ]
     },
@@ -145605,7 +145605,7 @@
       "path": "src/smt/theory_fpa.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
         "pkg/smtcore/theory_fpa_assertions.go",
@@ -145709,7 +145709,7 @@
         }
       ],
       "methods_audited": true,
-      "ownership_audited": false,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "theory_fpa::mk_fresh constructs a new theory owner against the destination context manager without retaining source converter, rewriter, trail, conversion, or scope state",
@@ -145872,11 +145872,11 @@
         "Display borrows the initialized theory/context, enode stack, actual family attachments and current core roots. It does not initialize a model, alter queues, merge classes or consume RNG. FPA uses existing converter-registered BV/arithmetic family identities only after the first FPA variable; no FPA variables means no text, lookup/format allocation or flush even with foreign nodes present. SMT2 operands use the existing project printer and retain its error/owner protocol. Optional borrowed Flush is reached at each source endl; direct displays report short writes, refused writes/flushes and operand allocation failures."
       ],
       "deviations": [
-        "Both header-level fpa_value_factory width assertions execute through the source assertion gate after each numerical setter and before numeral publication. The retained header method audit is complete; whole-header status remains partial only with the implementation unit's numerical ownership/failure-prefix audit.",
+        "Both header-level fpa_value_factory width assertions execute through the source assertion gate after each numerical setter and before numeral publication. The retained header method and ownership audits are complete.",
         "The native fresh-value factory method is itself unimplemented; the Go factory implements the retained canonical-value operations and deliberately reports that it cannot manufacture an unbounded fresh FP value.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
         "The raw TRACE/CTRACE/SASSERT inventory is closed for retained consumers. The reset_eh override is deliberately absent because the Go backend has no reusable context-reset lifecycle; teardown restores scope and closes concrete theory owners.",
-        "Factory numerical0/1, real source fatal fresh behavior and caller-owned ASTRef pair outputs are transcribed, including publication before the next setter/destructor and actual old-output NUM release failure. Model fallback paths and lifecycle are covered; the remaining whole-unit gap is exhaustive numerical destruction/failure-prefix ownership evidence. Native model reconstruction uses actual plugin MPF/MPZ owners. Ebits64 reaches the source signed top-exponent helper limit; the tested multi-limb boundary remains ebits63.",
+        "Factory numerical0/1, real source fatal fresh behavior and caller-owned ASTRef pair outputs are transcribed, including publication before the next setter/destructor and actual old-output NUM release failure. Model fallback paths, exhaustive numerical destruction/failure prefixes and lifecycle are covered. Native model reconstruction uses actual plugin MPF/MPZ owners. Ebits64 reaches the source signed top-exponent helper limit; the tested multi-limb boundary remains ebits63.",
         "Cold factory allocation sweeps construct caller output references before fault injection and lift faults before reading/closing those outputs. The earlier preallocated-arena census did not reach a refusal after zero publication; it was not whole failure-prefix evidence. New checked/debug physical NUM tests independently reach a consumed old-output release, prove the exact incoming acquisition remains caller-owned, keep the second output unchanged, and finish all actual owners at budget0. Native GNU-unreachable versus checked Continue exit107 behavior remains separately characterized."
       ]
     },
