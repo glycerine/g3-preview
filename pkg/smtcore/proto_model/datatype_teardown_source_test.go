@@ -71,3 +71,47 @@ func TestDatatypeFactoryUtilityStopsBeforeBaseTeardown(t *testing.T) {
 	}
 	protoMust(t, f.Close())
 }
+
+func TestDatatypeFactoryLexicalScopeStopsBeforeMembersAndRetries(t *testing.T) {
+	w := &datatypeFactoryTraceStopWriter{at: ""}
+	m, f, tags, sort, _ := datatypeFactoryTraceFixture(t, w)
+	value, err := f.SomeValue(sort)
+	protoMust(t, err)
+	ref, err := m.NewRef(value)
+	protoMust(t, err)
+	t.Cleanup(func() { protoMust(t, m.DelRef(&ref)) })
+	scope := &datatypeFactoryScope{manager: m}
+	protoMust(t, scope.push(value))
+	before, err := m.GetRefCount(value)
+	protoMust(t, err)
+
+	var lexicalErr error
+	w.action = func() { f.finishScope(scope, &lexicalErr) }
+	tags.Enable("ast")
+	if !tags.ShouldTrace("ast") {
+		t.Skip("requires source trace build")
+	}
+	floatSort, err := m.FloatingPointSort(3, 4)
+	protoMust(t, err)
+	_, err = m.MkFPAZeroOfSort(floatSort, false)
+	protoMust(t, err)
+	if !errors.Is(lexicalErr, ast.ErrASTPending) || len(f.pending) != 1 || f.pending[0].scope != scope {
+		t.Fatal("lexical scope failure was not retained before member teardown", lexicalErr, len(f.pending))
+	}
+	afterStop, err := m.GetRefCount(value)
+	protoMust(t, err)
+	if afterStop != before || f.last == nil || f.utility == nil || f.sets == nil {
+		t.Fatal("stopped lexical cleanup consumed ownership or entered member teardown", before, afterStop)
+	}
+	if _, err = f.SomeValue(sort); !errors.Is(err, ast.ErrASTHandle) {
+		t.Fatal("pending lexical cleanup allowed factory reuse", err)
+	}
+
+	protoMust(t, f.Close())
+	afterClose, err := m.GetRefCount(value)
+	protoMust(t, err)
+	if afterClose+2 != before || len(f.pending) != 0 || f.manager != nil {
+		t.Fatal("owning retry did not retire lexical then base references", before, afterClose, len(f.pending))
+	}
+	protoMust(t, f.Close())
+}

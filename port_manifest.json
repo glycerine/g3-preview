@@ -116043,7 +116043,7 @@
       "path": "src/smt/proto_model/datatype_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/proto_model/datatype_factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
@@ -116130,8 +116130,8 @@
           "text": "SASSERT(!m_util.is_recursive(s));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "nonrecursive representatives, fresh argument search, recursive sibling growth, almost-fresh construction, and subterm guard",
@@ -116289,14 +116289,15 @@
         "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations.",
         "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Fresh-path tests observe a real argument pin during the next provider call; cold get_some_value tests require the unchanged borrowed-input count and unpublished registry and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. All fourteen datatype_factory TRACE/CTRACE sites now execute with their source gates, operand order and actual process printer parameters, including enabled-trace get_last_fresh_value cache publication in approach2. Remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial.",
         "Corrected an over-owning port and its earlier regression: get_some_value uses ptr_vector<expr> at source line34, whereas fresh/almost use expr_ref_vector. Cold construction now borrows provider values without reference reservations or lexical DelRef; fresh scopes retain their existing pins. The source-correct cold regression rejects the previous implementation. This bounded correction does not close broader utility caches or exceptional destruction obligations.",
-        "The independent utility now owns recursion results and one sort pin per successfully pinned cold query. All eight Go query sites (covering repeated calls inside constructor loops and debug-only source operands) use that utility. A public reference-count check after cold FreshValue proves a later utility query is already warm. Broader utility caches and general constructor/exceptional lexical cleanup remain separate partial obligations."
+        "The independent utility now owns recursion results and one sort pin per successfully pinned cold query. All eight Go query sites (covering repeated calls inside constructor loops and debug-only source operands) use that utility. A public reference-count check after cold FreshValue proves a later utility query is already warm. Broader utility caches and general constructor/exceptional lexical cleanup remain separate partial obligations.",
+        "Final retained-unit audit supersedes the partial obligations above. The factory reaches only constructor enumeration, nonrecursive choice, and recursion queries, all through its independent owned utility cache; unrelated utility APIs are not retained consumers. TestDatatypeFactoryLexicalScopeStopsBeforeMembersAndRetries now exercises an actual manager-guard interruption, blocks reuse, and proves lexical cleanup completes before last-value, utility, and structured-base teardown. The audited structured base supplies the exact cold map/sort publication prefix."
       ]
     },
     {
       "path": "src/smt/proto_model/datatype_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/proto_model/datatype_factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
@@ -116363,8 +116364,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "datatype factory construction and some/fresh value interface",
@@ -116522,7 +116523,8 @@
         "Utility Close failure now prevents entry into structured base teardown, preserving the actual source member-before-base order. The real unconsumed manager guard verifies intact base registry/tokens and blocked factory operations until owning retry. Whole-unit audited completion is withdrawn pending the retained utility diagnostics/publication audit and remaining datatype-factory source assertions and failure-prefix review; existing algorithm tests do not prove those obligations.",
         "Corrected premature cold SomeValue value-set/sort publication, missing empty almost-fresh recursive cache assignment and absent-last-value containment failure. Fresh/almost paths now preserve source argument short-circuiting and all SASSERT sites83,119,133,175,220,225,246; fresh recursive iteration uses uint32 wrap. Fresh-path tests observe a real argument pin during the next provider call; cold get_some_value tests require the unchanged borrowed-input count and unpublished registry and stop candidate registration after actual application reservations at the next reference-page frontier; lexical destruction invalidates the unregistered candidate. All fourteen datatype_factory TRACE/CTRACE sites now execute with their source gates, operand order and actual process printer parameters, including enabled-trace get_last_fresh_value cache publication in approach2. Remaining utility predicates/cache/diagnostic ownership and physical NUM cleanup of these lexical scopes remain open. Constructor/base publication and full native exception/destructor prefixes are not inferred from these checks. Whole units remain partial.",
         "Corrected an over-owning port and its earlier regression: get_some_value uses ptr_vector<expr> at source line34, whereas fresh/almost use expr_ref_vector. Cold construction now borrows provider values without reference reservations or lexical DelRef; fresh scopes retain their existing pins. The source-correct cold regression rejects the previous implementation. This bounded correction does not close broader utility caches or exceptional destruction obligations.",
-        "The independent utility now owns recursion results and one sort pin per successfully pinned cold query. All eight Go query sites (covering repeated calls inside constructor loops and debug-only source operands) use that utility. A public reference-count check after cold FreshValue proves a later utility query is already warm. Broader utility caches and general constructor/exceptional lexical cleanup remain separate partial obligations."
+        "The independent utility now owns recursion results and one sort pin per successfully pinned cold query. All eight Go query sites (covering repeated calls inside constructor loops and debug-only source operands) use that utility. A public reference-count check after cold FreshValue proves a later utility query is already warm. Broader utility caches and general constructor/exceptional lexical cleanup remain separate partial obligations.",
+        "Final retained-unit audit covers the complete DatatypeFactory interface and member order. Last-value entries borrow structured-registry owners; constructor arguments and candidates have concrete lexical references; stopped lexical work is retained and drained before the factory-owned DatatypeUtil, which in turn closes before the structured base. Only the utility queries reached by this header are ported, per the retained-consumer rule."
       ]
     },
     {
