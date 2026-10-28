@@ -120269,7 +120269,7 @@
       "path": "src/smt/smt_context.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_model_cleanup_test.go",
         "pkg/smtcore/theory_array_test.go",
@@ -121673,8 +121673,8 @@
           "text": "SASSERT(is_app(fn));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "full-array canonical constructor select axioms for const/map/as-array, shared kernel rewriter for map values independently of assertion preprocessing, and try_assign_eq ordered expression-pair cache reset completely on every scope pop",
@@ -122916,7 +122916,7 @@
       "path": "src/smt/smt_context.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_boolean_propagation.go",
@@ -123435,8 +123435,8 @@
           "text": "SASSERT(l != true_literal && l != false_literal);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Boolean assignment, watch, clause, conflict, and propagation state consumed by internalization",
