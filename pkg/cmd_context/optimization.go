@@ -11,6 +11,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/opt"
+	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -279,6 +280,10 @@ func (c *Context) checkOptimize(assumptions []ast.ASTHandle) (status lbool.LBool
 				}
 			} else {
 				c.objectives[i].value = optimized.Values[i].Arithmetic
+				c.objectives[i].modelValue = optimized.Values[i].ArithmeticModel
+				c.objectives[i].openBounds = optimized.Values[i].ArithmeticOpenBounds
+				c.objectives[i].interval = optimized.Values[i].ArithmeticInterval && optimized.Values[i].ArithmeticModelValid &&
+					!sameArithmeticObjectiveValue(c.objectives[i].value, c.objectives[i].modelValue)
 			}
 			c.objectives[i].valueReady = optimized.Optimal
 		}
@@ -362,16 +367,48 @@ func (c *Context) writeSoftObjectiveValue(out io.Writer, value *big.Rat) (result
 }
 
 func (c *Context) writeObjectiveValue(out io.Writer, objective *optimizationObjective) error {
-	if objective.value.Unbounded {
-		if objective.maximize {
+	if objective.openBounds {
+		_, err := io.WriteString(out, " (interval (* (- 1) oo) oo)")
+		return err
+	}
+	if objective.interval {
+		if _, err := io.WriteString(out, " (interval "); err != nil {
+			return err
+		}
+		lower, upper := objective.modelValue, objective.value
+		if !objective.maximize {
+			lower, upper = upper, lower
+		}
+		if err := c.writeArithmeticObjectiveValue(out, objective.expression, lower, objective.maximize); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(out, " "); err != nil {
+			return err
+		}
+		if err := c.writeArithmeticObjectiveValue(out, objective.expression, upper, objective.maximize); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, ")")
+		return err
+	}
+	return c.writeArithmeticObjectiveValue(out, objective.expression, objective.value, objective.maximize)
+}
+
+func sameArithmeticObjectiveValue(a, b smtcore.SMTArithmeticObjectiveValue) bool {
+	return a.Unbounded == b.Unbounded && (a.Unbounded || a.Finite.Cmp(&b.Finite) == 0)
+}
+
+func (c *Context) writeArithmeticObjectiveValue(out io.Writer, expression ast.ASTHandle, objective smtcore.SMTArithmeticObjectiveValue, maximize bool) error {
+	if objective.Unbounded {
+		if maximize {
 			_, err := io.WriteString(out, "oo")
 			return err
 		}
 		_, err := io.WriteString(out, "(* (- 1) oo)")
 		return err
 	}
-	value := &objective.value.Finite
-	sort, err := c.manager.GetSort(objective.expression)
+	value := &objective.Finite
+	sort, err := c.manager.GetSort(expression)
 	if err != nil {
 		return err
 	}

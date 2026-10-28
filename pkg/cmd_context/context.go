@@ -36,6 +36,7 @@ type optimizationObjective struct {
 	expression ast.ASTHandle
 	ref        ast.ASTRef
 	value      smtcore.SMTArithmeticObjectiveValue
+	modelValue smtcore.SMTArithmeticObjectiveValue
 	softTerms  []optimizationSoftTerm
 	softValue  big.Rat
 	id         string
@@ -43,6 +44,8 @@ type optimizationObjective struct {
 	soft       bool
 	bitVector  bool
 	bitWidth   uint32
+	interval   bool
+	openBounds bool
 	valueReady bool
 }
 type optimizationSoftTerm struct {

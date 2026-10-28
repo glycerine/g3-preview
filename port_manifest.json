@@ -92865,7 +92865,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/parsers/smt2/commands.go", "pkg/cmd_context/optimization.go"],
-      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMT2BitVectorOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
+      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMT2BitVectorOptimizationEndToEnd", "TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd", "TestSMTLibRunnerCPPReference"],
       "assertions": [
         {
           "line": 86,
@@ -92879,7 +92879,7 @@
           "name": "retained maximize, minimize and get-objectives commands for arithmetic and bit-vector objectives, including scoped rollback (opt_cmds.cpp:115-180)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
-          "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2BitVectorOptimizationEndToEnd"]
+          "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2BitVectorOptimizationEndToEnd", "TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd"]
         },
         {
           "name": "assert-soft Boolean expression, persistent parametric weight/id lifecycle, grouped objective registration and exact assignment display (opt_cmds.cpp:46-107)",
@@ -92920,7 +92920,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go", "pkg/opt/bound_expression.go", "pkg/opt/bound_expression_test.go", "pkg/opt/arithmetic_value_expression.go", "pkg/cmd_context/optimization.go", "pkg/parsers/smt2/optimization_test.go"],
-      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult", "TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMT2BitVectorOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
+      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult", "TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMT2BitVectorOptimizationEndToEnd", "TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd", "TestSMTLibRunnerCPPReference"],
       "conditionals": [
         {
           "line": 271,
@@ -92995,10 +92995,10 @@
           "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"]
         },
         {
-          "name": "objective display conversion for exact finite, infinitesimal and unbounded arithmetic results (opt_context.cpp:1264-1283,1352-1381)",
+          "name": "objective display conversion for exact finite, infinitesimal, unbounded and lower/upper interval arithmetic results (opt_context.cpp:1264-1283,1299-1340,1352-1381)",
           "status": "partial",
-          "go_target": "pkg/opt/arithmetic_value_expression.go",
-          "tests": ["TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+          "go_target": "pkg/cmd_context/optimization.go",
+          "tests": ["TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         },
         {
           "name": "scoped_state grouped soft terms, negative-weight normalization, MaxSMT objective order, scoped rollback, model publication and exact rational assignment display (opt_context.cpp:49-107,156-180,227-230,800-925,1264-1283)",
@@ -93309,7 +93309,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/opt/arithmetic_solver.go", "pkg/parsers/smt2/optimization_test.go"],
-      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
+      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
       "assertions": [
         {
           "line": 113,
@@ -93352,10 +93352,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "bounded, strict and unbounded single arithmetic objectives plus attained lexicographic objective setup and exact blocker iteration (optsmt.cpp:93-221,463-521,583-591)",
+          "name": "bounded, strict and unbounded arithmetic objectives plus attained, unattained and open-bound lexicographic result handling and exact blocker iteration (optsmt.cpp:93-221,463-521,563-591)",
           "status": "partial",
           "go_target": "pkg/opt/arithmetic_solver.go",
-          "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+          "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2StrictLexicographicIntervalEndToEnd", "TestSMT2UnboundedLexicographicIntervalEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": [],

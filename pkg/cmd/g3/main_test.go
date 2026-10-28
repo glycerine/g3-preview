@@ -823,6 +823,7 @@ var scriptResults = map[string]string{
 	"bit_vector_optimization.smt2":                 "sat\n(objectives\n (x 9)\n)\n((x #x9))\nsat\n(objectives\n (x 3)\n)\n((x #x3))\nsat\n(objectives\n (x 15)\n (y 8)\n)\n((x #xf)\n (y #x8))\n",
 	"bounded_integer_optimization.smt2":            "sat\n(objectives\n (x 3)\n)\n((x 3))\nsat\n(objectives\n (x 0)\n)\n((x 0))\n",
 	"bounded_real_strict_optimization.smt2":        "sat\n(objectives\n (x (+ 5.0 (* (- 1.0) epsilon)))\n)\n((x (/ 9.0 2.0)))\nsat\n(objectives\n (x epsilon)\n)\n((x (/ 1.0 2.0)))\n",
+	"strict_lexicographic_interval.smt2":           "sat\n(objectives\n (x  (interval (/ 9.0 2.0) (+ 5.0 (* (- 1.0) epsilon))))\n (y (/ 9.0 2.0))\n)\n((x (/ 9.0 2.0))\n (y (/ 9.0 2.0)))\n",
 	"array_read_store.smt2":                        "unsat\n",
 	"quantified_boolean.smt2":                      "unsat\n",
 	"parallel_let.smt2":                            "sat\n((p true))\n",
@@ -833,6 +834,7 @@ var scriptResults = map[string]string{
 	"nary_equality.smt2":                           "unsat\n",
 	"unknown_static_classifier.smt2":               "sat\n((xr 1.0)\n (yr 2.0))\nsat\n((xi 2)\n (yi 3))\nsat\n((ur 4.0)\n ((fr ur) 7.0))\nsat\n((ui 6)\n ((fi ui) 9))\n",
 	"unbounded_real_optimization.smt2":             "sat\n(objectives\n (x oo)\n)\n((x 0.0))\nsat\n(objectives\n (x (* (- 1) oo))\n)\n((x 0.0))\n",
+	"unbounded_lexicographic_interval.smt2":        "sat\n(objectives\n (x oo)\n (y  (interval (* (- 1) oo) oo))\n)\n((x 0.0)\n (y 0.0))\n",
 	"weighted_soft_optimization.smt2":              "sat\n(objectives\n ( 1)\n)\n((a false)\n (b true))\nsat\n(objectives\n (first 0)\n (second (/ 9.0 4.0))\n)\n((a true)\n (b false))\nsat\n(objectives\n (second (- 2))\n)\n((a false))\nsat\n(objectives\n (soft-first (- 2))\n (x 1)\n (soft-last 0)\n)\n((a false)\n (x 1))\nsat\n(objectives\n (duplicate 2)\n)\n((a true))\nsat\n(objectives\n (zero 0)\n)\n",
 }
 

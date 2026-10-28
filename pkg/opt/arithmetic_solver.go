@@ -5,10 +5,10 @@ package opt
 
 import (
 	"errors"
-	"fmt"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/math/simplex"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/tactic"
@@ -20,10 +20,14 @@ import (
 // ObjectiveValue is one result in source lexicographic order. SoftCost is set
 // for a MaxSMT objective; Arithmetic is set for maximize/minimize.
 type ObjectiveValue struct {
-	Arithmetic    smtcore.SMTArithmeticObjectiveValue
-	SoftCost      big.Rat
-	SoftSatisfied big.Rat
-	Soft          bool
+	Arithmetic           smtcore.SMTArithmeticObjectiveValue
+	ArithmeticModel      smtcore.SMTArithmeticObjectiveValue
+	ArithmeticModelValid bool
+	ArithmeticInterval   bool
+	ArithmeticOpenBounds bool
+	SoftCost             big.Rat
+	SoftSatisfied        big.Rat
+	Soft                 bool
 }
 
 // ArithmeticResult owns the best model retained by one optimization check.
@@ -412,15 +416,60 @@ func (s *ArithmeticSolver) optimizeOne(index int, result *ArithmeticResult) (lbo
 	return s.optimizeArithmetic(index, result)
 }
 
-func (s *ArithmeticSolver) commitArithmeticObjective(index int, value smtcore.SMTArithmeticObjectiveValue) error {
-	if value.Unbounded || value.Finite.Infinity.Sign() != 0 || value.Finite.Epsilon.Sign() != 0 {
-		return fmt.Errorf("opt: lexicographic continuation after an unattained or unbounded objective requires interval bounds")
+func (s *ArithmeticSolver) captureArithmeticModel(index int, value *ObjectiveValue, md *model.ModelCore) (resultErr error) {
+	if value == nil || md == nil {
+		return ast.ErrASTHandle
 	}
+	evaluator, err := model.NewModelEvaluator(md, s.config.ModelEvaluator)
+	if err != nil {
+		if evaluator != nil {
+			err = errors.Join(err, evaluator.Close())
+		}
+		return err
+	}
+	defer func() { resultErr = errors.Join(resultErr, evaluator.Close()) }()
+	if err = evaluator.SetModelCompletion(true); err != nil {
+		return err
+	}
+	term, err := s.manager.RefGet(s.objectives[index].term)
+	if err != nil {
+		return err
+	}
+	ref, err := evaluator.EvaluateValue(term)
+	if err != nil {
+		return err
+	}
+	defer func() { resultErr = errors.Join(resultErr, s.manager.DelRef(&ref)) }()
+	h, err := s.manager.RefGet(ref)
+	if err != nil {
+		return err
+	}
+	text, _, matched, err := s.manager.ArithmeticNumeralText(h)
+	if err != nil {
+		return err
+	}
+	if !matched {
+		return ast.ErrASTDomain
+	}
+	rational, matched := new(big.Rat).SetString(text)
+	if !matched {
+		return ast.ErrASTDomain
+	}
+	value.ArithmeticModel = smtcore.SMTArithmeticObjectiveValue{Finite: simplex.RationalInfinitesimal(rational)}
+	value.ArithmeticModelValid = true
+	return nil
+}
+
+func (s *ArithmeticSolver) commitArithmeticObjective(index int, value ObjectiveValue) error {
+	if !value.ArithmeticModelValid {
+		return ast.ErrASTDomain
+	}
+	committed := value.ArithmeticModel
 	if !s.objectives[index].maximize {
-		value.Finite = value.Finite.Clone()
-		value.Finite.Neg()
+		committed.Finite = committed.Finite.Clone()
+		committed.Finite.Neg()
 	}
-	bound, err := s.backend.MakeObjectiveLowerBound(s.objectives[index].backendIndex, s.filter, value.Finite)
+	bound, err := s.backend.MakeObjectiveLowerBound(s.objectives[index].backendIndex, s.filter, committed.Finite)
 	if err != nil {
 		return err
 	}
@@ -459,7 +508,25 @@ func (s *ArithmeticSolver) commitObjective(index int, value ObjectiveValue) erro
 	if s.objectives[index].soft {
 		return s.commitSoftObjective(index, value)
 	}
-	return s.commitArithmeticObjective(index, value.Arithmetic)
+	return s.commitArithmeticObjective(index, value)
+}
+
+func (s *ArithmeticSolver) retainRemainingModelValues(start int, result *ArithmeticResult) error {
+	for i := start; i < len(s.objectives); i++ {
+		if s.objectives[i].soft {
+			cost, satisfied, err := s.evaluateSoft(&s.objectives[i], result.Model)
+			if err != nil {
+				return err
+			}
+			result.Values[i] = ObjectiveValue{SoftCost: cost, SoftSatisfied: satisfied, Soft: true}
+			continue
+		}
+		if err := s.captureArithmeticModel(i, &result.Values[i], result.Model); err != nil {
+			return err
+		}
+		result.Values[i].Arithmetic = result.Values[i].ArithmeticModel
+	}
+	return nil
 }
 
 // Check runs the source blocker loop and preserves the last valid optimized
@@ -493,6 +560,29 @@ func (s *ArithmeticSolver) Check() (result *ArithmeticResult, resultErr error) {
 		if !optimal {
 			result.Status = status
 			return result, nil
+		}
+		if !s.objectives[i].soft {
+			if err = s.captureArithmeticModel(i, &result.Values[i], result.Model); err != nil {
+				return nil, err
+			}
+			value := result.Values[i].Arithmetic
+			if value.Unbounded || value.Finite.Infinity.Sign() != 0 {
+				for j := i + 1; j < len(s.objectives); j++ {
+					if !s.objectives[j].soft {
+						result.Values[j].ArithmeticOpenBounds = true
+					}
+				}
+				result.Status, result.Optimal = lbool.True, true
+				return result, nil
+			}
+			if i+1 < len(s.objectives) && value.Finite.Epsilon.Sign() != 0 {
+				result.Values[i].ArithmeticInterval = true
+				if err = s.retainRemainingModelValues(i+1, result); err != nil {
+					return nil, err
+				}
+				result.Status, result.Optimal = lbool.True, true
+				return result, nil
+			}
 		}
 		if i+1 < len(s.objectives) {
 			if err = s.commitObjective(i, result.Values[i]); err != nil {

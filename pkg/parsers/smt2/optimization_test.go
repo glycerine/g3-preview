@@ -204,3 +204,53 @@ func TestSMT2BitVectorOptimizationEndToEnd(t *testing.T) {
 		})
 	}
 }
+
+func TestSMT2StrictLexicographicIntervalEndToEnd(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	const script = `(set-option :produce-models true)
+(set-logic QF_LRA)
+(declare-const x Real)(declare-const y Real)
+(assert (> x 0.0))(assert (< x 5.0))(assert (= y x))
+(maximize x)(minimize y)
+(check-sat)(get-objectives)(get-value (x y))`
+	var output bytes.Buffer
+	if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	want := "sat (objectives (x (interval (/ 9.0 2.0) (+ 5.0 (* (- 1.0) epsilon)))) (y (/ 9.0 2.0)) ) ((x (/ 9.0 2.0)) (y (/ 9.0 2.0)))"
+	if got := strings.Join(strings.Fields(output.String()), " "); got != want {
+		t.Fatal("strict lexicographic interval output", got, "want", want)
+	}
+}
+
+func TestSMT2UnboundedLexicographicIntervalEndToEnd(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	const script = `(set-option :produce-models true)(set-logic QF_LRA)
+(declare-const x Real)(declare-const y Real)
+(maximize x)(minimize y)
+(check-sat)(get-objectives)(get-value (x y))`
+	var output bytes.Buffer
+	if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	want := "sat (objectives (x oo) (y (interval (* (- 1) oo) oo)) ) ((x 0.0) (y 0.0))"
+	if got := strings.Join(strings.Fields(output.String()), " "); got != want {
+		t.Fatal("unbounded lexicographic interval output", got, "want", want)
+	}
+}
