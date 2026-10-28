@@ -1,7 +1,9 @@
 // Package engine links the generated parameter collectors at the process
-// composition boundary above util. The source mem_initializer links the same
-// collector translation units through gparams_register_modules.cpp.
+// composition boundary above util.
 package engine
+
+// Source: mem_initializer links the same collector translation units through
+// gparams_register_modules.cpp.
 
 import (
 	_ "github.com/glycerine/g3/pkg/ackermannization"
