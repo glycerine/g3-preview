@@ -19,10 +19,7 @@ type ruleTail struct {
 	negated   bool
 }
 
-// Rule is an owning Horn-rule representation. Tail order matches the native
-// rule layout: positive predicates, negative predicates, then interpreted
-// formulas.
-type Rule struct {
+type ruleState struct {
 	manager       *ast.ASTManager
 	head          ast.ASTHandle
 	headReference ast.ASTRef
@@ -30,7 +27,16 @@ type Rule struct {
 	positive      int
 	uninterpreted int
 	name          string
-	closed        bool
+	references    uint32
+	released      bool
+}
+
+// Rule is one owning reference to a Horn-rule representation. Tail order
+// matches the native rule layout: positive predicates, negative predicates,
+// then interpreted formulas.
+type Rule struct {
+	state  *ruleState
+	closed bool
 }
 
 // RuleManager owns the registered predicate declarations used to classify
@@ -142,9 +148,9 @@ func (m *RuleManager) NewRule(head ast.ASTHandle, tail []ast.ASTHandle, negated 
 	if err := m.validHead(head); err != nil {
 		return nil, err
 	}
-	r := &Rule{manager: m.manager, head: head, name: name}
+	r := &Rule{state: &ruleState{manager: m.manager, head: head, name: name, references: 1}}
 	var err error
-	r.headReference, err = m.manager.NewRef(head)
+	r.state.headReference, err = m.manager.NewRef(head)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +181,7 @@ func (m *RuleManager) NewRule(head ast.ASTHandle, tail []ast.ASTHandle, negated 
 		}
 		entry := ruleTail{handle: stored, reference: reference, negated: isNegated}
 		// Keep every acquired reference reachable by Close during construction.
-		r.tail = append(r.tail, entry)
+		r.state.tail = append(r.state.tail, entry)
 		if isPredicate {
 			uninterpreted = append(uninterpreted, entry)
 		} else {
@@ -196,81 +202,102 @@ func (m *RuleManager) NewRule(head ast.ASTHandle, tail []ast.ASTHandle, negated 
 			i++
 		}
 	}
-	r.positive = end
-	r.uninterpreted = len(uninterpreted)
-	r.tail = append(uninterpreted, interpreted...)
+	r.state.positive = end
+	r.state.uninterpreted = len(uninterpreted)
+	r.state.tail = append(uninterpreted, interpreted...)
 	return r, nil
 }
 
-func (r *Rule) open() error {
-	if r == nil || r.closed || r.manager == nil {
-		return ErrRuleOwner
+func (r *Rule) open() (*ruleState, error) {
+	if r == nil || r.closed || r.state == nil || r.state.released || r.state.manager == nil {
+		return nil, ErrRuleOwner
 	}
-	return nil
+	return r.state, nil
+}
+
+// Retain returns a distinct owning reference to the same native rule value.
+func (r *Rule) Retain() (*Rule, error) {
+	state, err := r.open()
+	if err != nil {
+		return nil, err
+	}
+	if state.references == ^uint32(0) {
+		return nil, ErrRuleOwner
+	}
+	state.references++
+	return &Rule{state: state}, nil
 }
 
 func (r *Rule) Head() (ast.ASTHandle, error) {
-	if err := r.open(); err != nil {
+	state, err := r.open()
+	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	return r.head, nil
+	return state.head, nil
 }
 
 func (r *Rule) Name() (string, error) {
-	if err := r.open(); err != nil {
+	state, err := r.open()
+	if err != nil {
 		return "", err
 	}
-	return r.name, nil
+	return state.name, nil
 }
 
 func (r *Rule) TailSize() (int, error) {
-	if err := r.open(); err != nil {
+	state, err := r.open()
+	if err != nil {
 		return 0, err
 	}
-	return len(r.tail), nil
+	return len(state.tail), nil
 }
 
 func (r *Rule) PositiveTailSize() (int, error) {
-	if err := r.open(); err != nil {
+	state, err := r.open()
+	if err != nil {
 		return 0, err
 	}
-	return r.positive, nil
+	return state.positive, nil
 }
 
 func (r *Rule) UninterpretedTailSize() (int, error) {
-	if err := r.open(); err != nil {
+	state, err := r.open()
+	if err != nil {
 		return 0, err
 	}
-	return r.uninterpreted, nil
+	return state.uninterpreted, nil
 }
 
 func (r *Rule) Tail(index int) (ast.ASTHandle, bool, error) {
-	if err := r.open(); err != nil {
+	state, err := r.open()
+	if err != nil {
 		return ast.ASTHandle{}, false, err
 	}
-	if index < 0 || index >= len(r.tail) {
+	if index < 0 || index >= len(state.tail) {
 		return ast.ASTHandle{}, false, fmt.Errorf("muz/base: tail index out of bounds")
 	}
-	return r.tail[index].handle, r.tail[index].negated, nil
+	return state.tail[index].handle, state.tail[index].negated, nil
 }
 
 func (r *Rule) HasNegation() (bool, error) {
-	if err := r.open(); err != nil {
+	state, err := r.open()
+	if err != nil {
 		return false, err
 	}
-	return r.positive != r.uninterpreted, nil
+	return state.positive != state.uninterpreted, nil
 }
 
 func (r *Rule) IsInTail(declaration ast.ASTHandle, onlyPositive bool) (bool, error) {
-	if err := r.open(); err != nil {
+	state, err := r.open()
+	if err != nil {
 		return false, err
 	}
-	end := r.uninterpreted
+	end := state.uninterpreted
 	if onlyPositive {
-		end = r.positive
+		end = state.positive
 	}
 	for i := 0; i < end; i++ {
-		candidate, err := r.manager.GetDecl(r.tail[i].handle)
+		candidate, err := state.manager.GetDecl(state.tail[i].handle)
 		if err != nil {
 			return false, err
 		}
@@ -282,18 +309,27 @@ func (r *Rule) IsInTail(declaration ast.ASTHandle, onlyPositive bool) (bool, err
 }
 
 func (r *Rule) Close() (result error) {
-	if r == nil || r.manager == nil {
+	if r == nil || r.state == nil {
 		return ErrRuleOwner
 	}
 	if r.closed {
 		return nil
 	}
-	for i := len(r.tail) - 1; i >= 0; i-- {
-		result = errors.Join(result, r.manager.DelRef(&r.tail[i].reference))
-	}
-	result = errors.Join(result, r.manager.DelRef(&r.headReference))
-	r.tail = nil
 	r.closed = true
+	state := r.state
+	if state.released || state.references == 0 {
+		return ErrRuleOwner
+	}
+	state.references--
+	if state.references != 0 {
+		return nil
+	}
+	for i := len(state.tail) - 1; i >= 0; i-- {
+		result = errors.Join(result, state.manager.DelRef(&state.tail[i].reference))
+	}
+	result = errors.Join(result, state.manager.DelRef(&state.headReference))
+	state.tail = nil
+	state.released = true
 	return result
 }
 

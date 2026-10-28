@@ -99,12 +99,18 @@ func TestRuleManagerClassifiesAndOwnsNativeTailLayout(t *testing.T) {
 	if name, err := rule.Name(); err != nil || name != "native-order" {
 		t.Fatal("rule name", name, err)
 	}
+	retained, err := rule.Retain()
+	ruleMust(t, err)
 	if err := rule.Close(); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := rule.Head(); !errors.Is(err, base.ErrRuleOwner) {
 		t.Fatal("closed rule accepted", err)
 	}
+	if head, err := retained.Head(); err != nil || head != applications[0] {
+		t.Fatal("retained rule lost shared state", head, err)
+	}
+	ruleMust(t, retained.Close())
 }
 
 func TestRuleManagerRejectsUnregisteredAndCompoundHeads(t *testing.T) {
