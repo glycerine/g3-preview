@@ -89805,22 +89805,45 @@
       "path": "src/nlsat/nlsat_clause.cpp",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/clause.go"
+      ],
+      "tests": [
+        "pkg/nlsat/clause_justification_test.go"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "clause placement construction, mutable/const literal access, active-prefix membership, retained capacity, activity counters, shrinking and borrowed assumptions",
+          "status": "partial",
+          "go_target": "pkg/nlsat/clause.go",
+          "tests": [
+            "TestClausePlacementMutablePrefixCapacityAndAssumptions",
+            "TestClauseIndependentMutationAndMembershipModels",
+            "TestClauseLazyAndAssumptionSourceGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The placement initializer fills solver-supplied fixed-capacity literal storage and copies its input. It borrows the assumption-set pointer without changing references; the source solver factory separately acquires literal/assumption references. Shrink changes only the active size, retaining the original 31-bit allocation capacity, hidden literal fields and assumption identity. Mutable literal access returns the actual slot."
+      ],
+      "deviations": [
+        "Go slices/fields and reflected native storage extents replace C++ flexible-array layout. The actual solver clause allocation, reference acquisition, sorting, watches and deletion are not yet wired. Full allocation/lexical and diagnostic audits remain open; source index/shrink assertions are connected. Both whole-source audit flags remain false."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_clause.h",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/clause.go"
+      ],
+      "tests": [
+        "pkg/nlsat/clause_justification_test.go"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -89847,9 +89870,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "clause placement construction, mutable/const literal access, active-prefix membership, retained capacity, activity counters, shrinking and borrowed assumptions",
+          "status": "partial",
+          "go_target": "pkg/nlsat/clause.go",
+          "tests": [
+            "TestClausePlacementMutablePrefixCapacityAndAssumptions",
+            "TestClauseIndependentMutationAndMembershipModels",
+            "TestClauseLazyAndAssumptionSourceGuards"
+          ]
+        }
+      ],
+      "ownership": [
+        "The placement initializer fills solver-supplied fixed-capacity literal storage and copies its input. It borrows the assumption-set pointer without changing references; the source solver factory separately acquires literal/assumption references. Shrink changes only the active size, retaining the original 31-bit allocation capacity, hidden literal fields and assumption identity. Mutable literal access returns the actual slot."
+      ],
+      "deviations": [
+        "Go slices/fields and reflected native storage extents replace C++ flexible-array layout. The actual solver clause allocation, reference acquisition, sorting, watches and deletion are not yet wired. Full allocation/lexical and diagnostic audits remain open; source index/shrink assertions are connected. Both whole-source audit flags remain false."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_evaluator.cpp",
@@ -90739,9 +90777,15 @@
       "path": "src/nlsat/nlsat_justification.h",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/justification.go"
+      ],
+      "tests": [
+        "pkg/nlsat/assumption_manager_test.go",
+        "pkg/nlsat/assumption_justification_pending_test.go",
+        "pkg/nlsat/clause_justification_test.go"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -90776,9 +90820,25 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "null/decision/clause/lazy tagged reasons, lazy literal copying/readout, actual allocator construction and lazy-only destruction",
+          "status": "partial",
+          "go_target": "pkg/nlsat/justification.go",
+          "tests": [
+            "TestJustificationTagsIdentityCopiesAndRetirement",
+            "TestLazyJustificationAllocationReservationPrefixes",
+            "TestClauseLazyAndAssumptionSourceGuards",
+            "TestAssumptionAndLazyOwnersPreserveEachOthersPendingAllocation"
+          ]
+        }
+      ],
+      "ownership": [
+        "Justification values borrow concrete clause/lazy pointers and preserve tag-sensitive identity, including tagged nil clause values. Lazy reasons allocate through the actual SmallAllocator, copy input literals and track exact accepted allocation outcomes plus physical release progress. Partial owners are returned on allocation errors so explicit deletion can release only the accepted owner; rejected younger entries cannot clear an older assumption/lazy pending raw block. Non-lazy deletion is a no-op."
+      ],
+      "deviations": [
+        "A concrete comparable tagged union replaces pointer tagging. Native owner headers and slices use reflected Go extents rather than C++ ABI layout. Source lazy-index and constructor-kind assertions are connected; the implicit Go null zero value has no C++ constructor call. Full diagnostic/erasure, lexical and every physical destructor frontier remain unaudited. Actual solver reason creation/retirement remains to be integrated. Both whole-source audit flags remain false."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_params.hpp",
@@ -90882,9 +90942,16 @@
       "path": "src/nlsat/nlsat_solver.cpp",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/assumption.go",
+        "pkg/nlsat/assumption_manager.go"
+      ],
+      "tests": [
+        "pkg/nlsat/assumption_manager_test.go",
+        "pkg/nlsat/assumption_justification_pending_test.go",
+        "pkg/nlsat/clause_justification_test.go"
+      ],
       "conditionals": [
         {
           "line": 39,
@@ -91259,9 +91326,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "dependency_manager<solver::imp::dconfig> with borrowed concrete assumption identities, 30-bit node refs, zero-ref leaf/join factories, source BFS traversal, node marks and iterative LIFO destruction",
+          "status": "partial",
+          "go_target": "pkg/nlsat/assumption_manager.go",
+          "go_targets": [
+            "pkg/nlsat/assumption.go"
+          ],
+          "tests": [
+            "TestAssumptionIdentitySourceBreadthFirstAndDuplicateLeaves",
+            "TestAssumptionDAGIndependentPathsAndReachability",
+            "TestAssumptionAllocationAndTraversalRecovery",
+            "TestAssumptionTraversalReachedPrefixAndDeletionPushContinuation",
+            "TestAssumptionDeletionSourceOrderThroughAllocatorReuse",
+            "TestAssumptionAndLazyOwnersPreserveEachOthersPendingAllocation"
+          ]
+        }
+      ],
+      "ownership": [
+        "The retained NLSAT dconfig has ref_count=false for leaf values. Its actual SmallAllocator-backed dependency nodes have zero factory references and acquire references to join children; aliases acquire none. Thirty-bit counters and node marks preserve the source algorithm. Interrupted traversal retains reached marks/output until explicit cleanup. Iterative deletion preserves left-to-right child decrements, parent retirement then LIFO queued children, with stored consumed-decrement/push and allocator-release progress. The manager borrows its allocator and rejects closing with live nodes."
+      ],
+      "deviations": [
+        "The NLSAT assumption specialization is concrete and AST-independent: leaf values carry either a frontend attachment identity or a borrowed pointer to an actual input literal. Nonzero-sized attachment tokens preserve distinct native identities; the retained goal frontend must map its concrete AST dependencies to these identities when integrated. Equal-valued literals at different input positions remain distinct. No any-valued callback/value adapter or C++ standard-library container is introduced. Native Go layouts/array capacities differ from source; caller output slices use Go storage. Every allocation/lexical/diagnostic frontier and full solver integration remain unaudited.",
+        "Only the actual retained assumption-manager/dconfig subobject is implemented by this entry. The solver constructor, Boolean-variable arrays, atom canonicalization/factories, clause/watch integration, assumption-check/core protocol, explanation/search, root permutation, model handling and own diagnostics remain unported. This is not a complete NLSAT solver or substitute general backend."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_solver.h",
@@ -91338,11 +91427,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/nlsat/atom.go",
-        "pkg/nlsat/evaluator.go"
+        "pkg/nlsat/evaluator.go",
+        "pkg/nlsat/assumption.go"
       ],
       "tests": [
         "pkg/nlsat/atom_test.go",
-        "pkg/nlsat/atom_diagnostics_test.go"
+        "pkg/nlsat/atom_diagnostics_test.go",
+        "pkg/nlsat/assumption_manager_test.go",
+        "pkg/nlsat/assumption_justification_pending_test.go",
+        "pkg/nlsat/clause_justification_test.go"
       ],
       "conditionals": [
         {
@@ -91408,7 +91501,7 @@
       ],
       "deviations": [
         "Tagged polynomial pointers become concrete Polynomial handles plus bool parity. Source hashes preserve polynomial IDs, source composite-child order, parity omission, uint32 index shifts and kind/index OR collisions; equality retains handle identity, factor order and parity. Native factor storage must be reserved and supplied by the retained solver factory, which remains unported; no replacement factory or stub solver is introduced.",
-        "Constructor, header decrement, factor-index and kind-flip assertions use actual source diagnostic locations. The evaluator uses a sealed concrete inequality/root interface for atom dispatch. Retained assumption types and full allocator/lexical and diagnostic audits await solver integration. Both whole-source audit flags remain false."
+        "Constructor, header decrement, factor-index and kind-flip assertions use actual source diagnostic locations. The evaluator uses a sealed concrete inequality/root interface for atom dispatch. The retained assumption domain is now a concrete frontend-identity/input-literal sum; frontend mapping and the solver check/core protocol still require integration. Full allocator/lexical and diagnostic audits remain open. Both whole-source audit flags remain false."
       ]
     },
     {
@@ -189539,7 +189632,9 @@
         "pkg/ast/ast_dependency_api.go",
         "pkg/ast/ast_dependency_traversal.go",
         "pkg/ast/ast_dependency_consumed_test.go",
-        "pkg/smtcore/smt_arith_bound_dependency.go"
+        "pkg/smtcore/smt_arith_bound_dependency.go",
+        "pkg/nlsat/assumption.go",
+        "pkg/nlsat/assumption_manager.go"
       ],
       "tests": [
         "TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled",
@@ -189559,7 +189654,10 @@
         "TestASTDependencyNativeOutputInvalidHandleRetainsCompactedPrefix",
         "TestASTDependencyDecConsumedActualRootOwnership",
         "TestSMTArithmeticBoundDependencyJoinLinearizeAndContains",
-        "TestSMTArithmeticBoundDependencyScopesAndReset"
+        "TestSMTArithmeticBoundDependencyScopesAndReset",
+        "pkg/nlsat/assumption_manager_test.go",
+        "pkg/nlsat/assumption_justification_pending_test.go",
+        "pkg/nlsat/clause_justification_test.go"
       ],
       "conditionals": [
         {
@@ -189684,8 +189782,12 @@
           "name": "dependency_manager<expr_dependency_config>::del leaf stops before leaf destruction and allocator deallocation when value dec_ref fails (dependency.h:88-94)",
           "status": "ported",
           "go_target": "pkg/ast/ast_dependency.go",
-          "go_targets": ["pkg/ast/ast_dependency_failure_test.go"],
-          "tests": ["TestASTDependencyLeafDeletionStopsBeforeFreeOnASTFailure"]
+          "go_targets": [
+            "pkg/ast/ast_dependency_failure_test.go"
+          ],
+          "tests": [
+            "TestASTDependencyLeafDeletionStopsBeforeFreeOnASTFailure"
+          ]
         },
         {
           "name": "dependency_manager<expr_dependency_config>::dec_ref/del ordinary RC decrement, left/right child publication, LIFO leaf callbacks and immediate node deallocation (dependency.h:86-107,128-134)",
@@ -189724,7 +189826,10 @@
           "name": "dependency_manager<expr_dependency_config>::del owning continuation after consumed leaf AST callback failure, retaining LIFO queued siblings (dependency.h:86-107)",
           "status": "ported",
           "go_target": "pkg/ast/ast_dependency.go",
-          "go_targets": ["pkg/ast/ast_dependency_api.go", "pkg/ast/ast_dependency_traversal.go"],
+          "go_targets": [
+            "pkg/ast/ast_dependency_api.go",
+            "pkg/ast/ast_dependency_traversal.go"
+          ],
           "tests": [
             "TestASTDependencyLeafDeletionStopsBeforeFreeOnASTFailure",
             "TestASTDependencyJoinDeletionResumesQueuedSiblingAfterCallbackStop"
@@ -189792,16 +189897,34 @@
             "TestSMTArithmeticBoundDependencyJoinLinearizeAndContains",
             "TestSMTArithmeticBoundDependencyScopesAndReset"
           ]
+        },
+        {
+          "name": "dependency_manager<solver::imp::dconfig> with borrowed concrete assumption identities, 30-bit node refs, zero-ref leaf/join factories, source BFS traversal, node marks and iterative LIFO destruction",
+          "status": "partial",
+          "go_target": "pkg/nlsat/assumption_manager.go",
+          "go_targets": [
+            "pkg/nlsat/assumption.go"
+          ],
+          "tests": [
+            "TestAssumptionIdentitySourceBreadthFirstAndDuplicateLeaves",
+            "TestAssumptionDAGIndependentPathsAndReachability",
+            "TestAssumptionAllocationAndTraversalRecovery",
+            "TestAssumptionTraversalReachedPrefixAndDeletionPushContinuation",
+            "TestAssumptionDeletionSourceOrderThroughAllocatorReuse",
+            "TestAssumptionAndLazyOwnersPreserveEachOthersPendingAllocation"
+          ]
         }
       ],
       "ownership": [
         "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Project RC30 wrapping and charged leaf/join16/24 records remain; dependency FIFO/LIFO worklists and persistent-array scratch use native Go slices without container arena charges or intrusive fallback links. Actual cold manager/header/payload and persistent-array object overlaps remain charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
         "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers.",
-        "The SMT nonlinear-arithmetic specialization stores borrowed concrete *smtArithmeticBound leaves in a search-scoped DAG; Go reachability replaces region allocation while reset and scope rollback retire manager ownership."
+        "The SMT nonlinear-arithmetic specialization stores borrowed concrete *smtArithmeticBound leaves in a search-scoped DAG; Go reachability replaces region allocation while reset and scope rollback retire manager ownership.",
+        "The retained NLSAT dconfig has ref_count=false for leaf values. Its actual SmallAllocator-backed dependency nodes have zero factory references and acquire references to join children; aliases acquire none. Thirty-bit counters and node marks preserve the source algorithm. Interrupted traversal retains reached marks/output until explicit cleanup. Iterative deletion preserves left-to-right child decrements, parent retirement then LIFO queued children, with stored consumed-decrement/push and allocator-release progress. The manager borrows its allocator and rejects closing with live nodes."
       ],
       "deviations": [
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",
-        "The retained goal native-slice owner uses DependencyDecConsumed to observe whether a real root decrement occurred before a subsequent destruction error. DependencyDec delegates to the same existing decrement path; source counter/debug and destruction order remain. No generic container credit is added."
+        "The retained goal native-slice owner uses DependencyDecConsumed to observe whether a real root decrement occurred before a subsequent destruction error. DependencyDec delegates to the same existing decrement path; source counter/debug and destruction order remain. No generic container credit is added.",
+        "The NLSAT assumption specialization is concrete and AST-independent: leaf values carry either a frontend attachment identity or a borrowed pointer to an actual input literal. Nonzero-sized attachment tokens preserve distinct native identities; the retained goal frontend must map its concrete AST dependencies to these identities when integrated. Equal-valued literals at different input positions remain distinct. No any-valued callback/value adapter or C++ standard-library container is introduced. Native Go layouts/array capacities differ from source; caller output slices use Go storage. Every allocation/lexical/diagnostic frontier and full solver integration remain unaudited."
       ]
     },
     {

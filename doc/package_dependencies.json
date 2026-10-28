@@ -2092,7 +2092,10 @@
       ],
       "production_files": [
         "assignment.go",
+        "assumption.go",
+        "assumption_manager.go",
         "atom.go",
+        "clause.go",
         "evaluator.go",
         "evaluator_interval_ref.go",
         "evaluator_intervals.go",
@@ -2100,6 +2103,7 @@
         "gparams_catalog_collectors.go",
         "interval_set.go",
         "interval_set_operations.go",
+        "justification.go",
         "sign_table.go"
       ]
     },
