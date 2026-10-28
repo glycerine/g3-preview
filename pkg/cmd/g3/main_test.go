@@ -1143,6 +1143,27 @@ func TestSMTLibRunnerCommandLine(t *testing.T) {
 	if !strings.HasPrefix(out.String(), "unsat\n") || !strings.Contains(out.String(), "asserted") {
 		t.Fatal(out.String())
 	}
+
+	const statisticsScript = "(assert false)(check-sat)"
+	out.Reset()
+	if err := runArguments([]string{"-st", "-in"}, strings.NewReader(statisticsScript), &out); err != nil {
+		t.Fatal("statistics command line", err)
+	}
+	if !strings.HasPrefix(out.String(), "unsat\n(") || !strings.Contains(out.String(), ":time") || !strings.Contains(out.String(), ":total-time") || !strings.HasSuffix(out.String(), ")\n") {
+		t.Fatal("statistics output", out.String())
+	}
+	if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+		cmd := exec.Command(reference, "-st", "-in")
+		cmd.Stdin = strings.NewReader(statisticsScript)
+		native, err := cmd.CombinedOutput()
+		if err != nil || !strings.HasPrefix(string(native), "unsat\n(") || !strings.Contains(string(native), ":time") || !strings.Contains(string(native), ":total-time") {
+			t.Fatal("native statistics output", err, string(native))
+		}
+	}
+	out.Reset()
+	if err := runArguments([]string{"-ist", "-in"}, strings.NewReader(statisticsScript), &out); err != nil || out.String() != "unsat\n" {
+		t.Fatal("internal statistics must remain inert for SMT-LIB", err, out.String())
+	}
 }
 
 // The retained C++ executable can return models violating p and (or a b)

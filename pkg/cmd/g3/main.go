@@ -1,5 +1,6 @@
-// g3 executes SMT-LIB scripts through the native Go SMT backend.
 package main
+
+// g3 executes SMT-LIB scripts through the native Go SMT backend.
 
 import (
 	"errors"
@@ -12,6 +13,7 @@ import (
 	_ "github.com/glycerine/g3/pkg/engine"
 	"github.com/glycerine/g3/pkg/parsers/smt2"
 	"github.com/glycerine/g3/pkg/shell"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 func run(input io.Reader, output io.Writer) (result error) {
@@ -62,9 +64,6 @@ func runArguments(args []string, input io.Reader, output io.Writer) (result erro
 	if kind != shell.InputSMT2 {
 		return fmt.Errorf("selected input frontend is not ported yet")
 	}
-	if command.DisplayStatistics || command.DisplayIStatistics {
-		return fmt.Errorf("shell statistics output is not ported yet")
-	}
 	if selected {
 		file, err := os.Open(filename)
 		if err != nil {
@@ -76,7 +75,22 @@ func runArguments(args []string, input io.Reader, output io.Writer) (result erro
 	if err = context.RefreshGlobalParameters(); err != nil {
 		return err
 	}
-	return smt2.ParseCommands(context, input, output)
+	total := stopwatch.New(nil)
+	if command.DisplayStatistics {
+		if err = total.Start(); err != nil {
+			return err
+		}
+	}
+	parseErr := smt2.ParseCommands(context, input, output)
+	if command.DisplayStatistics {
+		stopErr := total.Stop()
+		seconds, secondsErr := total.Seconds()
+		if stopErr == nil && secondsErr == nil {
+			err = context.WriteStatisticsWithTotalTime(output, seconds)
+		}
+		err = errors.Join(stopErr, secondsErr, err)
+	}
+	return errors.Join(parseErr, err)
 }
 
 func main() {

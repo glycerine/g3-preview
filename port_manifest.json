@@ -109998,7 +109998,7 @@
           ]
         },
         {
-          "name": "native Go SMT-LIB file/stdin frontend through the retained shell option scanner, context initialization, parser, SMTSolver and model/proof/core output; opt-in C++ executable differential vectors",
+          "name": "native Go SMT-LIB file/stdin frontend through the retained shell option scanner, context initialization, parser, SMTSolver, model/proof/core output and final -st statistics; opt-in C++ executable differential vectors",
           "status": "ported",
           "go_target": "pkg/cmd/g3/main.go",
           "tests": [
@@ -110009,7 +110009,7 @@
           ]
         },
         {
-          "name": "remaining frontend and process integration: full options/statistics, resource limits, signal handling, validation, and other input frontends",
+          "name": "remaining frontend and process integration: remaining options, resource limits, signal handling, validation, and other input frontends",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -110020,7 +110020,7 @@
       ],
       "deviations": [
         "The concrete scan reaches -T, -v, -nw, -t, -memory, name=value and build-gated -tr/-dbg through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. Trace and debug options are unknown in builds without their corresponding source gate; compiled builds mutate borrowed tag contexts. -p/-pd/-pm/-pp terminal actions now display through the real global-parameter service, including the -pp diagnostic line and -pm usage suffix. Rendering writes directly to the borrowed stdout writer in source insertion order, preserving a completed prefix on refusal. Help/version output, process exit, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error.",
-        "The early Go executable dispatches the retained SMT-LIB subset directly to SMTSolver. Source tactic-based solver factories, optimization/interpolation/fixedpoint frontend commands and other input formats remain incomplete."
+        "The Go executable dispatches the retained SMT-LIB subset through the strategic command context. Final -st output uses the command context's active-result statistics plus total frontend time; -ist remains inert for SMT-LIB as in the native frontend. Optimization/interpolation/fixedpoint frontend commands, signal-time statistics and other input formats remain incomplete."
       ]
     },
     {
@@ -110141,7 +110141,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "native Go SMT-LIB file/stdin frontend through the retained shell option scanner, context initialization, parser, SMTSolver and model/proof/core output; opt-in C++ executable differential vectors",
+          "name": "native Go SMT-LIB file/stdin frontend through the retained shell option scanner, context initialization, parser, SMTSolver, model/proof/core output and final -st statistics; opt-in C++ executable differential vectors",
           "status": "ported",
           "go_target": "pkg/cmd/g3/main.go",
           "tests": [
@@ -110152,7 +110152,7 @@
           ]
         },
         {
-          "name": "remaining frontend and process integration: full options/statistics, resource limits, signal handling, validation, and other input frontends",
+          "name": "remaining frontend and process integration: remaining options, resource limits, signal handling, validation, and other input frontends",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -110160,7 +110160,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The early Go executable dispatches the retained SMT-LIB subset directly to SMTSolver. Source tactic-based solver factories, optimization/interpolation/fixedpoint frontend commands and other input formats remain incomplete."
+        "The Go executable dispatches the retained SMT-LIB subset through the strategic command context. Final -st output uses the command context's active-result statistics plus total frontend time; -ist remains inert for SMT-LIB as in the native frontend. Optimization/interpolation/fixedpoint frontend commands, signal-time statistics and other input formats remain incomplete."
       ]
     },
     {

@@ -1,6 +1,7 @@
-// Source: src/cmd_context/cmd_context.cpp:775-778;
-// src/cmd_context/basic_cmds.cpp get_info_cmd :reason-unknown branch.
 package cmd_context
+
+// Source: src/cmd_context/cmd_context.cpp:775-778,1860-1877;
+// src/cmd_context/basic_cmds.cpp get_info_cmd :reason-unknown branch.
 
 import (
 	"io"
@@ -22,6 +23,16 @@ func (c *Context) ReasonUnknown() (string, error) {
 // WriteStatistics publishes the active result's solver statistics, following
 // the result-before-solver ordering in cmd_context::display_statistics.
 func (c *Context) WriteStatistics(out io.Writer) error {
+	return c.writeStatistics(out, nil)
+}
+
+// WriteStatisticsWithTotalTime publishes final shell statistics and includes
+// the whole SMT-LIB frontend duration.
+func (c *Context) WriteStatisticsWithTotalTime(out io.Writer, totalSeconds float64) error {
+	return c.writeStatistics(out, &totalSeconds)
+}
+
+func (c *Context) writeStatistics(out io.Writer, totalSeconds *float64) error {
 	if err := c.valid(); err != nil {
 		return err
 	}
@@ -29,6 +40,9 @@ func (c *Context) WriteStatistics(out io.Writer) error {
 		return io.ErrClosedPipe
 	}
 	st := statistics.New()
+	if totalSeconds != nil {
+		st.UpdateDouble("total time", *totalSeconds)
+	}
 	seconds, err := c.watch.Seconds()
 	if err != nil {
 		return err

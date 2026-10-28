@@ -80,6 +80,11 @@ func TestCommandContextStatisticsWriterAndWatch(t *testing.T) {
 	if !strings.Contains(out.String(), ":time") {
 		t.Fatal("check time missing", out.String())
 	}
+	out.Reset()
+	contextMust(t, c.WriteStatisticsWithTotalTime(&out, 1.25))
+	if !strings.Contains(out.String(), ":total-time") || !strings.Contains(out.String(), "1.25") {
+		t.Fatal("shell total time missing", out.String())
+	}
 	for _, limit := range []int{0, 1, 4, 12} {
 		if err := c.WriteStatistics(&reasonUnknownWriter{remaining: limit}); !errors.Is(err, io.ErrClosedPipe) {
 			t.Fatal("statistics writer refusal", limit, err)
