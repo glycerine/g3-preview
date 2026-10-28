@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_bv.h and src/smt/theory_bv.cpp bit-vector
 // variables, numeral bits, bit2bool atoms, and equality expansion.
-package smtcore
 
 import (
 	"errors"
@@ -530,6 +531,14 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 		literal, literalErr := state.Literal(bit)
 		if literalErr != nil {
 			return false, literalErr
+		}
+		// Native concat/extract splice existing literals directly, numerals use
+		// internalize_num, and int2bv uses mk_bits. Other retained term paths
+		// reach init_bits and its per-bit source trace.
+		if op != smtBVOpNumeral && op != 37 && op != 40 && op != 57 {
+			if err = t.traceBVInitBit(expression, uint32(index), literal); err != nil {
+				return false, err
+			}
 		}
 		if err = t.registerBitLiteral(expression, uint32(index), literal); err != nil {
 			return false, err

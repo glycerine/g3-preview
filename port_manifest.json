@@ -141292,18 +141292,23 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display is implemented using private roots; TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; init_bits/find_wpos/fixed_var_eh source traces are ported, while remaining TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
           "status": "partial"
         },
         {
           "name": "add_bit, init_bits/find_wpos and fixed_var_eh: interpreted gate notification, polarity-normalized occurrences, immediate fixed-term discovery and compound-value equalities used by UF congruence",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_bv.go",
           "go_targets": [
+            "pkg/smtcore/theory_bv_occurrences.go",
+            "pkg/smtcore/theory_bv_propagation.go",
+            "pkg/smtcore/theory_bv_fixed.go",
+            "pkg/smtcore/theory_bv_fixed_trace.go",
             "pkg/cmd/g3/main_test.go"
           ],
           "tests": [
             "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits",
+            "TestSMTBVInitWatchAndFixedEqualitySourceTrace",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -141788,18 +141793,23 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display is implemented using private roots; TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; init_bits/find_wpos/fixed_var_eh source traces are ported, while remaining TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
           "status": "partial"
         },
         {
           "name": "add_bit, init_bits/find_wpos and fixed_var_eh: interpreted gate notification, polarity-normalized occurrences, immediate fixed-term discovery and compound-value equalities used by UF congruence",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_bv.go",
           "go_targets": [
+            "pkg/smtcore/theory_bv_occurrences.go",
+            "pkg/smtcore/theory_bv_propagation.go",
+            "pkg/smtcore/theory_bv_fixed.go",
+            "pkg/smtcore/theory_bv_fixed_trace.go",
             "pkg/cmd/g3/main_test.go"
           ],
           "tests": [
             "TestSMTBitVectorCompoundFixedEqualityAndNegatedBits",
+            "TestSMTBVInitWatchAndFixedEqualitySourceTrace",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]

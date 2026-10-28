@@ -1,5 +1,6 @@
-// Source: src/smt/theory_bv.cpp:426-490; theory_bv.h value_sort_pair.
 package smtcore
+
+// Source: src/smt/theory_bv.cpp:426-490; theory_bv.h value_sort_pair.
 
 import (
 	"errors"
@@ -70,6 +71,9 @@ func (t *SMTBitVectorTheory) fixedVariable(variable SMTTheoryVar) error {
 	other := t.variables[old]
 	if node.root == other.root {
 		return nil
+	}
+	if err = t.traceBVFixedEquality(variable, old); err != nil {
+		return err
 	}
 	t.statistics.theoryToCoreEq++
 	if err = t.addFixedEquality(variable, old); err != nil {

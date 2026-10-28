@@ -1,5 +1,6 @@
-// Source: src/smt/theory_bv.cpp:330-351,1163-1281,1383-1457.
 package smtcore
+
+// Source: src/smt/theory_bv.cpp:330-351,1163-1281,1383-1457.
 
 import (
 	"errors"
@@ -54,11 +55,17 @@ func (t *SMTBitVectorTheory) findWatchedPosition(variable SMTTheoryVar) error {
 	bits := t.bitLiterals[variable]
 	initial := t.watchedPosition[variable]
 	for ; uint64(t.watchedPosition[variable]) < uint64(len(bits)); t.watchedPosition[variable]++ {
+		if err := t.traceBVWatchedLiteral(bits[t.watchedPosition[variable]]); err != nil {
+			return err
+		}
 		value, err := t.state.Assignment(bits[t.watchedPosition[variable]])
 		if err != nil {
 			return err
 		}
 		if value == lbool.Undef {
+			if err = t.traceBVMovedWatch(variable, t.watchedPosition[variable], 339); err != nil {
+				return err
+			}
 			return nil
 		}
 	}
@@ -72,8 +79,14 @@ func (t *SMTBitVectorTheory) findWatchedPosition(variable SMTTheoryVar) error {
 			return err
 		}
 		if value == lbool.Undef {
+			if err = t.traceBVMovedWatch(variable, t.watchedPosition[variable], 346); err != nil {
+				return err
+			}
 			return nil
 		}
+	}
+	if err := t.traceBVFixedWatch(variable); err != nil {
+		return err
 	}
 	return t.fixedVariable(variable)
 }
