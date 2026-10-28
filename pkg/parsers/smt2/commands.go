@@ -500,6 +500,14 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		success = false
+	case "get-assignment":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.WriteAssignment(p.out); err != nil {
+			return false, err
+		}
+		success = false
 	case "get-objectives":
 		if err = p.requireEnd(); err != nil {
 			return false, err

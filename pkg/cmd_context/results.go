@@ -1,7 +1,7 @@
 package cmd_context
 
-// Source: src/cmd_context/basic_cmds.cpp get-value, get-proof and
-// get-unsat-core; cmd_context.cpp result availability checks.
+// Source: src/cmd_context/basic_cmds.cpp get-value, get-assignment, get-proof
+// and get-unsat-core; cmd_context.cpp result availability checks.
 // Original get-value term text follows smt2parser.cpp parse_get_value.
 
 import (
@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	usmt2 "github.com/glycerine/g3/pkg/util/smt2"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -67,6 +68,90 @@ func (c *Context) WriteAssertions(out io.Writer) error {
 		}
 	}
 	_, err := io.WriteString(out, ")\n")
+	return err
+}
+
+func (c *Context) WriteAssignment(out io.Writer) (result error) {
+	md, err := c.Model()
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, md.DecRef()) }()
+	evaluator, err := model.NewModelEvaluator(md, c.config.ModelEvaluator)
+	if evaluator != nil {
+		defer func() { result = errors.Join(result, evaluator.Close()) }()
+	}
+	if err != nil {
+		return err
+	}
+	if err = evaluator.SetModelCompletion(true); err != nil {
+		return err
+	}
+	boolSort, err := c.manager.MkBoolSort()
+	if err != nil {
+		return err
+	}
+	if _, err = io.WriteString(out, "("); err != nil {
+		return err
+	}
+	first := true
+	seen := make(map[string]bool)
+	for _, name := range c.macroTrail {
+		if seen[name] {
+			continue
+		}
+		seen[name] = true
+		for _, declaration := range c.macros[name] {
+			if len(declaration.domain) != 0 {
+				continue
+			}
+			sort, e := c.manager.GetSort(declaration.body)
+			if e != nil {
+				return e
+			}
+			if sort != boolSort {
+				continue
+			}
+			value, e := evaluator.EvaluateValue(declaration.body)
+			if e != nil {
+				return e
+			}
+			h, e := c.manager.RefGet(value)
+			if e == nil && (c.manager.IsTrue(h) || c.manager.IsFalse(h)) {
+				e = c.writeAssignmentPair(out, name, c.manager.IsTrue(h), &first)
+			}
+			e = errors.Join(e, c.manager.DelRef(&value))
+			if e != nil {
+				return e
+			}
+		}
+	}
+	_, err = io.WriteString(out, ")\n")
+	return err
+}
+
+func (c *Context) writeAssignmentPair(out io.Writer, name string, value bool, first *bool) error {
+	symbol, err := c.manager.Symbols.Intern(name)
+	if err != nil {
+		return err
+	}
+	quoted, err := usmt2.IsSMT2QuotedSymbol(c.manager.Symbols, symbol)
+	if err != nil {
+		return err
+	}
+	if quoted {
+		name, err = usmt2.MkSMT2QuotedSymbol(c.manager.Symbols, symbol, nil)
+		if err != nil {
+			return err
+		}
+	}
+	if !*first {
+		if _, err = io.WriteString(out, " "); err != nil {
+			return err
+		}
+	}
+	*first = false
+	_, err = fmt.Fprintf(out, "(%s %t)", name, value)
 	return err
 }
 
