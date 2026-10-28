@@ -264483,14 +264483,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "587cd7a2331b427ae3d45c7b3b84feaef87d1d0d",
+    "commit": "b9f135622e2b85df7baab9326ac683c25fce303f",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-27T23:55:43.144717+00:00",
-    "completed_utc": "2026-10-27T23:59:12.847429+00:00",
+    "started_utc": "2026-10-28T01:01:48.950120+00:00",
+    "completed_utc": "2026-10-28T01:04:52.756616+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-587cd7a2.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-587cd7a2.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-587cd7a2.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-b9f13562.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-b9f13562.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-b9f13562.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -264506,9 +264506,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 90,
     "packages_without_test_files": 5,
-    "lp_seconds": 2.883,
+    "lp_seconds": 2.593,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean frozen 587cd7a2331b427ae3d45c7b3b84feaef87d1d0d, unchanged at start/end/verification; all95 packages exactly once (90 tested,5 without tests), canonical prebuilt C++ comparisons, CPUs8-16/GOMAXPROCS4 and insdict v0.14.6. Includes earlier FD/SMT-LIB/API/interpolation work, BV2real/NLA2BV integration and assignment foundation, plus NLSAT interval unions/complement witnesses31256bd3, atom/sign-table foundation494d7954 and actual evaluator algorithms587cd7a2. Evaluator comparisons reject528 exact projected-set/value disagreements; earlier interval65 and sign-table116 C++ checks remain independent. NLSAT/vector focused checks pass four profiles,28 sampled projection stops and seven constructor positions recover, and eight current behavioral mutations are rejected. Default full run skips guarded LP cases (LP2.883s); no full LP -short or full tagged-suite claim. Actual NLSAT solver factories/caches, typed assumptions/clauses, explanation/search, goal/tactic integration and full diagnostic/lexical allocation audits remain required. Complete general SMT backend/strategic factory/API/optimization/Horn/interpolation service integration remains unproven. Root production/tests and dependency graph match this frozen snapshot at documentation-only recording; no source-unit/API status or audit promotion is made."
+    "scope_warning": "Independently verified clean b9f135622e2b85df7baab9326ac683c25fce303f, unchanged at start/end/verification; all95 packages exactly once (90 tested,5 without tests), canonical prebuilt C++ comparisons, CPUs8-16/GOMAXPROCS4 and insdict v0.14.6. Includes assumptions/clauses/reasons026ae961, public polynomial leading-sign normalization56b11533, LP slow-test guardsb8666731 and the actual inner canonical inequality factoryb9f13562. Factory and cleanup checks pass native,g3trace,g3debug and combined profiles;48 additional cubic C++ projected-set/value disagreement queries are unsat and six compiling algorithm/ownership mutations are rejected. Full native default run skips guarded LP cases (LP2.593s); no full LP -short or full tagged-suite claim. Actual outer Boolean registration, root factory, explanation/search, goal/tactic integration and complete diagnostic/lexical/physical audits remain required. Complete general SMT backend/CLI/API/optimization/Horn/interpolation service integration remains unproven. Command-line portcheck evidence audit separately rejects pre-existing file-path test entries; portcheck package tests pass. No source-unit/API status or audit promotion is made by this checkpoint."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
