@@ -1,9 +1,12 @@
+package smtcore
+
 // Source: theory_array_base model default partition, collect_selects,
 // propagate_selects and array_value_proc preparation.
-package smtcore
 
 import (
 	"fmt"
+	"io"
+
 	"github.com/glycerine/g3/pkg/ast"
 )
 
@@ -34,10 +37,10 @@ func (d *smtArrayModelData) find(variable int) int {
 	return root
 }
 
-func (d *smtArrayModelData) merge(first, second int) {
+func (t *SMTArrayTheory) mergeArrayModelData(d *smtArrayModelData, first, second int) error {
 	first, second = d.find(first), d.find(second)
 	if first == second {
-		return
+		return nil
 	}
 	if d.parents[first] > d.parents[second] {
 		first, second = second, first
@@ -47,6 +50,42 @@ func (d *smtArrayModelData) merge(first, second int) {
 	if d.defaults[first] == nil {
 		d.defaults[first] = d.defaults[second]
 	}
+	return t.emitArrayTrace("array", "mg_merge", 568, func() bool { return d.defaults[second] != nil }, func(out io.Writer) error {
+		if err := displayArrayTraceExpression(t.state.manager, out, d.defaults[second].root.owner); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(out, "\n"); err != nil {
+			return err
+		}
+		if err := displayArrayTraceExpression(t.state.manager, out, d.defaults[first].root.owner); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	})
+}
+
+func (t *SMTArrayTheory) setArrayModelDefault(d *smtArrayModelData, variable int, node *SMTEnode) error {
+	if node == nil {
+		return ast.ErrASTDomain
+	}
+	if err := t.emitArrayTrace("array", "set_default", 521, nil, func(out io.Writer) error {
+		if _, err := fmt.Fprintf(out, "set default: %d ", variable); err != nil {
+			return err
+		}
+		if err := displayArrayTraceExpression(t.state.manager, out, node.owner); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return err
+	}
+	root := d.find(variable)
+	if d.defaults[root] == nil {
+		d.defaults[root] = node
+	}
+	return nil
 }
 
 func (t *SMTArrayTheory) modelRepresentative(node *SMTEnode) (int, error) {
@@ -89,7 +128,9 @@ func (t *SMTArrayTheory) prepareArrayModel(generator *SMTModelGenerator) error {
 			if err != nil {
 				return err
 			}
-			d.merge(variable, representative)
+			if err = t.mergeArrayModelData(d, variable, representative); err != nil {
+				return err
+			}
 			op, array, err := t.arrayOperation(node.owner)
 			if err != nil {
 				return err
@@ -99,24 +140,40 @@ func (t *SMTArrayTheory) prepareArrayModel(generator *SMTModelGenerator) error {
 			}
 			switch op {
 			case ast.ASTArrayOpStore:
+				baseVariable := node.arguments[0].TheoryVar(t.FamilyID())
+				if baseVariable < 0 {
+					return ast.ErrASTDomain
+				}
 				base, err := t.modelRepresentative(node.arguments[0])
 				if err != nil {
 					return err
 				}
-				d.merge(variable, base)
+				if err = t.mergeArrayModelData(d, variable, base); err != nil {
+					return err
+				}
+				if err = t.emitArrayTrace("array", "collect_defaults", 646, nil, func(out io.Writer) error {
+					if _, err := io.WriteString(out, "merge: "); err != nil {
+						return err
+					}
+					if err := displayArrayTraceExpression(t.state.manager, out, node.owner); err != nil {
+						return err
+					}
+					_, err := fmt.Fprintf(out, " %d %d\n", variable, baseVariable)
+					return err
+				}); err != nil {
+					return err
+				}
 			case ast.ASTArrayOpConst:
-				root := d.find(variable)
-				if d.defaults[root] == nil {
-					d.defaults[root] = node.arguments[0]
+				if err = t.setArrayModelDefault(d, variable, node.arguments[0]); err != nil {
+					return err
 				}
 			case ast.ASTArrayOpDefault:
 				base := node.arguments[0].TheoryVar(t.FamilyID())
 				if base < 0 {
 					return ast.ErrASTDomain
 				}
-				root := d.find(int(base))
-				if d.defaults[root] == nil {
-					d.defaults[root] = node
+				if err = t.setArrayModelDefault(d, int(base), node); err != nil {
+					return err
 				}
 			}
 		}

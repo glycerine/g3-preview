@@ -150,12 +150,12 @@ func (t *SMTArrayTheory) assertStoreReadAxiomCore(read, store ast.ASTHandle) err
 			for _, index := range readNode.arguments[1:] {
 				args = append(args, index.owner)
 			}
-			selected, err := s.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, args)
+			selected, err := t.makeArraySelect(args)
 			if err != nil {
 				return err
 			}
 			args[0] = storeNode.arguments[0].owner
-			fallback, err := s.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, args)
+			fallback, err := t.makeArraySelect(args)
 			if err != nil {
 				return err
 			}
@@ -208,6 +208,30 @@ func (t *SMTArrayTheory) assertStoreReadAxiomCore(read, store ast.ASTHandle) err
 				return err
 			}
 			if err := antecedent.DisplayCompact(out, s.manager, s.boolExpr); err != nil {
+				return err
+			}
+			_, err := io.WriteString(out, "\n")
+			return err
+		}); err != nil {
+			return err
+		}
+		if err = t.emitArrayTrace("array_map_bug", "assert_store_axiom2_core", 185, nil, func(out io.Writer) error {
+			if _, err := io.WriteString(out, "axiom2:\n"); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, left.owner); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\n=\n"); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, right.owner); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\nimplies\n"); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, consequenceExpr); err != nil {
 				return err
 			}
 			_, err := io.WriteString(out, "\n")

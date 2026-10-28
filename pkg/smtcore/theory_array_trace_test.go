@@ -34,7 +34,7 @@ func TestSMTArrayStoreReadSourceTracesAndRefusal(t *testing.T) {
 				writer = smtArrayClosedTraceWriter{}
 			}
 			tags := diagnostic.NewTraceTagsWithWriter(writer)
-			for _, tag := range []string{"array", "array_axiom", "array_bug"} {
+			for _, tag := range []string{"array", "array_axiom", "array_bug", "array_map_bug", "mk_var_bug"} {
 				tags.Enable(tag)
 			}
 			manager := smtArrayTraceManager(t, tags)
@@ -65,6 +65,14 @@ func TestSMTArrayStoreReadSourceTracesAndRefusal(t *testing.T) {
 				t.Fatal("duplicate store/read fingerprint", added, err)
 			}
 			astTestMust(t, theory.Propagate())
+			function, err := manager.MkFuncDecl(astTestSymbol(t, manager, "array-trace-function"), []ast.ASTHandle{indexSort, indexSort}, boolean, ast.ASTFuncDeclInfo{})
+			astTestMust(t, err)
+			asArray, err := manager.MkAsArray(function)
+			astTestMust(t, err)
+			astTestMust(t, state.Internalize(asArray, false))
+			if !theory.unsupported {
+				t.Fatal("as-array did not retain the unsupported-operation marker")
+			}
 			if closed {
 				return
 			}
@@ -78,12 +86,16 @@ func TestSMTArrayStoreReadSourceTracesAndRefusal(t *testing.T) {
 			for _, want := range []string{
 				"[array] assert_store_axiom2 src/smt/theory_array_base.cpp:201",
 				"[array] assert_store_axiom2 src/smt/theory_array_base.cpp:205",
+				"[mk_var_bug] mk_select src/smt/theory_array_base.cpp:45",
 				"[array] assert_store_axiom1_core src/smt/theory_array_base.cpp:106",
+				"[mk_var_bug] assert_store_axiom1_core src/smt/theory_array_base.cpp:113",
 				"[array] assert_store_axiom2_core src/smt/theory_array_base.cpp:131",
 				"[array_bug] assert_store_axiom2_core src/smt/theory_array_base.cpp:162",
 				"[array] assert_store_axiom2_core src/smt/theory_array_base.cpp:174",
 				"[array] assert_store_axiom2_core src/smt/theory_array_base.cpp:184",
+				"[array_map_bug] assert_store_axiom2_core src/smt/theory_array_base.cpp:185",
 				"[array_axiom] assert_axiom src/smt/theory_array_base.cpp:70",
+				"[array] found_unsupported_op src/smt/theory_array_base.cpp:36",
 			} {
 				if !strings.Contains(trace, want) {
 					t.Fatalf("missing source array trace %q in %q", want, trace)
@@ -183,6 +195,54 @@ func TestSMTArrayExtensionalityAndSharedSourceTraces(t *testing.T) {
 	} {
 		if !strings.Contains(trace, want) {
 			t.Fatalf("missing source array trace %q in %q", want, trace)
+		}
+	}
+}
+
+func TestSMTArrayModelDefaultAndMergeSourceTraces(t *testing.T) {
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("array")
+	manager := smtArrayTraceManager(t, tags)
+	family, err := manager.RegisterArrayPlugin()
+	astTestMust(t, err)
+	context, _, state := smtInternalizerFixture(t, manager, nil)
+	theory, err := NewSMTArrayTheory(family)
+	astTestMust(t, err)
+	astTestMust(t, state.RegisterTheory(theory))
+	boolean, err := manager.MkBoolSort()
+	astTestMust(t, err)
+	arraySort, err := manager.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+	astTestMust(t, err)
+	value, err := manager.MkFalse()
+	astTestMust(t, err)
+	constant, err := manager.MkConstArray(arraySort, value)
+	astTestMust(t, err)
+	index, err := manager.MkTrue()
+	astTestMust(t, err)
+	store, err := manager.MkFamilyApp(family, ast.ASTArrayOpStore, nil, []ast.ASTHandle{constant, index, value})
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(store, false))
+	for _, expression := range []ast.ASTHandle{constant, store} {
+		astTestMust(t, state.markRelevant(expression))
+	}
+	generator := &SMTModelGenerator{manager: manager, context: context}
+	astTestMust(t, theory.prepareArrayModel(generator))
+	astTestMust(t, theory.FinalizeModel(generator))
+	if !tags.ShouldTrace("array") {
+		if output.Len() != 0 {
+			t.Fatal("compiled-out array model traces executed", output.String())
+		}
+		return
+	}
+	trace := output.String()
+	for _, want := range []string{
+		"[array] set_default src/smt/theory_array_base.cpp:521",
+		"[array] mg_merge src/smt/theory_array_base.cpp:568",
+		"[array] collect_defaults src/smt/theory_array_base.cpp:646",
+	} {
+		if !strings.Contains(trace, want) {
+			t.Fatalf("missing source array model trace %q in %q", want, trace)
 		}
 	}
 }

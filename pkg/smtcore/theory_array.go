@@ -122,7 +122,9 @@ func (t *SMTArrayTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool
 			return false, nil
 		}
 		if t.simple && op != ast.ASTArrayOpSelect && op != ast.ASTArrayOpStore {
-			t.unsupported = true
+			if err := t.foundUnsupportedArrayOperation(expression); err != nil {
+				return false, err
+			}
 			return false, nil
 		}
 		if op == ast.ASTArrayOpSelect || op == ast.ASTArrayOpDefault || op == ast.ASTArrayOpExt {
@@ -154,7 +156,9 @@ func (t *SMTArrayTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool
 			}
 			return true, nil
 		}
-		t.unsupported = true
+		if err := t.foundUnsupportedArrayOperation(expression); err != nil {
+			return false, err
+		}
 	}
 	return false, nil
 }
@@ -172,7 +176,9 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 		return false, nil
 	}
 	if t.simple && op != ast.ASTArrayOpStore && op != ast.ASTArrayOpSelect {
-		t.unsupported = true
+		if err = t.foundUnsupportedArrayOperation(expression); err != nil {
+			return false, err
+		}
 		return false, nil
 	}
 	count, err := state.manager.GetNumArgs(expression)
@@ -237,13 +243,17 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 			}
 		}
 	case ast.ASTArrayOpAsArray:
-		t.unsupported = true
+		if err = t.foundUnsupportedArrayOperation(expression); err != nil {
+			return false, err
+		}
 	case ast.ASTArrayOpDefault:
 		if err = t.assertDefaultAxiom(expression); err != nil {
 			return false, fmt.Errorf("array default axiom: %w", err)
 		}
 	default:
-		t.unsupported = true
+		if err = t.foundUnsupportedArrayOperation(expression); err != nil {
+			return false, err
+		}
 	}
 	return handled, nil
 }
@@ -274,7 +284,7 @@ func (t *SMTArrayTheory) assertStoreAxiomCore(store ast.ASTHandle) error {
 		}
 		arguments = append(arguments, argument)
 	}
-	selected, err := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, arguments)
+	selected, err := t.makeArraySelect(arguments)
 	if err != nil {
 		return err
 	}
@@ -300,6 +310,16 @@ func (t *SMTArrayTheory) assertStoreAxiomCore(store ast.ASTHandle) error {
 			}
 		}
 		return t.assertArrayAxiom([]SMTLiteral{literal})
+	}
+	if err = t.emitArrayTrace("mk_var_bug", "assert_store_axiom1_core", 113, nil, func(out io.Writer) error {
+		id, err := state.manager.GetASTID(selected)
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "mk_sel: %d\n", id)
+		return err
+	}); err != nil {
+		return err
 	}
 	if err = state.Internalize(selected, false); err != nil {
 		return err
@@ -460,11 +480,11 @@ func (t *SMTArrayTheory) assertExtensionalityCore(left, right ast.ASTHandle) err
 	if len(leftArguments) == 1 {
 		return ast.ErrASTDomain
 	}
-	leftSelect, err := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, leftArguments)
+	leftSelect, err := t.makeArraySelect(leftArguments)
 	if err != nil {
 		return err
 	}
-	rightSelect, err := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, rightArguments)
+	rightSelect, err := t.makeArraySelect(rightArguments)
 	if err != nil {
 		return err
 	}

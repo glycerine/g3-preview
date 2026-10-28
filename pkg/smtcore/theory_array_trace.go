@@ -59,6 +59,46 @@ func (t *SMTArrayTheory) traceArrayExpressions(tag, function string, line int, p
 	})
 }
 
+func (t *SMTArrayTheory) makeArraySelect(arguments []ast.ASTHandle) (ast.ASTHandle, error) {
+	state, err := t.State()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, arguments)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	err = t.emitArrayTrace("mk_var_bug", "mk_select", 45, nil, func(out io.Writer) error {
+		id, err := state.manager.GetASTID(result)
+		if err != nil {
+			return err
+		}
+		if _, err = fmt.Fprintf(out, "mk_select: %d num_args: %d", id, len(arguments)); err != nil {
+			return err
+		}
+		for _, argument := range arguments {
+			id, err = state.manager.GetASTID(argument)
+			if err != nil {
+				return err
+			}
+			if _, err = fmt.Fprintf(out, " %d", id); err != nil {
+				return err
+			}
+		}
+		_, err = io.WriteString(out, "\n")
+		return err
+	})
+	return result, err
+}
+
+func (t *SMTArrayTheory) foundUnsupportedArrayOperation(expression ast.ASTHandle) error {
+	if err := t.traceArrayExpressions("array", "found_unsupported_op", 36, "", expression); err != nil {
+		return err
+	}
+	t.unsupported = true
+	return nil
+}
+
 func (t *SMTArrayTheory) assertArrayAxiom(literals []SMTLiteral) error {
 	state, err := t.State()
 	if err != nil {

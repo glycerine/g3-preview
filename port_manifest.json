@@ -138890,7 +138890,7 @@
       "path": "src/smt/theory_array_base.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_model_cleanup_test.go",
@@ -139299,9 +139299,41 @@
           ]
         },
         {
-          "name": "remaining base array diagnostic/trace integration and model completion audit",
-          "status": "unported",
-          "tests": []
+          "name": "remaining retained base array TRACE sites: unsupported operations, select construction, non-proof store reads, map diagnostics, default partition assignment and union",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_model.go",
+            "pkg/smtcore/theory_array_read_queue.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayStoreReadSourceTracesAndRefusal",
+            "TestSMTArrayModelDefaultAndMergeSourceTraces"
+          ]
+        },
+        {
+          "name": "final base array SASSERT, ownership and retained-source completion audit: sort and operation shapes, scoped witness/fingerprint ownership, relevant model inputs and exact table dependency cardinality",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_model.go",
+            "pkg/smtcore/theory_array_read_queue.go",
+            "pkg/smtcore/theory_array_sorts.go",
+            "pkg/smtcore/theory_array_sorts_test.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArraySortDeclarationsOwnedAndScoped",
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+            "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+            "TestSMTArrayStoreReadSourceTracesAndRefusal",
+            "TestSMTArrayModelDefaultAndMergeSourceTraces"
+          ]
         },
         {
           "name": "assert_extensionality_core marks array equality and witness-read equality relevant before inserting the extensionality axiom",
@@ -139391,7 +139423,7 @@
       "path": "src/smt/theory_array_base.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_model_cleanup_test.go",
@@ -139633,9 +139665,41 @@
           ]
         },
         {
-          "name": "remaining base array diagnostic/trace integration and model completion audit",
-          "status": "unported",
-          "tests": []
+          "name": "remaining retained base array TRACE sites: unsupported operations, select construction, non-proof store reads, map diagnostics, default partition assignment and union",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_model.go",
+            "pkg/smtcore/theory_array_read_queue.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayStoreReadSourceTracesAndRefusal",
+            "TestSMTArrayModelDefaultAndMergeSourceTraces"
+          ]
+        },
+        {
+          "name": "final base array SASSERT, ownership and retained-source completion audit: sort and operation shapes, scoped witness/fingerprint ownership, relevant model inputs and exact table dependency cardinality",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_model.go",
+            "pkg/smtcore/theory_array_read_queue.go",
+            "pkg/smtcore/theory_array_sorts.go",
+            "pkg/smtcore/theory_array_sorts_test.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/smtcore/theory_array_read_queue_test.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArraySortDeclarationsOwnedAndScoped",
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
+            "TestSMTArrayStoreReadQueuesProofBranchesAndRelevance",
+            "TestSMTArrayReadQueueRechecksIndexRootsAndClearsPoppedWork",
+            "TestSMTArrayStoreReadSourceTracesAndRefusal",
+            "TestSMTArrayModelDefaultAndMergeSourceTraces"
+          ]
         },
         {
           "name": "retained base axiom construction and model-value interface; source scheduling and shared-array interface equalities are recorded separately",
