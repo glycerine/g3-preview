@@ -111894,7 +111894,7 @@
       "path": "src/smt/diff_logic.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/smt_utvpi_cycle.go",
@@ -112307,8 +112307,8 @@
           "text": "SASSERT(!m_heap.empty());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "UTVPI cumulative conflicts/assertions/core equality counters, arithmetic equality-adapter counts and infinitesimal-graph propagation costs through solver statistics collection",
@@ -112371,8 +112371,10 @@
           ]
         },
         {
-          "name": "General implied-bound discovery and its search-state machinery (src/smt/diff_logic.h:1356-1639)",
-          "status": "unported"
+          "name": "General implied-bound discovery and its search-state machinery (src/smt/diff_logic.h:1356-1639) have no retained production caller; the only call is the legacy src/test/diff_logic.cpp driver",
+          "status": "dead_deleted",
+          "go_targets": [],
+          "tests": []
         },
         {
           "name": "Graph propagation and relaxed-cycle counters through difference-theory and solver statistics collection (src/smt/diff_logic.h:123-144)",
@@ -267829,6 +267831,19 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_native_checkpoint": "17ecadb7"
+  },
+  "latest_diff_logic_header_whole_audit": {
+    "source_units": [
+      "src/smt/diff_logic.h"
+    ],
+    "scope": "Whole retained diff_logic.h audit: concrete rational and infinitesimal graphs implement owned edges and assignments, indexed repair, activation, scopes, negative-cycle traversal with shortcut pruning, direct and two-hop subsumption, lazy explanations, zero normalization and SCC/path support, graph display and source counters. Difference logic and UTVPI exercise the retained concrete instantiations through solver conflict, proof, model, display and statistics paths. The general find_relevant/find_subsumed search has no production caller; its only call is the legacy src/test/diff_logic.cpp driver, so no unused search-state adapter is added. Debug explanation/path checks are represented by focused cycle and path invariants. Go slices and concrete big.Rat values replace source vectors, heaps and numeral templates while preserving insertion order, timestamps, scope rollback and borrowed literal explanations. Full native pkg/smtcore and pkg/portcheck pass.",
+    "focused_tests": [
+      "go test ./pkg/smtcore",
+      "go test ./pkg/portcheck"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 2,
+    "full_suite_qualification": "The whole repository suite was not rerun for this source-header promotion; the complete smtcore package passed."
   },
   "latest_smt_context_pp_whole_audit": {
     "source_units": [
