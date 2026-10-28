@@ -42,6 +42,34 @@ func (c *Context) WriteValues(out io.Writer, expressions []ast.ASTHandle) (resul
 	return c.WriteValuesWithText(out, expressions, nil)
 }
 
+func (c *Context) WriteAssertions(out io.Writer) error {
+	if err := c.valid(); err != nil {
+		return err
+	}
+	if !c.InteractiveMode {
+		return fmt.Errorf("command is only available in interactive mode, use command (set-option :interactive-mode true)")
+	}
+	if _, err := io.WriteString(out, "("); err != nil {
+		return err
+	}
+	for i := range c.assertions {
+		if i > 0 {
+			if _, err := io.WriteString(out, "\n "); err != nil {
+				return err
+			}
+		}
+		if c.assertions[i].displayText != "" {
+			if _, err := io.WriteString(out, c.assertions[i].displayText); err != nil {
+				return err
+			}
+		} else if err := c.WriteExpression(out, c.assertions[i].expression); err != nil {
+			return err
+		}
+	}
+	_, err := io.WriteString(out, ")\n")
+	return err
+}
+
 // WriteValuesWithText evaluates parsed expressions while echoing their original
 // SMT-LIB terms. A nil text slice uses the ordinary AST expression printer.
 func (c *Context) WriteValuesWithText(out io.Writer, expressions []ast.ASTHandle, text []string) (result error) {

@@ -40826,7 +40826,9 @@
         "pkg/smtcore/smt_kernel.go",
         "pkg/smtcore/smt_setup_lra_backend_test.go",
         "pkg/cmd_context/statistics_test.go",
-        "pkg/cmd/g3/lra_backend_test.go"
+        "pkg/cmd/g3/lra_backend_test.go",
+        "pkg/parsers/smt2/assertions_test.go",
+        "pkg/cmd/g3/test_vectors/get_assertions.smt2"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -40859,7 +40861,9 @@
         "TestSMTLibRunnerConcreteLRASmoke",
         "TestSMTLibRunnerConcreteLRAIsIntNormalization",
         "TestSMTLibRunnerConcreteLRAScriptsMatchCPP",
-        "TestSMTLibRunnerConcreteLRADefaultSelection"
+        "TestSMTLibRunnerConcreteLRADefaultSelection",
+        "TestSMT2GetAssertionsPreservesSourceTextAndScopes",
+        "TestSMT2GetAssertionsRequiresInteractiveMode"
       ],
       "conditionals": [
         {
@@ -40912,6 +40916,13 @@
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
           ]
+        },
+        {
+          "name": "interactive-mode/produce-assertions option and get-assertions source-text display with scoped rollback (basic_cmds.cpp:273,307-351,413-416)",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/results.go",
+          "go_targets": ["pkg/cmd_context/context.go", "pkg/parsers/smt2/commands.go", "pkg/parsers/smt2/assertions_test.go", "pkg/cmd/g3/test_vectors/get_assertions.smt2"],
+          "tests": ["TestSMT2GetAssertionsPreservesSourceTextAndScopes", "TestSMT2GetAssertionsRequiresInteractiveMode", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         },
         {
           "name": "remaining basic commands and non-Boolean option values, metadata state queries and validation, model completion policy and remaining output modes",

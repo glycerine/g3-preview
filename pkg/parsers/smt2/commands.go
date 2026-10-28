@@ -358,14 +358,14 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 	case "assert":
-		expression, named, err := p.expression()
+		expression, named, displayText, err := p.assertionExpression()
 		if err != nil {
 			return false, err
 		}
 		if err = p.requireEnd(); err != nil {
 			return false, err
 		}
-		if err = p.context.Assert(expression, named); err != nil {
+		if err = p.context.AssertWithText(expression, named, displayText); err != nil {
 			return false, err
 		}
 	case "assert-soft":
@@ -536,6 +536,14 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		success = false
+	case "get-assertions":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.WriteAssertions(p.out); err != nil {
+			return false, err
+		}
+		success = false
 	case "echo":
 		if p.token != StringToken {
 			return false, fmt.Errorf("string expected")
@@ -644,6 +652,31 @@ func (p *commandParser) expressions() ([]ast.ASTHandle, error) {
 		values = append(values, value)
 	}
 	return values, p.advance()
+}
+
+func (p *commandParser) assertionExpression() (ast.ASTHandle, string, string, error) {
+	if !p.context.InteractiveMode {
+		expression, name, err := p.expression()
+		return expression, name, "", err
+	}
+	compound := p.token == LeftParenToken
+	p.scanner.StartCaching()
+	defer func() {
+		p.scanner.StopCaching()
+		p.scanner.ResetCache()
+	}()
+	expression, name, err := p.expression()
+	if err != nil {
+		return ast.ASTHandle{}, "", "", err
+	}
+	text, err := p.scanner.CachedString(0, p.cacheEnd)
+	if err != nil {
+		return ast.ASTHandle{}, "", "", err
+	}
+	if compound {
+		text = "(" + text
+	}
+	return expression, name, text, nil
 }
 
 // Source parse_get_value caches each original term before expanding

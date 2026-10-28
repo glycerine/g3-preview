@@ -31,6 +31,7 @@ type declaration struct {
 type assertion struct {
 	expression, tag ast.ASTHandle
 	ref, tagRef     ast.ASTRef
+	displayText     string
 }
 type optimizationObjective struct {
 	expression ast.ASTHandle
@@ -92,6 +93,7 @@ type Context struct {
 	optimizationParetoBackend        *smtcore.SMTSolver
 	scopes                           []scope
 	PrintSuccess, GlobalDeclarations bool
+	InteractiveMode                  bool
 	checked                          bool
 	status                           lbool.LBool
 	watch                            stopwatch.Stopwatch
@@ -222,6 +224,12 @@ func (c *Context) SetBoolOption(name string, value bool) error {
 	switch name {
 	case "print_success":
 		c.PrintSuccess = value
+		return nil
+	case "interactive_mode", "produce_assertions":
+		if c.manager != nil {
+			return fmt.Errorf("option value cannot be modified after initialization")
+		}
+		c.InteractiveMode = value
 		return nil
 	case "global_declarations", "global_decls":
 		if c.manager != nil {
@@ -546,6 +554,10 @@ func (c *Context) DeclareFunction(name string, domain []ast.ASTHandle, rangeSort
 }
 
 func (c *Context) Assert(formula ast.ASTHandle, name string) (result error) {
+	return c.AssertWithText(formula, name, "")
+}
+
+func (c *Context) AssertWithText(formula ast.ASTHandle, name, displayText string) (result error) {
 	m, err := c.Manager()
 	if err != nil {
 		return err
@@ -561,7 +573,7 @@ func (c *Context) Assert(formula ast.ASTHandle, name string) (result error) {
 	if err != nil {
 		return err
 	}
-	row := assertion{expression: formula, ref: ref}
+	row := assertion{expression: formula, ref: ref, displayText: displayText}
 	state, err := c.parameters.State()
 	if err == nil && name != "" && state.UnsatCore {
 		symbol, e := m.Symbols.Intern(name)
