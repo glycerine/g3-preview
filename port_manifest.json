@@ -82777,7 +82777,9 @@
         "pkg/muz/pdr/predicate_rules_test.go",
         "pkg/muz/pdr/context.go",
         "pkg/muz/pdr/context_test.go",
-        "pkg/muz/pdr/context_bounded.go"
+        "pkg/muz/pdr/context_bounded.go",
+        "pkg/muz/pdr/model_search.go",
+        "pkg/muz/pdr/model_search_test.go"
       ],
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
@@ -82785,7 +82787,9 @@
         "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
         "TestPredicateTransformerCouplesPredecessorFramesByRuleTag",
         "TestContextInitializesHornProgramAndAnswersInitialQueries",
-        "TestContextBoundedQueryTraversesTaggedHornChain"
+        "TestContextBoundedQueryTraversesTaggedHornChain",
+        "TestModelSearchFrontierOrderingClosureAndOwnership",
+        "TestModelNodeRejectsInvalidParentLevel"
       ],
       "assertions": [
         {
@@ -82999,14 +83003,24 @@
           ]
         },
         {
-          "name": "cover/model conversion, model-node/search, generalization and top-level PDR solve loop",
+          "name": "model_node ownership/closure and model_search frontier, cache, duplicate, reset, validation and level-backtracking operations (pdr_context.cpp:750-779,875-1128,1435-1454)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/model_search.go",
+          "tests": [
+            "TestModelSearchFrontierOrderingClosureAndOwnership",
+            "TestModelNodeRejectsInvalidParentLevel"
+          ]
+        },
+        {
+          "name": "cover/model conversion, rule/model trace reconstruction, generalization and top-level PDR solve loop",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "PredicateTransformer owns its head/system/property AST references, PropSolver, and ReachableCache. It closes both context consumers before releasing AST pins; returned signatures, formulas, and cores borrow AST handles while requested models retain explicit ownership."
+        "PredicateTransformer owns its head/system/property AST references, PropSolver, and ReachableCache. It closes both context consumers before releasing AST pins; returned signatures, formulas, and cores borrow AST handles while requested models retain explicit ownership.",
+        "ModelSearch owns its root and complete descendant tree. ModelNode owns one state AST reference plus optional retained model and rule references; reset releases descendants bottom-up after removing frontier/cache links."
       ],
       "deviations": [
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
@@ -83025,7 +83039,9 @@
         "pkg/muz/pdr/predicate_rules_test.go",
         "pkg/muz/pdr/context.go",
         "pkg/muz/pdr/context_test.go",
-        "pkg/muz/pdr/context_bounded.go"
+        "pkg/muz/pdr/context_bounded.go",
+        "pkg/muz/pdr/model_search.go",
+        "pkg/muz/pdr/model_search_test.go"
       ],
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
@@ -83033,7 +83049,9 @@
         "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
         "TestPredicateTransformerCouplesPredecessorFramesByRuleTag",
         "TestContextInitializesHornProgramAndAnswersInitialQueries",
-        "TestContextBoundedQueryTraversesTaggedHornChain"
+        "TestContextBoundedQueryTraversesTaggedHornChain",
+        "TestModelSearchFrontierOrderingClosureAndOwnership",
+        "TestModelNodeRejectsInvalidParentLevel"
       ],
       "conditionals": [
         {
@@ -83092,14 +83110,24 @@
           ]
         },
         {
-          "name": "remaining pred_transformer rule/search surface plus model_node, model_search, core_generalizer and context",
+          "name": "retained model_node and model_search ownership, frontier, cache, closure and backtracking surface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/model_search.go",
+          "tests": [
+            "TestModelSearchFrontierOrderingClosureAndOwnership",
+            "TestModelNodeRejectsInvalidParentLevel"
+          ]
+        },
+        {
+          "name": "remaining pred_transformer cover/model surface plus model trace/proof reconstruction, core_generalizer and unbounded context solve loop",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "PredicateTransformer is the concrete Go owner for its proposition solver, reachable cache, and retained AST state."
+        "PredicateTransformer is the concrete Go owner for its proposition solver, reachable cache, and retained AST state.",
+        "ModelSearch owns the ModelNode tree; nodes own their state, optional model and optional rule references."
       ],
       "deviations": [
         "The Go frame API uses explicit methods and returned result values rather than C++ reference outputs and scoped mutable solver settings.",
