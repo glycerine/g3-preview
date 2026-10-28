@@ -137,6 +137,7 @@ type SMTLinearArithmeticTheory struct {
 	propagateEqualities                  bool
 	propagationThreshold                 uint32
 	boundPropagation                     uint32
+	skipRowsWithBigCoefficients          bool
 	maxLemmaSize, smallLemmaSize         uint32
 	pivotStrategy, blandThreshold        uint32
 	conflictCount                        uint32
@@ -229,34 +230,35 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 		return nil, err
 	}
 	t := &SMTLinearArithmeticTheory{
-		propagateEqualities:   true,
-		propagationThreshold:  ^uint32(0),
-		boundPropagation:      2,
-		maxLemmaSize:          128,
-		smallLemmaSize:        16,
-		blandThreshold:        1000,
-		strongerLemmas:        true,
-		branchCutRatio:        2,
-		gcdEnabled:            true,
-		liberalFinalCheck:     true,
-		SMTTheoryBase:         base,
-		solver:                simplex.NewSolver(nil),
-		atomByBool:            make(map[int32]int),
-		definitions:           make(map[SMTTheoryVar]smtLinearForm),
-		nextSimplex:           1,
-		replayedNextSimplex:   1,
-		integer:               integer,
-		integerColumns:        make(map[uint32]bool),
-		castTerms:             make(map[ast.ASTHandle]bool),
-		castPredicates:        make(map[int32]bool),
-		divisionTerms:         make(map[ast.ASTHandle]bool),
-		nonlinearFactors:      make(map[uint32][]uint32),
-		nonlinearEnabled:      true,
-		nonlinearGB:           true,
-		nonlinearGBPerturbate: true,
-		nonlinearGBLimit:      512,
-		nonlinearBranching:    true,
-		nonlinearRoundLimit:   1024,
+		propagateEqualities:         true,
+		propagationThreshold:        ^uint32(0),
+		boundPropagation:            2,
+		skipRowsWithBigCoefficients: true,
+		maxLemmaSize:                128,
+		smallLemmaSize:              16,
+		blandThreshold:              1000,
+		strongerLemmas:              true,
+		branchCutRatio:              2,
+		gcdEnabled:                  true,
+		liberalFinalCheck:           true,
+		SMTTheoryBase:               base,
+		solver:                      simplex.NewSolver(nil),
+		atomByBool:                  make(map[int32]int),
+		definitions:                 make(map[SMTTheoryVar]smtLinearForm),
+		nextSimplex:                 1,
+		replayedNextSimplex:         1,
+		integer:                     integer,
+		integerColumns:              make(map[uint32]bool),
+		castTerms:                   make(map[ast.ASTHandle]bool),
+		castPredicates:              make(map[int32]bool),
+		divisionTerms:               make(map[ast.ASTHandle]bool),
+		nonlinearFactors:            make(map[uint32][]uint32),
+		nonlinearEnabled:            true,
+		nonlinearGB:                 true,
+		nonlinearGBPerturbate:       true,
+		nonlinearGBLimit:            512,
+		nonlinearBranching:          true,
+		nonlinearRoundLimit:         1024,
 	}
 	t.equalityAdapter, err = newSMTArithmeticEqualityAdapter(base)
 	if err != nil {
@@ -274,6 +276,7 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 	t.propagateEqualities = config.PropagateEqs
 	t.propagationThreshold = config.PropagationThreshold
 	t.boundPropagation = config.BoundProp
+	t.skipRowsWithBigCoefficients = config.SkipRowsWithBigCoeffs
 	t.maxLemmaSize, t.smallLemmaSize = config.MaxLemmaSize, config.SmallLemmaSize
 	t.pivotStrategy, t.blandThreshold = config.PivotStrategy, config.BlandsRuleThreshold
 	t.solver.SetArithmeticPivotPolicy(t.pivotStrategy, t.blandThreshold)

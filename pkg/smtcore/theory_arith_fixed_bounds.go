@@ -201,6 +201,9 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex
 		if uint64(len(entries)) >= uint64(maxLemmaSize) {
 			continue
 		}
+		if t.skipRowsWithBigCoefficients && smtArithmeticRowHasBigCoefficient(entries) {
+			continue
+		}
 		for _, target := range entries {
 			for _, lower := range []bool{true, false} {
 				var bound simplex.Infinitesimal
@@ -375,6 +378,9 @@ func (t *SMTLinearArithmeticTheory) impliedArithmeticRowEndpoint(solver *simplex
 		if uint64(len(entries)) >= uint64(maxLemmaSize) {
 			continue
 		}
+		if t.skipRowsWithBigCoefficients && smtArithmeticRowHasBigCoefficient(entries) {
+			continue
+		}
 		for _, target := range entries {
 			if target.Variable != column {
 				continue
@@ -415,6 +421,23 @@ func (t *SMTLinearArithmeticTheory) impliedArithmeticRowEndpoint(solver *simplex
 		}
 	}
 	return best, explanation, found, nil
+}
+
+// Source rational::is_big is true when either normalized mpq component no
+// longer fits the inline signed-int representation used by mpz.
+func smtArithmeticRowHasBigCoefficient(entries []simplex.RowEntry) bool {
+	const minSmall, maxSmall = int64(-(1<<31 - 1)), int64(1<<31 - 1)
+	for _, entry := range entries {
+		numerator, denominator := entry.Coefficient.Num(), entry.Coefficient.Denom()
+		if !numerator.IsInt64() || !denominator.IsInt64() {
+			return true
+		}
+		n, d := numerator.Int64(), denominator.Int64()
+		if n < minSmall || n > maxSmall || d > maxSmall {
+			return true
+		}
+	}
+	return false
 }
 
 type smtArithmeticAssignedBoundCandidate struct {

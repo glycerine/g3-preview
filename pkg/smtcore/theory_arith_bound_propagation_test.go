@@ -202,3 +202,76 @@ func TestSMTArithmeticRowExplanationRelaxesStrongBounds(t *testing.T) {
 		}
 	}
 }
+
+func TestSMTArithmeticRowPropagationConfigurationGates(t *testing.T) {
+	tests := []struct {
+		name      string
+		boundProp uint32
+		threshold uint32
+		skipBig   bool
+		want      lbool.LBool
+	}{
+		{"enabled", 2, ^uint32(0), false, lbool.True},
+		{"mode-none", 0, ^uint32(0), false, lbool.Undef},
+		{"conflict-threshold", 2, 0, false, lbool.Undef},
+		{"skip-big-coefficients", 2, ^uint32(0), true, lbool.Undef},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			m := astTestManager(t)
+			family, err := m.RegisterArithmeticPlugin()
+			astTestMust(t, err)
+			_, _, state := smtInternalizerFixture(t, m, nil)
+			theory, err := NewSMTLinearArithmeticTheory(family)
+			astTestMust(t, err)
+			astTestMust(t, theory.ConfigureArithmetic(SMTArithState{
+				BoundProp: test.boundProp, PropagationThreshold: test.threshold,
+				SkipRowsWithBigCoeffs: test.skipBig, MaxLemmaSize: 128,
+				PropagateEqs: true, BlandsRuleThreshold: 1000,
+			}))
+			astTestMust(t, state.RegisterTheory(theory))
+			sort, err := m.MkFamilySort(family, 0, nil)
+			astTestMust(t, err)
+			variable := func(name string) ast.ASTHandle {
+				h, makeErr := m.MkConst(astTestSymbol(t, m, name), sort)
+				astTestMust(t, makeErr)
+				return h
+			}
+			number := func(text string) ast.ASTHandle {
+				h, makeErr := m.ArithmeticRealNumeralText(text)
+				astTestMust(t, makeErr)
+				return h
+			}
+			app := func(op int32, arguments ...ast.ASTHandle) ast.ASTHandle {
+				h, makeErr := m.MkFamilyApp(family, op, nil, arguments)
+				astTestMust(t, makeErr)
+				return h
+			}
+			x, y := variable("gate-x"), variable("gate-y")
+			premises := []ast.ASTHandle{
+				app(smtArithOpGE, x, number("1")),
+				app(smtArithOpGE, y, number("2")),
+			}
+			largeX := app(smtArithOpMul, number("2147483648"), x)
+			target := app(smtArithOpGE, app(smtArithOpAdd, largeX, y), number("2147483650"))
+			for _, expression := range append(append([]ast.ASTHandle{}, premises...), target) {
+				astTestMust(t, state.Internalize(expression, true))
+			}
+			astTestMust(t, theory.Propagate())
+			for _, expression := range premises {
+				literal, literalErr := state.Literal(expression)
+				astTestMust(t, literalErr)
+				astTestMust(t, state.AssignLiteral(literal, NewSMTBooleanAxiom()))
+			}
+			astTestMust(t, state.PropagateTheoryAssignments())
+			astTestMust(t, theory.Propagate())
+			targetLiteral, err := state.Literal(target)
+			astTestMust(t, err)
+			assignment, err := state.Assignment(targetLiteral)
+			astTestMust(t, err)
+			if assignment != test.want {
+				t.Fatal("row propagation gate", assignment, test.want)
+			}
+		})
+	}
+}
