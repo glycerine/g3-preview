@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	muzfp "github.com/glycerine/g3/pkg/muz/fp"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func (c *Context) fixedpointContext() (*muzfp.PropositionalEngine, error) {
@@ -133,4 +134,24 @@ func (c *Context) FixedpointAnswer(declaration ast.ASTHandle) (ast.ASTRef, error
 		return ast.ASTRef{}, err
 	}
 	return engine.Answer(declaration)
+}
+
+func (c *Context) FixedpointStatistics() (statistics.Statistics, error) {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return statistics.Statistics{}, err
+	}
+	var result statistics.Statistics
+	if err = engine.CollectStatistics(&result); err != nil {
+		return statistics.Statistics{}, err
+	}
+	return result, nil
+}
+
+func (c *Context) ResetFixedpointStatistics() error {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return err
+	}
+	return engine.ResetStatistics()
 }

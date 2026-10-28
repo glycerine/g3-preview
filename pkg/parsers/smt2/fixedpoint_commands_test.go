@@ -287,7 +287,7 @@ func TestSMT2FixedpointEmptyProgramQueryMatchesCPP(t *testing.T) {
 }
 
 func TestSMT2FixedpointQueryRefusesUnavailableOutputParameters(t *testing.T) {
-	for _, parameter := range []string{":print-statistics true", ":print-certificate true"} {
+	for _, parameter := range []string{":print-certificate true"} {
 		t.Run(parameter, func(t *testing.T) {
 			context, err := cmd_context.NewStandaloneContext()
 			if err != nil {
@@ -304,6 +304,40 @@ func TestSMT2FixedpointQueryRefusesUnavailableOutputParameters(t *testing.T) {
 				t.Fatal("unavailable query output accepted", err)
 			}
 		})
+	}
+}
+
+func TestSMT2FixedpointPDRStatistics(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	context.PrintSuccess = false
+	script := `(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(declare-rel Q (Int))
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (P x) (Q x)))
+(query Q :print-answer false :print-statistics true)
+`
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	text := output.String()
+	for _, expected := range []string{"sat\n(", ":PDR-num-unfoldings", ":PDR-max-depth", ":time"} {
+		if !strings.Contains(text, expected) {
+			t.Fatal("missing PDR statistic", expected, text)
+		}
+	}
+	if cpp := fixedpointReference(t, script); !strings.Contains(cpp, "\nsat\n") || !strings.Contains(cpp, ":time") {
+		t.Fatal("C++ PDR statistics result", cpp)
 	}
 }
 

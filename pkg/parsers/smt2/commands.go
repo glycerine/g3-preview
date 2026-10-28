@@ -9,6 +9,7 @@ import (
 	"io"
 	"math/big"
 	"strings"
+	"time"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
@@ -614,7 +615,7 @@ func (p *commandParser) command() (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		printAnswer := false
+		printAnswer, printStatistics := false, false
 		for p.token != RightParenToken {
 			if p.token != KeywordToken {
 				return false, fmt.Errorf("fixedpoint query parameter expected")
@@ -633,7 +634,9 @@ func (p *commandParser) command() (bool, error) {
 			switch key {
 			case ":print-answer":
 				printAnswer = value
-			case ":print-statistics", ":print-certificate":
+			case ":print-statistics":
+				printStatistics = value
+			case ":print-certificate":
 				if value {
 					return false, fmt.Errorf("unsupported fixedpoint query parameter %s", key)
 				}
@@ -645,6 +648,7 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		if !p.ignoreChecks {
+			started := time.Now()
 			status, x := p.context.QueryFixedpoint(declaration)
 			if x != nil {
 				return false, x
@@ -675,6 +679,16 @@ func (p *commandParser) command() (bool, error) {
 					_, y = fmt.Fprintln(p.out)
 				}
 				if y = errors.Join(y, manager.DelRef(&answer)); y != nil {
+					return false, y
+				}
+			}
+			if printStatistics {
+				stats, y := p.context.FixedpointStatistics()
+				if y != nil {
+					return false, y
+				}
+				stats.UpdateDouble("time", time.Since(started).Seconds())
+				if y = stats.DisplaySMT2(p.out); y != nil {
 					return false, y
 				}
 			}

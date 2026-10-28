@@ -17,6 +17,7 @@ import (
 	"github.com/glycerine/g3/pkg/muz/transforms"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 var (
@@ -1022,6 +1023,29 @@ func (e *PropositionalEngine) LastQueryUsedCompiledCode() (bool, error) {
 		return false, err
 	}
 	return e.compiled, nil
+}
+
+func (e *PropositionalEngine) CollectStatistics(destination *statistics.Statistics) error {
+	if err := e.open(); err != nil {
+		return err
+	}
+	if destination == nil {
+		return ErrPropositionalEngine
+	}
+	if e.pdr != nil {
+		return e.pdr.CollectStatistics(destination)
+	}
+	return nil
+}
+
+func (e *PropositionalEngine) ResetStatistics() error {
+	if err := e.open(); err != nil {
+		return err
+	}
+	if e.pdr != nil {
+		return e.pdr.ResetStatistics()
+	}
+	return nil
 }
 
 // QueryPredicate returns true exactly when the registered predicate relation

@@ -15,6 +15,7 @@ import (
 	_ "github.com/glycerine/g3/pkg/engine"
 	"github.com/glycerine/g3/pkg/muz/fp"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func fpMust(t *testing.T, err error) {
@@ -157,6 +158,12 @@ func TestPDREngineMatchesCPPIntegerHornQueries(t *testing.T) {
 	fpMust(t, engine.AddRule(step, "integer-step"))
 	gotReachable, err := engine.QueryPredicate(declarations["Q"])
 	fpMust(t, err)
+	stats := statistics.New()
+	fpMust(t, engine.CollectStatistics(stats))
+	if stats.Size() == 0 {
+		t.Fatal("PDR engine exposed no statistics after reachable query")
+	}
+	fpMust(t, engine.ResetStatistics())
 	gotUnreachable, err := engine.QueryPredicate(declarations["U"])
 	fpMust(t, err)
 	if gotReachable != lbool.True || gotUnreachable != lbool.False {

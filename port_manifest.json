@@ -83188,6 +83188,7 @@
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
         "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
+        "TestSMT2FixedpointPDRStatistics",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
       ],
@@ -83214,6 +83215,15 @@
             "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
+          ]
+        },
+        {
+          "name": "statistics collection and reset forwarding (pdr_dl_interface.cpp:195-202)",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": [
+            "TestPDREngineMatchesCPPIntegerHornQueries",
+            "TestSMT2FixedpointPDRStatistics"
           ]
         },
         {
@@ -83245,6 +83255,7 @@
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
         "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
+        "TestSMT2FixedpointPDRStatistics",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
       ],
@@ -83274,7 +83285,16 @@
           ]
         },
         {
-          "name": "cover, statistics reset/collection, certificate, answer, model, proof and parameter-update surface",
+          "name": "statistics reset/collection surface",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": [
+            "TestPDREngineMatchesCPPIntegerHornQueries",
+            "TestSMT2FixedpointPDRStatistics"
+          ]
+        },
+        {
+          "name": "cover, certificate, answer, model, proof and parameter-update surface",
           "status": "unported",
           "go_target": null,
           "tests": []
