@@ -144343,7 +144343,7 @@
       "path": "src/smt/theory_diff_logic_def.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_setup_basic_arithmetic.go",
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
@@ -144543,12 +144543,12 @@
           "text": "SASSERT(is_sat != l_false);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Basic setup_arith modes 0/1/2/3 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex or dense matrix; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
-          "status": "partial",
+          "name": "Basic setup_arith modes 0/1/2/3/4/5 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex, dense matrix, UTVPI or infinite arithmetic; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup_basic_arithmetic.go",
           "go_targets": [
             "pkg/smtcore/theory_diff_logic_real.go",
@@ -144607,8 +144607,10 @@
           ]
         },
         {
-          "name": "Adaptive and implied-bound propagation, cheap equality propagation, explained core equality/disequality reflection and reset (remaining src/smt/theory_diff_logic_def.h)",
-          "status": "unported"
+          "name": "Unreached adaptive scheduling, declaration-only cheap-equality state, explained three-argument core equality/disequality overloads, equality/implied-bound antecedent helpers and reusable reset: adaptive is constructor-fixed false with no writer; production smt_context invokes only the ported two-argument equality adapter callbacks; the antecedent helpers have no caller; cheap-equality members are never read; Go solver teardown replaces reusable reset",
+          "status": "dead_deleted",
+          "go_targets": [],
+          "tests": []
         },
         {
           "name": "Difference-logic shortened-cycle conflict publication with native extended justification and Farkas plus antecedent/result unit coefficients; source-region conflict parameter ownership through failed construction, scope pop and existing UTVPI publication",
@@ -267831,6 +267833,20 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_native_checkpoint": "17ecadb7"
+  },
+  "latest_theory_diff_logic_definitions_whole_audit": {
+    "source_units": [
+      "src/smt/theory_diff_logic_def.h"
+    ],
+    "scope": "Whole retained theory_diff_logic_def.h audit: concrete integer and real/mixed theories cover atom and term internalization, paired bounds, equality adaptation, assignment queues, graph propagation and conflicts, scopes, final checks, finite models, display, statistics and the live arbitrary-precision optimization bridge. Setup modes 0 through 5 select retained concrete arithmetic owners. Production smt_context calls only the two-argument equality/disequality callbacks implemented by the arithmetic equality adapter; the three-argument explained overloads and both antecedent helpers have no caller. Adaptive scheduling is constructor-fixed false with no writer. Cheap-equality fields are declaration-only, and Go solver teardown replaces reusable reset. No dead callback adapter or unused fixed-width specialization is added. Full native pkg/smtcore, pkg/portcheck and the retained C++-differential runner groups pass on the represented behavior.",
+    "focused_tests": [
+      "go test ./pkg/smtcore",
+      "go test ./pkg/portcheck",
+      "go test ./pkg/cmd/g3 -run TestSMTLibRunner(Scripts|CPPReference)$"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 2,
+    "full_suite_qualification": "The whole repository suite was not rerun for this source-header promotion; the complete smtcore package and retained end-to-end runner groups passed."
   },
   "latest_diff_logic_header_whole_audit": {
     "source_units": [
