@@ -41,6 +41,8 @@ type optimizationObjective struct {
 	id         string
 	maximize   bool
 	soft       bool
+	bitVector  bool
+	bitWidth   uint32
 	valueReady bool
 }
 type optimizationSoftTerm struct {

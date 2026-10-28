@@ -155,3 +155,52 @@ func TestSMT2WeightedSoftOptimizationEndToEnd(t *testing.T) {
 		})
 	}
 }
+
+func TestSMT2BitVectorOptimizationEndToEnd(t *testing.T) {
+	tests := []struct {
+		name, script, want string
+	}{
+		{
+			"maximize",
+			`(set-option :produce-models true)(set-logic QF_BV)
+(declare-const x (_ BitVec 4))(assert (bvule x #x9))
+(maximize x)(check-sat)(get-objectives)(get-value (x))`,
+			"sat (objectives (x 9) ) ((x #x9))",
+		},
+		{
+			"minimize",
+			`(set-option :produce-models true)(set-logic QF_BV)
+(declare-const x (_ BitVec 4))(assert (bvuge x #x3))
+(minimize x)(check-sat)(get-objectives)(get-value (x))`,
+			"sat (objectives (x 3) ) ((x #x3))",
+		},
+		{
+			"lexicographic",
+			`(set-option :produce-models true)(set-logic QF_BV)
+(declare-const x (_ BitVec 4))(declare-const y (_ BitVec 4))
+(assert (= (bvadd x y) #x7))(maximize x)(minimize y)
+(check-sat)(get-objectives)(get-value (x y))`,
+			"sat (objectives (x 15) (y 8) ) ((x #xf) (y #x8))",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				if err := context.Close(); err != nil {
+					t.Error(err)
+				}
+			})
+			var output bytes.Buffer
+			if err = ParseCommands(context, strings.NewReader(tc.script), &output); err != nil {
+				t.Fatal(err, output.String())
+			}
+			if got := strings.Join(strings.Fields(output.String()), " "); got != tc.want {
+				t.Fatal("bit-vector optimization output", got, "want", tc.want)
+			}
+		})
+	}
+}

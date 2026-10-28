@@ -820,6 +820,7 @@ var scriptResults = map[string]string{
 	"linear_real.smt2":                             "sat\n((x (/ 3.0 2.0)))\n",
 	"lexicographic_integer_optimization.smt2":      "sat\n(objectives\n (x 3)\n (y 2)\n)\n((x 3)\n (y 2))\nsat\n(objectives\n (x 0)\n (y 5)\n)\n((x 0)\n (y 5))\n",
 	"bit_vector.smt2":                              "sat\n((x #xf))\n",
+	"bit_vector_optimization.smt2":                 "sat\n(objectives\n (x 9)\n)\n((x #x9))\nsat\n(objectives\n (x 3)\n)\n((x #x3))\nsat\n(objectives\n (x 15)\n (y 8)\n)\n((x #xf)\n (y #x8))\n",
 	"bounded_integer_optimization.smt2":            "sat\n(objectives\n (x 3)\n)\n((x 3))\nsat\n(objectives\n (x 0)\n)\n((x 0))\n",
 	"bounded_real_strict_optimization.smt2":        "sat\n(objectives\n (x (+ 5.0 (* (- 1.0) epsilon)))\n)\n((x (/ 9.0 2.0)))\nsat\n(objectives\n (x epsilon)\n)\n((x (/ 1.0 2.0)))\n",
 	"array_read_store.smt2":                        "unsat\n",

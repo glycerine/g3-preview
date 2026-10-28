@@ -39,8 +39,13 @@ func (c *Context) AddObjective(expression ast.ASTHandle, maximize bool) error {
 	if err != nil {
 		return err
 	}
-	if family != arithmetic {
-		return fmt.Errorf("objective must be integer or real")
+	bitVector, err := m.RegisterBitVectorPlugin()
+	if err != nil {
+		return err
+	}
+	isBitVector := family == bitVector
+	if family != arithmetic && !isBitVector {
+		return fmt.Errorf("objective must be bit-vector, integer or real")
 	}
 	if err = c.logicChecker.CheckExpression(expression); err != nil {
 		return err
@@ -53,7 +58,14 @@ func (c *Context) AddObjective(expression ast.ASTHandle, maximize bool) error {
 	if err != nil {
 		return err
 	}
-	c.objectives = append(c.objectives, optimizationObjective{expression: expression, ref: ref, maximize: maximize})
+	objective := optimizationObjective{expression: expression, ref: ref, maximize: maximize, bitVector: isBitVector}
+	if isBitVector {
+		objective.bitWidth, err = m.BitVectorSize(sort)
+		if err != nil {
+			return errors.Join(err, m.DelRef(&ref))
+		}
+	}
+	c.objectives = append(c.objectives, objective)
 	return nil
 }
 
@@ -137,6 +149,64 @@ func (c *Context) restoreObjectives(size, softTerms int) error {
 	return nil
 }
 
+func (c *Context) addBitVectorObjective(optimizer *opt.ArithmeticSolver, objective *optimizationObjective) (resultErr error) {
+	if optimizer == nil || objective == nil || !objective.bitVector {
+		return ast.ErrASTHandle
+	}
+	var refs []ast.ASTRef
+	defer func() {
+		for i := len(refs) - 1; i >= 0; i-- {
+			resultErr = errors.Join(resultErr, c.manager.DelRef(&refs[i]))
+		}
+	}()
+	bit := uint64(0)
+	if objective.maximize {
+		bit = 1
+	}
+	value, err := c.manager.BitVectorNumeralUint64(bit, 1)
+	if err != nil {
+		return err
+	}
+	valueRef, err := c.manager.NewRef(value)
+	if err != nil {
+		return err
+	}
+	refs = append(refs, valueRef)
+	terms := make([]ast.ASTHandle, objective.bitWidth)
+	weights := make([]*big.Rat, objective.bitWidth)
+	for i := uint32(0); i < objective.bitWidth; i++ {
+		extracted, e := c.manager.MkBitVectorExtract(i, i, objective.expression)
+		if e != nil {
+			return e
+		}
+		extractedRef, e := c.manager.NewRef(extracted)
+		if e != nil {
+			return e
+		}
+		refs = append(refs, extractedRef)
+		value, e = c.manager.RefGet(valueRef)
+		if e != nil {
+			return e
+		}
+		extracted, e = c.manager.RefGet(extractedRef)
+		if e != nil {
+			return e
+		}
+		term, e := c.manager.MkEq(value, extracted)
+		if e != nil {
+			return e
+		}
+		termRef, e := c.manager.NewRef(term)
+		if e != nil {
+			return e
+		}
+		refs = append(refs, termRef)
+		terms[i] = term
+		weights[i] = new(big.Rat).SetInt(new(big.Int).Lsh(big.NewInt(1), uint(i)))
+	}
+	return optimizer.AddSoftObjective(terms, weights)
+}
+
 func (c *Context) checkOptimize(assumptions []ast.ASTHandle) (status lbool.LBool, resultErr error) {
 	optimizer, err := opt.NewArithmeticSolver(c.manager, &c.params, c.logic, c.config)
 	if err != nil {
@@ -162,6 +232,8 @@ func (c *Context) checkOptimize(assumptions []ast.ASTHandle) (status lbool.LBool
 				weights[i] = &objective.softTerms[i].weight
 			}
 			err = optimizer.AddSoftObjective(terms, weights)
+		} else if objective.bitVector {
+			err = c.addBitVectorObjective(optimizer, &objective)
 		} else {
 			err = optimizer.AddObjective(objective.expression, objective.maximize)
 		}
@@ -199,6 +271,12 @@ func (c *Context) checkOptimize(assumptions []ast.ASTHandle) (status lbool.LBool
 		for i := range c.objectives {
 			if c.objectives[i].soft {
 				c.objectives[i].softValue.Set(&optimized.Values[i].SoftCost)
+			} else if c.objectives[i].bitVector {
+				c.objectives[i].softValue.Set(&optimized.Values[i].SoftCost)
+				if c.objectives[i].maximize {
+					maximum := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), uint(c.objectives[i].bitWidth)), big.NewInt(1))
+					c.objectives[i].softValue.Sub(new(big.Rat).SetInt(maximum), &c.objectives[i].softValue)
+				}
 			} else {
 				c.objectives[i].value = optimized.Values[i].Arithmetic
 			}
@@ -237,7 +315,7 @@ func (c *Context) WriteObjectives(out io.Writer) error {
 		if _, err := io.WriteString(out, " "); err != nil {
 			return err
 		}
-		if objective.soft {
+		if objective.soft || objective.bitVector {
 			if err := c.writeSoftObjectiveValue(out, &objective.softValue); err != nil {
 				return err
 			}
