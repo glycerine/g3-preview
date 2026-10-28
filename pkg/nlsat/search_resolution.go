@@ -10,16 +10,15 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-var ErrResolutionAssumptions = errors.New("nlsat: conflict resolution assumptions not yet joined")
-
 // searchResolution is the concrete conflict-resolution scratch state. It owns
 // lemma literal references and borrows one live search state.
 type searchResolution struct {
-	search   *searchState
-	marks    []bool
-	numMarks uint32
-	lemma    scopedLiteralVector
-	lazy     scopedLiteralVector
+	search           *searchState
+	marks            []bool
+	numMarks         uint32
+	lemma            scopedLiteralVector
+	lazy             scopedLiteralVector
+	lemmaAssumptions *AssumptionSet
 }
 
 func newSearchResolution(r *searchState) (*searchResolution, error) {
@@ -36,6 +35,9 @@ func (q *searchResolution) close() error {
 	if q == nil {
 		return nil
 	}
+	if err := q.resetLemmaAssumptions(); err != nil {
+		return err
+	}
 	if err := q.lemma.close(); err != nil {
 		return err
 	}
@@ -45,6 +47,33 @@ func (q *searchResolution) close() error {
 	q.search = nil
 	q.marks = nil
 	q.numMarks = 0
+	return nil
+}
+
+func (q *searchResolution) resetLemmaAssumptions() error {
+	if q == nil || q.lemmaAssumptions == nil {
+		return nil
+	}
+	if err := q.search.store.assumptions.decRef(q.lemmaAssumptions); err != nil {
+		return err
+	}
+	q.lemmaAssumptions = nil
+	return nil
+}
+
+func (q *searchResolution) joinAssumptions(incoming *AssumptionSet) error {
+	joined, err := q.search.store.assumptions.mkJoin(incoming, q.lemmaAssumptions)
+	if err != nil || joined == q.lemmaAssumptions {
+		return err
+	}
+	if err = q.search.store.assumptions.incRef(joined); err != nil {
+		return err
+	}
+	old := q.lemmaAssumptions
+	q.lemmaAssumptions = joined
+	if old != nil {
+		return q.search.store.assumptions.decRef(old)
+	}
 	return nil
 }
 
@@ -86,7 +115,7 @@ func (q *searchResolution) clearAnalysis() error {
 		q.marks[i] = false
 	}
 	q.numMarks = 0
-	return q.lemma.reset()
+	return errors.Join(q.lemma.reset(), q.resetLemmaAssumptions())
 }
 
 // analyze resolves one conflict backwards through the live trail. The returned
@@ -94,9 +123,6 @@ func (q *searchResolution) clearAnalysis() error {
 func (q *searchResolution) analyze(conflict *Clause, explanation *explanationAssumptions) (foundDecision bool, err error) {
 	if q == nil || q.search == nil || conflict == nil {
 		return false, ErrSearchOwner
-	}
-	if conflict.Assumptions() != nil {
-		return false, ErrResolutionAssumptions
 	}
 	if q.numMarks != 0 {
 		return false, ErrSearchPending
@@ -109,6 +135,9 @@ func (q *searchResolution) analyze(conflict *Clause, explanation *explanationAss
 	if err = q.lemma.reset(); err != nil {
 		return false, err
 	}
+	if err = q.resetLemmaAssumptions(); err != nil {
+		return false, err
+	}
 	abort := func(cause error) (bool, error) {
 		if cleanup := q.clearAnalysis(); cleanup != nil {
 			return false, errors.Join(cause, cleanup)
@@ -116,6 +145,9 @@ func (q *searchResolution) analyze(conflict *Clause, explanation *explanationAss
 		return false, cause
 	}
 	if err = q.resolveLiterals(sat.NullBoolVar, conflict.Literals()); err != nil {
+		return abort(err)
+	}
+	if err = q.joinAssumptions(conflict.Assumptions()); err != nil {
 		return abort(err)
 	}
 
@@ -148,10 +180,10 @@ func (q *searchResolution) analyze(conflict *Clause, explanation *explanationAss
 				if cause != nil {
 					return abort(cause)
 				}
-				if clause.Assumptions() != nil {
-					return abort(ErrResolutionAssumptions)
-				}
 				if cause = q.resolveLiterals(t.b, clause.Literals()); cause != nil {
+					return abort(cause)
+				}
+				if cause = q.joinAssumptions(clause.Assumptions()); cause != nil {
 					return abort(cause)
 				}
 			case LazyJustificationKind:
@@ -262,7 +294,7 @@ func (q *searchResolution) resolveConflict(conflict *Clause, explanation *explan
 			}
 		}
 
-		learned, err := q.search.store.mkClause(q.lemma.result, true, nil)
+		learned, err := q.search.store.mkClause(q.lemma.result, true, q.lemmaAssumptions)
 		if err != nil {
 			return false, err
 		}

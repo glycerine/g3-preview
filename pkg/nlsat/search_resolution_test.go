@@ -156,7 +156,7 @@ func TestSearchResolutionAnalyzesDecisionAndClauseTrail(t *testing.T) {
 	}
 }
 
-func TestSearchResolutionRejectsUnjoinedAssumptionsBeforeMutation(t *testing.T) {
+func TestSearchResolutionJoinsConflictAssumptions(t *testing.T) {
 	_, r := searchStateFixture(t)
 	q, err := newSearchResolution(r)
 	assignmentMust(t, err)
@@ -164,16 +164,24 @@ func TestSearchResolutionRejectsUnjoinedAssumptionsBeforeMutation(t *testing.T) 
 	b, err := r.store.atoms.mkBoolVar()
 	assignmentMust(t, err)
 	literal := sat.MakeLiteral(b, false)
+	reason := searchClause(t, r, literal)
+	justification, err := NewClauseJustification(reason)
+	assignmentMust(t, err)
+	assignmentMust(t, r.assign(literal, justification))
 	attachment := &AssumptionAttachment{}
 	set, err := r.store.assumptions.mkLeaf(AttachedAssumption(attachment))
 	assignmentMust(t, err)
-	conflict, err := r.store.mkClause([]sat.Literal{literal}, false, set)
+	conflict, err := r.store.mkClause([]sat.Literal{literal.Negated()}, false, set)
 	assignmentMust(t, err)
-	if _, err = q.analyze(conflict, nil); err != ErrResolutionAssumptions {
-		t.Fatal("assumption-bearing conflict was not rejected explicitly", err)
+	found, err := q.analyze(conflict, nil)
+	assignmentMust(t, err)
+	if found || len(q.lemma.result) != 0 || q.lemmaAssumptions == nil {
+		t.Fatal("assumption-bearing empty lemma", found, q.lemma.result, q.lemmaAssumptions)
 	}
-	if len(q.lemma.result) != 0 || q.numMarks != 0 {
-		t.Fatal("rejected conflict mutated analysis scratch", q.lemma.result, q.numMarks)
+	var assumptions []Assumption
+	assignmentMust(t, r.store.assumptions.linearize(q.lemmaAssumptions, &assumptions))
+	if len(assumptions) != 1 || assumptions[0].Attachment() != attachment {
+		t.Fatal("conflict assumption was not retained", assumptions)
 	}
 }
 
@@ -237,4 +245,49 @@ func TestSearchResolutionPublishesBooleanLemmaAndDetectsEmptyLemma(t *testing.T)
 			t.Fatal("empty lemma did not report unsatisfiable", solved, q.lemma.result, len(r.store.learned))
 		}
 	})
+}
+
+func TestSearchResolutionPublishesJoinedReasonAssumptions(t *testing.T) {
+	_, r := searchStateFixture(t)
+	q, err := newSearchResolution(r)
+	assignmentMust(t, err)
+	t.Cleanup(func() { assignmentMust(t, q.close()) })
+	a, err := r.store.atoms.mkBoolVar()
+	assignmentMust(t, err)
+	b, err := r.store.atoms.mkBoolVar()
+	assignmentMust(t, err)
+	al := sat.MakeLiteral(a, false)
+	bl := sat.MakeLiteral(b, false)
+	assignmentMust(t, r.decide(al))
+	attachments := [2]*AssumptionAttachment{{}, {}}
+	sets := [2]*AssumptionSet{}
+	for i := range sets {
+		sets[i], err = r.store.assumptions.mkLeaf(AttachedAssumption(attachments[i]))
+		assignmentMust(t, err)
+	}
+	reason, err := r.store.mkClause([]sat.Literal{al.Negated(), bl}, false, sets[0])
+	assignmentMust(t, err)
+	justification, err := NewClauseJustification(reason)
+	assignmentMust(t, err)
+	assignmentMust(t, r.assign(bl, justification))
+	conflict, err := r.store.mkClause([]sat.Literal{bl.Negated()}, false, sets[1])
+	assignmentMust(t, err)
+
+	solved, err := q.resolveConflict(conflict, nil)
+	assignmentMust(t, err)
+	if !solved || len(r.store.learned) != 1 || r.store.learned[0].Assumptions() == nil {
+		t.Fatal("joined learned assumptions were not published", solved, len(r.store.learned))
+	}
+	var assumptions []Assumption
+	assignmentMust(t, r.store.assumptions.linearize(r.store.learned[0].Assumptions(), &assumptions))
+	if len(assumptions) != 2 {
+		t.Fatal("learned assumption count", assumptions)
+	}
+	seen := map[*AssumptionAttachment]bool{}
+	for _, assumption := range assumptions {
+		seen[assumption.Attachment()] = true
+	}
+	if !seen[attachments[0]] || !seen[attachments[1]] {
+		t.Fatal("learned clause lost a conflict or reason dependency", assumptions)
+	}
 }
