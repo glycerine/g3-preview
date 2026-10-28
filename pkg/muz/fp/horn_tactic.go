@@ -89,8 +89,18 @@ func (t *HornTactic) registerPredicates(engine *PropositionalEngine, root ast.AS
 		seen[declaration] = true
 	}
 	kind, err := t.manager.GetKind(root)
-	if err != nil || kind != ast.ASTApp {
+	if err != nil {
 		return err
+	}
+	if kind == ast.ASTQuantifier {
+		body, x := t.manager.GetQuantifierBody(root)
+		if x != nil {
+			return x
+		}
+		return t.registerPredicates(engine, body, seen)
+	}
+	if kind != ast.ASTApp {
+		return nil
 	}
 	count, err := t.manager.GetNumArgs(root)
 	if err != nil {
@@ -108,42 +118,124 @@ func (t *HornTactic) registerPredicates(engine *PropositionalEngine, root ast.AS
 	return nil
 }
 
-func (t *HornTactic) classify(formula ast.ASTHandle) (rule bool, query ast.ASTHandle, err error) {
-	if _, yes, x := t.predicate(formula); x != nil {
-		return false, query, x
-	} else if yes {
-		return true, query, nil
+func (t *HornTactic) pin(temporaries *[]ast.ASTRef, handle ast.ASTHandle) error {
+	reference, err := t.manager.NewRef(handle)
+	if err == nil {
+		*temporaries = append(*temporaries, reference)
 	}
-	operator, err := t.manager.GetDeclKind(formula)
+	return err
+}
+
+func (t *HornTactic) stripForall(formula ast.ASTHandle) (ast.ASTHandle, error) {
+	for {
+		kind, err := t.manager.GetKind(formula)
+		if err != nil || kind != ast.ASTQuantifier {
+			return formula, err
+		}
+		forall, err := t.manager.IsForall(formula)
+		if err != nil || !forall {
+			return formula, err
+		}
+		formula, err = t.manager.GetQuantifierBody(formula)
+		if err != nil {
+			return formula, err
+		}
+	}
+}
+
+func (t *HornTactic) isImplication(formula ast.ASTHandle) (bool, error) {
+	current, err := t.stripForall(formula)
 	if err != nil {
-		return false, query, err
+		return false, err
 	}
-	if operator == ast.ASTOpImplies {
-		count, x := t.manager.GetNumArgs(formula)
-		if x != nil || count != 2 {
-			return false, query, errors.Join(x, tactic.NewTacticException("formula is not in Horn fragment"))
+	for {
+		operator, err := t.manager.GetDeclKind(current)
+		if err != nil {
+			return false, err
 		}
-		head, x := t.manager.GetArg(formula, 1)
+		if operator != ast.ASTOpImplies {
+			_, predicate, err := t.predicate(current)
+			return predicate, err
+		}
+		current, err = t.manager.GetArg(current, 1)
+		if err != nil {
+			return false, err
+		}
+	}
+}
+
+// classify applies the source tactic's disjunctive Horn-clause view. A clause
+// has at most one positive predicate; clauses without one are query bodies.
+func (t *HornTactic) classify(formula ast.ASTHandle, temporaries *[]ast.ASTRef) (rule bool, normalized ast.ASTHandle, err error) {
+	analysis, err := t.stripForall(formula)
+	if err != nil {
+		return false, normalized, err
+	}
+	arguments, err := t.manager.FlattenOr([]ast.ASTHandle{analysis})
+	if err != nil {
+		return false, normalized, err
+	}
+	body := make([]ast.ASTHandle, 0, len(arguments))
+	var head ast.ASTHandle
+	for _, argument := range arguments {
+		operator, x := t.manager.GetDeclKind(argument)
 		if x != nil {
-			return false, query, x
+			return false, normalized, x
 		}
-		_, yes, x := t.predicate(head)
-		if x != nil || !yes {
-			return false, query, errors.Join(x, tactic.NewTacticException("formula is not in Horn fragment"))
+		if operator == ast.ASTOpNot {
+			child, y := t.manager.GetArg(argument, 0)
+			if y != nil {
+				return false, normalized, y
+			}
+			body = append(body, child)
+			continue
 		}
-		return true, query, nil
+		if _, predicate, y := t.predicate(argument); y != nil {
+			return false, normalized, y
+		} else if predicate {
+			if !head.IsNull() {
+				return false, normalized, tactic.NewTacticException("formula is not in Horn fragment")
+			}
+			head = argument
+			continue
+		}
+		negated, y := t.manager.MkNot(argument)
+		if y != nil {
+			return false, normalized, y
+		}
+		if y = t.pin(temporaries, negated); y != nil {
+			return false, normalized, y
+		}
+		body = append(body, negated)
 	}
-	if operator == ast.ASTOpNot {
-		argument, x := t.manager.GetArg(formula, 0)
-		if x != nil {
-			return false, query, x
-		}
-		if _, yes, x := t.predicate(argument); x != nil || !yes {
-			return false, query, errors.Join(x, tactic.NewTacticException("Horn query must negate a predicate"))
-		}
-		return false, argument, nil
+	antecedent, err := t.manager.MkAndArray(body)
+	if err != nil {
+		return false, normalized, err
 	}
-	return false, query, tactic.NewTacticException("formula is not in Horn fragment")
+	if err = t.pin(temporaries, antecedent); err != nil {
+		return false, normalized, err
+	}
+	if head.IsNull() {
+		return false, antecedent, nil
+	}
+	implication, err := t.isImplication(formula)
+	if err != nil {
+		return false, normalized, err
+	}
+	if implication {
+		return true, formula, nil
+	}
+	if len(body) == 0 {
+		return true, head, nil
+	}
+	normalized, err = t.manager.MkImplies(antecedent, head)
+	if err != nil {
+		return false, normalized, err
+	}
+	if err = t.pin(temporaries, normalized); err != nil {
+		return false, normalized, err
+	}
+	return true, normalized, nil
 }
 
 func (t *HornTactic) Apply(goal *tactic.Goal, out *tactic.TacticResult) (resultErr error) {
@@ -158,8 +250,14 @@ func (t *HornTactic) Apply(goal *tactic.Goal, out *tactic.TacticResult) (resultE
 		return err
 	}
 	defer func() { resultErr = errors.Join(resultErr, engine.Close()) }()
+	var temporaries []ast.ASTRef
+	defer func() {
+		for index := len(temporaries) - 1; index >= 0; index-- {
+			resultErr = errors.Join(resultErr, t.manager.DelRef(&temporaries[index]))
+		}
+	}()
 	seen := make(map[ast.ASTHandle]bool)
-	var query ast.ASTHandle
+	var queries []ast.ASTHandle
 	size, err := goal.Size()
 	if err != nil {
 		return err
@@ -172,26 +270,47 @@ func (t *HornTactic) Apply(goal *tactic.Goal, out *tactic.TacticResult) (resultE
 		if x = t.registerPredicates(engine, formula, seen); x != nil {
 			return x
 		}
-		isRule, candidate, x := t.classify(formula)
+		isRule, normalized, x := t.classify(formula, &temporaries)
 		if x != nil {
 			return x
 		}
 		if isRule {
-			if x = engine.AddRule(formula, "horn-tactic"); x != nil {
+			if x = engine.AddRule(normalized, "horn-tactic"); x != nil {
 				return x
 			}
-		} else if !query.IsNull() {
-			return tactic.NewTacticException("finite Horn tactic expects one query")
 		} else {
-			query = candidate
+			queries = append(queries, normalized)
 		}
 	}
-	if query.IsNull() {
-		return tactic.NewTacticException("finite Horn tactic expects one query")
-	}
-	declaration, _, err := t.predicate(query)
+	boolean, err := t.manager.MkBoolSort()
 	if err != nil {
 		return err
+	}
+	query, err := t.manager.MkFreshConst("query", boolean)
+	if err != nil {
+		return err
+	}
+	if err = t.pin(&temporaries, query); err != nil {
+		return err
+	}
+	declaration, yes, err := t.predicate(query)
+	if err != nil || !yes {
+		return errors.Join(err, tactic.NewTacticException("fresh Horn query is not a predicate"))
+	}
+	if err = engine.RegisterPredicate(declaration); err != nil {
+		return err
+	}
+	for _, body := range queries {
+		rule, x := t.manager.MkImplies(body, query)
+		if x != nil {
+			return x
+		}
+		if x = t.pin(&temporaries, rule); x != nil {
+			return x
+		}
+		if x = engine.AddRule(rule, "horn-query"); x != nil {
+			return x
+		}
 	}
 	status, err := engine.QueryPredicate(declaration)
 	if err != nil {

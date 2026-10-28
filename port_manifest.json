@@ -82607,7 +82607,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Retained finite propositional Horn verification path: register Boolean predicates, add facts and implications, accept one negated-predicate query, and convert reachability to a decided tactic goal",
+          "name": "Retained finite Horn verification path: register Boolean predicates, normalize disjunctive clauses, preserve universally quantified implications, combine zero or more query clauses through a fresh predicate, and convert reachability to a decided tactic goal",
           "status": "partial",
           "go_target": "pkg/muz/fp/horn_tactic.go",
           "tests": [
@@ -82621,7 +82621,7 @@
         "The command context retains the tactic through the existing tactic reference-count protocol."
       ],
       "deviations": [
-        "Quantifier stripping, disjunctive clause normalization, multiple-query fresh predicates, proof and model converters, horn-simplify, and general PDR or infinite-domain Horn solving remain unported."
+        "Negative existential normalization, proof and model converters, horn-simplify, and general PDR or infinite-domain Horn solving remain unported."
       ]
     },
     {
