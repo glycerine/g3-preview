@@ -1,8 +1,8 @@
 package fp
 
 // Source: src/muz/base/dl_context.cpp add_rule/query orchestration and
-// src/muz/base/dl_engine_base.h query contract. This is the first exact
-// end-to-end engine slice: positive, zero-arity Horn programs only.
+// src/muz/base/dl_engine_base.h query contract. This is the retained positive
+// finite-domain Horn execution path.
 
 import (
 	"errors"
@@ -10,23 +10,30 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/muz/base"
-	"github.com/glycerine/g3/pkg/muz/dataflow"
+	"github.com/glycerine/g3/pkg/muz/rel"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 var (
 	ErrPropositionalEngine = errors.New("muz/fp: invalid or closed propositional engine")
-	ErrPropositionalHorn   = errors.New("muz/fp: positive zero-arity Horn fragment required")
+	ErrPropositionalHorn   = errors.New("muz/fp: positive finite-domain Horn fragment required")
 )
 
-// PropositionalEngine owns a rule manager and rule set for the exact positive
-// zero-arity Horn fragment. Richer fixedpoint programs are refused explicitly.
+type predicateState struct {
+	sorts []ast.ASTHandle
+	table *rel.HashTable
+}
+
+// PropositionalEngine owns the retained rule and finite-relation managers.
+// Negation and interpreted rule tails are still refused explicitly.
 type PropositionalEngine struct {
 	manager    *ast.ASTManager
 	rules      *base.RuleManager
 	set        *base.RuleSet
+	binder     *base.VariableBinder
+	relations  *rel.RelationManager
 	scopes     []*base.RuleSet
-	predicates map[ast.ASTHandle]bool
+	predicates map[ast.ASTHandle]*predicateState
 	queried    bool
 	closed     bool
 }
@@ -43,13 +50,22 @@ func NewPropositionalEngine(manager *ast.ASTManager) (*PropositionalEngine, erro
 	if err != nil {
 		return nil, errors.Join(err, rules.Close())
 	}
+	binder, err := base.NewVariableBinder(manager)
+	if err != nil {
+		return nil, errors.Join(err, set.Close(), rules.Close())
+	}
+	relations, err := rel.NewRelationManager(manager)
+	if err != nil {
+		return nil, errors.Join(err, binder.Close(), set.Close(), rules.Close())
+	}
 	return &PropositionalEngine{
-		manager: manager, rules: rules, set: set, predicates: make(map[ast.ASTHandle]bool),
+		manager: manager, rules: rules, set: set, binder: binder, relations: relations,
+		predicates: make(map[ast.ASTHandle]*predicateState),
 	}, nil
 }
 
 func (e *PropositionalEngine) open() error {
-	if e == nil || e.closed || e.manager == nil || e.rules == nil || e.set == nil {
+	if e == nil || e.closed || e.manager == nil || e.rules == nil || e.set == nil || e.binder == nil || e.relations == nil {
 		return ErrPropositionalEngine
 	}
 	return nil
@@ -66,10 +82,6 @@ func (e *PropositionalEngine) RegisterPredicate(declaration ast.ASTHandle) error
 	if kind != ast.ASTFuncDecl {
 		return ErrPropositionalHorn
 	}
-	arity, err := e.manager.GetArity(declaration)
-	if err != nil {
-		return err
-	}
 	rangeSort, err := e.manager.GetRange(declaration)
 	if err != nil {
 		return err
@@ -78,14 +90,26 @@ func (e *PropositionalEngine) RegisterPredicate(declaration ast.ASTHandle) error
 	if err != nil {
 		return err
 	}
-	if arity != 0 || rangeSort != boolean {
+	if rangeSort != boolean {
 		return ErrPropositionalHorn
+	}
+	sorts, signature, err := e.relations.PredicateSignature(declaration)
+	if err != nil {
+		return err
 	}
 	if err = e.rules.RegisterPredicate(declaration); err != nil {
 		return err
 	}
-	e.predicates[declaration] = true
+	e.predicates[declaration] = &predicateState{sorts: sorts, table: rel.NewHashTable(signature)}
 	return nil
+}
+
+// RegisterVariable retains an implicit Datalog variable application.
+func (e *PropositionalEngine) RegisterVariable(variable ast.ASTHandle) error {
+	if err := e.open(); err != nil {
+		return err
+	}
+	return e.binder.AddVariable(variable)
 }
 
 func (e *PropositionalEngine) AddRule(formula ast.ASTHandle, name string) error {
@@ -101,7 +125,15 @@ func (e *PropositionalEngine) AddRule(formula ast.ASTHandle, name string) error 
 			return err
 		}
 	}
-	return e.rules.AddFormula(e.set, formula, name)
+	bound, err := e.binder.Bind(formula, true)
+	if err != nil {
+		return err
+	}
+	boundFormula, getErr := e.manager.RefGet(bound)
+	if getErr == nil {
+		getErr = e.rules.AddFormula(e.set, boundFormula, name)
+	}
+	return errors.Join(getErr, e.manager.DelRef(&bound))
 }
 
 // Push retains a snapshot of the current rule set. Predicate registrations are
@@ -153,12 +185,8 @@ func (e *PropositionalEngine) validateFragment() error {
 			return x
 		}
 		head, x := rule.HeadDeclaration()
-		if x == nil {
-			var arity uint32
-			arity, x = e.manager.GetArity(head)
-			if x == nil && arity != 0 {
-				x = ErrPropositionalHorn
-			}
+		if x == nil && e.predicates[head] == nil {
+			x = ErrPropositionalHorn
 		}
 		positive, pErr := rule.PositiveTailSize()
 		uninterpreted, uErr := rule.UninterpretedTailSize()
@@ -173,10 +201,7 @@ func (e *PropositionalEngine) validateFragment() error {
 				x = y
 				break
 			}
-			arity, y := e.manager.GetArity(declaration)
-			if y != nil {
-				x = y
-			} else if arity != 0 {
+			if e.predicates[declaration] == nil {
 				x = ErrPropositionalHorn
 			}
 		}
@@ -188,28 +213,184 @@ func (e *PropositionalEngine) validateFragment() error {
 	return nil
 }
 
-// Query returns true exactly when the registered zero-arity query predicate is
-// derivable by the positive Horn program.
-func (e *PropositionalEngine) Query(query ast.ASTHandle) (lbool.LBool, error) {
+type variableBinding map[uint32]rel.Element
+
+func cloneBinding(binding variableBinding) variableBinding {
+	result := make(variableBinding, len(binding))
+	for variable, value := range binding {
+		result[variable] = value
+	}
+	return result
+}
+
+func (e *PropositionalEngine) unify(application ast.ASTHandle, state *predicateState, fact rel.Fact, binding variableBinding) (variableBinding, bool, error) {
+	result := cloneBinding(binding)
+	for i, value := range fact {
+		argument, err := e.manager.GetArg(application, uint32(i))
+		if err != nil {
+			return nil, false, err
+		}
+		kind, err := e.manager.GetKind(argument)
+		if err != nil {
+			return nil, false, err
+		}
+		if kind == ast.ASTVar {
+			index, x := e.manager.GetVarIndex(argument)
+			if x != nil {
+				return nil, false, x
+			}
+			if previous, found := result[index]; found && previous != value {
+				return nil, false, nil
+			}
+			result[index] = value
+			continue
+		}
+		constant, err := e.relations.EncodeValue(state.sorts[i], argument)
+		if err != nil {
+			return nil, false, ErrPropositionalHorn
+		}
+		if constant != value {
+			return nil, false, nil
+		}
+	}
+	return result, true, nil
+}
+
+func (e *PropositionalEngine) instantiate(application ast.ASTHandle, state *predicateState, binding variableBinding) (rel.Fact, error) {
+	fact := make(rel.Fact, len(state.sorts))
+	for i, sort := range state.sorts {
+		argument, err := e.manager.GetArg(application, uint32(i))
+		if err != nil {
+			return nil, err
+		}
+		kind, err := e.manager.GetKind(argument)
+		if err != nil {
+			return nil, err
+		}
+		if kind == ast.ASTVar {
+			index, x := e.manager.GetVarIndex(argument)
+			if x != nil {
+				return nil, x
+			}
+			value, found := binding[index]
+			if !found {
+				return nil, fmt.Errorf("%w: head variable is not bound by a positive tail", ErrPropositionalHorn)
+			}
+			fact[i] = value
+			continue
+		}
+		fact[i], err = e.relations.EncodeValue(sort, argument)
+		if err != nil {
+			return nil, ErrPropositionalHorn
+		}
+	}
+	return fact, nil
+}
+
+func (e *PropositionalEngine) evaluateRule(rule *base.Rule) (changed bool, result error) {
+	defer func() { result = errors.Join(result, rule.Close()) }()
+	bindings := []variableBinding{{}}
+	tails, err := rule.TailSize()
+	if err != nil {
+		return false, err
+	}
+	for i := 0; i < tails; i++ {
+		application, negated, x := rule.Tail(i)
+		if x != nil {
+			return false, x
+		}
+		if negated {
+			return false, ErrPropositionalHorn
+		}
+		declaration, x := e.manager.GetDecl(application)
+		if x != nil {
+			return false, x
+		}
+		state := e.predicates[declaration]
+		if state == nil {
+			return false, ErrPropositionalHorn
+		}
+		facts, x := state.table.Facts()
+		if x != nil {
+			return false, x
+		}
+		next := make([]variableBinding, 0)
+		for _, binding := range bindings {
+			for _, fact := range facts {
+				unified, matches, y := e.unify(application, state, fact, binding)
+				if y != nil {
+					return false, y
+				}
+				if matches {
+					next = append(next, unified)
+				}
+			}
+		}
+		bindings = next
+	}
+	head, err := rule.Head()
+	if err != nil {
+		return false, err
+	}
+	declaration, err := e.manager.GetDecl(head)
+	if err != nil {
+		return false, err
+	}
+	state := e.predicates[declaration]
+	if state == nil {
+		return false, ErrPropositionalHorn
+	}
+	for _, binding := range bindings {
+		fact, x := e.instantiate(head, state, binding)
+		if x != nil {
+			return false, x
+		}
+		added, x := state.table.Add(fact)
+		if x != nil {
+			return false, x
+		}
+		changed = changed || added
+	}
+	return changed, nil
+}
+
+func (e *PropositionalEngine) saturate() error {
+	for _, state := range e.predicates {
+		if err := state.table.Reset(); err != nil {
+			return err
+		}
+	}
+	for {
+		changed := false
+		count, err := e.set.Len()
+		if err != nil {
+			return err
+		}
+		for i := 0; i < count; i++ {
+			rule, x := e.set.Rule(i)
+			if x != nil {
+				return x
+			}
+			added, x := e.evaluateRule(rule)
+			if x != nil {
+				return x
+			}
+			changed = changed || added
+		}
+		if !changed {
+			return nil
+		}
+	}
+}
+
+// QueryPredicate returns true exactly when the registered predicate relation
+// contains at least one tuple after positive Horn saturation.
+func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.LBool, error) {
 	if err := e.open(); err != nil {
 		return lbool.Undef, err
 	}
-	kind, err := e.manager.GetKind(query)
-	if err != nil {
-		return lbool.Undef, err
-	}
-	if kind != ast.ASTApp {
-		return lbool.Undef, ErrPropositionalHorn
-	}
-	declaration, err := e.manager.GetDecl(query)
-	if err != nil {
-		return lbool.Undef, err
-	}
-	arguments, err := e.manager.GetNumArgs(query)
-	if err != nil {
-		return lbool.Undef, err
-	}
-	if arguments != 0 || !e.predicates[declaration] {
+	state := e.predicates[declaration]
+	if state == nil {
 		return lbool.Undef, ErrPropositionalHorn
 	}
 	e.queried = true
@@ -229,11 +410,41 @@ func (e *PropositionalEngine) Query(query ast.ASTHandle) (lbool.LBool, error) {
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
 	}
-	reachable, err := dataflow.BottomUp(e.set)
+	if err = e.saturate(); err != nil {
+		return lbool.Undef, err
+	}
+	count, err := state.table.Len()
 	if err != nil {
 		return lbool.Undef, err
 	}
-	return lbool.FromBool(reachable.IsReachable(declaration)), nil
+	return lbool.FromBool(count != 0), nil
+}
+
+// Query accepts the zero-arity predicate application used by the original
+// propositional engine API. General declaration queries use QueryPredicate.
+func (e *PropositionalEngine) Query(query ast.ASTHandle) (lbool.LBool, error) {
+	if err := e.open(); err != nil {
+		return lbool.Undef, err
+	}
+	kind, err := e.manager.GetKind(query)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if kind != ast.ASTApp {
+		return lbool.Undef, ErrPropositionalHorn
+	}
+	arguments, err := e.manager.GetNumArgs(query)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if arguments != 0 {
+		return lbool.Undef, ErrPropositionalHorn
+	}
+	declaration, err := e.manager.GetDecl(query)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	return e.QueryPredicate(declaration)
 }
 
 func (e *PropositionalEngine) Close() (result error) {
@@ -255,6 +466,11 @@ func (e *PropositionalEngine) Close() (result error) {
 		result = errors.Join(result, e.rules.Close())
 		e.rules = nil
 	}
+	if e.binder != nil {
+		result = errors.Join(result, e.binder.Close())
+		e.binder = nil
+	}
+	e.relations = nil
 	e.predicates = nil
 	e.closed = true
 	return result

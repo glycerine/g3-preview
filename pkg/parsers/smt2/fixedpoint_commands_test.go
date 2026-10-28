@@ -99,6 +99,37 @@ func TestSMT2FixedpointRuleScopesMatchCPP(t *testing.T) {
 	}
 }
 
+func TestSMT2FixedpointFiniteRelationsMatchCPP(t *testing.T) {
+	script := `(set-option :fixedpoint.engine datalog)
+(declare-rel P (Bool))
+(declare-rel Q (Bool))
+(declare-rel U (Bool))
+(declare-var x Bool)
+(rule (P true))
+(rule (=> (P x) (Q x)))
+(query Q)
+(query U)
+`
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	context.PrintSuccess = false
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	if output.String() != cpp || cpp != "sat\nunsat\n" {
+		t.Fatal("finite fixedpoint SMT-LIB differential", output.String(), cpp)
+	}
+}
+
 func TestSMT2FixedpointEmptyProgramQueryMatchesCPP(t *testing.T) {
 	script := "(declare-rel P ())\n(query P)\n"
 	context, err := cmd_context.NewStandaloneContext()
@@ -139,6 +170,23 @@ func TestSMT2FixedpointQueryRefusesUnavailableOutputParameters(t *testing.T) {
 				t.Fatal("unavailable query output accepted", err)
 			}
 		})
+	}
+}
+
+func TestSMT2FixedpointRefusesUnportedTupleAnswer(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	script := "(declare-rel P (Bool))\n(rule (P true))\n(query P :print-answer true)\n"
+	err = smt2.ParseCommands(context, strings.NewReader(script), &bytes.Buffer{})
+	if err == nil || !strings.Contains(err.Error(), "nonzero-arity fixedpoint answers are not ported") {
+		t.Fatal("unported tuple answer accepted", err)
 	}
 }
 

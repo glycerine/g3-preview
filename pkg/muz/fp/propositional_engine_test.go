@@ -108,7 +108,7 @@ func TestPropositionalEngineMatchesCPPFixedpointQueries(t *testing.T) {
 	}
 }
 
-func TestPropositionalEngineRefusesRicherHornFragments(t *testing.T) {
+func TestPropositionalEngineRefusesNegativeHornFragments(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)
 	t.Cleanup(func() { fpMust(t, context.Close()) })
@@ -119,13 +119,6 @@ func TestPropositionalEngineRefusesRicherHornFragments(t *testing.T) {
 	t.Cleanup(func() { fpMust(t, engine.Close()) })
 	boolean, err := manager.MkBoolSort()
 	fpMust(t, err)
-	unaryName, err := manager.Symbols.Intern("fp-unary")
-	fpMust(t, err)
-	unary, err := manager.MkFuncDecl(unaryName, []ast.ASTHandle{boolean}, boolean, ast.ASTFuncDeclInfo{})
-	fpMust(t, err)
-	if err = engine.RegisterPredicate(unary); !errors.Is(err, fp.ErrPropositionalHorn) {
-		t.Fatal("nonzero-arity predicate accepted", err)
-	}
 	applications := make(map[string]ast.ASTHandle)
 	for _, name := range []string{"P", "Q"} {
 		symbol, e := manager.Symbols.Intern("fp-refuse-" + name)

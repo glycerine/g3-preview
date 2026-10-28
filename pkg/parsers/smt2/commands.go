@@ -434,6 +434,21 @@ func (p *commandParser) command() (bool, error) {
 		if _, err = p.context.DeclareRelation(relation, domain); err != nil {
 			return false, err
 		}
+	case "declare-var":
+		variable, err := p.symbol()
+		if err != nil {
+			return false, err
+		}
+		sort, err := p.sort()
+		if err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.DeclareFixedpointVariable(variable, sort); err != nil {
+			return false, err
+		}
 	case "define-fun", "define-const":
 		if err := p.defineFunction(name == "define-fun"); err != nil {
 			return false, err
@@ -623,6 +638,19 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		if !p.ignoreChecks {
+			if printAnswer {
+				manager, x := p.context.Manager()
+				if x != nil {
+					return false, x
+				}
+				arity, x := manager.GetArity(declaration)
+				if x != nil {
+					return false, x
+				}
+				if arity != 0 {
+					return false, fmt.Errorf("nonzero-arity fixedpoint answers are not ported")
+				}
+			}
 			status, x := p.context.QueryFixedpoint(declaration)
 			if x != nil {
 				return false, x
