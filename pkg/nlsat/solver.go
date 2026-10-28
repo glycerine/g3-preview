@@ -145,6 +145,41 @@ func (s *Solver) MkInequality(kind AtomKind, factors []polynomial.Polynomial, ev
 	if err := s.open(); err != nil {
 		return 0, err
 	}
+	if len(factors) == 0 || len(factors) != len(even) {
+		return 0, arena.ErrBounds
+	}
+	constant := true
+	sign := 1
+	core, err := s.config.Polynomial.ArithmeticCore()
+	if err != nil {
+		return 0, err
+	}
+	for i, factor := range factors {
+		max, err := core.MaxVariable(factor)
+		if err != nil {
+			return 0, err
+		}
+		if max != NullVariable {
+			constant = false
+			break
+		}
+		current, err := s.config.Algebraic.EvalSign(s.config.Polynomial, factor, s.assignment)
+		if err != nil {
+			return 0, err
+		}
+		if current == 0 {
+			sign = 0
+		} else if !even[i] {
+			sign *= current
+		}
+	}
+	if constant {
+		literal := TrueLiteral
+		if !satisfied(sign, kind, negative) {
+			literal = literal.Negated()
+		}
+		return literal, nil
+	}
 	literal, err := s.atoms.mkInequalityLiteral(kind, factors, even)
 	if negative {
 		literal = literal.Negated()

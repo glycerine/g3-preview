@@ -91718,7 +91718,9 @@
         "TestSMTLibRunnerUnivariateNRABooleanDifferential",
         "TestSMTSolverUnivariateNRAAPI",
         "TestSMTLibRunnerSeparableMultivariableNRA",
-        "TestSMTSolverSeparableMultivariableNRAAPI"
+        "TestSMTSolverSeparableMultivariableNRAAPI",
+        "TestSMTLibRunnerMixedMultivariableNRA",
+        "TestSMTSolverMixedMultivariableNRAAPI"
       ],
       "conditionals": [
         {
@@ -120447,7 +120449,9 @@
         "TestSMTLibRunnerUnivariateNRABooleanDifferential",
         "TestSMTSolverUnivariateNRAAPI",
         "TestSMTLibRunnerSeparableMultivariableNRA",
-        "TestSMTSolverSeparableMultivariableNRAAPI"
+        "TestSMTSolverSeparableMultivariableNRAAPI",
+        "TestSMTLibRunnerMixedMultivariableNRA",
+        "TestSMTSolverMixedMultivariableNRAAPI"
       ],
       "conditionals": [
         {
@@ -122593,7 +122597,7 @@
         "Factory now emits exactly one source-priority warning when relevancy and auto_config both disallow modes3-5; disabled or refused warning streams still permit mutation. Unknown numeric strategies use the source switch default activity queue while retaining the parameter value (tested7,61,UINT_MAX; scoped C++ vector includes61). Five factory groups verify all7 modes plus defaults, both fallback conditions, solver-update restoration versus borrowed/copy ownership, warning/RNG/mutation/allocation prefix with an actual allocation refusal, runtime warning controls and existing-context retention. Registered six-check scoped vector matches prebuilt C++ exactly on both stdout and warning stderr. No whole-unit promotion.",
         "The previous31 pending SASSERT sites now have concrete call-site mappings (85,173,174,208,343,354,391,399,411,418,436,514,542,585,591,603,610,625,775,786,831,841,850,859,867,874,892,916,918,1167,1169). Five assertion groups exercise enabled/disabled/native profiles, exact diagnostic identity and action, duplicate heap admission, relevance candidate/admission guards, scope counts/restoration order, goal secondary inconsistencies/indices and recovery, and negative/empty random-selection preconditions. Two overlays reject missing borrowed factory mutation and bypassed source assertion gates. All24 TRACE sites were mapped previously; complete queue method/owner closure and full context display composition still require the remaining audit. Source-unit statuses and audit flags stay unchanged.",
         "Go integration increment: original QF_NRA assertions are held by scoped AST references independently of preprocessing, allowing a guarded polynomial conjunction path before ordinary internalization. It uses the actual Expr2Polynomial translator with stable first-seen real-variable mapping and positive common denominators, NLSAT infeasible domains, exact complement witnesses and the normal generated-model publication path. Irrational witnesses are copied across numerical owners into the AST arithmetic plugin. Unsupported syntax, genuinely mixed-variable polynomials, proofs, nonempty assumptions and translated kernels retain the existing backend. CLI tests compare SAT/UNSAT and evaluated model truth against prebuilt C++; API tests cover powers, repeated models, multiple variables and push/pop. This does not complete general nonlinear/backend integration or source ownership audits.",
-        "The guarded path normalizes retained Boolean and/or/not/implication/XOR/equality/distinct/ite structure into conjunction branches, including constants and binary arithmetic distinct. Separate asserted formulas distribute over the same branch set, with a1024-branch cap before falling back to the existing backend. For exact model requests, each branch partitions any number of independent univariate real components, uses one actual NLSAT infeasible-interval union/complement-witness service per variable, and publishes every exact witness through the ordinary model path. Mixed polynomials and non-model multivariable checks still fall back. Directed two-algebraic-variable SAT, one-component UNSAT, cross-variable Boolean-branch and API model-evaluation cases match prebuilt C++. This advances multivariable frontend/model integration but is not the source NLSAT main search, conflict resolution or integration of the ported explanation/projection loop; source-unit status and whole-audit flags remain partial/false."
+        "The guarded path normalizes retained Boolean and/or/not/implication/XOR/equality/distinct/ite structure into conjunction branches, including constants and binary arithmetic distinct. Separate asserted formulas distribute over the same branch set, with a1024-branch cap before falling back to the existing backend. It now creates one general public NLSAT Solver before polynomial-variable mapping, translates every branch atom into actual NLSAT literals, and represents disjunctions with pure-Boolean selector variables plus guarded clauses and one selector clause. Mixed-variable polynomials therefore use the ported stage search, explanation projection, conflict resolution and exact model values. Constant translated polynomials become the canonical true literal or its negation without creating a null-stage arithmetic atom. Directed circle/product/linear-conflict/guarded-branch CLI cases match prebuilt C++, and API coupled-product SAT/model/pushed-UNSAT/pop-SAT passes. Proof mode, disabled preprocessing, non-model multivariable strategy-observability tests and unsupported syntax retain the established backend. Integer search_check and complete source/frontend audits remain partial/false."
       ]
     },
     {

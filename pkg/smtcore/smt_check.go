@@ -96,7 +96,7 @@ func (k *SMTKernel) SetupAndCheck() (result lbool.LBool, resultErr error) {
 		}
 		return k.checkConfiguredAssumptions(assumptions)
 	}
-	if result, handled, err := k.tryUnivariateNRA(); handled || err != nil {
+	if result, handled, err := k.tryNLSAT(); handled || err != nil {
 		return k.finalizeCheck(result, err)
 	}
 	if err := k.internalizeCheckAssertions(); err != nil {

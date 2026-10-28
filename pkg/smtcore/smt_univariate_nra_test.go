@@ -132,3 +132,72 @@ func TestSMTSolverSeparableMultivariableNRAAPI(t *testing.T) {
 	astTestMust(t, evaluator.Close())
 	astTestMust(t, md.DecRef())
 }
+
+func TestSMTSolverMixedMultivariableNRAAPI(t *testing.T) {
+	m, cfg := smtModelGeneratorFixture(t)
+	s, err := NewSMTSolver(m, nil, "QF_NRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	astTestMust(t, s.SetProduceModels(true))
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	real, err := m.MkFamilySort(family, 0, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "nra-api-mixed-x"), real)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "nra-api-mixed-y"), real)
+	astTestMust(t, err)
+	numeral := func(n int64) ast.ASTHandle {
+		h, e := m.ArithmeticNumeralRat(big.NewRat(n, 1), false)
+		astTestMust(t, e)
+		return h
+	}
+	product, err := m.MkFamilyApp(family, smtArithOpMul, nil, []ast.ASTHandle{x, y})
+	astTestMust(t, err)
+	productEquation, err := m.MkEq(product, numeral(2))
+	astTestMust(t, err)
+	xEquation, err := m.MkEq(x, numeral(1))
+	astTestMust(t, err)
+	yEquation, err := m.MkEq(y, numeral(2))
+	astTestMust(t, err)
+	formula, err := m.MkAndArgs([]ast.ASTHandle{productEquation, xEquation, yEquation})
+	astTestMust(t, err)
+	formulaRef, err := m.NewRef(formula)
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&formulaRef)) }()
+	astTestMust(t, s.Assert(formula))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("mixed API product", status)
+	}
+	md, err := s.AcquireModel()
+	astTestMust(t, err)
+	evaluator, err := model.NewModelEvaluator(md, s.kernel.modelConfig)
+	astTestMust(t, err)
+	valueRef, err := evaluator.EvaluateValue(formula)
+	astTestMust(t, err)
+	value, err := m.RefGet(valueRef)
+	astTestMust(t, err)
+	if !m.IsTrue(value) {
+		t.Fatal("mixed API model violates coupled product")
+	}
+	astTestMust(t, m.DelRef(&valueRef))
+	astTestMust(t, evaluator.Close())
+	astTestMust(t, md.DecRef())
+	astTestMust(t, s.Push())
+	yThree, err := m.MkEq(y, numeral(3))
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(yThree))
+	status, err = s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("mixed API pushed conflict", status)
+	}
+	astTestMust(t, s.Pop(1))
+	status, err = s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("mixed API pop", status)
+	}
+}

@@ -1,8 +1,7 @@
 package smtcore
 
-// Initial end-to-end QF_NRA Boolean-formula path. Reuses the ported AST
-// polynomial translator and NLSAT interval/witness engine; other inputs use
-// ordinary SMT.
+// QF_NRA Boolean-formula frontend over the general NLSAT solver. Unsupported
+// syntax and deliberately observable legacy-strategy modes retain ordinary SMT.
 
 import (
 	"errors"
@@ -13,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/nlsat"
+	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
@@ -385,27 +385,20 @@ func (in *smtNRAInput) formula(k *SMTKernel, h ast.ASTHandle, negative bool, fam
 }
 
 type smtNRAWorkspace struct {
-	kernel       *SMTKernel
-	q            *unumeral.RationalManager
-	am           *polynomial.AlgebraicManager
-	pm           *polynomial.MultivariatePolynomialManager
-	convert      *ast.Expr2Polynomial
-	conjunctions []*nlsat.UnivariateConjunction
-	cooperation  *cooperate.Cooperation
-	primes       *primegen.Generator
-	params       uparams.ParamsRef
-	paramsReady  bool
-	witnesses    []polynomial.Algebraic
+	kernel      *SMTKernel
+	q           *unumeral.RationalManager
+	am          *polynomial.AlgebraicManager
+	pm          *polynomial.MultivariatePolynomialManager
+	convert     *ast.Expr2Polynomial
+	solver      *nlsat.Solver
+	cooperation *cooperate.Cooperation
+	primes      *primegen.Generator
+	params      uparams.ParamsRef
+	paramsReady bool
+	witnesses   []polynomial.Algebraic
 }
 
 func (w *smtNRAWorkspace) resetBranch() error {
-	for len(w.conjunctions) > 0 {
-		i := len(w.conjunctions) - 1
-		if err := w.conjunctions[i].Close(); err != nil {
-			return err
-		}
-		w.conjunctions = w.conjunctions[:i]
-	}
 	if w.am != nil {
 		for len(w.witnesses) > 0 {
 			i := len(w.witnesses) - 1
@@ -419,19 +412,25 @@ func (w *smtNRAWorkspace) resetBranch() error {
 }
 
 func (w *smtNRAWorkspace) Close() error {
-	if w.am != nil {
-		if err := w.am.CleanupRetained(); err != nil {
-			return err
-		}
-	}
 	if err := w.resetBranch(); err != nil {
 		return err
+	}
+	if w.solver != nil {
+		if err := w.solver.Close(); err != nil {
+			return err
+		}
+		w.solver = nil
 	}
 	if w.convert != nil {
 		if err := w.convert.Close(); err != nil {
 			return err
 		}
 		w.convert = nil
+	}
+	if w.am != nil {
+		if err := w.am.CleanupRetained(); err != nil {
+			return err
+		}
 	}
 	if w.pm != nil {
 		if err := w.pm.CloseChecked(); err != nil {
@@ -471,7 +470,7 @@ func (w *smtNRAWorkspace) Close() error {
 	}
 	return nil
 }
-func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err error) {
+func (k *SMTKernel) tryNLSAT() (result lbool.LBool, handled bool, err error) {
 	if k.setupLogic != "QF_NRA" || !k.nraInputsValid || len(k.nraInputs) == 0 {
 		return lbool.Undef, false, nil
 	}
@@ -502,10 +501,9 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 	if !in.nonlinear || len(in.variables) == 0 || k.paramGlobals == nil {
 		return lbool.Undef, false, nil
 	}
-	// Keep established non-model arithmetic strategy consumers on their
-	// ordinary backend until the complete multivariate NLSAT search replaces
-	// this guarded exact-model specialization.
-	if len(in.variables) > 1 && !k.produceModel {
+	// Preserve the established non-model arithmetic engine and its strategy
+	// observability until the general NLSAT path replaces that backend outright.
+	if !k.preprocess || (len(in.variables) > 1 && !k.produceModel) {
 		return lbool.Undef, false, nil
 	}
 	handled = true
@@ -547,23 +545,22 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 	if err != nil {
 		return
 	}
+	w.solver, err = nlsat.NewSolver(nlsat.SolverConfig{Algebraic: w.am, Polynomial: w.pm, Limit: &k.manager.Limit, SimplifyCore: true, Factor: true})
+	if err != nil {
+		return
+	}
 	w.convert, err = ast.NewExpr2Polynomial(ast.Expr2PolynomialConfig{AST: k.manager, Polynomial: w.pm})
 	if err != nil {
 		return
 	}
 	// Pin real constants to stable polynomial variables in first-seen order.
-	core, e := w.pm.ArithmeticCore()
-	if e != nil {
-		err = e
-		return
-	}
 	mapping, e := w.convert.Mapping()
 	if e != nil {
 		err = e
 		return
 	}
 	for i, variable := range in.variables {
-		created, e := core.MkVar()
+		created, e := w.solver.MkVar(false)
 		if e != nil {
 			err = e
 			return
@@ -576,18 +573,20 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 			return
 		}
 	}
-	sat := false
+	selectors := make([]sat.Literal, 0, len(in.branches))
+	guarded := len(in.branches) > 1
 	for _, branch := range in.branches {
-		for variable := range in.variables {
-			conjunction, e := nlsat.NewUnivariateConjunction(w.am, w.pm, uint32(variable))
-			if e != nil {
-				err = e
+		var selector sat.Literal
+		if guarded {
+			var b sat.BoolVar
+			b, err = w.solver.MkBoolVar()
+			if err != nil {
 				return
 			}
-			w.conjunctions = append(w.conjunctions, conjunction)
+			selector = sat.MakeLiteral(b, false)
+			selectors = append(selectors, selector)
 		}
 		for _, a := range branch {
-			unsupported := false
 			difference, e := k.manager.MkFamilyApp(family, smtArithOpSub, nil, []ast.ASTHandle{a.left, a.right})
 			if e != nil {
 				err = e
@@ -617,20 +616,14 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 				e = de
 			}
 			if e == nil {
-				variable := uint32(0)
-				max, me := core.MaxVariable(value)
-				if me == nil && max != nlsat.NullVariable {
-					var univariate bool
-					univariate, me = core.IsUnivariate(value)
-					if me == nil && (!univariate || uint64(max) >= uint64(len(w.conjunctions))) {
-						unsupported = true
+				var literal sat.Literal
+				literal, e = w.solver.MkInequality(a.kind, []polynomial.Polynomial{value}, []bool{false}, a.negative)
+				if e == nil {
+					clause := []sat.Literal{literal}
+					if guarded {
+						clause = []sat.Literal{selector.Negated(), literal}
 					}
-					variable = max
-				}
-				if me == nil && !unsupported {
-					e = w.conjunctions[variable].Add(value, a.kind, a.negative)
-				} else if me != nil {
-					e = me
+					e = w.solver.AddClause(clause, nlsat.Assumption{})
 				}
 			}
 			e = errors.Join(e, d.Close(), p.Close())
@@ -638,38 +631,25 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 				err = e
 				return
 			}
-			if unsupported {
-				handled = false
-				result = lbool.Undef
-				return
-			}
 		}
-		sat = true
-		for _, conjunction := range w.conjunctions {
-			w.witnesses = append(w.witnesses, polynomial.Algebraic{})
-			ok, e := conjunction.Check(&w.witnesses[len(w.witnesses)-1])
-			if e != nil {
-				err = e
-				return
-			}
-			if !ok {
-				sat = false
-				break
-			}
-		}
-		if sat {
-			break
-		}
-		if err = w.resetBranch(); err != nil {
+	}
+	if guarded {
+		if err = w.solver.AddClause(selectors, nlsat.Assumption{}); err != nil {
 			return
 		}
 	}
-	if !sat {
-		return lbool.False, true, nil
+	result, err = w.solver.Check()
+	if err != nil || result != lbool.True {
+		return
 	}
-	result = lbool.True
 	if !k.produceModel {
 		return
+	}
+	for variable := range in.variables {
+		w.witnesses = append(w.witnesses, polynomial.Algebraic{})
+		if err = w.solver.Value(uint32(variable), &w.witnesses[len(w.witnesses)-1]); err != nil {
+			return
+		}
 	}
 	md, e := model.NewModel(k.manager)
 	if e != nil {

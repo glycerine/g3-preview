@@ -109,6 +109,41 @@ func TestSMTLibRunnerSeparableMultivariableNRA(t *testing.T) {
 	}
 }
 
+func TestSMTLibRunnerMixedMultivariableNRA(t *testing.T) {
+	cases := []struct{ name, formula, want string }{
+		{"circle-model", "(and (= (+ (* x x) (* y y)) 2) (> x 0) (> y 0))", "sat"},
+		{"coupled-product-conflict", "(and (= (* x y) 2) (= x 1) (= y 3))", "unsat"},
+		{"mixed-linear-conflict", "(and (> x 0) (> y 0) (< (+ x y) 0) (>= (* x x) 0))", "unsat"},
+		{"guarded-coupled-branches", "(or (and (= (* x y) 2) (= x 1) (= y 3)) (and (= (+ x y) 0) (= x 1) (= y (- 1))))", "sat"},
+	}
+	canonical := func(s string) string { return strings.Join(strings.Fields(s), " ") }
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			script := "(set-option :produce-models true)(set-logic QF_NRA)(declare-const x Real)(declare-const y Real)(assert " + tc.formula + ")(check-sat)"
+			want := tc.want
+			if tc.want == "sat" {
+				script += "(get-value (" + tc.formula + "))"
+				want += " ((" + tc.formula + " true))"
+			}
+			var out bytes.Buffer
+			if err := run(strings.NewReader(script), &out); err != nil {
+				t.Fatal(err, out.String())
+			}
+			if canonical(out.String()) != canonical(want) {
+				t.Fatalf("Go: %s; want: %s", out.String(), want)
+			}
+			if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+				cmd := exec.Command(reference, "-in")
+				cmd.Stdin = strings.NewReader(script)
+				native, err := cmd.CombinedOutput()
+				if err != nil || canonical(string(native)) != canonical(want) {
+					t.Fatalf("C++: %s, %v; want: %s", native, err, want)
+				}
+			}
+		})
+	}
+}
+
 func TestSMTLibRunnerUnivariateNRABooleanStructure(t *testing.T) {
 	cases := []struct {
 		name, formula, want string
