@@ -42038,7 +42038,7 @@
           ]
         },
         {
-          "name": "remaining command context: logic validation, parametric sorts/datatypes, reset, limits, optimization and tactic/extension commands",
+          "name": "remaining command context: optimization lifecycle and retained higher-level engine hooks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -42060,8 +42060,8 @@
           ]
         },
         {
-          "name": "dt_eh concrete datatype publication: register canonical sorts, constructors, recognizers and accessors in the current scoped/global declaration trails, preserve typed overloads and roll back declaration bindings after publication refusal; parametric pdecl ownership remains open",
-          "status": "partial",
+          "name": "dt_eh datatype publication: register nullary or lazily instantiated parametric sorts, constructors, recognizers and accessors in scoped/global declaration trails, preserve typed overloads and roll back declaration bindings after publication refusal",
+          "status": "ported",
           "go_target": "pkg/cmd_context/datatype_declarations.go",
           "go_targets": [
             "pkg/parsers/smt2/datatypes.go",
@@ -42072,6 +42072,8 @@
           "tests": [
             "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
             "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
+            "TestSMT2ParametricDatatypeInstantiationAndRecursiveFields",
+            "TestSMT2ParametricDatatypeInstantiationFunctionsFollowScopes",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -42814,7 +42816,7 @@
           ]
         },
         {
-          "name": "remaining command context: logic validation, parametric sorts/datatypes, reset, limits, optimization and tactic/extension commands",
+          "name": "remaining command context: optimization lifecycle and retained higher-level engine hooks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -43771,9 +43773,9 @@
       "path": "src/cmd_context/pdecl.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
-      "go_targets": ["pkg/smtcore/param_datatype_refs.go"],
-      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite", "TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/param_datatype_refs.go", "pkg/ast/ast_sort_substitution.go", "pkg/cmd_context/sort_declarations.go", "pkg/cmd_context/datatype_declarations.go", "pkg/parsers/smt2/commands.go", "pkg/parsers/smt2/datatypes.go"],
+      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite", "TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors", "TestSMT2ParametricDatatypeInstantiationAndRecursiveFields", "TestSMT2ParametricDatatypeInstantiationFunctionsFollowScopes", "TestSMT2ParametricSortDeclarationsAndDefinitions", "TestSMTLibRunnerCPPReference"],
       "assertions": [
         {
           "line": 31,
@@ -43852,12 +43854,12 @@
           "text": "SASSERT(d->get_num_params() == 0 || d->get_num_params() == PSORT_DECL_VAR_PARAMS);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "pdatatypes_decl::fix_missing_refs and accessor/constructor/datatype traversal: concrete declaration-order rewrite, first unknown name and prior mutations (pdecl.cpp:432-461,495-503,555-563,666-677)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
           "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
         },
@@ -43872,18 +43874,39 @@
           "status": "ported",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
           "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
+        },
+        {
+          "name": "psort constants, variables and applications plus user/builtin/datatype declarations: arity checks, canonical instantiation, define-sort substitution and source-order scoped declaration lookup",
+          "status": "platform_replacement",
+          "go_target": "pkg/cmd_context/sort_declarations.go",
+          "go_targets": ["pkg/ast/ast_sort_substitution.go", "pkg/parsers/smt2/commands.go"],
+          "tests": ["TestSMT2ParametricSortDeclarationsAndDefinitions", "TestSMT2ParametricSortArityAndScopeRefusals", "TestSMTLibRunnerCPPReference"]
+        },
+        {
+          "name": "paccessor/pconstructor/pdatatype/pdatatypes construction, recursive type instantiation, commit and lazy concrete constructor/recognizer/accessor publication",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/datatype_declarations.go",
+          "go_targets": ["pkg/ast/ast_datatype_definition.go", "pkg/parsers/smt2/datatypes.go"],
+          "tests": ["TestSMT2ParametricDatatypeInstantiationAndRecursiveFields", "TestSMT2ParametricDatatypeInstantiationFunctionsFollowScopes", "TestSMTLibRunnerCPPReference"]
+        },
+        {
+          "name": "pdecl manager hash-consing, instantiation caches, sort-info display and intrusive lifetime graph",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast",
+          "go_targets": ["pkg/cmd_context/sort_declarations.go", "pkg/cmd_context/context.go"],
+          "tests": ["TestSMT2ParametricSortDeclarationsAndDefinitions", "TestSMT2ParametricDatatypeInstantiationFunctionsFollowScopes", "TestSMTLibRunnerCPPReference"]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": ["The AST manager canonically owns instantiated sorts and datatype definitions. Parser command references own formal/body temporaries until Context acquires independent roots; Context sort-constructor trails release definition roots on pop/reset/close. Lazy datatype functions use ordinary declaration trails and are republished after scoped rollback."],
+      "deviations": ["Go uses AST-manager interning and native declaration maps instead of the C++ pdecl intrusive object graph and trie cache. SMT2 sort printing reads canonical AST sort metadata; no C++ sort_info side table or STL container is ported."]
     },
     {
       "path": "src/cmd_context/pdecl.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
-      "go_targets": ["pkg/smtcore/param_datatype_refs.go"],
-      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite", "TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/param_datatype_refs.go", "pkg/cmd_context/sort_declarations.go", "pkg/cmd_context/datatype_declarations.go", "pkg/parsers/smt2/datatypes.go"],
+      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite", "TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors", "TestSMT2ParametricDatatypeInstantiationAndRecursiveFields", "TestSMT2ParametricSortDeclarationsAndDefinitions", "TestSMTLibRunnerCPPReference"],
       "conditionals": [
         {
           "line": 19,
@@ -43920,24 +43943,32 @@
           "text": "symbol const & get_missing_ref() const { SASSERT(kind() == PTR_MISSING_REF); return m_missing_ref; }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Concrete ptype missing/recursive tags and parametric datatype accessor/constructor/group declarations for selected fix_missing_refs; manager instantiation remains open",
-          "status": "partial",
+          "name": "Concrete ptype missing/recursive/formal tags and parametric datatype accessor/constructor/group declarations through validation, AST commit and lazy instantiation",
+          "status": "ported",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
-          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
+          "go_targets": ["pkg/parsers/smt2/datatypes.go", "pkg/cmd_context/datatype_declarations.go"],
+          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite", "TestSMT2ParametricDatatypeInstantiationAndRecursiveFields", "TestSMTLibRunnerCPPReference"]
         },
         {
           "name": "Selected pdatatype_decl missing-reference and duplicate-accessor validation signatures over concrete declaration slices",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
           "tests": ["TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"]
+        },
+        {
+          "name": "Retained pdecl/psort declaration manager interfaces, typed applications, datatype callbacks and scoped owner aliases",
+          "status": "platform_replacement",
+          "go_target": "pkg/cmd_context/sort_declarations.go",
+          "go_targets": ["pkg/ast/ast_sort_substitution.go", "pkg/cmd_context/datatype_declarations.go"],
+          "tests": ["TestSMT2ParametricSortDeclarationsAndDefinitions", "TestSMT2ParametricDatatypeInstantiationFunctionsFollowScopes", "TestSMTLibRunnerCPPReference"]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": ["Concrete Go structs and AST references replace C++ pdecl subclasses and intrusive refs. Context owns formal/body roots and scoped declaration entries; parser and AST manager own only their respective temporary and canonical roots."],
+      "deviations": ["Only retained concrete SMT-LIB instantiations are represented. Go standard collections and AST interning replace C++ templates, allocator objects, and cache nodes."]
     },
     {
       "path": "src/cmd_context/simplify_cmd.cpp",
@@ -94256,26 +94287,29 @@
           ]
         },
         {
-          "name": "Selected sort-parameter and datatype declaration name bookkeeping with source reset boundaries; parameterized-sort construction and datatype command integration remain open",
-          "status": "partial",
+          "name": "Sort-parameter and datatype declaration name bookkeeping with source reset boundaries, parameterized-sort construction and datatype command integration",
+          "status": "ported",
           "go_target": "pkg/parsers/smt2/local_sort_names.go",
           "tests": [
-            "TestSMT2SortAndDatatypeNameTablesSourceScopes"
+            "TestSMT2SortAndDatatypeNameTablesSourceScopes",
+            "TestSMT2ParametricSortDeclarationsAndDefinitions",
+            "TestSMT2ParametricDatatypeInstantiationAndRecursiveFields"
           ]
         },
         {
-          "name": "Selected parse_declare_datatype(s) name validation: single missing-first, multi-declaration fix_missing_refs before duplicate checks, exact positioned diagnostics; AST commit and command publication remain open (smt2parser.cpp:885-920,930-954,981-1001)",
-          "status": "partial",
+          "name": "parse_declare_datatype(s) name validation: single missing-first, multi-declaration fix_missing_refs before duplicate checks, exact diagnostics, AST commit and command publication (smt2parser.cpp:885-920,930-954,981-1001)",
+          "status": "ported",
           "go_target": "pkg/parsers/smt2/datatype_validation.go",
           "go_targets": [
             "pkg/smtcore/param_datatype_refs.go"
           ],
           "tests": [
-            "TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite"
+            "TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite",
+            "TestSMT2ParametricDatatypeInstantiationAndRecursiveFields"
           ]
         },
         {
-          "name": "ParseCommands retained dispatch plus ParseAssertions solver-loading mode: set-logic, Boolean set-option, metadata consumption, nullary declare-sort, declare-fun/const, assert, push/pop, check-sat/assuming and result commands",
+          "name": "ParseCommands retained dispatch plus ParseAssertions solver-loading mode: set-logic, options/metadata, declare/define-sort including parametric constructors, declare-fun/const, assert, push/pop, check-sat/assuming and result commands",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/commands.go",
           "tests": [
@@ -94292,7 +94326,7 @@
           ]
         },
         {
-          "name": "retained expression grammar: builtin/UF applications, exact numerals/strings/BV literals, indexed identifiers, basic qualified identifiers, Bool/Int/Real/user/BV/Array sorts, universal/existential and parallel let bindings",
+          "name": "retained expression grammar: builtin/UF applications, exact numerals/strings/BV literals, indexed identifiers, qualified identifiers, builtin/user/parametric/datatype sorts, universal/existential and parallel let bindings",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/expressions.go",
           "tests": [
@@ -94329,7 +94363,7 @@
           ]
         },
         {
-          "name": "remaining parser grammar and command recovery: parametric datatype declarations, pattern/other attributes, complete qualified local resolution, options and extensions",
+          "name": "remaining parser grammar and command recovery: complete qualified local resolution, residual options and extensions",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -94403,8 +94437,8 @@
           "reason": "The command is connected for the retained concrete tactic/combinator set; remaining tactic/probe grammar and execution-option surface are tracked in tactic_cmds.cpp."
         },
         {
-          "name": "parse_declare_datatype(s), parse_datatype_dec and parse_constructor_decls concrete forms: legacy and SMT2.6 nullary mutually recursive declarations, pending direct sibling fields, bare/parenthesized constructors, recognizer naming, missing-reference-before-duplicate validation and publication after complete command syntax; parametric/nested recursive sort constructors and full declaration diagnostics remain open",
-          "status": "partial",
+          "name": "parse_declare_datatype(s), parse_datatype_dec and parse_constructor_decls: legacy and SMT2.6 nullary/parametric mutually recursive declarations, direct and nested sibling fields, formal sorts, constructor/recognizer/accessor naming, validation and publication after complete command syntax",
+          "status": "ported",
           "go_target": "pkg/parsers/smt2/datatypes.go",
           "go_targets": [
             "pkg/parsers/smt2/datatypes.go",
@@ -94415,6 +94449,8 @@
           "tests": [
             "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
             "TestSMT2DatatypeRefusalsBeforeDeclarationPublication",
+            "TestSMT2ParametricDatatypeInstantiationAndRecursiveFields",
+            "TestSMT2ParametricDatatypeInstantiationFunctionsFollowScopes",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]

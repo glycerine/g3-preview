@@ -4,6 +4,7 @@ package smt2
 // parse_datatype_dec and parse_constructor_decls: concrete declaration grammar.
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -14,6 +15,69 @@ type datatypePendingField struct {
 	name                            string
 }
 
+func (p *commandParser) currentDatatypeSort(name string, arguments []ast.ASTHandle) (result ast.ASTHandle, err error) {
+	m, err := p.astManager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	symbol, err := m.Symbols.Intern(name)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	parameters := make([]ast.ASTParameter, 0, len(arguments)+1)
+	nameParameter, err := m.NewParameterSymbol(symbol)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	parameters = append(parameters, nameParameter)
+	defer func() {
+		for i := len(parameters) - 1; i >= 0; i-- {
+			err = errors.Join(err, m.DelParameter(&parameters[i]))
+		}
+	}()
+	for _, argument := range arguments {
+		parameter, e := m.NewParameterAST(argument)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		parameters = append(parameters, parameter)
+	}
+	family, err := m.DatatypeFamilyID()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err = m.MkFamilySort(family, ast.ASTDatatypeSort, parameters)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return p.pin(result, nil)
+}
+
+func (p *commandParser) datatypeFormalParameters(names []string) ([]ast.ASTHandle, map[string]ast.ASTHandle, error) {
+	m, err := p.astManager()
+	if err != nil {
+		return nil, nil, err
+	}
+	parameters := make([]ast.ASTHandle, 0, len(names))
+	byName := make(map[string]ast.ASTHandle, len(names))
+	for _, name := range names {
+		if _, found := byName[name]; found {
+			return nil, nil, fmt.Errorf("duplicate sort parameter %s", name)
+		}
+		symbol, e := m.Symbols.Intern(name)
+		if e != nil {
+			return nil, nil, e
+		}
+		formal, e := p.pin(m.MkUninterpretedSort(symbol, nil))
+		if e != nil {
+			return nil, nil, e
+		}
+		parameters = append(parameters, formal)
+		byName[name] = formal
+	}
+	return parameters, byName, nil
+}
+
 func (p *commandParser) declareDatatypes(single bool) error {
 	m, err := p.context.Manager()
 	if err != nil {
@@ -22,13 +86,24 @@ func (p *commandParser) declareDatatypes(single bool) error {
 	var definitions []ast.DatatypeDefinition
 	var pending []datatypePendingField
 	var headers []string
+	var arities []uint32
+	var commonParameters []string
 	modern := false
+	previousHeaders := p.datatypeHeaders
+	previousParams := p.sortParams
+	p.datatypeHeaders = make(map[string]uint32)
+	defer func() {
+		p.datatypeHeaders = previousHeaders
+		p.sortParams = previousParams
+	}()
 	if single {
 		name, e := p.symbol()
 		if e != nil {
 			return e
 		}
 		headers = append(headers, name)
+		arities = append(arities, 0)
+		p.datatypeHeaders[name] = 0
 	} else {
 		if err = p.expect(LeftParenToken); err != nil {
 			return err
@@ -47,22 +122,27 @@ func (p *commandParser) declareDatatypes(single bool) error {
 				if e != nil {
 					return e
 				}
-				if arity != 0 {
-					return fmt.Errorf("parameterized datatype declarations are not ported yet")
-				}
 				headers = append(headers, name)
+				arities = append(arities, arity)
+				p.datatypeHeaders[name] = arity
 				if err = p.expect(RightParenToken); err != nil {
 					return err
 				}
 			}
-		} else if p.token != RightParenToken {
-			return fmt.Errorf("parameterized datatype declarations are not ported yet")
+		} else {
+			for p.token != RightParenToken {
+				name, e := p.symbol()
+				if e != nil {
+					return e
+				}
+				commonParameters = append(commonParameters, name)
+			}
 		}
 		if err = p.expect(RightParenToken); err != nil {
 			return err
 		}
 	}
-	parseBody := func(name string, old bool) error {
+	parseBody := func(name string, old bool, expectedArity int64) error {
 		if e := p.expect(LeftParenToken); e != nil {
 			return e
 		}
@@ -72,15 +152,48 @@ func (p *commandParser) declareDatatypes(single bool) error {
 			if e != nil {
 				return e
 			}
+			p.datatypeHeaders[name] = uint32(len(commonParameters))
 		}
+		parameterNames := commonParameters
+		wrapped := false
 		if p.token == SymbolToken && p.scanner.ID() == "par" {
-			return fmt.Errorf("parameterized datatype declarations are not ported yet")
+			wrapped = true
+			if e := p.advance(); e != nil {
+				return e
+			}
+			if e := p.expect(LeftParenToken); e != nil {
+				return e
+			}
+			parameterNames = nil
+			for p.token != RightParenToken {
+				parameter, e := p.symbol()
+				if e != nil {
+					return e
+				}
+				parameterNames = append(parameterNames, parameter)
+			}
+			if e := p.expect(RightParenToken); e != nil {
+				return e
+			}
+			if e := p.expect(LeftParenToken); e != nil {
+				return e
+			}
+			p.datatypeHeaders[name] = uint32(len(parameterNames))
 		}
+		if expectedArity >= 0 && uint32(expectedArity) != uint32(len(parameterNames)) {
+			return fmt.Errorf("datatype sort %s declares arity %d but defines %d parameters", name, expectedArity, len(parameterNames))
+		}
+		parameters, localParams, e := p.datatypeFormalParameters(parameterNames)
+		if e != nil {
+			return e
+		}
+		p.sortParams = localParams
+		defer func() { p.sortParams = previousParams }()
 		symbol, e := m.Symbols.Intern(name)
 		if e != nil {
 			return e
 		}
-		definition := ast.DatatypeDefinition{Name: symbol}
+		definition := ast.DatatypeDefinition{Name: symbol, Parameters: parameters}
 		for p.token != RightParenToken {
 			parenthesized := p.token == LeftParenToken
 			if parenthesized {
@@ -117,9 +230,16 @@ func (p *commandParser) declareDatatypes(single bool) error {
 					field := ast.DatatypeAccessorDefinition{Name: fieldSymbol}
 					if p.token == SymbolToken {
 						sortName := p.scanner.ID()
-						pending = append(pending, datatypePendingField{len(definitions), len(definition.Constructors), len(constructor.Accessors), sortName})
-						if e = p.advance(); e != nil {
-							return e
+						if formal, found := localParams[sortName]; found {
+							field.Range = formal
+							if e = p.advance(); e != nil {
+								return e
+							}
+						} else {
+							pending = append(pending, datatypePendingField{len(definitions), len(definition.Constructors), len(constructor.Accessors), sortName})
+							if e = p.advance(); e != nil {
+								return e
+							}
 						}
 					} else {
 						field.Range, e = p.sort()
@@ -142,10 +262,17 @@ func (p *commandParser) declareDatatypes(single bool) error {
 			return fmt.Errorf("invalid datatype declaration, datatype must have at least one constructor")
 		}
 		definitions = append(definitions, definition)
-		return p.expect(RightParenToken)
+		if e = p.expect(RightParenToken); e != nil {
+			return e
+		}
+		if wrapped {
+			return p.expect(RightParenToken)
+		}
+		return nil
 	}
 	if single {
-		if err = parseBody(headers[0], false); err != nil {
+		// A single declaration derives its arity from an optional par binder.
+		if err = parseBody(headers[0], false, -1); err != nil {
 			return err
 		}
 	} else {
@@ -160,7 +287,11 @@ func (p *commandParser) declareDatatypes(single bool) error {
 				}
 				name = headers[len(definitions)]
 			}
-			if err = parseBody(name, !modern); err != nil {
+			expected := int64(len(commonParameters))
+			if modern {
+				expected = int64(arities[len(definitions)])
+			}
+			if err = parseBody(name, !modern, expected); err != nil {
 				return err
 			}
 		}
@@ -188,6 +319,9 @@ func (p *commandParser) declareDatatypes(single bool) error {
 	for _, row := range pending {
 		field := &definitions[row.datatype].Constructors[row.constructor].Accessors[row.accessor]
 		if index, found := indices[row.name]; found {
+			if p.datatypeHeaders[row.name] != 0 {
+				return fmt.Errorf("sort constructor expects parameters")
+			}
 			field.Recursive = true
 			field.RecursiveIndex = index
 		} else {

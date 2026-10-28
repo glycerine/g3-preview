@@ -49,7 +49,7 @@ func TestSMT2DatatypeRefusalsBeforeDeclarationPublication(t *testing.T) {
 		"(declare-datatype D ((make)) extra)",
 		"(declare-datatypes ((D 0) (E 0)) (((make))))",
 		"(declare-datatypes ((D 0)) (((make)) ((other))))",
-		"(declare-datatypes ((D 1)) ((par (T) ((make (field T))))))",
+		"(declare-datatypes ((D 2)) ((par (T) ((make (field T))))))",
 	} {
 		t.Run(declaration, func(t *testing.T) {
 			context, err := cmd_context.NewStandaloneContext()
@@ -68,5 +68,71 @@ func TestSMT2DatatypeRefusalsBeforeDeclarationPublication(t *testing.T) {
 				t.Fatal("rejected declaration published its constructor")
 			}
 		})
+	}
+}
+
+func TestSMT2ParametricDatatypeInstantiationAndRecursiveFields(t *testing.T) {
+	for _, script := range []string{
+		"(declare-datatype Box (par (T) ((box (unbox T)))))" +
+			"(declare-const b (Box Bool))" +
+			"(assert (= (unbox (box true)) true))(check-sat)",
+		"(declare-datatypes ((List 1)) ((par (T) ((nil) (cons (head T) (tail (List T)))))))" +
+			"(declare-const xs (List Bool))" +
+			"(assert (= (head (cons true nil)) true))(check-sat)",
+		"(declare-datatypes (T) ((List (nil) (cons (head T) (tail (List T))))))" +
+			"(declare-const xs (List Bool))" +
+			"(assert (= (head (cons true nil)) true))(check-sat)",
+	} {
+		t.Run(script[:32], func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer context.Close()
+			var output bytes.Buffer
+			if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
+				t.Fatal(err, output.String())
+			}
+			if output.String() != "sat\n" {
+				t.Fatal(output.String())
+			}
+		})
+	}
+}
+
+func TestSMT2ParametricDatatypeSortArityRefusals(t *testing.T) {
+	for _, suffix := range []string{
+		"(declare-const x Box)",
+		"(declare-const x (Box Bool Int))",
+	} {
+		context, err := cmd_context.NewStandaloneContext()
+		if err != nil {
+			t.Fatal(err)
+		}
+		var output bytes.Buffer
+		err = ParseCommands(context, strings.NewReader("(declare-datatype Box (par (T) ((box (unbox T)))))"+suffix), &output)
+		_ = context.Close()
+		if err == nil {
+			t.Fatal("accepted invalid parametric datatype sort", suffix)
+		}
+	}
+}
+
+func TestSMT2ParametricDatatypeInstantiationFunctionsFollowScopes(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer context.Close()
+	var output bytes.Buffer
+	script := "(declare-datatype Box (par (T) ((box (unbox T)))))" +
+		"(push 1)(declare-const scoped (Box Bool))(pop 1)" +
+		"(declare-const retained (Box Bool))" +
+		"(assert (= (unbox (box true)) true))(check-sat)"
+	if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	if output.String() != "sat\n" {
+		t.Fatal(output.String())
 	}
 }

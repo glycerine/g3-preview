@@ -31,7 +31,7 @@ type assertion struct {
 	expression, tag ast.ASTHandle
 	ref, tagRef     ast.ASTRef
 }
-type scope struct{ functions, sorts, assertions, macros int }
+type scope struct{ functions, sorts, assertions, macros, sortConstructors int }
 type builtin struct {
 	family ast.FamilyID
 	kind   int32
@@ -53,6 +53,9 @@ type Context struct {
 	logic                            string
 	functions                        map[string][]ast.ASTHandle
 	sorts                            map[string]ast.ASTHandle
+	sortArities                      map[string]uint32
+	sortConstructors                 map[string]sortConstructorDeclaration
+	sortConstructorTrail             []string
 	builtins                         map[string][]builtin
 	functionTrail, sortTrail         []declaration
 	macros                           map[string][]macroDeclaration
@@ -74,7 +77,7 @@ func NewContext(config smtcore.SMTSolverConfig) (*Context, error) {
 	if config.Params == nil || config.Globals == nil {
 		return nil, uparams.ErrParamsOwner
 	}
-	c := &Context{config: config, functions: make(map[string][]ast.ASTHandle), sorts: make(map[string]ast.ASTHandle), builtins: make(map[string][]builtin), macros: make(map[string][]macroDeclaration), status: lbool.Undef}
+	c := &Context{config: config, functions: make(map[string][]ast.ASTHandle), sorts: make(map[string]ast.ASTHandle), sortArities: make(map[string]uint32), sortConstructors: make(map[string]sortConstructorDeclaration), builtins: make(map[string][]builtin), macros: make(map[string][]macroDeclaration), status: lbool.Undef}
 	var err error
 	c.params, err = config.Params.NewValue()
 	if err != nil {
@@ -408,28 +411,7 @@ func (c *Context) mkSolver(m *ast.ASTManager) error {
 }
 
 func (c *Context) DeclareSort(name string) (ast.ASTHandle, error) {
-	m, err := c.Manager()
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	if _, found := c.sorts[name]; found || c.BuiltinSortAvailable(name) {
-		return ast.ASTHandle{}, fmt.Errorf("sort already defined %s", name)
-	}
-	symbol, err := m.Symbols.Intern(name)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	sort, err := m.MkUninterpretedSort(symbol, nil)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	ref, err := m.NewRef(sort)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
-	c.sorts[name] = sort
-	c.sortTrail = append(c.sortTrail, declaration{name, sort, ref})
-	return sort, nil
+	return c.DeclareSortConstructor(name, 0)
 }
 
 func (c *Context) LookupSort(name string) (ast.ASTHandle, error) {
@@ -437,7 +419,13 @@ func (c *Context) LookupSort(name string) (ast.ASTHandle, error) {
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
+	if declaration, found := c.sortConstructors[name]; found {
+		return ast.ASTHandle{}, fmt.Errorf("sort constructor expects %d parameters", declaration.arity)
+	}
 	if s, found := c.sorts[name]; found {
+		if arity := c.sortArities[name]; arity != 0 {
+			return ast.ASTHandle{}, fmt.Errorf("sort constructor expects %d parameters", arity)
+		}
 		return s, nil
 	}
 	if !c.BuiltinSortAvailable(name) {
@@ -593,7 +581,7 @@ func (c *Context) Push(count uint32) error {
 		if err := c.solver.Push(); err != nil {
 			return err
 		}
-		c.scopes = append(c.scopes, scope{len(c.functionTrail), len(c.sortTrail), len(c.assertions), len(c.macroTrail)})
+		c.scopes = append(c.scopes, scope{len(c.functionTrail), len(c.sortTrail), len(c.assertions), len(c.macroTrail), len(c.sortConstructorTrail)})
 	}
 	c.checked = false
 	return nil
@@ -626,6 +614,9 @@ func (c *Context) Pop(count uint32) error {
 		if err := c.restoreDeclarations(s.functions, s.sorts); err != nil {
 			return err
 		}
+		if err := c.restoreSortConstructors(s.sortConstructors); err != nil {
+			return err
+		}
 	}
 	if err := c.restoreAssertions(s.assertions); err != nil {
 		return err
@@ -653,6 +644,7 @@ func (c *Context) restoreDeclarations(functions, sorts int) error {
 		i := len(c.sortTrail) - 1
 		row := &c.sortTrail[i]
 		delete(c.sorts, row.name)
+		delete(c.sortArities, row.name)
 		if err := c.manager.DelRef(&row.ref); err != nil {
 			return err
 		}
@@ -830,6 +822,9 @@ func (c *Context) resetManagerState() error {
 		if err := c.restoreDeclarations(0, 0); err != nil {
 			return err
 		}
+		if err := c.restoreSortConstructors(0); err != nil {
+			return err
+		}
 		if err := c.manager.Close(); err != nil {
 			return err
 		}
@@ -837,6 +832,9 @@ func (c *Context) resetManagerState() error {
 	}
 
 	clear(c.builtins)
+	clear(c.sortArities)
+	clear(c.sortConstructors)
+	c.sortConstructorTrail = nil
 	c.logicChecker.Reset()
 	c.logic = ""
 	c.scopes = nil

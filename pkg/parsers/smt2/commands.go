@@ -29,6 +29,8 @@ type commandParser struct {
 	locals             localExprStack
 	bindings           uint32
 	shifter            *rewriter.VarShifter
+	sortParams         map[string]ast.ASTHandle
+	datatypeHeaders    map[string]uint32
 	ignoreUserPatterns bool
 	ignoreBadPatterns  bool
 	ignoreChecks       bool
@@ -264,13 +266,46 @@ func (p *commandParser) command() (bool, error) {
 				return false, err
 			}
 		}
-		if arity != 0 {
-			return false, fmt.Errorf("parameterized user sorts are not ported yet")
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if _, err = p.context.DeclareSortConstructor(name, arity); err != nil {
+			return false, err
+		}
+	case "define-sort":
+		name, err := p.symbol()
+		if err != nil {
+			return false, err
+		}
+		if err = p.expect(LeftParenToken); err != nil {
+			return false, err
+		}
+		var parameterNames []string
+		for p.token != RightParenToken {
+			parameter, e := p.symbol()
+			if e != nil {
+				return false, e
+			}
+			parameterNames = append(parameterNames, parameter)
+		}
+		if err = p.expect(RightParenToken); err != nil {
+			return false, err
+		}
+		formals, byName, err := p.datatypeFormalParameters(parameterNames)
+		if err != nil {
+			return false, err
+		}
+		previous := p.sortParams
+		p.sortParams = byName
+		body, bodyErr := p.sort()
+		p.sortParams = previous
+		if bodyErr != nil {
+			return false, bodyErr
 		}
 		if err = p.requireEnd(); err != nil {
 			return false, err
 		}
-		if _, err = p.context.DeclareSort(name); err != nil {
+		if err = p.context.DefineSort(name, formals, body); err != nil {
 			return false, err
 		}
 	case "declare-fun", "declare-const":
@@ -609,6 +644,15 @@ func (p *commandParser) sort() (ast.ASTHandle, error) {
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}
+		if formal, found := p.sortParams[name]; found {
+			return p.pin(formal, nil)
+		}
+		if arity, found := p.datatypeHeaders[name]; found {
+			if arity != 0 {
+				return ast.ASTHandle{}, fmt.Errorf("sort constructor expects %d parameters", arity)
+			}
+			return p.currentDatatypeSort(name, nil)
+		}
 		return p.pin(p.context.LookupSort(name))
 	}
 	if err := p.expect(LeftParenToken); err != nil {
@@ -693,7 +737,24 @@ func (p *commandParser) sort() (ast.ASTHandle, error) {
 		}
 		return p.pin(value, nil)
 	}
-	return ast.ASTHandle{}, fmt.Errorf("unsupported sort constructor %s", name)
+	var arguments []ast.ASTHandle
+	for p.token != RightParenToken {
+		value, e := p.sort()
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		arguments = append(arguments, value)
+	}
+	if err = p.expect(RightParenToken); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if arity, found := p.datatypeHeaders[name]; found {
+		if uint32(len(arguments)) != arity {
+			return ast.ASTHandle{}, fmt.Errorf("invalid number of parameters to sort constructor %s: got %d, want %d", name, len(arguments), arity)
+		}
+		return p.currentDatatypeSort(name, arguments)
+	}
+	return p.pin(p.context.InstantiateSort(name, arguments))
 }
 
 func (p *commandParser) indexedApplication(name string, indices []identifierIndex, args []ast.ASTHandle, rangeSort ast.ASTHandle) (ast.ASTHandle, error) {
