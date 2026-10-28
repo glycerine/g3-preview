@@ -168,6 +168,30 @@ func TestSMTContextUnsatCoreAndProofResults(t *testing.T) {
 	})
 }
 
+func TestSMTContextConsequencesOwnReturnedExpressions(t *testing.T) {
+	f := newSMTAPIFixture(t, "QF_UF", nil)
+	boolean := f.pin(f.m.MkBoolSort())
+	symbol, err := f.m.Symbols.Intern("api-consequence-p")
+	astTestMust(t, err)
+	p := f.pin(f.m.MkConst(symbol, boolean))
+	astTestMust(t, f.c.Assert(p))
+	status, consequences, err := f.c.Consequences(nil, []ast.ASTHandle{p})
+	astTestMust(t, err)
+	if status != lbool.True || len(consequences) != 1 {
+		t.Fatal("consequence result", status, len(consequences))
+	}
+	value, err := f.m.RefGet(consequences[0])
+	astTestMust(t, err)
+	sort, err := f.m.GetSort(value)
+	astTestMust(t, err)
+	if sort != boolean {
+		t.Fatal("consequence is not Boolean", value)
+	}
+	for i := range consequences {
+		astTestMust(t, f.m.DelRef(&consequences[i]))
+	}
+}
+
 func TestSMTContextUnknownReason(t *testing.T) {
 	f := newSMTAPIFixture(t, "ALL", func(c *SMTContext) {
 		astTestMust(t, c.SetBoolOption("auto_config", false))

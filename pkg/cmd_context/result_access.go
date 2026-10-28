@@ -45,6 +45,19 @@ func (c *Context) Statistics() (statistics.Statistics, error) {
 	return result, nil
 }
 
+// Consequences invalidates command-result access and delegates to the
+// installed solver's concrete consequence engine.
+func (c *Context) Consequences(assumptions, variables []ast.ASTHandle) (lbool.LBool, []ast.ASTHandle, error) {
+	if err := c.valid(); err != nil {
+		return lbool.Undef, nil, err
+	}
+	if _, err := c.Manager(); err != nil {
+		return lbool.Undef, nil, err
+	}
+	c.checked = false
+	return c.solver.GetConsequences(assumptions, variables)
+}
+
 // UnsatCore returns a borrowed copy of the most recent unsatisfiable result's
 // tracked labels. The handles remain owned by the context result.
 func (c *Context) UnsatCore() ([]ast.ASTHandle, error) {

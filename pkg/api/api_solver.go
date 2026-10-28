@@ -176,6 +176,42 @@ func (c *SMTContext) Statistics() (statistics.Statistics, error) {
 	return c.command.Statistics()
 }
 
+// Consequences returns owning AST references for consequences over variables.
+// The caller must release every returned reference through Manager.DelRef.
+// As in the native solver API, the query replaces the solver's internal check
+// state; prior model/core/proof handles must not be requested afterward.
+func (c *SMTContext) Consequences(assumptions, variables []ast.ASTHandle) (status lbool.LBool, result []ast.ASTRef, resultErr error) {
+	if err := c.open(); err != nil {
+		return lbool.Undef, nil, err
+	}
+	status, expressions, err := c.command.Consequences(assumptions, variables)
+	if err != nil {
+		return status, nil, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return lbool.Undef, nil, err
+	}
+	defer func() {
+		if resultErr == nil {
+			return
+		}
+		for i := range result {
+			resultErr = errors.Join(resultErr, manager.DelRef(&result[i]))
+		}
+		result = nil
+	}()
+	result = make([]ast.ASTRef, 0, len(expressions))
+	for _, expression := range expressions {
+		ref, refErr := manager.NewRef(expression)
+		if refErr != nil {
+			return lbool.Undef, result, refErr
+		}
+		result = append(result, ref)
+	}
+	return status, result, nil
+}
+
 func (c *SMTContext) ResetAssertions() error {
 	if err := c.open(); err != nil {
 		return err
