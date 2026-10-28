@@ -82776,14 +82776,16 @@
         "pkg/muz/pdr/predicate_rules.go",
         "pkg/muz/pdr/predicate_rules_test.go",
         "pkg/muz/pdr/context.go",
-        "pkg/muz/pdr/context_test.go"
+        "pkg/muz/pdr/context_test.go",
+        "pkg/muz/pdr/context_bounded.go"
       ],
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
         "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
         "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
         "TestPredicateTransformerCouplesPredecessorFramesByRuleTag",
-        "TestContextInitializesHornProgramAndAnswersInitialQueries"
+        "TestContextInitializesHornProgramAndAnswersInitialQueries",
+        "TestContextBoundedQueryTraversesTaggedHornChain"
       ],
       "assertions": [
         {
@@ -82989,6 +82991,14 @@
           ]
         },
         {
+          "name": "bounded tag-selected transition composition used as the narrow Go end-to-end integration path while native model_search is ported",
+          "status": "partial",
+          "go_target": "pkg/muz/pdr/context_bounded.go",
+          "tests": [
+            "TestContextBoundedQueryTraversesTaggedHornChain"
+          ]
+        },
+        {
           "name": "cover/model conversion, model-node/search, generalization and top-level PDR solve loop",
           "status": "unported",
           "go_target": null,
@@ -82999,7 +83009,8 @@
         "PredicateTransformer owns its head/system/property AST references, PropSolver, and ReachableCache. It closes both context consumers before releasing AST pins; returned signatures, formulas, and cores borrow AST handles while requested models retain explicit ownership."
       ],
       "deviations": [
-        "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers."
+        "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
+        "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth and does not replace or claim completion of the unbounded native model_search loop."
       ]
     },
     {
@@ -83013,14 +83024,16 @@
         "pkg/muz/pdr/predicate_rules.go",
         "pkg/muz/pdr/predicate_rules_test.go",
         "pkg/muz/pdr/context.go",
-        "pkg/muz/pdr/context_test.go"
+        "pkg/muz/pdr/context_test.go",
+        "pkg/muz/pdr/context_bounded.go"
       ],
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
         "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
         "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
         "TestPredicateTransformerCouplesPredecessorFramesByRuleTag",
-        "TestContextInitializesHornProgramAndAnswersInitialQueries"
+        "TestContextInitializesHornProgramAndAnswersInitialQueries",
+        "TestContextBoundedQueryTraversesTaggedHornChain"
       ],
       "conditionals": [
         {
@@ -83074,7 +83087,8 @@
           "status": "ported",
           "go_target": "pkg/muz/pdr/context.go",
           "tests": [
-            "TestContextInitializesHornProgramAndAnswersInitialQueries"
+            "TestContextInitializesHornProgramAndAnswersInitialQueries",
+            "TestContextBoundedQueryTraversesTaggedHornChain"
           ]
         },
         {
@@ -83088,7 +83102,8 @@
         "PredicateTransformer is the concrete Go owner for its proposition solver, reachable cache, and retained AST state."
       ],
       "deviations": [
-        "The Go frame API uses explicit methods and returned result values rather than C++ reference outputs and scoped mutable solver settings."
+        "The Go frame API uses explicit methods and returned result values rather than C++ reference outputs and scoped mutable solver settings.",
+        "CheckBounded is a temporary finite-depth context operation for early integration coverage; the header's unbounded solve/model-search contract remains explicitly unported."
       ]
     },
     {

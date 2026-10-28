@@ -87,3 +87,80 @@ func TestContextInitializesHornProgramAndAnswersInitialQueries(t *testing.T) {
 	pdrMust(t, ruleManager.Close())
 	pdrMust(t, command.Close())
 }
+
+func TestContextBoundedQueryTraversesTaggedHornChain(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	pdrMust(t, err)
+	manager, err := command.Manager()
+	pdrMust(t, err)
+	globals, err := command.GlobalParameters()
+	pdrMust(t, err)
+	context, err := pdr.NewContext(manager, nil, 4, pdr.ReachableHashCache, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	pdrMust(t, err)
+	boolean, err := manager.MkBoolSort()
+	pdrMust(t, err)
+	declarations := []ast.ASTHandle{
+		pdrFunction(t, manager, "bounded_p", []ast.ASTHandle{boolean}, boolean),
+		pdrFunction(t, manager, "bounded_q", []ast.ASTHandle{boolean}, boolean),
+		pdrFunction(t, manager, "bounded_r", []ast.ASTHandle{boolean}, boolean),
+	}
+	ruleManager, err := base.NewRuleManager(manager)
+	pdrMust(t, err)
+	for _, declaration := range declarations {
+		pdrMust(t, ruleManager.RegisterPredicate(declaration))
+	}
+	set, err := base.NewRuleSet(ruleManager)
+	pdrMust(t, err)
+	variable, err := manager.MkVar(0, boolean)
+	pdrMust(t, err)
+	truth, err := manager.MkTrue()
+	pdrMust(t, err)
+	falsity, err := manager.MkFalse()
+	pdrMust(t, err)
+	for index, declaration := range declarations {
+		head, x := manager.MkApp(declaration, []ast.ASTHandle{variable})
+		pdrMust(t, x)
+		var tail ast.ASTHandle
+		if index == 0 {
+			tail, x = manager.MkEq(variable, truth)
+		} else {
+			tail, x = manager.MkApp(declarations[index-1], []ast.ASTHandle{variable})
+		}
+		pdrMust(t, x)
+		rule, x := ruleManager.NewRule(head, []ast.ASTHandle{tail}, nil, "bounded")
+		pdrMust(t, x)
+		pdrMust(t, set.Add(rule))
+		pdrMust(t, rule.Close())
+	}
+	pdrMust(t, context.Initialize(set))
+
+	for _, check := range []struct {
+		predicate int
+		argument  ast.ASTHandle
+		depth     uint32
+		want      lbool.LBool
+	}{
+		{0, truth, 0, lbool.True},
+		{1, truth, 0, lbool.False},
+		{1, truth, 1, lbool.True},
+		{2, truth, 1, lbool.False},
+		{2, truth, 2, lbool.True},
+		{2, falsity, 3, lbool.False},
+	} {
+		query, x := manager.MkApp(declarations[check.predicate], []ast.ASTHandle{check.argument})
+		pdrMust(t, x)
+		result, x := context.CheckBounded(query, check.depth, check.want == lbool.True)
+		pdrMust(t, x)
+		if result.Status != check.want {
+			t.Fatal("bounded query", check.predicate, check.depth, result.Status, check.want)
+		}
+		if result.Model != nil {
+			pdrMust(t, result.Model.DecRef())
+		}
+	}
+
+	pdrMust(t, context.Close())
+	pdrMust(t, set.Close())
+	pdrMust(t, ruleManager.Close())
+	pdrMust(t, command.Close())
+}
