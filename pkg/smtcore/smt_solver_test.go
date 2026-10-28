@@ -746,6 +746,48 @@ func TestSMTSolverDerivesBooleanConsequences(t *testing.T) {
 	}
 }
 
+func TestSMTSolverDerivesArithmeticConsequences(t *testing.T) {
+	m, modelConfig := smtModelGeneratorFixture(t)
+	if _, err := m.RegisterArithmeticPlugin(); err != nil {
+		t.Fatal(err)
+	}
+	three, err := m.ArithmeticNumeralRat(big.NewRat(3, 1), true)
+	astTestMust(t, err)
+	integer, err := m.GetSort(three)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "smt-solver-consequence-x"), integer)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "smt-solver-consequence-y"), integer)
+	astTestMust(t, err)
+	boolean, err := m.MkBoolSort()
+	astTestMust(t, err)
+	a, err := m.MkConst(astTestSymbol(t, m, "smt-solver-consequence-a"), boolean)
+	astTestMust(t, err)
+	equality, err := m.MkEq(x, three)
+	astTestMust(t, err)
+	conditional, err := m.MkImplies(a, equality)
+	astTestMust(t, err)
+	four, err := m.ArithmeticNumeralRat(big.NewRat(4, 1), true)
+	astTestMust(t, err)
+	yEquality, err := m.MkEq(y, four)
+	astTestMust(t, err)
+	s, err := NewSMTSolver(m, nil, "QF_LIA", SMTSolverConfig{Params: modelConfig.Context, ModelEvaluator: modelConfig})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	astTestMust(t, s.Assert(conditional))
+	astTestMust(t, s.Assert(yEquality))
+	status, consequences, err := s.GetConsequences([]ast.ASTHandle{a}, []ast.ASTHandle{a, x, y})
+	astTestMust(t, err)
+	if status != lbool.True || len(consequences) != 3 {
+		t.Fatal("arithmetic consequences", status, consequences)
+	}
+	for _, consequence := range consequences {
+		if _, err = m.GetSort(consequence); err != nil {
+			t.Fatal("arithmetic consequence lifetime", err)
+		}
+	}
+}
+
 func TestSMTSolverFindsBinaryClauseMutexes(t *testing.T) {
 	m, s := smtSolverFixture(t)
 	a := smtRelevancyBool(t, m, "smt-mutex-a")

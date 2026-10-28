@@ -52,6 +52,9 @@ func TestSolverDefaultConsequenceForNonBooleanValue(t *testing.T) {
 	if status != lbool.True || len(consequences) != 1 || len(s.scopes) != 0 || len(s.assertions) != 0 {
 		t.Fatal("non-Boolean consequence", status, len(consequences), len(s.scopes), len(s.assertions))
 	}
+	if _, err = m.GetSort(consequences[0]); err != nil {
+		t.Fatal("non-Boolean consequence lifetime", err)
+	}
 }
 
 func (s *solverFixture) Translate(*ast.ASTManager, *uparams.ParamsRef) (Solver, error) {
@@ -163,13 +166,16 @@ func TestSolverDefaultsScopedPushAssertionsAndConsequence(t *testing.T) {
 	md, err := model.NewModel(m)
 	solverMust(t, err)
 	solverMust(t, result.SetModel(md.Core()))
-	truth, err := m.MkTrue()
+	falsity, err := m.MkFalse()
 	solverMust(t, err)
 	status, consequences, err := DefaultGetConsequences(s, []ast.ASTHandle{assumption}, []ast.ASTHandle{variable}, func(*model.ModelCore) (ConsequenceEvaluator, error) {
-		return &fixedConsequenceEvaluator{manager: m, value: truth}, nil
+		return &fixedConsequenceEvaluator{manager: m, value: falsity}, nil
 	})
 	solverMust(t, err)
 	if status != lbool.True || len(consequences) != 1 || s.checks != 2 {
 		t.Fatal("default consequences", status, len(consequences), s.checks)
+	}
+	if _, err = m.GetSort(consequences[0]); err != nil {
+		t.Fatal("Boolean consequence lifetime", err)
 	}
 }

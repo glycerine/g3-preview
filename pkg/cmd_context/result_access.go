@@ -1,6 +1,6 @@
 package cmd_context
 
-// Source: src/cmd_context/cmd_context.cpp result ownership and
+// Source: src/cmd_context/cmd_context.cpp result ownership/get_consequences and
 // src/cmd_context/basic_cmds.cpp get-proof/get-unsat-core availability.
 
 import (
@@ -46,9 +46,9 @@ func (c *Context) Statistics() (statistics.Statistics, error) {
 	return result, nil
 }
 
-// Consequences invalidates command-result access and delegates to the
+// Consequences replaces the prior command result and delegates to the
 // installed solver's concrete consequence engine.
-func (c *Context) Consequences(assumptions, variables []ast.ASTHandle) (lbool.LBool, []ast.ASTHandle, error) {
+func (c *Context) Consequences(assumptions, variables []ast.ASTHandle) (status lbool.LBool, consequences []ast.ASTHandle, resultErr error) {
 	if err := c.valid(); err != nil {
 		return lbool.Undef, nil, err
 	}
@@ -56,7 +56,15 @@ func (c *Context) Consequences(assumptions, variables []ast.ASTHandle) (lbool.LB
 		return lbool.Undef, nil, err
 	}
 	c.checked = false
-	return c.solver.GetConsequences(assumptions, variables)
+	if err := c.clearCheckSatResult(); err != nil {
+		return lbool.Undef, nil, err
+	}
+	status, consequences, resultErr = c.solver.GetConsequences(assumptions, variables)
+	if resultErr != nil {
+		return status, consequences, resultErr
+	}
+	c.status, c.checked = status, true
+	return status, consequences, nil
 }
 
 // ImpliedEqualities partitions terms by equalities implied by the current

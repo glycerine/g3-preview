@@ -52,6 +52,7 @@ type SMTSolver struct {
 	logic         usymbol.Symbol
 	tracked       []smtTrackedAssertion
 	trackedScopes []uint32
+	consequences  []ast.ASTRef
 	objectives    []smtSolverObjective
 	callback      solver.ProgressCallback
 	references    uint32
@@ -334,6 +335,26 @@ func (s *SMTSolver) UnsatCore() ([]ast.ASTHandle, error) {
 		return []ast.ASTHandle{}, nil
 	}
 	return s.result.UnsatCore()
+}
+
+func (s *SMTSolver) clearConsequences() error {
+	for len(s.consequences) != 0 {
+		i := len(s.consequences) - 1
+		if err := s.manager.DelRef(&s.consequences[i]); err != nil {
+			return err
+		}
+		s.consequences = s.consequences[:i]
+	}
+	return nil
+}
+
+func (s *SMTSolver) RetainConsequence(value ast.ASTHandle) (ast.ASTHandle, error) {
+	ref, err := s.manager.NewRef(value)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	s.consequences = append(s.consequences, ref)
+	return s.manager.RefGet(ref)
 }
 
 func (s *SMTSolver) AcquireModel() (*model.ModelCore, error) {
@@ -666,6 +687,9 @@ func (s *SMTSolver) GetConsequences(assumptions []ast.ASTHandle, variables []ast
 	if err := s.open(); err != nil {
 		return lbool.Undef, nil, err
 	}
+	if err := s.clearConsequences(); err != nil {
+		return lbool.Undef, nil, err
+	}
 	if s.config.ModelEvaluator.Context == nil {
 		return lbool.Undef, nil, ast.ErrASTDomain
 	}
@@ -930,6 +954,7 @@ func (s *SMTSolver) Close() error {
 		return nil
 	}
 	var result error
+	result = errors.Join(result, s.clearConsequences())
 	result = errors.Join(result, s.clearResult())
 	result = errors.Join(result, s.named.Close())
 	result = errors.Join(result, s.restoreTracked(0))

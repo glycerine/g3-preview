@@ -34,6 +34,7 @@ type TacticSolver struct {
 	named                                      *NamedAssertions
 	result                                     *SimpleCheckSatResult
 	assertions                                 []ast.ASTRef
+	consequences                               []ast.ASTRef
 	scopes                                     []uint32
 	params                                     uparams.ParamsRef
 	logic                                      usymbol.Symbol
@@ -166,6 +167,26 @@ func (s *TacticSolver) UnsatCore() ([]ast.ASTHandle, error) {
 		return []ast.ASTHandle{}, nil
 	}
 	return s.result.UnsatCore()
+}
+
+func (s *TacticSolver) clearConsequences() error {
+	for len(s.consequences) != 0 {
+		i := len(s.consequences) - 1
+		if err := s.manager.DelRef(&s.consequences[i]); err != nil {
+			return err
+		}
+		s.consequences = s.consequences[:i]
+	}
+	return nil
+}
+
+func (s *TacticSolver) RetainConsequence(value ast.ASTHandle) (ast.ASTHandle, error) {
+	ref, err := s.manager.NewRef(value)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	s.consequences = append(s.consequences, ref)
+	return s.manager.RefGet(ref)
 }
 func (s *TacticSolver) AcquireModel() (*model.ModelCore, error) {
 	if err := s.open(); err != nil {
@@ -473,8 +494,14 @@ func (s *TacticSolver) CheckSatCore(assumptions []ast.ASTHandle) (status lbool.L
 
 func (s *TacticSolver) CheckSat(a []ast.ASTHandle) (lbool.LBool, error) { return s.named.CheckSat(a) }
 func (s *TacticSolver) GetConsequences(a, v []ast.ASTHandle) (lbool.LBool, []ast.ASTHandle, error) {
+	if err := s.open(); err != nil {
+		return lbool.Undef, nil, err
+	}
 	if s.config.EvaluatorFactory == nil {
 		return lbool.Undef, nil, ast.ErrASTHandle
+	}
+	if err := s.clearConsequences(); err != nil {
+		return lbool.Undef, nil, err
 	}
 	return s.named.WithAssumptions(a, func(combined []ast.ASTHandle) (lbool.LBool, []ast.ASTHandle, error) {
 		return DefaultGetConsequences(s, combined, v, s.config.EvaluatorFactory)
@@ -563,6 +590,9 @@ func (s *TacticSolver) Close() (err error) {
 	}
 	if s.closed {
 		return nil
+	}
+	if err = s.clearConsequences(); err != nil {
+		return err
 	}
 	if err = s.clearResult(); err != nil {
 		return err

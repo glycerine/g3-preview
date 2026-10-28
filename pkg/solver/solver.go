@@ -4,6 +4,7 @@ package solver
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -167,6 +168,10 @@ type ConsequenceEvaluator interface {
 
 type ConsequenceEvaluatorFactory func(*model.ModelCore) (ConsequenceEvaluator, error)
 
+type consequenceOwner interface {
+	RetainConsequence(ast.ASTHandle) (ast.ASTHandle, error)
+}
+
 func isUninterpretedConstant(m *ast.ASTManager, h ast.ASTHandle) (bool, error) {
 	kind, err := m.GetKind(h)
 	if err != nil || kind != ast.ASTApp {
@@ -214,6 +219,13 @@ func appendConsequence(m *ast.ASTManager, core []ast.ASTHandle, literal ast.ASTH
 		return ast.ASTHandle{}, err
 	}
 	return m.MkImplies(antecedent, literal)
+}
+
+func retainConsequence(s Solver, consequence ast.ASTHandle) (ast.ASTHandle, error) {
+	if owner, ok := s.(consequenceOwner); ok {
+		return owner.RetainConsequence(consequence)
+	}
+	return consequence, nil
 }
 
 // DefaultGetConsequences preserves solver::get_consequences and its core
@@ -270,19 +282,22 @@ func DefaultGetConsequences(s Solver, assumptions, variables []ast.ASTHandle, fa
 			return lbool.Undef, consequences, e
 		}
 		isValue, e := manager.IsValue(value)
-		if e = errors.Join(e, manager.DelRef(&valueRef)); e != nil {
-			return lbool.Undef, consequences, e
+		if e != nil {
+			return lbool.Undef, consequences, errors.Join(e, manager.DelRef(&valueRef))
 		}
 		if !isValue {
+			if e = manager.DelRef(&valueRef); e != nil {
+				return lbool.Undef, consequences, e
+			}
 			continue
 		}
 		boolean, e := isBoolean(manager, variable)
 		if e != nil {
-			return lbool.Undef, consequences, e
+			return lbool.Undef, consequences, errors.Join(e, manager.DelRef(&valueRef))
 		}
 		constant, e := isUninterpretedConstant(manager, variable)
 		if e != nil {
-			return lbool.Undef, consequences, e
+			return lbool.Undef, consequences, errors.Join(e, manager.DelRef(&valueRef))
 		}
 		var literal, negated ast.ASTHandle
 		if boolean && constant {
@@ -294,20 +309,36 @@ func DefaultGetConsequences(s Solver, assumptions, variables []ast.ASTHandle, fa
 				negated = variable
 				literal, e = manager.MkNot(variable)
 			default:
+				e = manager.DelRef(&valueRef)
+				if e != nil {
+					return lbool.Undef, consequences, e
+				}
 				continue
 			}
+			e = errors.Join(e, manager.DelRef(&valueRef))
 			if e != nil {
 				return lbool.Undef, consequences, e
+			}
+			literalRef, e := manager.NewRef(literal)
+			if e != nil {
+				return lbool.Undef, consequences, e
+			}
+			negatedRef, e := manager.NewRef(negated)
+			if e != nil {
+				return lbool.Undef, consequences, errors.Join(e, manager.DelRef(&literalRef))
+			}
+			releaseLiterals := func(cause error) error {
+				return errors.Join(cause, manager.DelRef(&negatedRef), manager.DelRef(&literalRef))
 			}
 			extended := append(append([]ast.ASTHandle(nil), assumptions...), negated)
 			status, e = s.CheckSat(extended)
 			if e != nil || status == lbool.Undef {
-				return status, consequences, e
+				return status, consequences, releaseLiterals(e)
 			}
 			if status == lbool.False {
 				core, e := s.UnsatCore()
 				if e != nil {
-					return lbool.Undef, consequences, e
+					return lbool.Undef, consequences, releaseLiterals(e)
 				}
 				filtered := core[:0]
 				for _, item := range core {
@@ -317,41 +348,58 @@ func DefaultGetConsequences(s Solver, assumptions, variables []ast.ASTHandle, fa
 				}
 				consequence, e := appendConsequence(manager, filtered, literal)
 				if e != nil {
-					return lbool.Undef, consequences, e
+					return lbool.Undef, consequences, releaseLiterals(e)
+				}
+				consequence, e = retainConsequence(s, consequence)
+				if e != nil {
+					return lbool.Undef, consequences, releaseLiterals(e)
 				}
 				consequences = append(consequences, consequence)
+			}
+			if e = releaseLiterals(nil); e != nil {
+				return lbool.Undef, consequences, e
 			}
 			continue
 		}
 		literal, e = manager.MkEq(variable, value)
+		e = errors.Join(e, manager.DelRef(&valueRef))
 		if e != nil {
-			return lbool.Undef, consequences, e
+			return lbool.Undef, consequences, fmt.Errorf("consequence equality: %w", e)
+		}
+		literalRef, e := manager.NewRef(literal)
+		if e != nil {
+			return lbool.Undef, consequences, fmt.Errorf("consequence equality root: %w", e)
 		}
 		negated, e = manager.MkNot(literal)
 		if e != nil {
-			return lbool.Undef, consequences, e
+			return lbool.Undef, consequences, fmt.Errorf("consequence negation: %w", errors.Join(e, manager.DelRef(&literalRef)))
 		}
 		scope, e := NewScopedPush(s)
 		if e != nil {
-			return lbool.Undef, consequences, e
+			return lbool.Undef, consequences, fmt.Errorf("consequence scope: %w", errors.Join(e, manager.DelRef(&literalRef)))
 		}
 		if e = s.Assert(negated); e == nil {
 			status, e = s.CheckSat(assumptions)
 		}
-		e = errors.Join(e, scope.Close())
-		if e != nil || status == lbool.Undef {
-			return status, consequences, e
-		}
-		if status == lbool.False {
+		if e == nil && status == lbool.False {
 			core, e := s.UnsatCore()
-			if e != nil {
-				return lbool.Undef, consequences, e
+			if e == nil {
+				var consequence ast.ASTHandle
+				consequence, e = appendConsequence(manager, core, literal)
+				if e == nil {
+					consequence, e = retainConsequence(s, consequence)
+					if e == nil {
+						consequences = append(consequences, consequence)
+					}
+				}
 			}
-			consequence, e := appendConsequence(manager, core, literal)
-			if e != nil {
-				return lbool.Undef, consequences, e
-			}
-			consequences = append(consequences, consequence)
+		}
+		e = errors.Join(e, scope.Close(), manager.DelRef(&literalRef))
+		if e != nil {
+			return lbool.Undef, consequences, fmt.Errorf("consequence query or cleanup: %w", e)
+		}
+		if status == lbool.Undef {
+			return status, consequences, nil
 		}
 	}
 	return lbool.True, consequences, nil

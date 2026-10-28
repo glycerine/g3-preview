@@ -826,6 +826,7 @@ var scriptResults = map[string]string{
 	"get_assertions.smt2":                          "((and a true))\n((and a true)\n (! b :named n))\n((and a true))\n",
 	"get_assignment.smt2":                          "sat\n((|p q| true) (q false))\nsat\n((|p q| true) (q false) (r false))\nsat\n((|p q| true) (q false))\n",
 	"get_unsat_assumptions.smt2":                   "unsat\n(a)\nunsat\n(b)\nunsat\n((not b))\nunsat\n(a)\n",
+	"get_consequences.smt2":                        "sat\n\n(=> a a)\nsat\n\n(=> a (= x 3))\nsat\n\n(=> true (= y 4))\nsat\n\n(=> true (= y 4))\nunsat\n\n",
 	"lexicographic_integer_optimization.smt2":      "sat\n(objectives\n (x 3)\n (y 2)\n)\n((x 3)\n (y 2))\nsat\n(objectives\n (x 0)\n (y 5)\n)\n((x 0)\n (y 5))\n",
 	"bit_vector.smt2":                              "sat\n((x #xf))\n",
 	"bit_vector_optimization.smt2":                 "sat\n(objectives\n (x 9)\n)\n((x #x9))\nsat\n(objectives\n (x 3)\n)\n((x #x3))\nsat\n(objectives\n (x 15)\n (y 8)\n)\n((x #xf)\n (y #x8))\n",

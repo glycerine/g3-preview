@@ -40832,7 +40832,10 @@
         "pkg/parsers/smt2/assignment_test.go",
         "pkg/cmd/g3/test_vectors/get_assignment.smt2",
         "pkg/parsers/smt2/unsat_assumptions_test.go",
-        "pkg/cmd/g3/test_vectors/get_unsat_assumptions.smt2"
+        "pkg/cmd/g3/test_vectors/get_unsat_assumptions.smt2",
+        "pkg/cmd_context/result_access.go",
+        "pkg/parsers/smt2/consequences_test.go",
+        "pkg/cmd/g3/test_vectors/get_consequences.smt2"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -40871,7 +40874,9 @@
         "TestSMT2GetAssignmentBooleanMacrosInDeclarationOrder",
         "TestSMT2GetAssignmentRequiresAvailableModel",
         "TestSMT2GetUnsatAssumptionsUsesDirectAssumptionCore",
-        "TestSMT2GetUnsatAssumptionsGuards"
+        "TestSMT2GetUnsatAssumptionsGuards",
+        "TestSMT2GetConsequencesAssumptionsVariablesAndStatuses",
+        "TestSMT2GetConsequencesRequiresTwoLists"
       ],
       "conditionals": [
         {
@@ -40945,6 +40950,13 @@
           "go_target": "pkg/cmd_context/results.go",
           "go_targets": ["pkg/cmd_context/context.go", "pkg/parsers/smt2/commands.go", "pkg/parsers/smt2/unsat_assumptions_test.go", "pkg/cmd/g3/test_vectors/get_unsat_assumptions.smt2"],
           "tests": ["TestSMT2GetUnsatAssumptionsUsesDirectAssumptionCore", "TestSMT2GetUnsatAssumptionsGuards", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+        },
+        {
+          "name": "get-consequences assumption/variable list dispatch, solver status display and consequence expression output (basic_cmds.cpp:810-845)",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/results.go",
+          "go_targets": ["pkg/cmd_context/result_access.go", "pkg/parsers/smt2/commands.go", "pkg/parsers/smt2/consequences_test.go", "pkg/cmd/g3/test_vectors/get_consequences.smt2"],
+          "tests": ["TestSMT2GetConsequencesAssumptionsVariablesAndStatuses", "TestSMT2GetConsequencesRequiresTwoLists", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         },
         {
           "name": "remaining basic commands and non-Boolean option values, metadata state queries and validation, model completion policy and remaining output modes",
@@ -41102,7 +41114,7 @@
         "The current Go shell owns its AST manager. External-manager reinitialization and a user-command registry remain outside these increments. Both reset and reset-assertions are dispatched. The default reset-assertions branch performs the owning full reset; the native extension-command parser has a separately recorded fresh-sort-initialization quirk, and strict comparisons exercise explicit empty-check initialization. Whole context/parser/command-unit completion is not claimed.",
         "The old native extension-command path does not initialize its fresh builtin sort table before an immediate post-reset-assertions sort lookup. The isolated unforced script gives native unknown-sort errors but executes the direct owning reset semantics safely in Go. A preceding empty check initializes the native manager and restores strict output agreement. Both observations are tested; the unforced discrepancy remains explicit and the parser method remains partial. No stale manager or invented unknown-sort failure is introduced into the Go parser.",
         "Three public backend tests cover QF_LRA/QF_UFLRA, automatic/basic setup and first push/check, late destination LP parameters, nonnumeral RHS/strict/equality normalization, valid exact models, scoped contradictions, real LRA proof mode with a tracked three-premise core and a proof whose fact is false, and nine setup allocation frontiers. Two command statistics regressions cover active result priority, real allocation/resource getters, passive reads, check watch retirement, failing writers and closed owners. CLI regressions prove actual LAR counters for default and explicit SMT checks, normal is_int yielding unknown as C++, and four model/core/division/shared-EUF scope scripts compared with prebuilt C++. Unsat core membership is compared as an unordered assumption set. Legacy-tableau nonlinear/Grobner/equality/epsilon algorithm tests explicitly disable automatic real setup so their algorithm assertions are retained; translated public real setup now requires concrete LRA, and public statistics expect arith-rows. The public QF real backend is now selected, superseding earlier unselected notes. Nonautomatic/general/quantified arithmetic routing stays on its source backend. C++ linear-logic parser rejection probes for nonlinear/integer-sort inputs are retained separately; the following C++ SAT after a rejected assertion is not claimed as nonlinear solving. Existing source-model and optimizer limitations remain explicit. All source status/audit/API flags remain unchanged, and whole-smtcore, remaining source/dispatch/CLI/API/higher-engine audit remains open; selecting LRA and these passing tests do not establish complete SMT or optimization coverage.",
-        "Final retained-consumer audit covers every command dispatched by the Go SMT-LIB runner: typed options, checks, scopes, reset modes, model/value/proof/core queries, reason/statistics info, echo and exit. Native help/get-option/set-info/declare-map/get-consequences and optimizer/environment-only side effects have no retained Go caller and remain reference-only rather than spawning unused command adapters. This supersedes earlier whole-unit partial notes for the retained frontend."
+        "Final retained-consumer audit covers the commands dispatched by the Go SMT-LIB runner: typed options, checks, scopes, reset modes, model/value/proof/core/assumption/consequence queries, reason/statistics info, echo and exit. Native help/get-option/declare-map and optimizer/environment-only side effects remain reference-only. This supersedes the earlier get-consequences reference-only note; the command is now exercised end-to-end against C++."
       ]
     },
     {
@@ -156523,11 +156535,15 @@
       "status": "ported",
       "go_targets": [
         "pkg/solver/solver.go",
-        "pkg/solver/solver_test.go"
+        "pkg/solver/solver_test.go",
+        "pkg/smtcore/smt_solver.go",
+        "pkg/smtcore/smt_solver_test.go",
+        "pkg/solver/tactic_solver.go"
       ],
       "tests": [
         "TestSolverDefaultsScopedPushAssertionsAndConsequence",
-        "TestSolverDefaultConsequenceForNonBooleanValue"
+        "TestSolverDefaultConsequenceForNonBooleanValue",
+        "TestSMTSolverDerivesArithmeticConsequences"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -156546,7 +156562,8 @@
           "go_target": "pkg/solver/solver.go",
           "tests": [
             "TestSolverDefaultsScopedPushAssertionsAndConsequence",
-            "TestSolverDefaultConsequenceForNonBooleanValue"
+            "TestSolverDefaultConsequenceForNonBooleanValue",
+            "TestSMTSolverDerivesArithmeticConsequences"
           ]
         },
         {
@@ -156559,7 +156576,7 @@
         }
       ],
       "ownership": [
-        "Assertion and assumption slices are borrowed; consequence outputs are manager-owned AST handles, while the algorithm owns and releases its acquired model, evaluator and temporary ASTRef values.",
+        "Assertion and assumption slices are borrowed. Concrete SMT/tactic solvers retain owning AST references for consequence outputs across all per-variable checks and until the next consequence query or solver close; the algorithm owns and releases its acquired model, evaluator, evaluated values and temporary equality roots.",
         "ScopedPush owns exactly one matching pop unless explicitly disabled."
       ],
       "deviations": [

@@ -1,7 +1,8 @@
 package cmd_context
 
-// Source: src/cmd_context/basic_cmds.cpp get-value, get-assignment, get-proof
-// and get-unsat-core; cmd_context.cpp result availability checks.
+// Source: src/cmd_context/basic_cmds.cpp get-value, get-assignment,
+// get-consequences, get-proof and get-unsat-core; cmd_context.cpp result
+// availability checks.
 // Original get-value term text follows smt2parser.cpp parse_get_value.
 
 import (
@@ -128,6 +129,34 @@ func (c *Context) WriteAssignment(out io.Writer) (result error) {
 	}
 	_, err = io.WriteString(out, ")\n")
 	return err
+}
+
+func (c *Context) WriteConsequences(out io.Writer, assumptions, variables []ast.ASTHandle) error {
+	status, consequences, err := c.Consequences(assumptions, variables)
+	if err != nil {
+		return err
+	}
+	word := "unknown"
+	if status == lbool.True {
+		word = "sat"
+	} else if status == lbool.False {
+		word = "unsat"
+	}
+	if _, err = fmt.Fprintln(out, word); err != nil {
+		return err
+	}
+	if _, err = fmt.Fprintln(out); err != nil {
+		return err
+	}
+	for _, consequence := range consequences {
+		if err = c.WriteExpression(out, consequence); err != nil {
+			return fmt.Errorf("write consequence: %w", err)
+		}
+		if _, err = fmt.Fprintln(out); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (c *Context) writeAssignmentPair(out io.Writer, name string, value bool, first *bool) error {
