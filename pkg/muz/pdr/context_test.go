@@ -132,6 +132,14 @@ func TestContextBoundedQueryTraversesTaggedHornChain(t *testing.T) {
 		pdrMust(t, set.Add(rule))
 		pdrMust(t, rule.Close())
 	}
+	selfHead, err := manager.MkApp(declarations[2], []ast.ASTHandle{variable})
+	pdrMust(t, err)
+	selfTail, err := manager.MkApp(declarations[2], []ast.ASTHandle{variable})
+	pdrMust(t, err)
+	selfRule, err := ruleManager.NewRule(selfHead, []ast.ASTHandle{selfTail}, nil, "bounded-self")
+	pdrMust(t, err)
+	pdrMust(t, set.Add(selfRule))
+	pdrMust(t, selfRule.Close())
 	pdrMust(t, context.Initialize(set))
 
 	for _, check := range []struct {
@@ -157,6 +165,54 @@ func TestContextBoundedQueryTraversesTaggedHornChain(t *testing.T) {
 		if result.Model != nil {
 			pdrMust(t, result.Model.DecRef())
 		}
+	}
+	status, err := context.Solve(declarations[2])
+	pdrMust(t, err)
+	if status != lbool.True {
+		t.Fatal("unbounded Horn chain query", status)
+	}
+
+	pdrMust(t, context.Close())
+	pdrMust(t, set.Close())
+	pdrMust(t, ruleManager.Close())
+	pdrMust(t, command.Close())
+}
+
+func TestContextSolveFindsInductiveUnreachablePredicate(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	pdrMust(t, err)
+	manager, err := command.Manager()
+	pdrMust(t, err)
+	globals, err := command.GlobalParameters()
+	pdrMust(t, err)
+	context, err := pdr.NewContext(manager, nil, 3, pdr.ReachableHashCache, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	pdrMust(t, err)
+	boolean, err := manager.MkBoolSort()
+	pdrMust(t, err)
+	predicate := pdrFunction(t, manager, "unreachable", []ast.ASTHandle{boolean}, boolean)
+	ruleManager, err := base.NewRuleManager(manager)
+	pdrMust(t, err)
+	pdrMust(t, ruleManager.RegisterPredicate(predicate))
+	set, err := base.NewRuleSet(ruleManager)
+	pdrMust(t, err)
+	variable, err := manager.MkVar(0, boolean)
+	pdrMust(t, err)
+	head, err := manager.MkApp(predicate, []ast.ASTHandle{variable})
+	pdrMust(t, err)
+	tail, err := manager.MkApp(predicate, []ast.ASTHandle{variable})
+	pdrMust(t, err)
+	rule, err := ruleManager.NewRule(head, []ast.ASTHandle{tail}, nil, "self")
+	pdrMust(t, err)
+	pdrMust(t, set.Add(rule))
+	pdrMust(t, rule.Close())
+	pdrMust(t, context.Initialize(set))
+	status, err := context.Solve(predicate)
+	pdrMust(t, err)
+	if status != lbool.False {
+		t.Fatal("self-recursive predicate without facts", status)
+	}
+	if last, x := context.LastResult(); x != nil || last != status {
+		t.Fatal("last result", last, x)
 	}
 
 	pdrMust(t, context.Close())

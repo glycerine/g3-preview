@@ -82778,6 +82778,7 @@
         "pkg/muz/pdr/context.go",
         "pkg/muz/pdr/context_test.go",
         "pkg/muz/pdr/context_bounded.go",
+        "pkg/muz/pdr/context_solve.go",
         "pkg/muz/pdr/model_search.go",
         "pkg/muz/pdr/model_search_test.go"
       ],
@@ -82788,6 +82789,7 @@
         "TestPredicateTransformerCouplesPredecessorFramesByRuleTag",
         "TestContextInitializesHornProgramAndAnswersInitialQueries",
         "TestContextBoundedQueryTraversesTaggedHornChain",
+        "TestContextSolveFindsInductiveUnreachablePredicate",
         "TestModelSearchFrontierOrderingClosureAndOwnership",
         "TestModelNodeRejectsInvalidParentLevel"
       ],
@@ -83012,7 +83014,16 @@
           ]
         },
         {
-          "name": "cover/model conversion, rule/model trace reconstruction, generalization and top-level PDR solve loop",
+          "name": "frame reachability expansion, tagged rule selection, child obligations, blocking, propagation and top-level PDR solve loop (pdr_context.cpp:1544-1769,1893-2215)",
+          "status": "partial",
+          "go_target": "pkg/muz/pdr/context_solve.go",
+          "tests": [
+            "TestContextBoundedQueryTraversesTaggedHornChain",
+            "TestContextSolveFindsInductiveUnreachablePredicate"
+          ]
+        },
+        {
+          "name": "cover/model conversion, rule/model trace reconstruction and model-implicant/QE child-state generalization",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83024,7 +83035,8 @@
       ],
       "deviations": [
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
-        "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth and does not replace or claim completion of the unbounded native model_search loop."
+        "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth.",
+        "Solve now drives the unbounded native frame/model-search loop, but child projection deliberately uses exact model values. Native model-implicant minimization and QE generalization remain explicit port obligations."
       ]
     },
     {
@@ -83040,6 +83052,7 @@
         "pkg/muz/pdr/context.go",
         "pkg/muz/pdr/context_test.go",
         "pkg/muz/pdr/context_bounded.go",
+        "pkg/muz/pdr/context_solve.go",
         "pkg/muz/pdr/model_search.go",
         "pkg/muz/pdr/model_search_test.go"
       ],
@@ -83050,6 +83063,7 @@
         "TestPredicateTransformerCouplesPredecessorFramesByRuleTag",
         "TestContextInitializesHornProgramAndAnswersInitialQueries",
         "TestContextBoundedQueryTraversesTaggedHornChain",
+        "TestContextSolveFindsInductiveUnreachablePredicate",
         "TestModelSearchFrontierOrderingClosureAndOwnership",
         "TestModelNodeRejectsInvalidParentLevel"
       ],
@@ -83119,7 +83133,16 @@
           ]
         },
         {
-          "name": "remaining pred_transformer cover/model surface plus model trace/proof reconstruction, core_generalizer and unbounded context solve loop",
+          "name": "retained unbounded context frame expansion, tagged rule selection, child obligations, blocking and propagation loop",
+          "status": "partial",
+          "go_target": "pkg/muz/pdr/context_solve.go",
+          "tests": [
+            "TestContextBoundedQueryTraversesTaggedHornChain",
+            "TestContextSolveFindsInductiveUnreachablePredicate"
+          ]
+        },
+        {
+          "name": "remaining pred_transformer cover/model surface plus model trace/proof reconstruction, core_generalizer and model-implicant/QE generalization",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83131,7 +83154,8 @@
       ],
       "deviations": [
         "The Go frame API uses explicit methods and returned result values rather than C++ reference outputs and scoped mutable solver settings.",
-        "CheckBounded is a temporary finite-depth context operation for early integration coverage; the header's unbounded solve/model-search contract remains explicitly unported."
+        "CheckBounded remains a finite-depth context operation for early integration coverage.",
+        "Solve uses exact model-value child cubes while native model-implicant minimization and QE generalization remain unported."
       ]
     },
     {

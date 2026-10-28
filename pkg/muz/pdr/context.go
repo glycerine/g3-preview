@@ -24,6 +24,13 @@ type Context struct {
 	cacheMode    ReachableCacheMode
 	transformers map[ast.ASTHandle]*PredicateTransformer
 	order        []ast.ASTHandle
+	search       *ModelSearch
+	lastResult   lbool.LBool
+	query        *PredicateTransformer
+	expanded     uint32
+	inductive    uint32
+	nodes        uint32
+	maxDepth     uint32
 	initialized  bool
 	closed       bool
 }
@@ -36,7 +43,7 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, err
 	}
-	return &Context{manager: manager, owner: owner, cacheMode: cacheMode}, nil
+	return &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(false), lastResult: lbool.Undef}, nil
 }
 
 func (c *Context) open() error {
@@ -279,6 +286,12 @@ func (c *Context) Close() (result error) {
 	if c.closed {
 		return nil
 	}
+	if c.search != nil {
+		if err := c.search.Close(); err != nil {
+			return err
+		}
+		c.search = nil
+	}
 	for index := len(c.order) - 1; index >= 0; index-- {
 		declaration := c.order[index]
 		if transformer := c.transformers[declaration]; transformer != nil {
@@ -297,6 +310,8 @@ func (c *Context) Close() (result error) {
 		c.owner = nil
 		c.transformers = nil
 		c.order = nil
+		c.search = nil
+		c.query = nil
 		c.closed = true
 	}
 	return result

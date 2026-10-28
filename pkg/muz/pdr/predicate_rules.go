@@ -9,9 +9,93 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+func (p *PredicateTransformer) selectRule(modelCore *model.ModelCore) (*normalizedRule, error) {
+	if err := p.open(); err != nil {
+		return nil, err
+	}
+	if modelCore == nil {
+		return nil, ast.ErrASTDomain
+	}
+	live := make([]*normalizedRule, 0, len(p.rules))
+	for _, rule := range p.rules {
+		if !rule.tag.IsNull() {
+			live = append(live, rule)
+		}
+	}
+	if len(live) == 1 {
+		return live[0], nil
+	}
+	out, err := p.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return nil, err
+	}
+	defer p.manager.DelRef(&out)
+	for _, rule := range live {
+		declaration, x := p.manager.GetDecl(rule.tag)
+		if x != nil {
+			return nil, x
+		}
+		found, x := modelCore.EvalConstant(declaration, out)
+		if x != nil {
+			return nil, x
+		}
+		if !found {
+			continue
+		}
+		value, x := p.manager.RefGet(out)
+		if x != nil {
+			return nil, x
+		}
+		if p.manager.IsTrue(value) {
+			return rule, nil
+		}
+	}
+	return nil, fmt.Errorf("muz/pdr: model did not select a transition rule")
+}
+
+func (p *PredicateTransformer) modelConstant(modelCore *model.ModelCore, application ast.ASTHandle, out ast.ASTRef) (bool, error) {
+	if err := p.open(); err != nil {
+		return false, err
+	}
+	if modelCore == nil {
+		return false, ast.ErrASTDomain
+	}
+	count, err := p.manager.GetNumArgs(application)
+	if err != nil {
+		return false, err
+	}
+	if count != 0 {
+		return false, ast.ErrASTDomain
+	}
+	declaration, err := p.manager.GetDecl(application)
+	if err != nil {
+		return false, err
+	}
+	found, err := modelCore.EvalConstant(declaration, out)
+	if err != nil || found {
+		return found, err
+	}
+	sort, err := p.manager.GetSort(application)
+	if err != nil {
+		return false, err
+	}
+	value, err := modelCore.GetSomeValue(sort)
+	if err != nil {
+		return false, err
+	}
+	if value.IsNull() {
+		return false, ast.ErrASTDomain
+	}
+	if err = p.manager.SetRef(out, value); err != nil {
+		return false, err
+	}
+	return true, nil
+}
 
 type normalizedRule struct {
 	rule         *base.Rule
