@@ -148,8 +148,8 @@ func TestPropositionalEngineExecutesStratifiedNegation(t *testing.T) {
 	}
 	compiled, err := engine.LastQueryUsedCompiledCode()
 	fpMust(t, err)
-	if compiled {
-		t.Fatal("unsupported negated rule was partially compiled")
+	if !compiled {
+		t.Fatal("stratified finite negation bypassed relational bytecode")
 	}
 }
 

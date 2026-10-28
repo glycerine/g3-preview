@@ -80783,7 +80783,7 @@
         "PropositionalEngine owns its RuleManager, RuleSet, VariableBinder, RelationManager with finite predicate tables, and optional AST theory rewriter. Compiled instruction blocks own their predicate references and per-rule accounting parents until execution completes; the engine borrows the AST manager and releases all owned references before it."
       ],
       "deviations": [
-        "This is an explicitly bounded integration slice, not the general dl_context: positive finite rules with zero, one, or two tails, recursion, constants, repeated variables, equijoins, Cartesian joins, projection, duplication, permutation, and unbound finite variables use relational bytecode; negated, interpreted, and wider multi-tail rules use the exact dependency-ordered fallback evaluator and produce finite tuple-answer formulas. Recursive bytecode uses semi-naive one-tail-at-a-time delta substitution, with one whole-program recursive group rather than the C++ SCC/local-delta partitioning. Non-ground or infinite-domain arithmetic, parameters, transformations, models/proofs, and general engine selection remain open."
+        "This is an explicitly bounded integration slice, not the general dl_context: stratified finite rules with zero, one, or two positive tails, negated predicates, recursion, constants, repeated variables, equijoins, Cartesian joins, projection, duplication, permutation, and unbound finite variables use relational bytecode; interpreted and wider multi-tail rules use the exact dependency-ordered fallback evaluator and produce finite tuple-answer formulas. Recursive bytecode uses semi-naive one-tail-at-a-time delta substitution within finalized predicate strata. Non-ground or infinite-domain arithmetic, parameters, transformations, models/proofs, and general engine selection remain open."
       ]
     },
     {
@@ -84130,7 +84130,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/rel/compiler.go", "pkg/muz/fp/propositional_engine.go"],
-      "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerJoinsTwoPositiveTails", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution", "TestFiniteCompilerSaturatesRecursiveRules", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRecursiveClosureMatchesCPP", "TestSMT2FixedpointTwoTailJoinMatchesCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2"],
+      "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerJoinsTwoPositiveTails", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution", "TestFiniteCompilerSaturatesRecursiveRules", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRecursiveClosureMatchesCPP", "TestSMT2FixedpointTwoTailJoinMatchesCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2"],
       "conditionals": [
         {
           "line": 742,
@@ -84401,6 +84401,12 @@
           "tests": ["TestFiniteCompilerSaturatesRecursiveRules", "TestSMT2FixedpointRecursiveClosureMatchesCPP"]
         },
         {
+          "name": "Stratified negative-predicate anti-joins, including constant selection, repeated variables, finite expansion of unbound variables, lower-stratum ordering, and mutable-target ownership (dl_compiler.cpp:634-683,1189-1275)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/compiler.go",
+          "tests": ["TestPropositionalEngineExecutesStratifiedNegation", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP"]
+        },
+        {
           "name": "Dependency-first acyclic compilation and recursive fallback-loop compilation for positive zero-, one-, and two-tail rules with explicit pre-execution refusal for unsupported rules (dl_compiler.cpp:1002-1018,1196-1245)",
           "status": "partial",
           "go_target": "pkg/muz/rel/compiler.go",
@@ -84411,7 +84417,7 @@
         "CompileFiniteRules transfers two instruction blocks to its caller. Each generated rule instruction retains its Rule accounting parent; load/store instructions retain predicate declarations; every partial compilation failure closes all generated instructions and owned references before returning."
       ],
       "deviations": [
-        "The compiler currently accepts positive finite rules with zero, one, or two tails, complete structural head assembly, and recursive semi-naive least-fixpoint loops. It groups all predicates when any cycle is present instead of reproducing the C++ SCC/local-delta partitioning. Negation, interpreted filters, widening, saturation marks, and wider multi-tail joins remain open; unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
+        "The compiler currently accepts stratified finite rules with zero, one, or two positive tails, negated predicate anti-joins, complete structural head assembly, and recursive semi-naive least-fixpoint loops grouped by finalized predicate stratum. Interpreted filters, widening, saturation marks, finer SCC/local-delta partitioning, and wider multi-tail joins remain open; unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
       ]
     },
     {
@@ -84451,7 +84457,7 @@
         "The Go compiler uses concrete finite HashTable registers and typed AST handles; it does not port the unused C++ container/template machinery. Returned blocks own all generated instructions."
       ],
       "deviations": [
-        "Only the live positive finite-rule slice with up to two tails is exposed; recursive loops use semi-naive tail deltas but one whole-program recursive group. SCC/local-delta partitioning, negation, interpreted filters, wider multi-tail joins, widening, and saturation marks remain open with the source unit marked partial."
+        "Only the live stratified finite-rule slice with up to two positive tails is exposed; recursive loops use semi-naive tail deltas within finalized strata. Finer SCC/local-delta partitioning, interpreted filters, wider multi-tail joins, widening, and saturation marks remain open with the source unit marked partial."
       ]
     },
     {
