@@ -82570,9 +82570,17 @@
       "path": "src/muz/fp/horn_tactic.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/fp/horn_tactic.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/test_vectors/horn_tactic_finite.smt2",
+        "pkg/cmd/g3/main_test.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts/horn_tactic_finite.smt2",
+        "TestSMTLibRunnerCPPReference/horn_tactic_finite.smt2"
+      ],
       "assertions": [
         {
           "line": 91,
@@ -82596,18 +82604,39 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Retained finite propositional Horn verification path: register Boolean predicates, add facts and implications, accept one negated-predicate query, and convert reachability to a decided tactic goal",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/horn_tactic.go",
+          "tests": [
+            "TestSMTLibRunnerScripts/horn_tactic_finite.smt2",
+            "TestSMTLibRunnerCPPReference/horn_tactic_finite.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "HornTactic owns no engine across calls; Apply creates and closes one finite PropositionalEngine and returns the caller-owned goal through the tactic result.",
+        "The command context retains the tactic through the existing tactic reference-count protocol."
+      ],
+      "deviations": [
+        "Quantifier stripping, disjunctive clause normalization, multiple-query fresh predicates, proof and model converters, horn-simplify, and general PDR or infinite-domain Horn solving remain unported."
+      ]
     },
     {
       "path": "src/muz/fp/horn_tactic.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/fp/horn_tactic.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts/horn_tactic_finite.smt2",
+        "TestSMTLibRunnerCPPReference/horn_tactic_finite.smt2"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -82619,10 +82648,21 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "make_horn_tactic retained concrete factory surface",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/horn_tactic.go",
+          "tests": ["TestSMTLibRunnerScripts/horn_tactic_finite.smt2"]
+        }
+      ],
+      "ownership": [
+        "NewHornTactic returns the concrete Go tactic and participates in the shared tactic reference-count protocol."
+      ],
+      "deviations": [
+        "The factory currently exposes only the finite propositional verification subset implemented by HornTactic."
+      ]
     },
     {
       "path": "src/muz/pdr/CMakeLists.txt",
