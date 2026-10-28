@@ -2133,6 +2133,7 @@
         "interval_set_receipt.go",
         "justification.go",
         "scoped_literal_vector.go",
+        "search_main.go",
         "search_propagation.go",
         "search_resolution.go",
         "search_state.go",
