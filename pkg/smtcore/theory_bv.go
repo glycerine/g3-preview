@@ -670,6 +670,9 @@ func (t *SMTBitVectorTheory) NewEquality(left, right SMTTheoryVar) error {
 	if _, err := t.State(); err != nil {
 		return err
 	}
+	if err := t.traceBVNewEquality(left, right); err != nil {
+		return err
+	}
 	return t.mergePrivateClasses(left, right)
 }
 
@@ -735,8 +738,11 @@ func (t *SMTBitVectorTheory) NewDisequality(left, right SMTTheoryVar) error {
 	return state.addTheoryAxiom(t.FamilyID(), clause)
 }
 
-func (t *SMTBitVectorTheory) Assign(variable int32, _ bool) error {
+func (t *SMTBitVectorTheory) Assign(variable int32, isTrue bool) error {
 	if _, err := t.State(); err != nil {
+		return err
+	}
+	if err := t.traceBVAssignment(variable, isTrue); err != nil {
 		return err
 	}
 	entries, exists := t.bitAtoms[variable]
@@ -746,6 +752,9 @@ func (t *SMTBitVectorTheory) Assign(variable int32, _ bool) error {
 	t.propagationQueue = t.propagationQueue[:0]
 	for i := len(entries) - 1; i >= 0; i-- {
 		t.propagationQueue = append(t.propagationQueue, entries[i])
+	}
+	if err := t.traceBVPropagationQueueSize(len(t.propagationQueue)); err != nil {
+		return err
 	}
 	return t.propagateBits()
 }

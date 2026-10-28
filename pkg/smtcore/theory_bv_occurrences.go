@@ -366,6 +366,9 @@ func (t *SMTBitVectorTheory) newStaticBitDisequality(left, right SMTTheoryVar, i
 	}); err != nil {
 		return err
 	}
+	if err = t.traceBVStaticDisequality(left, right); err != nil {
+		return err
+	}
 	t.statistics.diseqStatic++
 	equality, err := t.MkEqualityLiteral(node.owner, other.owner, true)
 	if err != nil {

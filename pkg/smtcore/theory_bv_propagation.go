@@ -231,9 +231,18 @@ func (t *SMTBitVectorTheory) assignBit(consequent SMTLiteral, from, to SMTTheory
 }
 
 func (t *SMTBitVectorTheory) mergeBitClasses(root, child, first, second SMTTheoryVar) error {
-	consistent, err := t.mergeZeroOneBits(root, child)
-	if err != nil || !consistent {
+	if err := t.traceBVMerge(first, second, "bv"); err != nil {
 		return err
+	}
+	if err := t.traceBVMerge(first, second, "bv_bit_prop"); err != nil {
+		return err
+	}
+	consistent, err := t.mergeZeroOneBits(root, child)
+	if err != nil {
+		return err
+	}
+	if !consistent {
+		return t.traceBVMergeConflict()
 	}
 	t.propagationQueue = t.propagationQueue[:0]
 	if err = bvAssert(1394, "bits1.size() == bits2.size()", func() (bool, error) {
@@ -243,6 +252,9 @@ func (t *SMTBitVectorTheory) mergeBitClasses(root, child, first, second SMTTheor
 	}
 	if len(t.bitLiterals[first]) != len(t.bitLiterals[second]) {
 		return ast.ErrASTDomain
+	}
+	if err = t.traceBVMergeSize(len(t.bitLiterals[first])); err != nil {
+		return err
 	}
 	s := t.state
 	for {
