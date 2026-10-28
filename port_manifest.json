@@ -130979,7 +130979,7 @@
         },
         {
           "name": "Basic setup_arith modes 0/1/2/3 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex or dense matrix; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup_basic_arithmetic.go",
           "go_targets": [
             "pkg/smtcore/theory_diff_logic_real.go",
@@ -131572,7 +131572,7 @@
         },
         {
           "name": "Basic setup_arith modes 0/1/2/3 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex or dense matrix; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup_basic_arithmetic.go",
           "go_targets": [
             "pkg/smtcore/theory_diff_logic_real.go",

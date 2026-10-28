@@ -11,7 +11,7 @@ import (
 )
 
 func TestSMTBasicArithmeticModesBeforeFirstBoundary(t *testing.T) {
-	for _, mode := range []uint32{0, 1, 2, 3, 4} {
+	for _, mode := range []uint32{0, 1, 2, 3, 4, 5} {
 		for _, real := range []bool{false, true} {
 			for _, push := range []bool{false, true} {
 				t.Run(fmt.Sprint(mode, "/", real, "/", push), func(t *testing.T) {
@@ -97,6 +97,11 @@ func TestSMTBasicArithmeticModesBeforeFirstBoundary(t *testing.T) {
 						}
 						if !found {
 							t.Fatal("solver statistics omitted the selected UTVPI backend")
+						}
+					case 5:
+						theory, ok := k.internalizer.theories[family].(*SMTLinearArithmeticTheory)
+						if !ok || !theory.infinite {
+							t.Fatal("infinite arithmetic mode not selected")
 						}
 					}
 					if k.arithState.Eq2Ineq != (mode == 1 || mode == 3 || mode == 4) || k.smtParams.arith.state != k.arithState || !k.preprocessState.NNFCNF {
