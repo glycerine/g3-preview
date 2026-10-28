@@ -636,6 +636,38 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		success = false
+	case "get-interpolant", "compute-interpolant":
+		var targets []ast.ASTHandle
+		for p.token != RightParenToken {
+			target, _, e := p.expression()
+			if e != nil {
+				return false, e
+			}
+			targets = append(targets, target)
+		}
+		if len(targets) == 0 {
+			return false, fmt.Errorf("not enough arguments")
+		}
+		tree := targets[0]
+		for _, target := range targets[1:] {
+			marked, e := p.pin(p.manager.MkInterp(tree))
+			if e != nil {
+				return false, e
+			}
+			tree, e = p.pin(p.manager.MkAnd(marked, target))
+			if e != nil {
+				return false, e
+			}
+		}
+		if name == "get-interpolant" {
+			err = p.context.WriteInterpolants(p.out, tree)
+		} else {
+			err = p.context.ComputeInterpolants(p.out, tree)
+		}
+		if err != nil {
+			return false, err
+		}
+		success = false
 	case "get-proof":
 		if err = p.requireEnd(); err != nil {
 			return false, err

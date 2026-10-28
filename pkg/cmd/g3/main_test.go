@@ -833,6 +833,7 @@ var scriptResults = map[string]string{
 	"expression_labels.smt2":                       "sat\n(labels)\nsat\nsat\n(labels)\n",
 	"display.smt2":                                 "(+ x 1)\n(and true false)\n",
 	"declare_map.smt2":                             "unsat\n",
+	"interpolation_commands.smt2":                  "unsat\n(interpolants\n q)\nsat\nunsat\n(interpolants\n p)\nunsat\n(interpolants\n p)\nunsat\n(interpolants\n (not (>= x 0)))\n",
 	"lexicographic_integer_optimization.smt2":      "sat\n(objectives\n (x 3)\n (y 2)\n)\n((x 3)\n (y 2))\nsat\n(objectives\n (x 0)\n (y 5)\n)\n((x 0)\n (y 5))\n",
 	"bit_vector.smt2":                              "sat\n((x #xf))\n",
 	"bit_vector_optimization.smt2":                 "sat\n(objectives\n (x 9)\n)\n((x #x9))\nsat\n(objectives\n (x 3)\n)\n((x #x3))\nsat\n(objectives\n (x 15)\n (y 8)\n)\n((x #xf)\n (y #x8))\n",

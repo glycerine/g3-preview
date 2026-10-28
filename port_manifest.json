@@ -43810,9 +43810,19 @@
       "path": "src/cmd_context/interpolant_cmds.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/cmd_context/interpolation.go",
+        "pkg/parsers/smt2/commands.go",
+        "pkg/parsers/smt2/interpolation_test.go",
+        "pkg/cmd/g3/test_vectors/interpolation_commands.smt2"
+      ],
+      "tests": [
+        "TestSMT2ComputeAndGetInterpolantUseNativeBackend",
+        "TestSMT2InterpolantCommandGuards",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "conditionals": [
         {
           "line": 136,
@@ -43824,18 +43834,36 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "make_tree plus get-interpolant and compute-interpolant command registration, proof/fresh-solver execution, SAT/UNSAT status and interpolant display",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/interpolation.go",
+          "go_targets": ["pkg/parsers/smt2/commands.go", "pkg/parsers/smt2/interpolation_test.go", "pkg/cmd/g3/test_vectors/interpolation_commands.smt2"],
+          "tests": ["TestSMT2ComputeAndGetInterpolantUseNativeBackend", "TestSMT2InterpolantCommandGuards", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+        },
+        {
+          "name": "parametric som/flat simplification, check/check-option diagnostics and profiling output",
+          "status": "reference_only",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Each command owns a short-lived interpolation manager and solver factory over the command context manager. Fresh compute solvers, optional models and every returned ASTRef close in reverse order; get-interpolant borrows the retained proof and assertion roots only during interpolation. Parser command roots retain every intermediate marker tree until command cleanup."
+      ],
+      "deviations": [
+        "The retained command path uses the concrete Go interpolation engine and source proof solver. The currently exposed commands accept formula arguments without interpolation-specific parametric options; simplification/check/profile modes remain reference-only."
+      ]
     },
     {
       "path": "src/cmd_context/interpolant_cmds.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/cmd_context/interpolation.go", "pkg/parsers/smt2/commands.go"],
+      "tests": ["TestSMT2ComputeAndGetInterpolantUseNativeBackend", "TestSMTLibRunnerCPPReference"],
       "conditionals": [
         {
           "line": 18,
@@ -43847,9 +43875,16 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "interpolant command installation surface",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": ["TestSMT2ComputeAndGetInterpolantUseNativeBackend", "TestSMTLibRunnerCPPReference"]
+        }
+      ],
+      "ownership": ["Go package registration and parser dispatch replace the source command allocator owner."],
       "deviations": []
     },
     {
