@@ -785,6 +785,9 @@ func (t *SMTFloatingPointTheory) InternalizeEquality(expression ast.ASTHandle, v
 			return conversionErr
 		}
 	}
+	if err = t.traceFPAConvertedEquality(converted[0], converted[1]); err != nil {
+		return err
+	}
 	var defined ast.ASTHandle
 	if floating {
 		defined, err = t.converter.MkEq(converted[0], converted[1])
@@ -909,11 +912,15 @@ func (t *SMTFloatingPointTheory) ApplySortConstraint(node *SMTEnode, sort ast.AS
 // Syntactic FP/RM equalities are bridged in InternalizeEquality. The retained
 // e-graph currently forbids creating a new Boolean circuit from inside a merge
 // callback because doing so invalidates its parent rollback ordering.
-func (*SMTFloatingPointTheory) NewEquality(SMTTheoryVar, SMTTheoryVar) error { return nil }
-func (*SMTFloatingPointTheory) NewDisequality(SMTTheoryVar, SMTTheoryVar) error {
-	return nil
+func (t *SMTFloatingPointTheory) NewEquality(left, right SMTTheoryVar) error {
+	return t.traceFPAEqualityCallback("new_eq_eh", 528, "=", left, right)
 }
-func (*SMTFloatingPointTheory) Assign(int32, bool) error { return nil }
+func (t *SMTFloatingPointTheory) NewDisequality(left, right SMTTheoryVar) error {
+	return t.traceFPAEqualityCallback("new_diseq_eh", 572, "!=", left, right)
+}
+func (t *SMTFloatingPointTheory) Assign(variable int32, isTrue bool) error {
+	return t.traceFPAAssignment(variable, isTrue)
+}
 
 func (t *SMTFloatingPointTheory) Relevant(expression ast.ASTHandle) error {
 	state, err := t.State()

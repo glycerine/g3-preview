@@ -160,6 +160,73 @@ func (t *SMTFloatingPointTheory) traceFPAWrapUnwrap(expression ast.ASTHandle) er
 	})
 }
 
+func (t *SMTFloatingPointTheory) traceFPAEqualityCallback(function string, line int, symbol string, left, right SMTTheoryVar) error {
+	leftNode, err := t.Enode(left)
+	if err != nil {
+		return err
+	}
+	rightNode, err := t.Enode(right)
+	if err != nil {
+		return err
+	}
+	label := "new eq"
+	if symbol == "!=" {
+		label = "new diseq"
+	}
+	return t.emitFPATrace("t_fpa", function, line, nil, func(out io.Writer) error {
+		if _, err = fmt.Fprintf(out, "%s: %d %s %d\n", label, left, symbol, right); err != nil {
+			return err
+		}
+		if err = t.displayFPATraceExpression(out, leftNode.Owner()); err != nil {
+			return err
+		}
+		if _, err = fmt.Fprintf(out, "\n %s \n", symbol); err != nil {
+			return err
+		}
+		if err = t.displayFPATraceExpression(out, rightNode.Owner()); err != nil {
+			return err
+		}
+		return diagnostic.WriteTraceEndl(out)
+	})
+}
+
+func (t *SMTFloatingPointTheory) traceFPAConvertedEquality(left, right ast.ASTHandle) error {
+	return t.emitFPATrace("t_fpa_detail", "new_eq_eh", 545, nil, func(out io.Writer) error {
+		if _, err := io.WriteString(out, "xc = "); err != nil {
+			return err
+		}
+		if err := t.displayFPATraceExpression(out, left); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(out, "\nyc = "); err != nil {
+			return err
+		}
+		if err := t.displayFPATraceExpression(out, right); err != nil {
+			return err
+		}
+		return diagnostic.WriteTraceEndl(out)
+	})
+}
+
+func (t *SMTFloatingPointTheory) traceFPAAssignment(variable int32, isTrue bool) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	if variable < 0 || int(variable) >= len(state.boolExpr) {
+		return ast.ErrASTDomain
+	}
+	return t.emitFPATrace("t_fpa", "assign_eh", 634, nil, func(out io.Writer) error {
+		if _, err = fmt.Fprintf(out, "assign_eh for: %d (%t):\n", variable, isTrue); err != nil {
+			return err
+		}
+		if err = t.displayFPATraceExpression(out, state.boolExpr[variable]); err != nil {
+			return err
+		}
+		return diagnostic.WriteTraceEndl(out)
+	})
+}
+
 func (t *SMTFloatingPointTheory) createFPAVariable(node *SMTEnode) (SMTTheoryVar, error) {
 	variable, err := t.CreateVariable(node)
 	if err != nil {

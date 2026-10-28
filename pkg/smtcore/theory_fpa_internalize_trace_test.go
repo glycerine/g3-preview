@@ -222,3 +222,58 @@ func TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace(t *testing.T) {
 		t.Fatal("compiled-out FPA lifecycle trace executed", output.String())
 	}
 }
+
+func TestSMTFPACallbackSourceTraceUsesEagerDefinitions(t *testing.T) {
+	var output bytes.Buffer
+	m, theory, family, sort, tags := smtFPAInternalizeTraceFixture(t, &output)
+	tags.Enable("t_fpa")
+	tags.Enable("t_fpa_detail")
+	state, err := theory.State()
+	astTestMust(t, err)
+	constants := make([]ast.ASTHandle, 2)
+	nodes := make([]*SMTEnode, 2)
+	for i, name := range []string{"fpa-callback-left", "fpa-callback-right"} {
+		constants[i], err = m.MkConst(astTestSymbol(t, m, name), sort)
+		astTestMust(t, err)
+		nodes[i], err = state.MkEnode(constants[i], false, false, true)
+		astTestMust(t, err)
+		astTestMust(t, theory.ApplySortConstraint(nodes[i], sort))
+	}
+	left := nodes[0].TheoryVar(family)
+	right := nodes[1].TheoryVar(family)
+	astTestMust(t, theory.NewEquality(left, right))
+	astTestMust(t, theory.NewDisequality(left, right))
+
+	structural, err := m.MkEq(constants[0], constants[1])
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(structural, false))
+	atom, err := m.MkFamilyApp(family, ast.FPAOpEq, nil, constants)
+	astTestMust(t, err)
+	matched, err := theory.InternalizeAtom(atom, false)
+	astTestMust(t, err)
+	if !matched {
+		t.Fatal("floating-point callback atom was not internalized")
+	}
+	variable, found := state.BoolVar(atom)
+	if !found {
+		t.Fatal("floating-point callback atom has no Boolean variable")
+	}
+	astTestMust(t, theory.Assign(variable, true))
+
+	if tags.ShouldTrace("t_fpa") {
+		trace := output.String()
+		for _, want := range []string{
+			"-------- [t_fpa] new_eq_eh src/smt/theory_fpa.cpp:528 ---------\nnew eq: 0 = 1\n",
+			"-------- [t_fpa_detail] new_eq_eh src/smt/theory_fpa.cpp:545 ---------\nxc = ",
+			"\nyc = ",
+			"-------- [t_fpa] new_diseq_eh src/smt/theory_fpa.cpp:572 ---------\nnew diseq: 0 != 1\n",
+			"-------- [t_fpa] assign_eh src/smt/theory_fpa.cpp:634 ---------\nassign_eh for: ",
+		} {
+			if !strings.Contains(trace, want) {
+				t.Fatalf("missing FPA callback trace %q in %q", want, trace)
+			}
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("compiled-out FPA callback trace executed", output.String())
+	}
+}
