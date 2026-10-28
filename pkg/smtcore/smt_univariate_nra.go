@@ -27,6 +27,7 @@ type smtNRAAtom struct {
 }
 type smtNRAInput struct {
 	variables []ast.ASTHandle
+	integers  []bool
 	branches  [][]smtNRAAtom
 	nonlinear bool
 }
@@ -88,7 +89,7 @@ func (in *smtNRAInput) term(m *ast.ASTManager, h ast.ASTHandle, family ast.Famil
 		if err != nil {
 			return false, false, err
 		}
-		if sf != family || sk != 0 {
+		if sf != family || (sk != 0 && sk != 1) {
 			return false, false, nil
 		}
 		for _, variable := range in.variables {
@@ -97,6 +98,7 @@ func (in *smtNRAInput) term(m *ast.ASTManager, h ast.ASTHandle, family ast.Famil
 			}
 		}
 		in.variables = append(in.variables, h)
+		in.integers = append(in.integers, sk == 1)
 		return true, true, nil
 	}
 	if fid != family {
@@ -471,7 +473,7 @@ func (w *smtNRAWorkspace) Close() error {
 	return nil
 }
 func (k *SMTKernel) tryNLSAT() (result lbool.LBool, handled bool, err error) {
-	if k.setupLogic != "QF_NRA" || !k.nraInputsValid || len(k.nraInputs) == 0 {
+	if (k.setupLogic != "QF_NRA" && k.setupLogic != "QF_NIA") || !k.nraInputsValid || len(k.nraInputs) == 0 {
 		return lbool.Undef, false, nil
 	}
 	proofs, err := k.manager.ProofsEnabled()
@@ -560,7 +562,7 @@ func (k *SMTKernel) tryNLSAT() (result lbool.LBool, handled bool, err error) {
 		return
 	}
 	for i, variable := range in.variables {
-		created, e := w.solver.MkVar(false)
+		created, e := w.solver.MkVar(in.integers[i])
 		if e != nil {
 			err = e
 			return
@@ -662,7 +664,7 @@ func (k *SMTKernel) tryNLSAT() (result lbool.LBool, handled bool, err error) {
 			err = errors.Join(err, md.Close())
 		}
 	}()
-	numeralFor := func(witness *polynomial.Algebraic) (ast.ASTHandle, error) {
+	numeralFor := func(witness *polynomial.Algebraic, integer bool) (ast.ASTHandle, error) {
 		rational, e := w.am.IsRational(witness)
 		if e != nil {
 			return ast.ASTHandle{}, e
@@ -681,7 +683,10 @@ func (k *SMTKernel) tryNLSAT() (result lbool.LBool, handled bool, err error) {
 			if !ok {
 				return ast.ASTHandle{}, ast.ErrASTDomain
 			}
-			return k.manager.ArithmeticNumeralRat(number, false)
+			return k.manager.ArithmeticNumeralRat(number, integer)
+		}
+		if integer {
+			return ast.ASTHandle{}, ast.ErrASTDomain
 		}
 		previous, e := uparams.BindProcessGlobalParamsService(k.paramGlobals)
 		if e != nil {
@@ -703,7 +708,7 @@ func (k *SMTKernel) tryNLSAT() (result lbool.LBool, handled bool, err error) {
 		return numeral, errors.Join(e, restore)
 	}
 	for i, variable := range in.variables {
-		numeral, e := numeralFor(&w.witnesses[i])
+		numeral, e := numeralFor(&w.witnesses[i], in.integers[i])
 		if e != nil {
 			err = e
 			return

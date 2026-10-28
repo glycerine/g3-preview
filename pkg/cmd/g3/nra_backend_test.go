@@ -144,6 +144,40 @@ func TestSMTLibRunnerMixedMultivariableNRA(t *testing.T) {
 	}
 }
 
+func TestSMTLibRunnerNonlinearIntegerBranchAndBound(t *testing.T) {
+	cases := []struct{ name, formula, want string }{
+		{"fractional-linear-with-nonlinear-trigger", "(and (= (* 2 x) 1) (>= (* x x) 0))", "unsat"},
+		{"irrational-roots", "(= (* x x) 2)", "unsat"},
+		{"integral-roots", "(= (* x x) 4)", "sat"},
+	}
+	canonical := func(s string) string { return strings.Join(strings.Fields(s), " ") }
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			script := "(set-option :produce-models true)(set-logic QF_NIA)(declare-const x Int)(assert " + tc.formula + ")(check-sat)"
+			want := tc.want
+			if tc.want == "sat" {
+				script += "(get-value (" + tc.formula + "))"
+				want += " ((" + tc.formula + " true))"
+			}
+			var out bytes.Buffer
+			if err := run(strings.NewReader(script), &out); err != nil {
+				t.Fatal(err, out.String())
+			}
+			if canonical(out.String()) != canonical(want) {
+				t.Fatalf("Go: %s; want: %s", out.String(), want)
+			}
+			if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+				cmd := exec.Command(reference, "-in")
+				cmd.Stdin = strings.NewReader(script)
+				native, err := cmd.CombinedOutput()
+				if err != nil || canonical(string(native)) != canonical(want) {
+					t.Fatalf("C++: %s, %v; want: %s", native, err, want)
+				}
+			}
+		})
+	}
+}
+
 func TestSMTLibRunnerUnivariateNRABooleanStructure(t *testing.T) {
 	cases := []struct {
 		name, formula, want string

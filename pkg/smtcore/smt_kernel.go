@@ -657,7 +657,7 @@ func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) (err error) {
 	if k == nil || k.manager == nil {
 		return ast.ErrASTHandle
 	}
-	if k.setupLogic != "QF_NRA" || !k.nraInputsValid || k.assertedFormulasInconsistent() {
+	if (k.setupLogic != "QF_NRA" && k.setupLogic != "QF_NIA") || !k.nraInputsValid || k.assertedFormulasInconsistent() {
 		return k.assertFormulaCore(formula, proof)
 	}
 	ref, err := k.manager.NewRef(formula)
