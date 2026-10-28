@@ -91098,7 +91098,9 @@
       "go_targets": [
         "pkg/nlsat/assumption.go",
         "pkg/nlsat/assumption_manager.go",
-        "pkg/nlsat/inequality_atom_cache.go"
+        "pkg/nlsat/inequality_atom_cache.go",
+        "pkg/nlsat/boolean_variables.go",
+        "pkg/nlsat/atom_factory.go"
       ],
       "tests": [
         "pkg/nlsat/assumption_manager_test.go",
@@ -91108,7 +91110,16 @@
         "TestInequalityFactorySourceSignFlipAndEvaluator",
         "TestInequalityFactoryAllocationCleanupAndReuse",
         "TestInequalityFactoryRetirementOwnsFactorsAcrossPolynomialReset",
-        "TestInequalityFactoryCanonicalCubicPrebuiltCPPOracle"
+        "TestInequalityFactoryCanonicalCubicPrebuiltCPPOracle",
+        "TestBooleanVariablesIndependentReuseAndParallelArrays",
+        "TestBooleanVariablesRealOutOfMemorySuppressesRecycling",
+        "TestAtomFactoryOuterRegistrationCanonicalRootsAndReferences",
+        "TestAtomFactoryWatchedRetirementStopsBeforeBooleanAndFactorRelease",
+        "TestAtomFactoryRootAllocationFrontiersCleanupAndReuse",
+        "TestAtomFactoryRootHashCollisionAndOwnerGuards",
+        "TestAtomFactoryCleanupPreservesIndependentAllocatorPrefix",
+        "TestAtomFactoryRootReachedAssertionsAndConstructorRefusals",
+        "TestAtomFactoryRegisteredRootsAndInequalitiesPrebuiltCPPOracle"
       ],
       "conditionals": [
         {
@@ -91512,16 +91523,45 @@
             "TestInequalityFactoryRetirementOwnsFactorsAcrossPolynomialReset",
             "TestInequalityFactoryCanonicalCubicPrebuiltCPPOracle"
           ]
+        },
+        {
+          "name": "Actual solver Boolean registry mk_bool_var_core/mk_bool_var and del(bool_var), parallel-array initialization, LIFO reuse and real process out-of-memory recycle suppression (cpp90-97,395-409,467-474)",
+          "status": "ported",
+          "go_target": "pkg/nlsat/boolean_variables.go",
+          "tests": [
+            "TestBooleanVariablesIndependentReuseAndParallelArrays",
+            "TestBooleanVariablesRealOutOfMemorySuppressesRecycling",
+            "TestAtomFactoryWatchedRetirementStopsBeforeBooleanAndFactorRelease"
+          ]
+        },
+        {
+          "name": "Outer inequality registration, empty-product literal constants, canonical root factory, atom reference forwarding and staged retirement (cpp272-298,476-499,548-599)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/atom_factory.go",
+          "go_targets": [
+            "pkg/nlsat/boolean_variables.go"
+          ],
+          "tests": [
+            "TestAtomFactoryOuterRegistrationCanonicalRootsAndReferences",
+            "TestAtomFactoryWatchedRetirementStopsBeforeBooleanAndFactorRelease",
+            "TestAtomFactoryRootAllocationFrontiersCleanupAndReuse",
+            "TestAtomFactoryRootHashCollisionAndOwnerGuards",
+            "TestAtomFactoryCleanupPreservesIndependentAllocatorPrefix",
+            "TestAtomFactoryRootReachedAssertionsAndConstructorRefusals",
+            "TestAtomFactoryRegisteredRootsAndInequalitiesPrebuiltCPPOracle"
+          ]
         }
       ],
       "ownership": [
         "The retained NLSAT dconfig has ref_count=false for leaf values. Its actual SmallAllocator-backed dependency nodes have zero factory references and acquire references to join children; aliases acquire none. Thirty-bit counters and node marks preserve the source algorithm. Interrupted traversal retains reached marks/output until explicit cleanup. Iterative deletion preserves left-to-right child decrements, parent retirement then LIFO queued children, with stored consumed-decrement/push and allocator-release progress. The manager borrows its allocator and rejects closing with live nodes.",
-        "The concrete inner inequality cache borrows the real polynomial manager, canonical polynomial cache and SmallAllocator. It normalizes leading signs, canonicalizes each ordered factor, constructs a zero-reference/null-Boolean atom and inserts before acquiring factor references. Duplicate temporary storage is retired without modifying the existing atom header or acquiring factor references. Concrete PolynomialRef owners retain each new factor independently of polynomial-cache reset. Retirement erases the table first and releases factors/storage separately, leaving the source Boolean-variable deletion step to the still-unported outer solver. Stopped accepted lexical sorting is acknowledged explicitly through PolynomialCache.CleanupUnique before factory temporary cleanup; stale cleanup preserves independent older lexical work."
+        "The concrete inner inequality cache borrows the real polynomial manager, canonical polynomial cache and SmallAllocator. It normalizes leading signs, canonicalizes each ordered factor, constructs a zero-reference/null-Boolean atom and inserts before acquiring factor references. Duplicate temporary storage is retired without modifying the existing atom header or acquiring factor references. Concrete PolynomialRef owners retain each new factor independently of polynomial-cache reset. Retirement erases the table first and releases factors/storage separately, leaving the source Boolean-variable deletion step to the still-unported outer solver. Stopped accepted lexical sorting is acknowledged explicitly through PolynomialCache.CleanupUnique before factory temporary cleanup; stale cleanup preserves independent older lexical work.",
+        "The atomFactory owns the actual inequality/root tables and Boolean arrays over the retained polynomial manager/cache/SmallAllocator. New inequalities acquire their factors through the inner factory before Boolean registration; roots insert and publish Boolean registration before acquiring their polynomial reference. Duplicate roots retire temporary storage and preserve the existing Boolean slot, atom counter and factor count. Zero-reference atoms are erased from their table before Boolean deletion/recycling and polynomial/storage release. Retirement stores its reached stage so a real watch assertion or release refusal cannot replay a consumed Boolean deletion. Native partial constructor/factory prefixes have explicit owning cleanup; independently older allocator work is preserved through exact allocation outcomes. The registry uses the real Runtime out-of-memory flag to suppress ID recycling, and deletion leaves values/levels/justifications unchanged until reused initialization."
       ],
       "deviations": [
         "The NLSAT assumption specialization is concrete and AST-independent: leaf values carry either a frontend attachment identity or a borrowed pointer to an actual input literal. Nonzero-sized attachment tokens preserve distinct native identities; the retained goal frontend must map its concrete AST dependencies to these identities when integrated. Equal-valued literals at different input positions remain distinct. No any-valued callback/value adapter or C++ standard-library container is introduced. Native Go layouts/array capacities differ from source; caller output slices use Go storage. Every allocation/lexical/diagnostic frontier and full solver integration remain unaudited.",
         "Only the actual retained assumption-manager/dconfig subobject is implemented by this entry. The solver constructor, Boolean-variable arrays, atom canonicalization/factories, clause/watch integration, assumption-check/core protocol, explanation/search, root permutation, model handling and own diagnostics remain unported. This is not a complete NLSAT solver or substitute general backend.",
-        "Go maps/slices replace source hashtable/vector internals. Native reflected storage extents and per-factor PolynomialRef owner headers differ from the C++ packed atom layout and introduce native allocation frontiers; focused failures verify native cleanup, not identical C++ allocation counts. Inner factory TRACE/display frontiers, complete physical/lexical ownership audit, outer Boolean registration, root factory, explanation and search remain unported or unaudited. Both whole-unit audit flags remain false."
+        "Go maps/slices replace source hashtable/vector internals. Native reflected storage extents and per-factor PolynomialRef owner headers differ from the C++ packed atom layout and introduce native allocation frontiers; focused failures verify native cleanup, not identical C++ allocation counts. Inner factory TRACE/display frontiers, complete physical/lexical ownership audit, outer Boolean registration, root factory, explanation and search remain unported or unaudited. Both whole-unit audit flags remain false.",
+        "Native maps/slices and existing concrete idgen replace source STL/container mechanisms; source vector capacity/failure machinery is not ported. Reflected native factory/root storage and charged PolynomialRef owner headers differ from the C++ layout and introduce Go reservation frontiers; the consecutive cold-root ladder covers this fixture through success, including an actual refusal after Boolean publication. Explicit native owner/precondition guards are not a whole C++ diagnostic-prefix audit. The component is an actual solver subobject, not a fake Solver: source true-clause construction, clause factories/sorting/watches, explanation/search, complete TRACE/display frontiers and general solver/tactic integration remain pending. Both whole-unit audit flags remain false."
       ]
     },
     {

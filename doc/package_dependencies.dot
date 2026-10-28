@@ -283,6 +283,8 @@ digraph packages {
   "nlsat" -> "sat";
   "nlsat" -> "util/diagnostic";
   "nlsat" -> "util/hash";
+  "nlsat" -> "util/idgen";
+  "nlsat" -> "util/lbool";
   "nlsat" -> "util/memory";
   "nlsat" -> "util/numeral";
   "nlsat" -> "util/params";
