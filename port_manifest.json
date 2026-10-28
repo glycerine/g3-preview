@@ -80864,9 +80864,9 @@
       "path": "src/muz/base/dl_rule.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/base/rule.go"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads"],
       "assertions": [
         {
           "line": 64,
@@ -80911,7 +80911,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "rule_manager::mk concrete head/tail construction and native positive-predicate, negative-predicate, interpreted-tail layout; check_valid_head; rule ownership, tail queries, negation and dependency lookup (dl_rule.cpp:467-535,833-901,939-961)",
+          "status": "partial",
+          "go_target": "pkg/muz/base/rule.go",
+          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -80919,9 +80926,9 @@
       "path": "src/muz/base/dl_rule.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/base/rule.go"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads"],
       "conditionals": [
         {
           "line": 20,
@@ -80956,7 +80963,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete rule and rule_manager retained representation, registered predicates, head/tail/name accessors, native tail partitions, and explicit Go ownership; formula conversion, normalization, substitution, proof traces, HNF/query construction, and quantifier analysis remain open",
+          "status": "partial",
+          "go_target": "pkg/muz/base/rule.go",
+          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
