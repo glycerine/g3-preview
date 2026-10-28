@@ -82,6 +82,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 	if err = node.SetRule(rule.rule); err != nil {
 		return err
 	}
+	node.selected = rule
 
 	eliminated := make([]ast.ASTHandle, 0, len(node.transformer.signature)+len(rule.auxiliaries))
 	for _, signature := range node.transformer.signature {

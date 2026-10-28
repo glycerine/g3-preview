@@ -58,6 +58,50 @@ func (p *PredicateTransformer) selectRule(modelCore *model.ModelCore) (*normaliz
 	return nil, fmt.Errorf("muz/pdr: model did not select a transition rule")
 }
 
+func (p *PredicateTransformer) selectInitialRule(modelCore *model.ModelCore) (*normalizedRule, error) {
+	if err := p.open(); err != nil {
+		return nil, err
+	}
+	initial := make([]*normalizedRule, 0, len(p.rules))
+	for _, rule := range p.rules {
+		if len(rule.predecessors) == 0 {
+			initial = append(initial, rule)
+		}
+	}
+	if len(initial) == 1 {
+		return initial[0], nil
+	}
+	if modelCore == nil {
+		return nil, ast.ErrASTDomain
+	}
+	out, err := p.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return nil, err
+	}
+	defer p.manager.DelRef(&out)
+	for _, rule := range initial {
+		declaration, x := p.manager.GetDecl(rule.tag)
+		if x != nil {
+			return nil, x
+		}
+		found, x := modelCore.EvalConstant(declaration, out)
+		if x != nil {
+			return nil, x
+		}
+		if !found {
+			continue
+		}
+		value, x := p.manager.RefGet(out)
+		if x != nil {
+			return nil, x
+		}
+		if p.manager.IsTrue(value) {
+			return rule, nil
+		}
+	}
+	return nil, fmt.Errorf("muz/pdr: model did not select an initial rule")
+}
+
 func (p *PredicateTransformer) modelConstant(modelCore *model.ModelCore, application ast.ASTHandle, out ast.ASTRef) (bool, error) {
 	if err := p.open(); err != nil {
 		return false, err

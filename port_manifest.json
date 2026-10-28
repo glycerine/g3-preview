@@ -80829,7 +80829,7 @@
         "PropositionalEngine owns its RuleManager, RuleSet, VariableBinder, RelationManager with finite predicate tables, and optional AST theory rewriter. Compiled instruction blocks own their predicate references and per-rule accounting parents until execution completes; the engine borrows the AST manager and releases all owned references before it."
       ],
       "deviations": [
-        "The Datalog slice remains finite-domain and produces tuple answers. Infinite-domain positive Horn rules may now dispatch through PDR/Spacer, consume current command assertions as background constraints, and produce simplified true answers for successful existential relation queries; general PDR trace/certificate/model/proof reconstruction, full transformations, parameters and broader engine selection remain open."
+        "The Datalog slice remains finite-domain and produces tuple answers. Infinite-domain positive Horn rules may now dispatch through PDR/Spacer, consume current command assertions as background constraints, and reconstruct successful existential answers including recursive-SCC state traces; remaining general trace reduction, certificate/model/proof reconstruction, full transformations, parameters and broader engine selection remain open."
       ]
     },
     {
@@ -82475,7 +82475,7 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2", "pkg/cmd/g3/test_vectors/fixedpoint_finite_relations.smt2", "pkg/cmd/g3/test_vectors/fixedpoint_pdr_background.smt2"],
+      "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2", "pkg/cmd/g3/test_vectors/fixedpoint_finite_relations.smt2", "pkg/cmd/g3/test_vectors/fixedpoint_pdr_background.smt2", "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2"],
       "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleNameAndBoundMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnknownOutputParameters", "TestSMT2FixedpointPDRStatistics", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP", "TestSMT2FixedpointQueryRefusesUnportedEngine", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestPropositionalEngineSelection", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2"],
       "assertions": [
         {
@@ -82801,6 +82801,9 @@
         "TestContextSolveProjectsCoupledPredecessors",
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+        "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
         "TestModelSearchFrontierOrderingClosureAndOwnership",
         "TestModelNodeRejectsInvalidParentLevel"
       ],
@@ -83035,16 +83038,20 @@
           ]
         },
         {
-          "name": "successful existential relation-declaration answer surface (pdr_context.cpp:1942-1950,1977-1988)",
+          "name": "successful existential relation-declaration answer and recursive-SCC model-search trace surface (pdr_context.cpp:1142-1288,1942-1950,1977-1988)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/answer.go",
           "tests": [
             "TestPDREngineMatchesCPPIntegerHornQueries",
-            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+            "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
+            "TestSMT2FixedpointPDRTraceReductionMatchesCPP",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
           ]
         },
         {
-          "name": "cover/model conversion, rule/model trace reconstruction, optional model-cone generalizer mode and post-QE disequality reduction",
+          "name": "cover/model conversion, remaining general rule/model trace reconstruction, optional model-cone generalizer mode and post-QE disequality reduction",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83059,7 +83066,7 @@
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
         "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth.",
         "Solve now drives the unbounded native frame/model-search loop, minimizes selected transition/state literals with model_implicant, applies the native QE-lite constant-elimination overload, and partitions projected literals among predecessor states. The optional pdr_use_model_generalizer cone mode and its post-QE disequality reduction remain explicit port obligations.",
-        "Successful retained relation-declaration queries expose the same simplified true answer as the native existential query path; arbitrary query traces, proof traces and unsatisfiable invariant answers remain unported."
+        "Successful retained relation-declaration queries reconstruct native-compatible empty/acyclic answers and recursive-SCC state traces. Remaining general trace reduction, proof traces and unsatisfiable invariant answers remain unported."
       ]
     },
     {
@@ -83092,6 +83099,9 @@
         "TestContextSolveProjectsCoupledPredecessors",
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+        "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
         "TestModelSearchFrontierOrderingClosureAndOwnership",
         "TestModelNodeRejectsInvalidParentLevel"
       ],
@@ -83171,16 +83181,20 @@
           ]
         },
         {
-          "name": "retained successful existential relation-declaration answer surface",
+          "name": "retained successful existential relation-declaration answer and recursive-SCC trace surface",
           "status": "partial",
           "go_target": "pkg/muz/pdr/answer.go",
           "tests": [
             "TestPDREngineMatchesCPPIntegerHornQueries",
-            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+            "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
+            "TestSMT2FixedpointPDRTraceReductionMatchesCPP",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
           ]
         },
         {
-          "name": "remaining pred_transformer cover/model surface plus model trace/proof reconstruction, core_generalizer, optional model-cone generalizer mode and post-QE disequality reduction",
+          "name": "remaining pred_transformer cover/model surface plus general model trace and proof reconstruction, core_generalizer, optional model-cone generalizer mode and post-QE disequality reduction",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83209,7 +83223,8 @@
         "pkg/cmd_context/fixedpoint.go",
         "pkg/parsers/smt2/fixedpoint_commands_test.go",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_background.smt2",
-        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_integer.smt2"
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_integer.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
@@ -83220,7 +83235,10 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2",
+        "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
       ],
       "assertions": [
         {
@@ -83251,12 +83269,16 @@
           ]
         },
         {
-          "name": "successful existential relation-declaration answer forwarding (pdr_dl_interface.cpp:175-182)",
+          "name": "successful existential relation-declaration answer and recursive-SCC trace forwarding (pdr_dl_interface.cpp:175-182)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": [
             "TestPDREngineMatchesCPPIntegerHornQueries",
-            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+            "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
+            "TestSMT2FixedpointPDRTraceReductionMatchesCPP",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
           ]
         },
         {
@@ -83269,7 +83291,7 @@
           ]
         },
         {
-          "name": "cover, general trace/certificate answer, model/proof, transformed-rule reuse and slice/unfold/coalesce integration",
+          "name": "cover, remaining general trace and certificate answer, model/proof, transformed-rule reuse and slice/unfold/coalesce integration",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83279,7 +83301,7 @@
         "PropositionalEngine owns the current PDR Context and closes/replaces it before each new PDR query or engine shutdown; rule and parameter services are borrowed."
       ],
       "deviations": [
-        "The current integration rebuilds PDR state per query instead of applying native rule-subsumption reuse. Successful existential declaration queries expose their simplified true answer; general trace/certificate reconstruction remains unported."
+        "The current integration rebuilds PDR state per query instead of applying native rule-subsumption reuse. Successful existential declaration queries expose empty/acyclic answers and recursive-SCC state traces; remaining general trace and certificate reconstruction remain unported."
       ]
     },
     {
@@ -83293,7 +83315,8 @@
         "pkg/muz/pdr/answer.go",
         "pkg/cmd_context/fixedpoint.go",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_background.smt2",
-        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_integer.smt2"
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_integer.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
@@ -83304,7 +83327,10 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2",
+        "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
       ],
       "conditionals": [
         {
@@ -83335,12 +83361,16 @@
           ]
         },
         {
-          "name": "successful existential relation-declaration answer surface",
+          "name": "successful existential relation-declaration answer and recursive-SCC trace surface",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": [
             "TestPDREngineMatchesCPPIntegerHornQueries",
-            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+            "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
+            "TestSMT2FixedpointPDRTraceReductionMatchesCPP",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
           ]
         },
         {
@@ -83353,7 +83383,7 @@
           ]
         },
         {
-          "name": "cover, general trace/certificate answer, model, proof and parameter-update surface",
+          "name": "cover, remaining general trace and certificate answer, model, proof and parameter-update surface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83363,7 +83393,7 @@
         "The fixedpoint engine owns its concrete PDR Context directly rather than through the native engine_base pointer."
       ],
       "deviations": [
-        "Query dispatch, statistics, and successful existential declaration answers are exposed; general answer traces and remaining diagnostic surfaces await PDR trace reconstruction."
+        "Query dispatch, statistics, empty/acyclic answers and recursive-SCC state traces are exposed; remaining general answer traces and diagnostic surfaces await PDR trace reconstruction."
       ]
     },
     {

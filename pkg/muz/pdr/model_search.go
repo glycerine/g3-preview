@@ -23,6 +23,7 @@ type ModelNode struct {
 	stateRef    ast.ASTRef
 	model       *model.ModelCore
 	rule        *base.Rule
+	selected    *normalizedRule
 	children    []*ModelNode
 	level       uint32
 	original    uint32
@@ -387,6 +388,7 @@ func (s *ModelSearch) removeNode(node *ModelNode, backtrack bool) error {
 		if err := nodes[0].SetModel(node.model); err != nil {
 			return err
 		}
+		nodes[0].selected = node.selected
 	}
 	if len(nodes) == 0 {
 		delete(cache, node.state)

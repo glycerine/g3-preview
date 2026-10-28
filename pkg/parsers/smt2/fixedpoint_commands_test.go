@@ -478,6 +478,99 @@ func TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP(t *testing.T) {
 	}
 }
 
+func TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	context.PrintSuccess = false
+	script := `(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(declare-rel Goal ())
+(declare-rel U ())
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (and (P x) (< x 2)) (P (+ x 1))))
+(rule (=> (P 2) Goal))
+(query Goal :print-answer true)
+(query U :print-answer false)
+`
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	want := "sat\n(and (P 1) (P 0))\nunsat\n"
+	if output.String() != cpp || cpp != want {
+		t.Fatal("PDR recursive trace differential", output.String(), cpp)
+	}
+}
+
+func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
+	tests := []struct {
+		name, script, want string
+	}{
+		{
+			"acyclic-branch",
+			`(set-option :fixedpoint.engine spacer)
+(declare-rel A (Int))
+(declare-rel B (Int))
+(declare-rel C (Int))
+(declare-rel Goal ())
+(declare-var x Int)
+(rule (A 0))
+(rule (B 0))
+(rule (=> (and (A x) (B x)) (C x)))
+(rule (=> (C 0) Goal))
+(query Goal :print-answer true)
+`,
+			"sat\ntrue\n",
+		},
+		{
+			"mutual-recursion",
+			`(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(declare-rel Q (Int))
+(declare-rel Goal ())
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (P x) (Q (+ x 1))))
+(rule (=> (Q x) (P (+ x 1))))
+(rule (=> (P 2) Goal))
+(query Goal :print-answer true)
+`,
+			"sat\n(and (P 0))\n",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				if err := context.Close(); err != nil {
+					t.Fatal(err)
+				}
+			})
+			context.PrintSuccess = false
+			var output bytes.Buffer
+			if err = smt2.ParseCommands(context, strings.NewReader(test.script), &output); err != nil {
+				t.Fatal(err)
+			}
+			cpp := fixedpointReference(t, test.script)
+			if output.String() != cpp || cpp != test.want {
+				t.Fatal("PDR trace reduction differential", output.String(), cpp)
+			}
+		})
+	}
+}
+
 func TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	if err != nil {
