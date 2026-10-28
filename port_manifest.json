@@ -118142,8 +118142,23 @@
         },
         {
           "name": "Remaining activity/relevancy queue displays and context printer integration",
-          "status": "unported",
-          "reason": "The retained context::display in smt_context_pp.cpp calls the virtual queue display. The old no-caller/dead premise was incorrect. Theory-aware display is implemented; other queue displays and full context printer integration remain pending."
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_activity_heap_queue.go",
+            "pkg/smtcore/smt_relevance_case_split_queue.go",
+            "pkg/smtcore/smt_relevance_activity_queue.go",
+            "pkg/smtcore/smt_relevance_goal_queue.go",
+            "pkg/smtcore/smt_theory_aware_branching.go",
+            "pkg/smtcore/smt_context_display_full.go"
+          ],
+          "tests": [
+            "TestSMTBasicActivityHeapExactDumpPrefixesAndAssignedFiltering",
+            "TestSMTRelevanceFIFOExactDumpHeadsEveryWriterPrefixAndBorrowing",
+            "TestSMTRelevanceActivityDisplayPrefixesAndStableQueue",
+            "TestSMTRelevanceGoalExactDisplayAndWriterPrefixes",
+            "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
+            "TestSMTContextDisplayFullCompositionAndRefusal"
+          ]
         },
         {
           "name": "Go final-check no-progress availability probe does not consume a native strategy-6 decision; other strategy behavior is preserved",
@@ -118501,8 +118516,23 @@
         },
         {
           "name": "Remaining activity/relevancy queue displays and context printer integration",
-          "status": "unported",
-          "reason": "The retained context::display in smt_context_pp.cpp calls the virtual queue display. The old no-caller/dead premise was incorrect. Theory-aware display is implemented; other queue displays and full context printer integration remain pending."
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_activity_heap_queue.go",
+            "pkg/smtcore/smt_relevance_case_split_queue.go",
+            "pkg/smtcore/smt_relevance_activity_queue.go",
+            "pkg/smtcore/smt_relevance_goal_queue.go",
+            "pkg/smtcore/smt_theory_aware_branching.go",
+            "pkg/smtcore/smt_context_display_full.go"
+          ],
+          "tests": [
+            "TestSMTBasicActivityHeapExactDumpPrefixesAndAssignedFiltering",
+            "TestSMTRelevanceFIFOExactDumpHeadsEveryWriterPrefixAndBorrowing",
+            "TestSMTRelevanceActivityDisplayPrefixesAndStableQueue",
+            "TestSMTRelevanceGoalExactDisplayAndWriterPrefixes",
+            "TestSMTTheoryAwareQueueDisplayRetainsNativeOrder",
+            "TestSMTContextDisplayFullCompositionAndRefusal"
+          ]
         },
         {
           "name": "Go final-check no-progress availability probe does not consume a native strategy-6 decision; other strategy behavior is preserved",
