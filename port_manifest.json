@@ -129479,7 +129479,7 @@
       "path": "src/smt/smt_quantifier.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_quantifier_registry.go",
         "pkg/smtcore/smt_quantifier_manager.go",
@@ -129596,6 +129596,27 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "complete retained definition inventory: quantifier_manager constructor/destructor, set_plugin, registry/statistics/enumeration wrappers, scope/search/reset/propagation/model dispatch, source-empty display/reset_statistics, and concrete default_qm_plugin lifecycle/E-matching/MBQI methods",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_quantifier_registry.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_mam.go",
+            "pkg/smtcore/smt_model_finder.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_kernel.go"
+          ],
+          "tests": [
+            "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
+            "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion",
+            "TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances",
+            "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
+            "TestSMTQuantifierManagerFiltersMBQIByQuantifierIDPrefix",
+            "TestSMTQuantifierPartitionsEagerAndLazyMultipatterns",
+            "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample"
+          ]
+        },
         {
           "name": "default manager construction, source-parameter configuration and production kernel lifecycle",
           "status": "ported",
@@ -129883,7 +129904,7 @@
         "The source public add_instance forwarding bug that passes max_generation as max_top_generation is preserved. Finite MBQI uses a concrete Go model checker, honors mbqi.id prefixes, resets and grows the source counterexample and iteration limits on each search, validates finite Skolem universes through an auxiliary solver, and applies the model finder before checking and publishing a candidate.",
         "The concrete matcher observes newly internalized unmarked terms when relevancy is disabled, including equal-length replacement scopes. Source instruction-tree optimizations remain represented by the existing direct typed matcher. Quantified E-matching saturation does not itself authorize SAT; the search boundary requires a model accepted by the quantifier checker.",
         "Core solver updates now follow source use_ematching, m_qi_max_instances and final_check_eh lazy-threshold reads. Tests exercise disabled/enabled matching across repeated contradictory child scopes, preserve the source strict-greater-than instance limit, release a previously delayed instance after a lazy-threshold update, and demonstrate that eager threshold and parsed cost remain constructor-cached. The C++ command-line tactic wrapper retains initial E-matching settings in the live-toggle experiment, so these core API update checks are kept separate from the 92 strict runner comparisons; full tactic-wrapper parameter lifecycle remains outside this increment.",
-        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. Retained eager/lazy multipattern partitioning, bounded rematches and scope trails are now implemented; recursive-definition first-trigger selection is now implemented; remaining lifecycle/diagnostic consumers still need audit.",
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. Retained eager/lazy multipattern partitioning, bounded rematches, scope trails and recursive-definition first-trigger selection are implemented. The completed definition/consumer audit also accounts for manager construction/destruction, plugin replacement, empty display/reset-statistics bodies and all concrete default-plugin callbacks; smt_quantifier.cpp/.h are ported.",
         "The default plugin owns two concrete SMTMAM instances. Unary triggers are eager; multipatterns use the live qi.max_multi_patterns limit plus one extra eager slot when no unary trigger exists. Deferred patterns match only in bounded final-check rematches, and their dirty flag does not itself request ordinary propagation. Lazy-index increments are individually trailed; init_search resets the current index without replacing scope trails. The source instruction-tree/indexing optimizations remain represented by the existing typed exhaustive matcher. Recursive-function definitions now have their concrete parser/context producer and select only the first function trigger.",
         "Four concrete regressions cover unavailable proper columns, source term-before-model zero insertion and persistent term caching, fresh proper/term values after explicit invalidation, uninterpreted Real applications dispatched by sort family, unattached/missing-theory/nil boundaries, exact fractional-Int refusal, stopped owner guard, managed quick-checker proof of x+1=3 at x=2 versus an actual queued/materialized counterexample for x+1=4, and distinct explicit roots for both values and the rewritten application with retirement at query cleanup. No synthesized zero is returned for an unavailable proper column and no model initialization is inserted. C++ validate_eq_in_model appears only in declarations/definitions across src, with no retained invocation; its unused LRA override is not ported under the retained-consumer rule. This supersedes its earlier pending-work listing. Source statuses/audit flags remain unchanged; quick-checker units retain their existing ported status while LRA/context remain partial. Public LRA setup selection, LP parameter forwarding, statistics/copy/reset, objective AST callbacks and remaining source/integration audit are still open."
       ]
@@ -129892,7 +129913,7 @@
       "path": "src/smt/smt_quantifier.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_quantifier_registry.go",
         "pkg/smtcore/smt_quantifier_manager.go",
@@ -129988,6 +130009,27 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "complete retained definition inventory: quantifier_manager constructor/destructor, set_plugin, registry/statistics/enumeration wrappers, scope/search/reset/propagation/model dispatch, source-empty display/reset_statistics, and concrete default_qm_plugin lifecycle/E-matching/MBQI methods",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_quantifier_registry.go",
+            "pkg/smtcore/smt_quantifier_manager.go",
+            "pkg/smtcore/smt_mam.go",
+            "pkg/smtcore/smt_model_finder.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_kernel.go"
+          ],
+          "tests": [
+            "TestSMTQuantifierRegistryStatsFingerprintQueueAndSourceGenerationForwarding",
+            "TestSMTQuantifierRegistrySourceInstanceLimitScopesAndStackDeletion",
+            "TestSMTQuantifierManagerPropagatesAndScopesQueuedInstances",
+            "TestSMTQuantifierManagerFinalCheckRunsActiveQuickChecker",
+            "TestSMTQuantifierManagerFiltersMBQIByQuantifierIDPrefix",
+            "TestSMTQuantifierPartitionsEagerAndLazyMultipatterns",
+            "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample"
+          ]
+        },
         {
           "name": "production construction and kernel-owned quantifier-manager lifecycle",
           "status": "ported",
@@ -130189,7 +130231,7 @@
       ],
       "deviations": [
         "The abstract C++ plugin surface is not reproduced as a universal adapter; retained MAM and MBQI behavior will use concrete typed Go components.",
-        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are now pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. Retained eager/lazy multipattern partitioning, bounded rematches and scope trails are now implemented; recursive-definition first-trigger selection is now implemented; remaining lifecycle/diagnostic consumers still need audit.",
+        "Candidate MBQI validation is no longer embedded in the rotating full quantifier slot. Ground theory completion gates candidate construction, so a theory give-up cannot accidentally trigger model validation. Counterexample expressions are pinned until a forced model-check base restart, where model-finder then model-checker callbacks publish them. Retained eager/lazy multipattern partitioning, bounded rematches, scope trails and recursive-definition first-trigger selection are implemented. The completed definition/consumer audit also accounts for manager construction/destruction, plugin replacement, empty display/reset-statistics bodies and all concrete default-plugin callbacks; smt_quantifier.cpp/.h are ported.",
         "The default plugin owns two concrete SMTMAM instances. Unary triggers are eager; multipatterns use the live qi.max_multi_patterns limit plus one extra eager slot when no unary trigger exists. Deferred patterns match only in bounded final-check rematches, and their dirty flag does not itself request ordinary propagation. Lazy-index increments are individually trailed; init_search resets the current index without replacing scope trails. The source instruction-tree/indexing optimizations remain represented by the existing typed exhaustive matcher. Recursive-function definitions now have their concrete parser/context producer and select only the first function trigger."
       ]
     },
