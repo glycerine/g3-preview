@@ -1,5 +1,6 @@
-// Source: src/smt/theory_bv.cpp internalize_carry/internalize_xor3.
 package smtcore
+
+// Source: src/smt/theory_bv.cpp internalize_carry/internalize_xor3.
 
 import "github.com/glycerine/g3/pkg/ast"
 

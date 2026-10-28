@@ -1,5 +1,6 @@
-// Source: src/smt/theory_bv.cpp:353-425,1506-1552.
 package smtcore
+
+// Source: src/smt/theory_bv.cpp:353-425,1506-1552.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

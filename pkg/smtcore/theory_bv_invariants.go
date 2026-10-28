@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_bv.cpp:1334-1339,1670-1764;
 // src/smt/theory_bv.h:256 after_merge_eh.
-package smtcore
 
 import (
 	"fmt"
