@@ -54800,7 +54800,8 @@
         "pkg/math/polynomial/polynomial_pseudo_verification_trace_test.go",
         "pkg/math/polynomial/polynomial_lex_sort_trace.go",
         "pkg/math/polynomial/polynomial_lex_sort_trace_test.go",
-        "pkg/math/polynomial/polynomial_flip_sign.go"
+        "pkg/math/polynomial/polynomial_flip_sign.go",
+        "pkg/math/polynomial/polynomial_ref_vector_projection.go"
       ],
       "tests": [
         "TestPolynomialDividesTraceZeroKeepsOlderAlgorithmReceipt",
@@ -55709,7 +55710,8 @@
         "TestPolynomialSubstitutionInvocationReservationPrefixes",
         "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch",
         "TestPolynomialGCDMGCDCheckRereadsTagAndConstructsDebugLocals",
-        "pkg/math/polynomial/polynomial_flip_sign_test.go"
+        "pkg/math/polynomial/polynomial_flip_sign_test.go",
+        "TestPolynomialProjectionIDReadsOnlyIDField"
       ],
       "conditionals": [
         {
@@ -60325,6 +60327,14 @@
             "TestPolynomialFlipSignBIGAllocationCleanupAndRetry",
             "TestPolynomialFlipSignRejectedCallPreservesIndependentNeg"
           ]
+        },
+        {
+          "name": "Retained polynomial ID query (cpp1689-1691; h279), reading only the native ID word",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_ref_vector_projection.go",
+          "tests": [
+            "TestPolynomialProjectionIDReadsOnlyIDField"
+          ]
         }
       ],
       "ownership": [
@@ -60463,7 +60473,8 @@
         "polynomial.cpp:6558-6830: exact guarded named child receipts, actual source constructors/declaration counts, youngest child stop before reverse lexical DT, separate false acknowledgment and true unjoined cleanup, immutable body/source/first-own history. No before/after roots or return-value/RC inference. Inline SET0/SET1/Factor constants reserve no history; charged diagnostic records appear only at reached Integer/Natural allocation leaves. UP and caller Factors physical graphs name actual members; callbacks cannot retire matched active owners; unrelated Factors remain allowed.",
         "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added.",
         "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness.",
-        "The public leading-sign operation borrows the input and returns either the identical alias or a new zero-reference negation without changing content. A concrete accepted polynomialNegInvocationReceipt binds its cleanup only to that actual child invocation; rejected/stale calls cannot acknowledge an independent older negation. The receipt is native manager lifetime metadata, not a second arithmetic owner."
+        "The public leading-sign operation borrows the input and returns either the identical alias or a new zero-reference negation without changing content. A concrete accepted polynomialNegInvocationReceipt binds its cleanup only to that actual child invocation; rejected/stale calls cannot acknowledge an independent older negation. The receipt is native manager lifetime metadata, not a second arithmetic owner.",
+        "Projection membership uses PolynomialID, which reads only the scalar ID word and masks the lexical-sort flag. It does not adopt polynomial references or inspect the reference-count, size, monomial or coefficient fields. A qualified uninitialized scalar-prefix fixture verifies this narrow query and restores the genuine owning location before destruction."
       ],
       "deviations": [
         "Divisibility TRACE cpp5155-5156 now precedes the zero shortcut and algorithm locals; cpp5181-5182 reports remainder/divisor and the actual optional quotient after monomial reference assignment. Direct polynomial display uses a separate exact diagnostic invocation and display generation. The compound caller receipt captures that pre-local child independently of the existing algorithm/prelude tuple, preserving the disabled-trace zero shortcut and its untouched older receipt. Exact cleanup rejects copied/stale diagnostic frames. Callback guards cover executing header/body/footer writes. Broader source failure/consumer audits remain open; no whole-unit promotion is claimed.",
@@ -61195,7 +61206,8 @@
         "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go",
         "pkg/math/polynomial/polynomial_gcd_check.go",
         "pkg/math/polynomial/polynomial_gcd_check_test.go",
-        "pkg/math/polynomial/polynomial_flip_sign.go"
+        "pkg/math/polynomial/polynomial_flip_sign.go",
+        "pkg/math/polynomial/polynomial_ref_vector_projection.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -61813,7 +61825,8 @@
         "TestPolynomialSubstitutionInvocationReservationPrefixes",
         "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch",
         "TestPolynomialGCDMGCDCheckRereadsTagAndConstructsDebugLocals",
-        "pkg/math/polynomial/polynomial_flip_sign_test.go"
+        "pkg/math/polynomial/polynomial_flip_sign_test.go",
+        "TestPolynomialProjectionIDReadsOnlyIDField"
       ],
       "conditionals": [
         {
@@ -64057,6 +64070,14 @@
             "TestPolynomialFlipSignBIGAllocationCleanupAndRetry",
             "TestPolynomialFlipSignRejectedCallPreservesIndependentNeg"
           ]
+        },
+        {
+          "name": "Retained polynomial ID query (cpp1689-1691; h279), reading only the native ID word",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_ref_vector_projection.go",
+          "tests": [
+            "TestPolynomialProjectionIDReadsOnlyIDField"
+          ]
         }
       ],
       "ownership": [
@@ -64121,7 +64142,8 @@
         "polynomial.cpp:6558-6830: exact guarded named child receipts, actual source constructors/declaration counts, youngest child stop before reverse lexical DT, separate false acknowledgment and true unjoined cleanup, immutable body/source/first-own history. No before/after roots or return-value/RC inference. Inline SET0/SET1/Factor constants reserve no history; charged diagnostic records appear only at reached Integer/Natural allocation leaves. UP and caller Factors physical graphs name actual members; callbacks cannot retire matched active owners; unrelated Factors remain allowed.",
         "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added.",
         "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness.",
-        "The public leading-sign operation borrows the input and returns either the identical alias or a new zero-reference negation without changing content. A concrete accepted polynomialNegInvocationReceipt binds its cleanup only to that actual child invocation; rejected/stale calls cannot acknowledge an independent older negation. The receipt is native manager lifetime metadata, not a second arithmetic owner."
+        "The public leading-sign operation borrows the input and returns either the identical alias or a new zero-reference negation without changing content. A concrete accepted polynomialNegInvocationReceipt binds its cleanup only to that actual child invocation; rejected/stale calls cannot acknowledge an independent older negation. The receipt is native manager lifetime metadata, not a second arithmetic owner.",
+        "Projection membership uses PolynomialID, which reads only the scalar ID word and masks the lexical-sort flag. It does not adopt polynomial references or inspect the reference-count, size, monomial or coefficient fields. A qualified uninitialized scalar-prefix fixture verifies this narrow query and restores the genuine owning location before destruction."
       ],
       "deviations": [
         "Algebraic exact sign evaluation mathematical-path increment (algebraic_numbers.cpp:1979-2188,3041-3043): EvalSign now connects optimistic rationals, rational elimination, interval refinement and exact resultant fallback. It creates y-p_prime in the private MM, stable-sorts actual variables by defining-polynomial degree, eliminates each source variable using its actual defining polynomial, converts into persistent eval-sign UP storage and computes the nonzero-root lower bound through an actually issued Knuth receipt. Saved intervals and +/-2^-k bounds follow source declaration/destruction order; exact refinement returns a strict sign or zero, restoring overrefined inputs, or restarts after rational discovery. The global converter binds an actual accepted algebraic caller and preserves existing public behavior. A real cancellation sweep exposed GCD source cleanup dropping an exact-division receipt while its earlier remainder-buffer arithmetic invocation still owned rows; pending detection now retains that precise child. Independent tests cover exact square/sum-of-squares zeros, signed sqrt(2)+sqrt(3)-3, mixed quadratic/cubic degree order, rational restart and raw-inline rational sign. The expected resultant y^4+12*y^3+44*y^2+48*y-8 and source input-interval restoration are checked independently. Every reached algebraic/resultant checkpoint cancellation/owning-cleanup/retry frontier passes in ordinary and checked/debug/trace profiles on CPUs 8-16. Full allocation-failure/callback/TRACE/eager-constructor and complete polynomial/AST audits remain partial; no whole-unit completion credit.",
@@ -90330,7 +90352,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/nlsat/explain_minimize.go",
-        "pkg/nlsat/search_state.go"
+        "pkg/nlsat/search_state.go",
+        "pkg/nlsat/explain_worklist.go"
       ],
       "tests": [
         "TestExplanationMinimizeOrderOwningAppendAndRegistryGrowth",
@@ -90341,7 +90364,12 @@
         "TestExplanationMinimizeInfeasibleCoresPrebuiltCPPOracle",
         "TestExplanationMinimizeConstructorAndParentClose",
         "TestExplanationMinimizeConsumedResultDECContinuation",
-        "TestExplanationMinimizeCleanupPreservesOlderMarks"
+        "TestExplanationMinimizeCleanupPreservesOlderMarks",
+        "TestProjectionWorklistCanonicalInsertionAndStableMaximumExtraction",
+        "TestProjectionWorklistIndependentRandomSequenceAndReferences",
+        "TestProjectionWorklistConstructorAndConstantGuards",
+        "TestProjectionWorklistCleanupPreservesBorrowedOutputFailure",
+        "TestProjectionWorklistStoppedCloseBlocksSearch"
       ],
       "conditionals": [
         {
@@ -90613,13 +90641,28 @@
             "TestExplanationMinimizeConsumedResultDECContinuation",
             "TestExplanationMinimizeCleanupPreservesOlderMarks"
           ]
+        },
+        {
+          "name": "Actual todo_set canonical insertion, reset, maximum-variable scan and stable maximum extraction (cpp49-118)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/explain_worklist.go",
+          "tests": [
+            "TestProjectionWorklistCanonicalInsertionAndStableMaximumExtraction",
+            "TestProjectionWorklistIndependentRandomSequenceAndReferences",
+            "TestProjectionWorklistConstructorAndConstantGuards",
+            "TestProjectionWorklistCleanupPreservesBorrowedOutputFailure",
+            "TestProjectionWorklistStoppedCloseBlocksSearch"
+          ]
         }
       ],
       "ownership": [
-        "Concrete explanationMinimizer borrows the actual search/store/evaluator/assignment/interval owners, reads the live atom registry rather than copied slice headers, and owns only its source work vectors, two scoped interval references, exact union receipt and concrete scoped-literal output. The evaluator returned reference transfers into the inner inf local; a separate INC transfers the union into the outer accumulator. Inner inf is retired before the outer local. Interrupted consumed interval drops record the exact old/accepted set; owning cleanup retires only those sets and the matching union receipt, preserving independent older justification marks and numerical callees. Output appends acquire one actual atom reference per occurrence; forward reset records the actual consumed last DEC before resuming that atom factory retirement, never replaying or repairing counters. Search owns and closes this component before releasing its borrowed parents; pending explanation work blocks search entry."
+        "Concrete explanationMinimizer borrows the actual search/store/evaluator/assignment/interval owners, reads the live atom registry rather than copied slice headers, and owns only its source work vectors, two scoped interval references, exact union receipt and concrete scoped-literal output. The evaluator returned reference transfers into the inner inf local; a separate INC transfers the union into the outer accumulator. Inner inf is retired before the outer local. Interrupted consumed interval drops record the exact old/accepted set; owning cleanup retires only those sets and the matching union receipt, preserving independent older justification marks and numerical callees. Output appends acquire one actual atom reference per occurrence; forward reset records the actual consumed last DEC before resuming that atom factory retirement, never replaying or repairing counters. Search owns and closes this component before releasing its borrowed parents; pending explanation work blocks search entry.",
+        "Concrete projectionWorklist borrows the actual search atom factory, polynomial core and canonical cache. MkUnique precedes membership lookup; the ID mark is published before the owning vector push. Removal resets the borrowed output first, acquires selected polynomial references before clearing marks, compacts survivors with real INC-before-DEC SET (including self-assignment) and retires the tail forward before changing extent. Search owns native component/partial constructor storage and closes it before releasing parent borrowers. Cleanup acknowledges only the owned vector; an interrupted caller-output reset or canonical-cache call retains its own authority. A qualified actual output-deletion refusal preserves callback count, memory state, old extent and old zero-reference polynomial until its output owner explicitly acknowledges it. No counters or published source marks are repaired.",
+        "A stopped worklist vector Close keeps the search pending guard active after lexical cleanup. The corresponding test releases the canonical-cache lease through its actual Reset owner, reaches a genuine final-reference deletion callback refusal, then resumes vector destruction without replaying that callback or allowing search entry. Worklist ID membership now uses the narrow PolynomialID query rather than unrelated Info fields."
       ],
       "deviations": [
-        "Only the retained core-minimization routines are ported here; public explain constructor/operator, normalization, vanishing-coefficient elimination, projection, simplification, result display/TRACE and solver resolution/main-search integration remain unported or unaudited. Native charged component storage and Go slices replace C++ object/vector layouts; no identical std::vector growth or allocation-prefix claim is made. The source empty-todo assertion at1373 remains observable for the qualified redundant order tested by TestExplanationMinimizeSourceEmptyTodoGuard; release still terminates by reconstructing the already-full core. No source progress or reference repair suppresses that difference. Thirty-six prebuilt C++ qfnra-nlsat queries verify unsatisfiability and deletion-minimality of nine reduced cores; these prove core properties rather than identical C++ internal selection order or whole-backend completeness. Source preconditions remain caller obligations."
+        "Only the retained core-minimization routines are ported here; public explain constructor/operator, normalization, vanishing-coefficient elimination, projection, simplification, result display/TRACE and solver resolution/main-search integration remain unported or unaudited. Native charged component storage and Go slices replace C++ object/vector layouts; no identical std::vector growth or allocation-prefix claim is made. The source empty-todo assertion at1373 remains observable for the qualified redundant order tested by TestExplanationMinimizeSourceEmptyTodoGuard; release still terminates by reconstructing the already-full core. No source progress or reference repair suppresses that difference. Thirty-six prebuilt C++ qfnra-nlsat queries verify unsatisfiability and deletion-minimality of nine reduced cores; these prove core properties rather than identical C++ internal selection order or whole-backend completeness. Source preconditions remain caller obligations.",
+        "This implements only the actual retained projection worklist prerequisite. Vanishing-coefficient elimination, normalization, projection algorithms, complete explain construction/interface and solver resolution/main-search integration remain unported or unaudited. Native charged component/vector headers and Go slices differ from C++ field/std::vector allocation layouts; no identical vector allocation frontier is claimed. Five worklist tests include a 100-step independent membership/order/reference model, actual canonical duplicates, reset/reinsert behavior, source constant guard and both constructor reservations. Existing C++ NLSAT oracles remain enabled in package profiles; there is no new claim of arithmetic/projection theorem completeness from ownership-only worklist checks."
       ]
     },
     {
@@ -243636,7 +243679,8 @@
         "pkg/opt/bound_expressions.go",
         "pkg/opt/bound_expressions_test.go",
         "pkg/opt/bound_expression.go",
-        "pkg/opt/bound_expression_test.go"
+        "pkg/opt/bound_expression_test.go",
+        "pkg/math/polynomial/polynomial_ref_vector_projection.go"
       ],
       "tests": [
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
@@ -243715,7 +243759,10 @@
         "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
         "TestSMT2LocalReferenceStacksFrameShrinkAndReset",
         "TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease",
-        "TestOptBoundExpressionSourceBranchesAndOwnedResult"
+        "TestOptBoundExpressionSourceBranchesAndOwnedResult",
+        "TestPolynomialProjectionVectorSetShrinkReferenceMultiplicity",
+        "TestPolynomialProjectionVectorStoppedShrinkOwnsForwardTail",
+        "TestPolynomialProjectionVectorSetRefusalAndShrinkGuard"
       ],
       "conditionals": [
         {
@@ -243749,32 +243796,40 @@
           "text": "SASSERT(m_ref);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "Concrete opt::context::to_exprs expr_ref_vector appends three independently pinned arithmetic numerals after ordered inf-epsilon projections (opt_context.cpp:1343-1350; ref_vector.h:96-101)",
           "status": "ported",
           "go_target": "pkg/opt/bound_expressions.go",
-          "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"]
+          "tests": [
+            "TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"
+          ]
         },
         {
           "name": "Concrete opt::context::to_expr expr_ref_vector owns source-ordered infinity, finite and epsilon terms through zero/singleton/add result publication and releases its terms forward (opt_context.cpp:1352-1381; ref_vector.h:96-101)",
           "status": "ported",
           "go_target": "pkg/opt/bound_expression.go",
-          "tests": ["TestOptBoundExpressionSourceBranchesAndOwnedResult"]
+          "tests": [
+            "TestOptBoundExpressionSourceBranchesAndOwnedResult"
+          ]
         },
         {
           "name": "Concrete model2expr entry-condition expr_ref_vector pins generated equalities in source order and releases them forward with retryable consumed-reference cleanup (model2expr.cpp:67-77)",
           "status": "ported",
           "go_target": "pkg/model/model2expr_entry_condition.go",
-          "tests": ["TestModel2ExprEntryConditionSourceArityAndReferenceScope"]
+          "tests": [
+            "TestModel2ExprEntryConditionSourceArityAndReferenceScope"
+          ]
         },
         {
           "name": "Concrete model2expr owning conjunction, argument and reverse-variable vectors retain AST roots through quantified construction and release on allocation refusal (model2expr.cpp:82-152)",
           "status": "ported",
           "go_target": "pkg/model/model2expr.go",
-          "tests": ["TestModel2ExprSourceBuilderAllocationRefusalsReleaseRoots"]
+          "tests": [
+            "TestModel2ExprSourceBuilderAllocationRefusalsReleaseRoots"
+          ]
         },
         {
           "name": "Concrete model-evaluator expr_ref_vector store rows, reconstruction arguments and equality constraints retain AST roots through source-order array expansion and comparison (model_evaluator.cpp:207-221,301-319,422-499)",
@@ -243796,13 +243851,17 @@
           "name": "Concrete UFBV new_exprs ref_vector publishes processed formulas and demodulators into a native slice with independent AST pins that outlive the processor and release after goal publication (ufbv_rewriter.cpp:735-749)",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
-          "tests": ["TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
+          "tests": [
+            "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
+          ]
         },
         {
           "name": "Concrete UFBV tactic forms/proofs ref_vectors copy each input formula and proof with independent AST pins before rewriting and release them in insertion order after younger rewritten output owners (ufbv_rewriter_tactic.cpp:47-68)",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
-          "tests": ["TestUFBVRewriterTacticProofModePreservesFormulaAndProof"]
+          "tests": [
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+          ]
         },
         {
           "name": "ref_vector_core construction, move, destruction, reset/finalize, both resize forms, reserve, shrink, push/pop, access, mutation, append, swap and reverse",
@@ -243963,25 +244022,47 @@
           "name": "SMT2 parser concrete sort_ref_vector owning push, back and pop for qualified local identifiers (ref_vector.h:96-101,104-110; smt2parser.cpp:1723-1729)",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/local_sort_stack.go",
-          "tests": ["TestSMT2ParserQualifiedLocalSortAndIndexRefusals"]
+          "tests": [
+            "TestSMT2ParserQualifiedLocalSortAndIndexRefusals"
+          ]
         },
         {
           "name": "SMT2 concrete sort_ref_vector and expr_ref_vector owning slots, frame shrink and reset (ref_vector.h:41-55,62-70,96-110)",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/local_expr_stack.go",
-          "go_targets": ["pkg/parsers/smt2/local_sort_stack.go"],
-          "tests": ["TestSMT2LocalReferenceStacksFrameShrinkAndReset"]
+          "go_targets": [
+            "pkg/parsers/smt2/local_sort_stack.go"
+          ],
+          "tests": [
+            "TestSMT2LocalReferenceStacksFrameShrinkAndReset"
+          ]
         },
         {
           "name": "SMT2 concrete sort/expr reference stack source shrink and pop assertions before reference release (ref_vector.h:91,103)",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/local_sort_stack.go",
-          "go_targets": ["pkg/parsers/smt2/local_expr_stack.go"],
-          "tests": ["TestSMT2LocalRefVectorSourceAssertionsBeforeRelease", "TestSMT2LocalReferenceStacksFrameShrinkAndReset"]
+          "go_targets": [
+            "pkg/parsers/smt2/local_expr_stack.go"
+          ],
+          "tests": [
+            "TestSMT2LocalRefVectorSourceAssertionsBeforeRelease",
+            "TestSMT2LocalReferenceStacksFrameShrinkAndReset"
+          ]
+        },
+        {
+          "name": "Concrete PolynomialRefVector public SET and source SHRINK for retained NLSAT projection/normalization consumers (h90-94,128-132)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_ref_vector_projection.go",
+          "tests": [
+            "TestPolynomialProjectionVectorSetShrinkReferenceMultiplicity",
+            "TestPolynomialProjectionVectorStoppedShrinkOwnsForwardTail",
+            "TestPolynomialProjectionVectorSetRefusalAndShrinkGuard"
+          ]
         }
       ],
       "ownership": [
-        "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added."
+        "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added.",
+        "PolynomialRefVector.Set uses the existing actual accepted SET frame: incoming INC precedes the old index read and DEC. Shrink begins at the requested tail boundary, consumes forward DECs and publishes the new logical extent only after all tail releases. A callback refusal retains the exact consumed-DEC cursor and original extent; ordinary writes/reset refuse pending shrink. Explicit own-vector CleanupRetained finishes only accepted SET/SHRINK/RESET work. Close finishes an interrupted shrink tail before resetting the surviving prefix; no already consumed DEC is replayed. No unrelated vector or polynomial/numerical manager operation is acknowledged."
       ],
       "deviations": [
         "No generic RefVectorCore, RefVector, or SRefVector exists in Go. Current AST, polynomial, and s-expression targets use concrete typed owners; remaining specializations should stay beside their consumers.",
@@ -243990,7 +244071,8 @@
         "Native Boolean collections: AND/OR flattening, nested NOT/OR and DISTINCT scratch use []ASTHandle; positive/negative/visited membership uses local map[ASTHandle]bool instead of shared AST planes. Local-context owning old/new rows and recursive AND-as-OR argument rows use native slices with explicit INC/consumed-DEC cleanup, retained on the real rewriter if lexical destruction stops. Completed rows retire before later cleanup; Close drains retained younger rows before older owners. Alternating forward/backward passes, reversal, survivor order, source unsigned cost/entry-limit behavior, raw nested ITE construction and actual AST construction failures remain. Shared foreign marks are neither read nor changed. Removed vector/ref-buffer codecs, emulated backing growth and mark-owner/trail allocation events at these callers. Prior inline/doubling/fast-mark storage claims are superseded; no generic C++ container/STL implementation credit is added.",
         "Native BV subtraction arguments: the lexical new_args owner is now []ASTHandle with explicit INC-before-append and consumed-DEC cleanup, directly borrowed by the retained add factory. Removed RefVector cold record/backing policies, args placement/saved-vector metadata and unpublished push-growth receipts. The owner/factory refusal campaign no longer requires a simulated vector failure; it checks each retained native argument owns a live AST reference, stopped-call guards and source history. Actual minus-one reference acquisition/literal destruction, numerical invocation cleanup, ordered products, zero skipping, singleton bypass and REWRITE2 status remain. This supersedes storage faultpoint/geometry claims and adds no C++ container/STL implementation credit.",
         "Removed the unused ASTRefVector general bridge, push receipts, physical element/iterator borrows and argument-view adapters after retained callers migrated to native slices. Production Go had no consumer beyond these bridge adapters; source ref_vector functionality used by retained algorithms is represented by their concrete native owning slices and scalar ASTRef. Removed bridge-only tests and source growth/refusal claims. Live mark/shared-occurrence test fixtures acquire and release native handle slices explicitly; borrowed BV argument range tests use SliceArguments.Range. Actual dependency-buffer raw word codecs stay at their concrete buffer consumer. This adds no generic container implementation credit and does not assert completion of other reference specializations.",
-        "Removed unused Go ASTDependencyRef scalar/vector/buffer adapters and their physical borrows, growth/copy/lifecycle tests and cleanup codecs. Caller audit found these APIs exclusively within their bridge implementations/tests after retained consumers migrated to concrete native ownership. Source expr_dependency_ref uses are not classified as dead: actual Go dependency DAG and goal ownership callbacks remain. The separate ASTManager vectorAllocator had no remaining production payload consumer and is removed from construction/statistics/teardown; its old diagnostic bit position is reserved to avoid renumbering remaining constructor bits. The live substitution dependency pointer conversion remains as a concrete substitution helper. Live substitution tests retain actual allocator/ownership/refcount checks and drop only observations of the unrelated empty adapter allocator. No generic template/container or whole-unit completion credit is added."
+        "Removed unused Go ASTDependencyRef scalar/vector/buffer adapters and their physical borrows, growth/copy/lifecycle tests and cleanup codecs. Caller audit found these APIs exclusively within their bridge implementations/tests after retained consumers migrated to concrete native ownership. Source expr_dependency_ref uses are not classified as dead: actual Go dependency DAG and goal ownership callbacks remain. The separate ASTManager vectorAllocator had no remaining production payload consumer and is removed from construction/statistics/teardown; its old diagnostic bit position is reserved to avoid renumbering remaining constructor bits. The live substitution dependency pointer conversion remains as a concrete substitution helper. Live substitution tests retain actual allocator/ownership/refcount checks and drop only observations of the unrelated empty adapter allocator. No generic template/container or whole-unit completion credit is added.",
+        "Whole-header audit flags are reopened for these newly reached concrete polynomial-vector consumers; earlier method records are preserved. Native Go slice capacity/growth and additional owning continuation fields do not represent a C++ standard-library port or identical packed allocation layouts. Only the actual retained public SET/SHRINK and exact owning cleanup are added here; remaining retained ref_vector consumers still require their own audits. New assertion uses the actual src/util/ref_vector.h:91 diagnostic action, including configured source throwing behavior, rather than assuming the legacy typed Go adapter."
       ]
     },
     {

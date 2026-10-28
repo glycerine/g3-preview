@@ -88,6 +88,7 @@ type searchState struct {
 	propRetired                     []*IntervalSet
 	core                            []sat.Literal
 	minimizer                       *explanationMinimizer
+	projection                      *projectionWorklist
 	header                          uint64
 	running, failed, closed         bool
 }
@@ -135,6 +136,9 @@ func (r *searchState) open() error {
 		return ErrSearchPending
 	}
 	if r.minimizer != nil && (r.minimizer.running || r.minimizer.failed || r.minimizer.resetting) {
+		return ErrSearchPending
+	}
+	if r.projection != nil && (r.projection.running || r.projection.failed || r.projection.set == nil) {
 		return ErrSearchPending
 	}
 	if err := r.store.open(); err != nil {
@@ -479,6 +483,11 @@ func (r *searchState) cleanup() error {
 	}
 	r.running = true
 	defer func() { r.running = false }()
+	if r.projection != nil {
+		if err := r.projection.cleanup(); err != nil {
+			return err
+		}
+	}
 	if r.minimizer != nil {
 		if err := r.minimizer.cleanup(); err != nil {
 			return err
@@ -545,6 +554,11 @@ func (r *searchState) close() error {
 	}
 	r.running = true
 	defer func() { r.running = false }()
+	if r.projection != nil {
+		if err := r.projection.close(); err != nil {
+			return err
+		}
+	}
 	if r.minimizer != nil {
 		if err := r.minimizer.close(); err != nil {
 			return err

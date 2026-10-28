@@ -179,6 +179,8 @@ type polynomialReferenceVector struct {
 	drainDec                                bool
 	drain                                   uint32
 	draining                                bool
+	shrinking                               bool
+	shrinkTo                                uint32
 }
 
 func (v *polynomialReferenceVector) get(m *MultivariatePolynomialCore, i uint32) (Polynomial, error) {
@@ -212,6 +214,14 @@ func (v *polynomialReferenceVector) resetMode(m *MultivariatePolynomialCore, own
 	}
 	if v.setActive {
 		return ErrPolynomialPending
+	}
+	if v.shrinking {
+		if !owning {
+			return ErrPolynomialPending
+		}
+		if e := v.finishShrink(m); e != nil {
+			return e
+		}
 	}
 	if !owning && v.cleanupCause != nil {
 		return v.cleanupCause
