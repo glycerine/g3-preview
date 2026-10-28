@@ -27,6 +27,10 @@ type smtIntegerDiffScope struct {
 	nonDifference     bool
 }
 
+type smtDiffStatistics struct {
+	conflicts, assertions, coreEqualities, coreDisequalities uint32
+}
+
 // SMTIntegerDiffTheory is the concrete integer difference-logic theory. It
 // accepts bounds of the form x-y <= k (and the equivalent >= form), where k
 // is an integer numeral. Unsupported arithmetic is recorded for final check.
@@ -43,6 +47,7 @@ type SMTIntegerDiffTheory struct {
 	addBinaryBounds bool
 	equalityAdapter *smtArithmeticEqualityAdapter
 	optimization    smtDiffOptimization
+	statistics      smtDiffStatistics
 }
 
 func (t *SMTIntegerDiffTheory) ConfigureArithmetic(config SMTArithState) error {
@@ -598,6 +603,7 @@ func (t *SMTIntegerDiffTheory) Assign(variable int32, truth bool) error {
 	}
 	t.atoms[index].truth = truth
 	t.assertions = append(t.assertions, smtIntegerDiffAssertion{atom: index, truth: truth})
+	t.statistics.assertions++
 	return nil
 }
 
@@ -633,7 +639,10 @@ func (t *SMTIntegerDiffTheory) Propagate() error {
 					kept = append(kept, literal)
 				}
 			}
-			return state.SetTheoryConflict(t.FamilyID(), kept)
+			if err = state.SetTheoryConflict(t.FamilyID(), kept); err == nil {
+				t.statistics.conflicts++
+			}
+			return err
 		}
 	}
 	return nil

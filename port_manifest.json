@@ -111910,6 +111910,8 @@
         "pkg/smtcore/smt_diff_graph_cycle_test.go",
         "pkg/smtcore/theory_diff_logic_display.go",
         "pkg/smtcore/theory_diff_logic_display_test.go",
+        "pkg/smtcore/theory_diff_logic_statistics.go",
+        "pkg/smtcore/theory_diff_logic_statistics_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd/g3/test_vectors/difference_shortcut_cores_real.smt2",
         "pkg/cmd/g3/test_vectors/difference_shortcut_cores_int.smt2"
@@ -111933,6 +111935,7 @@
         "TestSMTInfRationalPairedZeroAndCycleEdgeIdentity",
         "TestSMTDifferenceGraphShortcutsPreserveStrictConflict",
         "TestSMTDifferenceDisplayAtomsGraphsAssignmentsAndGuards",
+        "TestSMTDifferenceStatisticsActualAssertionsConflictsAndGuards",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference"
       ],
@@ -112370,6 +112373,14 @@
         {
           "name": "General implied-bound discovery and its search-state machinery (src/smt/diff_logic.h:1356-1639)",
           "status": "unported"
+        },
+        {
+          "name": "Graph propagation and relaxed-cycle counters through difference-theory and solver statistics collection (src/smt/diff_logic.h:123-144)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_diff_logic_statistics.go",
+          "tests": [
+            "TestSMTDifferenceStatisticsActualAssertionsConflictsAndGuards"
+          ]
         },
         {
           "name": "Concrete infinitesimal-rational graph instantiation used by real difference logic",
@@ -144341,6 +144352,8 @@
         "pkg/smtcore/theory_diff_logic_real_test.go",
         "pkg/smtcore/theory_diff_logic_display.go",
         "pkg/smtcore/theory_diff_logic_display_test.go",
+        "pkg/smtcore/theory_diff_logic_statistics.go",
+        "pkg/smtcore/theory_diff_logic_statistics_test.go",
         "pkg/smtcore/smt_boolean_propagation.go",
         "pkg/smtcore/smt_internalizer_state.go",
         "pkg/smtcore/smt_diff_graph_cycle.go",
@@ -144371,6 +144384,7 @@
         "TestSMTRealDiffTheoryStrictCycleConflict",
         "TestSMTRealDiffTheoryBuildsFiniteModelValues",
         "TestSMTDifferenceDisplayAtomsGraphsAssignmentsAndGuards",
+        "TestSMTDifferenceStatisticsActualAssertionsConflictsAndGuards",
         "TestSMTSolverSetupUsesRealDifferenceLogic",
         "TestSMTSolverPublishesStrictRealDifferenceModel",
         "TestSMTSolverRealDifferenceEqualityAdapter",
@@ -144583,7 +144597,15 @@
           ]
         },
         {
-          "name": "Adaptive and implied-bound propagation, cheap equality propagation, explained core equality/disequality reflection, reset and statistics (remaining src/smt/theory_diff_logic_def.h)",
+          "name": "Difference conflicts/assertions, core callback slots, arithmetic equality-adapter axioms and graph counters through concrete theory statistics collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_diff_logic_statistics.go",
+          "tests": [
+            "TestSMTDifferenceStatisticsActualAssertionsConflictsAndGuards"
+          ]
+        },
+        {
+          "name": "Adaptive and implied-bound propagation, cheap equality propagation, explained core equality/disequality reflection and reset (remaining src/smt/theory_diff_logic_def.h)",
           "status": "unported"
         },
         {

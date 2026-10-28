@@ -50,5 +50,6 @@ func (t *SMTRealDiffTheory) setNegativeCycleConflict(literals []SMTLiteral) (res
 	state.conflict = wrapped
 	state.conflictLiteral = SMTNullLiteral
 	state.statistics.NumConflicts++
+	t.realStatistics.conflicts++
 	return nil
 }

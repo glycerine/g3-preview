@@ -25,6 +25,7 @@ type SMTRealDiffTheory struct {
 	realScopes        []smtIntegerDiffScope
 	realNonDifference bool
 	delta             big.Rat
+	realStatistics    smtDiffStatistics
 }
 
 func NewSMTRealDiffTheory(family ast.FamilyID) (*SMTRealDiffTheory, error) {
@@ -431,6 +432,7 @@ func (t *SMTRealDiffTheory) Assign(variable int32, truth bool) error {
 	}
 	t.realAtoms[index].truth = truth
 	t.realAssertions = append(t.realAssertions, smtIntegerDiffAssertion{atom: index, truth: truth})
+	t.realStatistics.assertions++
 	return nil
 }
 
