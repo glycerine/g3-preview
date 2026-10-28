@@ -97,3 +97,26 @@ func TestSearchMainLearnsAcrossBooleanStage(t *testing.T) {
 		}
 	}
 }
+
+func TestSearchMainConflictLimitAfterResolvedConflict(t *testing.T) {
+	_, r := searchStateFixture(t)
+	q, err := newSearchResolution(r)
+	assignmentMust(t, err)
+	t.Cleanup(func() { assignmentMust(t, q.close()) })
+	r.config.MaxConflicts = 1
+	b, err := r.store.atoms.mkBoolVar()
+	assignmentMust(t, err)
+	c, err := r.store.atoms.mkBoolVar()
+	assignmentMust(t, err)
+	bl := sat.MakeLiteral(b, false)
+	cl := sat.MakeLiteral(c, false)
+	searchClause(t, r, bl, cl)
+	searchClause(t, r, bl, cl.Negated())
+	searchClause(t, r, bl.Negated(), cl)
+
+	result, err := r.search(q, nil)
+	assignmentMust(t, err)
+	if result != lbool.Undef || r.conflicts != 1 || len(r.store.learned) != 1 {
+		t.Fatal("conflict limit boundary", result, r.conflicts, len(r.store.learned))
+	}
+}

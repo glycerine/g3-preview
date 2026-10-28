@@ -91708,6 +91708,7 @@
             "TestSearchMainBooleanSATAndUNSAT",
             "TestSearchMainSelectsArithmeticWitness",
             "TestSearchMainLearnsAcrossBooleanStage",
+            "TestSearchMainConflictLimitAfterResolvedConflict",
             "TestSolverMixedPolynomialSearchAndRepeatedModel",
             "TestSolverMixedLinearConflict",
             "TestSolverIntegerBranchAndBound",
@@ -92249,13 +92250,14 @@
           ]
         },
         {
-          "name": "Main Boolean/arithmetic stage search, watched-clause processing, conflict-resolution handoff, decisions and witness selection (cpp1204-1256,1342-1352), excluding integer branch-and-bound search_check",
+          "name": "Main Boolean/arithmetic stage search, watched-clause processing, conflict-resolution handoff, max-conflicts cutoff, decisions and witness selection (cpp1204-1256,1342-1352), excluding integer branch-and-bound search_check",
           "status": "partial",
           "go_target": "pkg/nlsat/search_main.go",
           "tests": [
             "TestSearchMainBooleanSATAndUNSAT",
             "TestSearchMainSelectsArithmeticWitness",
-            "TestSearchMainLearnsAcrossBooleanStage"
+            "TestSearchMainLearnsAcrossBooleanStage",
+            "TestSearchMainConflictLimitAfterResolvedConflict"
           ]
         },
         {

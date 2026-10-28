@@ -81,6 +81,9 @@ func (r *searchState) search(resolution *searchResolution, explanation *explanat
 			if !solved {
 				return lbool.False, nil
 			}
+			if r.conflicts >= r.config.MaxConflicts {
+				return lbool.Undef, nil
+			}
 		}
 
 		if r.xk == NullVariable {

@@ -251,6 +251,7 @@ func (q *searchResolution) resolveConflict(conflict *Clause, explanation *explan
 		return false, ErrSearchOwner
 	}
 	for {
+		q.search.conflicts++
 		foundDecision, err := q.analyze(conflict, explanation)
 		if err != nil {
 			return false, err

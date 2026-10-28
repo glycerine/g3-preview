@@ -25,6 +25,7 @@ type SolverConfig struct {
 	SimplifyCore bool
 	Randomize    bool
 	Factor       bool
+	MaxConflicts uint32
 }
 
 // Solver composes the retained concrete NLSAT components. The numerical and
@@ -93,7 +94,7 @@ func NewSolver(config SolverConfig) (s *Solver, err error) {
 	if err != nil {
 		return s, err
 	}
-	s.search, err = newSearchState(s.clauses, s.evaluator, searchConfig{Limit: config.Limit, MaxMemory: s.config.MaxMemory, Lazy: config.Lazy, SimplifyCores: config.SimplifyCore, Randomize: config.Randomize})
+	s.search, err = newSearchState(s.clauses, s.evaluator, searchConfig{Limit: config.Limit, MaxMemory: s.config.MaxMemory, Lazy: config.Lazy, SimplifyCores: config.SimplifyCore, Randomize: config.Randomize, MaxConflicts: config.MaxConflicts})
 	if err != nil {
 		return s, err
 	}

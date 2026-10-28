@@ -59,6 +59,7 @@ type searchConfig struct {
 	Lazy          uint32
 	SimplifyCores bool
 	Randomize     bool
+	MaxConflicts  uint32
 }
 
 // searchState is the actual trail/propagation state, not a completed Solver.
@@ -74,6 +75,7 @@ type searchState struct {
 	xk                              uint32
 	level                           uint32
 	decisions, propagations, stages uint32
+	conflicts                       uint32
 	irrationalAssignments           uint32
 	witness                         polynomial.Algebraic
 	witnessActive                   bool
@@ -104,6 +106,9 @@ func newSearchState(s *clauseStore, e *Evaluator, config searchConfig) (*searchS
 	}
 	if config.Limit == nil || config.Limit.Closed() || s.search != nil || e.search != nil || e.assignment.search != nil || e.ism.search != nil || e.pm != s.atoms.ineq.pm || e.ism.allocator != s.atoms.ineq.allocator {
 		return nil, arena.ErrConfig
+	}
+	if config.MaxConflicts == 0 {
+		config.MaxConflicts = ^uint32(0)
 	}
 	h := uint64(reflect.TypeOf(searchState{}).Size())
 	if err := s.atoms.ineq.budget.Reserve(h); err != nil {
