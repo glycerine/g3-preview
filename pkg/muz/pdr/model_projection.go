@@ -107,6 +107,21 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 			resultErr = errors.Join(resultErr, c.manager.DelRef(&references[index]))
 		}
 	}()
+	if derived := modelCore.DerivedModel(); c.implicant != nil && derived != nil {
+		minimized, x := c.implicant.MinimizeLiterals(forms, derived)
+		if x != nil {
+			return x
+		}
+		references = append(references, minimized...)
+		forms = forms[:0]
+		for _, reference := range minimized {
+			formula, y := c.manager.RefGet(reference)
+			if y != nil {
+				return y
+			}
+			forms = append(forms, formula)
+		}
+	}
 	if c.lite != nil && len(eliminated) != 0 {
 		formula, x := c.manager.MkAndArray(forms)
 		if x != nil {

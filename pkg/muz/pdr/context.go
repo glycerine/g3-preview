@@ -7,6 +7,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/qe"
 	"github.com/glycerine/g3/pkg/smtcore"
@@ -27,6 +28,7 @@ type Context struct {
 	transformers map[ast.ASTHandle]*PredicateTransformer
 	order        []ast.ASTHandle
 	search       *ModelSearch
+	implicant    *model.ModelImplicant
 	lite         *qe.Lite
 	cooperation  *cooperate.Cooperation
 	ownedCoop    bool
@@ -66,6 +68,15 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 			return fail(err)
 		}
 		result.ownedCoop = true
+	}
+	services := config.ModelEvaluator
+	services.Context = config.Params
+	services.Globals = config.Globals
+	services.Memory = manager.NumeralService().RuntimeOwner()
+	services.Cooperation = result.cooperation
+	result.implicant, err = model.NewModelImplicant(manager, services)
+	if err != nil {
+		return fail(err)
 	}
 	result.lite, err = qe.NewLite(manager, params, true, qe.Config{Context: config.Params, Globals: config.Globals, Cooperation: result.cooperation, Trace: config.ModelEvaluator.Trace})
 	if err != nil {
@@ -330,6 +341,12 @@ func (c *Context) Close() (result error) {
 		}
 		c.search = nil
 	}
+	if c.implicant != nil {
+		if err := c.implicant.Close(); err != nil {
+			return err
+		}
+		c.implicant = nil
+	}
 	if c.lite != nil {
 		if err := c.lite.Close(); err != nil {
 			return err
@@ -362,6 +379,7 @@ func (c *Context) Close() (result error) {
 		c.transformers = nil
 		c.order = nil
 		c.search = nil
+		c.implicant = nil
 		c.lite = nil
 		c.cooperation = nil
 		c.query = nil
