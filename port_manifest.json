@@ -139285,6 +139285,20 @@
           ]
         },
         {
+          "name": "base array extensionality and shared-interface TRACE sites at lines 281, 325, 422, 432 and 459",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_extensionality.go",
+            "pkg/smtcore/theory_array_shared.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayExtensionalityAndSharedSourceTraces"
+          ]
+        },
+        {
           "name": "remaining base array diagnostic/trace integration and model completion audit",
           "status": "unported",
           "tests": []
@@ -139602,6 +139616,20 @@
           ],
           "tests": [
             "TestSMTArrayStoreReadSourceTracesAndRefusal"
+          ]
+        },
+        {
+          "name": "base array extensionality and shared-interface TRACE sites at lines 281, 325, 422, 432 and 459",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_extensionality.go",
+            "pkg/smtcore/theory_array_shared.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayExtensionalityAndSharedSourceTraces"
           ]
         },
         {

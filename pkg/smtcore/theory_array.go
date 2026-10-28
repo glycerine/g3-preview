@@ -7,6 +7,7 @@ package smtcore
 import (
 	"errors"
 	"fmt"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
@@ -465,6 +466,21 @@ func (t *SMTArrayTheory) assertExtensionalityCore(left, right ast.ASTHandle) err
 	}
 	rightSelect, err := state.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, rightArguments)
 	if err != nil {
+		return err
+	}
+	if err = t.emitArrayTrace("ext", "assert_extensionality_core", 325, nil, func(out io.Writer) error {
+		if err := displayArrayTraceExpression(state.manager, out, leftSelect); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(out, "\n"); err != nil {
+			return err
+		}
+		if err := displayArrayTraceExpression(state.manager, out, rightSelect); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
 		return err
 	}
 	arrayEquality, err := t.MkEqualityLiteral(left, right, true)

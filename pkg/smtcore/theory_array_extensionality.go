@@ -1,7 +1,10 @@
-// Source: theory_array::new_diseq_eh and theory_array_base extensionality queue.
 package smtcore
 
+// Source: theory_array::new_diseq_eh and theory_array_base extensionality queue.
+
 import (
+	"io"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -118,8 +121,17 @@ func (t *SMTArrayTheory) alreadyDisequalReads(first, second *SMTEnode) (bool, er
 				continue
 			}
 			different, err := t.hasRelevantDisequality(parent, other)
-			if err != nil || different {
-				return different, err
+			if err != nil {
+				return false, err
+			}
+			if different {
+				if err = t.emitArrayTrace("array_ext", "already_diseq", 281, nil, func(out io.Writer) error {
+					_, err := io.WriteString(out, "selects are disequal\n")
+					return err
+				}); err != nil {
+					return false, err
+				}
+				return true, nil
 			}
 		}
 	}

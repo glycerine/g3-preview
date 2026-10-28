@@ -92,3 +92,97 @@ func TestSMTArrayStoreReadSourceTracesAndRefusal(t *testing.T) {
 		})
 	}
 }
+
+func TestSMTArrayExtensionalityAndSharedSourceTraces(t *testing.T) {
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	for _, tag := range []string{"array_ext", "ext", "array_axiom", "array_shared", "array_bug"} {
+		tags.Enable(tag)
+	}
+	manager := smtArrayTraceManager(t, tags)
+	family, err := manager.RegisterArrayPlugin()
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, manager, nil)
+	theory, err := NewSMTArrayTheory(family)
+	astTestMust(t, err)
+	astTestMust(t, state.RegisterTheory(theory))
+	boolean, err := manager.MkBoolSort()
+	astTestMust(t, err)
+	arraySort, err := manager.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+	astTestMust(t, err)
+
+	a, err := manager.MkConst(astTestSymbol(t, manager, "array-ext-trace-a"), arraySort)
+	astTestMust(t, err)
+	b, err := manager.MkConst(astTestSymbol(t, manager, "array-ext-trace-b"), arraySort)
+	astTestMust(t, err)
+	index, err := manager.MkTrue()
+	astTestMust(t, err)
+	left, err := manager.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{a, index})
+	astTestMust(t, err)
+	right, err := manager.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{b, index})
+	astTestMust(t, err)
+	readEquality, err := theory.MkEqualityLiteral(left, right, true)
+	astTestMust(t, err)
+	for _, expression := range []ast.ASTHandle{left, right, state.boolExpr[readEquality.Var()]} {
+		astTestMust(t, state.markRelevant(expression))
+	}
+	astTestMust(t, state.AssignLiteral(readEquality.Negated(), NewSMTBooleanAxiom()))
+	_, err = state.PropagateCore()
+	astTestMust(t, err)
+	arrayEquality, err := theory.MkEqualityLiteral(a, b, true)
+	astTestMust(t, err)
+	astTestMust(t, state.AssignLiteral(arrayEquality.Negated(), NewSMTBooleanAxiom()))
+	_, err = state.PropagateCore()
+	astTestMust(t, err)
+
+	c, err := manager.MkConst(astTestSymbol(t, manager, "array-ext-trace-c"), arraySort)
+	astTestMust(t, err)
+	d, err := manager.MkConst(astTestSymbol(t, manager, "array-ext-trace-d"), arraySort)
+	astTestMust(t, err)
+	witnessEquality, err := theory.MkEqualityLiteral(c, d, true)
+	astTestMust(t, err)
+	astTestMust(t, state.AssignLiteral(witnessEquality.Negated(), NewSMTBooleanAxiom()))
+	astTestMust(t, state.PropagateTheoryAssignments())
+	astTestMust(t, state.PropagateTheoryEvents())
+	astTestMust(t, theory.Propagate())
+
+	outerSort, err := manager.MkArraySort(ast.SliceArguments([]ast.ASTHandle{arraySort}), boolean)
+	astTestMust(t, err)
+	outer, err := manager.MkConst(astTestSymbol(t, manager, "array-shared-trace-outer"), outerSort)
+	astTestMust(t, err)
+	shared := make([]ast.ASTHandle, 2)
+	for i, name := range []string{"array-shared-trace-e", "array-shared-trace-f"} {
+		shared[i], err = manager.MkConst(astTestSymbol(t, manager, name), arraySort)
+		astTestMust(t, err)
+		innerRead, err := manager.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{shared[i], index})
+		astTestMust(t, err)
+		astTestMust(t, state.Internalize(innerRead, false))
+		outerRead, err := manager.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{outer, shared[i]})
+		astTestMust(t, err)
+		astTestMust(t, state.Internalize(outerRead, false))
+		astTestMust(t, state.markRelevant(shared[i]))
+	}
+	progress, err := theory.makeInterfaceEqualities()
+	astTestMust(t, err)
+	if !progress {
+		t.Fatal("shared array trace fixture created no interface equality")
+	}
+	if !tags.ShouldTrace("ext") {
+		if output.Len() != 0 {
+			t.Fatal("compiled-out array traces executed", output.String())
+		}
+		return
+	}
+	trace := output.String()
+	for _, want := range []string{
+		"[array_ext] already_diseq src/smt/theory_array_base.cpp:281",
+		"[ext] assert_extensionality_core src/smt/theory_array_base.cpp:325",
+		"[array_shared] collect_shared_vars src/smt/theory_array_base.cpp:422",
+		"[array_shared] collect_shared_vars src/smt/theory_array_base.cpp:432",
+		"[array_bug] mk_interface_eqs src/smt/theory_array_base.cpp:459",
+	} {
+		if !strings.Contains(trace, want) {
+			t.Fatalf("missing source array trace %q in %q", want, trace)
+		}
+	}
+}

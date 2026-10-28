@@ -1,8 +1,14 @@
-// Source: theory_array_base::is_shared, collect_shared_vars, mk_interface_eqs,
-// context::is_shared, and theory_array::final_check_eh interface scheduling.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+// Source: theory_array_base::is_shared, collect_shared_vars, mk_interface_eqs,
+// context::is_shared, and theory_array::final_check_eh interface scheduling.
+
+import (
+	"fmt"
+	"io"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 // Source theory_array::init_search_eh starts the final-check cadence anew
 // for each check-sat, independently of user scopes and cumulative statistics.
@@ -70,6 +76,12 @@ func (t *SMTArrayTheory) makeInterfaceEqualities() (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	if err = t.emitArrayTrace("array_shared", "collect_shared_vars", 422, nil, func(out io.Writer) error {
+		_, err := io.WriteString(out, "collecting shared vars...\n")
+		return err
+	}); err != nil {
+		return false, err
+	}
 	seen := make(map[*SMTEnode]bool)
 	var roots []*SMTEnode
 	for _, node := range t.variables {
@@ -97,11 +109,28 @@ func (t *SMTArrayTheory) makeInterfaceEqualities() (bool, error) {
 			return false, err
 		}
 		if shared {
+			if err = t.emitArrayTrace("array_shared", "collect_shared_vars", 432, nil, func(out io.Writer) error {
+				id, err := root.OwnerID()
+				if err != nil {
+					return err
+				}
+				_, err = fmt.Fprintf(out, "new shared var: #%d\n", id)
+				return err
+			}); err != nil {
+				return false, err
+			}
 			roots = append(roots, root)
 		}
 	}
 	progress := false
 	for i, left := range roots {
+		if err = t.emitArrayTrace("array_bug", "mk_interface_eqs", 459, nil, func(out io.Writer) error {
+			variable := left.TheoryVar(t.FamilyID())
+			_, err := fmt.Fprintf(out, "mk_interface_eqs: processing: v%d\n", variable)
+			return err
+		}); err != nil {
+			return false, err
+		}
 		leftSort, err := s.manager.GetSort(left.owner)
 		if err != nil {
 			return false, err
