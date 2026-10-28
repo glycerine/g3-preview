@@ -4,7 +4,6 @@ package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func (t *SMTFloatingPointTheory) FinalCheck() (SMTFinalCheckStatus, error) {
@@ -14,17 +13,8 @@ func (t *SMTFloatingPointTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if err := t.traceFPAFinalCheck(); err != nil {
 		return SMTFinalCheckContinue, err
 	}
-	if diagnostic.DebugBuild {
-		d := diagnostic.BorrowProcessDebugContext()
-		enabled, err := diagnostic.SourceAssertionsEnabled(d)
-		if err != nil {
-			return SMTFinalCheckContinue, err
-		}
-		if enabled && len(t.converter.ExtraAssertions()) != 0 {
-			if err = diagnostic.DebugAssertionFailure(d, "src/smt/theory_fpa.cpp", 718, "m_converter.m_extra_assertions.empty()"); err != nil {
-				return SMTFinalCheckContinue, err
-			}
-		}
+	if err := fpaSourceAssertBool(718, "m_converter.m_extra_assertions.empty()", len(t.converter.ExtraAssertions()) == 0); err != nil {
+		return SMTFinalCheckContinue, err
 	}
 	return SMTFinalCheckDone, nil
 }

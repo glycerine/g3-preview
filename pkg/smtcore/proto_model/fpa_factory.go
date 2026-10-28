@@ -1,5 +1,6 @@
-// Source: src/smt/theory_fpa.h fpa_value_factory.
 package protomodel
+
+// Source: src/smt/theory_fpa.h fpa_value_factory.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

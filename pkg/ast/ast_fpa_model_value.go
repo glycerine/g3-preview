@@ -10,7 +10,7 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func fpaModelAssert(line int32, condition string, evaluate func() (bool, error)) error {
+func fpaSourceAssert(file string, line int32, condition string, evaluate func() (bool, error)) error {
 	if !diagnostic.DebugBuild {
 		return nil
 	}
@@ -23,7 +23,11 @@ func fpaModelAssert(line int32, condition string, evaluate func() (bool, error))
 	if err != nil || ok {
 		return err
 	}
-	return diagnostic.DebugAssertionFailure(d, "src/smt/theory_fpa.cpp", line, condition)
+	return diagnostic.DebugAssertionFailure(d, file, line, condition)
+}
+
+func fpaModelAssert(line int32, condition string, evaluate func() (bool, error)) error {
+	return fpaSourceAssert("src/smt/theory_fpa.cpp", line, condition, evaluate)
 }
 
 // MkFPAModelValue reconstructs a canonical numeral from the model procedure's

@@ -132,10 +132,19 @@ func (t *SMTFloatingPointTheory) wrap(expression ast.ASTHandle) (ast.ASTHandle, 
 		return ast.ASTHandle{}, err
 	}
 	rounding, err := state.manager.IsRoundingModeSort(sort)
-	if err != nil || (!floating && !rounding) {
-		if err != nil {
-			return ast.ASTHandle{}, err
-		}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssertBool(234, "m_fpa_util.is_float(e) || m_fpa_util.is_rm(e)", floating || rounding); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssert(235, "!m_fpa_util.is_bvwrap(e)", func() (bool, error) {
+		op, own, e := t.operation(expression)
+		return !own || op != ast.FPAOpBVWrap, e
+	}); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if !floating && !rounding {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
 	if op, own, operationErr := t.operation(expression); operationErr != nil {
@@ -150,12 +159,85 @@ func (t *SMTFloatingPointTheory) wrap(expression ast.ASTHandle) (ast.ASTHandle, 
 		}
 		return state.manager.MkBitVectorConcat(arguments)
 	}
+	if !rounding {
+		if err = fpaSourceAssertBool(252, "m_converter.is_float(es)", floating); err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
 	return state.manager.MkFamilyApp(t.FamilyID(), ast.FPAOpBVWrap, nil, []ast.ASTHandle{expression})
+}
+
+func (t *SMTFloatingPointTheory) unwrapFloating(expression, sort ast.ASTHandle) (ast.ASTHandle, error) {
+	state, err := t.State()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssert(267, "!m_fpa_util.is_fp(e)", func() (bool, error) {
+		op, own, e := t.operation(expression)
+		return !own || op != ast.FPAOpFP, e
+	}); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	width, widthErr := state.manager.BitVectorSize(expression)
+	if err = fpaSourceAssertBool(268, "m_bv_util.is_bv(e)", widthErr == nil); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if widthErr != nil {
+		return ast.ASTHandle{}, widthErr
+	}
+	ebits, sbits, floating, err := state.manager.FloatingPointSortShape(sort)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	rounding, err := state.manager.IsRoundingModeSort(sort)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssertBool(269, "m_fpa_util.is_float(s) || m_fpa_util.is_rm(s)", floating || rounding); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssertBool(284, "m_fpa_util.is_float(s)", floating); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if !floating {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	if err = fpaSourceAssertBool(286, "bv_sz == m_fpa_util.get_ebits(s) + sbits", width == ebits+sbits); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if width != ebits+sbits {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	sign, err := state.manager.MkBitVectorExtract(width-1, width-1, expression)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	exponent, err := state.manager.MkBitVectorExtract(width-2, sbits-1, expression)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	significand, err := state.manager.MkBitVectorExtract(sbits-2, 0, expression)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return state.manager.MkFamilyApp(t.FamilyID(), ast.FPAOpFP, nil, []ast.ASTHandle{sign, exponent, significand})
 }
 
 func (t *SMTFloatingPointTheory) convertFloatingConstant(declaration ast.ASTHandle) (ast.ASTHandle, error) {
 	state, err := t.State()
 	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssert(46, "f->get_family_id() == null_family_id", func() (bool, error) {
+		family, e := state.manager.GetFamilyID(declaration)
+		return family == ast.NullFamilyID, e
+	}); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssert(47, "f->get_arity() == 0", func() (bool, error) {
+		arity, e := state.manager.GetArity(declaration)
+		return arity == 0, e
+	}); err != nil {
 		return ast.ASTHandle{}, err
 	}
 	original, err := state.manager.MkApp(declaration, nil)
@@ -177,7 +259,16 @@ func (t *SMTFloatingPointTheory) convertFloatingConstant(declaration ast.ASTHand
 		}
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
-	width := ebits + sbits
+	width, err := state.manager.BitVectorSize(packed)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssertBool(58, "bv_sz == m_th.m_fpa_util.get_ebits(s) + sbits", width == ebits+sbits); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if width != ebits+sbits {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
 	sign, err := state.manager.MkBitVectorExtract(width-1, width-1, packed)
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -190,12 +281,47 @@ func (t *SMTFloatingPointTheory) convertFloatingConstant(declaration ast.ASTHand
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	return state.manager.MkFamilyApp(t.FamilyID(), ast.FPAOpFP, nil, []ast.ASTHandle{sign, exponent, significand})
+	result, err := state.manager.MkFamilyApp(t.FamilyID(), ast.FPAOpFP, nil, []ast.ASTHandle{sign, exponent, significand})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssert(62, "m_th.m_fpa_util.is_float(result)", func() (bool, error) {
+		resultSort, e := state.manager.GetSort(result)
+		if e != nil {
+			return false, e
+		}
+		_, _, matched, e := state.manager.FloatingPointSortShape(resultSort)
+		return matched, e
+	}); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return result, nil
 }
 
 func (t *SMTFloatingPointTheory) convertRoundingConstant(declaration ast.ASTHandle) (ast.ASTHandle, error) {
 	state, err := t.State()
 	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssert(70, "f->get_family_id() == null_family_id", func() (bool, error) {
+		family, e := state.manager.GetFamilyID(declaration)
+		return family == ast.NullFamilyID, e
+	}); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssert(71, "f->get_arity() == 0", func() (bool, error) {
+		arity, e := state.manager.GetArity(declaration)
+		return arity == 0, e
+	}); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = fpaSourceAssert(77, "is_rm(f->get_range())", func() (bool, error) {
+		rangeSort, e := state.manager.GetRange(declaration)
+		if e != nil {
+			return false, e
+		}
+		return state.manager.IsRoundingModeSort(rangeSort)
+	}); err != nil {
 		return ast.ASTHandle{}, err
 	}
 	original, err := state.manager.MkApp(declaration, nil)
@@ -257,6 +383,58 @@ func (t *SMTFloatingPointTheory) convert(expression ast.ASTHandle) (ast.ASTHandl
 		return ast.ASTHandle{}, err
 	}
 	value, err := state.manager.RefGet(output)
+	if err != nil {
+		_ = state.manager.DelRef(&output)
+		return ast.ASTHandle{}, err
+	}
+	inputSort, err := state.manager.GetSort(expression)
+	if err != nil {
+		_ = state.manager.DelRef(&output)
+		return ast.ASTHandle{}, err
+	}
+	booleanSort, err := state.manager.MkBoolSort()
+	if err != nil {
+		_ = state.manager.DelRef(&output)
+		return ast.ASTHandle{}, err
+	}
+	if inputSort == booleanSort {
+		if err = fpaSourceAssert(302, "is_app(res)", func() (bool, error) {
+			kind, e := state.manager.GetKind(value)
+			return kind == ast.ASTApp, e
+		}); err == nil {
+			err = fpaSourceAssert(303, "m.is_bool(res)", func() (bool, error) {
+				resultSort, e := state.manager.GetSort(value)
+				return resultSort == booleanSort, e
+			})
+		}
+	} else {
+		_, _, floating, shapeErr := state.manager.FloatingPointSortShape(inputSort)
+		if shapeErr != nil {
+			err = shapeErr
+		}
+		rounding := false
+		if err == nil {
+			rounding, err = state.manager.IsRoundingModeSort(inputSort)
+		}
+		if err == nil && (floating || rounding) {
+			err = fpaSourceAssertBool(308, "m_fpa_util.is_rm(e) || m_fpa_util.is_float(e)", true)
+			if err == nil {
+				resultOp, resultOwn, operationErr := t.operation(value)
+				if operationErr != nil {
+					err = operationErr
+				} else if rounding {
+					err = fpaSourceAssertBool(320, "m_fpa_util.is_bv2rm(e_conv)", resultOwn && resultOp == ast.FPAOpBV2RM)
+				} else {
+					err = fpaSourceAssertBool(326, "m_fpa_util.is_fp(e_conv)", resultOwn && resultOp == ast.FPAOpFP)
+				}
+			}
+		} else if err == nil {
+			err = fpaSourceAssert(341, "to_app(e)->get_family_id() == get_family_id()", func() (bool, error) {
+				family, e := state.manager.GetFamilyID(expression)
+				return family == t.FamilyID(), e
+			})
+		}
+	}
 	if err != nil {
 		_ = state.manager.DelRef(&output)
 		return ast.ASTHandle{}, err
@@ -423,7 +601,16 @@ func (t *SMTFloatingPointTheory) InternalizeAtom(expression ast.ASTHandle, _ boo
 	if err != nil || !own {
 		return false, err
 	}
-	state, _ := t.State()
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	if err = fpaSourceAssert(427, "atom->get_family_id() == get_family_id()", func() (bool, error) {
+		family, e := state.manager.GetFamilyID(expression)
+		return family == t.FamilyID(), e
+	}); err != nil {
+		return false, err
+	}
 	count, err := state.manager.GetNumArgs(expression)
 	if err != nil {
 		return false, err
@@ -499,6 +686,19 @@ func (t *SMTFloatingPointTheory) InternalizeTerm(expression ast.ASTHandle) (bool
 	if err != nil || !own {
 		return false, err
 	}
+	state, err := t.State()
+	if err != nil {
+		return false, err
+	}
+	if err = fpaSourceAssert(453, "term->get_family_id() == get_family_id()", func() (bool, error) {
+		family, e := state.manager.GetFamilyID(expression)
+		return family == t.FamilyID(), e
+	}); err != nil {
+		return false, err
+	}
+	if err = fpaSourceAssertBool(454, "!get_context().e_internalized(term)", state.context.enodes[expression] == nil); err != nil {
+		return false, err
+	}
 	created, err := t.ensureVariable(expression)
 	if err != nil || !created {
 		return true, err
@@ -509,7 +709,6 @@ func (t *SMTFloatingPointTheory) InternalizeTerm(expression ast.ASTHandle) (bool
 		if conversionErr != nil {
 			return false, conversionErr
 		}
-		state, _ := t.State()
 		equality, conversionErr := state.manager.MkEq(expression, converted)
 		if conversionErr == nil {
 			conversionErr = t.assertConstraint(equality)
@@ -618,8 +817,41 @@ func (t *SMTFloatingPointTheory) ApplySortConstraint(node *SMTEnode, sort ast.AS
 		return err
 	}
 	rounding, err := state.manager.IsRoundingModeSort(sort)
-	if err != nil || (!floating && !rounding) || t.IsAttachedToVariable(node) {
+	if err != nil {
 		return err
+	}
+	ownerSort, err := state.manager.GetSort(node.Owner())
+	if err != nil {
+		return err
+	}
+	_, _, ownerFloating, err := state.manager.FloatingPointSortShape(ownerSort)
+	if err != nil {
+		return err
+	}
+	ownerRounding, err := state.manager.IsRoundingModeSort(ownerSort)
+	if err != nil {
+		return err
+	}
+	if err = fpaSourceAssert(495, "s->get_family_id() == get_family_id()", func() (bool, error) {
+		family, e := state.manager.GetFamilyID(sort)
+		return family == t.FamilyID(), e
+	}); err != nil {
+		return err
+	}
+	if err = fpaSourceAssertBool(496, "m_fpa_util.is_float(s) || m_fpa_util.is_rm(s)", floating || rounding); err != nil {
+		return err
+	}
+	if err = fpaSourceAssertBool(497, "m_fpa_util.is_float(n->get_owner()) || m_fpa_util.is_rm(n->get_owner())", ownerFloating || ownerRounding); err != nil {
+		return err
+	}
+	if err = fpaSourceAssertBool(498, "n->get_owner()->get_decl()->get_range() == s", ownerSort == sort); err != nil {
+		return err
+	}
+	if !floating && !rounding || !ownerFloating && !ownerRounding || ownerSort != sort {
+		return ast.ErrASTDomain
+	}
+	if t.IsAttachedToVariable(node) {
+		return nil
 	}
 	if _, err = t.createFPAVariable(node); err != nil {
 		return err
@@ -673,14 +905,78 @@ func (t *SMTFloatingPointTheory) Relevant(expression ast.ASTHandle) error {
 		return err
 	}
 	rounding, err := state.manager.IsRoundingModeSort(sort)
-	if err != nil || (!floating && !rounding) {
+	if err != nil {
 		return err
 	}
-	// Float atoms and equalities recursively translate their operands, so every
-	// reached floating term already has an exact BV definition. Rounding-mode
-	// wrappers additionally need their finite-code connection here.
+	if !floating && !rounding {
+		family, familyErr := state.manager.GetFamilyID(expression)
+		if familyErr != nil {
+			return familyErr
+		}
+		if family == t.FamilyID() {
+			return fpaSourceAssertBool(686, "!m_fpa_util.is_float(n) && !m_fpa_util.is_rm(n)", true)
+		}
+		return fpaSourceAssert(695, "m_bv_util.is_bv(n)", func() (bool, error) {
+			_, e := state.manager.BitVectorSize(expression)
+			return e == nil, nil
+		})
+	}
 	if floating {
-		return nil
+		if op, own, operationErr := t.operation(expression); operationErr != nil {
+			return operationErr
+		} else if own && op == ast.FPAOpFP {
+			return nil
+		}
+		wrapper, wrapErr := t.wrap(expression)
+		if wrapErr != nil {
+			return wrapErr
+		}
+		var linked ast.ASTHandle
+		if value, valueErr := state.manager.IsValue(expression); valueErr != nil {
+			return valueErr
+		} else if value {
+			converted, conversionErr := t.convert(expression)
+			if conversionErr != nil {
+				return conversionErr
+			}
+			if conversionErr = fpaSourceAssert(666, "is_app(bv_val_e)", func() (bool, error) {
+				kind, e := state.manager.GetKind(converted)
+				return kind == ast.ASTApp, e
+			}); conversionErr != nil {
+				return conversionErr
+			}
+			if conversionErr = fpaSourceAssert(667, "to_app(bv_val_e)->get_num_args() == 3", func() (bool, error) {
+				count, e := state.manager.GetNumArgs(converted)
+				return count == 3, e
+			}); conversionErr != nil {
+				return conversionErr
+			}
+			linked, conversionErr = t.wrap(converted)
+			if conversionErr != nil {
+				return conversionErr
+			}
+		} else {
+			linked, err = t.unwrapFloating(wrapper, sort)
+			if err != nil {
+				return err
+			}
+			linked, err = state.manager.MkEq(linked, expression)
+			if err != nil {
+				return err
+			}
+			if err = t.assertConstraint(linked); err != nil {
+				return err
+			}
+			return t.flushSideConstraints()
+		}
+		constraint, constraintErr := t.bitVectorEquality(wrapper, linked)
+		if constraintErr != nil {
+			return constraintErr
+		}
+		if constraintErr = t.assertConstraint(constraint); constraintErr != nil {
+			return constraintErr
+		}
+		return t.flushSideConstraints()
 	}
 	if op, own, operationErr := t.operation(expression); operationErr != nil {
 		return operationErr
@@ -694,6 +990,16 @@ func (t *SMTFloatingPointTheory) Relevant(expression ast.ASTHandle) error {
 	wrapper, err := t.wrap(expression)
 	if err != nil {
 		return err
+	}
+	wrapperWidth, err := state.manager.BitVectorSize(wrapper)
+	if err != nil {
+		return err
+	}
+	if err = fpaSourceAssertBool(276, "bv_sz == 3", wrapperWidth == 3); err != nil {
+		return err
+	}
+	if wrapperWidth != 3 {
+		return ast.ErrASTDomain
 	}
 	constraint, err := t.bitVectorEquality(wrapper, packed)
 	if err != nil {
@@ -782,6 +1088,15 @@ func (t *SMTFloatingPointTheory) Close() (result error) {
 	t.scopes = nil
 	t.rewriter = nil
 	t.converter = nil
+	if err := fpaSourceAssertBool(118, "m_trail_stack.get_num_scopes() == 0", len(t.scopes) == 0); err != nil {
+		result = errors.Join(result, err)
+	}
+	if err := fpaSourceAssertBool(119, "m_conversions.empty()", len(t.conversion) == 0); err != nil {
+		result = errors.Join(result, err)
+	}
+	if err := fpaSourceAssertBool(120, "m_is_added_to_model.empty()", true); err != nil {
+		result = errors.Join(result, err)
+	}
 	return result
 }
 
@@ -823,6 +1138,9 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 		return nil, ast.ErrASTDomain
 	}
 	owner := node.Owner()
+	if err = fpaSourceAssertBool(739, "ctx.e_internalized(owner)", state.context.enodes[owner] != nil); err != nil {
+		return nil, err
+	}
 	sort, err := state.manager.GetSort(owner)
 	if err != nil {
 		return nil, err
@@ -852,6 +1170,12 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 	}
 	procedure := &smtFPAValueProcedure{manager: state.manager, ebits: ebits, sbits: sbits, rounding: rounding}
 	if own && op == ast.FPAOpFP {
+		if err = fpaSourceAssert(759, "to_app(owner)->get_num_args() == 3", func() (bool, error) {
+			count, e := state.manager.GetNumArgs(owner)
+			return count == 3, e
+		}); err != nil {
+			return nil, err
+		}
 		procedure.dependencies = make([]SMTModelValueDependency, 3)
 		nodes := make([]*SMTEnode, 3)
 		for i := range procedure.dependencies {
@@ -872,9 +1196,18 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 		if err = t.traceFPADependencies(generator, 770, nodes...); err != nil {
 			return nil, err
 		}
+		if err = fpaSourceAssertBool(808, "res != 0", procedure != nil); err != nil {
+			return nil, err
+		}
 		return procedure, nil
 	}
 	if own && op == ast.FPAOpBV2RM {
+		if err = fpaSourceAssert(777, "to_app(owner)->get_num_args() == 1", func() (bool, error) {
+			count, e := state.manager.GetNumArgs(owner)
+			return count == 1, e
+		}); err != nil {
+			return nil, err
+		}
 		argument, argumentErr := state.manager.GetArg(owner, 0)
 		if argumentErr != nil {
 			return nil, argumentErr
@@ -887,16 +1220,28 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 		if err == nil {
 			err = t.traceFPADependencies(generator, 782, argumentNode)
 		}
+		if err == nil {
+			err = fpaSourceAssertBool(808, "res != 0", procedure != nil)
+		}
 		return procedure, err
 	}
 	wrapped, err := t.wrap(owner)
 	if err != nil {
 		return nil, err
 	}
+	if err = fpaSourceAssert(750, "m_bv_util.is_bv(wrapped)", func() (bool, error) {
+		_, e := state.manager.BitVectorSize(wrapped)
+		return e == nil, nil
+	}); err != nil {
+		return nil, err
+	}
 	if wrappedNode := state.context.enodes[wrapped]; wrappedNode != nil {
 		procedure.dependencies, err = smtFPAEnodeDependency(wrappedNode)
 		if err == nil {
 			err = t.traceFPADependencies(generator, 798, wrappedNode)
+		}
+		if err == nil {
+			err = fpaSourceAssertBool(808, "res != 0", procedure != nil)
 		}
 		return procedure, err
 	}

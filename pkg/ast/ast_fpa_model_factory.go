@@ -1,5 +1,6 @@
-// Source: src/smt/theory_fpa.h:48-65; src/ast/fpa_decl_plugin.cpp:940-948.
 package ast
+
+// Source: src/smt/theory_fpa.h:35-65; src/ast/fpa_decl_plugin.cpp:940-948.
 
 // MkFPAModelFactoryValue follows fpa_value_factory::get_some_value. This is
 // separate from the declaration plugin's get_some_value, which supplies NaN.
@@ -50,6 +51,16 @@ func (m *ASTManager) mkFPAModelFactoryValues(sort ASTHandle, pair bool, first, s
 	if result = p.numeric.SetInt32(&frame.value, ebits, sbits, 0); result != nil {
 		return out, result
 	}
+	if result = fpaSourceAssert("src/smt/theory_fpa.h", 36, "m_util.get_ebits(s) == val.get_ebits()", func() (bool, error) {
+		return ebits == frame.value.EBits(), nil
+	}); result != nil {
+		return out, result
+	}
+	if result = fpaSourceAssert("src/smt/theory_fpa.h", 37, "m_util.get_sbits(s) == val.get_sbits()", func() (bool, error) {
+		return sbits == frame.value.SBits(), nil
+	}); result != nil {
+		return out, result
+	}
 	last, result = p.mkNumeral(&frame.value, nil)
 	if result != nil {
 		return out, result
@@ -61,6 +72,16 @@ func (m *ASTManager) mkFPAModelFactoryValues(sort ASTHandle, pair bool, first, s
 		return out, result
 	}
 	if result = p.numeric.SetInt32(&frame.value, ebits, sbits, 1); result != nil {
+		return out, result
+	}
+	if result = fpaSourceAssert("src/smt/theory_fpa.h", 36, "m_util.get_ebits(s) == val.get_ebits()", func() (bool, error) {
+		return ebits == frame.value.EBits(), nil
+	}); result != nil {
+		return out, result
+	}
+	if result = fpaSourceAssert("src/smt/theory_fpa.h", 37, "m_util.get_sbits(s) == val.get_sbits()", func() (bool, error) {
+		return sbits == frame.value.SBits(), nil
+	}); result != nil {
 		return out, result
 	}
 	last, result = p.mkNumeral(&frame.value, nil)

@@ -1,5 +1,6 @@
-// Source: src/smt/theory_fpa.h:48-66.
 package protomodel
+
+// Source: src/smt/theory_fpa.h:48-66.
 
 import (
 	"bytes"

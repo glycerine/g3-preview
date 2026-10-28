@@ -144737,6 +144737,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
+        "pkg/smtcore/theory_fpa_assertions.go",
+        "pkg/smtcore/theory_fpa_assertions_test.go",
         "pkg/smtcore/theory_fpa_trace.go",
         "pkg/smtcore/theory_fpa_final_check.go",
         "pkg/smtcore/theory_fpa_final_check_test.go",
@@ -144768,6 +144770,7 @@
       ],
       "tests": [
         "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence",
+        "TestSMTFPASourceAssertionGateAndSortShape",
         "TestSMTFPAInternalizeAtomAndTermSourceTrace",
         "TestSMTFPAInternalizeTraceStreamRefusalDoesNotStop",
         "TestSMTFPAConversionCacheSourceTrace",
@@ -145079,6 +145082,26 @@
           ]
         },
         {
+          "name": "Retained theory_fpa.cpp SASSERT/VERIFY contracts: nullary constant declarations, packed and component widths, canonical model numerals, wrap/unwrap shapes, converted atom/term kinds, internalization and sort domains, relevance branches, drained side conditions, model dependencies and destructor emptiness",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_fpa_assertions.go",
+          "go_targets": [
+            "pkg/smtcore/theory_fpa.go",
+            "pkg/smtcore/theory_fpa_final_check.go",
+            "pkg/smtcore/theory_fpa_assertions_test.go",
+            "pkg/ast/ast_fpa_model_value.go",
+            "pkg/smtcore/theory_fpa_model_source_test.go"
+          ],
+          "tests": [
+            "TestSMTFPASourceAssertionGateAndSortShape",
+            "TestSMTFPAModelWidthAssertionsAndActions",
+            "TestSMTFPAModelNumeralVerification",
+            "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace",
+            "TestSMTFPAModelLifecycleAndDependencySourceTrace",
+            "TestSMTFPAFinalCheckSourceTraceAndInvariant"
+          ]
+        },
+        {
           "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy, final check, model initialization/value selection and all dependency branches (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647,717,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
           "status": "ported",
           "go_targets": [
@@ -145217,6 +145240,7 @@
         "Display borrows the initialized theory/context, enode stack, actual family attachments and current core roots. It does not initialize a model, alter queues, merge classes or consume RNG. FPA uses existing converter-registered BV/arithmetic family identities only after the first FPA variable; no FPA variables means no text, lookup/format allocation or flush even with foreign nodes present. SMT2 operands use the existing project printer and retain its error/owner protocol. Optional borrowed Flush is reached at each source endl; direct displays report short writes, refused writes/flushes and operand allocation failures."
       ],
       "deviations": [
+        "The retained FPA assertion audit is now complete. Live outer theory sites use the process assertion gate, model VERIFY sites remain assertion-switch independent, and the Go direct rounding-mode BV encoding performs the source width check that native unwrap performs. Whole-unit status remains partial for the separate remaining TRACE/callback and owner-failure audit.",
         "The retained Go internalizer installs an eager biconditional when each FPA atom or structural equality is internalized, so the native assignment callback's polarity-specific implication is redundant.",
         "NewEquality and NewDisequality remain inert because the exact structural-equality bit-vector definition is installed syntactically; creating fresh Boolean circuits during a Go e-graph merge would violate rollback ordering.",
         "Float operands are reached recursively while translating atoms and equalities; rounding-mode relevancy additionally connects wrappers to finite encodings. Context display_theories is a retained display consumer and now reaches the complete FPA printer. The previous claim that native trace/display had no separate retained consumer was unsupported: live t_fpa/t_fpa_detail/t_fpa_internalize traces and source assertions remain unported, and fresh-theory reachability still requires revalidation.",
@@ -145233,6 +145257,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
+        "pkg/smtcore/theory_fpa_assertions.go",
+        "pkg/smtcore/theory_fpa_assertions_test.go",
         "pkg/smtcore/theory_fpa_trace.go",
         "pkg/smtcore/theory_fpa_final_check.go",
         "pkg/smtcore/theory_fpa_final_check_test.go",
@@ -145261,6 +145287,7 @@
       ],
       "tests": [
         "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence",
+        "TestSMTFPASourceAssertionGateAndSortShape",
         "TestSMTFPAInternalizeAtomAndTermSourceTrace",
         "TestSMTFPAInternalizeTraceStreamRefusalDoesNotStop",
         "TestSMTFPAConversionCacheSourceTrace",
@@ -145447,6 +145474,15 @@
           ]
         },
         {
+          "name": "fpa_value_factory::mk_value exponent/significand width SASSERT gates at each zero/one construction",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_model_factory.go",
+          "tests": [
+            "TestFloatingPointFactoryBothWidthAssertionsThenLiteralParameters",
+            "TestASTFPAModelFactoryUsesOneLiveNumericalScope"
+          ]
+        },
+        {
           "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. FPA assigns zero output before set(1), one output before scoped MPF destruction; failed old-output NUM release leaves incoming acquisition on the caller reference.",
           "status": "ported",
           "go_targets": [
@@ -145477,6 +145513,7 @@
         "Display borrows the initialized theory/context, enode stack, actual family attachments and current core roots. It does not initialize a model, alter queues, merge classes or consume RNG. FPA uses existing converter-registered BV/arithmetic family identities only after the first FPA variable; no FPA variables means no text, lookup/format allocation or flush even with foreign nodes present. SMT2 operands use the existing project printer and retain its error/owner protocol. Optional borrowed Flush is reached at each source endl; direct displays report short writes, refused writes/flushes and operand allocation failures."
       ],
       "deviations": [
+        "Both header-level fpa_value_factory width assertions now execute through the source assertion gate after each numerical setter and before numeral publication. Whole-header status remains partial with the implementation unit for the separate remaining TRACE/callback and owner-failure audit.",
         "The native fresh-value factory method is itself unimplemented; the Go factory implements the retained canonical-value operations and deliberately reports that it cannot manufacture an unbounded fresh FP value.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion.",
         "Corrected earlier whole-unit completion claim: status ported -> partial and method/owner audit flags true -> false. The cpp/header contain87 raw TRACE/CTRACE/SASSERT occurrence lines; their exact retained reachability and source-gated implementations remain unverified beyond the separately ported display. Functional solver/model tests alone do not establish whole-unit closure. No other source statuses or audit flags change.",
