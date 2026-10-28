@@ -144729,7 +144729,7 @@
       "path": "src/smt/theory_dl.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_dl.go",
         "pkg/smtcore/proto_model/datalog_factory.go",
@@ -144789,8 +144789,8 @@
           "text": "SASSERT(sz > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "finite-sort variable attachment, representative and abstraction declarations, numeral and inverse axioms, range bounds, strict-order reduction, scoped constraint rollback, model factory and model values",
@@ -144897,7 +144897,8 @@
         "The normal within-vector release ordering gap is corrected. This bounded check does not close constructor/map-publication or interrupted-destructor failure-prefix fidelity; whole value_factory.h and theory_dl.cpp remain partial. No C++ container implementation, generic adapter, or additional native full-suite checkpoint is introduced.",
         "The reproduced Go owning-retry defect is fixed: previously Close revisited zero ASTRef tokens and permanently returned invalid-owner errors. The physical regression runs under g3checked && g3debug, both with and without g3trace; other profiles cover ordinary teardown. Constructor/map-publication and complete native source failure-prefix fidelity remain open. Source-unit statuses/audit flags remain unchanged; no C++ rebuild or extra full native suite is claimed.",
         "The omit205 behavioral control survives the current cache-miss test because later owner checks can produce the same error; no mutation rejection is claimed for it. A focused compiler coverage profile separately confirms execution of the205 error-return branch, and the declaration lookup has no invented cardinality read. The source partial-map false condition remains outside the combined Go record and keeps whole-unit audit incomplete.",
-        "VERIFY on a nonfinite sort reports through the existing diagnostic service even when assertions are disabled and in native builds; GNU native unreachable returns its existing typed undefined-domain guard. Debug Continue leaves source sz uninitialized, so Go stops at that physical read instead of inventing a value. Zero finite metadata after a continued/erased sz>0 assertion preserves defined uint64 subtraction and creates the 64-bit all-ones numeral. Tests construct real sort metadata through the AST API rather than editing private records."
+        "VERIFY on a nonfinite sort reports through the existing diagnostic service even when assertions are disabled and in native builds; GNU native unreachable returns its existing typed undefined-domain guard. Debug Continue leaves source sz uninitialized, so Go stops at that physical read instead of inventing a value. Zero finite metadata after a continued/erased sz>0 assertion preserves defined uint64 subtraction and creates the 64-bit all-ones numeral. Tests construct real sort metadata through the AST API rather than editing private records.",
+        "Final retained-unit audit closes the representation-map/trail gap. Separate representative and abstraction maps are published before either trail owner; TestSMTDatalogDeclarationMapsPrecedeTrailOwnership leaves exactly one reusable reference so the representative trail succeeds and the abstraction trail refuses, proving both raw maps are visible, the completed record/map trails are absent, and scope pop releases only the published reference trail. Checked pop/close skip already consumed reference tokens. The concrete datalog factory's common simple_factory publication and teardown audit is complete in value_factory.h."
       ]
     },
     {

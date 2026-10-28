@@ -23,6 +23,8 @@ type smtDatalogScope struct{ declarations, references int }
 type SMTDatalogTheory struct {
 	*SMTTheoryBase
 	declarations     map[ast.ASTHandle]smtDatalogDeclarations
+	representatives  map[ast.ASTHandle]ast.ASTHandle
+	abstractions     map[ast.ASTHandle]ast.ASTHandle
 	declarationRefs  []ast.ASTRef
 	declarationTrail []ast.ASTHandle
 	scopes           []smtDatalogScope
@@ -35,8 +37,10 @@ func NewSMTDatalogTheory(family ast.FamilyID) (*SMTDatalogTheory, error) {
 		return nil, err
 	}
 	return &SMTDatalogTheory{
-		SMTTheoryBase: base,
-		declarations:  make(map[ast.ASTHandle]smtDatalogDeclarations),
+		SMTTheoryBase:   base,
+		declarations:    make(map[ast.ASTHandle]smtDatalogDeclarations),
+		representatives: make(map[ast.ASTHandle]ast.ASTHandle),
+		abstractions:    make(map[ast.ASTHandle]ast.ASTHandle),
 	}, nil
 }
 
@@ -48,7 +52,7 @@ func (t *SMTDatalogTheory) declarationsFor(sort ast.ASTHandle) (smtDatalogDeclar
 	if err != nil {
 		return smtDatalogDeclarations{}, err
 	}
-	if err = datalogAssert(205, "!m_reps.contains(s)", func() bool { _, found := t.declarations[sort]; return !found }); err != nil {
+	if err = datalogAssert(205, "!m_reps.contains(s)", func() bool { _, found := t.representatives[sort]; return !found }); err != nil {
 		return smtDatalogDeclarations{}, err
 	}
 	const width uint32 = 64
@@ -64,18 +68,24 @@ func (t *SMTDatalogTheory) declarationsFor(sort ast.ASTHandle) (smtDatalogDeclar
 	if err != nil {
 		return smtDatalogDeclarations{}, err
 	}
+	// Source get_rep publishes both raw declaration maps before add_trail
+	// acquires either AST reference. Preserve that observable failure prefix;
+	// the completed record below is published only after both trail owners.
+	t.representatives[sort] = rep
+	t.abstractions[sort] = abs
 	repRef, err := state.manager.NewRef(rep)
 	if err != nil {
 		return smtDatalogDeclarations{}, err
 	}
+	t.declarationRefs = append(t.declarationRefs, repRef)
 	absRef, err := state.manager.NewRef(abs)
 	if err != nil {
-		return smtDatalogDeclarations{}, errors.Join(err, state.manager.DelRef(&repRef))
+		return smtDatalogDeclarations{}, err
 	}
+	t.declarationRefs = append(t.declarationRefs, absRef)
 	declarations := smtDatalogDeclarations{rep: rep, abs: abs, bits: width}
 	t.declarations[sort] = declarations
 	t.declarationTrail = append(t.declarationTrail, sort)
-	t.declarationRefs = append(t.declarationRefs, repRef, absRef)
 	return declarations, nil
 }
 
@@ -370,10 +380,15 @@ func (t *SMTDatalogTheory) PopScopes(count uint32) error {
 	declarationLimit := t.scopes[level].declarations
 	for _, sort := range t.declarationTrail[declarationLimit:] {
 		delete(t.declarations, sort)
+		delete(t.representatives, sort)
+		delete(t.abstractions, sort)
 	}
 	t.declarationTrail = t.declarationTrail[:declarationLimit]
 	referenceLimit := t.scopes[level].references
 	for i := len(t.declarationRefs) - 1; i >= referenceLimit; i-- {
+		if t.declarationRefs[i] == (ast.ASTRef{}) {
+			continue
+		}
 		if err := t.state.manager.DelRef(&t.declarationRefs[i]); err != nil {
 			return err
 		}
@@ -419,12 +434,17 @@ func (t *SMTDatalogTheory) Close() (result error) {
 		return err
 	}
 	for i := len(t.declarationRefs) - 1; i >= 0; i-- {
+		if t.declarationRefs[i] == (ast.ASTRef{}) {
+			continue
+		}
 		result = errors.Join(result, state.manager.DelRef(&t.declarationRefs[i]))
 	}
 	if result == nil {
 		t.declarationRefs = nil
 		t.declarationTrail = nil
 		t.declarations = nil
+		t.representatives = nil
+		t.abstractions = nil
 		t.scopes = nil
 	}
 	return result

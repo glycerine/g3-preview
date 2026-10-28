@@ -328,6 +328,60 @@ func TestSMTDatalogNativeDeclarationWidthAndScopedMap(t *testing.T) {
 	}
 }
 
+func TestSMTDatalogDeclarationMapsPrecedeTrailOwnership(t *testing.T) {
+	f := newDLModelFixture(t, 5)
+	bitVector, err := f.m.BitVectorSort(64)
+	astTestMust(t, err)
+	rep, err := f.m.MkDatalogRepDecl(f.sort, bitVector)
+	astTestMust(t, err)
+	abs, err := f.m.MkDatalogAbsDecl(bitVector, f.sort)
+	astTestMust(t, err)
+	astTestPin(t, f.m, rep)
+	astTestPin(t, f.m, abs)
+	astTestMust(t, f.s.PushScope())
+
+	var occupied []ast.ASTRef
+	t.Cleanup(func() {
+		f.m.Budget().FailAfter(-1)
+		for i := range occupied {
+			astTestMust(t, f.m.DelRef(&occupied[i]))
+		}
+	})
+	f.m.Budget().FailAfter(0)
+	for len(occupied) < 8192 {
+		ref, e := f.m.NewRef(ast.ASTHandle{})
+		if errors.Is(e, arena.ErrInjectedFailure) {
+			break
+		}
+		astTestMust(t, e)
+		occupied = append(occupied, ref)
+	}
+	if len(occupied) == 8192 {
+		t.Fatal("reference page frontier not reached")
+	}
+	// Leave exactly one reusable record. The representative trail consumes
+	// it; the abstraction trail then reaches the refused page growth.
+	i := len(occupied) - 1
+	if i < 0 {
+		t.Fatal("reference frontier had no occupied record")
+	}
+	astTestMust(t, f.m.DelRef(&occupied[i]))
+	occupied = occupied[:i]
+	_, err = f.dl.declarationsFor(f.sort)
+	if !errors.Is(err, arena.ErrInjectedFailure) {
+		t.Fatal("abstraction trail did not reach the real reference frontier", err)
+	}
+	if f.dl.representatives[f.sort] != rep || f.dl.abstractions[f.sort] != abs || len(f.dl.declarations) != 0 || len(f.dl.declarationTrail) != 0 || len(f.dl.declarationRefs) != 1 {
+		t.Fatal("source declaration maps were made atomic with trail ownership")
+	}
+
+	f.m.Budget().FailAfter(-1)
+	astTestMust(t, f.s.PopScopes(1))
+	if len(f.dl.declarationRefs) != 0 || len(f.dl.declarationTrail) != 0 || f.dl.representatives[f.sort] != rep || f.dl.abstractions[f.sort] != abs {
+		t.Fatal("unpublished source map trails were incorrectly scoped")
+	}
+}
+
 func TestSMTDatalogNativeOrderBridgeTermContextAndRelevance(t *testing.T) {
 	f := newDLModelFixture(t, 5)
 	y, err := f.m.MkConst(astTestSymbol(t, f.m, "native-model-other-element"), f.sort)
