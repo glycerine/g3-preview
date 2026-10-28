@@ -286,8 +286,8 @@ func TestSMT2FixedpointEmptyProgramQueryMatchesCPP(t *testing.T) {
 	}
 }
 
-func TestSMT2FixedpointQueryRefusesUnavailableOutputParameters(t *testing.T) {
-	for _, parameter := range []string{":print-certificate true"} {
+func TestSMT2FixedpointQueryRefusesUnknownOutputParameters(t *testing.T) {
+	for _, parameter := range []string{":print-proof true"} {
 		t.Run(parameter, func(t *testing.T) {
 			context, err := cmd_context.NewStandaloneContext()
 			if err != nil {
@@ -438,7 +438,7 @@ func TestSMT2FixedpointSpacerIntegerQueriesMatchCPP(t *testing.T) {
 (declare-var x Int)
 (rule (P 0))
 (rule (=> (P x) (Q x)))
-(query Q :print-answer true)
+(query Q :print-answer true :print-certificate true)
 (query U :print-answer false)
 `
 	var output bytes.Buffer
@@ -446,7 +446,7 @@ func TestSMT2FixedpointSpacerIntegerQueriesMatchCPP(t *testing.T) {
 		t.Fatal(err)
 	}
 	cpp := fixedpointReference(t, script)
-	if output.String() != cpp || cpp != "sat\ntrue\nunsat\n" {
+	if output.String() != cpp || cpp != "sat\ntrue\n\nunsat\n" {
 		t.Fatal("spacer integer SMT-LIB differential", output.String(), cpp)
 	}
 }

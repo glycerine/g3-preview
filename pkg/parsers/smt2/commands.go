@@ -615,7 +615,7 @@ func (p *commandParser) command() (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		printAnswer, printStatistics := false, false
+		printAnswer, printStatistics, printCertificate := false, false, false
 		for p.token != RightParenToken {
 			if p.token != KeywordToken {
 				return false, fmt.Errorf("fixedpoint query parameter expected")
@@ -637,9 +637,7 @@ func (p *commandParser) command() (bool, error) {
 			case ":print-statistics":
 				printStatistics = value
 			case ":print-certificate":
-				if value {
-					return false, fmt.Errorf("unsupported fixedpoint query parameter %s", key)
-				}
+				printCertificate = value
 			default:
 				return false, fmt.Errorf("unsupported fixedpoint query parameter %s", key)
 			}
@@ -680,6 +678,11 @@ func (p *commandParser) command() (bool, error) {
 				}
 				if y = errors.Join(y, manager.DelRef(&answer)); y != nil {
 					return false, y
+				}
+			}
+			if printCertificate {
+				if _, x = fmt.Fprintln(p.out); x != nil {
+					return false, x
 				}
 			}
 			if printStatistics {
