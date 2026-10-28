@@ -80599,9 +80599,9 @@
       "path": "src/muz/base/bind_variables.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/base/bind_variables.go"],
+      "tests": ["TestVariableBinderAbstractsImplicitConstantsInSourceOrder", "TestVariableBinderWithoutVariablesReturnsOwnedIdentity"],
       "assertions": [
         {
           "line": 36,
@@ -80612,19 +80612,30 @@
           "text": "SASSERT(to_var(e)->get_idx() < scope);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "bind_variables construction, add_var, constant abstraction through nested scopes, empty identity, and forall/exists quantifier construction",
+          "status": "ported",
+          "go_target": "pkg/muz/base/bind_variables.go",
+          "tests": ["TestVariableBinderAbstractsImplicitConstantsInSourceOrder", "TestVariableBinderWithoutVariablesReturnsOwnedIdentity"]
+        }
+      ],
+      "ownership": [
+        "VariableBinder retains registered constant applications; Bind pins its input and returns one explicit owning ASTRef; Close releases all retained constants."
+      ],
+      "deviations": [
+        "Go delegates expression traversal and binder shifting to the already-ported concrete ast.ExprAbstractor implementation instead of duplicating AST internals."
+      ]
     },
     {
       "path": "src/muz/base/bind_variables.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/base/bind_variables.go"],
+      "tests": ["TestVariableBinderAbstractsImplicitConstantsInSourceOrder", "TestVariableBinderWithoutVariablesReturnsOwnedIdentity"],
       "conditionals": [
         {
           "line": 21,
@@ -80635,10 +80646,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete implicit-variable binder owner and complete retained public surface",
+          "status": "ported",
+          "go_target": "pkg/muz/base/bind_variables.go",
+          "tests": ["TestVariableBinderAbstractsImplicitConstantsInSourceOrder", "TestVariableBinderWithoutVariablesReturnsOwnedIdentity"]
+        }
+      ],
+      "ownership": [
+        "The Go owner replaces app_ref_vector and pinned/cache vectors with explicit ASTRef ownership and the concrete AST abstractor owner."
+      ],
       "deviations": []
     },
     {
