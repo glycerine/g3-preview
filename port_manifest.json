@@ -111898,6 +111898,7 @@
       "go_targets": [
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/smt_utvpi_cycle.go",
+        "pkg/smtcore/theory_utvpi_display.go",
         "pkg/smtcore/smt_utvpi_cycle_test.go",
         "pkg/smtcore/smt_diff_graph_rational.go",
         "pkg/smtcore/smt_diff_graph_rational_test.go",
@@ -154414,17 +154415,17 @@
         "The concrete theory owns its paired graph, literal/edge atom map, asserted queue/head, scopes, default equality adapter and rational model values. Enodes borrow the context; extended conflicts own copied proof parameters."
       ],
       "deviations": [
-        "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
+        "UTVPI has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts contribute to the runner comparison set.",
         "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
-        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement.",
-        "Completed the standalone theory_utvpi.cpp audit. The concrete linearizer preserves LIFO arithmetic traversal, numeral accumulation, coefficient cancellation, at-most-two unit terms, to_real traversal and refusal/reuse behavior. Only the retained real-difference instantiation is needed by mode 4; unused template instantiations are not reproduced. Theory state, display, reset and control obligations remain explicitly tracked in theory_utvpi.h/theory_utvpi_def.h."
+        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact numeral, typed-zero and positive/negative alias model behavior is tested; simplex is not used as a replacement.",
+        "Completed the standalone theory_utvpi.cpp audit. The concrete linearizer preserves LIFO arithmetic traversal, numeral accumulation, coefficient cancellation, at-most-two unit terms, to_real traversal and refusal/reuse behavior. Only the retained real-difference instantiation is needed by mode 4; unused template instantiations are not reproduced. Theory state, display and control obligations are closed in theory_utvpi.h/theory_utvpi_def.h."
       ]
     },
     {
       "path": "src/smt/theory_utvpi.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_utvpi.go",
         "pkg/smtcore/theory_utvpi_test.go",
@@ -154439,6 +154440,7 @@
         "pkg/smtcore/smt_utvpi_graph.go",
         "pkg/smtcore/smt_utvpi_graph_test.go",
         "pkg/smtcore/smt_utvpi_cycle.go",
+        "pkg/smtcore/theory_utvpi_display.go",
         "pkg/smtcore/smt_diff_graph_cycle.go",
         "pkg/smtcore/theory_diff_logic_conflict_test.go"
       ],
@@ -154455,6 +154457,7 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTUTVPILinearizationNormalizationAndRefusals",
         "TestSMTUTVPINumeralsAndConcreteTermAliases",
+        "TestSMTUTVPIDisplayAtomsGraphAssignmentsAndGuards",
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
         "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
         "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair",
@@ -154585,8 +154588,16 @@
           "tests": []
         },
         {
-          "name": "Source display/reset control fidelity",
-          "status": "unported",
+          "name": "Source atom/graph display, enabled-edge timestamps and graph assignments",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi_display.go",
+          "tests": [
+            "TestSMTUTVPIDisplayAtomsGraphAssignmentsAndGuards"
+          ]
+        },
+        {
+          "name": "reset_eh destructor/context-reset cleanup: retained Go kernels own and discard complete theory graphs; no theory-reset callback survives",
+          "status": "dead_deleted",
           "tests": []
         },
         {
@@ -154613,22 +154624,24 @@
         "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "UTVPI statistics now expose the source cumulative conflict/assertion/core equality counters, equality-adapter counts and graph propagation cost via SMTSolver. Counts survive scope pop. The active two-argument disequality callback does not increment the source disequality counter; its only increment is in an unused overload. Other UTVPI graph statistics remain zero because this owner never calls implied-literal discovery or find_relaxed_edge.",
         "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
-        "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
+        "UTVPI has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts contribute to the runner comparison set.",
         "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
-        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement."
+        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact numeral, typed-zero and positive/negative alias model behavior is tested; simplex is not used as a replacement.",
+        "The retained display prints the source atom prefix and live graph state, including enable timestamps. C++ reset_eh only serves destruction/context reset; Go has no retained theory-reset callback and discards the kernel-owned theory graph as one object."
       ]
     },
     {
       "path": "src/smt/theory_utvpi_def.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/theory_utvpi_lifecycle_test.go",
         "pkg/smtcore/smt_setup_difference.go",
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/smt_utvpi_cycle.go",
+        "pkg/smtcore/theory_utvpi_display.go",
         "pkg/smtcore/smt_utvpi_cycle_test.go",
         "pkg/smtcore/theory_utvpi.go",
         "pkg/smtcore/theory_utvpi_test.go",
@@ -154654,6 +154667,7 @@
         "TestSMTUTVPIMixedBridgeAndSumModelRefusal",
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
         "TestSMTUTVPINumeralsAndConcreteTermAliases",
+        "TestSMTUTVPIDisplayAtomsGraphAssignmentsAndGuards",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
@@ -154894,8 +154908,16 @@
           "tests": []
         },
         {
-          "name": "Source display/reset control fidelity",
-          "status": "unported",
+          "name": "Source atom/graph display, enabled-edge timestamps and graph assignments",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_utvpi_display.go",
+          "tests": [
+            "TestSMTUTVPIDisplayAtomsGraphAssignmentsAndGuards"
+          ]
+        },
+        {
+          "name": "reset_eh destructor/context-reset cleanup: retained Go kernels own and discard complete theory graphs; no theory-reset callback survives",
+          "status": "dead_deleted",
           "tests": []
         },
         {
@@ -154922,9 +154944,10 @@
         "UTVPI translation now implements the retained fresh-plugin behavior: the source installed theory is cloned with constructor defaults before destination setup, and duplicate arithmetic registration preserves that clone even when destination parameters select disabled arithmetic or simplex. Tests cover both same-manager and cross-manager translation, independent graph/adapter/statistics, child contradiction/pop recovery and typed model values. Other concrete plugins and the broader context-copy/learned-state behavior remain separately incomplete.",
         "UTVPI statistics now expose the source cumulative conflict/assertion/core equality counters, equality-adapter counts and graph propagation cost via SMTSolver. Counts survive scope pop. The active two-argument disequality callback does not increment the source disequality counter; its only increment is in an unused overload. Other UTVPI graph statistics remain zero because this owner never calls implied-literal discovery or find_relaxed_edge.",
         "The UTVPI negative-cycle traversal now uses the source shortcut algorithm and validates reverse cycle connectivity plus strictly negative total weight. The C++ try_relax argument is unused. Activity-based pruning only invokes the empty UTVPI new_edge callback, so it has no retained learned-edge behavior for this concrete owner; no universal callback adapter was added. General difference-logic learned-edge generation remains separately incomplete.",
-        "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
+        "UTVPI has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts contribute to the runner comparison set.",
         "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
-        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement."
+        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact numeral, typed-zero and positive/negative alias model behavior is tested; simplex is not used as a replacement.",
+        "The retained display prints the source atom prefix and live graph state, including enable timestamps. C++ reset_eh only serves destruction/context reset; Go has no retained theory-reset callback and discards the kernel-owned theory graph as one object."
       ]
     },
     {

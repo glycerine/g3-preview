@@ -75,6 +75,9 @@ func TestSMTInfRationalDiffGraphAssignmentScopeAndNormalization(t *testing.T) {
 	if feasible, enableErr := g.EnableEdge(base); enableErr != nil || !feasible {
 		t.Fatal(feasible, enableErr)
 	}
+	if g.edges[base].timestamp != 0 || g.timestamp != 1 {
+		t.Fatal("base enable timestamp", g.edges[base].timestamp, g.timestamp)
+	}
 	value, err := g.Assignment(1)
 	if err != nil || value.Cmp(diffInf(-2, -1)) != 0 {
 		t.Fatal("assignment", value, err)
@@ -89,8 +92,14 @@ func TestSMTInfRationalDiffGraphAssignmentScopeAndNormalization(t *testing.T) {
 	if feasible, enableErr := g.EnableEdge(temporary); enableErr != nil || !feasible {
 		t.Fatal(feasible, enableErr)
 	}
+	if g.edges[temporary].timestamp != 1 || g.timestamp != 2 {
+		t.Fatal("scoped enable timestamp", g.edges[temporary].timestamp, g.timestamp)
+	}
 	if err = g.Pop(1); err != nil || g.NumEdges() != 1 {
 		t.Fatal("scope rollback", g.NumEdges(), err)
+	}
+	if g.timestamp != 1 {
+		t.Fatal("scope did not restore enable timestamp", g.timestamp)
 	}
 	if err = g.SetToZero(1); err != nil {
 		t.Fatal(err)

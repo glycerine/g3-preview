@@ -61,6 +61,7 @@ type smtInfRationalDiffEdge struct {
 	source, target int32
 	weight         smtInfRational
 	explanation    SMTLiteral
+	timestamp      uint32
 	enabled        bool
 }
 
@@ -71,6 +72,7 @@ type smtInfRationalDiffAssignmentTrail struct {
 
 type smtInfRationalDiffScope struct {
 	edges, enabled int
+	timestamp      uint32
 }
 
 // SMTInfRationalDiffGraph is the retained infinitesimal-rational dl_graph
@@ -89,6 +91,7 @@ type SMTInfRationalDiffGraph struct {
 	lastEnabledEdge int32
 	enabledEdges    []int32
 	propagationCost uint32
+	timestamp       uint32
 }
 
 func NewSMTInfRationalDiffGraph() *SMTInfRationalDiffGraph {
@@ -128,7 +131,7 @@ func (g *SMTInfRationalDiffGraph) AddEdge(source, target int32, weight *smtInfRa
 		return -1, errSMTDiffGraphDomain
 	}
 	id := int32(len(g.edges))
-	edge := smtInfRationalDiffEdge{source: source, target: target, explanation: explanation}
+	edge := smtInfRationalDiffEdge{source: source, target: target, explanation: explanation, timestamp: g.timestamp}
 	edge.weight.Set(weight)
 	g.edges = append(g.edges, edge)
 	g.outEdges[source] = append(g.outEdges[source], id)
@@ -248,6 +251,8 @@ func (g *SMTInfRationalDiffGraph) EnableEdge(id int32) (bool, error) {
 		return true, nil
 	}
 	edge.enabled = true
+	edge.timestamp = g.timestamp
+	g.timestamp++
 	g.lastEnabledEdge = id
 	feasible := true
 	if !g.edgeFeasible(edge) {
@@ -293,7 +298,7 @@ func (g *SMTInfRationalDiffGraph) Push() error {
 	if g == nil {
 		return errSMTDiffGraphDomain
 	}
-	g.scopes = append(g.scopes, smtInfRationalDiffScope{len(g.edges), len(g.enabledEdges)})
+	g.scopes = append(g.scopes, smtInfRationalDiffScope{len(g.edges), len(g.enabledEdges), g.timestamp})
 	return nil
 }
 
@@ -307,6 +312,7 @@ func (g *SMTInfRationalDiffGraph) Pop(count uint32) error {
 		g.edges[g.enabledEdges[index-1]].enabled = false
 	}
 	g.enabledEdges = g.enabledEdges[:scope.enabled]
+	g.timestamp = scope.timestamp
 	for len(g.edges) > scope.edges {
 		id := int32(len(g.edges) - 1)
 		edge := &g.edges[id]
