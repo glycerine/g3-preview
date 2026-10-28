@@ -218,6 +218,19 @@ func (p *commandParser) command() (bool, error) {
 		if err := p.advance(); err != nil {
 			return false, err
 		}
+		if p.token == StringToken {
+			value := p.scanner.String()
+			if err = p.advance(); err != nil {
+				return false, err
+			}
+			if err = p.requireEnd(); err != nil {
+				return false, err
+			}
+			if err = p.context.SetStringOption(key, value); err != nil {
+				return false, err
+			}
+			break
+		}
 		if p.token == IntegerToken {
 			value, err := p.unsigned()
 			if err != nil {
@@ -628,6 +641,14 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		if err = p.context.WriteProof(p.out); err != nil {
+			return false, err
+		}
+		success = false
+	case "get-proof-graph":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.WriteProofGraph(); err != nil {
 			return false, err
 		}
 		success = false

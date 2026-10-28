@@ -366,6 +366,28 @@ func (c *Context) SetSymbolOption(name, value string) error {
 	return c.globalParametersUpdated()
 }
 
+// SetStringOption follows the context-local string parameter path used by
+// proof/trace filenames. Output-channel filenames remain separate transports.
+func (c *Context) SetStringOption(name, value string) error {
+	if err := c.valid(); err != nil {
+		return err
+	}
+	name = strings.ReplaceAll(name, "-", "_")
+	if name == "regular_output_channel" || name == "diagnostic_output_channel" {
+		return fmt.Errorf("string output-channel setters are not ported")
+	}
+	if name == "dot_proof_file" || name == "trace_file_name" {
+		if err := c.parameters.Set(&name, &value); err != nil {
+			return err
+		}
+		return c.config.Params.SetStringName(&c.params, &name, &value)
+	}
+	if err := c.config.Globals.SourceSetName(name, value); err != nil {
+		return err
+	}
+	return c.globalParametersUpdated()
+}
+
 // Source cmd_context::global_params_updated. Generic option values retain
 // their catalog types in gparams. Only the disabled context auto_config flag
 // is copied into the solver's local update, as in the native command context.

@@ -40849,7 +40849,9 @@
         "pkg/cmd/g3/test_vectors/display.smt2",
         "pkg/cmd_context/array_map.go",
         "pkg/parsers/smt2/declare_map_test.go",
-        "pkg/cmd/g3/test_vectors/declare_map.smt2"
+        "pkg/cmd/g3/test_vectors/declare_map.smt2",
+        "pkg/cmd_context/proof_graph.go",
+        "pkg/parsers/smt2/proof_graph_test.go"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -40902,7 +40904,10 @@
         "TestSMT2DisplayUsesParsedExpressionPrinter",
         "TestSMT2DisplayRejectsMissingAndTrailingTerms",
         "TestSMT2DeclareMapInstallsArrayAxiomAndScopes",
-        "TestSMT2DeclareMapRejectsEmptyIndicesAndNullaryFunctions"
+        "TestSMT2DeclareMapRejectsEmptyIndicesAndNullaryFunctions",
+        "TestSMT2GetProofGraphWritesConfiguredDOTFile",
+        "TestSMT2GetProofGraphGuards",
+        "TestSMT2GetProofGraphCPPReference"
       ],
       "conditionals": [
         {
@@ -41013,7 +41018,14 @@
           "tests": ["TestSMT2DeclareMapInstallsArrayAxiomAndScopes", "TestSMT2DeclareMapRejectsEmptyIndicesAndNullaryFunctions", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         },
         {
-          "name": "remaining help/get-proof-graph commands, string output-channel setters and model completion policy",
+          "name": "get-proof-graph availability guards, dot-proof-file string option and exact Graphviz file output (basic_cmds.cpp:206-224)",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/proof_graph.go",
+          "go_targets": ["pkg/cmd_context/context.go", "pkg/parsers/smt2/commands.go", "pkg/parsers/smt2/proof_graph_test.go"],
+          "tests": ["TestSMT2GetProofGraphWritesConfiguredDOTFile", "TestSMT2GetProofGraphGuards", "TestSMT2GetProofGraphCPPReference"]
+        },
+        {
+          "name": "remaining help command, string output-channel setters and model completion policy",
           "status": "reference_only",
           "go_target": null,
           "tests": []
