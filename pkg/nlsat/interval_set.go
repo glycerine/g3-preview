@@ -43,6 +43,7 @@ type IntervalSet struct {
 // it, and callers retire their sets before closing this manager.
 type IntervalSetManager struct {
 	self             *IntervalSetManager
+	search           *searchState
 	am               *polynomial.AlgebraicManager
 	allocator        *umemory.SmallAllocator
 	budget           *arena.Budget
@@ -51,6 +52,7 @@ type IntervalSetManager struct {
 	live             map[*IntervalSet]struct{}
 	retired          []*IntervalSet
 	pending          []*intervalBuffer
+	justifications   *intervalJustificationScope
 	allocation       umemory.SmallAllocatorAllocationOutcome
 	allocationFailed bool
 	header           uint64
@@ -89,7 +91,7 @@ func (m *IntervalSetManager) open() error {
 	if err := m.owner(); err != nil {
 		return err
 	}
-	if m.closing || m.allocationFailed || len(m.retired) > 0 || len(m.pending) > 0 {
+	if m.closing || m.allocationFailed || len(m.retired) > 0 || len(m.pending) > 0 || m.justifications != nil {
 		return polynomial.ErrAlgebraicPending
 	}
 	_, err := m.am.RationalManager()
@@ -146,11 +148,17 @@ func (m *IntervalSetManager) NumIntervals(s *IntervalSet) (uint32, error) {
 	return uint32(len(s.intervals)), nil
 }
 func (m *IntervalSetManager) allocate(n int) (*IntervalSet, error) {
+	return m.allocateForBuffer(n, nil)
+}
+func (m *IntervalSetManager) allocateForBuffer(n int, b *intervalBuffer) (*IntervalSet, error) {
 	if n < 1 || uint64(n) > math.MaxUint32 {
 		return nil, arena.ErrBounds
 	}
 	extent := uint64(reflect.TypeOf(IntervalSet{}).Size()) + uint64(n)*uint64(reflect.TypeOf(infeasibleInterval{}).Size())
 	raw, started, err := m.allocator.AllocateWithOutcomeStarted(extent, &m.allocation)
+	if b != nil && started {
+		b.allocation, b.allocationFailed = m.allocation, err != nil
+	}
 	if err != nil {
 		m.allocationFailed = started
 		return nil, err
@@ -193,6 +201,9 @@ func (m *IntervalSetManager) Cleanup() error {
 	if err := m.owner(); err != nil {
 		return err
 	}
+	if err := m.cleanupJustifications(m.justifications); err != nil {
+		return err
+	}
 	for len(m.pending) > 0 {
 		b := m.pending[len(m.pending)-1]
 		if err := b.close(); err != nil {
@@ -220,6 +231,9 @@ func (m *IntervalSetManager) Cleanup() error {
 func (m *IntervalSetManager) Close() error {
 	if m != nil && m.self == m && m.closed {
 		return nil
+	}
+	if m != nil && m.self == m && m.search != nil {
+		return ErrSearchLive
 	}
 	if err := m.owner(); err != nil {
 		return err
@@ -379,9 +393,12 @@ func (m *IntervalSetManager) Mk(lowerOpen, lowerInf bool, lower *polynomial.Alge
 // Each buffer record has a stable address while numerical copy calls run.
 // Publishing the final array moves these owners without copying their values.
 type intervalBuffer struct {
-	m       *IntervalSetManager
-	entries []*infeasibleInterval
-	bytes   uint64
+	m                  *IntervalSetManager
+	entries            []*infeasibleInterval
+	bytes              uint64
+	allocation         umemory.SmallAllocatorAllocationOutcome
+	allocationFailed   bool
+	published, retired *IntervalSet
 }
 
 func (b *intervalBuffer) push(i *infeasibleInterval) error {
@@ -425,10 +442,11 @@ func (m *IntervalSetManager) finishBuffer(b *intervalBuffer, err *error) {
 	*err = errors.Join(*err, cleanup)
 }
 func (m *IntervalSetManager) publish(b *intervalBuffer, full bool) (*IntervalSet, error) {
-	s, err := m.allocate(len(b.entries))
+	s, err := m.allocateForBuffer(len(b.entries), b)
 	if err != nil {
 		return nil, err
 	}
+	b.published = s
 	s.full = full
 	for j, i := range b.entries {
 		s.intervals[j] = *i
@@ -437,6 +455,7 @@ func (m *IntervalSetManager) publish(b *intervalBuffer, full bool) (*IntervalSet
 	}
 	if err = m.checkIntervals(s.intervals); err != nil {
 		m.retired = append(m.retired, s)
+		b.retired = s
 		return nil, err
 	}
 	return s, nil
@@ -459,6 +478,9 @@ func (m *IntervalSetManager) GetInterval(s *IntervalSet, index uint32) (result *
 	return m.publish(b, b.entries[0].lowerInf && b.entries[0].upperInf)
 }
 func (m *IntervalSetManager) GetJustifications(s *IntervalSet, out *[]sat.Literal) error {
+	return m.getJustificationsWithReceipt(s, out, nil)
+}
+func (m *IntervalSetManager) getJustificationsWithReceipt(s *IntervalSet, out *[]sat.Literal, receipt **intervalJustificationScope) (err error) {
 	if err := m.open(); err != nil {
 		return err
 	}
@@ -472,6 +494,17 @@ func (m *IntervalSetManager) GetJustifications(s *IntervalSet, out *[]sat.Litera
 	if s == nil {
 		return nil
 	}
+	scope := &intervalJustificationScope{owner: m}
+	m.justifications = scope
+	if receipt != nil {
+		*receipt = scope
+	}
+	defer func() {
+		if err == nil {
+			m.justifications = nil
+			scope.marked = nil
+		}
+	}()
 	for _, i := range s.intervals {
 		idx := uint64(i.justification.Index())
 		if idx < uint64(len(m.visited)) && m.visited[idx] {
@@ -490,6 +523,7 @@ func (m *IntervalSetManager) GetJustifications(s *IntervalSet, out *[]sat.Litera
 			m.visited = next
 		}
 		m.visited[idx] = true
+		scope.marked = append(scope.marked, uint32(idx))
 		*out = append(*out, i.justification)
 	}
 	for _, i := range s.intervals {

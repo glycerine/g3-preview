@@ -35,6 +35,7 @@ type clauseStore struct {
 	atoms                   *atomFactory
 	assumptions             *assumptionManager
 	vars                    arithmeticVariables
+	search                  *searchState
 	ids                     idgen.Generator
 	originals, learned      []*Clause
 	owned                   map[*Clause]*clauseStorage
@@ -417,6 +418,9 @@ func (s *clauseStore) cleanup() error {
 func (s *clauseStore) close() error {
 	if s != nil && s.self == s && s.closed {
 		return nil
+	}
+	if s != nil && s.self == s && s.search != nil {
+		return ErrSearchLive
 	}
 	if err := s.cleanup(); err != nil {
 		return err

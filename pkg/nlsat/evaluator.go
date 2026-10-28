@@ -23,6 +23,7 @@ func (*RootAtom) arithmeticAtom()       {}
 type Evaluator struct {
 	self                             *Evaluator
 	assignment                       *Assignment
+	search                           *searchState
 	pm                               *polynomial.MultivariatePolynomialManager
 	core                             *polynomial.MultivariatePolynomialCore
 	am                               *polynomial.AlgebraicManager
@@ -302,6 +303,9 @@ func (e *Evaluator) Cleanup() error {
 func (e *Evaluator) Close() error {
 	if e != nil && e.self == e && e.closed {
 		return nil
+	}
+	if e != nil && e.self == e && e.search != nil {
+		return ErrSearchLive
 	}
 	if err := e.owner(); err != nil {
 		return err

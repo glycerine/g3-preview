@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/sat"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
@@ -19,10 +20,15 @@ import (
 
 func clauseStoreFixture(t *testing.T) (*Evaluator, *clauseStore) {
 	t.Helper()
-	am, _ := assignmentFixture(t)
+	e, s, _ := clauseStoreFixtureWithLimit(t)
+	return e, s
+}
+func clauseStoreFixtureWithLimit(t *testing.T) (*Evaluator, *clauseStore, *control.Reslimit) {
+	t.Helper()
+	am, _, limit := assignmentFixtureWithLimit(t)
 	q, err := am.RationalManager()
 	assignmentMust(t, err)
-	pm, err := polynomial.NewMultivariatePolynomialManager(polynomial.MultivariatePolynomialManagerConfig{Core: polynomial.MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
+	pm, err := polynomial.NewMultivariatePolynomialManager(polynomial.MultivariatePolynomialManagerConfig{Core: polynomial.MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: limit.Inc, Cooperation: func() error { return nil }}})
 	assignmentMust(t, err)
 	t.Cleanup(func() { assignmentMust(t, pm.CloseChecked()) })
 	a, err := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: q.Integers().RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: diagnostic.DebugBuild}})
@@ -62,7 +68,7 @@ func clauseStoreFixture(t *testing.T) (*Evaluator, *clauseStore) {
 	e, err := NewEvaluator(assignment, pm, a)
 	assignmentMust(t, err)
 	t.Cleanup(func() { assignmentMust(t, e.Close()) })
-	return e, s
+	return e, s, limit
 }
 
 func TestClauseStoreArithmeticMetadataTrueClauseAndOwnerLifetimes(t *testing.T) {

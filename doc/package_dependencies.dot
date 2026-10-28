@@ -281,14 +281,17 @@ digraph packages {
   "nlsat" -> "arena";
   "nlsat" -> "math/polynomial";
   "nlsat" -> "sat";
+  "nlsat" -> "util/control";
   "nlsat" -> "util/diagnostic";
   "nlsat" -> "util/hash";
   "nlsat" -> "util/idgen";
   "nlsat" -> "util/lbool";
   "nlsat" -> "util/memory";
+  "nlsat" -> "util/messages";
   "nlsat" -> "util/numeral";
   "nlsat" -> "util/params";
   "nlsat" -> "util/random";
+  "nlsat" -> "util/z3exception";
   "opt" [style=filled, fillcolor="#eeeeee"];
   "opt" -> "arena";
   "opt" -> "ast";

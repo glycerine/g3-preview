@@ -19,6 +19,7 @@ import (
 type Assignment struct {
 	self            *Assignment
 	manager         *polynomial.AlgebraicManager
+	search          *searchState
 	budget          *arena.Budget
 	values          []polynomial.Algebraic
 	assigned        []bool
@@ -255,6 +256,9 @@ func (a *Assignment) Close() error {
 	}
 	if a.closed {
 		return nil
+	}
+	if a.search != nil {
+		return ErrSearchLive
 	}
 	a.closing = true
 	// The Boolean vector is the younger member and dies before numerical

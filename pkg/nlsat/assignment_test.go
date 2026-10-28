@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/cmd_context"
 	"github.com/glycerine/g3/pkg/math/polynomial"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
@@ -28,6 +29,11 @@ func assignmentMust(t *testing.T, err error) {
 	}
 }
 func assignmentFixture(t *testing.T) (*polynomial.AlgebraicManager, *arena.Budget) {
+	t.Helper()
+	am, budget, _ := assignmentFixtureWithLimit(t)
+	return am, budget
+}
+func assignmentFixtureWithLimit(t *testing.T) (*polynomial.AlgebraicManager, *arena.Budget, *control.Reslimit) {
 	t.Helper()
 	c, err := cmd_context.NewStandaloneContext()
 	assignmentMust(t, err)
@@ -60,7 +66,7 @@ func assignmentFixture(t *testing.T) (*polynomial.AlgebraicManager, *arena.Budge
 		t.Cleanup(func() { assignmentMust(t, am.Close()) })
 	}
 	assignmentMust(t, err)
-	return am, m.Budget()
+	return am, m.Budget(), &m.Limit
 }
 func assignmentNew(t *testing.T, m *polynomial.AlgebraicManager) *Assignment {
 	t.Helper()

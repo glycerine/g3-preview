@@ -80,6 +80,9 @@ func (m *IntervalSetManager) adjacent(a, b *infeasibleInterval) (bool, error) {
 	return false, nil
 }
 func (m *IntervalSetManager) MkUnion(s1, s2 *IntervalSet) (result *IntervalSet, err error) {
+	return m.mkUnionWithReceipt(s1, s2, nil)
+}
+func (m *IntervalSetManager) mkUnionWithReceipt(s1, s2 *IntervalSet, receipt *intervalUnionReceipt) (result *IntervalSet, err error) {
 	if err = m.open(); err != nil {
 		return nil, err
 	}
@@ -102,6 +105,9 @@ func (m *IntervalSetManager) MkUnion(s1, s2 *IntervalSet) (result *IntervalSet, 
 		return s2, nil
 	}
 	b := &intervalBuffer{m: m}
+	if receipt != nil {
+		*receipt = intervalUnionReceipt{m, b}
+	}
 	defer m.finishBuffer(b, &err)
 	i1, i2 := 0, 0
 	for {

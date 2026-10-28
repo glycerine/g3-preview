@@ -2084,14 +2084,17 @@
         "arena",
         "math/polynomial",
         "sat",
+        "util/control",
         "util/diagnostic",
         "util/hash",
         "util/idgen",
         "util/lbool",
         "util/memory",
+        "util/messages",
         "util/numeral",
         "util/params",
-        "util/random"
+        "util/random",
+        "util/z3exception"
       ],
       "production_files": [
         "arithmetic_variables.go",
@@ -2112,7 +2115,10 @@
         "inequality_atom_cache.go",
         "interval_set.go",
         "interval_set_operations.go",
+        "interval_set_receipt.go",
         "justification.go",
+        "search_propagation.go",
+        "search_state.go",
         "sign_table.go"
       ]
     },
