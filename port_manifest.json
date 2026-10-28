@@ -141595,7 +141595,7 @@
           ]
         },
         {
-          "name": "Native retained operator dispatch (theory_bv.cpp:49-63,160-198,687-855,920-980): canonical owned literal operands after process_args, source right-to-left AC fold, direct subtracter, concrete Engine arithmetic/division/logic/extension/reduction/comparison/shift/rotate/overflow algorithms, positive indexed mk_bits for suppressed sort attachment without find_wpos, native concat/extract literal identity",
+          "name": "Native retained operator dispatch (theory_bv.cpp:49-63,160-198,687-855,920-980,1052-1101): source atom approximation before operand processing/dispatch, canonical owned literal operands after process_args, source right-to-left AC fold, direct subtracter, concrete Engine arithmetic/division/logic/extension/reduction/comparison/shift/rotate/overflow algorithms, positive indexed mk_bits for suppressed sort attachment without find_wpos, approximated mk_bits core literals without BV occurrences, and native concat/extract literal identity",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_bv_operators.go",
@@ -141611,6 +141611,7 @@
             "TestSMTBVNativeOperatorCircuitsMatchSourceEngine",
             "TestSMTBVNativeOperatorRefusalScopeAndRetry",
             "TestSMTBVNativeOperandLookupCreatesSuppressedVariable",
+            "TestSMTBVAtomApproximationPrecedesOperatorDispatch",
             "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
@@ -142179,7 +142180,7 @@
           ]
         },
         {
-          "name": "Native retained operator dispatch (theory_bv.cpp:49-63,160-198,687-855,920-980): canonical owned literal operands after process_args, source right-to-left AC fold, direct subtracter, concrete Engine arithmetic/division/logic/extension/reduction/comparison/shift/rotate/overflow algorithms, positive indexed mk_bits for suppressed sort attachment without find_wpos, native concat/extract literal identity",
+          "name": "Native retained operator dispatch (theory_bv.cpp:49-63,160-198,687-855,920-980,1052-1101): source atom approximation before operand processing/dispatch, canonical owned literal operands after process_args, source right-to-left AC fold, direct subtracter, concrete Engine arithmetic/division/logic/extension/reduction/comparison/shift/rotate/overflow algorithms, positive indexed mk_bits for suppressed sort attachment without find_wpos, approximated mk_bits core literals without BV occurrences, and native concat/extract literal identity",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_bv_operators.go",
@@ -142195,6 +142196,7 @@
             "TestSMTBVNativeOperatorCircuitsMatchSourceEngine",
             "TestSMTBVNativeOperatorRefusalScopeAndRetry",
             "TestSMTBVNativeOperandLookupCreatesSuppressedVariable",
+            "TestSMTBVAtomApproximationPrecedesOperatorDispatch",
             "TestSMTBitVectorArithmeticUsesConfiguredExtendedGates",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"

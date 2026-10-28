@@ -343,8 +343,13 @@ func TestSMTBVNativeOperandLookupCreatesSuppressedVariable(t *testing.T) {
 		atom, err := m.MkBitVectorBit2Bool(uint32(i), x)
 		astTestMust(t, err)
 		variable, ok := s.BoolVar(atom)
-		if !ok || literal != NewSMTLiteral(variable, false) || len(bv.bitAtoms[variable]) != 1 {
+		if !ok || literal != NewSMTLiteral(variable, false) || len(bv.bitAtoms[variable]) != 0 {
 			t.Fatal("source mk_bits atom/position", i, literal)
+		}
+		data, err := s.BooleanData(variable)
+		astTestMust(t, err)
+		if data.Theory() != SMTNullTheoryID {
+			t.Fatal("approximated bit unexpectedly attached to BV theory", i, data.Theory())
 		}
 	}
 	if len(bv.fixedVariables) != 0 {
@@ -358,5 +363,26 @@ func TestSMTBVNativeOperandLookupCreatesSuppressedVariable(t *testing.T) {
 	astTestMust(t, err)
 	if status != SMTFinalCheckGiveUp {
 		t.Fatal("native get_var lost the earlier approximation flag")
+	}
+}
+
+func TestSMTBVAtomApproximationPrecedesOperatorDispatch(t *testing.T) {
+	m, _, bv := bvOccurrenceFixture(t)
+	bv.config.BlastMaxSize = 2
+	sort, err := m.BitVectorSort(4)
+	astTestMust(t, err)
+	left, err := m.MkConst(astTestSymbol(t, m, "approximate-atom-left"), sort)
+	astTestMust(t, err)
+	right, err := m.MkConst(astTestSymbol(t, m, "approximate-atom-right"), sort)
+	astTestMust(t, err)
+	comparison, err := m.MkBitVectorULE(left, right)
+	astTestMust(t, err)
+	handled, err := bv.InternalizeAtom(comparison, true)
+	astTestMust(t, err)
+	if handled || !bv.unsupported || len(bv.comparisonAtoms) != 0 {
+		t.Fatal("source atom approximation did not stop before operator dispatch", handled, bv.unsupported, len(bv.comparisonAtoms))
+	}
+	if bv.state.context.enodes[left] != nil || bv.state.context.enodes[right] != nil {
+		t.Fatal("source atom approximation processed operands before refusal")
 	}
 }

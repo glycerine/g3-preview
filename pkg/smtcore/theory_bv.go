@@ -415,6 +415,9 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, gateConte
 	}); err != nil {
 		return false, err
 	}
+	if approximate, approximateErr := t.approximateTerm(expression); approximateErr != nil || approximate {
+		return false, approximateErr
+	}
 	if !retainedBVAtomOperation(op) {
 		return false, diagnostic.BorrowProcessDebugContext().UnreachableSource("src/smt/theory_bv.cpp", 1067)
 	}
