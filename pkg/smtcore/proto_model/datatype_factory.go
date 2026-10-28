@@ -1,5 +1,6 @@
-// Source: src/smt/proto_model/datatype_factory.cpp/.h.
 package protomodel
+
+// Source: src/smt/proto_model/datatype_factory.cpp/.h.
 
 import (
 	"errors"

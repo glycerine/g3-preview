@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_statistics.h:26-54; src/smt/smt_statistics.cpp:24-26;
 // src/smt/smt_context.h:70.
-package smtcore
 
 // SMTContextStatistics is the actual first declared context member. It is a
 // pointer-free inline value; no separate owner, allocator ticket or mirrored

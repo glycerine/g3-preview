@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_core.h internalize_mul_core and
 // src/smt/theory_arith_nl.h get_value, check_monomial_assignment(s).
-package smtcore
 
 import (
 	"math/big"

@@ -1,5 +1,6 @@
-// Source: src/smt/smt_case_split_queue.cpp:1229-1262 mk_case_split_queue.
 package smtcore
+
+// Source: src/smt/smt_case_split_queue.cpp:1229-1262 mk_case_split_queue.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

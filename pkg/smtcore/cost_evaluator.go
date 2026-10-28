@@ -1,5 +1,6 @@
-// Source: src/smt/cost_evaluator.h and src/smt/cost_evaluator.cpp.
 package smtcore
+
+// Source: src/smt/cost_evaluator.h and src/smt/cost_evaluator.cpp.
 
 import (
 	"strconv"

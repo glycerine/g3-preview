@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/params/smt_params.h:75-318; src/smt/params/qi_params.h:31-109;
 // src/qe/qe_sat_tactic.cpp:632; src/muz/pdr/pdr_farkas_learner.cpp:390.
-package smtcore
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

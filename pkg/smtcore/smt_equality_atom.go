@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp context::mk_eq_atom, src/smt/smt_theory.h
 // theory::mk_eq_atom, and src/ast/arith_decl_plugin.h arith_util::mk_eq.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

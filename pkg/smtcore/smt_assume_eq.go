@@ -1,5 +1,6 @@
-// Source: src/smt/smt_context.cpp assume_eq and set_true_first_flag.
 package smtcore
+
+// Source: src/smt/smt_context.cpp assume_eq and set_true_first_flag.
 
 import (
 	"errors"

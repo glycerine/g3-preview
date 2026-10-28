@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_checker.cpp check/check_quantifiers/restart_eh.
 package smtcore
+
+// Source: src/smt/smt_model_checker.cpp check/check_quantifiers/restart_eh.
 
 import (
 	"strconv"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp get_eqc_allUnroll,
 // process_unroll_eq_const_str and unroll_str2reg_constStr.
-package smtcore
 
 import (
 	"errors"

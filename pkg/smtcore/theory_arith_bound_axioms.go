@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_core.h:959-1210 bound axioms and delayed flush.
 package smtcore
+
+// Source: src/smt/theory_arith_core.h:959-1210 bound axioms and delayed flush.
 
 import (
 	"errors"

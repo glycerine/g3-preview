@@ -1,5 +1,6 @@
-// Source: src/smt/smt_almost_cg_table.h and src/smt/smt_almost_cg_table.cpp.
 package smtcore
+
+// Source: src/smt/smt_almost_cg_table.h and src/smt/smt_almost_cg_table.cpp.
 
 import "github.com/glycerine/g3/pkg/ast"
 

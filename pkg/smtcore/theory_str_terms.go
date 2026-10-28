@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp mk_fresh_const, mk_str_var,
 // mk_concat_const_str, mk_concat and get_nodes_in_concat.
-package smtcore
 
 import (
 	"errors"

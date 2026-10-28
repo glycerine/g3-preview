@@ -1,5 +1,6 @@
-// Source: src/smt/theory_lra.cpp:2329-2448, retained theory_opt callbacks.
 package smtcore
+
+// Source: src/smt/theory_lra.cpp:2329-2448, retained theory_opt callbacks.
 
 import (
 	"errors"

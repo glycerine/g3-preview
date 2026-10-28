@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp cut_vars_map_copy, has_self_cut,
 // add_cut_info_one_node/merge, check_and_init_cut_var and pop_scope_eh.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

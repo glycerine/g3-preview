@@ -1,5 +1,6 @@
-// Source: src/smt/smt_case_split_queue.cpp:486-675 rel_act_case_split_queue.
 package smtcore
+
+// Source: src/smt/smt_case_split_queue.cpp:486-675 rel_act_case_split_queue.
 
 import (
 	"fmt"

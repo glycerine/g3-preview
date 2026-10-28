@@ -1,5 +1,6 @@
-// Source: src/smt/uses_theory.h and src/smt/uses_theory.cpp.
 package smtcore
+
+// Source: src/smt/uses_theory.h and src/smt/uses_theory.cpp.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq_empty.h theory_seq_empty.
 package smtcore
+
+// Source: src/smt/theory_seq_empty.h theory_seq_empty.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

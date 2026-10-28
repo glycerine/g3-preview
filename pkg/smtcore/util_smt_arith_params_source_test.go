@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/params/theory_arith_params.h:53-164;
 // src/smt/params/theory_arith_params.cpp:23-94.
-package smtcore
 
 import (
 	"errors"

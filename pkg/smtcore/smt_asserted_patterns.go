@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.h pattern_inference_fn and
 // src/smt/asserted_formulas.cpp simplify_fmls::operator(), reduce.
-package smtcore
 
 import (
 	"errors"

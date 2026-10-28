@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp gen_val_string and get_next_val_encode.
 package smtcore
+
+// Source: src/smt/theory_str.cpp gen_val_string and get_next_val_encode.
 
 import "github.com/glycerine/g3/pkg/ast"
 

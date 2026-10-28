@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp gen_val_options.
 package smtcore
+
+// Source: src/smt/theory_str.cpp gen_val_options.
 
 import (
 	"errors"

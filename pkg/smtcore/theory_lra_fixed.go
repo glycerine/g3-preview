@@ -1,5 +1,6 @@
-// Source: src/smt/theory_lra.cpp:1994-2142, retained fixed-bound equalities.
 package smtcore
+
+// Source: src/smt/theory_lra.cpp:1994-2142, retained fixed-bound equalities.
 
 import (
 	"fmt"

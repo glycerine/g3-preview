@@ -1,5 +1,6 @@
-// Source: src/smt/theory_lra.cpp get_value/init_variable_values and model hooks.
 package smtcore
+
+// Source: src/smt/theory_lra.cpp get_value/init_variable_values and model hooks.
 
 import (
 	"errors"

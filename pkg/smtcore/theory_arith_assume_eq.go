@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_aux.h assume_eqs_core and delayed_assume_eqs.
 package smtcore
+
+// Source: src/smt/theory_arith_aux.h assume_eqs_core and delayed_assume_eqs.
 
 import "github.com/glycerine/g3/pkg/ast"
 

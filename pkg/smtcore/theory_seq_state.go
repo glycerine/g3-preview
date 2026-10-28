@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp solution_map and exclusion_table;
 // src/smt/theory_seq.h corresponding declarations.
-package smtcore
 
 import (
 	"errors"

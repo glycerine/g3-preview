@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/dyn_ack.cpp:118-138,315-340; src/smt/dyn_ack.h:49-120;
 // src/smt/params/dyn_ack_params.h:23-29.
-package smtcore
 
 import (
 	"math"

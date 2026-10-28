@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp propagate_in_re. The retained Go sequence
 // rewriter supplies the equivalent automaton membership formula.
-package smtcore
 
 import (
 	"errors"

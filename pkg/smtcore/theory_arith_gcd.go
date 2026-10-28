@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_int.h gcd_test and ext_gcd_test. Eager and
 // adaptive modes are excluded: their source flags have no retained setter.
-package smtcore
 
 import (
 	"errors"

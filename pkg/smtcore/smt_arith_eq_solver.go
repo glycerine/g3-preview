@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/arith_eq_solver.cpp and src/smt/arith_eq_solver.h retained
 // integer-row operations used by the full arithmetic theory.
-package smtcore
 
 import (
 	"math/big"

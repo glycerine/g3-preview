@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp final_check_eh per-String regex intersection.
 package smtcore
+
+// Source: src/smt/theory_str.cpp final_check_eh per-String regex intersection.
 
 import (
 	"math/big"

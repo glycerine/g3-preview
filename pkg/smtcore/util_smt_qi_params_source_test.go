@@ -1,5 +1,6 @@
-// Source: src/smt/params/qi_params.h:31-109; src/smt/params/qi_params.cpp:23-64.
 package smtcore
+
+// Source: src/smt/params/qi_params.h:31-109; src/smt/params/qi_params.cpp:23-64.
 
 import (
 	"errors"

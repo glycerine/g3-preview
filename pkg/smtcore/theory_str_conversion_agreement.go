@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp finalcheck_str2int/finalcheck_int2str.
 // These are the retained conversion-agreement stage; the enclosing final-check
 // pipeline must establish its source prerequisites before dispatching them.
-package smtcore
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/cmd_context/context_params.cpp:42-135,158-196;
 // src/cmd_context/context_params.h:26-80.
-package smtcore
 
 import (
 	"errors"

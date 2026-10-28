@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_nl.h find_nl_var_for_branching and
 // branch_nl_int_var. Case splits are Boolean decisions, not asserted units.
-package smtcore
 
 import (
 	"errors"

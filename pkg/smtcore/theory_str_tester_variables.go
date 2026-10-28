@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp mk_internal_lenTest_var and
 // mk_internal_valTest_var. Reuse project SMT2 formatting and String skolems.
-package smtcore
 
 import (
 	"errors"

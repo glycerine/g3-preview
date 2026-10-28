@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/dyn_ack.cpp clause construction, context integration, and
 // clause-producing propagation.
-package smtcore
 
 import (
 	"errors"

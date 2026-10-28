@@ -1,5 +1,6 @@
-// Source: src/smt/smt_quick_checker.h and src/smt/smt_quick_checker.cpp.
 package smtcore
+
+// Source: src/smt/smt_quick_checker.h and src/smt/smt_quick_checker.cpp.
 
 import (
 	"errors"

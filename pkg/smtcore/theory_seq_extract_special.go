@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp is_tail, is_drop_last, add_tail_axiom and
 // add_drop_last_axiom.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

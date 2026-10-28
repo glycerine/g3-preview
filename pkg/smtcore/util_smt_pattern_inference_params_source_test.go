@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/ast/pattern/pattern_inference_params.h:30-50;
 // src/ast/pattern/pattern_inference_params.cpp:22-47; src/ast/pattern/pattern_inference_params_helper.pyg:1-12.
-package smtcore
 
 import (
 	"errors"

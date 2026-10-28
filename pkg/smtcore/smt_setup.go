@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_setup.h and src/smt/smt_setup.cpp retained explicit
 // logic routing for theories whose concrete Go solvers are not yet available.
-package smtcore
 
 import (
 	"errors"

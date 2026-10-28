@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp mk_indexof and instantiate_axiom_Indexof,
 // instantiate_axiom_Indexof_extended. Preserve the retained source's tail-relative
 // result in the extended case, including its delayed containment heuristic.
-package smtcore
 
 import (
 	"errors"

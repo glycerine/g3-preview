@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp instantiate_axiom_prefixof,
 // instantiate_axiom_suffixof and instantiate_axiom_Contains.
-package smtcore
 
 import (
 	"errors"

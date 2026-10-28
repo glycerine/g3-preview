@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/params/theory_pb_params.h:25-39;
 // src/smt/params/theory_pb_params.cpp:22-37; src/smt/params/smt_params_helper.pyg:55-58.
-package smtcore
 
 import (
 	"reflect"

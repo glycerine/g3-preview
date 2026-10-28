@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp process_concat_eq_unroll.
 package smtcore
+
+// Source: src/smt/theory_str.cpp process_concat_eq_unroll.
 
 import (
 	"errors"

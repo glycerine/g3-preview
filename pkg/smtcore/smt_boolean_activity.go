@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.h inc_bvar_activity(),
 // decay_bvar_activity(), and src/smt/smt_context.cpp rescale_bool_var_activity().
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

@@ -1,5 +1,6 @@
-// Source: src/util/approx_set.h:43-154; src/smt/smt_literal.h:114-116.
 package smtcore
+
+// Source: src/util/approx_set.h:43-154; src/smt/smt_literal.h:114-116.
 
 import (
 	"reflect"

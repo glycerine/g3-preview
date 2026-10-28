@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_nl.h max_min_nl_vars and
 // src/smt/theory_arith_aux.h max_min(variable), max_min(vars).
-package smtcore
 
 import (
 	"math/big"

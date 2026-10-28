@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/diff_logic.h tight-edge SCC, successors, path search,
 // assignment adjustment and paired zero normalization used by UTVPI.
-package smtcore
 
 // ComputeZeroEdgeSCC runs the source Gabow-style DFS over enabled edges whose
 // normalized weight is zero. Singleton components retain the source -1 ID.

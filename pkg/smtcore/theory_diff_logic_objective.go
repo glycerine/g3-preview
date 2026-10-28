@@ -1,5 +1,6 @@
-// Source: src/smt/theory_diff_logic_def.h:1079-1404 optimization callbacks.
 package smtcore
+
+// Source: src/smt/theory_diff_logic_def.h:1079-1404 optimization callbacks.
 
 import (
 	"errors"

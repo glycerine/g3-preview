@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp add_itos_axiom and add_stoi_axiom retained
 // arithmetic, empty-string and round-trip constraints.
-package smtcore
 
 import (
 	"math/big"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp simplify_eq, solve_unit_eq, occurs,
 // add_solution, solve_eqs, solve_eq, canonize and expand.
-package smtcore
 
 import (
 	"errors"

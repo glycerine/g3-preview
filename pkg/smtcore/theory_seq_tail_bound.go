@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq.cpp propagate_max_length.
 package smtcore
+
+// Source: src/smt/theory_seq.cpp propagate_max_length.
 
 import (
 	"math/big"

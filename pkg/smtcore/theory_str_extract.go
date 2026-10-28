@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp instantiate_axiom_CharAt and
 // instantiate_axiom_Substr. These use context/default rewriters respectively.
-package smtcore
 
 import (
 	"errors"

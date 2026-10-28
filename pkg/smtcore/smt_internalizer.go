@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_internalizer.cpp assertion, formula, gate, and default
 // uninterpreted-term internalization.
-package smtcore
 
 import (
 	"errors"

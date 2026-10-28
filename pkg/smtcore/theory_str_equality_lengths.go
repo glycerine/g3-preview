@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp get_arith_value, get_len_value and the
 // check_length_consistency family. Only actual core numeral roots are read.
-package smtcore
 
 import (
 	"errors"

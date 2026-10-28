@@ -1,5 +1,6 @@
-// Source: src/smt/smt_context.cpp theory equality and disequality queues.
 package smtcore
+
+// Source: src/smt/smt_context.cpp theory equality and disequality queues.
 
 import (
 	"fmt"

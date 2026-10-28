@@ -1,5 +1,6 @@
-// Source: src/smt/theory_lra.cpp:1303-1485,1733-1811. Live basic and LP propagation.
 package smtcore
+
+// Source: src/smt/theory_lra.cpp:1303-1485,1733-1811. Live basic and LP propagation.
 
 import (
 	"errors"

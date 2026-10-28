@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context_inv.cpp retained logical-context invariant and
 // Boolean clause-justification validation.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

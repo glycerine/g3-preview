@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_enode.h and src/smt/smt_enode.cpp. This file contains
 // the context-independent enode representation and algorithms.
-package smtcore
 
 import (
 	"math"

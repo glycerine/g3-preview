@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp gen_len_val_options_for_free_var's
 // !m_UseBinarySearch branch and term_appears_as_subterm.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

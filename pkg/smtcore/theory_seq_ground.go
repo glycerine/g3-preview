@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp add_length_axiom, add_indexof_axiom,
 // add_replace_axiom, add_extract_axiom and add_at_axiom concrete cases.
-package smtcore
 
 import (
 	"math/big"

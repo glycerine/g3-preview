@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_enode.cpp context-independent deletion, diagnostics,
 // invariant checks, and tmp_enode implementation.
-package smtcore
 
 import (
 	"fmt"

@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp binary_search_case_split,
 // binary_search_length_test and gen_len_val_options_for_free_var dispatch;
 // theory_str.h binary_search_info and binary_search_trail.
-package smtcore
 
 import (
 	"errors"

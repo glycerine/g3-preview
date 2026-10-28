@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp add_length_axiom and the retained exact
 // concat, unit, empty, string, int.to.str and non-negativity cases.
-package smtcore
 
 import (
 	"math/big"

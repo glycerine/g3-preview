@@ -1,5 +1,6 @@
-// Source: src/smt/params/dyn_ack_params.h:24-51; src/smt/params/dyn_ack_params.cpp:22-41.
 package smtcore
+
+// Source: src/smt/params/dyn_ack_params.h:24-51; src/smt/params/dyn_ack_params.cpp:22-41.
 
 import (
 	"errors"

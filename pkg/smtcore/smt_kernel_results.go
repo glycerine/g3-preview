@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp get_assignments,
 // get_relevant_labeled_literals, get_relevant_literals, and
 // get_guessed_literals.
-package smtcore
 
 import (
 	"errors"

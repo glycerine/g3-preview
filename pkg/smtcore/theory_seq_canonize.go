@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq.cpp canonize and expand1.
 package smtcore
+
+// Source: src/smt/theory_seq.cpp canonize and expand1.
 
 import (
 	"errors"

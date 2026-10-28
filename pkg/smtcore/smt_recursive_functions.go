@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_checker.cpp check_rec_fun;
 // src/smt/smt_context.cpp add_rec_funs_to_model.
-package smtcore
 
 import (
 	"errors"

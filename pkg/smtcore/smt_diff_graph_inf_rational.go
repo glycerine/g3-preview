@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/diff_logic.h concrete inf_int_rational graph fragment used
 // by real difference logic.
-package smtcore
 
 import "math/big"
 

@@ -1,5 +1,6 @@
-// Source: src/smt/theory_lra.cpp:2455-2468 display.
 package smtcore
+
+// Source: src/smt/theory_lra.cpp:2455-2468 display.
 
 import (
 	"fmt"

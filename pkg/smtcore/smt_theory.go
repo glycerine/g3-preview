@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_theory.h and src/smt/smt_theory.cpp internalization and
 // theory-variable lifecycle used by the logical context.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

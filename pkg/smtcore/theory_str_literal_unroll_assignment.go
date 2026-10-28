@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp computeGCD, computeLCM,
 // gen_assign_unroll_Str2Reg and get_eqc_simpleUnroll.
-package smtcore
 
 import (
 	"errors"

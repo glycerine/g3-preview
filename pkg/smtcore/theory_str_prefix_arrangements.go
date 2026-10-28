@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp process_concat_eq_type3:
 // concat(x,y) = concat(literal,n), in either operand orientation.
-package smtcore
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_generator.h model-value dependencies and
 // procedures.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

@@ -1,5 +1,6 @@
-// Source: src/smt/smt_clause.h and src/smt/smt_clause.cpp.
 package smtcore
+
+// Source: src/smt/smt_clause.h and src/smt/smt_clause.cpp.
 
 import (
 	"errors"

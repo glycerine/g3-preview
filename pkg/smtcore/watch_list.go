@@ -1,5 +1,6 @@
-// Source: src/smt/watch_list.h and src/smt/watch_list.cpp.
 package smtcore
+
+// Source: src/smt/watch_list.h and src/smt/watch_list.cpp.
 
 import "github.com/glycerine/g3/pkg/ast"
 

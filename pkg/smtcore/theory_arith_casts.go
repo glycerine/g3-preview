@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_core.h mk_to_int_axiom, internalize_to_int,
 // mk_is_int_axiom and internalize_is_int.
-package smtcore
 
 import (
 	"errors"

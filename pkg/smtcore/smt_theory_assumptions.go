@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp add_theory_assumptions and the owning
 // expr_ref_vector used by check/setup_and_check.
-package smtcore
 
 import (
 	"errors"

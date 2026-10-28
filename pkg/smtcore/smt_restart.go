@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp init_search(), inc_limits(), restart(), and
 // the restart exit in bounded_search().
-package smtcore
 
 import (
 	"math"

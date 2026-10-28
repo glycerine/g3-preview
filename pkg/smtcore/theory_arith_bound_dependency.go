@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_aux.h antecedents_t and bound explanations.
 package smtcore
+
+// Source: src/smt/theory_arith_aux.h antecedents_t and bound explanations.
 
 import (
 	"errors"

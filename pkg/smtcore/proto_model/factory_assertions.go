@@ -1,5 +1,6 @@
-// Source: SASSERT sites in src/smt/proto_model/value_factory.h/.cpp.
 package protomodel
+
+// Source: SASSERT sites in src/smt/proto_model/value_factory.h/.cpp.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

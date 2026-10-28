@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_dense_diff_logic_def.h mk_var, add_edge,
 // update_cells, get_antecedents, restore_cells and init_model.
-package smtcore
 
 // Dense closure stores a source edge explaining each improved distance.
 // Zero is the self-edge sentinel; negative one means disconnected.

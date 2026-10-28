@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/qi_queue.h and src/smt/qi_queue.cpp queue scheduling,
 // scope rollback, delayed-instance summaries, and statistics.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

@@ -1,5 +1,6 @@
-// Source: src/smt/diff_logic.h traverse_neg_cycle2 and check_explanation.
 package smtcore
+
+// Source: src/smt/diff_logic.h traverse_neg_cycle2 and check_explanation.
 
 // negativeCycleEdgesWithShortcuts preserves strict inconsistency while using
 // enabled weaker edges to shorten the parent cycle. The native try_relax

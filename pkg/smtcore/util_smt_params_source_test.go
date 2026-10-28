@@ -1,5 +1,6 @@
-// Source: src/smt/params/smt_params.h:75-318; src/smt/params/smt_params.cpp:24-164.
 package smtcore
+
+// Source: src/smt/params/smt_params.h:75-318; src/smt/params/smt_params.cpp:24-164.
 
 import (
 	"errors"

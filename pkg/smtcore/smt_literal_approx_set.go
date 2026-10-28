@@ -1,5 +1,6 @@
-// Source: src/util/approx_set.h:43-154; src/smt/smt_literal.h:114-116.
 package smtcore
+
+// Source: src/util/approx_set.h:43-154; src/smt/smt_literal.h:114-116.
 
 // SMTLiteralApproxSet is the concrete default unsigned-long-long source
 // specialization, an inline eight-byte value with no owning payload. Collision

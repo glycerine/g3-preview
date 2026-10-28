@@ -1,5 +1,6 @@
-// Source: src/smt/smt_setup.cpp setup_unknown and setup_arith.
 package smtcore
+
+// Source: src/smt/smt_setup.cpp setup_unknown and setup_arith.
 
 import "errors"
 

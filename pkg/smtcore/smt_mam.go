@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/mam.h and src/smt/mam.cpp retained E-matching semantics.
 // The Go port uses a direct congruence-aware matcher over context enodes; the
 // source instruction trees and approximate-label indexes are optimizations.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

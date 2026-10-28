@@ -1,5 +1,6 @@
-// Source: src/smt/theory_dl.cpp:114,197-198,205,244-248.
 package smtcore
+
+// Source: src/smt/theory_dl.cpp:114,197-198,205,244-248.
 
 import (
 	"io"

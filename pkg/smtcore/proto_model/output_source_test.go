@@ -1,6 +1,7 @@
+package protomodel
+
 // Source: value_factory.h get_some_values; theory_seq_empty.h:77-95;
 // theory_str.h:53-60. These tests own the real source output references.
-package protomodel
 
 import (
 	"errors"

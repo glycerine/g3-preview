@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp decide(), bounded_search(), resolve_conflict(),
 // and final_check().
-package smtcore
 
 import (
 	"errors"

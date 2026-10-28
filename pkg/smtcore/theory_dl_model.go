@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_dl.cpp:70-103,165-167;
 // src/smt/theory_bv.cpp:508-514.
-package smtcore
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp:12422-12424 theory_str::display.
 package smtcore
+
+// Source: src/smt/theory_str.cpp:12422-12424 theory_str::display.
 
 import (
 	"io"

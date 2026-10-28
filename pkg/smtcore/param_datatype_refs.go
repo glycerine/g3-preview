@@ -1,5 +1,6 @@
-// Source: src/cmd_context/pdecl.cpp:432-461,495-503,555-563,666-677.
 package smtcore
+
+// Source: src/cmd_context/pdecl.cpp:432-461,495-503,555-563,666-677.
 
 import (
 	"io"

@@ -1,5 +1,6 @@
-// Source: src/smt/smt_context_pp.cpp:99-105 and smt_context.h:1242.
 package smtcore
+
+// Source: src/smt/smt_context_pp.cpp:99-105 and smt_context.h:1242.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

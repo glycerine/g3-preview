@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/params/qi_params.h:31-109; src/smt/params/qi_params.cpp:23-64;
 // src/smt/params/smt_params_helper.pyg:24-37; scripts/mk_genfile_common.py:895-939.
-package smtcore
 
 import (
 	"reflect"

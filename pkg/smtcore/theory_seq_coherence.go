@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp check_length_coherence, mk_decompose and
 // propagate_length_coherence.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

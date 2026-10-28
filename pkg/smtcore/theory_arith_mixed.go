@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_core.h is_int_expr/mk_var and
 // src/smt/theory_arith_int.h integer bound rounding and branch selection.
-package smtcore
 
 import (
 	"math/big"

@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp gen_assign_unroll_reg.
 package smtcore
+
+// Source: src/smt/theory_str.cpp gen_assign_unroll_reg.
 
 import (
 	"errors"

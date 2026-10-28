@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_types.h, src/smt/smt_failure.h, and
 // src/smt/smt_theory_var_list.h.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

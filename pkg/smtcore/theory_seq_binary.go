@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp is_binary_eq, solve_binary_eq and
 // branch_binary_variable for fixed string boundaries.
-package smtcore
 
 import (
 	"strings"

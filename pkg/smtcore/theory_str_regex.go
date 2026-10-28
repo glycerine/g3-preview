@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp str2RegexStr, get_std_regex_str,
 // instantiate_axiom_RegexIn and check_regex_in.
-package smtcore
 
 import (
 	"errors"

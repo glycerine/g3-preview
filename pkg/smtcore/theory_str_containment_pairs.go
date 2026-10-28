@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp check_contain_by_substr,
 // check_contain_by_eq_nodes and check_contain_in_new_eq.
-package smtcore
 
 import (
 	"errors"

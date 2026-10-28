@@ -1,5 +1,6 @@
-// Source: src/util/cmd_context_types.h. Shared concrete utility exceptions.
 package smtcore
+
+// Source: src/util/cmd_context_types.h. Shared concrete utility exceptions.
 
 import (
 	ucmdexception "github.com/glycerine/g3/pkg/util/cmdexception"

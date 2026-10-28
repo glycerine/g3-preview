@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp mk_th_case_split,
 // undo_th_case_split and propagate_th_case_split.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

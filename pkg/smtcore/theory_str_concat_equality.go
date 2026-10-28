@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp infer_len_concat_arg,
 // infer_len_concat_equality and the active simplify_concat_equality dispatch.
-package smtcore
 
 import (
 	"errors"

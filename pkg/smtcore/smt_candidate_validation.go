@@ -1,5 +1,6 @@
-// Source: src/smt/smt_context_inv.cpp context::validate_model.
 package smtcore
+
+// Source: src/smt/smt_context_inv.cpp context::validate_model.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp will_result_in_overlap and
 // is_concat_eq_type1 through is_concat_eq_type6.
-package smtcore
 
 import (
 	"errors"

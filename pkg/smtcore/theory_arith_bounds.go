@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith.h:215-421 and
 // src/smt/theory_arith_aux.h:330-420,732-800.
-package smtcore
 
 import (
 	"math/big"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp aut_path_add_next,
 // aut_path_rewrite_constraint and generate_regex_path_constraints.
-package smtcore
 
 import (
 	"errors"

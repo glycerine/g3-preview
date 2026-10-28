@@ -1,5 +1,6 @@
-// Source: src/smt/theory_dl.cpp finite-domain reduction to bit-vectors.
 package smtcore
+
+// Source: src/smt/theory_dl.cpp finite-domain reduction to bit-vectors.
 
 import (
 	"errors"

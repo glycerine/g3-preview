@@ -1,5 +1,6 @@
-// Source: theory_pb constructor/mk_fresh snapshots and context::copy_plugins.
 package smtcore
+
+// Source: theory_pb constructor/mk_fresh snapshots and context::copy_plugins.
 
 import "github.com/glycerine/g3/pkg/ast"
 

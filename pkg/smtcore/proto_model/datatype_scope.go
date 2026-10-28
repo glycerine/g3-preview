@@ -1,5 +1,6 @@
-// Source: expr_ref_vector args and expr_ref new_value in datatype_factory.cpp.
 package protomodel
+
+// Source: expr_ref_vector args and expr_ref new_value in datatype_factory.cpp.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_lra.cpp imp::init_solver, get_var_index,
 // init_left_side, internalize_def, assert_bound, get_ivalue and make_feasible.
-package smtcore
 
 import (
 	"math/big"

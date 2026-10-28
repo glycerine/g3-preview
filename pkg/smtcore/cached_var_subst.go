@@ -1,5 +1,6 @@
-// Source: src/smt/cached_var_subst.h and src/smt/cached_var_subst.cpp.
 package smtcore
+
+// Source: src/smt/cached_var_subst.h and src/smt/cached_var_subst.cpp.
 
 import (
 	"errors"

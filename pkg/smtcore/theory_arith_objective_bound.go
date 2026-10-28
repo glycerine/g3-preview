@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_aux.h:1120-1143 mk_ge, instantiated for mi_ext and inf_ext.
 package smtcore
+
+// Source: src/smt/theory_arith_aux.h:1120-1143 mk_ge, instantiated for mi_ext and inf_ext.
 
 import (
 	"bytes"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp validate_assumptions(),
 // init_assumptions(), and reset_assumptions().
-package smtcore
 
 import (
 	"errors"

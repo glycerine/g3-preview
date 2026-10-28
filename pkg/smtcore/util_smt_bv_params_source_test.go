@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/params/theory_bv_params.cpp:23-29;
 // scripts/mk_genfile_common.py:895-939.
-package smtcore
 
 import (
 	"errors"

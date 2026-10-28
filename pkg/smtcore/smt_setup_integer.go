@@ -1,5 +1,6 @@
-// Source: src/smt/smt_setup.cpp setup_QF_LIA() and setup_QF_LIA(static_features).
 package smtcore
+
+// Source: src/smt/smt_setup.cpp setup_QF_LIA() and setup_QF_LIA(static_features).
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package protomodel
+
 // Source: src/smt/proto_model/numeral_factory.cpp/.h and
 // concrete simple_factory<rational> in value_factory.h:79-221.
-package protomodel
 
 import (
 	"errors"

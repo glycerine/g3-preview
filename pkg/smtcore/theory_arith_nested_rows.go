@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_nl.h is_problematic_non_linear_row and
 // is_cross_nested_consistent(row), is_cross_nested_consistent(nl_cluster).
-package smtcore
 
 import (
 	"errors"

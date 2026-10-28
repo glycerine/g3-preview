@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.h regex caches and retained positive unbounded
 // regex_automaton_under_assumptions instantiations; theory_str.cpp persistence.
-package smtcore
 
 import (
 	"errors"

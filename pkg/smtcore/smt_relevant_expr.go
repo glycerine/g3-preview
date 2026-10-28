@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_for_each_relevant_expr.h and
 // src/smt/smt_for_each_relevant_expr.cpp.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

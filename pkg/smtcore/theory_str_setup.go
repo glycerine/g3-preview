@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp set_up_axioms and init_search_eh.
 package smtcore
+
+// Source: src/smt/theory_str.cpp set_up_axioms and init_search_eh.
 
 import "github.com/glycerine/g3/pkg/ast"
 

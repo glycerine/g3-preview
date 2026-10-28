@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_nl.h get_polynomial_info, p2expr,
 // in_monovariate_monomials, factor, horner, cross_nested, and interval checks.
-package smtcore
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp mk_regex_rep_var, mk_int_var,
 // mk_unroll_bound_var, mk_unroll and instantiate_axiom_RegexIn.
-package smtcore
 
 import (
 	"errors"

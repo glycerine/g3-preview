@@ -1,5 +1,6 @@
-// Source: concrete arithmetic mk_fresh methods and context::copy_plugins.
 package smtcore
+
+// Source: concrete arithmetic mk_fresh methods and context::copy_plugins.
 
 func (k *SMTKernel) copyArithmeticPlugin(source *SMTKernel) error {
 	// Go eagerly installs constructor placeholders. Native arithmetic plugins

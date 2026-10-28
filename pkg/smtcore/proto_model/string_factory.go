@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.h str_value_factory.
 package protomodel
+
+// Source: src/smt/theory_str.h str_value_factory.
 
 import (
 	"strconv"

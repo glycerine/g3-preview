@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/old_interval.cpp and src/smt/old_interval.h retained
 // rational interval operations used by nonlinear arithmetic.
-package smtcore
 
 import (
 	"math/big"

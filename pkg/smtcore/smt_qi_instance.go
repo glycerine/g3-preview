@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/qi_queue.cpp:202-288, excluding proof construction and the
 // final context::internalize_instance call.
-package smtcore
 
 import (
 	"errors"

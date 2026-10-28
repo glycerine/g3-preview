@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_core.h refine_epsilon. Preserve distinctions
 // between shared infinitesimal assignments when constructing rational models.
-package smtcore
 
 import (
 	"math/big"

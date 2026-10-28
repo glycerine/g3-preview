@@ -1,5 +1,6 @@
-// Source: src/smt/theory_lra.cpp:1487-1731. Concrete rational LRA bounds.
 package smtcore
+
+// Source: src/smt/theory_lra.cpp:1487-1731. Concrete rational LRA bounds.
 
 import (
 	"errors"

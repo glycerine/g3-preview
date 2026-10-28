@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp lower_bound/upper_bound and their retained
 // theory_mi_arith get_lower/get_upper/to_expr calls in theory_arith_core.h.
-package smtcore
 
 import (
 	"math/big"

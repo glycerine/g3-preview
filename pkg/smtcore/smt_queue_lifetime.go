@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp:44-92,135-138,3281-3293,3367-3394;
 // src/smt/smt_case_split_queue.cpp mk_case_split_queue and borrowed m_params.
-package smtcore
 
 func effectiveSMTCaseSplitStrategy(params SMTParamsState) uint32 {
 	strategy := params.CaseSplitStrategy

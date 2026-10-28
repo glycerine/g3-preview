@@ -1,6 +1,7 @@
+package protomodel_test
+
 // Link the production source catalog for tests that set real global PP options.
 // This stays external to avoid a production dependency cycle through smtcore.
-package protomodel_test
 
 import (
 	_ "github.com/glycerine/g3/pkg/ackermannization"

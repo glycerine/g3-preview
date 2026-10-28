@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context_inv.cpp context::validate_unsat_core and
 // src/smt/smt_context.cpp context::mk_unsat_core.
-package smtcore
 
 import (
 	"errors"

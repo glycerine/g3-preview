@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_aux.h add_objective, value, maximize and mk_gt.
 package smtcore
+
+// Source: src/smt/theory_arith_aux.h add_objective, value, maximize and mk_gt.
 
 import (
 	"math/big"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp solve_nqs and solve_ne retained word
 // expansion, equality reduction and conflict case.
-package smtcore
 
 import (
 	"errors"

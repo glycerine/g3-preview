@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_nl.h is_perfect_square overloads and
 // is_inconsistent2, which recognizes expanded (M1-M2)^2 equations.
-package smtcore
 
 import (
 	"math/big"

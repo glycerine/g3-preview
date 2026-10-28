@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp nfa::convert_re, epsilon_closure and matches.
 package smtcore
+
+// Source: src/smt/theory_str.cpp nfa::convert_re, epsilon_closure and matches.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq.cpp retained propagate_not_suffix.
 package smtcore
+
+// Source: src/smt/theory_seq.cpp retained propagate_not_suffix.
 
 import "github.com/glycerine/g3/pkg/ast"
 

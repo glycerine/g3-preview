@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/dyn_ack.cpp:174-215,309-315,390-418;
 // src/smt/dyn_ack.h:39-69; src/util/obj_triple_hashtable.h:21-177.
-package smtcore
 
 import (
 	"math"

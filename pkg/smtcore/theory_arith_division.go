@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_core.h internalize_div/idiv/mod/rem,
 // mk_axiom, mk_div_axiom, mk_idiv_mod_axioms and mk_rem_axiom.
-package smtcore
 
 import (
 	"errors"

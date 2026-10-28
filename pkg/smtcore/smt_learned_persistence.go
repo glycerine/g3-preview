@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp learned-clause reinitialization across
 // search backtracking and base-scope lifetime.
-package smtcore
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp solve_ne retained reduction of fixed-length
 // sequence disequalities to element disequalities.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

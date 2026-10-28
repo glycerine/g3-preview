@@ -1,5 +1,6 @@
-// Source: datatype_factory.cpp TRACE/CTRACE and ast_smt2_pp.cpp mk_ismt2_pp.
 package protomodel
+
+// Source: datatype_factory.cpp TRACE/CTRACE and ast_smt2_pp.cpp mk_ismt2_pp.
 
 import (
 	"errors"

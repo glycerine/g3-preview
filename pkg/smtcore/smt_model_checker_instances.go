@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_checker.cpp add_instance, restart_eh,
 // assert_new_instances and reset_new_instances.
-package smtcore
 
 import (
 	"errors"

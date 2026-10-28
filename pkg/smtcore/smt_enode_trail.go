@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_enode.cpp context-trailed generation and label updates,
 // and the corresponding label-hash interface in src/smt/smt_enode.h.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_aux.h max_min(vars) and
 // src/smt/theory_arith_core.h m_asserted_bounds propagation and scope heads.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/math/simplex"
 

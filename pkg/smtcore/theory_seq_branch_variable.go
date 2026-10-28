@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp branch_variable, find_branch_candidate and
 // assume_equality retained equality case splitting for non-fixed words.
-package smtcore
 
 import (
 	"errors"

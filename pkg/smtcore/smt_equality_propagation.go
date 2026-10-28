@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp add_eq, add_diseq, propagate_eqs, and
 // congruence-table reinsertion. This is the retained single-goroutine core.
-package smtcore
 
 import (
 	"fmt"

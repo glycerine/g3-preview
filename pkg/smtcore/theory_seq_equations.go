@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.h eq and scoped_vector<eq>; the retained
 // sequence instantiation uses concrete Go storage with explicit AST roots.
-package smtcore
 
 import (
 	"errors"

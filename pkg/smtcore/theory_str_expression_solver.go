@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp seq_expr_solver and theory_str::init.
 package smtcore
+
+// Source: src/smt/theory_str.cpp seq_expr_solver and theory_str::init.
 
 import (
 	"errors"

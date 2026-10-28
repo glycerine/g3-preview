@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp m_atoms/m_atoms_lim and assign_eh for the
 // retained prefix, suffix and contains atoms.
-package smtcore
 
 import (
 	"errors"

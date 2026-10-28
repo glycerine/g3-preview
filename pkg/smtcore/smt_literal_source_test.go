@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_literal.h:35-103; src/smt/smt_literal.cpp:49-59,86-98;
 // src/smt/smt_types.h:33-37; source literal fixtures src/test/diff_logic.cpp:44,61-66.
-package smtcore
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/smt/smt_quantifier_stat.h and src/smt/smt_quantifier_stat.cpp.
 package smtcore
+
+// Source: src/smt/smt_quantifier_stat.h and src/smt/smt_quantifier_stat.cpp.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

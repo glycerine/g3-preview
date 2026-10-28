@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_arith_aux.h mutate_assignment. Freedom intervals
 // preserve the current tableau constraints; changed models are revalidated
 // by the integer, shared-equality and nonlinear final-check stages.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/math/simplex"
 

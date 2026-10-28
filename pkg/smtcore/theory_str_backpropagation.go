@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp final_check_eh constant-backpropagation stage,
 // collect_var_concat, get_unique_non_concat_nodes, propagate_length and
 // propagate_length_within_eqc.
-package smtcore
 
 import (
 	"errors"

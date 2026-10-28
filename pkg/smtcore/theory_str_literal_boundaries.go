@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp process_concat_eq_type4, type5 and type6.
 package smtcore
+
+// Source: src/smt/theory_str.cpp process_concat_eq_type4, type5 and type6.
 
 import (
 	"errors"

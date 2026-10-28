@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/diff_logic.h sparse graph construction, incremental edge
 // activation, feasible assignments, negative-cycle explanations and scopes.
-package smtcore
 
 import (
 	"errors"

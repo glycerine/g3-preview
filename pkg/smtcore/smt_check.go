@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp check_preamble/check_finalize,
 // check/setup_and_check early-conflict branches and init_search proof reset.
-package smtcore
 
 import (
 	"errors"

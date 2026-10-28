@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp check_regex_length_linearity,
 // check_regex_length_linearity_helper, check_subterm_lengths and
 // infer_all_regex_lengths. The enclosing automata stage remains separate.
-package smtcore
 
 import (
 	"errors"

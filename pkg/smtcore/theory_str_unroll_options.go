@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp mk_unroll_test_var, get_unrolled_string,
 // gen_unroll_assign and gen_unroll_conditional_options.
-package smtcore
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/smt/theory_lra.cpp:2222-2223,2470-2502.
 package smtcore
+
+// Source: src/smt/theory_lra.cpp:2222-2223,2470-2502.
 
 import (
 	"errors"

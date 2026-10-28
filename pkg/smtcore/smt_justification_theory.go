@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: ownership and dependency portions of the theory justifications in
 // src/smt/smt_justification.h and src/smt/smt_justification.cpp.
-package smtcore
 
 import (
 	"errors"

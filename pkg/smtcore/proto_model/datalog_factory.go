@@ -1,6 +1,7 @@
+package protomodel
+
 // Source: src/smt/theory_dl.cpp:45-57; concrete simple_factory<unsigned>
 // from src/smt/proto_model/value_factory.h:79-221.
-package protomodel
 
 import (
 	"errors"

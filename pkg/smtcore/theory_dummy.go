@@ -1,5 +1,6 @@
-// Source: src/smt/theory_dummy.cpp and src/smt/theory_dummy.h.
 package smtcore
+
+// Source: src/smt/theory_dummy.cpp and src/smt/theory_dummy.h.
 
 import "github.com/glycerine/g3/pkg/ast"
 

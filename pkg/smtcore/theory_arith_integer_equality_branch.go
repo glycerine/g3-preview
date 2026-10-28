@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_int.h branch_infeasible_int_equality.
 package smtcore
+
+// Source: src/smt/theory_arith_int.h branch_infeasible_int_equality.
 
 import (
 	"errors"

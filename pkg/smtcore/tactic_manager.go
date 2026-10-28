@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/cmd_context/tactic_manager.cpp:22-66;
 // src/cmd_context/tactic_manager.h:24-43; src/util/dictionary.h:25-29.
-package smtcore
 
 import (
 	"math"

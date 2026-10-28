@@ -1,5 +1,6 @@
-// Source: src/smt/fingerprints.h and src/smt/fingerprints.cpp.
 package smtcore
+
+// Source: src/smt/fingerprints.h and src/smt/fingerprints.cpp.
 
 import (
 	"fmt"

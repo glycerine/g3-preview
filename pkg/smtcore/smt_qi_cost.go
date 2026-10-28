@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/qi_queue.cpp parser setup, value publication, cost
 // evaluation, and new-generation evaluation.
-package smtcore
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp process_concat_eq_type1,
 // mk_nonempty_str_var, refresh_theory_var, and finite overlap tester setup.
-package smtcore
 
 import (
 	"errors"

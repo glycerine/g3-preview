@@ -1,5 +1,6 @@
-// Source: src/smt/smt_conflict_resolution.cpp:255-304.
 package smtcore
+
+// Source: src/smt/smt_conflict_resolution.cpp:255-304.
 
 import "github.com/glycerine/g3/pkg/ast"
 

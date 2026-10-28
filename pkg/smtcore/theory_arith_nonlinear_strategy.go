@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_arith_nl.h process_non_linear's rotating strategies
 // and scoped derived nonlinear bounds. Replay bounds have logical premises;
 // temporary candidate-model assignments never justify logical conflicts.
-package smtcore
 
 import (
 	"errors"

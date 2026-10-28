@@ -1,5 +1,6 @@
-// Source: src/smt/theory_lra.cpp:862-984, concrete Relevant operator axioms.
 package smtcore
+
+// Source: src/smt/theory_lra.cpp:862-984, concrete Relevant operator axioms.
 
 import (
 	"errors"

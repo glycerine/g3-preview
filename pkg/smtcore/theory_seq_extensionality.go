@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq.cpp check_extensionality.
 package smtcore
+
+// Source: src/smt/theory_seq.cpp check_extensionality.
 
 import (
 	"errors"

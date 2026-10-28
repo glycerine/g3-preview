@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp assert_axiom, instantiate_basic_string_axioms,
 // instantiate_concat_axiom and instantiate_str_eq_length_axiom.
-package smtcore
 
 import (
 	"errors"

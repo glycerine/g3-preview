@@ -1,5 +1,6 @@
-// Source: src/smt/smt_farkas_util.cpp and src/smt/smt_farkas_util.h.
 package smtcore
+
+// Source: src/smt/smt_farkas_util.cpp and src/smt/smt_farkas_util.h.
 
 import (
 	"errors"

@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_array.cpp display, display_var, display_ids;
 // src/smt/theory_array_full.cpp display_var; and
 // src/smt/smt_context_pp.cpp display_theories.
-package smtcore
 
 import (
 	"fmt"

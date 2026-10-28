@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_int.h branch_infeasible_int_var,
 // constrain_free_vars, mk_polynomial_ge and mk_gomory_cut.
-package smtcore
 
 import (
 	"errors"

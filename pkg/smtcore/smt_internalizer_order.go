@@ -1,5 +1,6 @@
-// Source: src/smt/smt_internalizer.cpp:28-181.
 package smtcore
+
+// Source: src/smt/smt_internalizer.cpp:28-181.
 
 import "github.com/glycerine/g3/pkg/ast"
 

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp more_len_tests, more_value_tests,
 // free_var_attempt and the opening of handle_equality.
-package smtcore
 
 import (
 	"errors"

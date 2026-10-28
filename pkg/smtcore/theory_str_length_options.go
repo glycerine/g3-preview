@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp gen_len_test_options.
 package smtcore
+
+// Source: src/smt/theory_str.cpp gen_len_test_options.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/smt/theory_fpa.cpp:840-892 theory_fpa::display.
 package smtcore
+
+// Source: src/smt/theory_fpa.cpp:840-892 theory_fpa::display.
 
 import (
 	"fmt"

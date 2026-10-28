@@ -1,5 +1,6 @@
-// Source: src/smt/smt_setup.cpp setup_QF_UF overloads and setup_QF_UFLRA.
 package smtcore
+
+// Source: src/smt/smt_setup.cpp setup_QF_UF overloads and setup_QF_UFLRA.
 
 import (
 	"errors"

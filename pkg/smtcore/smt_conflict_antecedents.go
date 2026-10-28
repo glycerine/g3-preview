@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_conflict_resolution.cpp:58-248 and the corresponding
 // public marking operations in smt_conflict_resolution.h.
-package smtcore
 
 import (
 	"errors"

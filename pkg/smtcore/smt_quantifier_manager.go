@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_quantifier.cpp quantifier_manager propagation, queue
 // instantiation, quick checking, final-check arbitration, and scope lifecycle.
-package smtcore
 
 import (
 	"errors"

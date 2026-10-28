@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp regex_inc_counter/regex_get_counter,
 // _qadd/_qmul, estimate_regex_complexity/under_complement and
 // estimate_automata_intersection_difficulty.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

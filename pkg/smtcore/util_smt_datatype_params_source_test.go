@@ -1,5 +1,6 @@
-// Source: src/smt/params/theory_datatype_params.h:22-35.
 package smtcore
+
+// Source: src/smt/params/theory_datatype_params.h:22-35.
 
 import (
 	utext "github.com/glycerine/g3/pkg/util/text"

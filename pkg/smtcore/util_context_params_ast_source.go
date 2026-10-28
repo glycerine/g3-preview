@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/cmd_context/context_params.cpp:198-209;
 // src/ast/ast.cpp:1297-1334; src/smt/params/qi_params.cpp:43-64.
-package smtcore
 
 import (
 	"strings"

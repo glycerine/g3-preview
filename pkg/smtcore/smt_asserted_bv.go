@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.h apply_bit2int, max_bv_sharing_fn;
 // src/smt/asserted_formulas.cpp simplify_fmls, reduce, push_scope, pop_scope.
-package smtcore
 
 import (
 	"errors"

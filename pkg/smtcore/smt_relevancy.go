@@ -1,5 +1,6 @@
-// Source: src/smt/smt_relevancy.h and src/smt/smt_relevancy.cpp.
 package smtcore
+
+// Source: src/smt/smt_relevancy.h and src/smt/smt_relevancy.cpp.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

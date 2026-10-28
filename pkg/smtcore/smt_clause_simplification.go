@@ -1,5 +1,6 @@
-// Source: src/smt/smt_context.cpp simplify_clause() and simplify_clauses().
 package smtcore
+
+// Source: src/smt/smt_context.cpp simplify_clause() and simplify_clauses().
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

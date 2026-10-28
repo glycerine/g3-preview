@@ -1,5 +1,6 @@
-// Source: src/smt/theory_opt.cpp is_linear() and is_numeral().
 package smtcore
+
+// Source: src/smt/theory_opt.cpp is_linear() and is_numeral().
 
 import "github.com/glycerine/g3/pkg/ast"
 

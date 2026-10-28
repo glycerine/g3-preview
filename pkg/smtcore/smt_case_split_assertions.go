@@ -1,5 +1,6 @@
-// Source: src/smt/smt_case_split_queue.cpp retained SASSERT gates.
 package smtcore
+
+// Source: src/smt/smt_case_split_queue.cpp retained SASSERT gates.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

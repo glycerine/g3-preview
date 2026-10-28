@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_array_base.cpp register_sort, restore_sorts,
 // push_scope_eh/pop_scope_eh and source sort2skolem destruction.
-package smtcore
 
 import (
 	"errors"

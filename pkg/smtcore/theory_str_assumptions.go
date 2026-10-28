@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp add_theory_assumptions and
 // validate_unsat_core, used by loop-avoiding concat arrangements.
-package smtcore
 
 import (
 	"strconv"

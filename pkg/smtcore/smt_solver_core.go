@@ -1,5 +1,6 @@
-// Source: src/smt/smt_solver.cpp unsat-core pattern extension.
 package smtcore
+
+// Source: src/smt/smt_solver.cpp unsat-core pattern extension.
 
 import "github.com/glycerine/g3/pkg/ast"
 

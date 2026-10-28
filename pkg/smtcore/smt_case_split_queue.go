@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_case_split_queue.cpp activity-based case selection used
 // by src/smt/smt_context.cpp decide().
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

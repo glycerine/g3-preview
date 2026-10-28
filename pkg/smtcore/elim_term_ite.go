@@ -1,5 +1,6 @@
-// Source: src/smt/elim_term_ite.h and src/smt/elim_term_ite.cpp.
 package smtcore
+
+// Source: src/smt/elim_term_ite.h and src/smt/elim_term_ite.cpp.
 
 import (
 	"errors"

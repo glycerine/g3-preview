@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/params/theory_array_params.h:24-59,61-75;
 // src/smt/params/theory_array_params.cpp:22-40; src/smt/params/smt_params_helper.pyg:59-60.
-package smtcore
 
 import (
 	"reflect"

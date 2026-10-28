@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq.cpp reduce_length_eq and reduce_length.
 package smtcore
+
+// Source: src/smt/theory_seq.cpp reduce_length_eq and reduce_length.
 
 import (
 	"math"

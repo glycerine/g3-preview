@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_literal.cpp AST-aware display helpers and
 // src/smt/smt_literal.h neg_literals.
-package smtcore
 
 import (
 	"io"

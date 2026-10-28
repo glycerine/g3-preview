@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp context::update_model and mk_proto_model;
 // retained caller src/opt/opt_solver.cpp maximize_objective.
-package smtcore
 
 import (
 	"errors"

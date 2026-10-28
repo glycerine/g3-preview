@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: live scoped_dependency_manager<void*> instantiation from
 // src/util/dependency.h, consumed by src/smt/old_interval.* and
 // src/smt/theory_arith_nl.h.
-package smtcore
 
 // smtArithmeticBound is the concrete leaf type used by nonlinear arithmetic
 // explanations. Its bound payload is filled by the arithmetic-theory port.

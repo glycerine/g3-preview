@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp z3str2_get_eqc_value, mk_value_helper,
 // init_model, mk_value and finalize_model.
-package smtcore
 
 import (
 	"strconv"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp get_const_str_asts_in_node and
 // check_contain_by_eqc_val; the constant-value part of check_contain_in_new_eq.
-package smtcore
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp final_check_eh free-variable scan and the
 // !needToAssignFreeVars conversion/path-completeness branch.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

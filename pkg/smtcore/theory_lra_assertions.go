@@ -1,5 +1,6 @@
-// Source: retained SASSERT gates in src/smt/theory_lra.cpp.
 package smtcore
+
+// Source: retained SASSERT gates in src/smt/theory_lra.cpp.
 
 import (
 	"github.com/glycerine/g3/pkg/math/simplex"

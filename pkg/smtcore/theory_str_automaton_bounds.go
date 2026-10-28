@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp refine_automaton_lower_bound,
 // refine_automaton_upper_bound and find_automaton_initial_bounds.
-package smtcore
 
 import (
 	"errors"

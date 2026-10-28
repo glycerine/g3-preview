@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.h lift_ite, ng_lift_ite and
 // elim_term_ite_fn; src/smt/asserted_formulas.cpp setup and simplify_fmls.
-package smtcore
 
 import (
 	"errors"

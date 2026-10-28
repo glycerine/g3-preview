@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.cpp reduce/invoke and the concrete
 // should_apply methods in src/smt/asserted_formulas.h.
-package smtcore
 
 import "fmt"
 

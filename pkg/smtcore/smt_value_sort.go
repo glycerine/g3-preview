@@ -1,5 +1,6 @@
-// Source: src/smt/smt_value_sort.h and src/smt/smt_value_sort.cpp.
 package smtcore
+
+// Source: src/smt/smt_value_sort.h and src/smt/smt_value_sort.cpp.
 
 import (
 	"errors"

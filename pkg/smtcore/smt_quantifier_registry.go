@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_quantifier.cpp quantifier_manager::imp registry,
 // statistics, add_instance, search initialization, and scoped queue storage.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

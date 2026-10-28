@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp instantiate_axiom_str_to_int and
 // instantiate_axiom_int_to_str. These are the initial constraints; source
 // finalcheck_str2int/finalcheck_int2str enforce the remaining value agreement.
-package smtcore
 
 import (
 	"errors"

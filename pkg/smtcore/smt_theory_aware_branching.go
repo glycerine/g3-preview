@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_case_split_queue.cpp theory_aware_act_lt and
 // theory_aware_branching_queue; smt_context.cpp branching-info dispatch.
-package smtcore
 
 import (
 	"fmt"

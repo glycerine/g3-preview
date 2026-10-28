@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp eval_concat, simplify_parent and
 // the initial concat shortcuts/parent dispatch of handle_equality.
-package smtcore
 
 import (
 	"errors"

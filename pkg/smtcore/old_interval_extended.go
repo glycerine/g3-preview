@@ -1,5 +1,6 @@
-// Source: src/smt/old_interval.cpp:20-158 and src/smt/old_interval.h:25-64.
 package smtcore
+
+// Source: src/smt/old_interval.cpp:20-158 and src/smt/old_interval.h:25-64.
 
 import (
 	"math/big"

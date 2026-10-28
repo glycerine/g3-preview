@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.h pull_nested_quantifiers and
 // src/smt/asserted_formulas.cpp simplify_fmls::operator().
-package smtcore
 
 import (
 	"errors"

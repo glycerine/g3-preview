@@ -1,5 +1,6 @@
-// Source: src/smt/theory_dense_diff_logic_def.h:841-1130 optimization.
 package smtcore
+
+// Source: src/smt/theory_dense_diff_logic_def.h:841-1130 optimization.
 
 import (
 	"math/big"

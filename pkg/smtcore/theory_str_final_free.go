@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp final_check_eh free-variable/unroll suffix
 // and process_free_var's retained tester-emission loops.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

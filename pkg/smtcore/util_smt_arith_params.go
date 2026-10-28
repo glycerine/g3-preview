@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/params/theory_arith_params.h:24-164;
 // src/smt/params/theory_arith_params.cpp:23-94; src/smt/params/smt_params_helper.pyg:7,40-53;
 // src/ast/rewriter/arith_rewriter_params.pyg:1-15; scripts/mk_genfile_common.py:895-939.
-package smtcore
 
 import (
 	"reflect"

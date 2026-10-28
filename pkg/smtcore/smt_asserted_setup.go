@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.cpp setup(), called by
 // smt::context::setup_components after logic/static-feature setup.
-package smtcore
 
 func (k *SMTKernel) setupAssertedPolicies() {
 	p := &k.preprocessState

@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq.h ne and scoped_vector<ne>.
 package smtcore
+
+// Source: src/smt/theory_seq.h ne and scoped_vector<ne>.
 
 import (
 	"errors"

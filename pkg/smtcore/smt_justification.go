@@ -1,5 +1,6 @@
-// Source: context-independent dependency records in smt_justification.h/.cpp.
 package smtcore
+
+// Source: context-independent dependency records in smt_justification.h/.cpp.
 
 import "github.com/glycerine/g3/pkg/ast"
 

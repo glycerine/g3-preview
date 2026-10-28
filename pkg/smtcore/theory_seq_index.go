@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq.cpp add_indexof_axiom.
 package smtcore
+
+// Source: src/smt/theory_seq.cpp add_indexof_axiom.
 
 import "github.com/glycerine/g3/pkg/ast"
 

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_b_justification.h, src/smt/smt_eq_justification.h,
 // and src/smt/smt_bool_var_data.h compact dependency records.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp solve_concat_eq_str and
 // generate_mutual_exclusion.
-package smtcore
 
 import (
 	"errors"

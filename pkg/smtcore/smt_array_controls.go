@@ -1,5 +1,6 @@
-// Source: theory_array::instantiate_extensionality and theory_array_params.
 package smtcore
+
+// Source: theory_array::instantiate_extensionality and theory_array_params.
 
 import "github.com/glycerine/g3/pkg/ast"
 

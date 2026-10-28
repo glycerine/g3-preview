@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_nl.h mk_gb_monomial, add_row_to_gb,
 // add_monomial_def_to_gb, init_grobner_var_order, and compute_grobner.
-package smtcore
 
 import (
 	"errors"

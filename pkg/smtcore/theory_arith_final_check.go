@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_core.h final_check_core and final_check_eh.
 // The replay tableau tracks actual assignment changes at stage boundaries.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/math/simplex"

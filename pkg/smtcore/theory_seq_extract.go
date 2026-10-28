@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp add_extract_axiom and its general
 // substring decomposition case.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

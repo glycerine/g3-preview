@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_checker.cpp auxiliary counterexample discovery
 // and delayed instance publication.
-package smtcore
 
 import (
 	"errors"

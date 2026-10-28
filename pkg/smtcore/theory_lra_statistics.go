@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_lra.cpp lra_lp::stats, make_feasible and
 // collect_statistics. All source counters have unsigned (32-bit) width.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

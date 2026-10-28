@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp get_var_in_eqc and process_free_var's
 // representative/leaf/standalone selection before tester generation.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

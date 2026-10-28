@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp learned-clause activity and inactive-lemma
 // deletion. The retained search has no restart loop, so fixed/geometric
 // conflict-triggered collection is the live path.
-package smtcore
 
 import (
 	"sort"

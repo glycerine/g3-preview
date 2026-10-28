@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: active implementation in src/smt/smt_cg_table.h and
 // src/smt/smt_cg_table.cpp.
-package smtcore
 
 import (
 	"encoding/binary"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp theory setup, search initialization,
 // restart, and round-robin final-check dispatch.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

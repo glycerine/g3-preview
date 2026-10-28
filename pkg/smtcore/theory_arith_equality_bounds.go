@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_core.h new_eq_eh and eq_bound justifications.
 package smtcore
+
+// Source: src/smt/theory_arith_core.h new_eq_eh and eq_bound justifications.
 
 import (
 	"math/big"

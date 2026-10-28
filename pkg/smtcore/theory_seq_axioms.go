@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_seq.cpp m_axioms, m_axiom_set, m_axioms_head and
 // enque_axiom/deque_axiom propagation lifecycle.
-package smtcore
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_int.h euclidean_solver_bridge and
 // apply_euclidean_solver. Logical replay bounds retain the current SMT scope.
-package smtcore
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/smt/smt_context_stat.cpp.
 package smtcore
+
+// Source: src/smt/smt_context_stat.cpp.
 
 import (
 	"io"

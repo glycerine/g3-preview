@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_arith_nl.h mark_var, mark_dependents, and
 // get_non_linear_cluster. The replay tableau has ordinary base rows only.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

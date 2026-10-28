@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/smt_conflict_resolution.cpp initialize_resolve(),
 // process_antecedent(), resolve(), and the non-minimizing part of
 // finalize_resolve().
-package smtcore
 
 import (
 	"errors"

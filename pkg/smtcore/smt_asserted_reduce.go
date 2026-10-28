@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.cpp set_eliminate_and, reduce_and_solve
 // and simplify_fmls; src/smt/asserted_formulas.h distribute_forall_fn.
-package smtcore
 
 import (
 	"errors"

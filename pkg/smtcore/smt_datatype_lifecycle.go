@@ -1,5 +1,6 @@
-// Source: theory_datatype::mk_fresh and context::copy_plugins.
 package smtcore
+
+// Source: theory_datatype::mk_fresh and context::copy_plugins.
 
 import "github.com/glycerine/g3/pkg/ast"
 

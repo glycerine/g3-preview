@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq.cpp seq_value_proc and theory_seq::mk_value.
 package smtcore
+
+// Source: src/smt/theory_seq.cpp seq_value_proc and theory_seq::mk_value.
 
 import (
 	"math/big"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp classify_ast_by_type,
 // classify_ast_by_type_in_positive_context and ctx_dep_analysis.
-package smtcore
 
 import (
 	"errors"

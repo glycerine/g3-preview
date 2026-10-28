@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: Boolean and theory-literal portions of
 // src/smt/smt_conflict_resolution.cpp mk_conflict_proof() and
 // src/smt/smt_justification.cpp mk_proof methods.
-package smtcore
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

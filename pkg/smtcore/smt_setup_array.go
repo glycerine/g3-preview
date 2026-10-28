@@ -1,5 +1,6 @@
-// Source: src/smt/smt_setup.cpp setup_QF_AX and setup_QF_AUFLIA overloads.
 package smtcore
+
+// Source: src/smt/smt_setup.cpp setup_QF_AX and setup_QF_AUFLIA overloads.
 
 import (
 	"errors"

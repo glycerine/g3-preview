@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context.cpp assign_core/bcp and
 // src/smt/smt_internalizer.cpp clause/watch construction.
-package smtcore
 
 import (
 	"errors"

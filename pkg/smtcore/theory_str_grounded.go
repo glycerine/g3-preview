@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp dealias_node, get_grounded_concats,
 // is_partial_in_grounded_concat, check_subsequence and compute_contains.
-package smtcore
 
 import (
 	"errors"

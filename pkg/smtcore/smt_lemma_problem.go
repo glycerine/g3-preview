@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context_pp.cpp:404-481 display_lemma_as_smt_problem;
 // src/smt/smt_context.h:493-500 literal2expr.
-package smtcore
 
 import (
 	"errors"

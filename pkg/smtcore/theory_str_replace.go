@@ -1,5 +1,6 @@
-// Source: src/smt/theory_str.cpp mk_contains and instantiate_axiom_Replace.
 package smtcore
+
+// Source: src/smt/theory_str.cpp mk_contains and instantiate_axiom_Replace.
 
 import (
 	"errors"

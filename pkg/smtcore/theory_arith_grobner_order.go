@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_nl.h compute_grobner perturbation phase.
 package smtcore
+
+// Source: src/smt/theory_arith_nl.h compute_grobner perturbation phase.
 
 import "github.com/glycerine/g3/pkg/math/grobner"
 

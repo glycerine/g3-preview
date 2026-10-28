@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp in_same_eqc, simplify_concat,
 // group_terms_by_eqc and the initial/coherence/concat steps of handle_equality.
-package smtcore
 
 import (
 	"errors"
