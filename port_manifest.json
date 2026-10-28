@@ -116016,7 +116016,7 @@
       "path": "src/smt/proto_model/datatype_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/proto_model/datatype_factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
@@ -116177,7 +116177,7 @@
         },
         {
           "name": "Native datatype value/fresh/almost control flow: lookup-only cold get_some_value, recursive almost-fresh seed, utility-owned constructor lists, actual contains_app including quantifier bodies, unsigned recursive iteration and all seven source SASSERT sites",
-          "status": "partial",
+          "status": "ported",
           "go_targets": [
             "pkg/smtcore/proto_model/datatype_factory.go",
             "pkg/smtcore/proto_model/datatype_factory_source_test.go"
@@ -116193,7 +116193,7 @@
         },
         {
           "name": "Concrete fresh/almost expr_ref_vector arguments and approach1/2 expr_ref candidates: pin each argument before the next provider call, candidate ownership before assertion/membership/registration, candidate-before-forward-argument retirement, ordered retained lexical cleanup before factory members",
-          "status": "partial",
+          "status": "ported",
           "go_targets": [
             "pkg/smtcore/proto_model/datatype_scope.go",
             "pkg/smtcore/proto_model/datatype_factory.go",
@@ -116207,7 +116207,7 @@
         },
         {
           "name": "All fourteen datatype_factory TRACE/CTRACE sites with lazy operands, source insertion order, actual global pp constructor profile, borrowed AST input and owned format document; shared nested stream refusal preserves operand side effects",
-          "status": "partial",
+          "status": "ported",
           "go_targets": [
             "pkg/smtcore/proto_model/datatype_trace.go",
             "pkg/smtcore/proto_model/datatype_trace_source_test.go",
@@ -116269,7 +116269,7 @@
       "path": "src/smt/proto_model/datatype_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/proto_model/datatype_factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
@@ -116410,7 +116410,7 @@
         },
         {
           "name": "Native datatype value/fresh/almost control flow: lookup-only cold get_some_value, recursive almost-fresh seed, utility-owned constructor lists, actual contains_app including quantifier bodies, unsigned recursive iteration and all seven source SASSERT sites",
-          "status": "partial",
+          "status": "ported",
           "go_targets": [
             "pkg/smtcore/proto_model/datatype_factory.go",
             "pkg/smtcore/proto_model/datatype_factory_source_test.go"
@@ -116426,7 +116426,7 @@
         },
         {
           "name": "Concrete fresh/almost expr_ref_vector arguments and approach1/2 expr_ref candidates: pin each argument before the next provider call, candidate ownership before assertion/membership/registration, candidate-before-forward-argument retirement, ordered retained lexical cleanup before factory members",
-          "status": "partial",
+          "status": "ported",
           "go_targets": [
             "pkg/smtcore/proto_model/datatype_scope.go",
             "pkg/smtcore/proto_model/datatype_factory.go",
@@ -116440,7 +116440,7 @@
         },
         {
           "name": "All fourteen datatype_factory TRACE/CTRACE sites with lazy operands, source insertion order, actual global pp constructor profile, borrowed AST input and owned format document; shared nested stream refusal preserves operand side effects",
-          "status": "partial",
+          "status": "ported",
           "go_targets": [
             "pkg/smtcore/proto_model/datatype_trace.go",
             "pkg/smtcore/proto_model/datatype_trace_source_test.go",
@@ -121735,7 +121735,7 @@
         },
         {
           "name": "Retained BV mk_fresh/copy_plugins: independent bit definitions, model values and scoped state; borrowed source BV and bit-blaster owners survive destination setup/updates and chained translation; unconfigured placeholders remain destination-selected",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_bv_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_bv_lifecycle_test.go"
@@ -121760,7 +121760,7 @@
         },
         {
           "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
@@ -121772,7 +121772,7 @@
         },
         {
           "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_solver.go",
@@ -132475,7 +132475,7 @@
       "methods": [
         {
           "name": "Retained BV mk_fresh/copy_plugins: independent bit definitions, model values and scoped state; borrowed source BV and bit-blaster owners survive destination setup/updates and chained translation; unconfigured placeholders remain destination-selected",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_bv_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_bv_lifecycle_test.go"
@@ -132486,7 +132486,7 @@
         },
         {
           "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_arithmetic_lifecycle_test.go"
@@ -132498,7 +132498,7 @@
         },
         {
           "name": "Retained UTVPI mk_fresh/copy_plugins path: preserve installed arithmetic type across destination modes, construct independent paired graph and equality adapter, then replay translated assertions and models",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_arithmetic_lifecycle.go",
           "go_targets": [
             "pkg/smtcore/smt_solver.go",
@@ -144026,7 +144026,7 @@
       "path": "src/smt/theory_dl.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_dl.go",
         "pkg/smtcore/proto_model/datalog_factory.go",
@@ -144091,7 +144091,7 @@
       "methods": [
         {
           "name": "finite-sort variable attachment, representative and abstraction declarations, numeral and inverse axioms, range bounds, strict-order reduction, scoped constraint rollback, model factory and model values",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_dl.go",
           "tests": [
             "TestSMTDatalogStrictOrderReduction",
