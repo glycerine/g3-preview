@@ -15,9 +15,9 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-func (c *Context) paretoArithmeticOnly() bool {
+func (c *Context) paretoNoSoftObjectives() bool {
 	for i := range c.objectives {
-		if c.objectives[i].soft || c.objectives[i].bitVector {
+		if c.objectives[i].soft {
 			return false
 		}
 	}
@@ -49,7 +49,11 @@ func (c *Context) evaluateParetoModel(md *model.ModelCore) (values []big.Rat, re
 		if e == nil {
 			var text string
 			var matched bool
-			text, _, matched, e = c.manager.ArithmeticNumeralText(h)
+			if c.objectives[i].bitVector {
+				text, matched, e = c.manager.BitVectorNumeralText(h)
+			} else {
+				text, _, matched, e = c.manager.ArithmeticNumeralText(h)
+			}
 			if e == nil && !matched {
 				e = ast.ErrASTDomain
 			}
@@ -65,6 +69,25 @@ func (c *Context) evaluateParetoModel(md *model.ModelCore) (values []big.Rat, re
 		}
 	}
 	return values, nil
+}
+
+func (c *Context) paretoBitVectorNumeral(value *big.Rat, width uint32) (result ast.ASTHandle, resultErr error) {
+	if value == nil || !value.IsInt() || value.Sign() < 0 || width == 0 {
+		return result, ast.ErrASTDomain
+	}
+	service := c.manager.NumeralService()
+	if service == nil {
+		return result, ast.ErrASTHandle
+	}
+	numeral, err := service.NewValue()
+	if err != nil {
+		return result, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, service.Del(&numeral)) }()
+	if err = service.SetString(&numeral, value.RatString()); err != nil {
+		return result, err
+	}
+	return c.manager.BitVectorNumeral(&numeral, width)
 }
 
 func (c *Context) assertParetoFormula(backend *smtcore.SMTSolver, values []big.Rat, dominates bool) (resultErr error) {
@@ -92,40 +115,53 @@ func (c *Context) assertParetoFormula(backend *smtcore.SMTSolver, values []big.R
 	strict := make([]ast.ASTHandle, len(c.objectives))
 	notBetter := make([]ast.ASTHandle, len(c.objectives))
 	for i := range c.objectives {
-		sort, err := c.manager.GetSort(c.objectives[i].expression)
-		if err != nil {
-			return err
-		}
-		kind, err := c.manager.GetDeclKind(sort)
-		if err != nil {
-			return err
-		}
+		objective := &c.objectives[i]
 		var numeral ast.ASTHandle
-		if kind == 1 {
-			numeral, err = hold(c.manager.ArithmeticIntegerNumeralText(values[i].RatString()))
+		var err error
+		if objective.bitVector {
+			numeral, err = hold(c.paretoBitVectorNumeral(&values[i], objective.bitWidth))
 		} else {
-			numeral, err = hold(c.manager.ArithmeticRealNumeralText(values[i].RatString()))
+			sort, e := c.manager.GetSort(objective.expression)
+			if e != nil {
+				return e
+			}
+			kind, e := c.manager.GetDeclKind(sort)
+			if e != nil {
+				return e
+			}
+			if kind == 1 {
+				numeral, err = hold(c.manager.ArithmeticIntegerNumeralText(values[i].RatString()))
+			} else {
+				numeral, err = hold(c.manager.ArithmeticRealNumeralText(values[i].RatString()))
+			}
 		}
 		if err != nil {
 			return err
 		}
-		term := c.objectives[i].expression
-		if c.objectives[i].maximize {
+		term := objective.expression
+		if objective.bitVector && objective.maximize {
+			weak[i], err = hold(c.manager.MkBitVectorULE(numeral, term))
+			if err == nil {
+				notBetter[i], err = hold(c.manager.MkBitVectorULE(term, numeral))
+			}
+		} else if objective.bitVector {
+			weak[i], err = hold(c.manager.MkBitVectorULE(term, numeral))
+			if err == nil {
+				notBetter[i], err = hold(c.manager.MkBitVectorULE(numeral, term))
+			}
+		} else if objective.maximize {
 			weak[i], err = hold(c.manager.MkArithmeticGE(term, numeral))
 			if err == nil {
 				notBetter[i], err = hold(c.manager.MkArithmeticLE(term, numeral))
-				if err == nil {
-					strict[i], err = hold(c.manager.MkNot(notBetter[i]))
-				}
 			}
 		} else {
 			weak[i], err = hold(c.manager.MkArithmeticLE(term, numeral))
 			if err == nil {
 				notBetter[i], err = hold(c.manager.MkArithmeticGE(term, numeral))
-				if err == nil {
-					strict[i], err = hold(c.manager.MkNot(notBetter[i]))
-				}
 			}
+		}
+		if err == nil {
+			strict[i], err = hold(c.manager.MkNot(notBetter[i]))
 		}
 		if err != nil {
 			return err
@@ -198,7 +234,7 @@ func (c *Context) newParetoBackend(assumptions []ast.ASTHandle) (backend *smtcor
 }
 
 func (c *Context) checkOptimizePareto(assumptions []ast.ASTHandle, continuation bool) (result *opt.ArithmeticResult, resultErr error) {
-	if !c.paretoArithmeticOnly() {
+	if !c.paretoNoSoftObjectives() {
 		return nil, ast.ErrASTDomain
 	}
 	if !continuation || !c.optimizationParetoActive {
@@ -298,6 +334,14 @@ func (c *Context) checkOptimizePareto(assumptions []ast.ASTHandle, continuation 
 	result = &opt.ArithmeticResult{Status: lbool.True, Values: make([]opt.ObjectiveValue, len(c.objectives)), Model: best, Optimal: true}
 	best = nil
 	for i := range values {
+		if c.objectives[i].bitVector {
+			result.Values[i].SoftCost.Set(&values[i])
+			if c.objectives[i].maximize {
+				maximum := new(big.Int).Sub(new(big.Int).Lsh(big.NewInt(1), uint(c.objectives[i].bitWidth)), big.NewInt(1))
+				result.Values[i].SoftCost.Sub(new(big.Rat).SetInt(maximum), &values[i])
+			}
+			continue
+		}
 		finite := simplex.RationalInfinitesimal(&values[i])
 		result.Values[i] = opt.ObjectiveValue{
 			Arithmetic:           smtcore.SMTArithmeticObjectiveValue{Finite: finite},

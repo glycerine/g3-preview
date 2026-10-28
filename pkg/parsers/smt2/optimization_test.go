@@ -322,3 +322,47 @@ func TestSMT2ParetoOptimizationEndToEnd(t *testing.T) {
 		}
 	}
 }
+
+func TestSMT2BitVectorParetoOptimizationEndToEnd(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	var script strings.Builder
+	script.WriteString(`(set-option :produce-models true)(set-option :opt.priority pareto)
+(set-logic QF_BV)(declare-const x (_ BitVec 2))(declare-const y (_ BitVec 2))
+(assert (= (bvadd x y) #b11))(maximize x)(maximize y)`)
+	for i := 0; i < 4; i++ {
+		script.WriteString(`(check-sat)(get-objectives)(get-value (x y))`)
+	}
+	script.WriteString(`(check-sat)`)
+	var output bytes.Buffer
+	if err = ParseCommands(context, strings.NewReader(script.String()), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	got := strings.Join(strings.Fields(output.String()), " ")
+	satCount := 0
+	for _, field := range strings.Fields(output.String()) {
+		if field == "sat" {
+			satCount++
+		}
+	}
+	if satCount != 4 || !strings.HasSuffix(got, "unsat") {
+		t.Fatal("bit-vector Pareto status sequence", got)
+	}
+	for x := 0; x < 4; x++ {
+		point := fmt.Sprintf("((x #b%02b) (y #b%02b))", x, 3-x)
+		if strings.Count(got, point) != 1 {
+			t.Fatal("bit-vector Pareto frontier point", point, got)
+		}
+		objective := fmt.Sprintf("(objectives (x %d) (y %d) )", x, 3-x)
+		if strings.Count(got, objective) != 1 {
+			t.Fatal("bit-vector Pareto objective", objective, got)
+		}
+	}
+}
