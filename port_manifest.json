@@ -128732,7 +128732,7 @@
       "path": "src/smt/smt_model_finder.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_model_finder.go",
         "pkg/smtcore/smt_model_finder_instantiation_set.go",
@@ -128771,18 +128771,24 @@
       "methods": [
         {
           "name": "model_finder public registration, scope, search and fix-model lifecycle surface",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder.go",
           "tests": [
-            "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle"
+            "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle",
+            "TestSMTModelFinderPublishesIsolatedSimpleMacro",
+            "TestSMTModelFinderPublishesSharedHintMacro",
+            "TestSMTModelFinderAUFProductionExtensionPreservesGroundFunction"
           ]
         },
         {
           "name": "flat quantifier, inverse lookup and instantiation-set restriction surface",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_instantiation_set.go",
           "tests": [
-            "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals"
+            "TestSMTModelFinderInstantiationSetOwnershipInverseAndRefusals",
+            "TestSMTModelFinderFlattenOwnsScopedQuantifierAndMapsOriginalBinders",
+            "TestSMTModelCheckerFlattenChecksAllBindersAndInstantiatesOriginal",
+            "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse"
           ]
         },
         {
@@ -128814,7 +128820,7 @@
         "Each auxiliary query owns fresh Skolem references, negated-body/clause references and finite-universe equality prefixes until scoped assertions take ownership. Query pop removes universe/instantiation restrictions and blocking clauses. Failed restriction allocation releases its prefix and leaves a reusable clean auxiliary scope. Production never enumerates a Cartesian product; existing standalone typed callers without an auxiliary factory retain their explicit model-enumeration contract, and the explicit no-model-finder auxiliary test retains unrestricted multi-witness enumeration. The saved complete model holds its own reference across the later restricted check, including UNKNOWN; that branch stops enumeration and uses the saved witness rather than marking the candidate exhausted."
       ],
       "deviations": [
-        "The live lifecycle includes flattened analysis, macro publication, AUF graph fixing and projections, inverse recovery and deferred witness constraints. The enclosing source-surface and ownership completeness audit remains open."
+        "The live lifecycle includes flattened analysis, macro publication, AUF graph fixing and projections, inverse recovery and deferred witness constraints. Concrete typed Go components replace the private C++ class graph; the retained public header surface and its ownership are audited."
       ]
     },
     {
