@@ -144167,7 +144167,7 @@
       "path": "src/smt/theory_diff_logic.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
@@ -144234,7 +144234,7 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -144250,8 +144250,8 @@
           ]
         },
         {
-          "name": "Basic setup_arith modes 0/1/2/3 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex or dense matrix; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
-          "status": "partial",
+          "name": "Basic setup_arith modes 0/1/2/3/4/5 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex, dense matrix, UTVPI or infinite arithmetic; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup_basic_arithmetic.go",
           "go_targets": [
             "pkg/smtcore/theory_diff_logic_real.go",
@@ -144294,8 +144294,10 @@
           ]
         },
         {
-          "name": "Equality propagation metadata, adaptive/implied-bound propagation, statistics and optimization (src/smt/theory_diff_logic.h:95-132,167-176,186-203,247-254,276-306,310-339,361-378,380-433)",
-          "status": "unported"
+          "name": "Declaration-only cheap-equality metadata, unreachable adaptive/implied-bound helpers and unused three-argument explained equality callbacks: fields have no reader, adaptive is constructor-fixed false, production context uses the ported two-argument adapter callbacks, and antecedent helpers have no caller",
+          "status": "dead_deleted",
+          "go_targets": [],
+          "tests": []
         },
         {
           "name": "Difference-logic shortened-cycle conflict publication with native extended justification and Farkas plus antecedent/result unit coefficients; source-region conflict parameter ownership through failed construction, scope pop and existing UTVPI publication",
@@ -267833,6 +267835,20 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_native_checkpoint": "17ecadb7"
+  },
+  "latest_theory_diff_logic_header_whole_audit": {
+    "source_units": [
+      "src/smt/theory_diff_logic.h"
+    ],
+    "scope": "Whole retained theory_diff_logic.h audit: concrete integer and real/mixed Go owners provide atom records, graph ownership, assertion queues, scope snapshots, setup/copy lifecycle, internalization, propagation, final checks, models, conflict publication, display, statistics and the live arbitrary-precision optimization interface. Fixed-width specializations and standalone integer-only optimization selectors are unreachable through constructor-fixed parameters. Cheap-equality metadata has no reader; adaptive scheduling is constructor-fixed false; production smt_context invokes only the ported two-argument arithmetic equality-adapter callbacks; explained three-argument callbacks and antecedent helpers have no caller. Graphs own copied numerals and scoped state, borrow immutable literals/enodes, and objective cores have explicit independent AST ownership. Full native pkg/smtcore, pkg/portcheck and retained C++-differential runner groups pass.",
+    "focused_tests": [
+      "go test ./pkg/smtcore",
+      "go test ./pkg/portcheck",
+      "go test ./pkg/cmd/g3 -run TestSMTLibRunner(Scripts|CPPReference)$"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 2,
+    "full_suite_qualification": "The whole repository suite was not rerun for this source-header promotion; the complete smtcore package and retained end-to-end runner groups passed."
   },
   "latest_theory_diff_logic_definitions_whole_audit": {
     "source_units": [
