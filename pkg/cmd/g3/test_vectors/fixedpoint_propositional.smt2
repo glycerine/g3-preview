@@ -11,5 +11,5 @@
 (rule (=> R S))
 (fixedpoint-pop)
 (query S)
-(query R)
+(query R :print-answer true)
 (query U)

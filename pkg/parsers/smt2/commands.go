@@ -168,7 +168,11 @@ func (p *commandParser) pin(value ast.ASTHandle, err error) (ast.ASTHandle, erro
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	ref, err := p.manager.NewRef(value)
+	manager, err := p.astManager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	ref, err := manager.NewRef(value)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
@@ -588,6 +592,33 @@ func (p *commandParser) command() (bool, error) {
 		if err != nil {
 			return false, err
 		}
+		printAnswer := false
+		for p.token != RightParenToken {
+			if p.token != KeywordToken {
+				return false, fmt.Errorf("fixedpoint query parameter expected")
+			}
+			key := p.scanner.ID()
+			if err = p.advance(); err != nil {
+				return false, err
+			}
+			if p.token != SymbolToken || p.scanner.ID() != "true" && p.scanner.ID() != "false" {
+				return false, fmt.Errorf("invalid fixedpoint query parameter value")
+			}
+			value := p.scanner.ID() == "true"
+			if err = p.advance(); err != nil {
+				return false, err
+			}
+			switch key {
+			case ":print-answer":
+				printAnswer = value
+			case ":print-statistics", ":print-certificate":
+				if value {
+					return false, fmt.Errorf("unsupported fixedpoint query parameter %s", key)
+				}
+			default:
+				return false, fmt.Errorf("unsupported fixedpoint query parameter %s", key)
+			}
+		}
 		if err = p.requireEnd(); err != nil {
 			return false, err
 		}
@@ -604,6 +635,11 @@ func (p *commandParser) command() (bool, error) {
 			}
 			if _, err = fmt.Fprintln(p.out, text); err != nil {
 				return false, err
+			}
+			if status == lbool.True && printAnswer {
+				if _, err = fmt.Fprintln(p.out, "true"); err != nil {
+					return false, err
+				}
 			}
 		}
 		success = false

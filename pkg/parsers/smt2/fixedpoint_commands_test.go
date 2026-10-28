@@ -46,8 +46,8 @@ func TestSMT2FixedpointPropositionalQueriesMatchCPP(t *testing.T) {
 (rule P)
 (rule (=> P Q))
 (rule (=> Q R))
-(query R)
-(query U)
+(query R :print-answer true :print-statistics false :print-certificate false)
+(query U :print-answer true)
 `
 	context, err := cmd_context.NewStandaloneContext()
 	if err != nil {
@@ -64,7 +64,7 @@ func TestSMT2FixedpointPropositionalQueriesMatchCPP(t *testing.T) {
 		t.Fatal(err)
 	}
 	cpp := fixedpointReference(t, script)
-	if output.String() != cpp || cpp != "sat\nunsat\n" {
+	if output.String() != cpp || cpp != "sat\ntrue\nunsat\n" {
 		t.Fatal("fixedpoint SMT-LIB differential", output.String(), cpp)
 	}
 }
@@ -96,5 +96,48 @@ func TestSMT2FixedpointRuleScopesMatchCPP(t *testing.T) {
 	cpp := fixedpointReference(t, script)
 	if output.String() != cpp || cpp != "unsat\n" {
 		t.Fatal("fixedpoint rule-scope differential", output.String(), cpp)
+	}
+}
+
+func TestSMT2FixedpointEmptyProgramQueryMatchesCPP(t *testing.T) {
+	script := "(declare-rel P ())\n(query P)\n"
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	context.PrintSuccess = false
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	if output.String() != cpp || cpp != "unsat\n" {
+		t.Fatal("empty fixedpoint program differential", output.String(), cpp)
+	}
+}
+
+func TestSMT2FixedpointQueryRefusesUnavailableOutputParameters(t *testing.T) {
+	for _, parameter := range []string{":print-statistics true", ":print-certificate true"} {
+		t.Run(parameter, func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				if err := context.Close(); err != nil {
+					t.Fatal(err)
+				}
+			})
+			script := "(declare-rel P ())\n(query P " + parameter + ")\n"
+			err = smt2.ParseCommands(context, strings.NewReader(script), &bytes.Buffer{})
+			if err == nil || !strings.Contains(err.Error(), "unsupported fixedpoint query parameter") {
+				t.Fatal("unavailable query output accepted", err)
+			}
+		})
 	}
 }

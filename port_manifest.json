@@ -82398,7 +82398,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2"],
-      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestPropositionalEngineScopeGuards", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
+      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestPropositionalEngineScopeGuards", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
       "assertions": [
         {
           "line": 305,
@@ -82417,11 +82417,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Narrow declare-rel, rule, and query command execution for positive zero-arity Horn programs (dl_cmds.cpp:64-313)",
+          "name": "Narrow declare-rel, rule, and query command execution for positive zero-arity Horn programs, including Boolean print-answer output (dl_cmds.cpp:64-313)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
-          "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
-
+          "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
         },
         {
           "name": "fixedpoint-push and fixedpoint-pop command dispatch with scoped rule restoration (dl_cmds.cpp:481-525)",
@@ -82434,7 +82433,7 @@
         "cmd_context.Context owns and closes the lazily created fixedpoint engine before declarations and the AST manager; parser command references are temporary and clear after the engine retains rules."
       ],
       "deviations": [
-        "This first command slice accepts declare-rel, optional rule names, and declaration queries only for the exact positive zero-arity backend. declare-var, relation representations, rule bounds, query parameters, answers, certificates, statistics, and general fixedpoint engines remain open."
+        "This first command slice accepts declare-rel, optional rule names, scoped rules, declaration queries, and exact Boolean print-answer output only for the positive zero-arity backend. declare-var, relation representations, rule bounds, non-Boolean answer forms, certificates, statistics, remaining query parameters, and general fixedpoint engines remain open; unavailable requested output is refused explicitly."
       ]
     },
     {
@@ -82443,7 +82442,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2"],
-      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
+      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
       "conditionals": [
         {
           "line": 18,
@@ -82461,8 +82460,7 @@
           "name": "Registration surface for the retained declare-rel, rule, and query command subset (dl_cmds.h:23-34)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
-          "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
-
+          "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
         },
         {
           "name": "Registration surface for retained fixedpoint-push and fixedpoint-pop commands (dl_cmds.h:23-34)",
@@ -94161,10 +94159,16 @@
         "pkg/parsers/smt2/expression_labels_test.go",
         "pkg/cmd/g3/test_vectors/expression_labels.smt2",
         "pkg/parsers/smt2/declare_map_test.go",
-        "pkg/cmd/g3/test_vectors/declare_map.smt2"
+        "pkg/cmd/g3/test_vectors/declare_map.smt2",
+        "pkg/parsers/smt2/fixedpoint_commands_test.go",
+        "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
+        "TestSMT2FixedpointEmptyProgramQueryMatchesCPP",
+        "TestSMT2FixedpointPropositionalQueriesMatchCPP",
+        "TestSMT2FixedpointRuleScopesMatchCPP",
+        "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters",
         "TestSMT2ParserPushLocalShiftsFreeVariables",
         "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders",
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
@@ -94769,6 +94773,7 @@
           ],
           "tests": [
             "TestSMT2FunctionDeclarationReferenceErrors",
+            "TestSMT2FixedpointEmptyProgramQueryMatchesCPP",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
