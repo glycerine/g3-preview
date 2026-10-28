@@ -149105,6 +149105,18 @@
           ]
         },
         {
+          "name": "integrated retained sequence path across cyclic and literal word equations, fixed lengths, positive and negative prefix/suffix relations, containment witnesses, bounded regex membership, and integer/string conversion, with scoped model restoration and C++ differential output",
+          "status": "complete",
+          "go_target": "pkg/cmd/g3/test_vectors/sequence_word_equations_relations.smt2",
+          "go_targets": [
+            "pkg/cmd/g3/main_test.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
           "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
           "status": "unported",
           "go_target": null,

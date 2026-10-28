@@ -752,6 +752,7 @@ var scriptResults = map[string]string{
 	"mixed_integer_freedom_patch.smt2":             "sat\n((x 1) (y 2))\nsat\nunsat\nsat\n",
 	"shared_linear_expression_bounds.smt2":         "unsat\nunsat\nsat\n",
 	"row_bound_propagation_scopes.smt2":            "unsat\n(x_strict y_lower blocked_sum)\nsat\n((x (/ 3.0 2.0))\n (y 2.0)\n ((+ x y) (/ 7.0 2.0)))\n",
+	"sequence_word_equations_relations.smt2":       "unsat\nsat\n((x \"aa\"))\nsat\n((x \"ab\"))\nsat\n((x \"bc\"))\nsat\n((x \"ab\"))\nsat\nunsat\nsat\nsat\nsat\nsat\nsat\nsat\n",
 	"mixed_equality_and_ite_join.smt2":             "sat\nunsat\nunsat\nunsat\nsat\n",
 	"integer_gcd_scopes.smt2":                      "unsat\nsat\n",
 	"integer_extended_gcd.smt2":                    "unsat\nsat\n",
