@@ -4,7 +4,6 @@ package fp_test
 // fixedpoint Datalog result for the positive propositional Horn fragment.
 
 import (
-	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -108,7 +107,7 @@ func TestPropositionalEngineMatchesCPPFixedpointQueries(t *testing.T) {
 	}
 }
 
-func TestPropositionalEngineRefusesNegativeHornFragments(t *testing.T) {
+func TestPropositionalEngineExecutesStratifiedNegation(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)
 	t.Cleanup(func() { fpMust(t, context.Close()) })
@@ -137,9 +136,10 @@ func TestPropositionalEngineRefusesNegativeHornFragments(t *testing.T) {
 	fpMust(t, err)
 	defer func() { fpMust(t, manager.DelRef(&formulaRef)) }()
 	fpMust(t, engine.AddRule(formula, "negative"))
-	_, err = engine.Query(applications["Q"])
-	if !errors.Is(err, fp.ErrPropositionalHorn) {
-		t.Fatal("negative Horn rule accepted", err)
+	status, err := engine.Query(applications["Q"])
+	fpMust(t, err)
+	if status != lbool.True {
+		t.Fatal("stratified negative Horn rule was not derived", status)
 	}
 }
 

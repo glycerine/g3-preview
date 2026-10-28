@@ -25,7 +25,7 @@ type predicateState struct {
 }
 
 // PropositionalEngine owns the retained rule and finite-relation managers.
-// Negation and interpreted rule tails are still refused explicitly.
+// Interpreted rule tails are still refused explicitly.
 type PropositionalEngine struct {
 	manager    *ast.ASTManager
 	rules      *base.RuleManager
@@ -192,7 +192,7 @@ func (e *PropositionalEngine) validateFragment() error {
 		uninterpreted, uErr := rule.UninterpretedTailSize()
 		tailSize, tErr := rule.TailSize()
 		x = errors.Join(x, pErr, uErr, tErr)
-		if x == nil && (positive != uninterpreted || uninterpreted != tailSize) {
+		if x == nil && (positive > uninterpreted || uninterpreted != tailSize) {
 			x = ErrPropositionalHorn
 		}
 		for j := 0; x == nil && j < uninterpreted; j++ {
@@ -287,14 +287,95 @@ func (e *PropositionalEngine) instantiate(application ast.ASTHandle, state *pred
 	return fact, nil
 }
 
+func (e *PropositionalEngine) negativeMatch(application ast.ASTHandle, state *predicateState, fact rel.Fact, binding variableBinding) (bool, error) {
+	for i, value := range fact {
+		argument, err := e.manager.GetArg(application, uint32(i))
+		if err != nil {
+			return false, err
+		}
+		kind, err := e.manager.GetKind(argument)
+		if err != nil {
+			return false, err
+		}
+		if kind == ast.ASTVar {
+			index, x := e.manager.GetVarIndex(argument)
+			if x != nil {
+				return false, x
+			}
+			bound, found := binding[index]
+			if !found {
+				return false, fmt.Errorf("%w: negative-tail variable is not bound by a positive tail", ErrPropositionalHorn)
+			}
+			if bound != value {
+				return false, nil
+			}
+			continue
+		}
+		constant, err := e.relations.EncodeValue(state.sorts[i], argument)
+		if err != nil {
+			return false, ErrPropositionalHorn
+		}
+		if constant != value {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func (e *PropositionalEngine) expandUnbound(application ast.ASTHandle, state *predicateState, bindings []variableBinding) ([]variableBinding, error) {
+	signature, err := state.table.Signature()
+	if err != nil {
+		return nil, err
+	}
+	for i := range state.sorts {
+		argument, x := e.manager.GetArg(application, uint32(i))
+		if x != nil {
+			return nil, x
+		}
+		kind, x := e.manager.GetKind(argument)
+		if x != nil {
+			return nil, x
+		}
+		if kind != ast.ASTVar {
+			continue
+		}
+		index, x := e.manager.GetVarIndex(argument)
+		if x != nil {
+			return nil, x
+		}
+		domain, x := signature.Domain(i)
+		if x != nil {
+			return nil, x
+		}
+		next := make([]variableBinding, 0)
+		for _, binding := range bindings {
+			if _, found := binding[index]; found {
+				next = append(next, binding)
+				continue
+			}
+			for value := uint64(0); value < domain; value++ {
+				expanded := cloneBinding(binding)
+				expanded[index] = rel.Element(value)
+				next = append(next, expanded)
+			}
+		}
+		bindings = next
+	}
+	return bindings, nil
+}
+
 func (e *PropositionalEngine) evaluateRule(rule *base.Rule) (changed bool, result error) {
 	defer func() { result = errors.Join(result, rule.Close()) }()
 	bindings := []variableBinding{{}}
-	tails, err := rule.TailSize()
+	positive, err := rule.PositiveTailSize()
 	if err != nil {
 		return false, err
 	}
-	for i := 0; i < tails; i++ {
+	uninterpreted, err := rule.UninterpretedTailSize()
+	if err != nil {
+		return false, err
+	}
+	for i := 0; i < positive; i++ {
 		application, negated, x := rule.Tail(i)
 		if x != nil {
 			return false, x
@@ -328,6 +409,49 @@ func (e *PropositionalEngine) evaluateRule(rule *base.Rule) (changed bool, resul
 		}
 		bindings = next
 	}
+	for i := positive; i < uninterpreted; i++ {
+		application, negated, x := rule.Tail(i)
+		if x != nil {
+			return false, x
+		}
+		if !negated {
+			return false, ErrPropositionalHorn
+		}
+		declaration, x := e.manager.GetDecl(application)
+		if x != nil {
+			return false, x
+		}
+		state := e.predicates[declaration]
+		if state == nil {
+			return false, ErrPropositionalHorn
+		}
+		bindings, x = e.expandUnbound(application, state, bindings)
+		if x != nil {
+			return false, x
+		}
+		facts, x := state.table.Facts()
+		if x != nil {
+			return false, x
+		}
+		next := make([]variableBinding, 0, len(bindings))
+		for _, binding := range bindings {
+			excluded := false
+			for _, fact := range facts {
+				matches, y := e.negativeMatch(application, state, fact, binding)
+				if y != nil {
+					return false, y
+				}
+				if matches {
+					excluded = true
+					break
+				}
+			}
+			if !excluded {
+				next = append(next, binding)
+			}
+		}
+		bindings = next
+	}
 	head, err := rule.Head()
 	if err != nil {
 		return false, err
@@ -339,6 +463,10 @@ func (e *PropositionalEngine) evaluateRule(rule *base.Rule) (changed bool, resul
 	state := e.predicates[declaration]
 	if state == nil {
 		return false, ErrPropositionalHorn
+	}
+	bindings, err = e.expandUnbound(head, state, bindings)
+	if err != nil {
+		return false, err
 	}
 	for _, binding := range bindings {
 		fact, x := e.instantiate(head, state, binding)
@@ -360,27 +488,53 @@ func (e *PropositionalEngine) saturate() error {
 			return err
 		}
 	}
-	for {
-		changed := false
-		count, err := e.set.Len()
-		if err != nil {
-			return err
+	count, err := e.set.Len()
+	if err != nil {
+		return err
+	}
+	rulesByStratum := make(map[uint32][]int)
+	var maximum uint32
+	for i := 0; i < count; i++ {
+		rule, x := e.set.Rule(i)
+		if x != nil {
+			return x
 		}
-		for i := 0; i < count; i++ {
-			rule, x := e.set.Rule(i)
-			if x != nil {
-				return x
+		head, x := rule.HeadDeclaration()
+		if x == nil {
+			var stratum uint32
+			stratum, x = e.set.PredicateStratum(head)
+			if x == nil {
+				rulesByStratum[stratum] = append(rulesByStratum[stratum], i)
+				if stratum > maximum {
+					maximum = stratum
+				}
 			}
-			added, x := e.evaluateRule(rule)
-			if x != nil {
-				return x
-			}
-			changed = changed || added
 		}
-		if !changed {
-			return nil
+		x = errors.Join(x, rule.Close())
+		if x != nil {
+			return x
 		}
 	}
+	for stratum := uint32(0); stratum <= maximum; stratum++ {
+		for {
+			changed := false
+			for _, index := range rulesByStratum[stratum] {
+				rule, x := e.set.Rule(index)
+				if x != nil {
+					return x
+				}
+				added, x := e.evaluateRule(rule)
+				if x != nil {
+					return x
+				}
+				changed = changed || added
+			}
+			if !changed {
+				break
+			}
+		}
+	}
+	return nil
 }
 
 // QueryPredicate returns true exactly when the registered predicate relation

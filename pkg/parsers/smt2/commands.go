@@ -24,7 +24,6 @@ type commandParser struct {
 	cacheEnd           int
 	out                io.Writer
 	manager            *ast.ASTManager
-	fixedpointPrintAns bool
 	refs               []ast.ASTRef
 	env                smt2LocalEnv
 	locals             localExprStack
@@ -608,7 +607,7 @@ func (p *commandParser) command() (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		printAnswer := p.fixedpointPrintAns
+		printAnswer := false
 		for p.token != RightParenToken {
 			if p.token != KeywordToken {
 				return false, fmt.Errorf("fixedpoint query parameter expected")
@@ -627,7 +626,6 @@ func (p *commandParser) command() (bool, error) {
 			switch key {
 			case ":print-answer":
 				printAnswer = value
-				p.fixedpointPrintAns = value
 			case ":print-statistics", ":print-certificate":
 				if value {
 					return false, fmt.Errorf("unsupported fixedpoint query parameter %s", key)

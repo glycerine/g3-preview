@@ -77,7 +77,7 @@ func TestSMT2FixedpointRuleScopesMatchCPP(t *testing.T) {
 (fixedpoint-push)
 (rule (=> P Q))
 (fixedpoint-pop)
-(query Q)
+(query Q :print-answer true)
 `
 	context, err := cmd_context.NewStandaloneContext()
 	if err != nil {
@@ -192,6 +192,63 @@ func TestSMT2FixedpointTupleAnswerMatchesCPP(t *testing.T) {
 	cpp := fixedpointReference(t, script)
 	if output.String() != cpp || cpp != "sat\n(or (= (:var 0) true) (= (:var 0) false))\n" {
 		t.Fatal("tuple answer differential", output.String(), cpp)
+	}
+}
+
+func TestSMT2FixedpointFiniteVariableExpansionMatchesCPP(t *testing.T) {
+	script := `(set-option :fixedpoint.engine datalog)
+(declare-var x Bool)
+(declare-rel All (Bool))
+(rule (All x))
+(query All :print-answer true)
+(declare-rel Blocked (Bool))
+(declare-rel Q (Bool))
+(declare-rel Goal ())
+(rule (Blocked true))
+(rule (=> (not (Blocked x)) (Q x)))
+(rule (=> (Q false) Goal))
+(query Goal)
+`
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	context.PrintSuccess = false
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	want := "sat\n(or (= (:var 0) false) (= (:var 0) true))\nsat\n"
+	if output.String() != cpp || cpp != want {
+		t.Fatal("finite variable expansion differential", output.String(), cpp)
+	}
+}
+
+func TestSMT2FixedpointRejectsUnstratifiedNegation(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	script := `(declare-rel P ())
+(declare-rel Q ())
+(rule (=> (not P) Q))
+(rule (=> (not Q) P))
+(query P)
+`
+	err = smt2.ParseCommands(context, strings.NewReader(script), &bytes.Buffer{})
+	if err == nil || !strings.Contains(err.Error(), "negation is not stratified") {
+		t.Fatal("unstratified negation accepted", err)
 	}
 }
 
