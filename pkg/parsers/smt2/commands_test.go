@@ -50,6 +50,38 @@ func TestSMT2ParseAssertionsIgnoresCheckCommands(t *testing.T) {
 	}
 }
 
+func TestSMT2EvalCommandMatchesCPP(t *testing.T) {
+	script := `(set-logic QF_UF)(declare-const p Bool)(check-sat)
+(eval p)(eval p :completion true)(eval p)`
+	c, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := c.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	var output bytes.Buffer
+	if err = ParseCommands(c, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	if want := "sat\np\nfalse\nfalse\n"; output.String() != want {
+		t.Fatal("eval output", output.String(), want)
+	}
+	if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
+		command := exec.Command(reference, "-in")
+		command.Stdin = strings.NewReader(script)
+		cpp, err := command.Output()
+		if err != nil {
+			t.Fatal(err, string(cpp))
+		}
+		if output.String() != string(cpp) {
+			t.Fatal("C++ eval differential", output.String(), string(cpp))
+		}
+	}
+}
+
 func testArithmeticStrategicDIMACS(t *testing.T, logic string) {
 	t.Helper()
 	c, err := cmd_context.NewStandaloneContext()

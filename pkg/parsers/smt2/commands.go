@@ -620,6 +620,31 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		success = false
+	case "eval":
+		expression, _, err := p.expression()
+		if err != nil {
+			return false, err
+		}
+		completion := false
+		for p.token != RightParenToken {
+			if p.token != KeywordToken || p.scanner.ID() != ":completion" {
+				return false, fmt.Errorf("invalid keyword argument")
+			}
+			if err = p.advance(); err != nil {
+				return false, err
+			}
+			if p.token != SymbolToken || p.scanner.ID() != "true" && p.scanner.ID() != "false" {
+				return false, fmt.Errorf("invalid parameter value, true or false expected")
+			}
+			completion = p.scanner.ID() == "true"
+			if err = p.advance(); err != nil {
+				return false, err
+			}
+		}
+		if err = p.context.WriteEvaluation(p.out, expression, completion); err != nil {
+			return false, err
+		}
+		success = false
 	case "get-consequences":
 		assumptions, err := p.expressions()
 		if err != nil {

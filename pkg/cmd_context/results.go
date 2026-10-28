@@ -65,6 +65,25 @@ func (c *Context) Evaluate(expression ast.ASTHandle, completion bool) (result as
 	return evaluator.EvaluateValue(expression)
 }
 
+// WriteEvaluation evaluates one expression and prints its value using the
+// command context's SMT-LIB expression printer.
+func (c *Context) WriteEvaluation(out io.Writer, expression ast.ASTHandle, completion bool) (resultErr error) {
+	value, err := c.Evaluate(expression, completion)
+	if err != nil {
+		return err
+	}
+	defer func() { resultErr = errors.Join(resultErr, c.manager.DelRef(&value)) }()
+	handle, err := c.manager.RefGet(value)
+	if err != nil {
+		return err
+	}
+	if err = c.WriteExpression(out, handle); err != nil {
+		return err
+	}
+	_, err = io.WriteString(out, "\n")
+	return err
+}
+
 func (c *Context) WriteAssertions(out io.Writer) error {
 	if err := c.valid(); err != nil {
 		return err

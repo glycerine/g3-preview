@@ -43627,9 +43627,9 @@
       "path": "src/cmd_context/eval_cmd.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/cmd_context/results.go"],
+      "tests": ["TestSMT2EvalCommandMatchesCPP"],
       "assertions": [
         {
           "line": 66,
@@ -43638,7 +43638,15 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "eval command expression evaluation, model availability guard, completion parameter, and SMT-LIB result printing; timeout, rlimit, cache, array-equality, and box-model-index parameters remain open",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/results.go",
+          "go_targets": ["pkg/parsers/smt2/commands.go"],
+          "tests": ["TestSMT2EvalCommandMatchesCPP"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
