@@ -1,12 +1,35 @@
-// Source: src/smt/smt_theory.cpp:60-114 display_app/display_flat_app.
 package smtcore
 
+// Source: src/smt/smt_theory.cpp:60-114 display_app/display_flat_app.
+
 import (
+	"fmt"
 	"io"
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
+
+// DisplayVariableEnodes is theory::display_var2enode. Variable order is the
+// theory's creation order and each enode is borrowed from the live context.
+func (t *SMTTheoryBase) DisplayVariableEnodes(out io.Writer) error {
+	if _, err := t.State(); err != nil {
+		return err
+	}
+	if out == nil {
+		return ast.ErrASTHandle
+	}
+	for variable, node := range t.variables {
+		id, err := node.OwnerID()
+		if err != nil {
+			return err
+		}
+		if err = smtWriteTheoryText(out, fmt.Sprintf("v%d -> #%d\n", variable, id)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func smtWriteTheoryText(out io.Writer, text string) error {
 	n, err := io.WriteString(out, text)

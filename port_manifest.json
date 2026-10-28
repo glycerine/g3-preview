@@ -132721,14 +132721,17 @@
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_model_value.go",
         "pkg/smtcore/smt_theory_display.go",
-        "pkg/smtcore/theory_lra_display_test.go"
+        "pkg/smtcore/theory_lra_display_test.go",
+        "pkg/smtcore/theory_dense_diff_display.go",
+        "pkg/smtcore/theory_dense_diff_display_test.go"
       ],
       "tests": [
         "TestSMTSearchEqualityArithmeticConventions",
         "TestSMTTheoryInternalizationCallbacksVariablesAndScopes",
         "TestSMTTheoryAttachmentQueuesEqualityAndDisequalityEvents",
         "TestSMTTheoryBaseConstructsEqualityLiteral",
-        "TestSMTTheoryDisplayFlatSourceStackAndForeignApplications"
+        "TestSMTTheoryDisplayFlatSourceStackAndForeignApplications",
+        "TestSMTDenseDifferenceDisplayThroughContext"
       ],
       "assertions": [
         {
@@ -132789,7 +132792,7 @@
           ]
         },
         {
-          "name": "display helpers, shared equality assumptions, and reset",
+          "name": "shared equality assumptions and reset",
           "status": "reference_only",
           "go_target": null,
           "tests": []
@@ -132801,6 +132804,18 @@
           "tests": [
             "TestSMTTheoryDisplayFlatSourceStackAndForeignApplications"
           ]
+        },
+        {
+          "name": "display_var2enode theory-variable mapping",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_display.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dense_diff_display.go",
+            "pkg/smtcore/theory_dense_diff_display_test.go"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceDisplayThroughContext"
+          ]
         }
       ],
       "ownership": [
@@ -132808,7 +132823,7 @@
         "Diagnostic output borrows AST heads/parameters and existing solver/cache owners. Rational parameter insertion uses the retained numeral service; Go character/formatting slices acquire no fictitious charged source owner. Exact writer prefixes, nil/closed guards and successful cleanup are checked. Cached term display can insert zero-valued missing proper columns, matching source."
       ],
       "deviations": [
-        "Only methods consumed by the retained internalizer are exposed. Display and shared-assumption helpers have no Go caller; solver state teardown replaces resetting and reusing an attached theory object.",
+        "Only methods consumed by retained theories and the internalizer are exposed. Shared-assumption helpers have no additional Go caller; solver state teardown replaces resetting and reusing an attached theory object.",
         "Bounded diagnostic increment only: source flags/status remain unchanged. Go io.Writer errors/short writes stop the current display. Associative flattening preserves native LIFO deferral, private parameters are included and foreign nonconstants use AST IDs. Source trace call sites/display_evidence and checked validation routines remain outside this increment; no whole LRA/smtcore completion credit."
       ]
     },
@@ -132838,7 +132853,9 @@
         "pkg/smtcore/smt_quantifier_manager.go",
         "pkg/smtcore/theory_lra_direct_value_test.go",
         "pkg/smtcore/smt_theory_display.go",
-        "pkg/smtcore/theory_lra_display_test.go"
+        "pkg/smtcore/theory_lra_display_test.go",
+        "pkg/smtcore/theory_dense_diff_display.go",
+        "pkg/smtcore/theory_dense_diff_display_test.go"
       ],
       "tests": [
         "TestSMTSearchEqualityArithmeticConventions",
@@ -132857,7 +132874,8 @@
         "TestSMTLRADirectValueIntegerAndStoppedOwnerGuards",
         "TestSMTLRADirectValueManagedQuickChecker",
         "TestSMTLRADirectValueQuickCheckerRootsEveryArgument",
-        "TestSMTTheoryDisplayFlatSourceStackAndForeignApplications"
+        "TestSMTTheoryDisplayFlatSourceStackAndForeignApplications",
+        "TestSMTDenseDifferenceDisplayThroughContext"
       ],
       "conditionals": [
         {
@@ -132964,6 +132982,18 @@
           "go_target": "pkg/smtcore/smt_theory_display.go",
           "tests": [
             "TestSMTTheoryDisplayFlatSourceStackAndForeignApplications"
+          ]
+        },
+        {
+          "name": "display_var2enode retained theory-variable mapping used by concrete theory diagnostics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_theory_display.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dense_diff_display.go",
+            "pkg/smtcore/theory_dense_diff_display_test.go"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceDisplayThroughContext"
           ]
         }
       ],
@@ -142705,7 +142735,9 @@
         "pkg/smtcore/smt_setup_rdl_test.go",
         "pkg/smtcore/smt_setup_ufidl_test.go",
         "pkg/smtcore/theory_dense_diff_objective.go",
-        "pkg/smtcore/theory_diff_logic_objective.go"
+        "pkg/smtcore/theory_diff_logic_objective.go",
+        "pkg/smtcore/theory_dense_diff_display.go",
+        "pkg/smtcore/theory_dense_diff_display_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -142725,7 +142757,9 @@
         "TestSMTDenseObjectiveSourceIndexAndCompilerDomains",
         "TestSMTDenseObjectiveCoreOwnsScopedExpressions",
         "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker",
-        "TestSMTDenseObjectiveNativeOptimizationCaller"
+        "TestSMTDenseObjectiveNativeOptimizationCaller",
+        "TestSMTDenseDifferenceDisplayInfinitesimalText",
+        "TestSMTDenseDifferenceDisplayThroughContext"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -142770,6 +142804,19 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "display/display_atom exact variable, matrix-edge, infinitesimal and Boolean-assignment diagnostics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dense_diff_display.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_display.go",
+            "pkg/smtcore/theory_dense_diff_display_test.go"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceDisplayInfinitesimalText",
+            "TestSMTDenseDifferenceDisplayThroughContext"
+          ]
         },
         {
           "name": "QF_RDL default and static setup: reject non-difference/integer/UF features, preserve first-push mixed simplex, choose mixed simplex for proofs/explicit simplex/arithmetic-dominant/ITE inputs, dense matrix for dense input, and real difference graph with binary bounds for the Boolean-rich sparse route; AS_OPTINF backend mode remains outside this increment",
@@ -142838,7 +142885,9 @@
         "pkg/smtcore/smt_setup_rdl_test.go",
         "pkg/smtcore/smt_setup_ufidl_test.go",
         "pkg/smtcore/theory_dense_diff_objective.go",
-        "pkg/smtcore/theory_diff_logic_objective.go"
+        "pkg/smtcore/theory_diff_logic_objective.go",
+        "pkg/smtcore/theory_dense_diff_display.go",
+        "pkg/smtcore/theory_dense_diff_display_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -142858,7 +142907,9 @@
         "TestSMTDenseObjectiveSourceIndexAndCompilerDomains",
         "TestSMTDenseObjectiveCoreOwnsScopedExpressions",
         "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker",
-        "TestSMTDenseObjectiveNativeOptimizationCaller"
+        "TestSMTDenseObjectiveNativeOptimizationCaller",
+        "TestSMTDenseDifferenceDisplayInfinitesimalText",
+        "TestSMTDenseDifferenceDisplayThroughContext"
       ],
       "conditionals": [
         {
@@ -142929,6 +142980,19 @@
           "tests": []
         },
         {
+          "name": "display/display_atom exact variable, matrix-edge, infinitesimal and Boolean-assignment diagnostics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dense_diff_display.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_display.go",
+            "pkg/smtcore/theory_dense_diff_display_test.go"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceDisplayInfinitesimalText",
+            "TestSMTDenseDifferenceDisplayThroughContext"
+          ]
+        },
+        {
           "name": "QF_RDL default and static setup: reject non-difference/integer/UF features, preserve first-push mixed simplex, choose mixed simplex for proofs/explicit simplex/arithmetic-dominant/ITE inputs, dense matrix for dense input, and real difference graph with binary bounds for the Boolean-rich sparse route; AS_OPTINF backend mode remains outside this increment",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
@@ -142993,7 +143057,9 @@
         "pkg/smtcore/smt_setup_rdl_test.go",
         "pkg/smtcore/smt_setup_ufidl_test.go",
         "pkg/smtcore/theory_dense_diff_objective.go",
-        "pkg/smtcore/theory_diff_logic_objective.go"
+        "pkg/smtcore/theory_diff_logic_objective.go",
+        "pkg/smtcore/theory_dense_diff_display.go",
+        "pkg/smtcore/theory_dense_diff_display_test.go"
       ],
       "tests": [
         "TestSMTDenseDifferenceClosureExplanationsAndRollback",
@@ -143011,7 +143077,9 @@
         "TestSMTDenseObjectiveSourceIndexAndCompilerDomains",
         "TestSMTDenseObjectiveCoreOwnsScopedExpressions",
         "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker",
-        "TestSMTDenseObjectiveNativeOptimizationCaller"
+        "TestSMTDenseObjectiveNativeOptimizationCaller",
+        "TestSMTDenseDifferenceDisplayInfinitesimalText",
+        "TestSMTDenseDifferenceDisplayThroughContext"
       ],
       "conditionals": [
         {
@@ -143188,6 +143256,19 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "display/display_atom exact variable, matrix-edge, infinitesimal and Boolean-assignment diagnostics",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dense_diff_display.go",
+          "go_targets": [
+            "pkg/smtcore/smt_theory_display.go",
+            "pkg/smtcore/theory_dense_diff_display_test.go"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceDisplayInfinitesimalText",
+            "TestSMTDenseDifferenceDisplayThroughContext"
+          ]
         },
         {
           "name": "QF_RDL default and static setup: reject non-difference/integer/UF features, preserve first-push mixed simplex, choose mixed simplex for proofs/explicit simplex/arithmetic-dominant/ITE inputs, dense matrix for dense input, and real difference graph with binary bounds for the Boolean-rich sparse route; AS_OPTINF backend mode remains outside this increment",
