@@ -112,6 +112,49 @@ func TestPropositionalEngineMatchesCPPFixedpointQueries(t *testing.T) {
 	}
 }
 
+func TestPropositionalEngineCompilesSimpleJoinNormalization(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngine(manager)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	applications := make([]ast.ASTHandle, 4)
+	for index, name := range []string{"A", "B", "C", "Goal"} {
+		symbol, x := manager.Symbols.Intern("simple-join-" + name)
+		fpMust(t, x)
+		declaration, x := manager.MkFuncDecl(symbol, nil, boolean, ast.ASTFuncDeclInfo{})
+		fpMust(t, x)
+		applications[index], x = manager.MkApp(declaration, nil)
+		fpMust(t, x)
+		fpMust(t, engine.RegisterPredicate(declaration))
+	}
+	for index := 0; index < 3; index++ {
+		fpMust(t, engine.AddRule(applications[index], "simple-join-fact"))
+	}
+	first, err := manager.MkAnd(applications[0], applications[1])
+	fpMust(t, err)
+	body, err := manager.MkAnd(first, applications[2])
+	fpMust(t, err)
+	rule, err := manager.MkImplies(body, applications[3])
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(rule, "simple-join-goal"))
+	status, err := engine.Query(applications[3])
+	fpMust(t, err)
+	if status != lbool.True {
+		t.Fatal("three-tail rule was not derived", status)
+	}
+	compiled, err := engine.LastQueryUsedCompiledCode()
+	fpMust(t, err)
+	if !compiled {
+		t.Fatal("simple-join normalization bypassed relational bytecode")
+	}
+}
+
 func TestPropositionalEngineExecutesStratifiedNegation(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)

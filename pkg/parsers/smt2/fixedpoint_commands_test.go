@@ -193,6 +193,42 @@ func TestSMT2FixedpointTwoTailJoinMatchesCPP(t *testing.T) {
 	}
 }
 
+func TestSMT2FixedpointSimpleJoinNormalizationMatchesCPP(t *testing.T) {
+	script := `(set-option :fixedpoint.engine datalog)
+	(declare-rel A (Bool Bool))
+(declare-rel B (Bool Bool))
+(declare-rel C (Bool Bool))
+(declare-rel Goal (Bool Bool))
+(declare-var w Bool)
+(declare-var x Bool)
+(declare-var y Bool)
+(declare-var z Bool)
+(rule (A true false))
+(rule (B false true))
+(rule (C true false))
+(rule (=> (and (A x y) (B y z) (C z w)) (Goal x w)))
+(query Goal)
+`
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	context.PrintSuccess = false
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	if output.String() != cpp || cpp != "sat\n" {
+		t.Fatal("simple-join fixedpoint SMT-LIB differential", output.String(), cpp)
+	}
+}
+
 func TestSMT2FixedpointRecursiveClosureMatchesCPP(t *testing.T) {
 	script := `(set-option :fixedpoint.engine datalog)
 (declare-rel Edge (Bool Bool))

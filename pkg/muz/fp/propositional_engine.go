@@ -13,6 +13,7 @@ import (
 	astrewriter "github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/rel"
+	"github.com/glycerine/g3/pkg/muz/transforms"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -232,6 +233,31 @@ func (e *PropositionalEngine) validateFragment() error {
 		if x != nil {
 			return x
 		}
+	}
+	return nil
+}
+
+func (e *PropositionalEngine) normalizeSimpleJoins() (resultErr error) {
+	plugin := transforms.NewSimpleJoinsPlugin(e.manager, e.rules, 0)
+	transformer := base.NewRuleTransformer()
+	if err := transformer.Register(plugin); err != nil {
+		return errors.Join(err, transformer.Close())
+	}
+	defer func() { resultErr = errors.Join(resultErr, transformer.Close()) }()
+	modified, err := transformer.Apply(e.set)
+	if err != nil || !modified {
+		return err
+	}
+	for _, declaration := range plugin.FreshPredicates() {
+		sorts, _, x := e.relations.PredicateSignature(declaration)
+		if x != nil {
+			return x
+		}
+		table, x := e.relations.GetRelation(declaration)
+		if x != nil {
+			return x
+		}
+		e.predicates[declaration] = &predicateState{sorts: sorts, table: table}
 	}
 	return nil
 }
@@ -1008,6 +1034,9 @@ func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.L
 		if !valid {
 			return lbool.Undef, fmt.Errorf("muz/fp: negation is not stratified")
 		}
+	}
+	if err = e.normalizeSimpleJoins(); err != nil {
+		return lbool.Undef, err
 	}
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
