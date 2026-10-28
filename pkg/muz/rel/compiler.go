@@ -78,6 +78,8 @@ type finiteCompiler struct {
 	constants     map[constantRegisterKey]uint32
 	totals        map[totalRegisterKey]uint32
 	emptyTotals   map[ast.ASTHandle]uint32
+	markOrder     []ast.ASTHandle
+	marked        map[ast.ASTHandle]bool
 }
 
 func newFiniteCompiler(relations *RelationManager, guard *astrewriter.TheoryRewriter) (*finiteCompiler, error) {
@@ -91,6 +93,7 @@ func newFiniteCompiler(relations *RelationManager, guard *astrewriter.TheoryRewr
 		constants:     make(map[constantRegisterKey]uint32),
 		totals:        make(map[totalRegisterKey]uint32),
 		emptyTotals:   make(map[ast.ASTHandle]uint32),
+		marked:        make(map[ast.ASTHandle]bool),
 	}, nil
 }
 
@@ -1199,6 +1202,21 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 		if len(group) == 0 {
 			continue
 		}
+		allSaturated := true
+		for _, rule := range group {
+			head, x := c.manager.GetDecl(rule.head)
+			if x != nil {
+				return x
+			}
+			done, x := c.relations.IsSaturated(head)
+			if x != nil {
+				return x
+			}
+			allSaturated = allSaturated && done
+		}
+		if allSaturated {
+			continue
+		}
 		ordered, x := c.orderRules(group)
 		if x != nil {
 			if !errors.Is(x, ErrCompilerUnsupported) {
@@ -1207,16 +1225,35 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 			if x = c.compileRecursive(group); x != nil {
 				return x
 			}
-			continue
+		} else {
+			for _, rule := range ordered {
+				if x = c.compileRule(rule, VoidRegister, [2]uint32{VoidRegister, VoidRegister}); x != nil {
+					return x
+				}
+			}
 		}
-		for _, rule := range ordered {
-			if x = c.compileRule(rule, VoidRegister, [2]uint32{VoidRegister, VoidRegister}); x != nil {
+		for _, rule := range group {
+			head, x := c.manager.GetDecl(rule.head)
+			if x != nil {
 				return x
+			}
+			if !c.marked[head] {
+				c.marked[head] = true
+				c.markOrder = append(c.markOrder, head)
 			}
 		}
 	}
 	for _, predicate := range c.loaded {
 		instruction, x := NewStoreInstruction(c.relations, predicate, c.predicateRegs[predicate])
+		if x != nil {
+			return x
+		}
+		if x = c.append(c.termination, instruction, nil); x != nil {
+			return x
+		}
+	}
+	for _, predicate := range c.markOrder {
+		instruction, x := NewMarkSaturatedInstruction(c.relations, predicate)
 		if x != nil {
 			return x
 		}

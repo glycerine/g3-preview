@@ -15,6 +15,7 @@ import (
 type RelationManager struct {
 	manager   *ast.ASTManager
 	relations map[ast.ASTHandle]*HashTable
+	saturated map[ast.ASTHandle]bool
 	closed    bool
 }
 
@@ -25,14 +26,32 @@ func NewRelationManager(manager *ast.ASTManager) (*RelationManager, error) {
 	if err := manager.RegisterDeclarationPlugins(); err != nil {
 		return nil, err
 	}
-	return &RelationManager{manager: manager, relations: make(map[ast.ASTHandle]*HashTable)}, nil
+	return &RelationManager{manager: manager, relations: make(map[ast.ASTHandle]*HashTable), saturated: make(map[ast.ASTHandle]bool)}, nil
 }
 
 func (m *RelationManager) open() error {
-	if m == nil || m.closed || m.manager == nil || m.relations == nil {
+	if m == nil || m.closed || m.manager == nil || m.relations == nil || m.saturated == nil {
 		return ErrTable
 	}
 	return nil
+}
+
+func (m *RelationManager) MarkSaturated(predicate ast.ASTHandle) error {
+	if err := m.open(); err != nil {
+		return err
+	}
+	if _, _, err := m.PredicateSignature(predicate); err != nil {
+		return err
+	}
+	m.saturated[predicate] = true
+	return nil
+}
+
+func (m *RelationManager) IsSaturated(predicate ast.ASTHandle) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	return m.saturated[predicate], nil
 }
 
 // TryGetRelation returns the borrowed table stored for predicate.
@@ -103,6 +122,7 @@ func (m *RelationManager) ResetRelations() (result error) {
 		result = errors.Join(result, err)
 		if consumed {
 			delete(m.relations, predicate)
+			delete(m.saturated, predicate)
 		}
 	}
 	return result
@@ -122,6 +142,7 @@ func (m *RelationManager) Close() (result error) {
 	m.closed = true
 	m.manager = nil
 	m.relations = nil
+	m.saturated = nil
 	return result
 }
 

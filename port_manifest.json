@@ -84417,7 +84417,7 @@
         "CompileFiniteRules transfers two instruction blocks to its caller. Each generated rule instruction retains its Rule accounting parent; load/store instructions retain predicate declarations; every partial compilation failure closes all generated instructions and owned references before returning."
       ],
       "deviations": [
-        "The compiler currently accepts stratified finite rules with zero, one, or two positive tails, negated predicate anti-joins, theory-rewritten interpreted finite filters, complete structural head assembly, and recursive semi-naive least-fixpoint loops grouped by finalized predicate stratum. Widening, saturation marks, finer SCC/local-delta partitioning, and wider multi-tail joins remain open; unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
+        "The compiler currently accepts stratified finite rules with zero, one, or two positive tails, negated predicate anti-joins, theory-rewritten interpreted finite filters, complete structural head assembly, recursive semi-naive least-fixpoint loops grouped by finalized predicate stratum, and post-store saturation marks reused by later queries. Widening and finer SCC/local-delta partitioning remain open; wider bodies are normalized by the simple-joins transformer. Unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
       ]
     },
     {
@@ -84457,7 +84457,7 @@
         "The Go compiler uses concrete finite HashTable registers and typed AST handles; it does not port the unused C++ container/template machinery. Returned blocks own all generated instructions."
       ],
       "deviations": [
-        "Only the live stratified finite-rule slice with up to two positive tails is exposed; recursive loops use semi-naive tail deltas within finalized strata and interpreted finite filters reuse the borrowed theory rewriter. Finer SCC/local-delta partitioning, wider multi-tail joins, widening, and saturation marks remain open with the source unit marked partial."
+        "Only the live stratified finite-rule slice with up to two positive tails is exposed; recursive loops use semi-naive tail deltas within finalized strata, interpreted finite filters reuse the borrowed theory rewriter, and successful termination marks stored strata saturated. Finer SCC/local-delta partitioning and widening remain open with the source unit marked partial."
       ]
     },
     {
@@ -84937,7 +84937,7 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_construct.go", "pkg/muz/rel/instruction_interpreted.go", "pkg/muz/rel/instruction_io.go", "pkg/muz/rel/instruction_loop.go", "pkg/muz/rel/instruction_table.go"],
+      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_construct.go", "pkg/muz/rel/instruction_interpreted.go", "pkg/muz/rel/instruction_io.go", "pkg/muz/rel/instruction_loop.go", "pkg/muz/rel/instruction_saturation.go", "pkg/muz/rel/instruction_table.go"],
       "tests": ["TestFiniteRelationConstructionInstructions", "TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions", "TestRelationInstructionsLoadCloneAndStoreOwnership", "TestUnarySingletonInstructionRejectsOutOfDomainValue", "TestWhileInstructionExecutesUntilControlsEmpty", "TestWhileInstructionPropagatesBodyTerminationAndOwnsBody"],
       "assertions": [
         {
@@ -84945,6 +84945,12 @@
           "status": "ported",
           "go_target": "pkg/muz/rel/instruction_interpreted.go",
           "tests": ["TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2"]
+        },
+        {
+          "name": "Post-store predicate saturation marker with retained declaration lifetime (dl_instruction.cpp:997-1007)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/instruction_saturation.go",
+          "tests": ["TestFiniteCompilerSaturatesRecursiveRules", "TestPropositionalEngineMatchesCPPFixedpointQueries"]
         },
         {
           "line": 103,
@@ -85009,7 +85015,7 @@
         "ExecutionContext owns register tables and move transfers the exact pointer while clone creates an independent table. Load clones the stored relation; store transfers its register table into RelationManager and empties the register. Relation I/O instructions retain their predicate declarations. InstructionBlock owns and closes instructions in source order; each instruction owns its AccountedObject. WhileInstruction owns and closes its nested body."
       ],
       "deviations": [
-        "The execution context currently retains finite HashTable registers, a borrowed finite RelationManager, a borrowed theory rewriter for interpreted filters, and caller-supplied termination only. Timers, operation-function caches, saturation markers, and non-table relation implementations stay open."
+        "The execution context currently retains finite HashTable registers, a borrowed finite RelationManager, a borrowed theory rewriter for interpreted filters, and caller-supplied termination only. Timers, operation-function caches, and non-table relation implementations stay open."
       ]
     },
     {
@@ -86000,6 +86006,12 @@
           "tests": ["TestRelationManagerOwnsStoredPredicateRelations", "TestRelationInstructionsLoadCloneAndStoreOwnership"]
         },
         {
+          "name": "Predicate saturation state publication, lookup, and reset for completed finite strata (dl_relation_manager.cpp:121-139)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/relation_manager.go",
+          "tests": ["TestFiniteCompilerSaturatesRecursiveRules", "TestPropositionalEngineMatchesCPPFixedpointQueries"]
+        },
+        {
           "name": "Finite predicate-domain to table signature conversion and Bool/bit-vector/Datalog finite numeral fact conversion in both directions (dl_relation_manager.cpp:373-451)",
           "status": "ported",
           "go_target": "pkg/muz/rel/relation_manager.go",
@@ -86013,7 +86025,7 @@
         }
       ],
       "ownership": [
-        "RelationManager borrows its AST manager, owns stored finite tables, and retains each stored predicate declaration until reset or close. Encode paths return caller-owned Go facts; decode paths return explicit owning AST references and release partial results on failure."
+        "RelationManager borrows its AST manager, owns stored finite tables and saturation state, and retains each stored predicate declaration until reset or close. Encode paths return caller-owned Go facts; decode paths return explicit owning AST references and release partial results on failure."
       ],
       "deviations": [
         "Plugin registration/selection, the general operation-factory hierarchy, functional tables, and non-table relation implementations remain open. Retained concrete finite-table storage and operations are exposed directly. Only bounded finite sorts with concrete native numeral encodings are accepted."

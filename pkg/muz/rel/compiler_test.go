@@ -610,6 +610,12 @@ func TestFiniteCompilerSaturatesRecursiveRules(t *testing.T) {
 	if err != nil || !complete {
 		t.Fatal("recursive termination", complete, err)
 	}
+	for _, predicate := range []ast.ASTHandle{edge, path} {
+		saturated, x := relations.IsSaturated(predicate)
+		if x != nil || !saturated {
+			t.Fatal("recursive predicate not marked saturated", predicate, saturated, x)
+		}
+	}
 	table, found, err := relations.TryGetRelation(path)
 	if err != nil || !found || table == nil {
 		t.Fatal("recursive path relation", table, found, err)

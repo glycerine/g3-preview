@@ -971,11 +971,6 @@ func (e *PropositionalEngine) tryCompiledSaturation() (used bool, resultErr erro
 	defer func() {
 		resultErr = errors.Join(resultErr, execution.Close(), termination.Close(), context.Close())
 	}()
-	for _, state := range e.predicates {
-		if err = state.table.Reset(); err != nil {
-			return true, err
-		}
-	}
 	complete, err := execution.Perform(context)
 	if err != nil {
 		return true, err
