@@ -1,5 +1,6 @@
-// Source: src/cmd_context/cmd_context.cpp cmd_context::insert_rec_fun.
 package cmd_context
+
+// Source: src/cmd_context/cmd_context.cpp cmd_context::insert_rec_fun.
 
 import (
 	"errors"

@@ -1,7 +1,8 @@
+package cmd_context
+
 // Source: src/cmd_context/basic_cmds.cpp get-value, get-proof and
 // get-unsat-core; cmd_context.cpp result availability checks.
 // Original get-value term text follows smt2parser.cpp parse_get_value.
-package cmd_context
 
 import (
 	"errors"

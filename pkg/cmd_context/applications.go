@@ -1,6 +1,7 @@
+package cmd_context
+
 // Source: src/cmd_context/cmd_context.cpp init_manager, mk_app and
 // find_func_decl. Builtin names come from the retained declaration plugins.
-package cmd_context
 
 import (
 	"fmt"

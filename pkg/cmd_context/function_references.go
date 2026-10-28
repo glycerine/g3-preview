@@ -1,5 +1,6 @@
-// Source: src/cmd_context/cmd_context.cpp find_func_decl overloads.
 package cmd_context
+
+// Source: src/cmd_context/cmd_context.cpp find_func_decl overloads.
 
 import (
 	"errors"

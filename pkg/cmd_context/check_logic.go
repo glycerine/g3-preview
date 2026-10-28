@@ -1,7 +1,8 @@
+package cmd_context
+
 // Source: src/cmd_context/check_logic.cpp/.h. This validates the source logic
 // profiles, including their intentional permissive cases; it is not an SMT-LIB
 // standards checker.
-package cmd_context
 
 import (
 	"errors"

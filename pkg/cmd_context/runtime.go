@@ -1,5 +1,6 @@
-// Source: src/cmd_context/cmd_context.cpp init_manager and reset ownership.
 package cmd_context
+
+// Source: src/cmd_context/cmd_context.cpp init_manager and reset ownership.
 
 import (
 	"errors"

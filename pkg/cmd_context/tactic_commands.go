@@ -1,6 +1,7 @@
+package cmd_context
+
 // Source: src/cmd_context/tactic_cmds.cpp check_sat_using_tactict_cmd;
 // src/cmd_context/cmd_context_to_goal.cpp assert_exprs_from.
-package cmd_context
 
 import (
 	"errors"

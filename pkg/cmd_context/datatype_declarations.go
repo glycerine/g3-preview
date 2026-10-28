@@ -1,6 +1,7 @@
+package cmd_context
+
 // Source: src/cmd_context/cmd_context.cpp dt_eh::operator(), concrete datatype
 // instantiations. Parametric declaration owners remain a separate parser port.
-package cmd_context
 
 import (
 	"errors"

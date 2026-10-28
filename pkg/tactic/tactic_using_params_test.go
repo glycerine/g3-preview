@@ -1,5 +1,6 @@
-// Source: src/tactic/tactical.cpp:1158-1188.
 package tactic
+
+// Source: src/tactic/tactical.cpp:1158-1188.
 
 import (
 	"testing"
@@ -55,5 +56,29 @@ func TestUsingParamsAppliesStoredOverridesAtConstructionAndUpdate(t *testing.T) 
 	astTestMust(t, wrapper.UpdateParams(&outer))
 	if len(child.seen) != 2 || child.seen[1] != [2]uint32{7, 11} {
 		t.Fatal("stored parameter precedence", child.seen)
+	}
+}
+
+func TestNestedUsingParamsKeepsInnermostOverride(t *testing.T) {
+	context, _, _ := paramsTestOwner(t)
+	key := "fixed"
+	innerParams, err := context.NewValue()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, context.Del(&innerParams)) })
+	astTestMust(t, context.SetUIntName(&innerParams, &key, 7))
+	outerParams, err := context.NewValue()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, context.Del(&outerParams)) })
+	astTestMust(t, context.SetUIntName(&outerParams, &key, 3))
+	child := &paramsRecordingTactic{primitiveTactic: newPrimitiveTactic(primitiveSkip, "", 0), context: context, fixed: key}
+	inner, err := NewUsingParamsTactic(context, child, &innerParams)
+	astTestMust(t, err)
+	tacticOwnForTest(t, inner)
+	outer, err := NewUsingParamsTactic(context, inner, &outerParams)
+	astTestMust(t, err)
+	tacticOwnForTest(t, outer)
+	astTestMust(t, outer.UpdateParams(&outerParams))
+	if got := child.seen[len(child.seen)-1][0]; got != 7 {
+		t.Fatal("outer update replaced innermost fixed parameter", got)
 	}
 }

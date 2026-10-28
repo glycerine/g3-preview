@@ -1,6 +1,7 @@
+package cmd_context
+
 // Source: src/cmd_context/cmd_context.cpp macro_decls, insert, macros_find,
 // erase_macro and mk_app; src/ast/ast.cpp compatible_sorts.
-package cmd_context
 
 import (
 	"errors"

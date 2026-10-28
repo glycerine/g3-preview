@@ -190,6 +190,8 @@ type SMTLinearArithmeticTheory struct {
 	nonlinearRounds     uint32
 	nonlinearRoundLimit uint32
 	nonlinearRandom     z3rand.Generator
+	replayStatsEpoch    uint64
+	replayStatsCounted  uint64
 	delta               big.Rat
 	equalityAdapter     *smtArithmeticEqualityAdapter
 	statistics          smtLinearArithmeticStatistics
@@ -800,6 +802,7 @@ func (t *SMTLinearArithmeticTheory) Assign(variable int32, truth bool) error {
 		t.statistics.assertUpper++
 	}
 	t.assertions = append(t.assertions, smtIntegerDiffAssertion{atom: index, truth: truth})
+	t.replayStatsEpoch++
 	return nil
 }
 
@@ -1532,7 +1535,13 @@ func (t *SMTLinearArithmeticTheory) buildSimplexReplay(values map[uint32]*big.Ra
 	if err != nil {
 		return nil, lbool.Undef, err
 	}
-	t.statistics.pivots += uint64(solver.Stats.NumPivots)
+	// Every Go replay reconstructs the complete current tableau. Multiple
+	// source stages may inspect the same assigned state, but native arithmetic
+	// keeps one tableau and does not count those reconstructions as new pivots.
+	if t.replayStatsCounted != t.replayStatsEpoch {
+		t.statistics.pivots += uint64(solver.Stats.NumPivots)
+		t.replayStatsCounted = t.replayStatsEpoch
+	}
 	return solver, status, nil
 }
 
