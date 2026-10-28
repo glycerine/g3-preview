@@ -83237,9 +83237,15 @@
       "path": "src/muz/pdr/pdr_manager.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/pdr/manager.go",
+        "pkg/muz/pdr/manager_test.go"
+      ],
+      "tests": [
+        "TestManagerStateCreationConversionAndAtomRecognition",
+        "TestManagerBooleanBackgroundSolverAndImplicationIntegration"
+      ],
       "assertions": [
         {
           "line": 176,
@@ -83259,18 +83265,44 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "manager construction, zero-arity state creation, state/formula conversions, cube/lemma operations, atom recognition, implication checks and SMT context/statistics integration (pdr_manager.cpp:159-287)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/manager.go",
+          "tests": [
+            "TestManagerStateCreationConversionAndAtomRecognition",
+            "TestManagerBooleanBackgroundSolverAndImplicationIntegration"
+          ]
+        },
+        {
+          "name": "inductive_property model conversion and rule display (pdr_manager.cpp:42-156)",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Manager owns one background AST reference, one SymbolMux and one SMTContextManager. Close rejects active proposition solvers through the context manager, then releases contexts, mux pins and the background in dependency order."
+      ],
+      "deviations": [
+        "Typed errors replace assertion-only zero-arity state and lookup conditions. Go returns borrowed handles and native slices instead of source pointer/reference-vector iterators."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_manager.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/pdr/manager.go",
+        "pkg/muz/pdr/manager_test.go"
+      ],
+      "tests": [
+        "TestManagerStateCreationConversionAndAtomRecognition",
+        "TestManagerBooleanBackgroundSolverAndImplicationIntegration"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -83292,10 +83324,30 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained manager state-symbol, formula conversion, classification, Boolean, SMT context and statistics surface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/manager.go",
+          "tests": [
+            "TestManagerStateCreationConversionAndAtomRecognition",
+            "TestManagerBooleanBackgroundSolverAndImplicationIntegration"
+          ]
+        },
+        {
+          "name": "inductive_property and rule-manager display surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "Manager is the concrete Go owner for the symbol multiplexer, guarded context pool and background AST reference; child PropSolvers must close before it."
+      ],
+      "deviations": [
+        "Source overloads and iterator pairs become explicit typed Go methods and slices. The retained source restriction to zero-arity state declarations is enforced as an error."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_prop_solver.cpp",
