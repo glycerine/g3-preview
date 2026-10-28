@@ -80783,7 +80783,7 @@
         "PropositionalEngine owns its RuleManager, RuleSet, VariableBinder, RelationManager with finite predicate tables, and optional AST theory rewriter. Compiled instruction blocks own their predicate references and per-rule accounting parents until execution completes; the engine borrows the AST manager and releases all owned references before it."
       ],
       "deviations": [
-        "This is an explicitly bounded integration slice, not the general dl_context: positive finite rules with zero, one, or two tails, recursion, constants, repeated variables, equijoins, Cartesian joins, projection, duplication, permutation, and unbound finite variables use relational bytecode; negated, interpreted, and wider multi-tail rules use the exact dependency-ordered fallback evaluator and produce finite tuple-answer formulas. Recursive bytecode currently performs exact full-relation iterations rather than the C++ semi-naive tail-delta optimization. Non-ground or infinite-domain arithmetic, parameters, transformations, models/proofs, and general engine selection remain open."
+        "This is an explicitly bounded integration slice, not the general dl_context: positive finite rules with zero, one, or two tails, recursion, constants, repeated variables, equijoins, Cartesian joins, projection, duplication, permutation, and unbound finite variables use relational bytecode; negated, interpreted, and wider multi-tail rules use the exact dependency-ordered fallback evaluator and produce finite tuple-answer formulas. Recursive bytecode uses semi-naive one-tail-at-a-time delta substitution, with one whole-program recursive group rather than the C++ SCC/local-delta partitioning. Non-ground or infinite-domain arithmetic, parameters, transformations, models/proofs, and general engine selection remain open."
       ]
     },
     {
@@ -84395,7 +84395,7 @@
           "tests": ["TestFiniteCompilerJoinsTwoPositiveTails", "TestSMT2FixedpointTwoTailJoinMatchesCPP"]
         },
         {
-          "name": "Recursive finite least-fixpoint bytecode using per-predicate current/next control deltas, exact full-relation iterations, loop termination on empty deltas, and temporary ownership transfer (dl_compiler.cpp:902-1188)",
+          "name": "Recursive finite least-fixpoint bytecode using per-predicate current/next control deltas, semi-naive one-tail-at-a-time delta substitution, loop termination on empty deltas, and temporary ownership transfer (dl_compiler.cpp:902-1188)",
           "status": "partial",
           "go_target": "pkg/muz/rel/compiler.go",
           "tests": ["TestFiniteCompilerSaturatesRecursiveRules", "TestSMT2FixedpointRecursiveClosureMatchesCPP"]
@@ -84411,7 +84411,7 @@
         "CompileFiniteRules transfers two instruction blocks to its caller. Each generated rule instruction retains its Rule accounting parent; load/store instructions retain predicate declarations; every partial compilation failure closes all generated instructions and owned references before returning."
       ],
       "deviations": [
-        "The compiler currently accepts positive finite rules with zero, one, or two tails, complete structural head assembly, and recursive least-fixpoint loops. Recursive loops use exact full-relation evaluation rather than C++ semi-naive tail-delta substitution. Negation, interpreted filters, widening, saturation marks, and wider multi-tail joins remain open; unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
+        "The compiler currently accepts positive finite rules with zero, one, or two tails, complete structural head assembly, and recursive semi-naive least-fixpoint loops. It groups all predicates when any cycle is present instead of reproducing the C++ SCC/local-delta partitioning. Negation, interpreted filters, widening, saturation marks, and wider multi-tail joins remain open; unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
       ]
     },
     {
@@ -84451,7 +84451,7 @@
         "The Go compiler uses concrete finite HashTable registers and typed AST handles; it does not port the unused C++ container/template machinery. Returned blocks own all generated instructions."
       ],
       "deviations": [
-        "Only the live positive finite-rule slice with up to two tails is exposed; recursive loops use full-relation evaluation while semi-naive tail deltas, negation, interpreted filters, wider multi-tail joins, widening, and saturation marks remain open with the source unit marked partial."
+        "Only the live positive finite-rule slice with up to two tails is exposed; recursive loops use semi-naive tail deltas but one whole-program recursive group. SCC/local-delta partitioning, negation, interpreted filters, wider multi-tail joins, widening, and saturation marks remain open with the source unit marked partial."
       ]
     },
     {

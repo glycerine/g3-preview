@@ -667,7 +667,7 @@ func (c *finiteCompiler) groundHead(rule finiteCompiledRule, predicate ast.ASTHa
 	return c.assembleHead(rule, predicate, 0, Signature{}, false, false, nil)
 }
 
-func (c *finiteCompiler) prepareTail(rule *base.Rule, application ast.ASTHandle) (uint32, Signature, bool, map[uint32][]int, error) {
+func (c *finiteCompiler) prepareTail(rule *base.Rule, application ast.ASTHandle, source uint32) (uint32, Signature, bool, map[uint32][]int, error) {
 	tailPredicate, err := c.manager.GetDecl(application)
 	if err != nil {
 		return 0, Signature{}, false, nil, err
@@ -676,7 +676,12 @@ func (c *finiteCompiler) prepareTail(rule *base.Rule, application ast.ASTHandle)
 	if err != nil {
 		return 0, Signature{}, false, nil, err
 	}
-	current := c.predicateRegs[tailPredicate]
+	current := source
+	if current == VoidRegister {
+		current = c.predicateRegs[tailPredicate]
+	} else if int(current) >= len(c.signatures) || !c.signatures[current].equal(signature) {
+		return 0, Signature{}, false, nil, ErrCompilerUnsupported
+	}
 	owned := false
 	variableColumns := make(map[uint32][]int)
 	tailCount, err := c.manager.GetNumArgs(application)
@@ -739,20 +744,20 @@ func (c *finiteCompiler) prepareTail(rule *base.Rule, application ast.ASTHandle)
 	return current, signature, owned, variableColumns, nil
 }
 
-func (c *finiteCompiler) singleTailHead(rule finiteCompiledRule, predicate ast.ASTHandle) (uint32, bool, error) {
-	current, signature, owned, variableColumns, err := c.prepareTail(rule.rule, rule.tail)
+func (c *finiteCompiler) singleTailHead(rule finiteCompiledRule, predicate ast.ASTHandle, source uint32) (uint32, bool, error) {
+	current, signature, owned, variableColumns, err := c.prepareTail(rule.rule, rule.tail, source)
 	if err != nil {
 		return 0, false, err
 	}
 	return c.assembleHead(rule, predicate, current, signature, owned, true, variableColumns)
 }
 
-func (c *finiteCompiler) twoTailHead(rule finiteCompiledRule, predicate ast.ASTHandle) (uint32, bool, error) {
-	left, leftSignature, leftOwned, leftVariables, err := c.prepareTail(rule.rule, rule.tail)
+func (c *finiteCompiler) twoTailHead(rule finiteCompiledRule, predicate ast.ASTHandle, sources [2]uint32) (uint32, bool, error) {
+	left, leftSignature, leftOwned, leftVariables, err := c.prepareTail(rule.rule, rule.tail, sources[0])
 	if err != nil {
 		return 0, false, err
 	}
-	right, rightSignature, rightOwned, rightVariables, err := c.prepareTail(rule.rule, rule.tail2)
+	right, rightSignature, rightOwned, rightVariables, err := c.prepareTail(rule.rule, rule.tail2, sources[1])
 	if err != nil {
 		return 0, false, err
 	}
@@ -794,7 +799,7 @@ func (c *finiteCompiler) twoTailHead(rule finiteCompiledRule, predicate ast.ASTH
 	return c.assembleHead(rule, predicate, joined, joinedSignature, true, true, variableColumns)
 }
 
-func (c *finiteCompiler) compileRule(rule finiteCompiledRule, delta uint32) error {
+func (c *finiteCompiler) compileRule(rule finiteCompiledRule, delta uint32, tailSources [2]uint32) error {
 	predicate, err := c.manager.GetDecl(rule.head)
 	if err != nil {
 		return err
@@ -806,9 +811,9 @@ func (c *finiteCompiler) compileRule(rule finiteCompiledRule, delta uint32) erro
 	case finiteGroundRule:
 		source, owned, err = c.groundHead(rule, predicate)
 	case finiteSingleTailRule:
-		source, owned, err = c.singleTailHead(rule, predicate)
+		source, owned, err = c.singleTailHead(rule, predicate, tailSources[0])
 	case finiteTwoTailRule:
-		source, owned, err = c.twoTailHead(rule, predicate)
+		source, owned, err = c.twoTailHead(rule, predicate, tailSources)
 	default:
 		err = ErrCompilerUnsupported
 	}
@@ -827,11 +832,11 @@ func (c *finiteCompiler) compileRule(rule finiteCompiledRule, delta uint32) erro
 	return nil
 }
 
-// compileRecursive emits an exact finite fixpoint loop. Each iteration reads
-// complete predicate relations and records only newly inserted tuples in the
-// next control deltas; replacing full reads with semi-naive tail deltas is a
-// performance refinement and does not change the resulting least fixpoint.
+// compileRecursive emits an exact semi-naive finite fixpoint loop. Each rule
+// run substitutes one changed tail relation and reads accumulated relations
+// for its other tails, recording newly inserted tuples in the next deltas.
 func (c *finiteCompiler) compileRecursive(rules []finiteCompiledRule) (resultErr error) {
+	fullSources := [2]uint32{VoidRegister, VoidRegister}
 	headOrder := make([]ast.ASTHandle, 0)
 	seen := make(map[ast.ASTHandle]bool)
 	currentDeltas := make(map[ast.ASTHandle]uint32)
@@ -855,7 +860,7 @@ func (c *finiteCompiler) compileRecursive(rules []finiteCompiledRule) (resultErr
 		if err != nil {
 			return err
 		}
-		if err = c.compileRule(rule, currentDeltas[head]); err != nil {
+		if err = c.compileRule(rule, currentDeltas[head], fullSources); err != nil {
 			return err
 		}
 	}
@@ -878,8 +883,27 @@ func (c *finiteCompiler) compileRecursive(rules []finiteCompiledRule) (resultErr
 		if err != nil {
 			return err
 		}
-		if err = c.compileRule(rule, nextDeltas[head]); err != nil {
-			return err
+		tails := []ast.ASTHandle{rule.tail}
+		if rule.kind == finiteTwoTailRule {
+			tails = append(tails, rule.tail2)
+		}
+		if rule.kind == finiteGroundRule {
+			continue
+		}
+		for index, application := range tails {
+			predicate, x := c.manager.GetDecl(application)
+			if x != nil {
+				return x
+			}
+			delta, found := currentDeltas[predicate]
+			if !found {
+				continue
+			}
+			sources := fullSources
+			sources[index] = delta
+			if err = c.compileRule(rule, nextDeltas[head], sources); err != nil {
+				return err
+			}
 		}
 	}
 	controls := make([]uint32, 0, len(headOrder))
@@ -938,7 +962,7 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 		}
 	} else {
 		for _, rule := range ordered {
-			if err = c.compileRule(rule, VoidRegister); err != nil {
+			if err = c.compileRule(rule, VoidRegister, [2]uint32{VoidRegister, VoidRegister}); err != nil {
 				return err
 			}
 		}
