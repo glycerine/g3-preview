@@ -17,6 +17,7 @@ import (
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic/portfolio"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
@@ -95,6 +96,10 @@ type Context struct {
 	PrintSuccess, GlobalDeclarations bool
 	InteractiveMode                  bool
 	ProduceUnsatAssumptions          bool
+	ProduceAssignments               bool
+	NumeralAsReal                    bool
+	ExitOnError                      bool
+	RandomSeed                       uint32
 	checked                          bool
 	status                           lbool.LBool
 	watch                            stopwatch.Stopwatch
@@ -215,7 +220,7 @@ func (c *Context) SetLogic(logic string) error {
 	return nil
 }
 
-func (c *Context) NumeralsAsReal() bool { return solver.LogicHasRealsOnly(c.logic) }
+func (c *Context) NumeralsAsReal() bool { return c.NumeralAsReal || solver.LogicHasRealsOnly(c.logic) }
 
 func (c *Context) SetBoolOption(name string, value bool) error {
 	if err := c.valid(); err != nil {
@@ -238,6 +243,18 @@ func (c *Context) SetBoolOption(name string, value bool) error {
 		}
 		c.ProduceUnsatAssumptions = value
 		return nil
+	case "produce_assignments":
+		c.ProduceAssignments = value
+		return nil
+	case "numeral_as_real":
+		c.NumeralAsReal = value
+		return nil
+	case "int_real_coercions":
+		manager, err := c.Manager()
+		if err != nil {
+			return err
+		}
+		return manager.EnableIntRealCoercions(value)
 	case "global_declarations", "global_decls":
 		if c.manager != nil {
 			return fmt.Errorf("option value cannot be modified after initialization")
@@ -247,6 +264,11 @@ func (c *Context) SetBoolOption(name string, value bool) error {
 	case "produce_models":
 		name = "model"
 	case "produce_proofs":
+		name = "proof"
+	case "produce_interpolants":
+		if c.manager != nil {
+			return fmt.Errorf("option value cannot be modified after initialization")
+		}
 		name = "proof"
 	case "produce_unsat_cores":
 		name = "unsat_core"
@@ -286,6 +308,16 @@ func (c *Context) SetUIntOption(name string, value uint32) error {
 		return err
 	}
 	name = strings.ReplaceAll(name, "-", "_")
+	if name == "random_seed" {
+		c.RandomSeed = value
+		return nil
+	}
+	if name == "verbosity" {
+		return diagnostic.SetProcessVerbosityLevel(value)
+	}
+	if name == "reproducible_resource_limit" {
+		name = "rlimit"
+	}
 	text := strconv.FormatUint(uint64(value), 10)
 	if name == "timeout" || name == "rlimit" {
 		if err := c.parameters.Set(&name, &text); err != nil {
@@ -316,6 +348,17 @@ func (c *Context) SetSymbolOption(name, value string) error {
 		return err
 	}
 	name = strings.ReplaceAll(name, "-", "_")
+	if name == "error_behavior" {
+		switch value {
+		case "immediate-exit":
+			c.ExitOnError = true
+		case "continued-execution":
+			c.ExitOnError = false
+		default:
+			return fmt.Errorf("error setting :error-behavior, 'immediate-execution' or 'continued-execution' expected")
+		}
+		return nil
+	}
 	if err := c.config.Globals.SourceSetName(name, value); err != nil {
 		return err
 	}
@@ -905,6 +948,7 @@ func (c *Context) resetManagerState() error {
 	c.sortConstructorTrail = nil
 	c.logicChecker.Reset()
 	c.logic = ""
+	c.NumeralAsReal = false
 	c.scopes = nil
 	c.checked = false
 	c.status = lbool.Undef

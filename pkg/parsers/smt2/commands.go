@@ -189,6 +189,7 @@ func (p *commandParser) clearCommand() (result error) {
 }
 
 func (p *commandParser) command() (bool, error) {
+	commandLine, commandPosition := p.scanner.Line(), p.scanner.Position()
 	if err := p.expect(LeftParenToken); err != nil {
 		return false, err
 	}
@@ -487,6 +488,30 @@ func (p *commandParser) command() (bool, error) {
 			err = p.context.WriteReasonUnknown(p.out)
 		default:
 			return false, fmt.Errorf("unsupported information attribute %s", key)
+		}
+		if err != nil {
+			return false, err
+		}
+		success = false
+	case "get-option":
+		if p.token != KeywordToken {
+			return false, fmt.Errorf("option keyword expected")
+		}
+		keyword := p.scanner.ID()
+		if err = p.advance(); err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		value, supported, err := p.context.GetOption(keyword)
+		if err != nil {
+			return false, err
+		}
+		if supported {
+			_, err = fmt.Fprintln(p.out, value)
+		} else {
+			_, err = fmt.Fprintf(p.out, "; %s line: %d position: %d\nunsupported\n", keyword, commandLine, commandPosition)
 		}
 		if err != nil {
 			return false, err
