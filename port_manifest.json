@@ -83329,22 +83329,46 @@
       "path": "src/muz/pdr/pdr_reachable_cache.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/pdr/reachable_cache.go",
+        "pkg/muz/pdr/reachable_cache_test.go"
+      ],
+      "tests": [
+        "TestReachableCacheModes",
+        "TestReachableConstraintCacheHonorsBackgroundAndInit"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "reachable_cache construction, disjunction-chain insertion, init/reachable insertion, reachability checks, and statistics",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/reachable_cache.go",
+          "tests": [
+            "TestReachableCacheModes",
+            "TestReachableConstraintCacheHonorsBackgroundAndInit"
+          ]
+        }
+      ],
+      "ownership": [
+        "ReachableCache owns its optional SMTContext, current connector reference, and explicit hash-cache expression references."
+      ],
       "deviations": []
     },
     {
       "path": "src/muz/pdr/pdr_reachable_cache.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/pdr/reachable_cache.go",
+        "pkg/muz/pdr/reachable_cache_test.go"
+      ],
+      "tests": [
+        "TestReachableCacheModes",
+        "TestReachableConstraintCacheHonorsBackgroundAndInit"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -83355,10 +83379,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "ReachableCacheMode, ReachableCacheStatistics, and ReachableCache retained interface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/reachable_cache.go",
+          "tests": ["TestReachableCacheModes"]
+        }
+      ],
+      "ownership": [
+        "Explicit Close replaces source scoped_ptr and AST reference-vector destruction."
+      ],
       "deviations": []
     },
     {
