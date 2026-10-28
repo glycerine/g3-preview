@@ -225,7 +225,16 @@ func (s *ArithmeticSolver) Check() (result *ArithmeticResult, resultErr error) {
 		}
 	}()
 	for i := range s.objectives {
+		outer := i+1 < len(s.objectives)
+		if outer {
+			if err := s.backend.Push(); err != nil {
+				return nil, err
+			}
+		}
 		status, optimal, err := s.optimizeOne(i, result)
+		if outer {
+			err = errors.Join(err, s.backend.Pop(1))
+		}
 		if err != nil {
 			return nil, err
 		}
