@@ -1,5 +1,6 @@
-// Source: src/smt/theory_utvpi.cpp utvpi_tester::linearize overloads.
 package smtcore
+
+// Source: src/smt/theory_utvpi.cpp utvpi_tester::linearize overloads.
 
 import (
 	"math/big"
