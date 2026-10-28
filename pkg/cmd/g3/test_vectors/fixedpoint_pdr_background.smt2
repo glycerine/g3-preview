@@ -1,0 +1,5 @@
+(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(assert false)
+(rule (P 0))
+(query P :print-answer false)
