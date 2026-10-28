@@ -140748,7 +140748,7 @@
       "path": "src/smt/theory_bv.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_bv_lifecycle.go",
         "pkg/smtcore/smt_bv_lifecycle_test.go",
@@ -141223,8 +141223,8 @@
           "text": "SASSERT(!already_found[it->m_idx]);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained BV mk_fresh/copy_plugins: independent bit definitions, model values and scoped state; borrowed source BV and bit-blaster owners survive destination setup/updates and chained translation; unconfigured placeholders remain destination-selected",
@@ -141238,8 +141238,8 @@
           ]
         },
         {
-          "name": "Legacy broad BV operator feature coverage; native source algorithms and dispatch are recorded separately below, while remaining source/method/assertion audit stays open",
-          "status": "partial",
+          "name": "Legacy broad BV operator coverage, superseded by the concrete native operator dispatch and completed whole-unit method/assertion audit below",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_bv.go",
           "tests": [
             "TestSMTBitVectorNumeralEquality",
@@ -141252,8 +141252,8 @@
           ]
         },
         {
-          "name": "Legacy BV Boolean atom feature coverage; native comparison/overflow algorithms, bit atoms and three-input gate clauses are recorded separately, with remaining source/assertion audit open",
-          "status": "partial",
+          "name": "Legacy BV Boolean atom coverage, superseded by concrete comparison/overflow algorithms, bit atoms, three-input gate clauses and the completed whole-unit assertion audit below",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_bv.go",
           "tests": [
             "TestSMTBitVectorNumeralBit2Bool",
@@ -141286,8 +141286,8 @@
           ]
         },
         {
-          "name": "Legacy BV feature coverage: conversion bridges, blast limit, enode parameters, models, division-by-zero interpretations, statistics and cleanup; remaining whole-method/source/owner audit is open, with native conversion/relevancy algorithms recorded separately below",
-          "status": "partial",
+          "name": "Legacy BV conversion, blast-limit, enode, model, division-by-zero, statistics and cleanup coverage, superseded by the concrete algorithms and completed whole-method/source/owner audit below",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_bv.go",
           "tests": [
             "TestSMTBitVectorToIntAxiom",
@@ -141712,7 +141712,7 @@
       "path": "src/smt/theory_bv.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_bv_lifecycle.go",
         "pkg/smtcore/smt_bv_lifecycle_test.go",
@@ -141881,8 +141881,8 @@
           "text": "void after_merge_eh(theory_var r1, theory_var r2, theory_var v1, theory_var v2) { SASSERT(check_zero_one_bits(r1)); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained BV mk_fresh/copy_plugins: independent bit definitions, model values and scoped state; borrowed source BV and bit-blaster owners survive destination setup/updates and chained translation; unconfigured placeholders remain destination-selected",
@@ -141896,8 +141896,8 @@
           ]
         },
         {
-          "name": "theory_bv state, atom records, internalization callbacks, equality and disequality callbacks, relevancy, scopes, final check, model and statistics hooks",
-          "status": "partial",
+          "name": "Whole retained theory_bv state and method surface: atom records, internalization callbacks, equality and disequality callbacks, relevancy, scopes, final check, model, name and statistics hooks",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_bv.go",
           "tests": [
             "TestSMTBitVectorExtendedBooleanGates",
@@ -267783,6 +267783,22 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_native_checkpoint": "17ecadb7"
+  },
+  "latest_bv_whole_audit": {
+    "source_units": [
+      "src/smt/theory_bv.cpp",
+      "src/smt/theory_bv.h"
+    ],
+    "scope": "Whole retained bit-vector theory audit: concrete Go state and callbacks cover variable/bit construction, Boolean atoms, native bit-blaster operator dispatch, integer conversion, equality/disequality propagation, private union-find and scoped undo, fixed-value discovery, explanations, models, statistics, display, TRACE/SASSERT diagnostics, exact incomplete-theory naming and independent fresh-theory ownership. MK_BINARY_COND is definition-only with no invocation. C++ reset_eh has no retained Go solver-reset consumer; Go solver teardown reaches Close, which releases owned AST references and native state. Derived BV operators are normalized before theory dispatch and retain the source unsupported-operator trace/unreachable boundary. The five division-by-zero declarations deliberately remain on core UF congruence and model-interpretation paths. Go maps/slices replace C++ vectors, pointer tables, trail regions and union-find storage while preserving source ordering, scope and ownership behavior. Full native pkg/smtcore, focused g3debug/g3trace operator diagnostics, pkg/portcheck and both C++-differential SMT-LIB runner groups pass on the promoted code.",
+    "focused_tests": [
+      "go test ./pkg/smtcore",
+      "go test -tags g3debug,g3trace ./pkg/smtcore -run TestSMTBVOperatorSourceAssertionSites|TestSMTBVUnsupportedOperatorSourceUnreachableAndTrace|TestSMTBVNativeOperatorCircuitsMatchSourceEngine",
+      "go test ./pkg/portcheck",
+      "go test ./pkg/cmd/g3 -run TestSMTLibRunner(Scripts|CPPReference)$"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 2,
+    "full_suite_qualification": "The whole repository suite was not rerun for this manifest-only promotion; the complete smtcore package and retained end-to-end runner groups passed."
   },
   "latest_lp_exclusion_audit": {
     "source_units": [
