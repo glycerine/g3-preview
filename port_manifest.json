@@ -249556,7 +249556,7 @@
       "path": "src/util/sorting_network.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/ast/util_psort_ast_network.go",
         "pkg/ast/util_psort_ast_context_source_test.go",
@@ -249805,8 +249805,8 @@
           ]
         },
         {
-          "name": "Concrete SMTLiteral psort_nw<theory_pb::psort_expr> reached by PB compile_ineq: ge/le dualization, at-most-one groups, source unsigned cost selection, card/sort/merge and subset encodings; source TRACE records and branch-site guards; final whole-instantiation audit remains",
-          "status": "partial",
+          "name": "Concrete SMTLiteral psort_nw<theory_pb::psort_expr> reached by PB compile_ineq: ge/le dualization, at-most-one groups, source unsigned cost selection, card/sort/merge and subset encodings; complete source TRACE, assertion and whole-instantiation audit",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_pb_sort.go",
           "go_targets": [
             "pkg/smtcore/theory_pb_compile.go",
@@ -249819,6 +249819,9 @@
             "TestSMTPBCompilationThresholdRestartAndRollback",
             "TestSMTPBCompilationWeightedDefinitionsAndBaseFolding",
             "TestSMTPBCompilationPigeonholeSearchAndScopeRecovery",
+            "TestSMTPBLiteralNetworkSourceCardinalityCostOrder",
+            "TestSMTPBLiteralNetworkDebugGuardsPrecedeEffects",
+            "TestSMTPBLiteralNetworkRecursiveDiagnosticsPreserveThreshold",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -249855,7 +249858,8 @@
         "Retained ast_ext2 clauses/trail now use owning []ASTHandle with INC before native append. Removed ASTRefVector construction, capacity/refusal emulation and unpublished push receipt frames. Cleanup retains reverse member/ascending element order and consumed-DEC progress; source teardown retains its first cause while owning Close can resume. Actual AST factory and network reservation campaigns and independent clause oracles remain. Forty repeated cached factories/singleton clauses verify exact reference ownership and append order; native growth needs no arena reservation, while debug retains actual factory checks. Escaped owners close after manager teardown without stale node callbacks. No source container allocation geometry is credited.",
         "Reopened from ported to partial because PB compilation now reaches a distinct concrete SMTLiteral instantiation. Its actual algorithms, source costs, clauses and scope lifetime are implemented and independently tested; its TRACE/assertion audit remains open. Existing AST/unsigned instantiations retain their separate evidence. Corrected AST vc_card_rec to preserve source vc_smerge(a,b,c) argument order, which differs from executable smerge(c,a,b); the source-derived k=1,n=5 regression fails before correction (3 variables,6 clauses) and passes after (5,6).",
         "Concrete SMTLiteral network variable/clause/literal statistics use source unsigned uint32 wrap before factory/clause effects. Literal-network TRACE/assertion audit remains open.",
-        "Literal-network diagnostics now preserve source file/function/line, entry and completion order, trailing literal spacing, and sticky ostream behavior while disabled/native traces erase operands. Added source debug guards for retained recursive/direct shape and cost domains, with branch conditions enforcing ge/le range invariants; unused EQ/bitonic/template helpers are not introduced. A 12-input recursive cardinality network is checked by an independent existential clause-SAT oracle for every true-input count. Final whole-instantiation audit remains separate from this diagnostic increment."
+        "Literal-network diagnostics now preserve source file/function/line, entry and completion order, trailing literal spacing, and sticky ostream behavior while disabled/native traces erase operands. Added source debug guards for retained recursive/direct shape and cost domains, with branch conditions enforcing ge/le range invariants; unused EQ/bitonic/template helpers are not introduced. A 12-input recursive cardinality network is checked by an independent existential clause-SAT oracle for every true-input count. Final whole-instantiation audit remains separate from this diagnostic increment.",
+        "Completed the concrete SMTLiteral whole-instantiation audit. Every retained ge/le/card/sort/merge/interleave/direct/subset branch has source-order guards before clause effects, exact uint32 cost arithmetic and independent emitted-clause SAT evidence. A direct k=1,n=5 regression fixes the subtle source vc_smerge(a,b,c) to Go executable-helper (c,a,b) mapping at cost 31 and direct-card selection cost 21. EQ, generic bitonic helpers and other template paths remain excluded because no retained SMTLiteral consumer reaches them; the separately retained AST and unsigned instantiations already carry their own complete evidence."
       ]
     },
     {

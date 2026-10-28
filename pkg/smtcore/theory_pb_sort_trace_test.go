@@ -14,6 +14,21 @@ func smtPBNetworkTraceRecord(function string, line int, body string) string {
 	return fmt.Sprintf("-------- [pb] %s src/util/sorting_network.h:%d ---------\n%s------------------------------------------------\n", function, line, body)
 }
 
+func TestSMTPBLiteralNetworkSourceCardinalityCostOrder(t *testing.T) {
+	_, _, pb, _, _ := smtPBWatchFixture(t, []int64{1, 1}, 2, false)
+	network := smtPBSort{theory: pb, mode: smtPBSortGE}
+	// Source vc_card_rec calls vc_smerge(k,l,n-l), whose parameters are
+	// (a,b,c). The Go executable helper is ordered (c,a,b), so k=1,n=5
+	// maps to (3,1,2) and costs 5 vertices + 6 clauses = 31.
+	if got := network.costCardRecursive(1, 5); got != 31 {
+		t.Fatal("source vc_smerge cardinality cost order", got)
+	}
+	if got := network.costDirectSort(1, 5); got != 21 || !network.useDirectCard(1, 5) {
+		t.Fatal("source direct-cardinality selection", got)
+	}
+	astTestMust(t, network.err)
+}
+
 func TestSMTPBLiteralNetworkTraceActualComparatorClauseOrder(t *testing.T) {
 	_, s, pb, _, inputs := smtPBWatchFixture(t, []int64{1, 1}, 2, false)
 	var output bytes.Buffer
