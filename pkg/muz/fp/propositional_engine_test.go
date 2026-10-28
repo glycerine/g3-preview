@@ -85,7 +85,7 @@ func TestPropositionalEngineMatchesCPPFixedpointQueries(t *testing.T) {
 	compiled, err := engine.LastQueryUsedCompiledCode()
 	fpMust(t, err)
 	if !compiled {
-		t.Fatal("ground and identity Horn program bypassed relational bytecode")
+		t.Fatal("supported finite Horn program bypassed relational bytecode")
 	}
 	got[1], err = engine.Query(applications["U"])
 	fpMust(t, err)

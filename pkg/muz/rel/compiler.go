@@ -39,7 +39,7 @@ type finiteRuleKind uint8
 
 const (
 	finiteGroundRule finiteRuleKind = iota
-	finiteIdentityRule
+	finiteSingleTailRule
 )
 
 type finiteCompiledRule struct {
@@ -177,19 +177,13 @@ func (c *finiteCompiler) classify(rule *base.Rule) (finiteCompiledRule, error) {
 		return result, err
 	}
 	tailCount, err := c.manager.GetNumArgs(result.tail)
-	if err != nil || headCount != tailCount {
-		return result, errors.Join(ErrCompilerUnsupported, err)
+	if err != nil {
+		return result, err
 	}
-	for index := uint32(0); index < headCount; index++ {
-		headArgument, x := c.manager.GetArg(result.head, index)
-		if x != nil {
-			return result, x
-		}
+	tailVariables := make([]uint32, 0, tailCount)
+	tailVariableSet := make(map[uint32]bool)
+	for index := uint32(0); index < tailCount; index++ {
 		tailArgument, x := c.manager.GetArg(result.tail, index)
-		if x != nil {
-			return result, x
-		}
-		headKind, x := c.manager.GetKind(headArgument)
 		if x != nil {
 			return result, x
 		}
@@ -197,22 +191,61 @@ func (c *finiteCompiler) classify(rule *base.Rule) (finiteCompiledRule, error) {
 		if x != nil {
 			return result, x
 		}
-		if headKind != ast.ASTVar || tailKind != ast.ASTVar {
-			return result, ErrCompilerUnsupported
+		if tailKind != ast.ASTVar {
+			value, y := c.manager.IsValue(tailArgument)
+			if y != nil {
+				return result, y
+			}
+			if !value {
+				return result, ErrCompilerUnsupported
+			}
+			continue
 		}
-		headVariable, x := c.manager.GetVarIndex(headArgument)
+		variable, x := c.manager.GetVarIndex(tailArgument)
 		if x != nil {
 			return result, x
 		}
-		tailVariable, x := c.manager.GetVarIndex(tailArgument)
-		if x != nil {
-			return result, x
-		}
-		if headVariable != tailVariable {
+		if tailVariableSet[variable] {
 			return result, ErrCompilerUnsupported
 		}
+		tailVariableSet[variable] = true
+		tailVariables = append(tailVariables, variable)
 	}
-	result.kind = finiteIdentityRule
+	previous := -1
+	headVariableSet := make(map[uint32]bool)
+	for index := uint32(0); index < headCount; index++ {
+		headArgument, x := c.manager.GetArg(result.head, index)
+		if x != nil {
+			return result, x
+		}
+		headKind, x := c.manager.GetKind(headArgument)
+		if x != nil {
+			return result, x
+		}
+		if headKind != ast.ASTVar {
+			return result, ErrCompilerUnsupported
+		}
+		variable, x := c.manager.GetVarIndex(headArgument)
+		if x != nil {
+			return result, x
+		}
+		if headVariableSet[variable] {
+			return result, ErrCompilerUnsupported
+		}
+		headVariableSet[variable] = true
+		position := -1
+		for tailIndex, candidate := range tailVariables {
+			if candidate == variable {
+				position = tailIndex
+				break
+			}
+		}
+		if position <= previous {
+			return result, ErrCompilerUnsupported
+		}
+		previous = position
+	}
+	result.kind = finiteSingleTailRule
 	return result, nil
 }
 
@@ -258,7 +291,7 @@ func (c *finiteCompiler) orderRules(rules []finiteCompiledRule) ([]finiteCompile
 			headOrder = append(headOrder, head)
 		}
 		byHead[head] = append(byHead[head], rule)
-		if rule.kind == finiteIdentityRule {
+		if rule.kind == finiteSingleTailRule {
 			tail, x := c.manager.GetDecl(rule.tail)
 			if x != nil {
 				return nil, x
@@ -378,6 +411,100 @@ func (c *finiteCompiler) groundHead(rule finiteCompiledRule, predicate ast.ASTHa
 	return current, owned, nil
 }
 
+func (c *finiteCompiler) singleTailHead(rule finiteCompiledRule) (uint32, bool, error) {
+	tailPredicate, err := c.manager.GetDecl(rule.tail)
+	if err != nil {
+		return 0, false, err
+	}
+	sorts, signature, err := c.relations.PredicateSignature(tailPredicate)
+	if err != nil {
+		return 0, false, err
+	}
+	current := c.predicateRegs[tailPredicate]
+	owned := false
+	variables := make([]uint32, 0, signature.Len())
+	tailCount, err := c.manager.GetNumArgs(rule.tail)
+	if err != nil {
+		return 0, false, err
+	}
+	for index := uint32(0); index < tailCount; index++ {
+		argument, x := c.manager.GetArg(rule.tail, index)
+		if x != nil {
+			return 0, false, x
+		}
+		kind, x := c.manager.GetKind(argument)
+		if x != nil {
+			return 0, false, x
+		}
+		if kind == ast.ASTVar {
+			variable, y := c.manager.GetVarIndex(argument)
+			if y != nil {
+				return 0, false, y
+			}
+			variables = append(variables, variable)
+			continue
+		}
+		value, x := c.relations.EncodeValue(sorts[index], argument)
+		if x != nil {
+			return 0, false, x
+		}
+		column := len(variables)
+		projected, x := projectedSignature(signature, []int{column})
+		if x != nil {
+			return 0, false, x
+		}
+		result := current
+		if owned {
+			c.signatures[result] = projected
+		} else {
+			result = c.fresh(projected)
+		}
+		if x = c.append(c.execution, NewSelectEqualProjectInstruction(current, value, column, result), rule.rule); x != nil {
+			return 0, false, x
+		}
+		current, signature, owned = result, projected, true
+	}
+	headVariables := make(map[uint32]bool)
+	headCount, err := c.manager.GetNumArgs(rule.head)
+	if err != nil {
+		return 0, false, err
+	}
+	for index := uint32(0); index < headCount; index++ {
+		argument, x := c.manager.GetArg(rule.head, index)
+		if x != nil {
+			return 0, false, x
+		}
+		variable, x := c.manager.GetVarIndex(argument)
+		if x != nil {
+			return 0, false, x
+		}
+		headVariables[variable] = true
+	}
+	removed := make([]int, 0, len(variables)-int(headCount))
+	for column, variable := range variables {
+		if !headVariables[variable] {
+			removed = append(removed, column)
+		}
+	}
+	if len(removed) != 0 {
+		projected, x := projectedSignature(signature, removed)
+		if x != nil {
+			return 0, false, x
+		}
+		result := current
+		if owned {
+			c.signatures[result] = projected
+		} else {
+			result = c.fresh(projected)
+		}
+		if x = c.append(c.execution, NewProjectionInstruction(current, removed, result), rule.rule); x != nil {
+			return 0, false, x
+		}
+		current, owned = result, true
+	}
+	return current, owned, nil
+}
+
 func (c *finiteCompiler) compileRule(rule finiteCompiledRule) error {
 	predicate, err := c.manager.GetDecl(rule.head)
 	if err != nil {
@@ -389,10 +516,8 @@ func (c *finiteCompiler) compileRule(rule finiteCompiledRule) error {
 	switch rule.kind {
 	case finiteGroundRule:
 		source, owned, err = c.groundHead(rule, predicate)
-	case finiteIdentityRule:
-		var tail ast.ASTHandle
-		tail, err = c.manager.GetDecl(rule.tail)
-		source = c.predicateRegs[tail]
+	case finiteSingleTailRule:
+		source, owned, err = c.singleTailHead(rule)
 	default:
 		err = ErrCompilerUnsupported
 	}
@@ -429,7 +554,7 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 		if x = c.ensureLoaded(head); x != nil {
 			return x
 		}
-		if rule.kind == finiteIdentityRule {
+		if rule.kind == finiteSingleTailRule {
 			tail, y := c.manager.GetDecl(rule.tail)
 			if y != nil {
 				return y
@@ -457,7 +582,7 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 }
 
 // CompileFiniteRules compiles the currently retained nonrecursive finite
-// ground and identity-rule slice into execution and termination bytecode.
+// ground and ordered single-tail rule slice into execution and termination bytecode.
 // Ownership of both returned blocks transfers to the caller.
 func CompileFiniteRules(relations *RelationManager, set *base.RuleSet) (*InstructionBlock, *InstructionBlock, error) {
 	compiler, err := newFiniteCompiler(relations)

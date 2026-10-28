@@ -72,8 +72,10 @@ func TestFiniteCompilerOrdersFactsAndIdentityRules(t *testing.T) {
 	}
 	p := compilerDeclaration(t, manager, "compiled-P", []ast.ASTHandle{boolean, boolean}, boolean)
 	q := compilerDeclaration(t, manager, "compiled-Q", []ast.ASTHandle{boolean, boolean}, boolean)
+	r := compilerDeclaration(t, manager, "compiled-R", []ast.ASTHandle{boolean}, boolean)
+	s := compilerDeclaration(t, manager, "compiled-S", nil, boolean)
 	z := compilerDeclaration(t, manager, "compiled-Z", nil, boolean)
-	for _, predicate := range []ast.ASTHandle{p, q, z} {
+	for _, predicate := range []ast.ASTHandle{p, q, r, s, z} {
 		if err = rules.RegisterPredicate(predicate); err != nil {
 			t.Fatal(err)
 		}
@@ -108,6 +110,24 @@ func TestFiniteCompilerOrdersFactsAndIdentityRules(t *testing.T) {
 		t.Fatal(err)
 	}
 	compilerRule(t, rules, set, pFact, nil, "fact-after-dependent")
+	rHead, err := manager.MkApp(r, []ast.ASTHandle{variable0})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rTail, err := manager.MkApp(p, []ast.ASTHandle{variable0, falsity})
+	if err != nil {
+		t.Fatal(err)
+	}
+	compilerRule(t, rules, set, rHead, []ast.ASTHandle{rTail}, "select-tail-constant")
+	sFact, err := manager.MkApp(s, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sTail, err := manager.MkApp(p, []ast.ASTHandle{truth, falsity})
+	if err != nil {
+		t.Fatal(err)
+	}
+	compilerRule(t, rules, set, sFact, []ast.ASTHandle{sTail}, "project-selected-tail")
 	zFact, err := manager.MkApp(z, nil)
 	if err != nil {
 		t.Fatal(err)
@@ -144,6 +164,22 @@ func TestFiniteCompilerOrdersFactsAndIdentityRules(t *testing.T) {
 		if x != nil || len(facts) != 1 || len(facts[0]) != 2 || facts[0][0] != 1 || facts[0][1] != 0 {
 			t.Fatal("compiled facts", predicate, facts, x)
 		}
+	}
+	rTable, found, err := relations.TryGetRelation(r)
+	if err != nil || !found || rTable == nil {
+		t.Fatal("selected compiled relation", rTable, found, err)
+	}
+	rFacts, err := rTable.Facts()
+	if err != nil || len(rFacts) != 1 || len(rFacts[0]) != 1 || rFacts[0][0] != 1 {
+		t.Fatal("selected compiled facts", rFacts, err)
+	}
+	sTable, found, err := relations.TryGetRelation(s)
+	if err != nil || !found || sTable == nil {
+		t.Fatal("projected compiled relation", sTable, found, err)
+	}
+	sFacts, err := sTable.Facts()
+	if err != nil || len(sFacts) != 1 || len(sFacts[0]) != 0 {
+		t.Fatal("projected compiled fact", sFacts, err)
 	}
 	zTable, found, err := relations.TryGetRelation(z)
 	if err != nil || !found || zTable == nil {
