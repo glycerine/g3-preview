@@ -148194,7 +148194,7 @@
       "path": "src/smt/theory_seq.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_seq_state.go",
         "pkg/smtcore/theory_seq_equations.go",
@@ -148793,7 +148793,7 @@
           "text": "SASSERT(ctx.get_assignment(e) == l_false);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -149161,10 +149161,23 @@
           ]
         },
         {
-          "name": "remaining sequence word-equation solving, length, containment, regex, propagation and branching algorithms",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "whole retained source-function inventory: external theory callbacks, word equations, arithmetic length reasoning, containment, regular-language propagation, branching, axiom dispatch, model construction and statistics are covered by the concrete rows above; eager Go axiom construction replaces the native queue dispatcher, stateless Go automata need no init_search cache reset, explain_empty and propagate_max_length have no retained caller, display helpers are diagnostic-only, and compile-disabled negative-prefix/suffix alternatives remain excluded",
+          "status": "complete",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_solve.go",
+            "pkg/smtcore/theory_seq_fixed_length.go",
+            "pkg/smtcore/theory_seq_regex.go",
+            "pkg/smtcore/theory_seq_statistics.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/sequence_helper_inventory.smt2",
+            "pkg/cmd/g3/test_vectors/sequence_word_equations_relations.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceStatisticsFlowThroughSolverCollection",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         },
         {
           "name": "context::is_relevant policy for symbolic sequence interface-root enumeration under disabled filtering, with scoped equality creation",
@@ -149621,14 +149634,15 @@
         "Connected the active native negative-containment queue reducer: constants retire, changed canonical formulas replace records, negative equalities propagate with theory explanations, disjunctions split and swap-replaced slots are revisited. A pending queue now prevents is_solved/Done, replacing the former concrete-string-only check. Canonicalization expands the retained structural relation/concat/unit/index operands, source ITE decision/egraph branches and guarded nonnegative integer conversions before the private substitution-free rewriter. Native persistent expansion-cache/replay bookkeeping and broader source integration remain partial. Equation simplification now runs before negative-containment reduction, and a genuinely new solution-map insertion counts as kernel work even if its enodes were already merged. The former Go-only boundary/tail consequences are removed; unresolved records now preserve the native unknown result.",
         "Promoted seq_negative_contains_canonize_scopes.smt2 into the strict runner corpus after removing the non-native boundary/tail compatibility expansion. Go and C++ now exactly agree on constrained concat/prefix/numeral scopes, model invariants, and unknown results in the two unconstrained generic ALL/theory_seq scopes. QF_S routes through the separately ported theory_str backend, so this vector intentionally uses ALL to isolate theory_seq.",
         "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Generic ALL negative-containment parity is now enforced by the strict runner corpus; the broader source units stay partial.",
-        "Context copies now install a new concrete SMTSequenceTheory rather than reselecting the algorithm from destination String options. Unconfigured eager placeholders remain uninstalled and use destination setup; actual copied/explicit plugins survive pre-setup chained copies. The source header mk_fresh requires no parameter borrow. Models and child conflict/pop recovery cover same/cross-manager translation; other Sequence algorithm and parity work remains partial."
+        "Context copies now install a new concrete SMTSequenceTheory rather than reselecting the algorithm from destination String options. Unconfigured eager placeholders remain uninstalled and use destination setup; actual copied/explicit plugins survive pre-setup chained copies. The source header mk_fresh requires no parameter borrow. Models and child conflict/pop recovery cover same/cross-manager translation.",
+        "The final whole-source function and reachability audit supersedes historical per-increment notes above that described then-remaining sequence work. All retained theory_seq.cpp algorithms and externally consumed callbacks are represented by complete method rows; source-only TRACE/display helpers, compile-disabled alternatives and uncalled private helpers do not require Go adapters."
       ]
     },
     {
       "path": "src/smt/theory_seq.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_seq_state.go",
         "pkg/smtcore/theory_seq_equations.go",
@@ -149764,7 +149778,7 @@
           "text": "expr_ref mk_concat(ptr_vector<expr> const& es) { SASSERT(!es.empty()); return mk_concat(es.size(), es.c_ptr()); }"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -149961,10 +149975,21 @@
           ]
         },
         {
-          "name": "remaining word-equation, arithmetic, containment, regular-language, propagation and branching declarations",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "whole retained declaration inventory for theory callbacks, scoped state, word equations, arithmetic length reasoning, containment, regular-language propagation, branching, model construction and statistics; source-private templates and declarations without retained consumers have no universal Go adapter",
+          "status": "complete",
+          "go_target": "pkg/smtcore/theory_seq.go",
+          "go_targets": [
+            "pkg/smtcore/theory_seq_solve.go",
+            "pkg/smtcore/theory_seq_fixed_length.go",
+            "pkg/smtcore/theory_seq_regex.go",
+            "pkg/smtcore/theory_seq_statistics.go",
+            "pkg/cmd/g3/test_vectors/sequence_helper_inventory.smt2"
+          ],
+          "tests": [
+            "TestSMTSequenceStatisticsFlowThroughSolverCollection",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         },
         {
           "name": "reduce_eq/set_empty propagates each component equal to empty with original dependency; concrete units use established character equalities with evidence; newly cached regex refinement counts as source m_new_propagation even when clauses are already satisfied",
@@ -150370,7 +150395,8 @@
         "Connected the active native negative-containment queue reducer: constants retire, changed canonical formulas replace records, negative equalities propagate with theory explanations, disjunctions split and swap-replaced slots are revisited. A pending queue now prevents is_solved/Done, replacing the former concrete-string-only check. Canonicalization expands the retained structural relation/concat/unit/index operands, source ITE decision/egraph branches and guarded nonnegative integer conversions before the private substitution-free rewriter. Native persistent expansion-cache/replay bookkeeping and broader source integration remain partial. Equation simplification now runs before negative-containment reduction, and a genuinely new solution-map insertion counts as kernel work even if its enodes were already merged. The former Go-only boundary/tail consequences are removed; unresolved records now preserve the native unknown result.",
         "Promoted seq_negative_contains_canonize_scopes.smt2 into the strict runner corpus after removing the non-native boundary/tail compatibility expansion. Go and C++ now exactly agree on constrained concat/prefix/numeral scopes, model invariants, and unknown results in the two unconstrained generic ALL/theory_seq scopes. QF_S routes through the separately ported theory_str backend, so this vector intentionally uses ALL to isolate theory_seq.",
         "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Generic ALL negative-containment parity is now enforced by the strict runner corpus; the broader source units stay partial.",
-        "Context copies now install a new concrete SMTSequenceTheory rather than reselecting the algorithm from destination String options. Unconfigured eager placeholders remain uninstalled and use destination setup; actual copied/explicit plugins survive pre-setup chained copies. The source header mk_fresh requires no parameter borrow. Models and child conflict/pop recovery cover same/cross-manager translation; other Sequence algorithm and parity work remains partial."
+        "Context copies now install a new concrete SMTSequenceTheory rather than reselecting the algorithm from destination String options. Unconfigured eager placeholders remain uninstalled and use destination setup; actual copied/explicit plugins survive pre-setup chained copies. The source header mk_fresh requires no parameter borrow. Models and child conflict/pop recovery cover same/cross-manager translation.",
+        "The final whole-header declaration and reachability audit supersedes historical per-increment notes above that described then-remaining sequence work. All retained theory_seq.h state and callbacks have concrete Go owners or method rows; source-private template machinery and declarations without retained consumers have no universal adapter."
       ]
     },
     {
