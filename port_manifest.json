@@ -54298,7 +54298,7 @@
       "path": "src/math/polynomial/polynomial.cpp",
       "component": "math",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/math/polynomial/polynomial_constructor_assertions.go",
         "pkg/math/polynomial/polynomial_cell_assertions.go",
@@ -54799,7 +54799,8 @@
         "pkg/math/polynomial/polynomial_pseudo_trace_test.go",
         "pkg/math/polynomial/polynomial_pseudo_verification_trace_test.go",
         "pkg/math/polynomial/polynomial_lex_sort_trace.go",
-        "pkg/math/polynomial/polynomial_lex_sort_trace_test.go"
+        "pkg/math/polynomial/polynomial_lex_sort_trace_test.go",
+        "pkg/math/polynomial/polynomial_flip_sign.go"
       ],
       "tests": [
         "TestPolynomialDividesTraceZeroKeepsOlderAlgorithmReceipt",
@@ -54894,7 +54895,7 @@
         "TestPolynomialCellSourceDuplicateCancellation",
         "TestPolynomialCellIndependentArithmeticIdentity",
         "TestPolynomialCheapDuplicateAssertionBeforeZero",
-            "TestPolynomialCheapAppendDuplicateAssertionActions",
+        "TestPolynomialCheapAppendDuplicateAssertionActions",
         "TestPolynomialCheapResetReleasesBIG",
         "TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor",
         "TestPolynomialStoppedMonomialUnitOwningGuardDependency",
@@ -55091,7 +55092,7 @@
         "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
         "TestMonomialUnitNativeRecycleFinalizationIsIdempotent",
         "TestPolynomialLazardDichotomousIndependentCoefficients",
-            "TestPolynomialLazardSourceTraceAllBranches",
+        "TestPolynomialLazardSourceTraceAllBranches",
         "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
         "TestPolynomialPSCComposedEveryReservationPrefix",
@@ -55099,17 +55100,17 @@
         "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
-            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
+        "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
         "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
         "TestPolynomialPSCEveryCheckpointCancellationFrontier",
         "TestPolynomialPSCWarmActualSourceProfile",
         "TestPolynomialPSCFullOwnerPendingLocalClosePrefix",
         "TestPolynomialPSCSourceAssertionBeforeOutputReset",
-            "TestPolynomialPSCSourceTraceRecordsAndGating",
-            "TestPolynomialPSCSourceTraceStreamRefusal",
-            "TestPolynomialPSCAssertionActions",
-            "TestPolynomialPSCAssertionRuntimeActions",
+        "TestPolynomialPSCSourceTraceRecordsAndGating",
+        "TestPolynomialPSCSourceTraceStreamRefusal",
+        "TestPolynomialPSCAssertionActions",
+        "TestPolynomialPSCAssertionRuntimeActions",
         "TestPolynomialPSCOutputColdGuardBeforeOperandRead",
         "TestPolynomialPSCRegisteredFirstFixture",
         "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
@@ -55185,7 +55186,7 @@
         "TestProcessRandBorrowedDrawsShareSrand",
         "TestGLibc31DrawsAllocateNoStorage",
         "TestPolynomialSqrtDormantOriginal",
-            "TestPolynomialSqrtSourceTraceAndZeroRoute",
+        "TestPolynomialSqrtSourceTraceAndZeroRoute",
         "TestPolynomialSqrtIndependentSmallSquares",
         "TestPolynomialSqrtEveryReservation",
         "TestPolynomialSqrtQuickBranchesAndCancel",
@@ -55259,7 +55260,7 @@
         "TestPolynomialGCDPowerDegreeSortSourceAdapter",
         "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
         "TestPolynomialFreshValueZeroModulusSourceProfile",
-            "TestPolynomialFreshValueAssertionActions",
+        "TestPolynomialFreshValueAssertionActions",
         "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
         "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
         "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
@@ -55294,7 +55295,7 @@
         "TestPolynomialResultantEveryReservationPrefix",
         "TestPolynomialResultantBigNumeralEveryReservationPrefix",
         "TestPolynomialResultantAllEightOriginalPSCAssertions",
-            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
+        "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialScopedZPActualModeAndPrimeRestoration",
         "TestPolynomialScopedZPFailedBodyDoesNotRestoreMode",
         "TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending",
@@ -55350,13 +55351,13 @@
         "TestPolynomialCoefficientReceiptCachedMonomialCreatesNoLeafAuthority",
         "TestPolynomialCoefficientReceiptActualCalleeCompletionClearsTag",
         "TestPolynomialSqrtInvocationGuardAndActualAcquisition",
-            "TestPolynomialSqrtActualAllocationTransportRefusesOwnerRetirement",
-            "TestPolynomialSqrtAppendAllocationUsesActualInvocation",
-            "TestPolynomialSqrtScalarAllocationUsesActualInvocation",
-            "TestPolynomialSqrtDivisionAllocationUsesActualChild",
-            "TestPolynomialSqrtPositiveDivisionAllocationUsesActualInvocation",
-            "TestPolynomialSqrtMonomialAllocationUsesActualInvocation",
-            "TestPolynomialSqrtFinalFactoryAllocationUsesActualInvocation",
+        "TestPolynomialSqrtActualAllocationTransportRefusesOwnerRetirement",
+        "TestPolynomialSqrtAppendAllocationUsesActualInvocation",
+        "TestPolynomialSqrtScalarAllocationUsesActualInvocation",
+        "TestPolynomialSqrtDivisionAllocationUsesActualChild",
+        "TestPolynomialSqrtPositiveDivisionAllocationUsesActualInvocation",
+        "TestPolynomialSqrtMonomialAllocationUsesActualInvocation",
+        "TestPolynomialSqrtFinalFactoryAllocationUsesActualInvocation",
         "TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort",
         "TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort",
         "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",
@@ -55704,10 +55705,11 @@
         "TestPolynomialGCDCleanupPreservesIndependentLazard",
         "TestPolynomialGCDIndependentLazardReservationPrefixes",
         "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
-            "TestPolynomialGCDContentScaleAssignmentCallbackAndRetry",
+        "TestPolynomialGCDContentScaleAssignmentCallbackAndRetry",
         "TestPolynomialSubstitutionInvocationReservationPrefixes",
         "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch",
-        "TestPolynomialGCDMGCDCheckRereadsTagAndConstructsDebugLocals"
+        "TestPolynomialGCDMGCDCheckRereadsTagAndConstructsDebugLocals",
+        "pkg/math/polynomial/polynomial_flip_sign_test.go"
       ],
       "conditionals": [
         {
@@ -56961,8 +56963,8 @@
           "text": "SASSERT(m_imp->consistent_coeffs(p));"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "Retained eq_proc get_power228 for internal and borrowed tmp_monomial::get_ptr keys at cpp185-187,853-854",
@@ -57357,19 +57359,26 @@
           "name": "Complete Horner composition cpp4798-4818: exact MulAdd child binding, source cleanup, false/true owning acknowledgment and retry without stranded borrowed monomials",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
-          "tests": ["TestPolynomialCompositionHornerChildCancellationCleanupAndRetry", "TestAlgebraicBinaryEveryReachedCancellationAndRetry"]
+          "tests": [
+            "TestPolynomialCompositionHornerChildCancellationCleanupAndRetry",
+            "TestAlgebraicBinaryEveryReachedCancellationAndRetry"
+          ]
         },
         {
           "name": "Published SOM buffer vector child alloc at polynomial.cpp:2166 and ordered destructor dealloc at :2182 over charged concrete Go child owners",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
-          "tests": ["TestPolynomialSOMVectorPublishedChildMemoryWrappers"]
+          "tests": [
+            "TestPolynomialSOMVectorPublishedChildMemoryWrappers"
+          ]
         },
         {
           "name": "Retained Newton interpolator vector child alloc at polynomial.cpp:2948 and ordered flush/deletion at :2936 over charged concrete child owners",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
-          "tests": ["TestPolynomialNewtonVectorChildMemoryWrappers"]
+          "tests": [
+            "TestPolynomialNewtonVectorChildMemoryWrappers"
+          ]
         },
         {
           "name": "Retained monomial Lex, LexWithMinimum and GradedLex cpp609-704 with process assertion gates and source actions",
@@ -57434,7 +57443,7 @@
           "notes": "Actual467/474 process gates/source Throw/Continue actions replace hard DebugBuild checks. Reset reads ID before its gated size condition, then reaches the physical native-slice guard after Continue/disabled. Set reads ID and publishes reserve(id+1,UINT_MAX) before consulting its independent gate, and lazily reads the existing slot only if enabled. Actual duplicate Set3->Set5 preserves3 on Throw and overwrites5 on Continue/disabled. Fully constructed real monomials and both reserved/empty maps under a closed process owner distinguish erased operands, Get without an assertion, and native growth before the failed gate. No source IDs/counts or monomial descriptors are modified in these new tests; the legacy malformed-ID boundary test remains separate."
         },
         {
-          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92–154; concrete []MonomialPower replaces source arrays",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -57473,7 +57482,7 @@
           ]
         },
         {
-          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92–154; concrete []MonomialPower replaces source arrays",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -57512,7 +57521,7 @@
           ]
         },
         {
-          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92–154; concrete []MonomialPower replaces source arrays",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -57551,7 +57560,7 @@
           ]
         },
         {
-          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156–234; five source uint32 fields plus powers with cold scalar handle provenance",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
@@ -57592,7 +57601,7 @@
           ]
         },
         {
-          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156–234; five source uint32 fields plus powers with cold scalar handle provenance",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
@@ -57633,7 +57642,7 @@
           ]
         },
         {
-          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156–234; five source uint32 fields plus powers with cold scalar handle provenance",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_table.go",
           "tests": [
@@ -57674,7 +57683,7 @@
           ]
         },
         {
-          "name": "complete max/search/is_valid/square query block cpp218,236\u2013375,423\u2013437 with exact reached-field reads and retained small/large search branches",
+          "name": "complete max/search/is_valid/square query block cpp218,236–375,423–437 with exact reached-field reads and retained small/large search branches",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -57720,7 +57729,7 @@
           ]
         },
         {
-          "name": "complete ordinary/SMT2 display and object rename block cpp378\u2013445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
+          "name": "complete ordinary/SMT2 display and object rename block cpp378–445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
@@ -57763,7 +57772,7 @@
           ]
         },
         {
-          "name": "complete ordinary/SMT2 display and object rename block cpp378\u2013445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
+          "name": "complete ordinary/SMT2 display and object rename block cpp378–445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -57806,7 +57815,7 @@
           ]
         },
         {
-          "name": "complete tmp_monomial block cpp507\u2013594: native []MonomialPower with source logical size/capacity 128, destructive reserve/init growth, preserving push-back growth, exact hash/reset and runtime assertion actions",
+          "name": "complete tmp_monomial block cpp507–594: native []MonomialPower with source logical size/capacity 128, destructive reserve/init growth, preserving push-back growth, exact hash/reset and runtime assertion actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -57852,7 +57861,7 @@
           "notes": "Source setters preserve literal behavior after Continue: set_size582 publishes logical size without allocating; set_power587 always consults the process switch then reaches a typed physical Go bounds guard instead of inventing reserve/growth. Continued private increase/expand521/528 execute their actual source bodies even for a smaller capacity; preserving copies check physical source/destination spans. A constructed empty native slice represents capacity0 distinctly from an unconstructed nil slice, with no fake constructor bit. Oversized source spans/hash reads and zero-capacity push/write operations return typed bounds errors before the actual undefined memory access and never synthesize capacity. Equality of actual temporary/borrowed-temporary monomial keys now uses logical get_power228 assertion semantics; native tempPower remains a raw capacity-checked getter."
         },
         {
-          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765–918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
@@ -57893,7 +57902,7 @@
           ]
         },
         {
-          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765–918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
@@ -57934,7 +57943,7 @@
           ]
         },
         {
-          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765–918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_lifetime.go",
           "tests": [
@@ -57975,7 +57984,7 @@
           ]
         },
         {
-          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765–918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_vector.go",
           "tests": [
@@ -58016,7 +58025,7 @@
           ]
         },
         {
-          "name": "complete mul, divides/divide, GCD, unify, power/sqrt, variable division/removal and derivative block cpp919\u20131268 with source reserves, assertions and reached-field order",
+          "name": "complete mul, divides/divide, GCD, unify, power/sqrt, variable division/removal and derivative block cpp919–1268 with source reserves, assertions and reached-field order",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -58059,7 +58068,7 @@
           ]
         },
         {
-          "name": "complete manager Rename cpp1270\u20131292: native []bool permutation check, insertion-ordered insdict traversal, exact runtime assertion actions, per-monomial mutation/hash/table publication and final swap",
+          "name": "complete manager Rename cpp1270–1292: native []bool permutation check, insertion-ordered insdict traversal, exact runtime assertion actions, per-monomial mutation/hash/table publication and final swap",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -58102,7 +58111,7 @@
           "notes": "The1289 extra contains lookup is wholly gated; mandatory insertion remains independent. Rename uses actual replace-on-equal chashtable::insert client semantics, while factory interning keeps its prior canonical object. Native insertion-ordered traversal determines the last equal key retained after diagnostic Continue on a many-to-one map. New tests use actual caller roots and public variable construction, preserve failed/successful source local-table lifetimes and retire hash-mutated intermediates through explicit owning token cleanup without payload/ID/count repair."
         },
         {
-          "name": "Complete retained monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
+          "name": "Complete retained monomial SIZE/VAR/DEG-only reached queries cpp236–375,423–437 with actual get_power DEBUG reference guards",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -58123,7 +58132,7 @@
           ]
         },
         {
-          "name": "Complete retained ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
+          "name": "Complete retained ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378–416",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
@@ -58167,7 +58176,7 @@
           "notes": "Go sort.Slice over concrete powers replaces std::sort. Its input copy reads raw variable/degree fields instead of adding get_power228 assertions absent from the source leaf. A real two-power monomial and permutation under a closed process assertion owner verify the sort and published variables without modifying source fields or constructing fake handles. Exact caller-root CleanupValue removes the old-table token using stored metadata; no source hash erase or inverse rename repairs the intermediate."
         },
         {
-          "name": "Complete retained raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
+          "name": "Complete retained raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919–1268",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -58503,7 +58512,7 @@
           ]
         },
         {
-          "name": "Complete concrete preparation/default/body constructor stages and tmp_monomial placement cpp193/507\u2013544/2308\u20132344 with full imp lifecycle composition",
+          "name": "Complete concrete preparation/default/body constructor stages and tmp_monomial placement cpp193/507–544/2308–2344 with full imp lifecycle composition",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
@@ -58511,7 +58520,7 @@
           ]
         },
         {
-          "name": "Complete polynomial skeleton cpp2958\u20133068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC, failed-constructor retained references, TRACE and assertion actions; native []*PolynomialSkeleton operations with published child owning history",
+          "name": "Complete polynomial skeleton cpp2958–3068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC, failed-constructor retained references, TRACE and assertion actions; native []*PolynomialSkeleton operations with published child owning history",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
@@ -58535,7 +58544,7 @@
           ]
         },
         {
-          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179\u20136232 and var_pos/scoped_var_pos cpp6307\u20136344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
+          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179–6232 and var_pos/scoped_var_pos cpp6307–6344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_variable_helpers.go",
           "tests": [
@@ -60098,109 +60107,152 @@
           "name": "Retained euclid_gcd non-univariate mgcd CTRACE before source assertion at polynomial.cpp:3641",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_euclid_trace.go",
-          "tests": ["TestPolynomialEuclidNonUnivariateConditionalSourceTrace"]
+          "tests": [
+            "TestPolynomialEuclidNonUnivariateConditionalSourceTrace"
+          ]
         },
         {
           "name": "Retained iccp_ZpX content_bug CTRACE with source divisibility condition at polynomial.cpp:4002",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_content_bug_trace.go",
-          "tests": ["TestPolynomialICCPZPXContentBugConditionalSourceTrace", "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel"]
+          "tests": [
+            "TestPolynomialICCPZPXContentBugConditionalSourceTrace",
+            "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel"
+          ]
         },
         {
           "name": "Retained iccp_ZpX and lc_glex_ZpX mgcd_detail TRACE at polynomial.cpp:3878-3954,4042",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_zpx_trace.go",
-          "tests": ["TestPolynomialGCDICCPZPXSourceShortcutTable", "TestPolynomialGCDGlexZPXIndependentCoefficientModel"]
+          "tests": [
+            "TestPolynomialGCDICCPZPXSourceShortcutTable",
+            "TestPolynomialGCDGlexZPXIndependentCoefficientModel"
+          ]
         },
         {
           "name": "Retained recursive modular GCD mgcd_detail TRACE at polynomial.cpp:4100,4114,4149,4152,4167,4184,4186,4205",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_detail_trace.go",
-          "tests": ["TestPolynomialRecursiveModularGCDSourceTrace"]
+          "tests": [
+            "TestPolynomialRecursiveModularGCDSourceTrace"
+          ]
         },
         {
           "name": "Retained recursive modular GCD mgcd TRACE at polynomial.cpp:4078,4085,4141,4177,4223",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_trace.go",
-          "tests": ["TestPolynomialRecursiveModularGCDSourceTrace"]
+          "tests": [
+            "TestPolynomialRecursiveModularGCDSourceTrace"
+          ]
         },
         {
           "name": "Retained multivariate modular GCD mgcd and mgcd_call TRACE at polynomial.cpp:4239-4343",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_modular_trace.go",
-          "tests": ["TestPolynomialMultivariateModularGCDSourceTrace", "TestPolynomialMultivariateModularGCDConstantTrace"]
+          "tests": [
+            "TestPolynomialMultivariateModularGCDSourceTrace",
+            "TestPolynomialMultivariateModularGCDConstantTrace"
+          ]
         },
         {
           "name": "Retained univariate modular GCD mgcd TRACE at polynomial.cpp:3770-3860",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_univariate_trace.go",
-          "tests": ["TestPolynomialUnivariateModularGCDSourceTrace", "TestPolynomialGCDDefaultIntegerCRAReconstruction", "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS"]
+          "tests": [
+            "TestPolynomialUnivariateModularGCDSourceTrace",
+            "TestPolynomialGCDDefaultIntegerCRAReconstruction",
+            "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS"
+          ]
         },
         {
           "name": "Retained polynomial CRA image, inverse, bound and merge TRACE at polynomial.cpp:3678-3760",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_cra_trace.go",
-          "tests": ["TestPolynomialCRASourceTraceMergeBranches"]
+          "tests": [
+            "TestPolynomialCRASourceTraceMergeBranches"
+          ]
         },
         {
           "name": "Retained polynomial gcd_prs entry, content, iteration and exit TRACE at polynomial.cpp:3556,3572,3591,3597,3604",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_prs_trace.go",
-          "tests": ["TestPolynomialGCDPRSSourceTraceBranches"]
+          "tests": [
+            "TestPolynomialGCDPRSSourceTraceBranches"
+          ]
         },
         {
           "name": "Retained skeleton lex_lt2 comparator TRACE at polynomial.cpp:684 on native Go sort calls",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
-          "tests": ["TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls"]
+          "tests": [
+            "TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls"
+          ]
         },
         {
           "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
-          "tests": ["TestPolynomialSkeletonSourceTraceOfGroupedPowers"]
+          "tests": [
+            "TestPolynomialSkeletonSourceTraceOfGroupedPowers"
+          ]
         },
         {
           "name": "Retained sparse interpolator equation and system TRACE at polynomial.cpp:3157,3164",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_sparse_trace.go",
-          "tests": ["TestPolynomialSparseInterpolationSourceTraceSequence"]
+          "tests": [
+            "TestPolynomialSparseInterpolationSourceTraceSequence"
+          ]
         },
         {
           "name": "Retained Newton interpolator add/mk TRACE at polynomial.cpp:2833,2851,2871,2890,2896,2901",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_newton_trace.go",
-          "tests": ["TestPolynomialNewtonSourceTraceSequenceAndRefusal"]
+          "tests": [
+            "TestPolynomialNewtonSourceTraceSequenceAndRefusal"
+          ]
         },
         {
           "name": "Retained polynomial iccp degree, content and divisor TRACE at polynomial.cpp:3493,3513,3528",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_iccp_trace.go",
-          "tests": ["TestPolynomialICCPDegreeSourceTraceBeforeFilterShortcut", "TestPolynomialICCPContentAndDivisorSourceTraces"]
+          "tests": [
+            "TestPolynomialICCPDegreeSourceTraceBeforeFilterShortcut",
+            "TestPolynomialICCPContentAndDivisorSourceTraces"
+          ]
         },
         {
           "name": "Retained polynomial iccp entry TRACE at polynomial.cpp:3454 before zero and constant shortcuts",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_iccp_trace.go",
-          "tests": ["TestPolynomialICCPEntrySourceTraceBeforeShortcuts"]
+          "tests": [
+            "TestPolynomialICCPEntrySourceTraceBeforeShortcuts"
+          ]
         },
         {
           "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_coefficient_trace.go",
-          "tests": ["TestPolynomialCoefficientSourceTraceAndStreamRefusal"]
+          "tests": [
+            "TestPolynomialCoefficientSourceTraceAndStreamRefusal"
+          ]
         },
         {
           "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_delete_trace.go",
-          "tests": ["TestPolynomialDeletionSourceTraceBeforeHandlerAndDuringClose", "TestPolynomialDeletionTraceStreamRefusalStillDeletes"]
+          "tests": [
+            "TestPolynomialDeletionSourceTraceBeforeHandlerAndDuringClose",
+            "TestPolynomialDeletionTraceStreamRefusalStillDeletes"
+          ]
         },
         {
           "name": "monomial_manager::mul source TRACE around interning at polynomial.cpp:960,967",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_mul_trace.go",
-          "tests": ["TestMonomialMultiplySourceTraceBeforeAndAfterIntern"]
+          "tests": [
+            "TestMonomialMultiplySourceTraceBeforeAndAfterIntern"
+          ]
         },
         {
           "name": "polynomial.cpp:6558-6830 Factor family: source assertion actions, strict minimum-degree selector, direct AccConstant/FlipSign, original-p UP converter, borrowed bound square-free backend, literal degree dispatcher, recursive FactorCore and accumulating Factor including erased zero/constant paths.",
@@ -60262,6 +60314,17 @@
             "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix",
             "TestPolynomialFactorSourceAssertionActions"
           ]
+        },
+        {
+          "name": "retained public manager::flip_sign_if_lm_neg forwarding cpp7220-7222 with exact raw-result core semantics cpp3434-3442 and accepted Neg cleanup",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_flip_sign.go",
+          "tests": [
+            "TestPolynomialFlipSignRetainedNLSATLeadingOrderAndContent",
+            "TestPolynomialFlipSignActualAllocationCleanupAndRetry",
+            "TestPolynomialFlipSignBIGAllocationCleanupAndRetry",
+            "TestPolynomialFlipSignRejectedCallPreservesIndependentNeg"
+          ]
         }
       ],
       "ownership": [
@@ -60291,7 +60354,7 @@
         "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md.",
         "Actual lexical polynomial references and H native reference slice; successful INC precedes native append without a Runtime container failure. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md.",
         "Every recursive invocation constructs its real auxiliary; charged concrete cached frame owners preserve exact lexical destruction, first stopped source cause and explicit owning abort. Matching actual LexSort/RAW generation and newly reached Integer ObjectRef/allocator roots are cleaned without sweeping later foreign calls. Rejected live-caller Close preserves cached frames.",
-        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
+        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral→rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
         "Actual Runtime numeral arrays, inline128 monomial buffer, auxiliary numeral and embedded concrete linear solver; reflected enclosing cold fields charged once, no mirror arrays or per-call solver heap header. Source destruction retains its first cause and stops before older locals; owning abort uses exact generation/numeric ObjectRef/raw receipts.",
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
         "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
@@ -60399,7 +60462,8 @@
         "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
         "polynomial.cpp:6558-6830: exact guarded named child receipts, actual source constructors/declaration counts, youngest child stop before reverse lexical DT, separate false acknowledgment and true unjoined cleanup, immutable body/source/first-own history. No before/after roots or return-value/RC inference. Inline SET0/SET1/Factor constants reserve no history; charged diagnostic records appear only at reached Integer/Natural allocation leaves. UP and caller Factors physical graphs name actual members; callbacks cannot retire matched active owners; unrelated Factors remain allowed.",
         "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added.",
-        "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness."
+        "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness.",
+        "The public leading-sign operation borrows the input and returns either the identical alias or a new zero-reference negation without changing content. A concrete accepted polynomialNegInvocationReceipt binds its cleanup only to that actual child invocation; rejected/stale calls cannot acknowledge an independent older negation. The receipt is native manager lifetime metadata, not a second arithmetic owner."
       ],
       "deviations": [
         "Divisibility TRACE cpp5155-5156 now precedes the zero shortcut and algorithm locals; cpp5181-5182 reports remainder/divisor and the actual optional quotient after monomial reference assignment. Direct polynomial display uses a separate exact diagnostic invocation and display generation. The compound caller receipt captures that pre-local child independently of the existing algorithm/prelude tuple, preserving the disabled-trace zero shortcut and its untouched older receipt. Exact cleanup rejects copied/stale diagnostic frames. Callback guards cover executing header/body/footer writes. Broader source failure/consumer audits remain open; no whole-unit promotion is claimed.",
@@ -60539,7 +60603,8 @@
         "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added.",
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
         "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial.",
-        "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is implemented with separate source failure and TRACE obligations remaining. The cpp2598 left-sample trace now uses the actual source display and protects its live sample across trace callbacks; disabled tracing does not read the sample, failed output preserves computations, and formatter allocation failure preserves isolated roots before sign publication. The cpp2578 input/assignment/root trace block now displays the actual polynomial, collects variables with the retained source Vars algorithm into a native local slice, rereads each assigned value separately for root and interval display, and displays each isolated root before precision refinement. Exact records, erased/no-root gates, sticky output failure, repeated-getter failure and callback refusal before manager/root-vector mutation are checked. Complete descendant allocation/destructor composition and eager constructor audits remain open."
+        "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is implemented with separate source failure and TRACE obligations remaining. The cpp2598 left-sample trace now uses the actual source display and protects its live sample across trace callbacks; disabled tracing does not read the sample, failed output preserves computations, and formatter allocation failure preserves isolated roots before sign publication. The cpp2578 input/assignment/root trace block now displays the actual polynomial, collects variables with the retained source Vars algorithm into a native local slice, rereads each assigned value separately for root and interval display, and displays each isolated root before precision refinement. Exact records, erased/no-root gates, sticky output failure, repeated-getter failure and callback refusal before manager/root-vector mutation are checked. Complete descendant allocation/destructor composition and eager constructor audits remain open.",
+        "Whole-unit audits are reopened: the prior ported/true flags recorded the private flip_sign_if_lm_neg/reference-update helpers but did not provide the retained external NLSAT public forwarding entry. That public path is now implemented and tested for graded-lex selection, raw-result alias/content semantics and exact accepted-child cleanup. Native additional receipt/header state differs from C++ layout. All source allocation/lexical/diagnostic frontiers of the new public entry are not yet audited, so the unit is partial with both whole-audit flags false; existing individually verified methods retain their recorded evidence."
       ],
       "trace_polynomial_display_dispatch_audit": {
         "source": "src/math/polynomial/polynomial.cpp",
@@ -60817,7 +60882,7 @@
       "path": "src/math/polynomial/polynomial.h",
       "component": "math",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/math/polynomial/polynomial_factors_assertions.go",
         "pkg/math/polynomial/polynomial_factors_assertions_test.go",
@@ -61129,7 +61194,8 @@
         "pkg/math/polynomial/polynomial_substitution_invocation_test.go",
         "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go",
         "pkg/math/polynomial/polynomial_gcd_check.go",
-        "pkg/math/polynomial/polynomial_gcd_check_test.go"
+        "pkg/math/polynomial/polynomial_gcd_check_test.go",
+        "pkg/math/polynomial/polynomial_flip_sign.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -61204,7 +61270,7 @@
         "TestPolynomialCellSourceDuplicateCancellation",
         "TestPolynomialCellIndependentArithmeticIdentity",
         "TestPolynomialCheapDuplicateAssertionBeforeZero",
-            "TestPolynomialCheapAppendDuplicateAssertionActions",
+        "TestPolynomialCheapAppendDuplicateAssertionActions",
         "TestPolynomialCheapResetReleasesBIG",
         "TestPolynomialSOMResetStoppedAfterPhysicalFreeOwningCursor",
         "TestPolynomialStoppedMonomialUnitOwningGuardDependency",
@@ -61385,7 +61451,7 @@
         "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
         "TestMonomialUnitNativeRecycleFinalizationIsIdempotent",
         "TestPolynomialLazardDichotomousIndependentCoefficients",
-            "TestPolynomialLazardSourceTraceAllBranches",
+        "TestPolynomialLazardSourceTraceAllBranches",
         "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
         "TestPolynomialPSCComposedEveryReservationPrefix",
@@ -61393,17 +61459,17 @@
         "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
-            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
+        "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
         "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
         "TestPolynomialPSCEveryCheckpointCancellationFrontier",
         "TestPolynomialPSCWarmActualSourceProfile",
         "TestPolynomialPSCFullOwnerPendingLocalClosePrefix",
         "TestPolynomialPSCSourceAssertionBeforeOutputReset",
-            "TestPolynomialPSCSourceTraceRecordsAndGating",
-            "TestPolynomialPSCSourceTraceStreamRefusal",
-            "TestPolynomialPSCAssertionActions",
-            "TestPolynomialPSCAssertionRuntimeActions",
+        "TestPolynomialPSCSourceTraceRecordsAndGating",
+        "TestPolynomialPSCSourceTraceStreamRefusal",
+        "TestPolynomialPSCAssertionActions",
+        "TestPolynomialPSCAssertionRuntimeActions",
         "TestPolynomialPSCOutputColdGuardBeforeOperandRead",
         "TestPolynomialPSCRegisteredFirstFixture",
         "TestPolynomialPSCBufferDestructorStopsOlderSourceLocals",
@@ -61526,7 +61592,7 @@
         "TestPolynomialGCDPowerDegreeSortSourceAdapter",
         "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
         "TestPolynomialFreshValueZeroModulusSourceProfile",
-            "TestPolynomialFreshValueAssertionActions",
+        "TestPolynomialFreshValueAssertionActions",
         "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
         "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
         "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
@@ -61561,7 +61627,7 @@
         "TestPolynomialResultantEveryReservationPrefix",
         "TestPolynomialResultantBigNumeralEveryReservationPrefix",
         "TestPolynomialResultantAllEightOriginalPSCAssertions",
-            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
+        "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialScopedZPActualModeAndPrimeRestoration",
         "TestPolynomialScopedZPFailedBodyDoesNotRestoreMode",
         "TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending",
@@ -61743,10 +61809,11 @@
         "TestPolynomialGCDCleanupPreservesIndependentLazard",
         "TestPolynomialGCDIndependentLazardReservationPrefixes",
         "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
-            "TestPolynomialGCDContentScaleAssignmentCallbackAndRetry",
+        "TestPolynomialGCDContentScaleAssignmentCallbackAndRetry",
         "TestPolynomialSubstitutionInvocationReservationPrefixes",
         "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch",
-        "TestPolynomialGCDMGCDCheckRereadsTagAndConstructsDebugLocals"
+        "TestPolynomialGCDMGCDCheckRereadsTagAndConstructsDebugLocals",
+        "pkg/math/polynomial/polynomial_flip_sign_test.go"
       ],
       "conditionals": [
         {
@@ -61772,8 +61839,8 @@
           "text": "SASSERT(k > 0);"
         }
       ],
-      "methods_audited": true,
-      "ownership_audited": true,
+      "methods_audited": false,
+      "ownership_audited": false,
       "methods": [
         {
           "name": "Concrete polynomial hash child reads only monomial hash and follows composite child visitation (polynomial.cpp:210,2468-2480)",
@@ -62025,10 +62092,13 @@
           "name": "Complete Horner composition cpp4798-4818: exact MulAdd child binding, source cleanup, false/true owning acknowledgment and retry without stranded borrowed monomials",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
-          "tests": ["TestPolynomialCompositionHornerChildCancellationCleanupAndRetry", "TestAlgebraicBinaryEveryReachedCancellationAndRetry"]
+          "tests": [
+            "TestPolynomialCompositionHornerChildCancellationCleanupAndRetry",
+            "TestAlgebraicBinaryEveryReachedCancellationAndRetry"
+          ]
         },
         {
-          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609\u2013764), source reference guards, size/variable reads and reached-only degree reads",
+          "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609–764), source reference guards, size/variable reads and reached-only degree reads",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_order.go",
           "tests": [
@@ -62077,7 +62147,7 @@
           ]
         },
         {
-          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92–154; concrete []MonomialPower replaces source arrays",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -62116,7 +62186,7 @@
           ]
         },
         {
-          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92–154; concrete []MonomialPower replaces source arrays",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -62155,7 +62225,7 @@
           ]
         },
         {
-          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92–154; concrete []MonomialPower replaces source arrays",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -62194,7 +62264,7 @@
           ]
         },
         {
-          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156–234; five source uint32 fields plus powers with cold scalar handle provenance",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
@@ -62235,7 +62305,7 @@
           ]
         },
         {
-          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156–234; five source uint32 fields plus powers with cold scalar handle provenance",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
@@ -62276,7 +62346,7 @@
           ]
         },
         {
-          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156\u2013234; five source uint32 fields plus powers with cold scalar handle provenance",
+          "name": "complete monomial header, constructor, references, hash/equality and get_power block cpp156–234; five source uint32 fields plus powers with cold scalar handle provenance",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_table.go",
           "tests": [
@@ -62317,7 +62387,7 @@
           ]
         },
         {
-          "name": "complete max/search/is_valid/square query block cpp218,236\u2013375,423\u2013437 with exact reached-field reads and retained small/large search branches",
+          "name": "complete max/search/is_valid/square query block cpp218,236–375,423–437 with exact reached-field reads and retained small/large search branches",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -62363,7 +62433,7 @@
           ]
         },
         {
-          "name": "complete ordinary/SMT2 display and object rename block cpp378\u2013445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
+          "name": "complete ordinary/SMT2 display and object rename block cpp378–445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
@@ -62406,7 +62476,7 @@
           ]
         },
         {
-          "name": "complete ordinary/SMT2 display and object rename block cpp378\u2013445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
+          "name": "complete ordinary/SMT2 display and object rename block cpp378–445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -62449,7 +62519,7 @@
           ]
         },
         {
-          "name": "complete tmp_monomial block cpp507\u2013594: native []MonomialPower with source logical size/capacity 128, destructive reserve/init growth, preserving push-back growth, exact hash/reset and runtime assertion actions",
+          "name": "complete tmp_monomial block cpp507–594: native []MonomialPower with source logical size/capacity 128, destructive reserve/init growth, preserving push-back growth, exact hash/reset and runtime assertion actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
@@ -62495,7 +62565,7 @@
           "notes": "Source setters preserve literal behavior after Continue: set_size582 publishes logical size without allocating; set_power587 always consults the process switch then reaches a typed physical Go bounds guard instead of inventing reserve/growth. Continued private increase/expand521/528 execute their actual source bodies even for a smaller capacity; preserving copies check physical source/destination spans. A constructed empty native slice represents capacity0 distinctly from an unconstructed nil slice, with no fake constructor bit. Oversized source spans/hash reads and zero-capacity push/write operations return typed bounds errors before the actual undefined memory access and never synthesize capacity. Equality of actual temporary/borrowed-temporary monomial keys now uses logical get_power228 assertion semantics; native tempPower remains a raw capacity-checked getter."
         },
         {
-          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765–918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
@@ -62536,7 +62606,7 @@
           ]
         },
         {
-          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765–918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
@@ -62577,7 +62647,7 @@
           ]
         },
         {
-          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765–918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_lifetime.go",
           "tests": [
@@ -62618,7 +62688,7 @@
           ]
         },
         {
-          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765–918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_vector.go",
           "tests": [
@@ -62659,7 +62729,7 @@
           ]
         },
         {
-          "name": "complete mul, divides/divide, GCD, unify, power/sqrt, variable division/removal and derivative block cpp919\u20131268 with source reserves, assertions and reached-field order",
+          "name": "complete mul, divides/divide, GCD, unify, power/sqrt, variable division/removal and derivative block cpp919–1268 with source reserves, assertions and reached-field order",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -62702,7 +62772,7 @@
           ]
         },
         {
-          "name": "complete manager Rename cpp1270\u20131292: native []bool permutation check, insertion-ordered insdict traversal, exact runtime assertion actions, per-monomial mutation/hash/table publication and final swap",
+          "name": "complete manager Rename cpp1270–1292: native []bool permutation check, insertion-ordered insdict traversal, exact runtime assertion actions, per-monomial mutation/hash/table publication and final swap",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -62742,7 +62812,7 @@
           ]
         },
         {
-          "name": "Complete retained monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
+          "name": "Complete retained monomial SIZE/VAR/DEG-only reached queries cpp236–375,423–437 with actual get_power DEBUG reference guards",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
@@ -62763,7 +62833,7 @@
           ]
         },
         {
-          "name": "Complete retained ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
+          "name": "Complete retained ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378–416",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
@@ -62784,7 +62854,7 @@
           ]
         },
         {
-          "name": "Complete retained monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
+          "name": "Complete retained monomial rename VAR-only mutation before sort/hash cpp439–445; declared concrete heapsort adaptation preserved",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
@@ -62805,7 +62875,7 @@
           ]
         },
         {
-          "name": "Complete retained raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
+          "name": "Complete retained raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919–1268",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
@@ -63133,7 +63203,7 @@
           ]
         },
         {
-          "name": "Complete concrete preparation/default/body constructor stages and tmp_monomial placement cpp193/507\u2013544/2308\u20132344 with full imp lifecycle composition",
+          "name": "Complete concrete preparation/default/body constructor stages and tmp_monomial placement cpp193/507–544/2308–2344 with full imp lifecycle composition",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
@@ -63141,7 +63211,7 @@
           ]
         },
         {
-          "name": "Complete polynomial skeleton cpp2958\u20133068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC, failed-constructor retained references, TRACE and assertion actions; native []*PolynomialSkeleton operations with published child owning history",
+          "name": "Complete polynomial skeleton cpp2958–3068 canonical grouping, native typed entry/power/original slices and borrowed sorting scratch, actual monomial INC/DEC, failed-constructor retained references, TRACE and assertion actions; native []*PolynomialSkeleton operations with published child owning history",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton.go",
           "tests": [
@@ -63164,7 +63234,7 @@
           ]
         },
         {
-          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179\u20136232 and var_pos/scoped_var_pos cpp6307\u20136344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
+          "name": "Selected complete var_max_degree/scoped_var_max_degree cpp6179–6232 and var_pos/scoped_var_pos cpp6307–6344: reached source reads, all-expansion filled resize, actual embedded vector copy/move and scoped destruction; full imp composition remains open",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_variable_helpers.go",
           "tests": [
@@ -63769,109 +63839,152 @@
           "name": "Retained euclid_gcd non-univariate mgcd CTRACE before source assertion at polynomial.cpp:3641",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_euclid_trace.go",
-          "tests": ["TestPolynomialEuclidNonUnivariateConditionalSourceTrace"]
+          "tests": [
+            "TestPolynomialEuclidNonUnivariateConditionalSourceTrace"
+          ]
         },
         {
           "name": "Retained iccp_ZpX content_bug CTRACE with source divisibility condition at polynomial.cpp:4002",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_content_bug_trace.go",
-          "tests": ["TestPolynomialICCPZPXContentBugConditionalSourceTrace", "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel"]
+          "tests": [
+            "TestPolynomialICCPZPXContentBugConditionalSourceTrace",
+            "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel"
+          ]
         },
         {
           "name": "Retained iccp_ZpX and lc_glex_ZpX mgcd_detail TRACE at polynomial.cpp:3878-3954,4042",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_zpx_trace.go",
-          "tests": ["TestPolynomialGCDICCPZPXSourceShortcutTable", "TestPolynomialGCDGlexZPXIndependentCoefficientModel"]
+          "tests": [
+            "TestPolynomialGCDICCPZPXSourceShortcutTable",
+            "TestPolynomialGCDGlexZPXIndependentCoefficientModel"
+          ]
         },
         {
           "name": "Retained recursive modular GCD mgcd_detail TRACE at polynomial.cpp:4100,4114,4149,4152,4167,4184,4186,4205",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_detail_trace.go",
-          "tests": ["TestPolynomialRecursiveModularGCDSourceTrace"]
+          "tests": [
+            "TestPolynomialRecursiveModularGCDSourceTrace"
+          ]
         },
         {
           "name": "Retained recursive modular GCD mgcd TRACE at polynomial.cpp:4078,4085,4141,4177,4223",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_trace.go",
-          "tests": ["TestPolynomialRecursiveModularGCDSourceTrace"]
+          "tests": [
+            "TestPolynomialRecursiveModularGCDSourceTrace"
+          ]
         },
         {
           "name": "Retained multivariate modular GCD mgcd and mgcd_call TRACE at polynomial.cpp:4239-4343",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_modular_trace.go",
-          "tests": ["TestPolynomialMultivariateModularGCDSourceTrace", "TestPolynomialMultivariateModularGCDConstantTrace"]
+          "tests": [
+            "TestPolynomialMultivariateModularGCDSourceTrace",
+            "TestPolynomialMultivariateModularGCDConstantTrace"
+          ]
         },
         {
           "name": "Retained univariate modular GCD mgcd TRACE at polynomial.cpp:3770-3860",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_univariate_trace.go",
-          "tests": ["TestPolynomialUnivariateModularGCDSourceTrace", "TestPolynomialGCDDefaultIntegerCRAReconstruction", "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS"]
+          "tests": [
+            "TestPolynomialUnivariateModularGCDSourceTrace",
+            "TestPolynomialGCDDefaultIntegerCRAReconstruction",
+            "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS"
+          ]
         },
         {
           "name": "Retained polynomial CRA image, inverse, bound and merge TRACE at polynomial.cpp:3678-3760",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_cra_trace.go",
-          "tests": ["TestPolynomialCRASourceTraceMergeBranches"]
+          "tests": [
+            "TestPolynomialCRASourceTraceMergeBranches"
+          ]
         },
         {
           "name": "Retained polynomial gcd_prs entry, content, iteration and exit TRACE at polynomial.cpp:3556,3572,3591,3597,3604",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_prs_trace.go",
-          "tests": ["TestPolynomialGCDPRSSourceTraceBranches"]
+          "tests": [
+            "TestPolynomialGCDPRSSourceTraceBranches"
+          ]
         },
         {
           "name": "Retained skeleton lex_lt2 comparator TRACE at polynomial.cpp:684 on native Go sort calls",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
-          "tests": ["TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls"]
+          "tests": [
+            "TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls"
+          ]
         },
         {
           "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
-          "tests": ["TestPolynomialSkeletonSourceTraceOfGroupedPowers"]
+          "tests": [
+            "TestPolynomialSkeletonSourceTraceOfGroupedPowers"
+          ]
         },
         {
           "name": "Retained sparse interpolator equation and system TRACE at polynomial.cpp:3157,3164",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_sparse_trace.go",
-          "tests": ["TestPolynomialSparseInterpolationSourceTraceSequence"]
+          "tests": [
+            "TestPolynomialSparseInterpolationSourceTraceSequence"
+          ]
         },
         {
           "name": "Retained Newton interpolator add/mk TRACE at polynomial.cpp:2833,2851,2871,2890,2896,2901",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_newton_trace.go",
-          "tests": ["TestPolynomialNewtonSourceTraceSequenceAndRefusal"]
+          "tests": [
+            "TestPolynomialNewtonSourceTraceSequenceAndRefusal"
+          ]
         },
         {
           "name": "Retained polynomial iccp degree, content and divisor TRACE at polynomial.cpp:3493,3513,3528",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_iccp_trace.go",
-          "tests": ["TestPolynomialICCPDegreeSourceTraceBeforeFilterShortcut", "TestPolynomialICCPContentAndDivisorSourceTraces"]
+          "tests": [
+            "TestPolynomialICCPDegreeSourceTraceBeforeFilterShortcut",
+            "TestPolynomialICCPContentAndDivisorSourceTraces"
+          ]
         },
         {
           "name": "Retained polynomial iccp entry TRACE at polynomial.cpp:3454 before zero and constant shortcuts",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_iccp_trace.go",
-          "tests": ["TestPolynomialICCPEntrySourceTraceBeforeShortcuts"]
+          "tests": [
+            "TestPolynomialICCPEntrySourceTraceBeforeShortcuts"
+          ]
         },
         {
           "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_coefficient_trace.go",
-          "tests": ["TestPolynomialCoefficientSourceTraceAndStreamRefusal"]
+          "tests": [
+            "TestPolynomialCoefficientSourceTraceAndStreamRefusal"
+          ]
         },
         {
           "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_delete_trace.go",
-          "tests": ["TestPolynomialDeletionSourceTraceBeforeHandlerAndDuringClose", "TestPolynomialDeletionTraceStreamRefusalStillDeletes"]
+          "tests": [
+            "TestPolynomialDeletionSourceTraceBeforeHandlerAndDuringClose",
+            "TestPolynomialDeletionTraceStreamRefusalStillDeletes"
+          ]
         },
         {
           "name": "monomial_manager::mul source TRACE around interning at polynomial.cpp:960,967",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_mul_trace.go",
-          "tests": ["TestMonomialMultiplySourceTraceBeforeAndAfterIntern"]
+          "tests": [
+            "TestMonomialMultiplySourceTraceBeforeAndAfterIntern"
+          ]
         },
         {
           "name": "polynomial.cpp:6558-6830 Factor family: source assertion actions, strict minimum-degree selector, direct AccConstant/FlipSign, original-p UP converter, borrowed bound square-free backend, literal degree dispatcher, recursive FactorCore and accumulating Factor including erased zero/constant paths.",
@@ -63933,6 +64046,17 @@
             "TestPolynomialFactorMinimumVariableEveryActualConstructorPrefix",
             "TestPolynomialFactorSourceAssertionActions"
           ]
+        },
+        {
+          "name": "retained public manager::flip_sign_if_lm_neg forwarding cpp7220-7222 with exact raw-result core semantics cpp3434-3442 and accepted Neg cleanup",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_flip_sign.go",
+          "tests": [
+            "TestPolynomialFlipSignRetainedNLSATLeadingOrderAndContent",
+            "TestPolynomialFlipSignActualAllocationCleanupAndRetry",
+            "TestPolynomialFlipSignBIGAllocationCleanupAndRetry",
+            "TestPolynomialFlipSignRejectedCallPreservesIndependentNeg"
+          ]
         }
       ],
       "ownership": [
@@ -63961,7 +64085,7 @@
         "Translation uses the existing actual imp coefficient-buffer member. Named roots include actual child/raw/pending/old storage, retained NUM and exact generated monomial/factory generation; ordinary scope unwind precedes owning abort. Full owning Close rejects retained translation locals before child or caller teardown. Lex sort owns real Runtime bucket bindings and cold child directory plus permutation member; failed lower recursion preserves prior published term permutations. No registry-derived owning authority or native class allocation equivalence.",
         "Actual derivative n/a embedded full-manager scope and reverse source destruction; charged created-only monomial cohort never owns borrowed RC0. Exact executing factory generation/parent, numeric ObjectRef and allzero-before allocator pending triple receipts identify only reached failed callees. Source causes stay sticky, consumed drops/frees never replay, and owning cleanup leaves later caller replacements untouched. See PORT_PROGRESS.md.",
         "Actual lexical polynomial references and H native reference slice; successful INC precedes native append without a Runtime container failure. Reverse lexical destruction and source first-cause stops precede explicit operation-owned abort. Actual invocation/factory/singleton and pending-cell receipts exclude later caller continuations. See PORT_PROGRESS.md.",
-        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral\u2192rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
+        "Concrete reflected composition scope borrows source degree2pos member, owns actual completed numeral/poly locals and exact created-outcome orphan cohort. Source auxiliary then degree then local destruction; matching younger constant numeral→rational NUM/DEN stop preserves older locals and sticky causes. Explicit owning cleanup resumes matching callee first and acknowledges only its exact consumed returned result; physical pending ObjectRef/triples and borrowed callbacks remain separate, no registry-derived authority.",
         "Actual Runtime numeral arrays, inline128 monomial buffer, auxiliary numeral and embedded concrete linear solver; reflected enclosing cold fields charged once, no mirror arrays or per-call solver heap header. Source destruction retains its first cause and stops before older locals; owning abort uses exact generation/numeric ObjectRef/raw receipts.",
         "Content ai and monic inv/newA are actual named cold fields; the three actual retained BIG fixture detects missing root enumeration, without claiming simultaneous mathematical reachability. Direct caller output SET/ref-assignment roots remain caller-owned.",
         "Real source deletion callbacks do not grant outer PSC factory/singleton ownership; actual callback execution excludes receipt acquisition without changing source callback/depth order.",
@@ -63996,7 +64120,8 @@
         "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
         "polynomial.cpp:6558-6830: exact guarded named child receipts, actual source constructors/declaration counts, youngest child stop before reverse lexical DT, separate false acknowledgment and true unjoined cleanup, immutable body/source/first-own history. No before/after roots or return-value/RC inference. Inline SET0/SET1/Factor constants reserve no history; charged diagnostic records appear only at reached Integer/Natural allocation leaves. UP and caller Factors physical graphs name actual members; callbacks cannot retire matched active owners; unrelated Factors remain allowed.",
         "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added.",
-        "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness."
+        "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness.",
+        "The public leading-sign operation borrows the input and returns either the identical alias or a new zero-reference negation without changing content. A concrete accepted polynomialNegInvocationReceipt binds its cleanup only to that actual child invocation; rejected/stale calls cannot acknowledge an independent older negation. The receipt is native manager lifetime metadata, not a second arithmetic owner."
       ],
       "deviations": [
         "Algebraic exact sign evaluation mathematical-path increment (algebraic_numbers.cpp:1979-2188,3041-3043): EvalSign now connects optimistic rationals, rational elimination, interval refinement and exact resultant fallback. It creates y-p_prime in the private MM, stable-sorts actual variables by defining-polynomial degree, eliminates each source variable using its actual defining polynomial, converts into persistent eval-sign UP storage and computes the nonzero-root lower bound through an actually issued Knuth receipt. Saved intervals and +/-2^-k bounds follow source declaration/destruction order; exact refinement returns a strict sign or zero, restoring overrefined inputs, or restarts after rational discovery. The global converter binds an actual accepted algebraic caller and preserves existing public behavior. A real cancellation sweep exposed GCD source cleanup dropping an exact-division receipt while its earlier remainder-buffer arithmetic invocation still owned rows; pending detection now retains that precise child. Independent tests cover exact square/sum-of-squares zeros, signed sqrt(2)+sqrt(3)-3, mixed quadratic/cubic degree order, rational restart and raw-inline rational sign. The expected resultant y^4+12*y^3+44*y^2+48*y-8 and source input-interval restoration are checked independently. Every reached algebraic/resultant checkpoint cancellation/owning-cleanup/retry frontier passes in ordinary and checked/debug/trace profiles on CPUs 8-16. Full allocation-failure/callback/TRACE/eager-constructor and complete polynomial/AST audits remain partial; no whole-unit completion credit.",
@@ -64077,7 +64202,8 @@
         "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added.",
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
         "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial.",
-        "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is implemented with separate source failure and TRACE obligations remaining. The cpp2598 left-sample trace now uses the actual source display and protects its live sample across trace callbacks; disabled tracing does not read the sample, failed output preserves computations, and formatter allocation failure preserves isolated roots before sign publication. The cpp2578 input/assignment/root trace block now displays the actual polynomial, collects variables with the retained source Vars algorithm into a native local slice, rereads each assigned value separately for root and interval display, and displays each isolated root before precision refinement. Exact records, erased/no-root gates, sticky output failure, repeated-getter failure and callback refusal before manager/root-vector mutation are checked. Complete descendant allocation/destructor composition and eager constructor audits remain open."
+        "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is implemented with separate source failure and TRACE obligations remaining. The cpp2598 left-sample trace now uses the actual source display and protects its live sample across trace callbacks; disabled tracing does not read the sample, failed output preserves computations, and formatter allocation failure preserves isolated roots before sign publication. The cpp2578 input/assignment/root trace block now displays the actual polynomial, collects variables with the retained source Vars algorithm into a native local slice, rereads each assigned value separately for root and interval display, and displays each isolated root before precision refinement. Exact records, erased/no-root gates, sticky output failure, repeated-getter failure and callback refusal before manager/root-vector mutation are checked. Complete descendant allocation/destructor composition and eager constructor audits remain open.",
+        "Whole-unit audits are reopened: the prior ported/true flags recorded the private flip_sign_if_lm_neg/reference-update helpers but did not provide the retained external NLSAT public forwarding entry. That public path is now implemented and tested for graded-lex selection, raw-result alias/content semantics and exact accepted-child cleanup. Native additional receipt/header state differs from C++ layout. All source allocation/lexical/diagnostic frontiers of the new public entry are not yet audited, so the unit is partial with both whole-audit flags false; existing individually verified methods retain their recorded evidence."
       ]
     },
     {

@@ -1323,6 +1323,7 @@
         "polynomial_factory_assertions.go",
         "polynomial_factory_receipt.go",
         "polynomial_flip_assertions.go",
+        "polynomial_flip_sign.go",
         "polynomial_gcd.go",
         "polynomial_gcd_check.go",
         "polynomial_gcd_cleanup.go",
