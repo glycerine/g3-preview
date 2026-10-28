@@ -97,11 +97,16 @@ func TestScopedTimerAuthorityAndRunningCallbackClose(t *testing.T) {
 	}
 
 	selfClosed := make(chan error, 1)
-	var self *ScopedTimer
-	self, err = NewScopedTimer(20, EventHandlerFunc(func(EventCaller) {
+	// Publish the fully constructed timer to the callback. A timeout alone
+	// does not synchronize the constructor's return or the caller's assignment.
+	selfReady := make(chan *ScopedTimer, 1)
+	self, err := NewScopedTimer(1, EventHandlerFunc(func(EventCaller) {
+		self := <-selfReady
 		selfClosed <- self.Close()
 	}))
 	serviceMust(t, err)
+	defer func() { serviceMust(t, self.Close()) }()
+	selfReady <- self
 	select {
 	case err = <-selfClosed:
 		serviceMust(t, err)
