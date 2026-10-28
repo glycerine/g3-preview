@@ -84,3 +84,29 @@ func TestSearchResolutionClauseSkipAndNewArithmeticLevel(t *testing.T) {
 		t.Fatal("arithmetic lemma classified Boolean")
 	}
 }
+
+func TestSearchResolutionLazyClauseUsesComposedExplanation(t *testing.T) {
+	e, r, n, _ := projectionCoefficientFixture(t, true)
+	q, err := newSearchResolution(r)
+	assignmentMust(t, err)
+	t.Cleanup(func() { assignmentMust(t, q.close()) })
+	evaluatorSetFraction(t, e, 0, 0, 1)
+	evaluatorSetFraction(t, e, 1, 1, 1)
+	p := evaluatorPolynomial(t, e, evaluatorTerm{1, 0, 2}, evaluatorTerm{1, 1, 0}, evaluatorTerm{-2, 0, 0})
+	b, err := r.store.atoms.mkInequality(AtomEQ, []polynomial.Polynomial{p}, []bool{false})
+	assignmentMust(t, err)
+	conflict := sat.MakeLiteral(b, false)
+	j, err := NewLazyJustification(r.store.atoms.ineq.allocator, []sat.Literal{conflict})
+	assignmentMust(t, err)
+	t.Cleanup(func() { assignmentMust(t, DeleteJustification(r.store.atoms.ineq.allocator, j)) })
+	lazy, err := j.Lazy()
+	assignmentMust(t, err)
+	assignmentMust(t, q.buildLazyClause(lazy, n))
+	if len(q.lazy.result) != 2 || q.lazy.result[1] != conflict.Negated() || len(n.output.result) != 0 {
+		t.Fatal("lazy explanation clause composition", q.lazy.result, n.output.result)
+	}
+	root, ok := r.store.atoms.bools.atoms[q.lazy.result[0].Variable()].(*RootAtom)
+	if !ok || root.kind != AtomRootLT || !q.lazy.result[0].Sign() {
+		t.Fatal("lazy clause projected boundary", q.lazy.result[0], root)
+	}
+}

@@ -15,6 +15,7 @@ type searchResolution struct {
 	marks    []bool
 	numMarks uint32
 	lemma    scopedLiteralVector
+	lazy     scopedLiteralVector
 }
 
 func newSearchResolution(r *searchState) (*searchResolution, error) {
@@ -23,6 +24,7 @@ func newSearchResolution(r *searchState) (*searchResolution, error) {
 	}
 	q := &searchResolution{search: r}
 	q.lemma.factory = r.store.atoms
+	q.lazy.factory = r.store.atoms
 	return q, nil
 }
 
@@ -33,9 +35,45 @@ func (q *searchResolution) close() error {
 	if err := q.lemma.close(); err != nil {
 		return err
 	}
+	if err := q.lazy.close(); err != nil {
+		return err
+	}
 	q.search = nil
 	q.marks = nil
 	q.numMarks = 0
+	return nil
+}
+
+func (q *searchResolution) buildLazyClause(j *LazyJustification, explanation *explanationAssumptions) (err error) {
+	if j == nil || explanation == nil || explanation.search != q.search {
+		return ErrSearchOwner
+	}
+	literals, err := j.Literals()
+	if err != nil {
+		return err
+	}
+	if err = q.lazy.reset(); err != nil {
+		return err
+	}
+	if err = explanation.reset(); err != nil {
+		return err
+	}
+	if err = explanation.collectExplanation(literals, false); err != nil {
+		return err
+	}
+	for _, literal := range explanation.output.result {
+		if err = q.lazy.push(literal); err != nil {
+			return err
+		}
+	}
+	if err = explanation.reset(); err != nil {
+		return err
+	}
+	for _, literal := range literals {
+		if err = q.lazy.push(literal.Negated()); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
