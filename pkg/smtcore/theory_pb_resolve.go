@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: theory_pb process_antecedent/process_ineq/resolve_conflict and
 // hoist_maximal_values/remove_from_lemma. All state belongs to one resolution.
-package smtcore
 
 import (
 	"errors"

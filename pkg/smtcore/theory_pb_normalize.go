@@ -1,5 +1,6 @@
-// Source: theory_pb::arg_t and pb_rewriter_util<pb_lit_rewriter_util>.
 package smtcore
+
+// Source: theory_pb::arg_t and pb_rewriter_util<pb_lit_rewriter_util>.
 
 import (
 	"math/big"

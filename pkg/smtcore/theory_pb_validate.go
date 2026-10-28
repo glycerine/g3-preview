@@ -1,5 +1,6 @@
-// Source: src/smt/theory_pb.cpp:961-970,1029-1045,1146,1838-1915.
 package smtcore
+
+// Source: src/smt/theory_pb.cpp:961-970,1029-1045,1146,1838-1915.
 
 import (
 	"fmt"

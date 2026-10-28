@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_pb.cpp and src/smt/theory_pb.h retained exact
 // pseudo-Boolean atom semantics.
-package smtcore
 
 import (
 	"errors"

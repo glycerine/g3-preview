@@ -1,5 +1,6 @@
-// Source: src/util/sorting_network.h, concrete retained SMTLiteral psort.
 package smtcore
+
+// Source: src/util/sorting_network.h, concrete retained SMTLiteral psort.
 
 import (
 	"fmt"

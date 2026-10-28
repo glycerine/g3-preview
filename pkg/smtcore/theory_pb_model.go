@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_pb.cpp pb_factory and init_model. The source PB
 // build_models hook is false; Boolean roots use assignment-value wrappers
 // before family dispatch in smt_model_generator.cpp, not pb_model_value_proc.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

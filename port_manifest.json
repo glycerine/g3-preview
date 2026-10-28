@@ -146374,7 +146374,7 @@
       "path": "src/smt/theory_pb.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_pb.go",
         "pkg/smtcore/theory_pb_normalize.go",
@@ -146925,9 +146925,30 @@
           ]
         },
         {
-          "name": "Remaining whole-unit and inline PB assertion/VERIFY audit; final literal sorting-network whole-instantiation audit tracked separately in sorting_network.h",
-          "status": "unported",
-          "tests": []
+          "name": "Complete whole-unit and inline PB assertion/VERIFY audit; final literal sorting-network whole-instantiation audit remains tracked separately in sorting_network.h",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_compile.go",
+            "pkg/smtcore/theory_pb_inline_guard_test.go",
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_resolve.go",
+            "pkg/smtcore/theory_pb_simplex.go",
+            "pkg/smtcore/theory_pb_validate.go",
+            "pkg/smtcore/theory_pb_validate_test.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb_watch_test.go"
+          ],
+          "tests": [
+            "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
+            "TestSMTPBInternalizeTermSourceUnreachableGuard",
+            "TestSMTPBDebugNormalizedArgumentContract",
+            "TestSMTPBDebugWatchAndAssignmentValidators",
+            "TestSMTPBDebugVariableSumsAndFinalCheckRelevance",
+            "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+            "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+            "TestSMTPBSimplexBoundTrailAndRepresentativeRemoval"
+          ]
         },
         {
           "name": "process_antecedent/process_ineq/resolve_conflict/remove_from_lemma/hoist_maximal_values: source weighted cutting-plane resolution, LCM coefficient alignment, assignment-trail marks, complement cancellation, Boolean clause/binary/axiom/proof-wrapper handling, foreign/equality/predicate reason barriers, maximal-coefficient hoisting and guarded clause/new-predicate publication; exact conflict-frequency gate",
@@ -147169,14 +147190,15 @@
         "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
         "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h.",
         "Complement VERIFY now evaluates normalization in every build and checks l_undef in source debug builds, returning the established Go guard error after the normalization prefix. The internalize_term hook preserves native false and source debug UNREACHABLE. Exhaustive signed/rational normalization and strict-complement valuations check the live valid domain; final whole-unit audit remains open.",
-        "Removed non-source inconsistency exits inside the retained PB assignment callback. An actual weighted literal-watch conflict now reaches a second predicate variable-watch update and its new false assignment, preserving source watch sums/fixed counts and the original context conflict. Explicit pending callback regression fails before this correction."
+        "Removed non-source inconsistency exits inside the retained PB assignment callback. An actual weighted literal-watch conflict now reaches a second predicate variable-watch update and its new false assignment, preserving source watch sums/fixed counts and the original context conflict. Explicit pending callback regression fails before this correction.",
+        "Completed the retained theory_pb.cpp/.h assertion and VERIFY audit. Concrete debug guards cover normalized dual arguments, positive integral coefficients and bounds, literal uniqueness, watch indices/sums/fixed counts, assignment premises and consequences, simplex bound violations, compilation thresholds/integer expansion, resolution marks/coefficient signs/well-formed lemmas, final valuation consistency and model dependency counts. Native VERIFY side effects remain active where required. The concrete sorting-network instantiation remains independently partial under src/util/sorting_network.h and is not claimed by this closure."
       ]
     },
     {
       "path": "src/smt/theory_pb.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_pb.go",
         "pkg/smtcore/theory_pb_normalize.go",
@@ -147429,9 +147451,30 @@
           ]
         },
         {
-          "name": "Remaining whole-unit and inline PB assertion/VERIFY audit; final literal sorting-network whole-instantiation audit tracked separately in sorting_network.h",
-          "status": "unported",
-          "tests": []
+          "name": "Complete whole-unit and inline PB assertion/VERIFY audit; final literal sorting-network whole-instantiation audit remains tracked separately in sorting_network.h",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_pb.go",
+            "pkg/smtcore/theory_pb_compile.go",
+            "pkg/smtcore/theory_pb_inline_guard_test.go",
+            "pkg/smtcore/theory_pb_normalize.go",
+            "pkg/smtcore/theory_pb_resolve.go",
+            "pkg/smtcore/theory_pb_simplex.go",
+            "pkg/smtcore/theory_pb_validate.go",
+            "pkg/smtcore/theory_pb_validate_test.go",
+            "pkg/smtcore/theory_pb_watch.go",
+            "pkg/smtcore/theory_pb_watch_test.go"
+          ],
+          "tests": [
+            "TestSMTPBComplementVerifyRetainsNormalizationPrefix",
+            "TestSMTPBInternalizeTermSourceUnreachableGuard",
+            "TestSMTPBDebugNormalizedArgumentContract",
+            "TestSMTPBDebugWatchAndAssignmentValidators",
+            "TestSMTPBDebugVariableSumsAndFinalCheckRelevance",
+            "TestSMTPBWeightedWatchReplacementJustificationAndRollback",
+            "TestSMTPBResolutionCoefficientAlignmentAndComplementControls",
+            "TestSMTPBSimplexBoundTrailAndRepresentativeRemoval"
+          ]
         },
         {
           "name": "process_antecedent/process_ineq/resolve_conflict/remove_from_lemma/hoist_maximal_values: source weighted cutting-plane resolution, LCM coefficient alignment, assignment-trail marks, complement cancellation, Boolean clause/binary/axiom/proof-wrapper handling, foreign/equality/predicate reason barriers, maximal-coefficient hoisting and guarded clause/new-predicate publication; exact conflict-frequency gate",
@@ -147673,7 +147716,8 @@
         "The per-inequality propagation count now uses concrete uint32, matching source unsigned wrap before compilation-threshold and conflict-frequency comparisons; the earlier uint64 field could incorrectly enqueue compilation at wrap. Native trace tests distinguish actual packet/operand behavior from writer or Go budget-guard domains. Post-prune trace placement preserves existing constant/residual-predicate correctness corrections rather than reintroducing source folding defects. Weighted-resolution and literal-network diagnostic work remains explicitly incomplete.",
         "Resolution diagnostics preserve source packet order and separate pb/pb_verbose tags. Compiler-dependent C++ typeid names use concrete Go justification names as a platform replacement, without ABI mangling. Six source PB counters and network counters wrap at uint32; the Go-only pb clauses metric remains uint64 and follows source statistics. Whole-unit/inline and final literal-network audits remain incomplete; subsequent literal-network diagnostic evidence is recorded in sorting_network.h.",
         "Complement VERIFY now evaluates normalization in every build and checks l_undef in source debug builds, returning the established Go guard error after the normalization prefix. The internalize_term hook preserves native false and source debug UNREACHABLE. Exhaustive signed/rational normalization and strict-complement valuations check the live valid domain; final whole-unit audit remains open.",
-        "Removed non-source inconsistency exits inside the retained PB assignment callback. An actual weighted literal-watch conflict now reaches a second predicate variable-watch update and its new false assignment, preserving source watch sums/fixed counts and the original context conflict. Explicit pending callback regression fails before this correction."
+        "Removed non-source inconsistency exits inside the retained PB assignment callback. An actual weighted literal-watch conflict now reaches a second predicate variable-watch update and its new false assignment, preserving source watch sums/fixed counts and the original context conflict. Explicit pending callback regression fails before this correction.",
+        "Completed the retained theory_pb.cpp/.h assertion and VERIFY audit. Concrete debug guards cover normalized dual arguments, positive integral coefficients and bounds, literal uniqueness, watch indices/sums/fixed counts, assignment premises and consequences, simplex bound violations, compilation thresholds/integer expansion, resolution marks/coefficient signs/well-formed lemmas, final valuation consistency and model dependency counts. Native VERIFY side effects remain active where required. The concrete sorting-network instantiation remains independently partial under src/util/sorting_network.h and is not claimed by this closure."
       ]
     },
     {

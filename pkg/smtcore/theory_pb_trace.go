@@ -1,5 +1,6 @@
-// Source: src/smt/theory_pb.cpp retained pb TRACE records and arg_t::display.
 package smtcore
+
+// Source: src/smt/theory_pb.cpp retained pb TRACE records and arg_t::display.
 
 import (
 	"fmt"

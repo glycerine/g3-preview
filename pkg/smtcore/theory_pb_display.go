@@ -1,5 +1,6 @@
-// Source: src/smt/theory_pb.cpp display(ineq), display_watch and display.
 package smtcore
+
+// Source: src/smt/theory_pb.cpp display(ineq), display_watch and display.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: theory_pb variable/literal watches, assign_watch, assign_ineq,
 // assign_watch_ge and their scope trails. Numerals are concrete exact rationals.
-package smtcore
 
 import (
 	"io"

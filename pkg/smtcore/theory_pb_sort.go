@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/util/sorting_network.h, retained psort_nw<theory_pb::psort_expr>
 // instantiation reached by src/smt/theory_pb.cpp:compile_ineq.
-package smtcore
 
 import (
 	"fmt"

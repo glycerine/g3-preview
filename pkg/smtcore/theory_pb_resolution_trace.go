@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_pb.cpp weighted-resolution TRACE/IF_VERBOSE records
 // and display_resolved_lemma. RTTI byte names use retained justification names.
-package smtcore
 
 import (
 	"fmt"
