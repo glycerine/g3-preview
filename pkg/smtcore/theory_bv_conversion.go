@@ -1,5 +1,6 @@
-// Source: src/smt/theory_bv.cpp:185-198,554-685,1298-1305.
 package smtcore
+
+// Source: src/smt/theory_bv.cpp:185-198,554-685,1298-1305.
 
 import (
 	"errors"
@@ -67,11 +68,15 @@ func (c *smtBVExpressionCall) bits(expression ast.ASTHandle) ([]ast.ASTHandle, e
 }
 
 func (t *SMTBitVectorTheory) publishConversionEquality(left, right ast.ASTHandle) error {
-	s := t.state
 	literal, err := t.MkEqualityLiteral(left, right, false)
 	if err != nil {
 		return err
 	}
+	return t.publishConversionLiteral(literal)
+}
+
+func (t *SMTBitVectorTheory) publishConversionLiteral(literal SMTLiteral) error {
+	s := t.state
 	if literal.Var() != SMTTrueBoolVar {
 		expression, err := s.BoolExpression(literal.Var())
 		if err != nil {
@@ -87,6 +92,9 @@ func (t *SMTBitVectorTheory) publishConversionEquality(left, right ast.ASTHandle
 func (t *SMTBitVectorTheory) assertBVToIntAxiom(expression ast.ASTHandle) (result error) {
 	s, err := t.State()
 	if err != nil {
+		return err
+	}
+	if err = t.traceBVBVToIntAxiom(expression); err != nil {
 		return err
 	}
 	c := smtBVExpressionCall{theory: t}
@@ -150,7 +158,14 @@ func (t *SMTBitVectorTheory) assertBVToIntAxiom(expression ast.ASTHandle) (resul
 	if err != nil {
 		return err
 	}
-	return t.publishConversionEquality(expression, sum)
+	literal, err := t.MkEqualityLiteral(expression, sum, false)
+	if err != nil {
+		return err
+	}
+	if err = t.traceBVBVToIntEquality(expression, sum, literal); err != nil {
+		return err
+	}
+	return t.publishConversionLiteral(literal)
 }
 
 func (t *SMTBitVectorTheory) assertIntToBVAxiom(expression ast.ASTHandle) (result error) {
@@ -180,7 +195,14 @@ func (t *SMTBitVectorTheory) assertIntToBVAxiom(expression ast.ASTHandle) (resul
 	if err != nil {
 		return err
 	}
-	if err = t.publishConversionEquality(converted, rhs); err != nil {
+	literal, err := t.MkEqualityLiteral(converted, rhs, false)
+	if err != nil {
+		return err
+	}
+	if err = t.traceBVIntToBVMainEquality(converted, rhs); err != nil {
+		return err
+	}
+	if err = t.publishConversionLiteral(literal); err != nil {
 		return err
 	}
 	bits, err := c.bits(expression)
@@ -213,6 +235,9 @@ func (t *SMTBitVectorTheory) assertIntToBVAxiom(expression ast.ASTHandle) (resul
 		}
 		condition, err := c.hold(s.manager.MkEq(parity, one))
 		if err != nil {
+			return err
+		}
+		if err = t.traceBVIntToBVBitEquality(bit, condition); err != nil {
 			return err
 		}
 		if err = t.publishConversionEquality(bit, condition); err != nil {

@@ -141302,7 +141302,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality and bit-propagation source traces are ported, while remaining TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control and conversion source traces are ported, while remaining operator TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -141331,6 +141331,21 @@
           "tests": [
             "TestSMTBVBitPropagationSourceTrace",
             "TestSMTBVPropagationAndMergeConflictSourceTrace"
+          ]
+        },
+        {
+          "name": "BV frontend/control and conversion retained trace path: term/atom internalization, first blast-limit refusal, fixed equality scope, BV2Int and Int2BV axiom expressions, relevancy and scope pop with lazy source operands",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv_control_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_fixed.go",
+            "pkg/smtcore/theory_bv_conversion.go",
+            "pkg/smtcore/theory_bv_control_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTBVConversionSourceTrace",
+            "TestSMTBVFrontendFixedRelevantAndScopeSourceTrace"
           ]
         },
         {
@@ -141506,7 +141521,7 @@
           ]
         },
         {
-          "name": "Native conversion/relevancy algorithms (theory_bv.cpp:185-198,554-685,920-980,1282-1316): canonical signed literal get_bits, rewritten weighted n-ary BV2Int sum, Int2BV top modulus plus per-bit div/mod equations, gate-false equality and relevant-before-unit ordering, delayed axioms with scope re-entry, no Int2BV find_wpos, retained le_atom literal definitions and native literal relevancy; TRACE/assertion closure remains outside this increment",
+          "name": "Native conversion/relevancy algorithms (theory_bv.cpp:185-198,554-685,920-980,1282-1316): canonical signed literal get_bits, rewritten weighted n-ary BV2Int sum, Int2BV top modulus plus per-bit div/mod equations, gate-false equality and relevant-before-unit ordering, delayed axioms with scope re-entry, no Int2BV find_wpos, retained le_atom literal definitions and native literal relevancy; associated TRACE is recorded separately and assertion closure remains open",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_bv.go",
@@ -141831,7 +141846,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality and bit-propagation source traces are ported, while remaining TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control and conversion source traces are ported, while remaining operator TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -141860,6 +141875,21 @@
           "tests": [
             "TestSMTBVBitPropagationSourceTrace",
             "TestSMTBVPropagationAndMergeConflictSourceTrace"
+          ]
+        },
+        {
+          "name": "BV frontend/control and conversion retained trace path: term/atom internalization, first blast-limit refusal, fixed equality scope, BV2Int and Int2BV axiom expressions, relevancy and scope pop with lazy source operands",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv_control_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_fixed.go",
+            "pkg/smtcore/theory_bv_conversion.go",
+            "pkg/smtcore/theory_bv_control_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTBVConversionSourceTrace",
+            "TestSMTBVFrontendFixedRelevantAndScopeSourceTrace"
           ]
         },
         {
@@ -142023,7 +142053,7 @@
           ]
         },
         {
-          "name": "Native conversion/relevancy algorithms (theory_bv.cpp:185-198,554-685,920-980,1282-1316): canonical signed literal get_bits, rewritten weighted n-ary BV2Int sum, Int2BV top modulus plus per-bit div/mod equations, gate-false equality and relevant-before-unit ordering, delayed axioms with scope re-entry, no Int2BV find_wpos, retained le_atom literal definitions and native literal relevancy; TRACE/assertion closure remains outside this increment",
+          "name": "Native conversion/relevancy algorithms (theory_bv.cpp:185-198,554-685,920-980,1282-1316): canonical signed literal get_bits, rewritten weighted n-ary BV2Int sum, Int2BV top modulus plus per-bit div/mod equations, gate-false equality and relevant-before-unit ordering, delayed axioms with scope re-entry, no Int2BV find_wpos, retained le_atom literal definitions and native literal relevancy; associated TRACE is recorded separately and assertion closure remains open",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_bv.go",

@@ -406,6 +406,9 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, gateConte
 	if err != nil || !own {
 		return false, err
 	}
+	if err = t.traceBVExpression("bv", "internalize_atom", 1052, "internalizing atom: ", expression); err != nil {
+		return false, err
+	}
 	if op != smtBVOpBit2Bool {
 		if op == 59 || op == 60 {
 			return t.internalizeBooleanGate3(expression, op, gateContext)
@@ -457,6 +460,11 @@ func (t *SMTBitVectorTheory) approximateTerm(expression ast.ASTHandle) (bool, er
 				return false, widthErr
 			}
 			if width > t.config.BlastMaxSize {
+				if !t.unsupported {
+					if err = t.traceBVExpression("bv", "approximate_term", 1087, "found large size bit-vector:\n", expression); err != nil {
+						return false, err
+					}
+				}
 				t.unsupported = true
 				return true, nil
 			}
@@ -474,6 +482,9 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	if err != nil || !own {
 		return false, err
 	}
+	if err = t.traceBVExpression("bv", "internalize_term", 859, "internalizing term: ", expression); err != nil {
+		return false, err
+	}
 	if approximate, err := t.approximateTerm(expression); err != nil || approximate {
 		return false, err
 	}
@@ -484,6 +495,11 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	// including congruence closure. Their BV sort constraint creates bits.
 	if op >= 12 && op <= 16 {
 		return false, nil
+	}
+	if op == 58 {
+		if err = t.traceBVExpression("bv", "internalize_bv2int", 557, "", expression); err != nil {
+			return false, err
+		}
 	}
 	count, err := state.manager.GetNumArgs(expression)
 	if err != nil {
@@ -609,6 +625,9 @@ func (t *SMTBitVectorTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHan
 func (t *SMTBitVectorTheory) Relevant(expression ast.ASTHandle) error {
 	state, err := t.State()
 	if err != nil || state.relevancy == nil {
+		return err
+	}
+	if err = t.traceBVExpression("bv", "relevant_eh", 1285, "relevant: ", expression); err != nil {
 		return err
 	}
 	if t.config.EnableInt2BV {
@@ -777,6 +796,9 @@ func (t *SMTBitVectorTheory) PopScopes(count uint32) error {
 	}
 	state, err := t.State()
 	if err != nil {
+		return err
+	}
+	if err = t.traceBVScopePop(count); err != nil {
 		return err
 	}
 	level := len(t.scopes) - int(count)

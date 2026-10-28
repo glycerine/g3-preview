@@ -116,6 +116,9 @@ func (t *SMTBitVectorTheory) addFixedEquality(first, second SMTTheoryVar) error 
 	if err != nil {
 		return err
 	}
+	if err = t.traceBVFixedAxiom(left.owner, right.owner); err != nil {
+		return err
+	}
 	equalities := make([]SMTLiteral, 0, int(width)+1)
 	for index := uint32(0); index < width; index++ {
 		equality, err := t.addFixedBitEquality(left.owner, right.owner, wordEquality, t.bitLiterals[first][index], t.bitLiterals[second][index], index)
