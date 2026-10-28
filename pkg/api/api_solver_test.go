@@ -6,6 +6,7 @@ package api
 import (
 	"bytes"
 	"errors"
+	"math/big"
 	"strings"
 	"testing"
 
@@ -149,6 +150,63 @@ func TestSMTContextEndToEndModelScopesAndAssumptions(t *testing.T) {
 	if status != lbool.True {
 		t.Fatal("assumption recovery", status)
 	}
+}
+
+func TestSMTContextOptimizationObjectivesAndSoftConstraints(t *testing.T) {
+	t.Run("arithmetic", func(t *testing.T) {
+		f := newSMTAPIFixture(t, "QF_LIA", nil)
+		x := f.arithmeticVariable("api-opt-x", true)
+		zero := f.pin(f.m.ArithmeticIntegerNumeralText("0"))
+		five := f.pin(f.m.ArithmeticIntegerNumeralText("5"))
+		lower := f.pin(f.m.MkArithmeticGE(x, zero))
+		upper := f.pin(f.m.MkArithmeticLE(x, five))
+		astTestMust(t, f.c.Assert(lower))
+		astTestMust(t, f.c.Assert(upper))
+		astTestMust(t, f.c.Maximize(x))
+		status, err := f.c.CheckSat()
+		astTestMust(t, err)
+		if status != lbool.True {
+			t.Fatal("optimization status", status)
+		}
+		var output bytes.Buffer
+		astTestMust(t, f.c.WriteObjectives(&output))
+		if output.String() != "(objectives\n (api-opt-x 5)\n)\n" {
+			t.Fatal("objective output", output.String())
+		}
+		md, err := f.c.Model()
+		astTestMust(t, err)
+		declaration, err := f.m.GetDecl(x)
+		astTestMust(t, err)
+		value, err := md.ConstantInterpretation(declaration)
+		astTestMust(t, err)
+		text, integer, matched, err := f.m.ArithmeticNumeralText(value)
+		astTestMust(t, err)
+		if !matched || !integer || text != "5" {
+			t.Fatal("optimal model value", text, integer, matched)
+		}
+		astTestMust(t, md.DecRef())
+	})
+
+	t.Run("soft", func(t *testing.T) {
+		f := newSMTAPIFixture(t, "QF_UF", nil)
+		boolean := f.pin(f.m.MkBoolSort())
+		symbol, err := f.m.Symbols.Intern("api-soft-p")
+		astTestMust(t, err)
+		p := f.pin(f.m.MkConst(symbol, boolean))
+		notP := f.pin(f.m.MkNot(p))
+		astTestMust(t, f.c.AssertSoft(p, big.NewRat(2, 1), "preferences"))
+		astTestMust(t, f.c.AssertSoft(notP, big.NewRat(1, 1), "preferences"))
+		status, err := f.c.CheckSat()
+		astTestMust(t, err)
+		if status != lbool.True {
+			t.Fatal("soft status", status)
+		}
+		var output bytes.Buffer
+		astTestMust(t, f.c.WriteObjectives(&output))
+		if output.String() != "(objectives\n (preferences 1)\n)\n" {
+			t.Fatal("soft objective output", output.String())
+		}
+	})
 }
 
 func TestSMTContextUnsatCoreAndProofResults(t *testing.T) {

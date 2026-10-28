@@ -5707,14 +5707,24 @@
       "path": "src/api/api_opt.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/api/api_solver.go"],
+      "tests": ["TestSMTContextOptimizationObjectivesAndSoftConstraints"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained optimize assertion, soft-constraint, maximize/minimize, check, model, push/pop, and objective-value operations (api_opt.cpp:63-153 and related result access); the idiomatic Go SMTContext shares the command-context optimizer instead of reproducing opaque C optimize handles",
+          "status": "partial",
+          "go_target": "pkg/api/api_solver.go",
+          "go_targets": ["pkg/cmd_context/optimization.go"],
+          "tests": ["TestSMTContextOptimizationObjectivesAndSoftConstraints", "TestSMTContextEndToEndModelScopesAndAssumptions"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go exposes optimization on the owning SMTContext and reuses its existing scopes, assertions, result, and model lifetime; it does not reproduce the opaque reference-counted C API optimize object."
+      ]
     },
     {
       "path": "src/api/api_params.cpp",

@@ -7,6 +7,7 @@ package api
 import (
 	"errors"
 	"io"
+	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/cmd_context"
@@ -100,6 +101,39 @@ func (c *SMTContext) AssertTracked(formula ast.ASTHandle, name string) error {
 		return err
 	}
 	return c.command.Assert(formula, name)
+}
+
+// Maximize adds an arithmetic or bit-vector optimization objective.
+func (c *SMTContext) Maximize(expression ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.AddObjective(expression, true)
+}
+
+// Minimize adds an arithmetic or bit-vector optimization objective.
+func (c *SMTContext) Minimize(expression ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.AddObjective(expression, false)
+}
+
+// AssertSoft adds a weighted Boolean constraint. Constraints with the same
+// identifier belong to one soft-objective group. The weight is copied.
+func (c *SMTContext) AssertSoft(formula ast.ASTHandle, weight *big.Rat, id string) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.AddSoftConstraint(formula, weight, id)
+}
+
+// WriteObjectives writes the objective values from the latest optimal result.
+func (c *SMTContext) WriteObjectives(out io.Writer) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.WriteObjectives(out)
 }
 
 // Assertions returns the borrowed asserted formulas in insertion order.
