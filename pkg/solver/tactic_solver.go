@@ -1,5 +1,6 @@
-// Source: src/solver/tactic2solver.h; src/solver/tactic2solver.cpp.
 package solver
+
+// Source: src/solver/tactic2solver.h; src/solver/tactic2solver.cpp.
 
 import (
 	"errors"
@@ -139,7 +140,11 @@ func (s *TacticSolver) SetStatus(v lbool.LBool) error {
 		return err
 	}
 	if s.result == nil {
-		return ast.ErrASTHandle
+		// A combined solver can publish a command-context exception status
+		// before this nonselected tactic solver has executed. Native stores
+		// that status in the combined check_sat_result; there is no tactic
+		// result to update on this branch.
+		return nil
 	}
 	return s.result.SetStatus(v)
 }

@@ -1,6 +1,7 @@
+package smtlogics
+
 // Source: src/tactic/smtlogics/quant_tactics.cpp retained preprocessing and
 // mk_ufnia_tactic/mk_uflra_tactic/mk_auflia_tactic/mk_auflira_tactic/mk_aufnira_tactic.
-package smtlogics
 
 import (
 	"errors"
@@ -61,12 +62,20 @@ func NewAUFNIRATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SM
 	return newQuantifiedArithmeticTactic(m, p, config, quantStandard)
 }
 
+// NewQuantifierFreeLIRATactic is the quantifier-free retained branch of
+// mk_lira_tactic: run the shared quantifier preprocessor, QE-lite, then SMT.
+// The general ALL dispatcher guards this specialization with !has-quantifier.
+func NewQuantifierFreeLIRATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig) (tactic.Tactic, error) {
+	return newQuantifiedArithmeticTactic(m, p, config, quantQFLIRA)
+}
+
 type quantifiedStrategy uint8
 
 const (
 	quantStandard quantifiedStrategy = iota
 	quantAUFLIA
 	quantUFNIA
+	quantQFLIRA
 )
 
 // AUFLIA disables Gaussian elimination and tries qi.cost=0 only when the
@@ -160,7 +169,7 @@ func newQuantifiedArithmeticTactic(m *ast.ASTManager, p *uparams.ParamsRef, conf
 		b.keep(core.MakeSimplifyTactic(m, c, g, nil)))
 	var backend tactic.Tactic
 	var elimination tactic.Tactic
-	if strategy == quantUFNIA {
+	if strategy == quantUFNIA || strategy == quantQFLIRA {
 		elimination = b.keep(qe.NewLiteTactic(m, p, qe.Config{Context: c, Globals: g, Cooperation: config.ModelEvaluator.Cooperation, Trace: config.ModelEvaluator.Trace}))
 	}
 	if strategy == quantAUFLIA {
@@ -178,7 +187,7 @@ func newQuantifiedArithmeticTactic(m *ast.ASTManager, p *uparams.ParamsRef, conf
 	if b.err != nil {
 		return nil, b.err
 	}
-	if strategy == quantUFNIA {
+	if strategy == quantUFNIA || strategy == quantQFLIRA {
 		result, err = tactic.NewAndThenTactic(pre, elimination, backend)
 	} else {
 		result, err = tactic.NewAndThenTactic(pre, backend)

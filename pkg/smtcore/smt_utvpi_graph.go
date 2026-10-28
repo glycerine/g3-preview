@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_utvpi_def.h add_ineq, enable_edge,
 // check_z_consistency, is_parity_ok and enforce_parity (rdl_ext).
-package smtcore
 
 import "math/big"
 
@@ -240,7 +241,8 @@ func (g *smtUTVPIGraph) pop(count uint32) error {
 
 // modelValues implements the graph part of init_model, compute_delta and
 // mk_value. The distinguished zero variable is created by the theory owner.
-// Values own their rationals; integer values are checked before publication.
+// Values own their rationals. Source only debug-asserts integer-valued Int
+// assignments here; its arithmetic factory performs the release rejection.
 func (g *smtUTVPIGraph) modelValues(zeroVariable int32) ([]big.Rat, error) {
 	if zeroVariable < 0 || int(zeroVariable) >= len(g.integer) {
 		return nil, errSMTDiffGraphDomain
@@ -279,15 +281,12 @@ func (g *smtUTVPIGraph) modelValues(zeroVariable int32) ([]big.Rat, error) {
 		}
 	}
 	values := make([]big.Rat, len(g.integer))
-	for variable, integer := range g.integer {
+	for variable := range g.integer {
 		var difference smtInfRational
 		difference.Sub(&g.graph.assignment[2*variable], &g.graph.assignment[2*variable+1])
 		values[variable].Mul(delta, &difference.infinitesimal)
 		values[variable].Add(&values[variable], &difference.rational)
 		values[variable].Quo(&values[variable], big.NewRat(2, 1))
-		if integer && !values[variable].IsInt() {
-			return nil, errSMTDiffGraphDomain
-		}
 	}
 	return values, nil
 }

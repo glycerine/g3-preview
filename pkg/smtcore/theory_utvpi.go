@@ -1,5 +1,6 @@
-// Source: retained rdl_ext instantiation of src/smt/theory_utvpi.h/.def.h.
 package smtcore
+
+// Source: retained rdl_ext instantiation of src/smt/theory_utvpi.h/.def.h.
 
 import (
 	"errors"
@@ -360,12 +361,6 @@ func (t *SMTUTVPITheory) FinalCheck() (SMTFinalCheckStatus, error) {
 		return SMTFinalCheckContinue, t.setConflict(conflict)
 	}
 	if t.unsupported {
-		return SMTFinalCheckGiveUp, nil
-	}
-	// The source arithmetic factory rejects a fractional Int candidate even
-	// when its rational-part parity check succeeded. Catch that refusal here
-	// so it becomes UNKNOWN before the model generator publishes numerals.
-	if _, err := t.graph.modelValues(int32(t.zero)); err != nil {
 		return SMTFinalCheckGiveUp, nil
 	}
 	return SMTFinalCheckDone, nil

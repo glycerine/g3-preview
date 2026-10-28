@@ -153398,7 +153398,8 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_utvpi_graph.go",
           "tests": [
-            "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse"
+            "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse",
+            "TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerCandidate"
           ]
         },
         {
@@ -153704,7 +153705,8 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_utvpi_graph.go",
           "tests": [
-            "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse"
+            "TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse",
+            "TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerCandidate"
           ]
         },
         {
@@ -168926,7 +168928,10 @@
         "pkg/cmd_context/context.go",
         "pkg/cmd/g3/combined_solver_gap_test.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2"
+        "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2",
+        "pkg/tactic/smtlogics/quant_tactics.go",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2",
+        "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2"
       ],
       "tests": [
         "TestSMTLibRunnerAsArrayCombinedSolverFallback",
@@ -168937,7 +168942,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained ALL default-strategy integration for goals containing OP_AS_ARRAY: select the existing theory-neutral simplify/propagate/solve-eqs/eliminate/simplify pipeline before SMT and preserve the ordinary combined-solver incremental unknown fallback",
+          "name": "Retained ALL default-strategy integration for OP_AS_ARRAY and quantifier-free mixed linear integer/real goals: select the source preprocessing branch before SMT and preserve ordinary combined-solver incremental fallback and exception behavior",
           "status": "partial",
           "go_targets": [
             "pkg/tactic/portfolio/all_as_array_probe.go",
@@ -168945,7 +168950,10 @@
             "pkg/cmd_context/context.go",
             "pkg/cmd/g3/combined_solver_gap_test.go",
             "pkg/cmd/g3/main_test.go",
-            "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2"
+            "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2",
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2",
+            "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2"
           ],
           "tests": [
             "TestSMTLibRunnerAsArrayCombinedSolverFallback",
@@ -168956,7 +168964,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The complete nested default tactic classifier remains unported. The retained Go integration currently selects the stronger existing preprocessing only when an ALL goal contains OP_AS_ARRAY; every other ALL goal retains the direct SMT tactic path. This closes the public combined-solver fallback exercised by the strict array vector without changing native-unknown results in unrelated fragments."
+        "The complete nested default tactic classifier remains unported. The retained Go integration currently selects stronger existing preprocessing for ALL goals containing OP_AS_ARRAY and the source quantifier-free mixed LIRA branch after excluding the earlier single-sort QF_LIA/QF_LRA cases; other ALL goals retain the direct SMT tactic path. Strict array and mixed UTVPI vectors cover combined-solver fallback, native model-construction exception conversion and unrelated single-sort unknown preservation."
       ]
     },
     {
@@ -169503,7 +169511,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Retained general ALL factory operator integration for OP_AS_ARRAY goals: tactic solver plus direct ALL incremental SMT under combined-solver scope, unknown fallback and result-provider policy",
+          "name": "Retained general ALL factory operator integration for OP_AS_ARRAY and quantifier-free mixed LIRA goals: tactic solver plus direct ALL incremental SMT under combined-solver scope, unknown fallback, source exception conversion and result-provider policy",
           "status": "partial",
           "go_targets": [
             "pkg/tactic/portfolio/all_as_array_probe.go",
@@ -169511,7 +169519,10 @@
             "pkg/cmd_context/context.go",
             "pkg/cmd/g3/combined_solver_gap_test.go",
             "pkg/cmd/g3/main_test.go",
-            "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2"
+            "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2",
+            "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2",
+            "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2"
           ],
           "tests": [
             "TestSMTLibRunnerAsArrayCombinedSolverFallback",

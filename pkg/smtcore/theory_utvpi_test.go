@@ -1,6 +1,7 @@
 package smtcore
 
 import (
+	"errors"
 	"fmt"
 	"math/big"
 	"reflect"
@@ -9,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSMTUTVPIContextConflictsProofsAndScopes(t *testing.T) {
@@ -305,17 +307,9 @@ func TestSMTUTVPIMixedBridgeAndSumModelRefusal(t *testing.T) {
 				astTestMust(t, solver.Assert(eq))
 			}
 			status, err := solver.CheckSat(nil)
-			if err != nil {
-				theory := solver.kernel.internalizer.theories[family].(*SMTUTVPITheory)
-				for v, integer := range theory.graph.integer {
-					a, b := &theory.graph.graph.assignment[2*v], &theory.graph.graph.assignment[2*v+1]
-					t.Logf("variable %d integer %v: (%s,%s epsilon), (%s,%s epsilon)", v, integer, a.rational.RatString(), a.infinitesimal.RatString(), b.rational.RatString(), b.infinitesimal.RatString())
-				}
-				t.Fatal(err)
-			}
-			want := lbool.Undef
-			if status != want {
-				t.Fatal("mixed source result", status, "want", want)
+			var source z3exception.Z3Exception
+			if status != lbool.Undef || !errors.As(err, &source) || source.Message() != "invalid rational value passed as an integer" {
+				t.Fatal("mixed source model refusal", status, err)
 			}
 		})
 	}

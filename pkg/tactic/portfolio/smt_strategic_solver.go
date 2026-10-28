@@ -15,6 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/tactic/arith"
 	"github.com/glycerine/g3/pkg/tactic/smtlogics"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -36,31 +37,98 @@ func NewQFAUFLIAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs,
 // so combined_solver owns the same nonincremental/incremental transition and
 // unknown fallback as the source factory.
 func NewALLStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (result solver.Solver, err error) {
+	var tacticOwners []tactic.Tactic
+	var probeOwners []tactic.ProbeEvaluator
+	defer func() {
+		for i := len(tacticOwners) - 1; i >= 0; i-- {
+			err = errors.Join(err, tacticOwners[i].DecRef())
+		}
+		for i := len(probeOwners) - 1; i >= 0; i-- {
+			err = errors.Join(err, probeOwners[i].DecRef())
+		}
+	}()
+	keepTactic := func(value tactic.Tactic, cause error) (tactic.Tactic, error) {
+		if cause != nil {
+			return nil, cause
+		}
+		if cause = value.IncRef(); cause != nil {
+			return nil, cause
+		}
+		tacticOwners = append(tacticOwners, value)
+		return value, nil
+	}
+	keepProbe := func(value tactic.ProbeEvaluator, cause error) (tactic.ProbeEvaluator, error) {
+		if cause != nil {
+			return nil, cause
+		}
+		if cause = value.IncRef(); cause != nil {
+			return nil, cause
+		}
+		probeOwners = append(probeOwners, value)
+		return value, nil
+	}
 	strong, err := smtlogics.NewQFAUFLIATactic(m, p, config)
+	strong, err = keepTactic(strong, err)
 	if err != nil {
 		return nil, err
 	}
-	if err = strong.IncRef(); err != nil {
-		return nil, err
-	}
-	defer func() { err = errors.Join(err, strong.DecRef()) }()
-	ordinary, err := smtcore.NewSMTTactic(m, p, config)
+	ordinaryValue, err := smtcore.NewSMTTactic(m, p, config)
+	ordinary, err := keepTactic(ordinaryValue, err)
 	if err != nil {
 		return nil, err
 	}
-	if err = ordinary.IncRef(); err != nil {
-		return nil, err
-	}
-	defer func() { err = errors.Join(err, ordinary.DecRef()) }()
 	probe, err := newALLAsArrayProbe(m)
+	asArray, err := keepProbe(probe, err)
 	if err != nil {
 		return nil, err
 	}
-	if err = probe.IncRef(); err != nil {
+	lira, err := smtlogics.NewQuantifierFreeLIRATactic(m, p, config)
+	lira, err = keepTactic(lira, err)
+	if err != nil {
 		return nil, err
 	}
-	defer func() { err = errors.Join(err, probe.DecRef()) }()
-	strategy, err := tactic.NewCondTactic(probe, strong, ordinary)
+	liraFragment, err := keepProbe(arith.NewArithmeticFragmentProbe(m.Budget(), config.Params, config.Globals, arith.FragmentLIRA))
+	if err != nil {
+		return nil, err
+	}
+	qfLIA, err := keepProbe(arith.NewArithmeticFragmentProbe(m.Budget(), config.Params, config.Globals, arith.FragmentQFLIA))
+	if err != nil {
+		return nil, err
+	}
+	qfLRA, err := keepProbe(arith.NewArithmeticFragmentProbe(m.Budget(), config.Params, config.Globals, arith.FragmentQFLRA))
+	if err != nil {
+		return nil, err
+	}
+	qfSingleSort, err := keepProbe(tactic.NewBinaryProbe(m.Budget(), tactic.ProbeOr, qfLIA, qfLRA))
+	if err != nil {
+		return nil, err
+	}
+	mixedArithmetic, err := keepProbe(tactic.NewNotProbe(m.Budget(), qfSingleSort))
+	if err != nil {
+		return nil, err
+	}
+	liraMixed, err := keepProbe(tactic.NewBinaryProbe(m.Budget(), tactic.ProbeAnd, liraFragment, mixedArithmetic))
+	if err != nil {
+		return nil, err
+	}
+	hasQuantifier, err := keepProbe(tactic.NewProbe(m.Budget(), tactic.ProbeHasQuantifier, 0))
+	if err != nil {
+		return nil, err
+	}
+	noQuantifier, err := keepProbe(tactic.NewNotProbe(m.Budget(), hasQuantifier))
+	if err != nil {
+		return nil, err
+	}
+	qfLIRA, err := keepProbe(tactic.NewBinaryProbe(m.Budget(), tactic.ProbeAnd, liraMixed, noQuantifier))
+	if err != nil {
+		return nil, err
+	}
+	liraRoute, err := tactic.NewCondTactic(qfLIRA, lira, ordinary)
+	liraRoute, err = keepTactic(liraRoute, err)
+	if err != nil {
+		return nil, err
+	}
+	strategy, err := tactic.NewCondTactic(asArray, strong, liraRoute)
 	if err != nil {
 		return nil, err
 	}

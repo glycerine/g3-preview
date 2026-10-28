@@ -12,9 +12,6 @@ func (m *ASTManager) ArithmeticNumeralRat(value *big.Rat, integer bool) (result 
 	if value == nil {
 		return ASTHandle{}, fmt.Errorf("g3: nil arithmetic numeral")
 	}
-	if integer && !value.IsInt() {
-		return ASTHandle{}, ErrASTDomain
-	}
 	n, err := m.numerals.NewValue()
 	if err != nil {
 		return ASTHandle{}, err

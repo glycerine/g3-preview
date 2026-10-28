@@ -19,6 +19,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 type declaration struct {
@@ -691,9 +692,26 @@ func (c *Context) CheckSat(assumptions []ast.ASTHandle) (status lbool.LBool, err
 		return lbool.Undef, err
 	}
 	status, err = c.solver.CheckSat(assumptions)
-	if err == nil {
-		c.status, c.checked = status, true
+	if err != nil {
+		var fatal z3exception.Z3Error
+		var source z3exception.Z3Exception
+		if errors.As(err, &fatal) || !errors.As(err, &source) {
+			return lbool.Undef, err
+		}
+		// Native cmd_context converts nonfatal solver exceptions into an
+		// unknown result owned by the installed solver. In particular, this
+		// prevents combined_solver from treating a malformed model value as
+		// an ordinary solver-2 unknown and falling back to solver 1.
+		status = lbool.Undef
+		if setErr := c.solver.SetReasonUnknown(source.Message()); setErr != nil {
+			return lbool.Undef, errors.Join(err, setErr)
+		}
+		if setErr := c.solver.SetStatus(status); setErr != nil {
+			return lbool.Undef, errors.Join(err, setErr)
+		}
+		err = nil
 	}
+	c.status, c.checked = status, true
 	return status, err
 }
 

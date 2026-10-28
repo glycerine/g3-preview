@@ -276,7 +276,7 @@ func TestSMTUTVPIGraphStrictMixedModelsAndScopedVariableReuse(t *testing.T) {
 	}
 }
 
-func TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerRefusal(t *testing.T) {
+func TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerCandidate(t *testing.T) {
 	g := newSMTUTVPIGraph()
 	zero, err := g.addVariable(true)
 	astTestMust(t, err)
@@ -306,7 +306,9 @@ func TestSMTUTVPIGraphRealParityPredicateAndFractionalIntegerRefusal(t *testing.
 	if !ok {
 		t.Fatal("rational-part parity predicate must ignore epsilon")
 	}
-	if _, err := g.modelValues(zero); err == nil {
-		t.Fatal("fractional Int candidate escaped the model publication guard")
+	values, err := g.modelValues(zero)
+	astTestMust(t, err)
+	if values[integer].Cmp(big.NewRat(1, 2)) != 0 {
+		t.Fatal("source fractional Int candidate was rounded before the arithmetic factory", &values[integer])
 	}
 }

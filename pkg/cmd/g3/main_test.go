@@ -339,6 +339,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 
 var scriptResults = map[string]string{
 	"array_as_array_combined_fallback_gap.smt2":    "sat\nunsat\nsat\n",
+	"utvpi_mixed_sum_model.smt2":                   "sat\n",
 	"nla2bv_bounded_scopes.smt2":                   "sat\n((x 7))\nunsat\nsat\n((x 7))\n",
 	"nla2bv_under_unknown.smt2":                    "unknown\nsat\n(((= (* x x) 4) true))\n",
 	"nla2bv_real_models.smt2":                      "sat\n(((= (* x x) 2.0) true))\nunknown\nsat\n(((= (* x x) 2.0) true))\n",
@@ -701,7 +702,7 @@ var scriptResults = map[string]string{
 	"array_extensional_enabled_scopes.smt2":        "unsat\nsat\n",
 	"bit_vector_symbolic_carry_scopes.smt2":        "sat\n(((= (bvadd x y) #xa) true) ((= (bvsub x y) #x4) true))\nunsat\nsat\n(((= (bvadd x y) #xa) true) ((= (bvsub x y) #x4) true))\n",
 	"utvpi_mixed_model_refusal.smt2":               "unknown\n",
-	"utvpi_mixed_sum_model_refusal.smt2":           "unknown\n",
+	"utvpi_mixed_sum_model_refusal.smt2":           "unknown\n(:reason-unknown \"invalid rational value passed as an integer\")\n",
 	"utvpi_integer_parity_scopes.smt2":             "unsat\nsat\n((x 1) (y 1))\nunsat\nsat\n((x 1) (y 1))\n",
 	"utvpi_mixed_models.smt2":                      "sat\n(((>= i 0) true) ((<= i 1) true) ((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\nunsat\nsat\n(((>= i 0) true) ((<= i 1) true) ((> r 0.0) true) ((< r (/ 1.0 3.0)) true))\n",
 	"utvpi_real_strict_scopes.smt2":                "sat\n(((> (+ x y) 0.0) true) ((< (+ x y) (/ 1.0 3.0)) true) ((= x y) true))\nunsat\nsat\n(((> (+ x y) 0.0) true) ((< (+ x y) (/ 1.0 3.0)) true) ((= x y) true))\n",
@@ -969,11 +970,9 @@ func TestSMTLibRunnerPB2BVArithmeticLogicReferenceGap(t *testing.T) {
 }
 
 // The native combined solver uses its strategic tactic pipeline before the
-// incremental core is selected. This remains an integration gap: the native
-// nonincremental tactic solves this mixed sum, while the direct UTVPI core
-// refuses its fractional Int candidate. The strict comparison set includes
-// the matching incremental variant in utvpi_mixed_sum_model_refusal.smt2.
-func TestSMTLibRunnerUTVPINonincrementalStrategyGap(t *testing.T) {
+// incremental core is selected. Preserve that nonincremental LIRA route while
+// the matching incremental UTVPI variant intentionally remains unknown.
+func TestSMTLibRunnerUTVPINonincrementalStrategy(t *testing.T) {
 	script, err := os.ReadFile(filepath.Join("test_vectors", "utvpi_mixed_sum_model.smt2"))
 	if err != nil {
 		t.Fatal(err)
@@ -982,8 +981,8 @@ func TestSMTLibRunnerUTVPINonincrementalStrategyGap(t *testing.T) {
 	if err := run(bytes.NewReader(script), &output); err != nil {
 		t.Fatal(err, output.String())
 	}
-	if canonicalOutput(output.String()) != "unknown" {
-		t.Fatal("update the recorded UTVPI strategy gap after checking the native pipeline", output.String())
+	if canonicalOutput(output.String()) != "sat" {
+		t.Fatal("ALL did not select the quantifier-free LIRA strategy", output.String())
 	}
 	if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {
 		cmd := exec.Command(reference, "-in")

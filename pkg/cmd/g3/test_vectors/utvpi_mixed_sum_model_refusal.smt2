@@ -10,3 +10,4 @@
 (assert (< (+ (to_real i) r) (/ 1.0 3.0)))
 (push 1)
 (check-sat)
+(get-info :reason-unknown)
