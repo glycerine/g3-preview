@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	protomodel "github.com/glycerine/g3/pkg/smtcore/proto_model"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 type smtDenseAtom struct {
@@ -303,7 +304,18 @@ func (t *SMTDenseDiffTheory) addEdge(source, target int, offset *smtInfRational,
 		return err
 	}
 	if !ok {
-		return t.state.SetTheoryConflict(t.FamilyID(), reason)
+		if err = t.state.SetTheoryConflict(t.FamilyID(), reason); err != nil {
+			return err
+		}
+		if !t.config.DumpLemmas {
+			return nil
+		}
+		_, err = t.state.DumpLemmaAsSMTProblem(reason, nil, SMTFalseLiteral, usymbol.Symbol{})
+		var dump *SMTLemmaDumpError
+		if errors.As(err, &dump) {
+			return dump.OperandError
+		}
+		return err
 	}
 	return nil
 }
