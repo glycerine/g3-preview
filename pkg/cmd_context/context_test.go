@@ -70,6 +70,28 @@ func TestCommandContextUnsignedOptionsValidateTypesAndUpdateLiveSolver(t *testin
 	}
 }
 
+func TestCommandContextDoubleOptionsValidateTypesAndUpdateLiveSolver(t *testing.T) {
+	c := contextFixture(t)
+	contextMust(t, c.SetDoubleOption("smt.restart_factor", 1.25))
+	global, err := c.config.Globals.SourceGetValueName("smt.restart_factor")
+	contextMust(t, err)
+	if global != "1.25" {
+		t.Fatal("module double value", global)
+	}
+	status, err := c.CheckSat(nil)
+	contextMust(t, err)
+	if status != lbool.True {
+		t.Fatal(status)
+	}
+	contextMust(t, c.SetDoubleOption("smt.qi.eager_threshold", 12.5))
+	if err = c.SetDoubleOption("smt.relevancy", 1.5); err == nil {
+		t.Fatal("double value accepted for an unsigned option")
+	}
+	if err = c.SetDoubleOption("smt.unported_double_option", 1.5); err == nil {
+		t.Fatal("unknown double option accepted")
+	}
+}
+
 func TestCommandContextGenericBooleanValuePreservesCatalogSymbolType(t *testing.T) {
 	c := contextFixture(t)
 	contextMust(t, c.SetBoolOption("smt.string_solver", true))

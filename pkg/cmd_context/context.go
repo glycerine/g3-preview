@@ -343,6 +343,19 @@ func (c *Context) SetUIntOption(name string, value uint32) error {
 	return nil
 }
 
+// SetDoubleOption follows the catalog-typed global parameter path. Floating
+// point parameters are solver tunables rather than SMT-LIB context options.
+func (c *Context) SetDoubleOption(name string, value float64) error {
+	if err := c.valid(); err != nil {
+		return err
+	}
+	name = strings.ReplaceAll(name, "-", "_")
+	if err := c.config.Globals.SourceSetName(name, strconv.FormatFloat(value, 'g', -1, 64)); err != nil {
+		return err
+	}
+	return c.globalParametersUpdated()
+}
+
 // SetSymbolOption follows set_option_cmd::set_symbol's generic parameter
 // path. The source catalog validates the module/name and parses its type;
 // keeping that typed global value avoids an incorrectly typed local shadow.

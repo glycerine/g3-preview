@@ -81,6 +81,13 @@ func (c *SMTContext) SetUIntOption(name string, value uint32) error {
 	return c.command.SetUIntOption(name, value)
 }
 
+func (c *SMTContext) SetDoubleOption(name string, value float64) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.SetDoubleOption(name, value)
+}
+
 func (c *SMTContext) SetSymbolOption(name, value string) error {
 	if err := c.open(); err != nil {
 		return err
