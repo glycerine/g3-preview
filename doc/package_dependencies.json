@@ -2134,6 +2134,7 @@
         "justification.go",
         "scoped_literal_vector.go",
         "search_propagation.go",
+        "search_resolution.go",
         "search_state.go",
         "search_witness.go",
         "sign_table.go",
