@@ -80885,8 +80885,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/base/rule.go"],
-      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion"],
+      "go_targets": ["pkg/muz/base/rule.go", "pkg/muz/base/rule_formula.go"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal"],
       "assertions": [
         {
           "line": 64,
@@ -80937,6 +80937,12 @@
           "status": "partial",
           "go_target": "pkg/muz/base/rule.go",
           "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion"]
+        },
+        {
+          "name": "Already-Horn mk_rule/mk_horn_rule fast path: universal-prefix removal, implication/conjunction extraction, compound predicate argument hoisting, negated predicate recognition, and explicit HNF-definition refusal (dl_rule.cpp:143-232,233-263,355-417,449-465)",
+          "status": "partial",
+          "go_target": "pkg/muz/base/rule_formula.go",
+          "tests": ["TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal"]
         }
       ],
       "ownership": [],
@@ -80947,8 +80953,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/base/rule.go"],
-      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion"],
+      "go_targets": ["pkg/muz/base/rule.go", "pkg/muz/base/rule_formula.go"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal"],
       "conditionals": [
         {
           "line": 20,
