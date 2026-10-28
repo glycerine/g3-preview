@@ -216,6 +216,54 @@ func (t *HashTable) Reset() error {
 	return nil
 }
 
+// FilterEqual retains rows whose selected column equals value.
+func (t *HashTable) FilterEqual(value Element, column int) error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	if column < 0 || column >= t.signature.Len() || uint64(value) >= t.signature.domains[column] {
+		return fmt.Errorf("%w: filter value or column out of range", ErrTable)
+	}
+	for key, fact := range t.rows.All() {
+		if fact[column] != value {
+			t.rows.Del(key)
+		}
+	}
+	return nil
+}
+
+// FilterIdentical retains rows whose listed columns all have the same value.
+func (t *HashTable) FilterIdentical(columns []int) error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	for i, column := range columns {
+		if column < 0 || column >= t.signature.Len() {
+			return fmt.Errorf("%w: identical-filter column out of range", ErrTable)
+		}
+		if i != 0 && t.signature.domains[column] != t.signature.domains[columns[0]] {
+			return fmt.Errorf("%w: identical-filter column domains differ", ErrTable)
+		}
+	}
+	if len(columns) < 2 {
+		return nil
+	}
+	for key, fact := range t.rows.All() {
+		value := fact[columns[0]]
+		match := true
+		for _, column := range columns[1:] {
+			if fact[column] != value {
+				match = false
+				break
+			}
+		}
+		if !match {
+			t.rows.Del(key)
+		}
+	}
+	return nil
+}
+
 // Join performs the retained nested-loop hashtable join. Result rows contain
 // the complete left tuple followed by the complete right tuple.
 func (t *HashTable) Join(other *HashTable, leftColumns, rightColumns []int) (*HashTable, error) {

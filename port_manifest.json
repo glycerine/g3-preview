@@ -84879,8 +84879,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/rel/instruction.go"],
-      "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform"],
+      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_table.go"],
+      "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions"],
       "assertions": [
         {
           "line": 103,
@@ -84911,6 +84911,12 @@
           "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership"]
         },
         {
+          "name": "Concrete finite-table join, equality/identity filters, union/widen with delta, project/rename, join-project, select-equal-project, and negation-filter instructions (dl_instruction.cpp:362-521,639-997)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/instruction_table.go",
+          "tests": ["TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions"]
+        },
+        {
           "name": "instruction_block ordered ownership, execution with termination checks, cost processing, annotations, statistics, display and reset (dl_instruction.cpp:1127-1190)",
           "status": "ported",
           "go_target": "pkg/muz/rel/instruction.go",
@@ -84921,7 +84927,7 @@
         "ExecutionContext owns register tables and move transfers the exact pointer while clone creates an independent table. InstructionBlock owns and closes instructions in source order; each instruction owns its AccountedObject."
       ],
       "deviations": [
-        "The execution context currently retains finite HashTable registers and caller-supplied termination only. Relation-context I/O, timers, operation-function caches, while-loop and remaining relational instructions stay open."
+        "The execution context currently retains finite HashTable registers and caller-supplied termination only. Relation-context I/O, timers, operation-function caches, while-loop, interpreted filters, singleton/total construction, saturation markers, signature assertions, and non-table relation implementations stay open."
       ]
     },
     {
@@ -84929,8 +84935,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/rel/instruction.go"],
-      "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform"],
+      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_table.go"],
+      "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions"],
       "conditionals": [
         {
           "line": 19,
@@ -84974,7 +84980,7 @@
           "name": "Retained execution_context register surface, concrete instruction contract, and instruction_block surface (dl_instruction.h:48-163,177-365)",
           "status": "partial",
           "go_target": "pkg/muz/rel/instruction.go",
-          "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform"]
+          "tests": ["TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions"]
         }
       ],
       "ownership": [
@@ -85742,7 +85748,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/rel/relation_manager.go", "pkg/muz/rel/table.go"],
-      "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues"],
+      "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues", "TestHashTableFiniteFiltersValidateAndMutate"],
       "assertions": [
         {
           "line": 71,
@@ -85885,13 +85891,19 @@
           "status": "ported",
           "go_target": "pkg/muz/rel/relation_manager.go",
           "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues"]
+        },
+        {
+          "name": "Concrete default finite-table equality and identical-column mutators (dl_relation_manager.cpp:1276-1310,1350-1380)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/table.go",
+          "tests": ["TestHashTableFiniteFiltersValidateAndMutate"]
         }
       ],
       "ownership": [
         "RelationManager borrows its AST manager. Encode paths return caller-owned Go facts; decode paths return explicit owning AST references and release partial results on failure."
       ],
       "deviations": [
-        "Plugin registration/selection, relation storage, operation factory fallbacks, functional tables, and non-table relation implementations remain open. Only bounded finite sorts with concrete native numeral encodings are accepted."
+        "Plugin registration/selection, relation storage, the general operation-factory hierarchy, functional tables, and non-table relation implementations remain open. Retained concrete finite-table operations are exposed directly. Only bounded finite sorts with concrete native numeral encodings are accepted."
       ]
     },
     {
@@ -85900,7 +85912,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/rel/relation_manager.go", "pkg/muz/rel/table.go"],
-      "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues"],
+      "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues", "TestHashTableFiniteFiltersValidateAndMutate"],
       "conditionals": [
         {
           "line": 19,
@@ -85961,6 +85973,12 @@
           "status": "ported",
           "go_target": "pkg/muz/rel/relation_manager.go",
           "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues"]
+        },
+        {
+          "name": "Concrete retained finite-table relational operation surface used by compiled instructions (dl_relation_manager.h:215-567)",
+          "status": "partial",
+          "go_target": "pkg/muz/rel/table.go",
+          "tests": ["TestHashTableJoinProjectSelectionAndRename", "TestHashTableUnionDeltaAndNegation", "TestHashTableFiniteFiltersValidateAndMutate"]
         }
       ],
       "ownership": [
