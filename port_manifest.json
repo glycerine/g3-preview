@@ -93809,7 +93809,9 @@
         "pkg/cmd/g3/lra_backend_test.go",
         "pkg/parsers/smt2/lemma_problem_test.go",
         "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2",
-        "pkg/parsers/smt2/command_globals_test.go"
+        "pkg/parsers/smt2/command_globals_test.go",
+        "pkg/parsers/smt2/expression_labels_test.go",
+        "pkg/cmd/g3/test_vectors/expression_labels.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -93835,6 +93837,8 @@
         "TestSMT2QuantifierPatternValidationAndParserOptions",
         "TestSMT2NestedQuantifierMetadataAndNoPatternsStayLocal",
         "TestSMT2QuantifierAttributesRejectWrongScopesAndBadPatterns",
+        "TestSMT2ExpressionLabelsPreserveAttributeNesting",
+        "TestSMT2ExpressionLabelRequiresBooleanBodyAndSymbol",
         "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
         "TestSMT2TacticCombinatorsAndTypedParameters",
         "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",
@@ -94586,7 +94590,7 @@
           ]
         },
         {
-          "name": "consume_attributes, push_pattern_frame, process_last_symbol and pop_quant_frame: direct quantifier-body patterns and multi-patterns, no-pattern terms, weight, qid, skolemid, line-number fallback IDs, nested binder isolation, pattern validation and parser.ignore_user_patterns/parser.ignore_bad_patterns updates",
+          "name": "consume_attributes, push_pattern_frame, process_last_symbol and pop_quant_frame: ordered lblpos/lblneg wrappers, direct quantifier-body patterns and multi-patterns, no-pattern terms, weight, qid, skolemid, line-number fallback IDs, nested binder isolation, pattern validation and parser.ignore_user_patterns/parser.ignore_bad_patterns updates",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/annotations.go",
           "tests": [
@@ -94594,11 +94598,15 @@
             "TestSMT2QuantifierPatternValidationAndParserOptions",
             "TestSMT2NestedQuantifierMetadataAndNoPatternsStayLocal",
             "TestSMT2QuantifierAttributesRejectWrongScopesAndBadPatterns",
+            "TestSMT2ExpressionLabelsPreserveAttributeNesting",
+            "TestSMT2ExpressionLabelRequiresBooleanBodyAndSymbol",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ],
           "go_targets": [
-            "pkg/cmd/g3/main_test.go"
+            "pkg/parsers/smt2/expression_labels_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/expression_labels.smt2"
           ]
         },
         {
@@ -94927,7 +94935,7 @@
         "The retained Array constructor now parses all supplied sort arguments, using the final sort as range and preceding sorts as domains, matching native variadic array sorts. Empty/unary constructors are rejected before installing the declaration. Two multidimensional store/read scope scripts, with proofs disabled/enabled, now run through the public parser and compare against C++; strict runner agreement is 130.",
         "The selected local lookup returns an owning ASTRef for the future parser expression stack and reuses the concrete AST var_shifter; scanner, command-context fallback, other parser branches and complete expression-stack integration remain unported.",
         "Go recursive grammar functions replace source explicit parser frame dispatch for retained branches. The current runner stops on the first command error; full C++ recovery and unsupported grammar branches remain open and fail explicitly.",
-        "Explicit quantified patterns now reach E-matching through the SMT-LIB runner. Validation warnings use the process diagnostic warning service, invalid patterns follow ignore_bad_patterns, and ignored user patterns are consumed as S-expressions. Full legacy qualified unary-pattern and constant-pattern discard variants, expression labels, unknown-attribute warning/recovery and other parser grammar branches remain partial. The runner now has 92 strict C++ comparisons plus the separately documented C++ live-relevancy model defect regression.",
+        "Explicit quantified patterns now reach E-matching through the SMT-LIB runner. Validation warnings use the process diagnostic warning service, invalid patterns follow ignore_bad_patterns, and ignored user patterns are consumed as S-expressions. Expression labels preserve source left-to-right wrapping, polarity, symbol ownership and Boolean-body guards through an exact C++ runner vector. Full legacy qualified unary-pattern and constant-pattern discard variants, unknown-attribute warning/recovery and other parser grammar branches remain partial. The separately documented C++ live-relevancy model defect regression remains excluded from strict agreement.",
         "The new datatype C++ comparison exposed rejection of valid (push)/(pop). Scope counts now default to one only at a closing parenthesis. Invalid counts refuse before mutation; valid counts mutate the context before a trailing-token error, matching source control flow. Nested rollback and failed-command success suppression are tested with print-success enabled. Existing Go scanner error formatting is retained; broader parser work remains partial.",
         "The new comparison first failed on unsupported sort constructor Seq. The retained parser now constructs nested Seq/RegEx sorts with temporary AST parameters and pins the resulting sort; command-context builtin names are logic gated and bare names report the source one-parameter diagnostic. Zero/two parameters refuse the declaration, nested Seq, arrays indexed by sequences and native RegEx Bool acceptance are checked against clean-exit/error C++. This is concrete retained builtin support, not a universal parameterized-sort adapter or completion of general sort/parser recovery.",
         "SMT-LIB set-option accepts non-Boolean symbol values and delegates module/name/type validation to the existing global parameter catalog. The command context refreshes an already-created solver without introducing an incorrectly typed local shadow. CLI vectors change string_solver after declaration/assertion but before the first check, and compare actual free models and scope recovery against C++. Other unsupported front-end option forms and commands remain outside this increment.",

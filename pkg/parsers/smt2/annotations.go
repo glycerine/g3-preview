@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	parserutil "github.com/glycerine/g3/pkg/parsers/util"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func (p *commandParser) configurePatternOptions() (result error) {
@@ -42,12 +43,34 @@ func (p *commandParser) annotatedExpression(quantifier *ast.ASTQuantifierSpec) (
 		if err = p.advance(); err != nil {
 			return ast.ASTHandle{}, "", err
 		}
-		if key != ":named" && !(p.ignoreUserPatterns && (key == ":pattern" || key == ":no-pattern")) && quantifier == nil {
+		isLabel := key == ":lblpos" || key == ":lblneg"
+		if key != ":named" && !isLabel && !(p.ignoreUserPatterns && (key == ":pattern" || key == ":no-pattern")) && quantifier == nil {
 			return ast.ASTHandle{}, "", fmt.Errorf("invalid attribute, not in the scope of a quantifier")
 		}
 		switch key {
 		case ":named":
 			named, err = p.symbol()
+		case ":lblpos", ":lblneg":
+			var name string
+			name, err = p.symbol()
+			if err == nil {
+				var boolean ast.ASTHandle
+				boolean, err = p.manager.MkBoolSort()
+				if err == nil {
+					var sort ast.ASTHandle
+					sort, err = p.manager.GetSort(body)
+					if err == nil && sort != boolean {
+						err = fmt.Errorf("invalid labeled expression, expression must have Bool sort")
+					}
+				}
+			}
+			var label usymbol.Symbol
+			if err == nil {
+				label, err = p.manager.Symbols.Intern(name)
+			}
+			if err == nil {
+				body, err = p.pin(p.manager.MkLabel(key == ":lblpos", []usymbol.Symbol{label}, body))
+			}
 		case ":weight":
 			var weight uint32
 			weight, err = p.unsigned()
