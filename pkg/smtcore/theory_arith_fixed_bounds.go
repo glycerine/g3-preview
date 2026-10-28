@@ -273,22 +273,7 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticBoundAtoms() error {
 	if status == lbool.Undef {
 		return nil
 	}
-	bases := make([]uint32, len(t.atoms))
-	coefficientBases := make(map[string]uint32)
-	for index := range t.atoms {
-		atom := &t.atoms[index]
-		if !atom.supported {
-			continue
-		}
-		key := smtArithmeticCoefficientKey(&atom.form)
-		if base, found := coefficientBases[key]; found {
-			bases[index] = base
-			continue
-		}
-		base := t.nextSimplex + uint32(index)
-		bases[index] = base
-		coefficientBases[key] = base
-	}
+	bases := t.arithmeticAtomBases()
 	proofs, err := t.state.manager.ProofsEnabled()
 	if err != nil {
 		return err
@@ -316,6 +301,9 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticBoundAtoms() error {
 			if !found || lower && endpoint.Cmp(&threshold) < 0 || !lower && endpoint.Cmp(&threshold) > 0 {
 				continue
 			}
+			if t.strongerLemmas && len(explanation.uses) != 0 {
+				explanation = t.relaxArithmeticRowExplanation(solver, explanation.uses, endpoint, threshold, lower, bases)
+			}
 			var antecedents smtArithmeticAntecedents
 			for _, dependency := range explanation.dependencies {
 				if err = smtArithmeticPushDependency(&antecedents, dependency, &dependency.Coefficient, proofs, t.equalityBounds); err != nil {
@@ -330,6 +318,26 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticBoundAtoms() error {
 		}
 	}
 	return nil
+}
+
+func (t *SMTLinearArithmeticTheory) arithmeticAtomBases() []uint32 {
+	bases := make([]uint32, len(t.atoms))
+	coefficientBases := make(map[string]uint32)
+	for index := range t.atoms {
+		atom := &t.atoms[index]
+		if !atom.supported {
+			continue
+		}
+		key := smtArithmeticCoefficientKey(&atom.form)
+		if base, found := coefficientBases[key]; found {
+			bases[index] = base
+			continue
+		}
+		base := t.nextSimplex + uint32(index)
+		bases[index] = base
+		coefficientBases[key] = base
+	}
+	return bases
 }
 
 // impliedArithmeticRowEndpoint computes the strongest currently justified
@@ -401,11 +409,115 @@ func (t *SMTLinearArithmeticTheory) impliedArithmeticRowEndpoint(solver *simplex
 				continue
 			}
 			if !found || lower && candidate.Cmp(&best) > 0 || !lower && candidate.Cmp(&best) < 0 {
+				reason.uses = append(reason.uses[:0], uses...)
 				best, explanation, found = candidate, reason, true
 			}
 		}
 	}
 	return best, explanation, found, nil
+}
+
+type smtArithmeticAssignedBoundCandidate struct {
+	value      simplex.Infinitesimal
+	dependency simplex.BoundDependency
+}
+
+// relaxArithmeticRowExplanation is source explain_bound with relax_bounds:
+// spend the implication slack from left to right, replacing each strongest
+// endpoint by the weakest assigned atom that remains sufficient.
+func (t *SMTLinearArithmeticTheory) relaxArithmeticRowExplanation(solver *simplex.Solver, uses []simplex.ArithmeticBoundUse, endpoint, threshold simplex.Infinitesimal, lower bool, bases []uint32) *smtArithmeticBoundExplanation {
+	delta := endpoint.Clone()
+	if lower {
+		delta.Sub(&threshold)
+	} else {
+		delta = threshold.Clone()
+		delta.Sub(&endpoint)
+	}
+	result := &smtArithmeticBoundExplanation{uses: append([]simplex.ArithmeticBoundUse(nil), uses...)}
+	positions := make(map[[2]uint32]int)
+	push := func(dependency simplex.BoundDependency, coefficient *big.Rat) {
+		weighted := new(big.Rat).Mul(&dependency.Coefficient, coefficient)
+		key := smtArithmeticDependencyKey(dependency)
+		if position, found := positions[key]; found {
+			result.dependencies[position].Coefficient.Add(&result.dependencies[position].Coefficient, weighted)
+			return
+		}
+		positions[key] = len(result.dependencies)
+		result.dependencies = append(result.dependencies, simplex.BoundDependency{Literal: dependency.Literal, Equality: dependency.Equality, Coefficient: *weighted})
+	}
+	for _, use := range uses {
+		current, found := solver.Upper(use.Column)
+		if use.Lower {
+			current, found = solver.Lower(use.Column)
+		}
+		if !found {
+			return smtArithmeticWeightedBoundExplanation(solver, uses)
+		}
+		absolute := new(big.Rat).Abs(new(big.Rat).Set(&use.Coefficient))
+		var selected *smtArithmeticAssignedBoundCandidate
+		var selectedCost simplex.Infinitesimal
+		for _, candidate := range t.assignedArithmeticBoundCandidates(use.Column, use.Lower, bases) {
+			distance := current.Clone()
+			if use.Lower {
+				if candidate.value.Cmp(&current) >= 0 {
+					continue
+				}
+				distance.Sub(&candidate.value)
+			} else {
+				if candidate.value.Cmp(&current) <= 0 {
+					continue
+				}
+				distance = candidate.value.Clone()
+				distance.Sub(&current)
+			}
+			distance.Mul(absolute)
+			if distance.Cmp(&delta) > 0 || selected != nil && (use.Lower && candidate.value.Cmp(&selected.value) >= 0 || !use.Lower && candidate.value.Cmp(&selected.value) <= 0) {
+				continue
+			}
+			copy := candidate
+			selected, selectedCost = &copy, distance
+		}
+		if selected != nil {
+			push(selected.dependency, &use.Coefficient)
+			delta.Sub(&selectedCost)
+			continue
+		}
+		dependencies, known := solver.BoundDependencies(use.Column, use.Lower)
+		if !known {
+			return smtArithmeticWeightedBoundExplanation(solver, uses)
+		}
+		for _, dependency := range dependencies {
+			push(dependency, &use.Coefficient)
+		}
+	}
+	return result
+}
+
+func (t *SMTLinearArithmeticTheory) assignedArithmeticBoundCandidates(column uint32, lower bool, bases []uint32) []smtArithmeticAssignedBoundCandidate {
+	result := make([]smtArithmeticAssignedBoundCandidate, 0)
+	for _, assertion := range t.assertions {
+		atom := &t.atoms[assertion.atom]
+		if !atom.supported {
+			continue
+		}
+		boundLower, value := smtLinearAtomBound(atom, assertion.truth, t.integralAtom(atom))
+		literal := smtLinearAssertionLiteral(atom, assertion)
+		if bases[assertion.atom] == column && boundLower == lower {
+			result = append(result, smtArithmeticAssignedBoundCandidate{value: value, dependency: simplex.BoundDependency{Literal: literal.Index(), Coefficient: *big.NewRat(1, 1)}})
+		}
+		if len(atom.form.terms) != 1 {
+			continue
+		}
+		for variable, coefficient := range atom.form.terms {
+			if variable != column || coefficient.Sign() == 0 || lower != (boundLower == (coefficient.Sign() > 0)) {
+				continue
+			}
+			direct := value.Clone()
+			direct.Quo(coefficient)
+			result = append(result, smtArithmeticAssignedBoundCandidate{value: direct, dependency: simplex.BoundDependency{Literal: literal.Index(), Coefficient: *new(big.Rat).Inv(coefficient)}})
+		}
+	}
+	return result
 }
 
 func (t *SMTLinearArithmeticTheory) assignArithmeticBoundLiteral(literal SMTLiteral, antecedents *smtArithmeticAntecedents) (result error) {

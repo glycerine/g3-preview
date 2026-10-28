@@ -12,6 +12,7 @@ import (
 
 type smtArithmeticBoundExplanation struct {
 	dependencies []simplex.BoundDependency
+	uses         []simplex.ArithmeticBoundUse
 }
 
 // Source set_conflict(v_dependency*) flattens the selected endpoint into a

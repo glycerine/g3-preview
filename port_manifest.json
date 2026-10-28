@@ -136134,7 +136134,7 @@
           ]
         },
         {
-          "name": "propagate_bounds: retained affine definition rows carry nonlinear interval bounds through preprocessor aliases before and after monomial propagation; every eligible small tableau row derives strict/rational/integer endpoints and publishes implied unassigned Boolean bounds with exact premises, source small-lemma or external justification ownership, propagation-mode and conflict-threshold gates, statistics, and scope restoration; stronger-lemma premise relaxation remains partial",
+          "name": "propagate_bounds: retained affine definition rows carry nonlinear interval bounds through preprocessor aliases before and after monomial propagation; every eligible small tableau row derives strict/rational/integer endpoints and publishes implied unassigned Boolean bounds with source left-to-right stronger-lemma premise relaxation, proof coefficients, small-lemma or external justification ownership, propagation-mode and conflict-threshold gates, statistics, and scope restoration; incremental marked-row scheduling, big-coefficient skipping, and BP_REFINE tableau-bound installation remain partial",
           "status": "partial",
           "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
           "go_targets": [
