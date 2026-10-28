@@ -237,6 +237,20 @@ func (c *Context) WriteUnsatCore(out io.Writer) error {
 	if !c.checked || c.status != lbool.False || !state.UnsatCore {
 		return fmt.Errorf("unsat core is not available")
 	}
+	return c.writeUnsatResultCore(out)
+}
+
+func (c *Context) WriteUnsatAssumptions(out io.Writer) error {
+	if !c.ProduceUnsatAssumptions {
+		return fmt.Errorf("unsat assumptions construction is not enabled, use command (set-option :produce-unsat-assumptions true)")
+	}
+	if !c.checked || c.status != lbool.False {
+		return fmt.Errorf("unsat assumptions is not available")
+	}
+	return c.writeUnsatResultCore(out)
+}
+
+func (c *Context) writeUnsatResultCore(out io.Writer) error {
 	core, err := c.checkSatResult().UnsatCore()
 	if err != nil {
 		return err

@@ -94,6 +94,7 @@ type Context struct {
 	scopes                           []scope
 	PrintSuccess, GlobalDeclarations bool
 	InteractiveMode                  bool
+	ProduceUnsatAssumptions          bool
 	checked                          bool
 	status                           lbool.LBool
 	watch                            stopwatch.Stopwatch
@@ -230,6 +231,12 @@ func (c *Context) SetBoolOption(name string, value bool) error {
 			return fmt.Errorf("option value cannot be modified after initialization")
 		}
 		c.InteractiveMode = value
+		return nil
+	case "produce_unsat_assumptions":
+		if c.manager != nil {
+			return fmt.Errorf("option value cannot be modified after initialization")
+		}
+		c.ProduceUnsatAssumptions = value
 		return nil
 	case "global_declarations", "global_decls":
 		if c.manager != nil {

@@ -40830,7 +40830,9 @@
         "pkg/parsers/smt2/assertions_test.go",
         "pkg/cmd/g3/test_vectors/get_assertions.smt2",
         "pkg/parsers/smt2/assignment_test.go",
-        "pkg/cmd/g3/test_vectors/get_assignment.smt2"
+        "pkg/cmd/g3/test_vectors/get_assignment.smt2",
+        "pkg/parsers/smt2/unsat_assumptions_test.go",
+        "pkg/cmd/g3/test_vectors/get_unsat_assumptions.smt2"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -40867,7 +40869,9 @@
         "TestSMT2GetAssertionsPreservesSourceTextAndScopes",
         "TestSMT2GetAssertionsRequiresInteractiveMode",
         "TestSMT2GetAssignmentBooleanMacrosInDeclarationOrder",
-        "TestSMT2GetAssignmentRequiresAvailableModel"
+        "TestSMT2GetAssignmentRequiresAvailableModel",
+        "TestSMT2GetUnsatAssumptionsUsesDirectAssumptionCore",
+        "TestSMT2GetUnsatAssumptionsGuards"
       ],
       "conditionals": [
         {
@@ -40934,6 +40938,13 @@
           "go_target": "pkg/cmd_context/results.go",
           "go_targets": ["pkg/parsers/smt2/commands.go", "pkg/parsers/smt2/assignment_test.go", "pkg/cmd/g3/test_vectors/get_assignment.smt2"],
           "tests": ["TestSMT2GetAssignmentBooleanMacrosInDeclarationOrder", "TestSMT2GetAssignmentRequiresAvailableModel", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+        },
+        {
+          "name": "produce-unsat-assumptions option guard and get-unsat-assumptions direct assumption-core display (basic_cmds.cpp:250-257,430-433)",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/results.go",
+          "go_targets": ["pkg/cmd_context/context.go", "pkg/parsers/smt2/commands.go", "pkg/parsers/smt2/unsat_assumptions_test.go", "pkg/cmd/g3/test_vectors/get_unsat_assumptions.smt2"],
+          "tests": ["TestSMT2GetUnsatAssumptionsUsesDirectAssumptionCore", "TestSMT2GetUnsatAssumptionsGuards", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         },
         {
           "name": "remaining basic commands and non-Boolean option values, metadata state queries and validation, model completion policy and remaining output modes",

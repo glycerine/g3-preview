@@ -544,6 +544,14 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		success = false
+	case "get-unsat-assumptions":
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.WriteUnsatAssumptions(p.out); err != nil {
+			return false, err
+		}
+		success = false
 	case "get-assertions":
 		if err = p.requireEnd(); err != nil {
 			return false, err
