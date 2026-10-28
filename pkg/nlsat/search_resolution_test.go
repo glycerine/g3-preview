@@ -110,3 +110,68 @@ func TestSearchResolutionLazyClauseUsesComposedExplanation(t *testing.T) {
 		t.Fatal("lazy clause projected boundary", q.lazy.result[0], root)
 	}
 }
+
+func TestSearchResolutionAnalyzesDecisionAndClauseTrail(t *testing.T) {
+	_, r := searchStateFixture(t)
+	q, err := newSearchResolution(r)
+	assignmentMust(t, err)
+	t.Cleanup(func() { assignmentMust(t, q.close()) })
+
+	decision, err := r.store.atoms.mkBoolVar()
+	assignmentMust(t, err)
+	derived, err := r.store.atoms.mkBoolVar()
+	assignmentMust(t, err)
+	decisionLiteral := sat.MakeLiteral(decision, false)
+	derivedLiteral := sat.MakeLiteral(derived, false)
+	assignmentMust(t, r.decide(decisionLiteral))
+	reason := searchClause(t, r, decisionLiteral.Negated(), derivedLiteral)
+	justification, err := NewClauseJustification(reason)
+	assignmentMust(t, err)
+	assignmentMust(t, r.assign(derivedLiteral, justification))
+	conflict := searchClause(t, r, derivedLiteral.Negated())
+
+	found, err := q.analyze(conflict, nil)
+	assignmentMust(t, err)
+	if !found || len(q.lemma.result) != 1 || q.lemma.result[0] != decisionLiteral.Negated() {
+		t.Fatal("clause trail did not resolve to the false decision literal", found, q.lemma.result)
+	}
+	if q.numMarks != 0 {
+		t.Fatal("analysis retained marked trail literals", q.numMarks)
+	}
+	for b, marked := range q.marks {
+		if marked {
+			t.Fatal("analysis retained mark", b)
+		}
+	}
+
+	assignmentMust(t, r.undoUntilLevel(0))
+	assignmentMust(t, q.lemma.reset())
+	assignmentMust(t, r.decide(decisionLiteral.Negated()))
+	direct := searchClause(t, r, decisionLiteral)
+	found, err = q.analyze(direct, nil)
+	assignmentMust(t, err)
+	if !found || len(q.lemma.result) != 1 || q.lemma.result[0] != decisionLiteral {
+		t.Fatal("direct conflict decision polarity", found, q.lemma.result)
+	}
+}
+
+func TestSearchResolutionRejectsUnjoinedAssumptionsBeforeMutation(t *testing.T) {
+	_, r := searchStateFixture(t)
+	q, err := newSearchResolution(r)
+	assignmentMust(t, err)
+	t.Cleanup(func() { assignmentMust(t, q.close()) })
+	b, err := r.store.atoms.mkBoolVar()
+	assignmentMust(t, err)
+	literal := sat.MakeLiteral(b, false)
+	attachment := &AssumptionAttachment{}
+	set, err := r.store.assumptions.mkLeaf(AttachedAssumption(attachment))
+	assignmentMust(t, err)
+	conflict, err := r.store.mkClause([]sat.Literal{literal}, false, set)
+	assignmentMust(t, err)
+	if _, err = q.analyze(conflict, nil); err != ErrResolutionAssumptions {
+		t.Fatal("assumption-bearing conflict was not rejected explicitly", err)
+	}
+	if len(q.lemma.result) != 0 || q.numMarks != 0 {
+		t.Fatal("rejected conflict mutated analysis scratch", q.lemma.result, q.numMarks)
+	}
+}

@@ -1,12 +1,16 @@
 package nlsat
 
-// Source: src/nlsat/nlsat_solver.cpp:1426-1647.
+// Source: src/nlsat/nlsat_solver.cpp:1426-1733.
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+var ErrResolutionAssumptions = errors.New("nlsat: conflict resolution assumptions not yet joined")
 
 // searchResolution is the concrete conflict-resolution scratch state. It owns
 // lemma literal references and borrows one live search state.
@@ -75,6 +79,137 @@ func (q *searchResolution) buildLazyClause(j *LazyJustification, explanation *ex
 		}
 	}
 	return nil
+}
+
+func (q *searchResolution) clearAnalysis() error {
+	for i := range q.marks {
+		q.marks[i] = false
+	}
+	q.numMarks = 0
+	return q.lemma.reset()
+}
+
+// analyze resolves one conflict backwards through the live trail. The returned
+// lemma borrows its literals through q until the publication phase consumes it.
+func (q *searchResolution) analyze(conflict *Clause, explanation *explanationAssumptions) (foundDecision bool, err error) {
+	if q == nil || q.search == nil || conflict == nil {
+		return false, ErrSearchOwner
+	}
+	if conflict.Assumptions() != nil {
+		return false, ErrResolutionAssumptions
+	}
+	if q.numMarks != 0 {
+		return false, ErrSearchPending
+	}
+	for _, marked := range q.marks {
+		if marked {
+			return false, ErrSearchPending
+		}
+	}
+	if err = q.lemma.reset(); err != nil {
+		return false, err
+	}
+	abort := func(cause error) (bool, error) {
+		if cleanup := q.clearAnalysis(); cleanup != nil {
+			return false, errors.Join(cause, cleanup)
+		}
+		return false, cause
+	}
+	if err = q.resolveLiterals(sat.NullBoolVar, conflict.Literals()); err != nil {
+		return abort(err)
+	}
+
+	top := len(q.search.trail)
+	for {
+		foundDecision = false
+		for q.numMarks > 0 {
+			if top == 0 {
+				return abort(arena.ErrBounds)
+			}
+			top--
+			t := q.search.trail[top]
+			if t.kind == trailStage {
+				return abort(arena.ErrConfig)
+			}
+			if t.kind != trailBoolean || !q.marked(t.b) {
+				continue
+			}
+			q.numMarks--
+			if err = q.resetMark(t.b); err != nil {
+				return abort(err)
+			}
+			if uint64(t.b) >= uint64(len(q.search.store.atoms.bools.justifications)) {
+				return abort(arena.ErrBounds)
+			}
+			justification := q.search.store.atoms.bools.justifications[t.b]
+			switch justification.Kind() {
+			case ClauseJustification:
+				clause, cause := justification.Clause()
+				if cause != nil {
+					return abort(cause)
+				}
+				if clause.Assumptions() != nil {
+					return abort(ErrResolutionAssumptions)
+				}
+				if cause = q.resolveLiterals(t.b, clause.Literals()); cause != nil {
+					return abort(cause)
+				}
+			case LazyJustificationKind:
+				lazy, cause := justification.Lazy()
+				if cause != nil {
+					return abort(cause)
+				}
+				if cause = q.buildLazyClause(lazy, explanation); cause != nil {
+					return abort(cause)
+				}
+				if cause = q.resolveLiterals(t.b, q.lazy.result); cause != nil {
+					return abort(cause)
+				}
+			case DecisionJustification:
+				if q.numMarks != 0 || uint64(t.b) >= uint64(len(q.search.store.atoms.bools.values)) {
+					return abort(arena.ErrConfig)
+				}
+				foundDecision = true
+				literal := sat.MakeLiteral(t.b, q.search.store.atoms.bools.values[t.b] == lbool.True)
+				if cause := q.lemma.push(literal); cause != nil {
+					return abort(cause)
+				}
+			default:
+				return abort(arena.ErrConfig)
+			}
+		}
+
+		if foundDecision {
+			break
+		}
+		previous, cause := q.onlyPreviousStages(q.lemma.result)
+		if cause != nil {
+			return abort(cause)
+		}
+		if previous {
+			break
+		}
+		level, cause := q.maxScopeLevel(q.lemma.result)
+		if cause != nil {
+			return abort(cause)
+		}
+		if level >= q.search.level {
+			return abort(arena.ErrConfig)
+		}
+		if cause = q.removeLiteralsFromLevel(&q.lemma, level); cause != nil {
+			return abort(cause)
+		}
+		if cause = q.search.undoUntilLevel(level); cause != nil {
+			return abort(cause)
+		}
+		top = len(q.search.trail)
+	}
+
+	if err = q.resetMarks(); err != nil {
+		return abort(err)
+	}
+	q.numMarks = 0
+	return foundDecision, nil
 }
 
 func (q *searchResolution) marked(b sat.BoolVar) bool {
