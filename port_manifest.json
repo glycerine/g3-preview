@@ -84417,7 +84417,7 @@
         "CompileFiniteRules transfers two instruction blocks to its caller. Each generated rule instruction retains its Rule accounting parent; load/store instructions retain predicate declarations; every partial compilation failure closes all generated instructions and owned references before returning."
       ],
       "deviations": [
-        "The compiler currently accepts stratified finite rules with zero, one, or two positive tails, negated predicate anti-joins, complete structural head assembly, and recursive semi-naive least-fixpoint loops grouped by finalized predicate stratum. Interpreted filters, widening, saturation marks, finer SCC/local-delta partitioning, and wider multi-tail joins remain open; unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
+        "The compiler currently accepts stratified finite rules with zero, one, or two positive tails, negated predicate anti-joins, theory-rewritten interpreted finite filters, complete structural head assembly, and recursive semi-naive least-fixpoint loops grouped by finalized predicate stratum. Widening, saturation marks, finer SCC/local-delta partitioning, and wider multi-tail joins remain open; unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
       ]
     },
     {
@@ -84457,7 +84457,7 @@
         "The Go compiler uses concrete finite HashTable registers and typed AST handles; it does not port the unused C++ container/template machinery. Returned blocks own all generated instructions."
       ],
       "deviations": [
-        "Only the live stratified finite-rule slice with up to two positive tails is exposed; recursive loops use semi-naive tail deltas within finalized strata. Finer SCC/local-delta partitioning, interpreted filters, wider multi-tail joins, widening, and saturation marks remain open with the source unit marked partial."
+        "Only the live stratified finite-rule slice with up to two positive tails is exposed; recursive loops use semi-naive tail deltas within finalized strata and interpreted finite filters reuse the borrowed theory rewriter. Finer SCC/local-delta partitioning, wider multi-tail joins, widening, and saturation marks remain open with the source unit marked partial."
       ]
     },
     {
@@ -84937,9 +84937,15 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_construct.go", "pkg/muz/rel/instruction_io.go", "pkg/muz/rel/instruction_loop.go", "pkg/muz/rel/instruction_table.go"],
+      "go_targets": ["pkg/muz/rel/instruction.go", "pkg/muz/rel/instruction_construct.go", "pkg/muz/rel/instruction_interpreted.go", "pkg/muz/rel/instruction_io.go", "pkg/muz/rel/instruction_loop.go", "pkg/muz/rel/instruction_table.go"],
       "tests": ["TestFiniteRelationConstructionInstructions", "TestInstructionBlockCloneMoveDeallocateOwnership", "TestInstructionBlockChecksTerminationBeforePerform", "TestFiniteTableJoinProjectionRenameInstructions", "TestFiniteTableUnionDeltaFiltersAndSelectionInstructions", "TestRelationInstructionsLoadCloneAndStoreOwnership", "TestUnarySingletonInstructionRejectsOutOfDomainValue", "TestWhileInstructionExecutesUntilControlsEmpty", "TestWhileInstructionPropagatesBodyTerminationAndOwnsBody"],
       "assertions": [
+        {
+          "name": "Concrete interpreted finite-relation filtering through tuple decoding, de-Bruijn variable binding, and the retained theory rewriter (dl_instruction.cpp:526-635)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/instruction_interpreted.go",
+          "tests": ["TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2"]
+        },
         {
           "line": 103,
           "text": "SASSERT(time_in_ms > 0);"
@@ -85003,7 +85009,7 @@
         "ExecutionContext owns register tables and move transfers the exact pointer while clone creates an independent table. Load clones the stored relation; store transfers its register table into RelationManager and empties the register. Relation I/O instructions retain their predicate declarations. InstructionBlock owns and closes instructions in source order; each instruction owns its AccountedObject. WhileInstruction owns and closes its nested body."
       ],
       "deviations": [
-        "The execution context currently retains finite HashTable registers, a borrowed finite RelationManager, and caller-supplied termination only. Timers, operation-function caches, interpreted filters, saturation markers, and non-table relation implementations stay open."
+        "The execution context currently retains finite HashTable registers, a borrowed finite RelationManager, a borrowed theory rewriter for interpreted filters, and caller-supplied termination only. Timers, operation-function caches, saturation markers, and non-table relation implementations stay open."
       ]
     },
     {

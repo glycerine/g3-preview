@@ -6,8 +6,10 @@ package rel
 import (
 	"errors"
 	"fmt"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
+	astrewriter "github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/muz/base"
 )
 
@@ -44,12 +46,13 @@ const (
 )
 
 type finiteCompiledRule struct {
-	rule     *base.Rule
-	kind     finiteRuleKind
-	head     ast.ASTHandle
-	tail     ast.ASTHandle
-	tail2    ast.ASTHandle
-	negative []ast.ASTHandle
+	rule        *base.Rule
+	kind        finiteRuleKind
+	head        ast.ASTHandle
+	tail        ast.ASTHandle
+	tail2       ast.ASTHandle
+	negative    []ast.ASTHandle
+	interpreted []ast.ASTHandle
 }
 
 type constantRegisterKey struct {
@@ -68,6 +71,7 @@ type finiteCompiler struct {
 	execution     *InstructionBlock
 	termination   *InstructionBlock
 	current       *InstructionBlock
+	guard         *astrewriter.TheoryRewriter
 	predicateRegs map[ast.ASTHandle]uint32
 	signatures    []Signature
 	loaded        []ast.ASTHandle
@@ -76,12 +80,12 @@ type finiteCompiler struct {
 	emptyTotals   map[ast.ASTHandle]uint32
 }
 
-func newFiniteCompiler(relations *RelationManager) (*finiteCompiler, error) {
+func newFiniteCompiler(relations *RelationManager, guard *astrewriter.TheoryRewriter) (*finiteCompiler, error) {
 	if err := relations.open(); err != nil {
 		return nil, err
 	}
 	return &finiteCompiler{
-		manager: relations.manager, relations: relations,
+		manager: relations.manager, relations: relations, guard: guard,
 		execution: NewInstructionBlock(), termination: NewInstructionBlock(),
 		predicateRegs: make(map[ast.ASTHandle]uint32),
 		constants:     make(map[constantRegisterKey]uint32),
@@ -193,7 +197,7 @@ func (c *finiteCompiler) classify(rule *base.Rule) (finiteCompiledRule, error) {
 	if err = validArguments(result.head); err != nil {
 		return result, err
 	}
-	if positive < 0 || positive > 2 || uninterpreted < positive || tails != uninterpreted {
+	if positive < 0 || positive > 2 || uninterpreted < positive || tails < uninterpreted {
 		return result, ErrCompilerUnsupported
 	}
 	result.kind = finiteGroundRule
@@ -229,6 +233,16 @@ func (c *finiteCompiler) classify(rule *base.Rule) (finiteCompiledRule, error) {
 			return result, x
 		}
 		result.negative = append(result.negative, application)
+	}
+	if tails != uninterpreted && c.guard == nil {
+		return result, ErrCompilerUnsupported
+	}
+	for index := uninterpreted; index < tails; index++ {
+		condition, negated, x := rule.Tail(index)
+		if x != nil || negated {
+			return result, errors.Join(x, ErrCompilerUnsupported)
+		}
+		result.interpreted = append(result.interpreted, condition)
 	}
 	return result, nil
 }
@@ -885,6 +899,102 @@ func (c *finiteCompiler) filterNegatives(rule finiteCompiledRule, predicate ast.
 	return current, signature, owned, present, variableColumns, nil
 }
 
+func (c *finiteCompiler) conditionVariables(root ast.ASTHandle, variables map[uint32]ast.ASTHandle) error {
+	kind, err := c.manager.GetKind(root)
+	if err != nil {
+		return err
+	}
+	if kind == ast.ASTVar {
+		index, x := c.manager.GetVarIndex(root)
+		if x != nil {
+			return x
+		}
+		variables[index], x = c.manager.GetSort(root)
+		return x
+	}
+	if kind != ast.ASTApp {
+		return nil
+	}
+	count, err := c.manager.GetNumArgs(root)
+	if err != nil {
+		return err
+	}
+	for index := uint32(0); index < count; index++ {
+		child, x := c.manager.GetArg(root, index)
+		if x != nil {
+			return x
+		}
+		if x = c.conditionVariables(child, variables); x != nil {
+			return x
+		}
+	}
+	return nil
+}
+
+func (c *finiteCompiler) filterInterpreted(rule finiteCompiledRule, predicate ast.ASTHandle, current uint32, signature Signature, owned, present bool, variableColumns map[uint32][]int) (uint32, Signature, bool, bool, map[uint32][]int, error) {
+	if !present {
+		seed, err := c.emptyTotalRegister(rule.rule, predicate)
+		if err != nil {
+			return 0, Signature{}, false, false, nil, err
+		}
+		current, present = seed, true
+	}
+	variables := make(map[uint32]ast.ASTHandle)
+	for _, condition := range rule.interpreted {
+		if err := c.conditionVariables(condition, variables); err != nil {
+			return 0, Signature{}, false, false, nil, err
+		}
+	}
+	order := make([]int, 0, len(variables))
+	for variable := range variables {
+		order = append(order, int(variable))
+	}
+	sort.Ints(order)
+	for _, raw := range order {
+		variable := uint32(raw)
+		if len(variableColumns[variable]) != 0 {
+			continue
+		}
+		size, err := c.manager.GetSortSize(variables[variable])
+		if err != nil || !size.IsFinite() {
+			return 0, Signature{}, false, false, nil, errors.Join(err, ErrCompilerUnsupported)
+		}
+		domain, err := size.Size()
+		if err != nil {
+			return 0, Signature{}, false, false, nil, err
+		}
+		total, err := c.totalRegister(rule.rule, predicate, variables[variable], domain)
+		if err != nil {
+			return 0, Signature{}, false, false, nil, err
+		}
+		column := signature.Len()
+		current, signature, owned, present, err = c.appendColumn(current, signature, owned, present, total, domain, rule.rule)
+		if err != nil {
+			return 0, Signature{}, false, false, nil, err
+		}
+		variableColumns[variable] = []int{column}
+	}
+	if !owned {
+		clone := c.fresh(signature)
+		if err := c.emit(NewCloneInstruction(current, clone), rule.rule); err != nil {
+			return 0, Signature{}, false, false, nil, err
+		}
+		current, owned = clone, true
+	}
+	columns := make(map[uint32]int, len(variables))
+	for variable := range variables {
+		columns[variable] = variableColumns[variable][0]
+	}
+	instruction, err := NewFilterInterpretedInstruction(c.manager, c.relations, c.guard, current, rule.interpreted, columns, variables)
+	if err != nil {
+		return 0, Signature{}, false, false, nil, err
+	}
+	if err = c.emit(instruction, rule.rule); err != nil {
+		return 0, Signature{}, false, false, nil, err
+	}
+	return current, signature, owned, present, variableColumns, nil
+}
+
 func (c *finiteCompiler) compileRule(rule finiteCompiledRule, delta uint32, tailSources [2]uint32) error {
 	predicate, err := c.manager.GetDecl(rule.head)
 	if err != nil {
@@ -912,6 +1022,12 @@ func (c *finiteCompiler) compileRule(rule finiteCompiledRule, delta uint32, tail
 	}
 	if len(rule.negative) != 0 {
 		current, signature, owned, present, variableColumns, err = c.filterNegatives(rule, predicate, current, signature, owned, present, variableColumns)
+		if err != nil {
+			return err
+		}
+	}
+	if len(rule.interpreted) != 0 {
+		current, signature, owned, present, variableColumns, err = c.filterInterpreted(rule, predicate, current, signature, owned, present, variableColumns)
 		if err != nil {
 			return err
 		}
@@ -1115,7 +1231,12 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 // slice with up to two positive tails into execution and termination bytecode.
 // Ownership of both returned blocks transfers to the caller.
 func CompileFiniteRules(relations *RelationManager, set *base.RuleSet) (*InstructionBlock, *InstructionBlock, error) {
-	compiler, err := newFiniteCompiler(relations)
+	return CompileFiniteRulesWithGuard(relations, set, nil)
+}
+
+// CompileFiniteRulesWithGuard additionally compiles interpreted finite guards.
+func CompileFiniteRulesWithGuard(relations *RelationManager, set *base.RuleSet, guard *astrewriter.TheoryRewriter) (*InstructionBlock, *InstructionBlock, error) {
+	compiler, err := newFiniteCompiler(relations, guard)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -931,7 +931,7 @@ func (e *PropositionalEngine) saturate() error {
 }
 
 func (e *PropositionalEngine) tryCompiledSaturation() (used bool, resultErr error) {
-	execution, termination, err := rel.CompileFiniteRules(e.relations, e.set)
+	execution, termination, err := rel.CompileFiniteRulesWithGuard(e.relations, e.set, e.guard)
 	if errors.Is(err, rel.ErrCompilerUnsupported) {
 		return false, nil
 	}
