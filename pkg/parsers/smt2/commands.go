@@ -551,6 +551,11 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		success = false
+	case "simplify":
+		if err = p.simplifyCommand(); err != nil {
+			return false, err
+		}
+		success = false
 	case "reset", "reset-assertions":
 		if p.token != RightParenToken {
 			if name == "reset" {

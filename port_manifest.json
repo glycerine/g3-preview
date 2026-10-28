@@ -43974,22 +43974,30 @@
       "path": "src/cmd_context/simplify_cmd.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/cmd_context/simplify.go", "pkg/parsers/smt2/simplify.go", "pkg/cmd/g3/test_vectors/simplify_command.smt2"],
+      "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMT2SimplifyCommandRejectsUnknownParameterBeforeOutput", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "simplify_cmd default term rewriting, theory-rewriter parameter validation, som/flat normalization and conditional result printing (simplify_cmd.cpp:30-96,140-153)",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/simplify.go",
+          "go_targets": ["pkg/cmd_context/simplify.go"],
+          "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMT2SimplifyCommandRejectsUnknownParameterBeforeOutput", "TestSMTLibRunnerCPPReference"]
+        }
+      ],
+      "ownership": ["Each command owns its local ParamsRef, parameter descriptors and simplified AST reference; the context call owns and closes the temporary TheoryRewriter."],
+      "deviations": ["Proof/statistics printing, timeout/rlimit command wrappers, caught simplifier diagnostics and the lazy sequence-expression solver callback remain unported."]
     },
     {
       "path": "src/cmd_context/simplify_cmd.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/cmd_context/simplify.go", "pkg/parsers/smt2/simplify.go"],
+      "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMTLibRunnerCPPReference"],
       "conditionals": [
         {
           "line": 18,
@@ -44002,9 +44010,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained simplify command installation and default execution surface (simplify_cmd.h:23)",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMTLibRunnerCPPReference"]
+        }
+      ],
+      "ownership": ["Go command dispatch directly calls the concrete context rewrite operation; no command registry allocation is retained."],
+      "deviations": ["The unported optional proof/statistics/resource-control behavior keeps this header unit partial."]
     },
     {
       "path": "src/cmd_context/tactic_cmds.cpp",

@@ -1,0 +1,7 @@
+(set-logic QF_LIA)
+(declare-const x Int)
+(declare-const y Int)
+(simplify (+ 0 (* 1 x) 2 3))
+(simplify (* (+ x y) (+ x y)) :som true)
+(simplify (and true (= (+ 1 2) 3)))
+(simplify (+ x 0) :print false)

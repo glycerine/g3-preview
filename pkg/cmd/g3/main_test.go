@@ -821,6 +821,7 @@ var scriptResults = map[string]string{
 	"pareto_optimization.smt2":                     "sat\n(objectives\n (x 3)\n (y 3)\n)\n((x 3)\n (y 3))\nunsat\nsat\n(objectives\n (x 3)\n (y 3)\n)\n((x 3)\n (y 3))\n",
 	"pareto_bit_vector_optimization.smt2":          "sat\n(objectives\n (x 3)\n (y 3)\n)\n((x #b11)\n (y #b11))\nunsat\nsat\n(objectives\n (x 3)\n (y 3)\n)\n((x #b11)\n (y #b11))\n",
 	"pareto_soft_optimization.smt2":                "sat\n(objectives\n (x 0)\n (y 0)\n)\n((a true)\n (b true))\nunsat\nsat\n(objectives\n (x 0)\n (y 0)\n)\n((a true)\n (b true))\n",
+	"simplify_command.smt2":                        "(+ 5 x)\n(+ (* x x) (* 2 x y) (* y y))\ntrue\n",
 	"lexicographic_integer_optimization.smt2":      "sat\n(objectives\n (x 3)\n (y 2)\n)\n((x 3)\n (y 2))\nsat\n(objectives\n (x 0)\n (y 5)\n)\n((x 0)\n (y 5))\n",
 	"bit_vector.smt2":                              "sat\n((x #xf))\n",
 	"bit_vector_optimization.smt2":                 "sat\n(objectives\n (x 9)\n)\n((x #x9))\nsat\n(objectives\n (x 3)\n)\n((x #x3))\nsat\n(objectives\n (x 15)\n (y 8)\n)\n((x #xf)\n (y #x8))\n",
