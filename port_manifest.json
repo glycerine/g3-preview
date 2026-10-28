@@ -136330,7 +136330,7 @@
       "path": "src/smt/theory_arith_eq.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_arith_linear.go",
         "pkg/smtcore/theory_arith_mixed.go",
@@ -136348,7 +136348,9 @@
         "pkg/smtcore/smt_equality_propagation.go",
         "pkg/smtcore/smt_theory_propagation.go",
         "pkg/smtcore/smt_context_invariant.go",
-        "pkg/smtcore/smt_core_equality_queue_test.go"
+        "pkg/smtcore/smt_core_equality_queue_test.go",
+        "pkg/smtcore/theory_arith_eq_diagnostics.go",
+        "pkg/smtcore/theory_arith_eq_diagnostics_test.go"
       ],
       "tests": [
         "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
@@ -136366,7 +136368,9 @@
         "TestSMTArithmeticOwnEqualityRetainedForReplayWithoutContextBounce",
         "TestSMTLibRunnerProofScript",
         "TestSMTCoreEqualityQueueFIFOWithGeneratedCongruenceConflict",
-        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting"
+        "TestSMTCoreEqualityQueueUndeliveredPopAndRedundantAccounting",
+        "TestSMTArithmeticEqualityRetainedDiagnostics",
+        "TestSMTArithmeticEqualityDiagnosticBadbitAndAssertionGate"
       ],
       "conditionals": [
         {
@@ -136464,18 +136468,19 @@
           "text": "SASSERT(y == y2 && k == k2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "fixed-variable, zero-offset-row, and fixed-monomial offset equality propagation with theory antecedents",
-          "status": "partial",
+          "name": "fixed-variable, zero-offset-row, fixed-monomial offset equality, and one-variable implied-fixed equality propagation with theory antecedents",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_linear.go",
           "tests": [
             "TestSMTSolverLinearArithmeticPropagatesImpliedEquality",
             "TestSMTSolverLinearArithmeticPropagatesFixedEquality",
             "TestSMTSolverLinearArithmeticPropagatesOffsetEquality",
-            "TestSMTLinearArithmeticEqualDefinitionRows"
+            "TestSMTLinearArithmeticEqualDefinitionRows",
+            "TestSMTArithmeticEqualityRetainedDiagnostics/fixed-monomial-implies-fixed-variable"
           ]
         },
         {
@@ -136564,14 +136569,16 @@
       ],
       "ownership": [
         "Integer-column and cast-axiom metadata follows theory scopes. Temporary cast formulas are pinned through recursive internalization; literal clauses and internalized nodes retain surviving ASTs. Model numeral sorts come from the original enode, independently of integrality classification.",
-        "Shared fixed-value equality propagation now expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the previous conservative fallback; other offset equality propagation and the source fixed-variable table/event integration remain partial.",
+        "Shared fixed-value equality propagation expands the four logical replay endpoint explanations in source order and records zero coefficients under the eq-propagate rule. Temporary parameters are released after the equality justification takes owning copies. The real/integer scoped proof matrix excludes an unrelated arithmetic assertion, requires both lower-bound assertions and the row upper bound, and inspects all source-zero coefficients. Unexplained logical endpoints retain the conservative all-antecedent fallback.",
         "The arithmetic theory owns an unsigned per-search conflict count in addition to cumulative conflict statistics. All retained arithmetic conflict publication paths increment both counters; init_search_eh resets only the per-search count, while pop_scope_eh and restart_eh preserve it. PropagateEqs and PropagationThreshold are consumed from the concrete arithmetic configuration by fixed and implied equality paths. The C++ script toggles the supported arith.propagate_eqs option; finite thresholds are tested through typed configuration because the retained C++ threshold is an internal setup setting, including setup_QF_UFLIA's value of 1000, rather than an SMT-LIB set-option parameter. Completing that full setup profile remains separate.",
-        "Context takes scoped extended-equality justification ownership before merging. Arithmetic retains its own derived equality in scoped replay endpoints/bounds; these roll back with its tableau inputs. FromTheory remains the arithmetic family and context suppresses the origin callback."
+        "Context takes scoped extended-equality justification ownership before merging. Arithmetic retains its own derived equality in scoped replay endpoints/bounds; these roll back with its tableau inputs. FromTheory remains the arithmetic family and context suppresses the origin callback.",
+        "The source keeps non-trailed fixed-value and offset-row hash tables and validates stale entries after pop. Go reconstructs the candidate sequence from scoped active assertions and sorted definition variables on each propagation pass, so popped entries are absent rather than retained stale. Trace controls are borrowed; equality justifications own copied literals, equality pairs, and proof parameters."
       ],
       "deviations": [
-        "The linear specialization recognizes active opposite bound pairs, substitutes fixed monomials, and compares affine definition rows directly instead of maintaining the source row-id offset index.",
-        "C++ retains the proved equality in its persistent tableau; the Go arithmetic tableau replays inputs. Own propagation now records that equality locally through the concrete existing bound/adapter path, replacing an implicit dependence on context bouncing the equality back. Existing nonlinear-alias and mixed-floor scripts enforce behavior; the broader arithmetic source unit remains partial.",
-        "The source tableau already knows its proved equality. Go replay records a concrete scoped own-equality obligation and creates its equality-bound evidence after the core merge, before numerical propagation. CanPropagate includes this work; pop restores entry/head. This is Go replay bookkeeping, not an extra source theory notification. Direct final-check tests require Continue and logical-context propagation before expecting merged roots."
+        "The linear specialization recognizes active opposite bound pairs, substitutes fixed monomials, derives the native one-variable x=k case, and compares affine definition rows directly instead of maintaining the source row-id offset index. Candidate variables are sorted to replace native row ordering deterministically.",
+        "C++ retains the proved equality in its persistent tableau; the Go arithmetic tableau replays inputs. Own propagation records that equality locally through the concrete existing bound/adapter path, replacing an implicit dependence on context bouncing the equality back.",
+        "The source tableau already knows its proved equality. Go replay records a concrete scoped own-equality obligation and creates its equality-bound evidence after the core merge, before numerical propagation. CanPropagate includes this work; pop restores entry/head. This is Go replay bookkeeping, not an extra source theory notification. Direct final-check tests require Continue and logical-context propagation before expecting merged roots.",
+        "PROFILE_OFFSET_ROW is disabled in the retained C++ build and only measures the helper; its stopwatch/counter instrumentation is not ported. Live TRACE/CTRACE and SASSERT gates are retained."
       ]
     },
     {

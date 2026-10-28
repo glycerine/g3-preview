@@ -1,9 +1,12 @@
+package smtcore
+
 // Source: src/smt/theory_arith_core.h row bound propagation and fixed-value
 // equality propagation. Only unconditional replay bounds justify equalities.
-package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/math/simplex"
@@ -95,6 +98,41 @@ func (t *SMTLinearArithmeticTheory) propagateFixedEquality(solver *simplex.Solve
 	if !t.canPropagateArithmeticEqualities() {
 		return false, nil
 	}
+	firstLower, firstHasLower := solver.Lower(first)
+	firstUpper, firstHasUpper := solver.Upper(first)
+	secondLower, secondHasLower := solver.Lower(second)
+	secondUpper, secondHasUpper := solver.Upper(second)
+	firstFixed := firstHasLower && firstHasUpper && firstLower.Cmp(&firstUpper) == 0
+	secondFixed := secondHasLower && secondHasUpper && secondLower.Cmp(&secondUpper) == 0
+	if err := arithmeticEqualityAssertion(40, "is_fixed(v)", firstFixed && secondFixed); err != nil {
+		return false, err
+	}
+	if !firstFixed || !secondFixed {
+		return false, nil
+	}
+	if err := t.emitArithmeticEquality("arith_bug", "fixed_var_eh", 43, func() bool { return !firstLower.IsRational() }, func(out io.Writer) error {
+		if err := t.displayArithmeticEqualityVariable(out, first); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, "\n")
+	}); err != nil {
+		return false, err
+	}
+	if err := arithmeticEqualityAssertion(44, "lower_bound(v).is_rational()", firstLower.IsRational() && secondLower.IsRational()); err != nil {
+		return false, err
+	}
+	if !firstLower.IsRational() || !secondLower.IsRational() || firstLower.Main.Cmp(&secondLower.Main) != 0 {
+		return false, nil
+	}
+	firstValue := &firstLower.Main
+	if err := t.emitArithmeticEquality("arith_eq", "fixed_var_eh", 47, func() bool { return true }, func(out io.Writer) error {
+		if err := t.displayArithmeticEqualityVariable(out, first); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, " = "+firstValue.RatString()+"\n")
+	}); err != nil {
+		return false, err
+	}
 	proofs, err := t.state.manager.ProofsEnabled()
 	if err != nil {
 		return false, err
@@ -107,6 +145,23 @@ func (t *SMTLinearArithmeticTheory) propagateFixedEquality(solver *simplex.Solve
 	}
 	antecedents, known, err := smtArithmeticExplainBounds(solver, uses, proofs, t.equalityBounds)
 	if err != nil {
+		return false, err
+	}
+	if err = t.emitArithmeticEquality("arith_eq", "fixed_var_eh", 68, func() bool { return true }, func(out io.Writer) error {
+		if err := smtWriteTheoryText(out, fmt.Sprintf("propagate eq: v%d = v%d\n", first, second)); err != nil {
+			return err
+		}
+		if err := t.displayArithmeticEqualityVariable(out, first); err != nil {
+			return err
+		}
+		if err := smtWriteTheoryText(out, "\n"); err != nil {
+			return err
+		}
+		if err := t.displayArithmeticEqualityVariable(out, second); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, "\n")
+	}); err != nil {
 		return false, err
 	}
 	if !known {

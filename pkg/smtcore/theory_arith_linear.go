@@ -7,6 +7,8 @@ package smtcore
 // from src/smt/theory_arith_pp.h.
 
 import (
+	"fmt"
+	"io"
 	"math/big"
 	"sort"
 
@@ -938,6 +940,20 @@ func (t *SMTLinearArithmeticTheory) propagateEqualityWithParameters(state *SMTIn
 	}
 	// Source propagate_eq_to_core never merges Int and Real enodes.
 	if leftSort != rightSort {
+		if err = t.emitArithmeticEquality("arith", "propagate_eq_to_core", 334, func() bool { return true }, func(out io.Writer) error {
+			if err := smtArithEqDisplayExpression(state.manager, out, left.owner); err != nil {
+				return err
+			}
+			if err := smtWriteTheoryText(out, " = "); err != nil {
+				return err
+			}
+			if err := smtArithEqDisplayExpression(state.manager, out, right.owner); err != nil {
+				return err
+			}
+			return smtWriteTheoryText(out, "\n")
+		}); err != nil {
+			return false, err
+		}
 		return false, nil
 	}
 	justification, err := NewSMTExtTheoryEqualityPropagationJustification(
@@ -946,6 +962,70 @@ func (t *SMTLinearArithmeticTheory) propagateEqualityWithParameters(state *SMTIn
 		return false, err
 	}
 	state.ownedJustifications = append(state.ownedJustifications, justification)
+	if err = t.emitArithmeticEquality("arith_eq", "propagate_eq_to_core", 351, func() bool { return true }, func(out io.Writer) error {
+		leftID, err := left.OwnerID()
+		if err != nil {
+			return err
+		}
+		rightID, err := right.OwnerID()
+		if err != nil {
+			return err
+		}
+		if err = smtWriteTheoryText(out, fmt.Sprintf("detected equality: #%d = #%d\n", leftID, rightID)); err != nil {
+			return err
+		}
+		if err = t.displayArithmeticEqualityVariable(out, first); err != nil {
+			return err
+		}
+		if err = smtWriteTheoryText(out, "\n"); err != nil {
+			return err
+		}
+		if err = t.displayArithmeticEqualityVariable(out, second); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, "\n")
+	}); err != nil {
+		return false, err
+	}
+	if err = t.emitArithmeticEquality("arith_eq_propagation", "propagate_eq_to_core", 354, func() bool { return true }, func(out io.Writer) error {
+		for _, literal := range literals {
+			if err := state.DisplayDetailedLiteral(out, literal); err != nil {
+				return err
+			}
+			if err := smtWriteTheoryText(out, "\n"); err != nil {
+				return err
+			}
+		}
+		for _, equality := range equalities {
+			if err := smtArithEqDisplayExpression(state.manager, out, equality.First.owner); err != nil {
+				return err
+			}
+			if err := smtWriteTheoryText(out, " = "); err != nil {
+				return err
+			}
+			if err := smtArithEqDisplayExpression(state.manager, out, equality.Second.owner); err != nil {
+				return err
+			}
+			if err := smtWriteTheoryText(out, "\n"); err != nil {
+				return err
+			}
+		}
+		if err := smtWriteTheoryText(out, " ==> "); err != nil {
+			return err
+		}
+		if err := smtArithEqDisplayExpression(state.manager, out, left.owner); err != nil {
+			return err
+		}
+		if err := smtWriteTheoryText(out, " = "); err != nil {
+			return err
+		}
+		if err := smtArithEqDisplayExpression(state.manager, out, right.owner); err != nil {
+			return err
+		}
+		return smtWriteTheoryText(out, "\n")
+	}); err != nil {
+		return false, err
+	}
 	if err = state.assignEquality(left, right, NewSMTEqualityJustification(justification)); err != nil {
 		return false, err
 	}
@@ -993,6 +1073,14 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 		if !firstOK {
 			continue
 		}
+		if err = t.emitArithmeticEquality("arith_eq_verbose", "propagate_cheap_eq", 220, func() bool { return true }, func(out io.Writer) error {
+			if err := smtWriteTheoryText(out, fmt.Sprintf("checking if row %d can propagate equality.\n", firstIndex)); err != nil {
+				return err
+			}
+			return displayArithmeticEqualityForm(out, &firstForm)
+		}); err != nil {
+			return false, err
+		}
 		if firstForm.infinity.Sign() != 0 || firstForm.constant.Sign() != 0 || firstForm.infinitesimal.Sign() != 0 || len(firstForm.terms) != 2 {
 			continue
 		}
@@ -1005,14 +1093,18 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 			if !smtLinearFormsOpposite(&firstForm, &secondForm) {
 				continue
 			}
-			variables := make([]uint32, 0, 2)
-			coefficients := make([]*big.Rat, 0, 2)
-			for variable, coefficient := range firstForm.terms {
-				variables = append(variables, variable)
-				coefficients = append(coefficients, coefficient)
-			}
+			variables := sortedSMTLinearFormVariables(&firstForm)
+			coefficients := []*big.Rat{firstForm.terms[variables[0]], firstForm.terms[variables[1]]}
 			if coefficients[0].Sign() == 0 || coefficients[0].Cmp(new(big.Rat).Neg(coefficients[1])) != 0 {
 				continue
+			}
+			if err = t.emitArithmeticEquality("arith_eq", "propagate_cheap_eq", 263, func() bool { return true }, func(out io.Writer) error {
+				if err := smtWriteTheoryText(out, "propagate eq using x-y=0 row:\n"); err != nil {
+					return err
+				}
+				return displayArithmeticEqualityForm(out, &firstForm)
+			}); err != nil {
+				return false, err
 			}
 			propagated, propagateErr := t.propagateEquality(state, variables[0], variables[1], []SMTLiteral{
 				smtLinearAssertionLiteral(firstAtom, firstAssertion),
@@ -1061,6 +1153,11 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 				continue
 			}
 			literals := append(append([]SMTLiteral(nil), fixed[first].literals...), fixed[second].literals...)
+			if err = t.emitArithmeticEquality("arith_eq_propagation", "propagate_cheap_eq", 251, func() bool { return true }, func(out io.Writer) error {
+				return smtWriteTheoryText(out, "fixed\n")
+			}); err != nil {
+				return false, err
+			}
 			propagated, propagateErr := t.propagateEquality(state, fixed[first].variable, fixed[second].variable, literals)
 			if propagated {
 				t.statistics.fixedEqualities++
@@ -1092,6 +1189,9 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 				if coefficient == nil {
 					continue
 				}
+				if err = arithmeticEqualityAssertion(170, "is_fixed(v)", value.variable != 0); err != nil {
+					return false, err
+				}
 				var contribution big.Rat
 				contribution.Mul(coefficient, &value.value.Infinity)
 				remaining.infinity.Add(&remaining.infinity, &contribution)
@@ -1102,17 +1202,52 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 				delete(remaining.terms, value.variable)
 				literals = append(literals, value.literals...)
 			}
+			if len(remaining.terms) == 1 {
+				variables := sortedSMTLinearFormVariables(&remaining)
+				if err = arithmeticEqualityAssertion(193, "x != null_theory_var", variables[0] != 0); err != nil {
+					return false, err
+				}
+				coefficient := remaining.terms[variables[0]]
+				if coefficient.Sign() == 0 {
+					continue
+				}
+				value := simplex.NewInfiniteInfinitesimal(new(big.Rat).Neg(&remaining.infinity), new(big.Rat).Neg(&remaining.constant), new(big.Rat).Neg(&remaining.infinitesimal))
+				value.Quo(coefficient)
+				for _, candidate := range fixed {
+					if candidate.variable == variables[0] || candidate.value.Cmp(&value) != 0 {
+						continue
+					}
+					if err = t.emitArithmeticEquality("arith_eq_propagation", "propagate_cheap_eq", 251, func() bool { return true }, func(out io.Writer) error {
+						return smtWriteTheoryText(out, "fixed\n")
+					}); err != nil {
+						return false, err
+					}
+					fixedLiterals := append(append([]SMTLiteral(nil), literals...), candidate.literals...)
+					propagated, propagateErr := t.propagateEquality(state, variables[0], candidate.variable, fixedLiterals)
+					if propagated {
+						t.statistics.fixedEqualities++
+					}
+					if propagateErr != nil || propagated {
+						return propagated, propagateErr
+					}
+				}
+				continue
+			}
 			if remaining.infinity.Sign() != 0 || remaining.constant.Sign() != 0 || remaining.infinitesimal.Sign() != 0 || len(remaining.terms) != 2 {
 				continue
 			}
-			variables := make([]uint32, 0, 2)
-			coefficients := make([]*big.Rat, 0, 2)
-			for variable, coefficient := range remaining.terms {
-				variables = append(variables, variable)
-				coefficients = append(coefficients, coefficient)
-			}
+			variables := sortedSMTLinearFormVariables(&remaining)
+			coefficients := []*big.Rat{remaining.terms[variables[0]], remaining.terms[variables[1]]}
 			if coefficients[0].Sign() == 0 || coefficients[0].Cmp(new(big.Rat).Neg(coefficients[1])) != 0 {
 				continue
+			}
+			if err = t.emitArithmeticEquality("arith_eq", "propagate_cheap_eq", 263, func() bool { return true }, func(out io.Writer) error {
+				if err := smtWriteTheoryText(out, "propagate eq using x-y=0 row:\n"); err != nil {
+					return err
+				}
+				return displayArithmeticEqualityForm(out, &remaining)
+			}); err != nil {
+				return false, err
 			}
 			propagated, propagateErr := t.propagateEquality(state, variables[0], variables[1], literals)
 			if propagated {
@@ -1136,6 +1271,23 @@ func (t *SMTLinearArithmeticTheory) propagateImpliedEqualities() (bool, error) {
 			secondForm := t.definitions[second]
 			if !smtLinearFormsEqual(&firstForm, &secondForm) {
 				continue
+			}
+			if err = arithmeticEqualityAssertion(300, "y == y2 && k == k2", smtLinearFormsEqual(&firstForm, &secondForm)); err != nil {
+				return false, err
+			}
+			if err = t.emitArithmeticEquality("arith_eq", "propagate_cheap_eq", 304, func() bool { return true }, func(out io.Writer) error {
+				if err := smtWriteTheoryText(out, "propagate eq two rows:\nswapped: 0\n"); err != nil {
+					return err
+				}
+				if err := smtWriteTheoryText(out, fmt.Sprintf("x  : v%d\nx2 : v%d\n", first, second)); err != nil {
+					return err
+				}
+				if err := displayArithmeticEqualityForm(out, &firstForm); err != nil {
+					return err
+				}
+				return displayArithmeticEqualityForm(out, &secondForm)
+			}); err != nil {
+				return false, err
 			}
 			propagated, propagateErr := t.propagateEquality(
 				state, t.simplexVariables[first], t.simplexVariables[second], nil)
