@@ -55,6 +55,13 @@ func (c *Context) DeclareRelation(name string, domain []ast.ASTHandle) (ast.ASTH
 }
 
 func (c *Context) AddFixedpointRule(formula ast.ASTHandle, name string) error {
+	return c.AddFixedpointRuleWithBound(formula, name, ^uint32(0))
+}
+
+// AddFixedpointRuleWithBound accepts the rule command's retained recursion
+// bound. The concrete Datalog engine ignores it, as does the source Datalog
+// flush path; the bound is consumed only by the unretained duality engine.
+func (c *Context) AddFixedpointRuleWithBound(formula ast.ASTHandle, name string, _ uint32) error {
 	engine, err := c.fixedpointContext()
 	if err != nil {
 		return err

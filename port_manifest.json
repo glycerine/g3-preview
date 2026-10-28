@@ -82398,7 +82398,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2", "pkg/cmd/g3/test_vectors/fixedpoint_finite_relations.smt2"],
-      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestSMT2FixedpointQueryRefusesUnportedEngine", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestPropositionalEngineSelection", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"],
+      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleNameAndBoundMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestSMT2FixedpointQueryRefusesUnportedEngine", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestPropositionalEngineSelection", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"],
       "assertions": [
         {
           "line": 305,
@@ -82417,10 +82417,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "declare-rel, declare-var, rule, and declaration-query execution for finite-domain Horn programs, including query-local print-answer parameters and finite tuple-answer formulas (dl_cmds.cpp:64-313)",
+          "name": "declare-rel, declare-var, named/bounded rule, and declaration-query execution for finite-domain Horn programs, including query-local print-answer parameters and finite tuple-answer formulas (dl_cmds.cpp:64-313)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
-          "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"]
+          "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleNameAndBoundMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"]
         },
         {
           "name": "fixedpoint-push and fixedpoint-pop command dispatch with scoped rule restoration (dl_cmds.cpp:481-525)",
@@ -82433,7 +82433,7 @@
         "cmd_context.Context owns and closes the lazily created fixedpoint engine before declarations and the AST manager; parser command references are temporary and clear after the engine retains rules."
       ],
       "deviations": [
-        "This command slice accepts declare-rel, declare-var, optional rule names, scoped rules, declaration queries, finite variable expansion, stratified negation, direct finite guards, ground theory-rewritten bit-vector arithmetic/comparison guards, and finite tuple-answer formulas for the finite-domain backend. Rule bounds, certificates, statistics, remaining query parameters, non-ground or infinite-domain arithmetic, and general fixedpoint engines remain open; unavailable requested output is refused explicitly."
+        "This command slice accepts declare-rel, declare-var, optional rule names and recursion bounds, scoped rules, declaration queries, finite variable expansion, stratified negation, direct finite guards, ground theory-rewritten bit-vector arithmetic/comparison guards, and finite tuple-answer formulas for the finite-domain backend. As in the source Datalog flush path, recursion bounds have no Datalog effect and remain relevant only to the unported duality engine. Certificates, statistics, remaining query parameters, non-ground or infinite-domain arithmetic, and general fixedpoint engines remain open; unavailable requested output is refused explicitly."
       ]
     },
     {
@@ -82442,7 +82442,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2", "pkg/cmd/g3/test_vectors/fixedpoint_finite_relations.smt2"],
-      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"],
+      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleNameAndBoundMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"],
       "conditionals": [
         {
           "line": 18,

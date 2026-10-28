@@ -1,7 +1,7 @@
 package fp
 
 // Source: src/muz/base/dl_context.cpp add_rule/query orchestration and
-// src/muz/base/dl_engine_base.h query contract. This is the retained positive
+// src/muz/base/dl_engine_base.h query contract. This is the retained stratified
 // finite-domain Horn execution path.
 
 import (
@@ -27,8 +27,8 @@ type predicateState struct {
 	table *rel.HashTable
 }
 
-// PropositionalEngine owns the retained rule and finite-relation managers.
-// Interpreted rule tails are still refused explicitly.
+// PropositionalEngine owns the retained rule, finite-relation, and optional
+// ground-guard rewriting services.
 type PropositionalEngine struct {
 	manager    *ast.ASTManager
 	rules      *base.RuleManager

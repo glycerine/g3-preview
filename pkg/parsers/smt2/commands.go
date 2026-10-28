@@ -474,8 +474,15 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		name := ""
+		bound := ^uint32(0)
 		if p.token != RightParenToken {
 			name, err = p.symbol()
+			if err != nil {
+				return false, err
+			}
+		}
+		if p.token != RightParenToken {
+			bound, err = p.unsigned()
 			if err != nil {
 				return false, err
 			}
@@ -483,7 +490,7 @@ func (p *commandParser) command() (bool, error) {
 		if err = p.requireEnd(); err != nil {
 			return false, err
 		}
-		if err = p.context.AddFixedpointRule(expression, name); err != nil {
+		if err = p.context.AddFixedpointRuleWithBound(expression, name, bound); err != nil {
 			return false, err
 		}
 	case "fixedpoint-push", "fixedpoint-pop":

@@ -3,7 +3,7 @@
 (declare-rel Q (Bool Bool))
 (declare-var p Bool)
 (declare-var q Bool)
-(rule (P true false))
+(rule (P true false) finite-seed 0)
 (rule (=> (P p q) (Q p q)))
 (query Q :print-answer true)
 
