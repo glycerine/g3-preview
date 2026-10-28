@@ -115783,7 +115783,7 @@
       "path": "src/smt/proto_model/array_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/proto_model/array_factory.go",
         "pkg/smtcore/proto_model/array_factory_trace.go",
@@ -115840,8 +115840,8 @@
           "text": "SASSERT(set->size() >= 2);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Source TRACE/DEBUG_CODE/SASSERT diagnostics at array_factory.cpp:64,79,96,108-109,117,152,163,203, including sort/expression printing and native ostream badbit continuation",
@@ -115911,14 +115911,15 @@
       "ownership": ["ArrayFactory retains every constructed as-array value; the prototype model owns each auxiliary declaration and function interpretation."],
       "deviations": [
         "Earlier whole-unit audited claims remain withdrawn. Concrete output-reference publication and normal structured member/ref-vector destruction now follow source; Go owning retries preserve actual AST-reference tokens and closed registry state. Complete source constructor/map/storage ordering, joined-versus-interrupted native destructor failure contracts and remaining diagnostics still require audit. The existing get_value_set path acquires its Go ASTRef descriptor before publishing the map entry, whereas source publishes the set/map before its sort-vector INC; that earlier publication gap is not claimed closed by the new post-publication SASSERT30 mapping. Structured/array units remain partial with audit flags false.",
-        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment."
+        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
+        "Final retained-unit audit supersedes the earlier partial claims. Auxiliary declarations and function interpretations transfer to ProtoModel before as-array publication; constructed array values transfer to the now-audited structured registry. Range temporaries, fresh-index branches, pair outputs, assertions, traces, and checked cleanup have focused coverage. The shared cold set/map-before-sort-reference failure prefix is verified by TestStructuredFactoryValueSetPublishesBeforeSortReference."
       ]
     },
     {
       "path": "src/smt/proto_model/array_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/proto_model/array_factory.go",
         "pkg/smtcore/proto_model/array_factory_trace.go",
@@ -115963,8 +115964,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Complete retained array-factory diagnostic interface, including source TRACE/DEBUG_CODE/SASSERT sites and sort/expression rendering",
@@ -116034,7 +116035,8 @@
       "ownership": ["The factory borrows its manager and prototype model and owns its structured value registry."],
       "deviations": [
         "Earlier whole-unit audited claims remain withdrawn. Concrete output-reference publication and normal structured member/ref-vector destruction now follow source; Go owning retries preserve actual AST-reference tokens and closed registry state. Complete source constructor/map/storage ordering, joined-versus-interrupted native destructor failure contracts and remaining diagnostics still require audit. The existing get_value_set path acquires its Go ASTRef descriptor before publishing the map entry, whereas source publishes the set/map before its sort-vector INC; that earlier publication gap is not claimed closed by the new post-publication SASSERT30 mapping. Structured/array units remain partial with audit flags false.",
-        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment."
+        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
+        "Final retained-unit audit covers the complete concrete ArrayFactory interface and its ownership boundary: the factory borrows its manager/model, owns its structured registry, and delegates auxiliary declaration/function interpretation ownership to ProtoModel. The audited structured base supplies the source publication and destruction order for this derived header."
       ]
     },
     {
