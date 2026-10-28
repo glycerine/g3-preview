@@ -58,6 +58,7 @@ type PropositionalEngine struct {
 	binder     *base.VariableBinder
 	relations  *rel.RelationManager
 	guard      *astrewriter.TheoryRewriter
+	background ast.ASTRef
 	params     *uparams.ParamsContext
 	globals    *uparams.GlobalParamsService
 	backend    string
@@ -105,9 +106,17 @@ func NewPropositionalEngine(manager *ast.ASTManager) (*PropositionalEngine, erro
 	if err != nil {
 		return nil, errors.Join(err, binder.Close(), set.Close(), rules.Close())
 	}
+	truth, err := manager.MkTrue()
+	if err != nil {
+		return nil, errors.Join(err, relations.Close(), binder.Close(), set.Close(), rules.Close())
+	}
+	background, err := manager.NewRef(truth)
+	if err != nil {
+		return nil, errors.Join(err, relations.Close(), binder.Close(), set.Close(), rules.Close())
+	}
 	return &PropositionalEngine{
 		manager: manager, rules: rules, set: set, binder: binder, relations: relations,
-		predicates: make(map[ast.ASTHandle]*predicateState), backend: "datalog",
+		background: background, predicates: make(map[ast.ASTHandle]*predicateState), backend: "datalog",
 	}, nil
 }
 
@@ -157,6 +166,15 @@ func (e *PropositionalEngine) RegisterVariable(variable ast.ASTHandle) error {
 		return err
 	}
 	return e.binder.AddVariable(variable)
+}
+
+// SetBackground replaces the background constraint used by subsequent PDR
+// queries. The engine retains the formula independently of the caller.
+func (e *PropositionalEngine) SetBackground(background ast.ASTHandle) error {
+	if err := e.open(); err != nil {
+		return err
+	}
+	return e.manager.SetRef(e.background, background)
 }
 
 func (e *PropositionalEngine) AddRule(formula ast.ASTHandle, name string) error {
@@ -1246,6 +1264,7 @@ func (e *PropositionalEngine) Close() (result error) {
 		result = errors.Join(result, e.relations.Close())
 		e.relations = nil
 	}
+	result = errors.Join(result, e.manager.DelRef(&e.background))
 	e.predicates = nil
 	e.params, e.globals = nil, nil
 	e.closed = true

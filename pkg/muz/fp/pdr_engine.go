@@ -45,6 +45,13 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err != nil {
 		return lbool.Undef, err
 	}
+	background, err := e.manager.RefGet(e.background)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetBackground(background); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	if err = context.Initialize(e.set); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}

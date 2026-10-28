@@ -80822,14 +80822,14 @@
           "name": "infinite-domain predicate registration and PDR/Spacer query dispatch through the retained rule context",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
-          "tests": ["TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP"]
+          "tests": ["TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP"]
         }
       ],
       "ownership": [
         "PropositionalEngine owns its RuleManager, RuleSet, VariableBinder, RelationManager with finite predicate tables, and optional AST theory rewriter. Compiled instruction blocks own their predicate references and per-rule accounting parents until execution completes; the engine borrows the AST manager and releases all owned references before it."
       ],
       "deviations": [
-        "The Datalog slice remains finite-domain and produces tuple answers. Infinite-domain positive Horn rules may now dispatch through PDR/Spacer and successful existential relation queries produce their simplified true answer; general PDR trace/certificate/model/proof reconstruction, background assertions, full transformations, parameters and broader engine selection remain open."
+        "The Datalog slice remains finite-domain and produces tuple answers. Infinite-domain positive Horn rules may now dispatch through PDR/Spacer, consume current command assertions as background constraints, and produce simplified true answers for successful existential relation queries; general PDR trace/certificate/model/proof reconstruction, full transformations, parameters and broader engine selection remain open."
       ]
     },
     {
@@ -82476,7 +82476,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2", "pkg/cmd/g3/test_vectors/fixedpoint_finite_relations.smt2"],
-      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleNameAndBoundMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnknownOutputParameters", "TestSMT2FixedpointPDRStatistics", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointQueryRefusesUnportedEngine", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestPropositionalEngineSelection", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"],
+      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleNameAndBoundMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnknownOutputParameters", "TestSMT2FixedpointPDRStatistics", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP", "TestSMT2FixedpointQueryRefusesUnportedEngine", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestPropositionalEngineSelection", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"],
       "assertions": [
         {
           "line": 305,
@@ -82495,10 +82495,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "declare-rel, declare-var, named/bounded rule, and declaration-query execution for retained Horn programs, including query-local answer, empty-certificate and statistics output plus finite tuple-answer formulas (dl_cmds.cpp:64-313,338-370)",
+          "name": "declare-rel, declare-var, named/bounded rule, command-assertion background handoff and declaration-query execution for retained Horn programs, including query-local answer, empty-certificate and statistics output plus finite tuple-answer formulas (dl_cmds.cpp:64-370)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
-          "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleNameAndBoundMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointQueryRefusesUnknownOutputParameters", "TestSMT2FixedpointPDRStatistics", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"]
+          "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleNameAndBoundMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointTupleAnswerMatchesCPP", "TestSMT2FixedpointQueryRefusesUnknownOutputParameters", "TestSMT2FixedpointPDRStatistics", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerScripts/fixedpoint_finite_relations.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_finite_relations.smt2"]
         },
         {
           "name": "fixedpoint-push and fixedpoint-pop command dispatch with scoped rule restoration (dl_cmds.cpp:481-525)",
@@ -82511,7 +82511,7 @@
         "cmd_context.Context owns and closes the lazily created fixedpoint engine before declarations and the AST manager; parser command references are temporary and clear after the engine retains rules."
       ],
       "deviations": [
-        "This command slice accepts declare-rel, declare-var, optional rule names and recursion bounds, scoped rules, declaration queries, finite variable expansion, stratified negation, direct finite guards, ground theory-rewritten bit-vector arithmetic/comparison guards, finite tuple-answer formulas, PDR existential answers, native empty certificate lines, and fixedpoint statistics. As in the source Datalog flush path, recursion bounds have no Datalog effect and remain relevant only to the unported duality engine. Rich certificates, remaining query parameters, broader arithmetic, and remaining fixedpoint engines remain open; unknown requested output is refused explicitly."
+        "This command slice accepts declare-rel, declare-var, optional rule names and recursion bounds, scoped rules, declaration queries, command assertions as PDR background constraints, finite variable expansion, stratified negation, direct finite guards, ground theory-rewritten bit-vector arithmetic/comparison guards, finite tuple-answer formulas, PDR existential answers, native empty certificate lines, and fixedpoint statistics. As in the source Datalog flush path, recursion bounds have no Datalog effect and remain relevant only to the unported duality engine. Rich certificates, remaining query parameters, broader arithmetic, and remaining fixedpoint engines remain open; unknown requested output is refused explicitly."
       ]
     },
     {
@@ -83214,6 +83214,7 @@
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
         "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
+        "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
         "TestSMT2FixedpointPDRStatistics",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
@@ -83232,13 +83233,14 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "PDR/Spacer engine selection, finalized rule-set handoff, per-query context initialization and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
+          "name": "PDR/Spacer engine selection, finalized rule-set and command-background handoff, per-query context initialization and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [
             "TestPDREngineMatchesCPPIntegerHornQueries",
             "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
             "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
+            "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
           ]
@@ -83291,6 +83293,7 @@
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
         "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
+        "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
         "TestSMT2FixedpointPDRStatistics",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
@@ -83316,6 +83319,7 @@
             "TestPDREngineMatchesCPPIntegerHornQueries",
             "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
             "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
+            "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
           ]

@@ -113,6 +113,21 @@ func (c *Context) QueryFixedpoint(declaration ast.ASTHandle) (lbool.LBool, error
 	if err != nil {
 		return lbool.Undef, err
 	}
+	assertions, err := c.Assertions()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	manager, err := c.Manager()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	background, err := manager.MkAndArray(assertions)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if err = engine.SetBackground(background); err != nil {
+		return lbool.Undef, err
+	}
 	selection, supported, err := c.GetOption(":fixedpoint.engine")
 	if err != nil {
 		return lbool.Undef, err
