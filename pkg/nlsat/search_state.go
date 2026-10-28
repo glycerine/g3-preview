@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -56,6 +57,7 @@ type searchConfig struct {
 	MaxMemory     uint64
 	Lazy          uint32
 	SimplifyCores bool
+	Randomize     bool
 }
 
 // searchState is the actual trail/propagation state, not a completed Solver.
@@ -71,6 +73,9 @@ type searchState struct {
 	xk                              uint32
 	level                           uint32
 	decisions, propagations, stages uint32
+	irrationalAssignments           uint32
+	witness                         polynomial.Algebraic
+	witnessActive                   bool
 	trail                           []searchTrail
 	undoing, undoEntryActive        bool
 	target                          undoTarget
@@ -470,6 +475,14 @@ func (r *searchState) cleanup() error {
 	}
 	r.running = true
 	defer func() { r.running = false }()
+	if r.witnessActive {
+		// Only this invocation's lexical scoped_anum is owned here. Numerical
+		// callees retain responsibility for their own interrupted operations.
+		if err := r.evaluator.am.CleanupValue(&r.witness); err != nil {
+			return err
+		}
+		r.witnessActive = false
+	}
 	if err := r.ism.cleanupJustifications(r.justificationScope); err != nil {
 		return err
 	}
