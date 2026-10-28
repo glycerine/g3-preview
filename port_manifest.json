@@ -148961,13 +148961,14 @@
           ]
         },
         {
-          "name": "retained negative-suffix shared-segment mismatch witness and active lazy negative-prefix protocol; inactive prefix-mismatch and first/last suffix variants excluded; general canonization remains partial",
-          "status": "partial",
+          "name": "retained negative-suffix shared-segment mismatch witness and active lazy negative-prefix protocol; inactive prefix-mismatch and first/last suffix variants excluded",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_seq_boundary_negative.go",
           "tests": [
             "TestSMTSequenceTheoryNegativeBoundaryWitnesses",
             "TestSMTSequenceTheoryNegativePrefixPropagatesToTails",
-            "TestSMTSequenceTheoryNegativeSuffixDoesNotExposeInactiveInitialSegments"
+            "TestSMTSequenceTheoryNegativeSuffixDoesNotExposeInactiveInitialSegments",
+            "TestSMTLibRunnerCPPReference"
           ]
         },
         {
@@ -149528,14 +149529,15 @@
         },
         {
           "name": "canonizes(false, e) before negative containment assignment consequences, scoped solution expansion and conditional decision/equality dependencies; concrete index operands expand while their offset remains unchanged; nonnegative integer-to-string expansion requires merged numeral evidence or emits guarded equivalence axioms",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_seq_canonize.go",
           "tests": [
             "TestSMTSequenceNonContainsCanonicalDisjunctionAndScope",
             "TestSMTSequenceNonContainsCanonicalConstantsSkipQueue",
             "TestSMTSequenceNonContainsCanonicalSolutionEvidenceAndRollback",
             "TestSMTSequenceNonContainsUnresolvedQueuePreventsDone",
-            "TestSMTSequenceCanonicalConditionalScope"
+            "TestSMTSequenceCanonicalConditionalScope",
+            "TestSMTLibRunnerCPPReference"
           ]
         },
         {
@@ -150267,14 +150269,15 @@
         },
         {
           "name": "canonizes(false, e) before negative containment assignment consequences, scoped solution expansion and conditional decision/equality dependencies; concrete index operands expand while their offset remains unchanged; nonnegative integer-to-string expansion requires merged numeral evidence or emits guarded equivalence axioms",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_seq_canonize.go",
           "tests": [
             "TestSMTSequenceNonContainsCanonicalDisjunctionAndScope",
             "TestSMTSequenceNonContainsCanonicalConstantsSkipQueue",
             "TestSMTSequenceNonContainsCanonicalSolutionEvidenceAndRollback",
             "TestSMTSequenceNonContainsUnresolvedQueuePreventsDone",
-            "TestSMTSequenceCanonicalConditionalScope"
+            "TestSMTSequenceCanonicalConditionalScope",
+            "TestSMTLibRunnerCPPReference"
           ]
         },
         {
