@@ -54,6 +54,11 @@ type constantRegisterKey struct {
 	value Element
 }
 
+type totalRegisterKey struct {
+	sort      ast.ASTHandle
+	predicate ast.ASTHandle
+}
+
 type finiteCompiler struct {
 	manager       *ast.ASTManager
 	relations     *RelationManager
@@ -63,6 +68,7 @@ type finiteCompiler struct {
 	signatures    []Signature
 	loaded        []ast.ASTHandle
 	constants     map[constantRegisterKey]uint32
+	totals        map[totalRegisterKey]uint32
 	emptyTotals   map[ast.ASTHandle]uint32
 }
 
@@ -75,6 +81,7 @@ func newFiniteCompiler(relations *RelationManager) (*finiteCompiler, error) {
 		execution: NewInstructionBlock(), termination: NewInstructionBlock(),
 		predicateRegs: make(map[ast.ASTHandle]uint32),
 		constants:     make(map[constantRegisterKey]uint32),
+		totals:        make(map[totalRegisterKey]uint32),
 		emptyTotals:   make(map[ast.ASTHandle]uint32),
 	}, nil
 }
@@ -144,23 +151,36 @@ func (c *finiteCompiler) classify(rule *base.Rule) (finiteCompiledRule, error) {
 	if err != nil {
 		return result, err
 	}
-	if positive == 0 && uninterpreted == 0 && tails == 0 {
-		count, x := c.manager.GetNumArgs(result.head)
+	validArguments := func(application ast.ASTHandle) error {
+		count, x := c.manager.GetNumArgs(application)
 		if x != nil {
-			return result, x
+			return x
 		}
 		for index := uint32(0); index < count; index++ {
-			argument, y := c.manager.GetArg(result.head, index)
+			argument, y := c.manager.GetArg(application, index)
 			if y != nil {
-				return result, y
+				return y
+			}
+			kind, y := c.manager.GetKind(argument)
+			if y != nil {
+				return y
+			}
+			if kind == ast.ASTVar {
+				continue
 			}
 			value, y := c.manager.IsValue(argument)
 			if y != nil {
-				return result, y
+				return y
 			}
 			if !value {
-				return result, ErrCompilerUnsupported
+				return ErrCompilerUnsupported
 			}
+		}
+		return nil
+	}
+	if positive == 0 && uninterpreted == 0 && tails == 0 {
+		if err = validArguments(result.head); err != nil {
+			return result, err
 		}
 		result.kind = finiteGroundRule
 		return result, nil
@@ -172,78 +192,11 @@ func (c *finiteCompiler) classify(rule *base.Rule) (finiteCompiledRule, error) {
 	if err != nil {
 		return result, err
 	}
-	headCount, err := c.manager.GetNumArgs(result.head)
-	if err != nil {
+	if err = validArguments(result.head); err != nil {
 		return result, err
 	}
-	tailCount, err := c.manager.GetNumArgs(result.tail)
-	if err != nil {
+	if err = validArguments(result.tail); err != nil {
 		return result, err
-	}
-	tailVariables := make([]uint32, 0, tailCount)
-	tailVariableSet := make(map[uint32]bool)
-	for index := uint32(0); index < tailCount; index++ {
-		tailArgument, x := c.manager.GetArg(result.tail, index)
-		if x != nil {
-			return result, x
-		}
-		tailKind, x := c.manager.GetKind(tailArgument)
-		if x != nil {
-			return result, x
-		}
-		if tailKind != ast.ASTVar {
-			value, y := c.manager.IsValue(tailArgument)
-			if y != nil {
-				return result, y
-			}
-			if !value {
-				return result, ErrCompilerUnsupported
-			}
-			continue
-		}
-		variable, x := c.manager.GetVarIndex(tailArgument)
-		if x != nil {
-			return result, x
-		}
-		if tailVariableSet[variable] {
-			return result, ErrCompilerUnsupported
-		}
-		tailVariableSet[variable] = true
-		tailVariables = append(tailVariables, variable)
-	}
-	previous := -1
-	headVariableSet := make(map[uint32]bool)
-	for index := uint32(0); index < headCount; index++ {
-		headArgument, x := c.manager.GetArg(result.head, index)
-		if x != nil {
-			return result, x
-		}
-		headKind, x := c.manager.GetKind(headArgument)
-		if x != nil {
-			return result, x
-		}
-		if headKind != ast.ASTVar {
-			return result, ErrCompilerUnsupported
-		}
-		variable, x := c.manager.GetVarIndex(headArgument)
-		if x != nil {
-			return result, x
-		}
-		if headVariableSet[variable] {
-			return result, ErrCompilerUnsupported
-		}
-		headVariableSet[variable] = true
-		position := -1
-		for tailIndex, candidate := range tailVariables {
-			if candidate == variable {
-				position = tailIndex
-				break
-			}
-		}
-		if position <= previous {
-			return result, ErrCompilerUnsupported
-		}
-		previous = position
 	}
 	result.kind = finiteSingleTailRule
 	return result, nil
@@ -350,36 +303,316 @@ func (c *finiteCompiler) constantRegister(rule *base.Rule, sort ast.ASTHandle, d
 	return register, nil
 }
 
-func (c *finiteCompiler) groundHead(rule finiteCompiledRule, predicate ast.ASTHandle) (uint32, bool, error) {
-	sorts, signature, err := c.relations.PredicateSignature(predicate)
+func (c *finiteCompiler) totalRegister(rule *base.Rule, predicate, sort ast.ASTHandle, domain uint64) (uint32, error) {
+	key := totalRegisterKey{sort: sort, predicate: predicate}
+	if register, found := c.totals[key]; found {
+		return register, nil
+	}
+	signature := Signature{domains: []uint64{domain}}
+	register := c.fresh(signature)
+	if err := c.append(c.execution, NewTotalInstruction(signature, register), rule); err != nil {
+		return 0, err
+	}
+	c.totals[key] = register
+	return register, nil
+}
+
+func (c *finiteCompiler) emptyTotalRegister(rule *base.Rule, predicate ast.ASTHandle) (uint32, error) {
+	if register, found := c.emptyTotals[predicate]; found {
+		return register, nil
+	}
+	signature := Signature{}
+	register := c.fresh(signature)
+	if err := c.append(c.execution, NewTotalInstruction(signature, register), rule); err != nil {
+		return 0, err
+	}
+	c.emptyTotals[predicate] = register
+	return register, nil
+}
+
+func (c *finiteCompiler) project(register uint32, signature Signature, removed []int, owned bool, rule *base.Rule) (uint32, Signature, bool, error) {
+	projected, err := projectedSignature(signature, removed)
+	if err != nil {
+		return 0, Signature{}, false, err
+	}
+	result := register
+	if owned {
+		c.signatures[result] = projected
+	} else {
+		result = c.fresh(projected)
+	}
+	if err = c.append(c.execution, NewProjectionInstruction(register, removed, result), rule); err != nil {
+		return 0, Signature{}, false, err
+	}
+	return result, projected, true, nil
+}
+
+func (c *finiteCompiler) appendColumn(current uint32, signature Signature, owned, present bool, columnRegister uint32, domain uint64, rule *base.Rule) (uint32, Signature, bool, bool, error) {
+	if !present {
+		return columnRegister, Signature{domains: []uint64{domain}}, false, true, nil
+	}
+	joined, err := NewSignature(append(signature.Domains(), domain))
+	if err != nil {
+		return 0, Signature{}, false, false, err
+	}
+	result := current
+	if owned {
+		c.signatures[result] = joined
+	} else {
+		result = c.fresh(joined)
+	}
+	if err = c.append(c.execution, NewJoinInstruction(current, columnRegister, nil, nil, result), rule); err != nil {
+		return 0, Signature{}, false, false, err
+	}
+	return result, joined, true, true, nil
+}
+
+func (c *finiteCompiler) duplicateColumn(current uint32, signature Signature, column int, owned bool, rule *base.Rule) (uint32, Signature, bool, error) {
+	if column < 0 || column >= signature.Len() {
+		return 0, Signature{}, false, ErrCompilerUnsupported
+	}
+	single := current
+	temporary := false
+	if signature.Len() != 1 {
+		removed := make([]int, 0, signature.Len()-1)
+		for index := 0; index < signature.Len(); index++ {
+			if index != column {
+				removed = append(removed, index)
+			}
+		}
+		one, err := projectedSignature(signature, removed)
+		if err != nil {
+			return 0, Signature{}, false, err
+		}
+		single = c.fresh(one)
+		if err = c.append(c.execution, NewProjectionInstruction(current, removed, single), rule); err != nil {
+			return 0, Signature{}, false, err
+		}
+		temporary = true
+	}
+	domain := signature.domains[column]
+	joined, err := NewSignature(append(signature.Domains(), domain))
+	if err != nil {
+		return 0, Signature{}, false, err
+	}
+	result := current
+	if owned {
+		c.signatures[result] = joined
+	} else {
+		result = c.fresh(joined)
+	}
+	if err = c.append(c.execution, NewJoinInstruction(current, single, []int{column}, []int{0}, result), rule); err != nil {
+		return 0, Signature{}, false, err
+	}
+	if temporary {
+		if err = c.append(c.execution, NewDeallocateInstruction(single), rule); err != nil {
+			return 0, Signature{}, false, err
+		}
+	}
+	return result, joined, true, nil
+}
+
+func renamedSignature(signature Signature, cycle []int) (Signature, error) {
+	if len(cycle) < 2 {
+		return signature, nil
+	}
+	domains := signature.Domains()
+	original := signature.Domains()
+	seen := make(map[int]bool)
+	for _, column := range cycle {
+		if column < 0 || column >= len(domains) || seen[column] {
+			return Signature{}, ErrCompilerUnsupported
+		}
+		seen[column] = true
+	}
+	for index := 1; index < len(cycle); index++ {
+		domains[cycle[index-1]] = original[cycle[index]]
+	}
+	domains[cycle[len(cycle)-1]] = original[cycle[0]]
+	return NewSignature(domains)
+}
+
+func (c *finiteCompiler) reorder(current uint32, signature Signature, order []int, owned bool, rule *base.Rule) (uint32, Signature, bool, error) {
+	if len(order) != signature.Len() {
+		return 0, Signature{}, false, ErrCompilerUnsupported
+	}
+	seen := make([]bool, len(order))
+	for _, source := range order {
+		if source < 0 || source >= len(order) || seen[source] {
+			return 0, Signature{}, false, ErrCompilerUnsupported
+		}
+		seen[source] = true
+	}
+	visited := make([]bool, len(order))
+	for start := range order {
+		if visited[start] || order[start] == start {
+			visited[start] = true
+			continue
+		}
+		cycle := make([]int, 0, 2)
+		for column := start; !visited[column]; column = order[column] {
+			visited[column] = true
+			cycle = append(cycle, column)
+		}
+		renamed, err := renamedSignature(signature, cycle)
+		if err != nil {
+			return 0, Signature{}, false, err
+		}
+		result := current
+		if owned {
+			c.signatures[result] = renamed
+		} else {
+			result = c.fresh(renamed)
+		}
+		if err = c.append(c.execution, NewRenameInstruction(current, cycle, result), rule); err != nil {
+			return 0, Signature{}, false, err
+		}
+		current, signature, owned = result, renamed, true
+	}
+	return current, signature, owned, nil
+}
+
+func copyVariableColumns(source map[uint32][]int) map[uint32][]int {
+	result := make(map[uint32][]int, len(source))
+	for variable, columns := range source {
+		result[variable] = append([]int(nil), columns...)
+	}
+	return result
+}
+
+func (c *finiteCompiler) assembleHead(rule finiteCompiledRule, predicate ast.ASTHandle, current uint32, signature Signature, owned, present bool, variableColumns map[uint32][]int) (uint32, bool, error) {
+	sorts, target, err := c.relations.PredicateSignature(predicate)
 	if err != nil {
 		return 0, false, err
 	}
-	count := signature.Len()
-	if count == 0 {
-		if register, found := c.emptyTotals[predicate]; found {
-			return register, false, nil
-		}
-		register := c.fresh(signature)
-		if err = c.append(c.execution, NewTotalInstruction(signature, register), rule.rule); err != nil {
-			return 0, false, err
-		}
-		c.emptyTotals[predicate] = register
-		return register, false, nil
+	count := target.Len()
+	if count == 0 && !present {
+		register, x := c.emptyTotalRegister(rule.rule, predicate)
+		return register, false, x
 	}
-	var current uint32
-	owned := false
-	currentSignature, _ := NewSignature(nil)
+	columns := make([]int, count)
+	for index := range columns {
+		columns[index] = -1
+	}
+	boundVariables := make([]uint32, count)
+	isBound := make([]bool, count)
+	available := copyVariableColumns(variableColumns)
+	referenced := make([]bool, signature.Len())
 	for index := 0; index < count; index++ {
 		argument, x := c.manager.GetArg(rule.head, uint32(index))
 		if x != nil {
 			return 0, false, x
 		}
+		kind, x := c.manager.GetKind(argument)
+		if x != nil {
+			return 0, false, x
+		}
+		if kind != ast.ASTVar {
+			continue
+		}
+		variable, x := c.manager.GetVarIndex(argument)
+		if x != nil {
+			return 0, false, x
+		}
+		if source := available[variable]; len(source) != 0 {
+			columns[index] = source[0]
+			available[variable] = source[1:]
+			referenced[source[0]] = true
+			boundVariables[index], isBound[index] = variable, true
+		} else if len(variableColumns[variable]) != 0 {
+			boundVariables[index], isBound[index] = variable, true
+		}
+	}
+	if present {
+		removed := make([]int, 0)
+		offset := make([]int, signature.Len())
+		for column := 0; column < signature.Len(); column++ {
+			offset[column] = len(removed)
+			if !referenced[column] {
+				removed = append(removed, column)
+			}
+		}
+		if len(removed) != 0 {
+			current, signature, owned, err = c.project(current, signature, removed, owned, rule.rule)
+			if err != nil {
+				return 0, false, err
+			}
+			for index, column := range columns {
+				if column >= 0 {
+					columns[index] = column - offset[column]
+				}
+			}
+		}
+	}
+	primary := make(map[uint32]int)
+	for index, variable := range boundVariables {
+		if isBound[index] && columns[index] >= 0 {
+			if _, found := primary[variable]; !found {
+				primary[variable] = columns[index]
+			}
+		}
+	}
+	for index := 0; index < count; index++ {
+		if !isBound[index] || columns[index] >= 0 {
+			continue
+		}
+		column, found := primary[boundVariables[index]]
+		if !found {
+			return 0, false, ErrCompilerUnsupported
+		}
+		current, signature, owned, err = c.duplicateColumn(current, signature, column, owned, rule.rule)
+		if err != nil {
+			return 0, false, err
+		}
+		columns[index] = signature.Len() - 1
+	}
+	unbound := make(map[uint32]int)
+	for index := 0; index < count; index++ {
+		if columns[index] >= 0 {
+			continue
+		}
+		argument, x := c.manager.GetArg(rule.head, uint32(index))
+		if x != nil {
+			return 0, false, x
+		}
+		kind, x := c.manager.GetKind(argument)
+		if x != nil {
+			return 0, false, x
+		}
+		if kind == ast.ASTVar {
+			variable, y := c.manager.GetVarIndex(argument)
+			if y != nil {
+				return 0, false, y
+			}
+			if column, found := unbound[variable]; found {
+				current, signature, owned, err = c.duplicateColumn(current, signature, column, owned, rule.rule)
+				if err != nil {
+					return 0, false, err
+				}
+				columns[index] = signature.Len() - 1
+				continue
+			}
+			domain, y := target.Domain(index)
+			if y != nil {
+				return 0, false, y
+			}
+			total, y := c.totalRegister(rule.rule, predicate, sorts[index], domain)
+			if y != nil {
+				return 0, false, y
+			}
+			column := signature.Len()
+			current, signature, owned, present, err = c.appendColumn(current, signature, owned, present, total, domain, rule.rule)
+			if err != nil {
+				return 0, false, err
+			}
+			columns[index], unbound[variable] = column, column
+			continue
+		}
 		value, x := c.relations.EncodeValue(sorts[index], argument)
 		if x != nil {
 			return 0, false, x
 		}
-		domain, x := signature.Domain(index)
+		domain, x := target.Domain(index)
 		if x != nil {
 			return 0, false, x
 		}
@@ -387,31 +620,28 @@ func (c *finiteCompiler) groundHead(rule finiteCompiledRule, predicate ast.ASTHa
 		if x != nil {
 			return 0, false, x
 		}
-		if index == 0 {
-			current = singleton
-			currentSignature = Signature{domains: []uint64{domain}}
-			continue
+		column := signature.Len()
+		current, signature, owned, present, err = c.appendColumn(current, signature, owned, present, singleton, domain, rule.rule)
+		if err != nil {
+			return 0, false, err
 		}
-		domains := append(currentSignature.Domains(), domain)
-		joined, x := NewSignature(domains)
-		if x != nil {
-			return 0, false, x
-		}
-		result := current
-		if owned {
-			c.signatures[result] = joined
-		} else {
-			result = c.fresh(joined)
-		}
-		if x = c.append(c.execution, NewJoinInstruction(current, singleton, nil, nil, result), rule.rule); x != nil {
-			return 0, false, x
-		}
-		current, currentSignature, owned = result, joined, true
+		columns[index] = column
+	}
+	current, signature, owned, err = c.reorder(current, signature, columns, owned, rule.rule)
+	if err != nil {
+		return 0, false, err
+	}
+	if !signature.equal(target) {
+		return 0, false, ErrCompilerUnsupported
 	}
 	return current, owned, nil
 }
 
-func (c *finiteCompiler) singleTailHead(rule finiteCompiledRule) (uint32, bool, error) {
+func (c *finiteCompiler) groundHead(rule finiteCompiledRule, predicate ast.ASTHandle) (uint32, bool, error) {
+	return c.assembleHead(rule, predicate, 0, Signature{}, false, false, nil)
+}
+
+func (c *finiteCompiler) singleTailHead(rule finiteCompiledRule, predicate ast.ASTHandle) (uint32, bool, error) {
 	tailPredicate, err := c.manager.GetDecl(rule.tail)
 	if err != nil {
 		return 0, false, err
@@ -422,7 +652,7 @@ func (c *finiteCompiler) singleTailHead(rule finiteCompiledRule) (uint32, bool, 
 	}
 	current := c.predicateRegs[tailPredicate]
 	owned := false
-	variables := make([]uint32, 0, signature.Len())
+	variableColumns := make(map[uint32][]int)
 	tailCount, err := c.manager.GetNumArgs(rule.tail)
 	if err != nil {
 		return 0, false, err
@@ -441,14 +671,21 @@ func (c *finiteCompiler) singleTailHead(rule finiteCompiledRule) (uint32, bool, 
 			if y != nil {
 				return 0, false, y
 			}
-			variables = append(variables, variable)
+			column := 0
+			for _, columns := range variableColumns {
+				column += len(columns)
+			}
+			variableColumns[variable] = append(variableColumns[variable], column)
 			continue
 		}
 		value, x := c.relations.EncodeValue(sorts[index], argument)
 		if x != nil {
 			return 0, false, x
 		}
-		column := len(variables)
+		column := 0
+		for _, columns := range variableColumns {
+			column += len(columns)
+		}
 		projected, x := projectedSignature(signature, []int{column})
 		if x != nil {
 			return 0, false, x
@@ -464,45 +701,22 @@ func (c *finiteCompiler) singleTailHead(rule finiteCompiledRule) (uint32, bool, 
 		}
 		current, signature, owned = result, projected, true
 	}
-	headVariables := make(map[uint32]bool)
-	headCount, err := c.manager.GetNumArgs(rule.head)
-	if err != nil {
-		return 0, false, err
-	}
-	for index := uint32(0); index < headCount; index++ {
-		argument, x := c.manager.GetArg(rule.head, index)
-		if x != nil {
-			return 0, false, x
+	for _, columns := range variableColumns {
+		if len(columns) < 2 {
+			continue
 		}
-		variable, x := c.manager.GetVarIndex(argument)
-		if x != nil {
-			return 0, false, x
+		if !owned {
+			result := c.fresh(signature)
+			if err = c.append(c.execution, NewCloneInstruction(current, result), rule.rule); err != nil {
+				return 0, false, err
+			}
+			current, owned = result, true
 		}
-		headVariables[variable] = true
-	}
-	removed := make([]int, 0, len(variables)-int(headCount))
-	for column, variable := range variables {
-		if !headVariables[variable] {
-			removed = append(removed, column)
+		if err = c.append(c.execution, NewFilterIdenticalInstruction(current, columns), rule.rule); err != nil {
+			return 0, false, err
 		}
 	}
-	if len(removed) != 0 {
-		projected, x := projectedSignature(signature, removed)
-		if x != nil {
-			return 0, false, x
-		}
-		result := current
-		if owned {
-			c.signatures[result] = projected
-		} else {
-			result = c.fresh(projected)
-		}
-		if x = c.append(c.execution, NewProjectionInstruction(current, removed, result), rule.rule); x != nil {
-			return 0, false, x
-		}
-		current, owned = result, true
-	}
-	return current, owned, nil
+	return c.assembleHead(rule, predicate, current, signature, owned, true, variableColumns)
 }
 
 func (c *finiteCompiler) compileRule(rule finiteCompiledRule) error {
@@ -517,7 +731,7 @@ func (c *finiteCompiler) compileRule(rule finiteCompiledRule) error {
 	case finiteGroundRule:
 		source, owned, err = c.groundHead(rule, predicate)
 	case finiteSingleTailRule:
-		source, owned, err = c.singleTailHead(rule)
+		source, owned, err = c.singleTailHead(rule, predicate)
 	default:
 		err = ErrCompilerUnsupported
 	}
@@ -582,7 +796,7 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 }
 
 // CompileFiniteRules compiles the currently retained nonrecursive finite
-// ground and ordered single-tail rule slice into execution and termination bytecode.
+// no-tail and single-tail rule slice into execution and termination bytecode.
 // Ownership of both returned blocks transfers to the caller.
 func CompileFiniteRules(relations *RelationManager, set *base.RuleSet) (*InstructionBlock, *InstructionBlock, error) {
 	compiler, err := newFiniteCompiler(relations)

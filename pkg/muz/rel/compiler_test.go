@@ -41,6 +41,20 @@ func compilerRule(t *testing.T, rules *base.RuleManager, set *base.RuleSet, head
 	}
 }
 
+func compilerWantFacts(t *testing.T, table *rel.HashTable, expected ...rel.Fact) {
+	t.Helper()
+	count, err := table.Len()
+	if err != nil || count != len(expected) {
+		t.Fatal("compiled fact count", count, expected, err)
+	}
+	for _, fact := range expected {
+		found, x := table.Contains(fact)
+		if x != nil || !found {
+			t.Fatal("missing compiled fact", fact, x)
+		}
+	}
+}
+
 func TestFiniteCompilerOrdersFactsAndIdentityRules(t *testing.T) {
 	command, err := cmd_context.NewStandaloneContext()
 	if err != nil {
@@ -232,8 +246,145 @@ func TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	compilerRule(t, rules, set, head, nil, "unbound-head")
+	truth, err := manager.MkTrue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	compilerRule(t, rules, set, head, []ast.ASTHandle{truth}, "interpreted-tail")
 	if _, _, err = rel.CompileFiniteRules(relations, set); !errors.Is(err, rel.ErrCompilerUnsupported) {
 		t.Fatal("unsupported rule was not rejected", err)
 	}
+}
+
+func TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = command.Close() })
+	manager, err := command.Manager()
+	if err != nil {
+		t.Fatal(err)
+	}
+	relations, err := rel.NewRelationManager(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = relations.Close() })
+	rules, err := base.NewRuleManager(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = rules.Close() })
+	set, err := base.NewRuleSet(rules)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = set.Close() })
+	boolean, err := manager.MkBoolSort()
+	if err != nil {
+		t.Fatal(err)
+	}
+	domain2 := []ast.ASTHandle{boolean, boolean}
+	predicates := make(map[string]ast.ASTHandle)
+	for _, name := range []string{"P", "Swap", "Dup", "Diagonal", "Const", "All", "Equal"} {
+		domain := domain2
+		if name == "Diagonal" {
+			domain = []ast.ASTHandle{boolean}
+		}
+		predicates[name] = compilerDeclaration(t, manager, "assembly-"+name, domain, boolean)
+		if err = rules.RegisterPredicate(predicates[name]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	truth, err := manager.MkTrue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	falsity, err := manager.MkFalse()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for index, values := range [][]ast.ASTHandle{{truth, falsity}, {falsity, truth}, {truth, truth}} {
+		head, x := manager.MkApp(predicates["P"], values)
+		if x != nil {
+			t.Fatal(x)
+		}
+		compilerRule(t, rules, set, head, nil, "assembly-fact-"+string(rune('0'+index)))
+	}
+	x, err := manager.MkVar(0, boolean)
+	if err != nil {
+		t.Fatal(err)
+	}
+	y, err := manager.MkVar(1, boolean)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pXY, err := manager.MkApp(predicates["P"], []ast.ASTHandle{x, y})
+	if err != nil {
+		t.Fatal(err)
+	}
+	addSingle := func(name string, arguments []ast.ASTHandle, tail ast.ASTHandle) {
+		t.Helper()
+		head, x := manager.MkApp(predicates[name], arguments)
+		if x != nil {
+			t.Fatal(x)
+		}
+		compilerRule(t, rules, set, head, []ast.ASTHandle{tail}, "assembly-"+name)
+	}
+	addSingle("Swap", []ast.ASTHandle{y, x}, pXY)
+	addSingle("Dup", []ast.ASTHandle{x, x}, pXY)
+	pXX, err := manager.MkApp(predicates["P"], []ast.ASTHandle{x, x})
+	if err != nil {
+		t.Fatal(err)
+	}
+	addSingle("Diagonal", []ast.ASTHandle{x}, pXX)
+	addSingle("Const", []ast.ASTHandle{falsity, x}, pXY)
+	for _, name := range []string{"All", "Equal"} {
+		arguments := []ast.ASTHandle{x, y}
+		if name == "Equal" {
+			arguments = []ast.ASTHandle{x, x}
+		}
+		head, x := manager.MkApp(predicates[name], arguments)
+		if x != nil {
+			t.Fatal(x)
+		}
+		compilerRule(t, rules, set, head, nil, "assembly-"+name)
+	}
+	valid, err := set.Finalize()
+	if err != nil || !valid {
+		t.Fatal("finalize", valid, err)
+	}
+	execution, termination, err := rel.CompileFiniteRules(relations, set)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = execution.Close(); _ = termination.Close() })
+	context, err := rel.NewExecutionContextWithRelations(relations, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = context.Close() })
+	complete, err := execution.Perform(context)
+	if err != nil || !complete {
+		t.Fatal("assembly execution", complete, err)
+	}
+	complete, err = termination.Perform(context)
+	if err != nil || !complete {
+		t.Fatal("assembly termination", complete, err)
+	}
+	table := func(name string) *rel.HashTable {
+		t.Helper()
+		value, found, x := relations.TryGetRelation(predicates[name])
+		if x != nil || !found || value == nil {
+			t.Fatal("missing assembly relation", name, value, found, x)
+		}
+		return value
+	}
+	compilerWantFacts(t, table("Swap"), rel.Fact{0, 1}, rel.Fact{1, 0}, rel.Fact{1, 1})
+	compilerWantFacts(t, table("Dup"), rel.Fact{1, 1}, rel.Fact{0, 0})
+	compilerWantFacts(t, table("Diagonal"), rel.Fact{1})
+	compilerWantFacts(t, table("Const"), rel.Fact{0, 1}, rel.Fact{0, 0})
+	compilerWantFacts(t, table("All"), rel.Fact{0, 0}, rel.Fact{0, 1}, rel.Fact{1, 0}, rel.Fact{1, 1})
+	compilerWantFacts(t, table("Equal"), rel.Fact{0, 0}, rel.Fact{1, 1})
 }

@@ -80699,7 +80699,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/base/hnf.go", "pkg/muz/dataflow/reachability.go", "pkg/muz/rel/table.go", "pkg/muz/rel/relation_manager.go", "pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
-      "tests": ["TestFiniteCompilerOrdersFactsAndIdentityRules", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"],
+      "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"],
       "assertions": [
         {
           "line": 82,
@@ -80766,10 +80766,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained register_predicate/add_rule/close-reopen/query orchestration for finite-domain Horn programs, including compiled relational-bytecode execution for ground facts and nonrecursive ordered single-tail selection/projection rules, implicit-variable binding, HNF ingestion with computed head terms, stratified negation, finite direct guards and ground theory-rewritten guards, dependency-ordered fallback table saturation, tuple answers, and lbool results (dl_context.cpp:122-190,344-469,680-738,861-889)",
+          "name": "Retained register_predicate/add_rule/close-reopen/query orchestration for finite-domain Horn programs, including compiled relational-bytecode execution for nonrecursive no-tail and single-tail finite rules with complete structural head assembly, implicit-variable binding, HNF ingestion with computed head terms, stratified negation, finite direct guards and ground theory-rewritten guards, dependency-ordered fallback table saturation, tuple answers, and lbool results (dl_context.cpp:122-190,344-469,680-738,861-889)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
-          "tests": ["TestFiniteCompilerOrdersFactsAndIdentityRules", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"]
+          "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"]
 
         },
         {
@@ -80783,7 +80783,7 @@
         "PropositionalEngine owns its RuleManager, RuleSet, VariableBinder, RelationManager with finite predicate tables, and optional AST theory rewriter. Compiled instruction blocks own their predicate references and per-rule accounting parents until execution completes; the engine borrows the AST manager and releases all owned references before it."
       ],
       "deviations": [
-        "This is an explicitly bounded integration slice, not the general dl_context: ground facts and nonrecursive ordered single-tail selection/projection rules use relational bytecode; richer registered finite-domain predicates, stratified positive/negative predicate tails, direct finite Boolean/equality/distinct guards, and ground finite guards handled by the retained AST theory rewriter execute by the exact dependency-ordered fallback evaluator and produce finite tuple-answer formulas. General recursive/delta compilation, non-ground or infinite-domain arithmetic, parameters, transformations, models/proofs, and general engine selection remain open."
+        "This is an explicitly bounded integration slice, not the general dl_context: nonrecursive no-tail and single-tail finite rules with constants, repeated variables, projection, duplication, permutation, and unbound finite variables use relational bytecode; multi-tail, negated, interpreted, and recursive rules use the exact dependency-ordered fallback evaluator and produce finite tuple-answer formulas. General join/delta compilation, non-ground or infinite-domain arithmetic, parameters, transformations, models/proofs, and general engine selection remain open."
       ]
     },
     {
@@ -84130,7 +84130,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/rel/compiler.go", "pkg/muz/fp/propositional_engine.go"],
-      "tests": ["TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2"],
+      "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2"],
       "conditionals": [
         {
           "line": 742,
@@ -84377,29 +84377,29 @@
           "tests": ["TestFiniteCompilerOrdersFactsAndIdentityRules"]
         },
         {
-          "name": "Ground constant and empty-signature head assembly using cached unary singleton/total registers, joins, union, and temporary deallocation (dl_compiler.cpp:169-400,449-864)",
-          "status": "partial",
+          "name": "Complete structural finite head assembly for constants, bound/unbound and repeated variables using cached singleton/total registers, projection, correlated duplication, cycle renaming, joins, union, and temporary deallocation (dl_compiler.cpp:169-400,813-864)",
+          "status": "ported",
           "go_target": "pkg/muz/rel/compiler.go",
-          "tests": ["TestFiniteCompilerOrdersFactsAndIdentityRules"]
+          "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules"]
         },
         {
-          "name": "Unique-variable single-tail constant selection and unused-variable projection with source-order head preservation (dl_compiler.cpp:518-598,813-863)",
-          "status": "partial",
+          "name": "Single-tail constant selection, repeated-variable identity filtering, unused-variable projection, and handoff to complete head assembly (dl_compiler.cpp:518-598,813-863)",
+          "status": "ported",
           "go_target": "pkg/muz/rel/compiler.go",
-          "tests": ["TestFiniteCompilerOrdersFactsAndIdentityRules"]
+          "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules"]
         },
         {
-          "name": "Dependency-first nonrecursive ground and ordered single-tail rule compilation with explicit pre-execution refusal for unsupported rules (dl_compiler.cpp:1002-1018,1196-1245)",
+          "name": "Dependency-first nonrecursive no-tail and single-tail rule compilation with explicit pre-execution refusal for unsupported rules (dl_compiler.cpp:1002-1018,1196-1245)",
           "status": "partial",
           "go_target": "pkg/muz/rel/compiler.go",
-          "tests": ["TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution", "TestPropositionalEngineMatchesCPPFixedpointQueries"]
+          "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution", "TestPropositionalEngineMatchesCPPFixedpointQueries"]
         }
       ],
       "ownership": [
         "CompileFiniteRules transfers two instruction blocks to its caller. Each generated rule instruction retains its Rule accounting parent; load/store instructions retain predicate declarations; every partial compilation failure closes all generated instructions and owned references before returning."
       ],
       "deviations": [
-        "The compiler currently accepts ground finite facts and nonrecursive single-tail rules with constants plus unique bound variables retained in source order. Variable permutation/duplication, repeated-variable filters, head constants/unbound variables, two-relation joins, negation, interpreted filters, recursive delta loops, widening, and saturation marks remain open; unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
+        "The compiler currently accepts nonrecursive finite no-tail and single-tail rules with complete structural head assembly. Two-relation joins, negation, interpreted filters, recursive delta loops, widening, and saturation marks remain open; unsupported programs are rejected before bytecode execution and use the existing exact finite evaluator."
       ]
     },
     {
@@ -84408,7 +84408,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/rel/compiler.go"],
-      "tests": ["TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution"],
+      "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution"],
       "conditionals": [
         {
           "line": 19,
@@ -84432,14 +84432,14 @@
           "name": "Concrete typed finite compiler state, register/signature allocation, rule cost parentage, and execution/termination block ownership surface (dl_compiler.h:37-285)",
           "status": "partial",
           "go_target": "pkg/muz/rel/compiler.go",
-          "tests": ["TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution"]
+          "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestFiniteCompilerRejectsRicherRulesWithoutPartialExecution"]
         }
       ],
       "ownership": [
         "The Go compiler uses concrete finite HashTable registers and typed AST handles; it does not port the unused C++ container/template machinery. Returned blocks own all generated instructions."
       ],
       "deviations": [
-        "Only the live ground-fact and nonrecursive ordered single-tail selection/projection slice is exposed; the remaining compiler methods stay open with the source unit marked partial."
+        "Only the live nonrecursive no-tail and single-tail finite-rule slice is exposed; multi-tail joins, negation, interpreted filters, and recursive delta compilation remain open with the source unit marked partial."
       ]
     },
     {
