@@ -232,3 +232,23 @@ func TestPolynomialNonzeroConstantCoefficientActualNormalizeScratch(t *testing.T
 	}
 
 }
+
+func TestPolynomialNonzeroConstantCoefficientFailedBodyGuardsParentBeforeProgress(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c := m.core
+	// Qualified native-owner refusal after the actual scoped NUM construction;
+	// no incomplete child allocation is present to supply a different guard.
+	_, err := c.NonzeroConstantCoefficient(Polynomial{}, 0, 0)
+	if !errors.Is(err, ErrPolynomialOwner) || !c.nonzeroConstant.active || c.nonzeroConstant.numeralConstructed || c.constantCoefficientInvocation.active {
+		t.Fatal("native body refusal did not retain only its actual predicate scope", err)
+	}
+	for _, f := range []func() error{c.CloseChecked, c.SourceFinalizePrefix, m.CloseChecked, m.SourceFinalize} {
+		if err := f(); !errors.Is(err, ErrPolynomialPending) {
+			t.Fatal("parent progressed before predicate acknowledgment", err)
+		}
+		if c.closed || c.closing || c.sourceStarted || m.closed || m.closing || m.sourceStarted {
+			t.Fatal("parent destruction mutated its source history")
+		}
+	}
+	serviceMust(t, c.CleanupNonzeroConstantCoefficient())
+}

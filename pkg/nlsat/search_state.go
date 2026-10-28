@@ -89,6 +89,7 @@ type searchState struct {
 	core                            []sat.Literal
 	minimizer                       *explanationMinimizer
 	projection                      *projectionWorklist
+	explanationAssumptions          *explanationAssumptions
 	header                          uint64
 	running, failed, closed         bool
 }
@@ -139,6 +140,9 @@ func (r *searchState) open() error {
 		return ErrSearchPending
 	}
 	if r.projection != nil && (r.projection.running || r.projection.failed || r.projection.set == nil) {
+		return ErrSearchPending
+	}
+	if r.explanationAssumptions != nil && (r.explanationAssumptions.running || r.explanationAssumptions.failed || r.explanationAssumptions.factors == nil) {
 		return ErrSearchPending
 	}
 	if err := r.store.open(); err != nil {
@@ -483,6 +487,11 @@ func (r *searchState) cleanup() error {
 	}
 	r.running = true
 	defer func() { r.running = false }()
+	if r.explanationAssumptions != nil {
+		if err := r.explanationAssumptions.cleanup(); err != nil {
+			return err
+		}
+	}
 	if r.projection != nil {
 		if err := r.projection.cleanup(); err != nil {
 			return err
@@ -554,6 +563,11 @@ func (r *searchState) close() error {
 	}
 	r.running = true
 	defer func() { r.running = false }()
+	if r.explanationAssumptions != nil {
+		if err := r.explanationAssumptions.close(); err != nil {
+			return err
+		}
+	}
 	if r.projection != nil {
 		if err := r.projection.close(); err != nil {
 			return err

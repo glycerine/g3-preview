@@ -14,16 +14,13 @@ import (
 // It borrows the live registry through search, never a snapshot of its slices.
 // Projection, normalization and the full explain functor are still separate.
 type explanationMinimizer struct {
-	self                    *explanationMinimizer
-	search                  *searchState
-	todo, core, newTodo     []sat.Literal // borrowed source work vectors
-	result                  []sat.Literal // concrete scoped_literal_vector owner
+	self                *explanationMinimizer
+	search              *searchState
+	todo, core, newTodo []sat.Literal // borrowed source work vectors
+	scopedLiteralVector
 	refs                    [2]evaluatorIntervalRef
 	union                   intervalUnionReceipt
 	retired                 []*IntervalSet
-	resetIndex              int
-	resetting               bool
-	retiringAtom            ArithmeticAtom
 	header                  uint64
 	running, failed, closed bool
 }
@@ -41,6 +38,7 @@ func newExplanationMinimizer(r *searchState) (*explanationMinimizer, error) {
 	}
 	m := &explanationMinimizer{search: r, header: h}
 	m.self = m
+	m.scopedLiteralVector.factory = r.store.atoms
 	for i := range m.refs {
 		m.refs[i].manager = r.ism
 	}
@@ -192,10 +190,9 @@ func (m *explanationMinimizer) minimize(lits []sat.Literal) (result []sat.Litera
 		}
 	}
 	for _, l := range m.core {
-		if err = m.search.store.atoms.incRef(l.Variable()); err != nil {
+		if err = m.scopedLiteralVector.push(l); err != nil {
 			return nil, err
 		}
-		m.result = append(m.result, l)
 	}
 	return m.result, nil
 }
@@ -232,48 +229,9 @@ func (m *explanationMinimizer) resetResult() error {
 	if m.running {
 		return ErrSearchPending
 	}
-	m.resetting = true
-	f := m.search.store.atoms
-	for m.resetIndex < len(m.result) || m.retiringAtom != nil {
-		if m.retiringAtom != nil {
-			// Only an actual completed last DEC authorizes this continuation.
-			if f.retiring != nil && f.retiring != m.retiringAtom {
-				return ErrAtomCachePending
-			}
-			if f.retiring == m.retiringAtom {
-				if err := f.cleanup(); err != nil {
-					return err
-				}
-			}
-			m.retiringAtom = nil
-			continue
-		}
-		b := m.result[m.resetIndex].Variable()
-		var a ArithmeticAtom
-		var before uint32
-		if uint64(b) < uint64(len(f.bools.atoms)) {
-			a = f.bools.atoms[b]
-		}
-		if h := arithmeticAtomHeader(a); h != nil {
-			before = h.refs
-		}
-		err := f.decRef(b)
-		if err != nil {
-			if h := arithmeticAtomHeader(a); h != nil && before > 0 && h.refs == before-1 {
-				m.resetIndex++
-				if f.retiring == a {
-					m.retiringAtom = a
-				}
-			}
-			return err
-		}
-		m.resetIndex++
-	}
-	m.result = m.result[:0]
-	m.resetIndex = 0
-	m.resetting = false
-	return nil
+	return m.scopedLiteralVector.reset()
 }
+
 func (m *explanationMinimizer) close() error {
 	if m != nil && m.self == m && m.closed {
 		return nil

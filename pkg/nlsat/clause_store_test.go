@@ -16,6 +16,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
 
 func clauseStoreFixture(t *testing.T) (*Evaluator, *clauseStore) {
@@ -24,11 +25,21 @@ func clauseStoreFixture(t *testing.T) (*Evaluator, *clauseStore) {
 	return e, s
 }
 func clauseStoreFixtureWithLimit(t *testing.T) (*Evaluator, *clauseStore, *control.Reslimit) {
+	return clauseStoreFixtureConfigured(t, false)
+}
+func clauseStoreFixtureConfigured(t *testing.T, factorization bool) (*Evaluator, *clauseStore, *control.Reslimit) {
 	t.Helper()
 	am, _, limit := assignmentFixtureWithLimit(t)
 	q, err := am.RationalManager()
 	assignmentMust(t, err)
-	pm, err := polynomial.NewMultivariatePolynomialManager(polynomial.MultivariatePolynomialManagerConfig{Core: polynomial.MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: limit.Inc, Cooperation: func() error { return nil }}})
+	var fc polynomial.UPolynomialFactorizationConfig
+	if factorization {
+		primes, e := primegen.NewGenerator(q.Budget())
+		assignmentMust(t, e)
+		t.Cleanup(func() { assignmentMust(t, primes.Close()) })
+		fc.Primes = primes
+	}
+	pm, err := polynomial.NewMultivariatePolynomialManager(polynomial.MultivariatePolynomialManagerConfig{Factorization: fc, Core: polynomial.MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: limit.Inc, Cooperation: func() error { return nil }}})
 	assignmentMust(t, err)
 	t.Cleanup(func() { assignmentMust(t, pm.CloseChecked()) })
 	a, err := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: q.Integers().RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: diagnostic.DebugBuild}})
