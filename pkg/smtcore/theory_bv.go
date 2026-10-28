@@ -409,6 +409,15 @@ func (t *SMTBitVectorTheory) InternalizeAtom(expression ast.ASTHandle, gateConte
 	if err = t.traceBVExpression("bv", "internalize_atom", 1052, "internalizing atom: ", expression); err != nil {
 		return false, err
 	}
+	if err = bvAssert(1053, "atom->get_family_id() == get_family_id()", func() (bool, error) {
+		family, familyErr := t.state.manager.GetFamilyID(expression)
+		return family == t.FamilyID(), familyErr
+	}); err != nil {
+		return false, err
+	}
+	if !retainedBVAtomOperation(op) {
+		return false, diagnostic.BorrowProcessDebugContext().UnreachableSource("src/smt/theory_bv.cpp", 1067)
+	}
 	if op != smtBVOpBit2Bool {
 		if op == 59 || op == 60 {
 			return t.internalizeBooleanGate3(expression, op, gateContext)
@@ -482,6 +491,12 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	if err != nil || !own {
 		return false, err
 	}
+	if err = bvAssert(858, "term->get_family_id() == get_family_id()", func() (bool, error) {
+		family, familyErr := state.manager.GetFamilyID(expression)
+		return family == t.FamilyID(), familyErr
+	}); err != nil {
+		return false, err
+	}
 	if err = t.traceBVExpression("bv", "internalize_term", 859, "internalizing term: ", expression); err != nil {
 		return false, err
 	}
@@ -496,6 +511,12 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	if op >= 12 && op <= 16 {
 		return false, nil
 	}
+	if !retainedBVTermOperation(op) {
+		if err = t.traceBVExpression("bv_op", "internalize_term", 911, "unsupported operator: ", expression); err != nil {
+			return false, err
+		}
+		return false, diagnostic.BorrowProcessDebugContext().UnreachableSource("src/smt/theory_bv.cpp", 912)
+	}
 	if op == 58 {
 		if err = t.traceBVExpression("bv", "internalize_bv2int", 557, "", expression); err != nil {
 			return false, err
@@ -503,6 +524,9 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	}
 	count, err := state.manager.GetNumArgs(expression)
 	if err != nil {
+		return false, err
+	}
+	if err = t.assertTermOperatorShape(expression, op, count); err != nil {
 		return false, err
 	}
 	switch op {

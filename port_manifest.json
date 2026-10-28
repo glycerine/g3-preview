@@ -141302,8 +141302,17 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, construction, conversion and private union-find diagnostics are ported, while remaining operator TRACE/SASSERT diagnostics remain incomplete",
-          "status": "partial"
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, construction, conversion, operator and private union-find diagnostics are ported",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_operators.go",
+            "pkg/smtcore/theory_bv_operator_diagnostics_test.go"
+          ],
+          "tests": [
+            "TestSMTBVOperatorSourceAssertionSites",
+            "TestSMTBVUnsupportedOperatorSourceUnreachableAndTrace"
+          ]
         },
         {
           "name": "mk_new_diseq_axiom/new_eq_eh/assign_eh/merge_eh retained trace path: lazy source operands, static-disequality variable display, equality expressions and relevance, Boolean assignment and queue size, merge owner IDs, conflicts and bit-vector size",
@@ -141586,7 +141595,7 @@
           ]
         },
         {
-          "name": "Native retained operator dispatch (theory_bv.cpp:49-63,160-198,687-855,920-980): canonical owned literal operands after process_args, source right-to-left AC fold, direct subtracter, concrete Engine arithmetic/division/logic/extension/reduction/comparison/shift/rotate/overflow algorithms, positive indexed mk_bits for suppressed sort attachment without find_wpos, native concat/extract literal identity; whole-unit TRACE/SASSERT closure remains outside this increment",
+          "name": "Native retained operator dispatch (theory_bv.cpp:49-63,160-198,687-855,920-980): canonical owned literal operands after process_args, source right-to-left AC fold, direct subtracter, concrete Engine arithmetic/division/logic/extension/reduction/comparison/shift/rotate/overflow algorithms, positive indexed mk_bits for suppressed sort attachment without find_wpos, native concat/extract literal identity",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_bv_operators.go",
@@ -141889,8 +141898,17 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, construction, conversion and private union-find diagnostics are ported, while remaining operator TRACE/SASSERT diagnostics remain incomplete",
-          "status": "partial"
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, construction, conversion, operator and private union-find diagnostics are ported",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_operators.go",
+            "pkg/smtcore/theory_bv_operator_diagnostics_test.go"
+          ],
+          "tests": [
+            "TestSMTBVOperatorSourceAssertionSites",
+            "TestSMTBVUnsupportedOperatorSourceUnreachableAndTrace"
+          ]
         },
         {
           "name": "mk_new_diseq_axiom/new_eq_eh/assign_eh/merge_eh retained trace path: lazy source operands, static-disequality variable display, equality expressions and relevance, Boolean assignment and queue size, merge owner IDs, conflicts and bit-vector size",
@@ -142161,7 +142179,7 @@
           ]
         },
         {
-          "name": "Native retained operator dispatch (theory_bv.cpp:49-63,160-198,687-855,920-980): canonical owned literal operands after process_args, source right-to-left AC fold, direct subtracter, concrete Engine arithmetic/division/logic/extension/reduction/comparison/shift/rotate/overflow algorithms, positive indexed mk_bits for suppressed sort attachment without find_wpos, native concat/extract literal identity; whole-unit TRACE/SASSERT closure remains outside this increment",
+          "name": "Native retained operator dispatch (theory_bv.cpp:49-63,160-198,687-855,920-980): canonical owned literal operands after process_args, source right-to-left AC fold, direct subtracter, concrete Engine arithmetic/division/logic/extension/reduction/comparison/shift/rotate/overflow algorithms, positive indexed mk_bits for suppressed sort attachment without find_wpos, native concat/extract literal identity",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_bv_operators.go",

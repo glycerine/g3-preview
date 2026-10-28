@@ -1,5 +1,6 @@
-// Source: src/smt/theory_bv.cpp:185-198,687-855,920-980.
 package smtcore
+
+// Source: src/smt/theory_bv.cpp:185-198,687-855,920-980.
 
 import (
 	"errors"
@@ -52,6 +53,89 @@ func (t *SMTBitVectorTheory) retainNativeBits(bits []ast.ASTHandle) ([]ast.ASTHa
 	return bits, nil
 }
 
+// assertTermOperatorShape preserves the preconditions of the source operator
+// bodies before process_args creates the term enode. MK_BINARY_COND has no
+// retained invocation in theory_bv.cpp and therefore has no Go counterpart.
+func (t *SMTBitVectorTheory) assertTermOperatorShape(expression ast.ASTHandle, operation int32, count uint32) error {
+	s := t.state
+	fresh := func(line int32) error {
+		return bvAssert(line, "!get_context().e_internalized(n)", func() (bool, error) {
+			return s.context.enodes[expression] == nil, nil
+		})
+	}
+	arity := func(line int32, condition string, holds bool) error {
+		return bvAssert(line, condition, func() (bool, error) { return holds, nil })
+	}
+	switch operation {
+	case 32, 42, 43:
+		if err := fresh(689); err != nil {
+			return err
+		}
+		return arity(690, "n->get_num_args() == 1", count == 1)
+	case 17, 18, 19, 20, 21, 44, 45, 46, 47, 50, 51:
+		if err := fresh(702); err != nil {
+			return err
+		}
+		return arity(703, "n->get_num_args() == 2", count == 2)
+	case 4, 6, 30, 31, 33, 34, 35, 36:
+		if err := fresh(718); err != nil {
+			return err
+		}
+		return arity(719, "n->get_num_args() >= 2", count >= 2)
+	case 5:
+		if err := fresh(766); err != nil {
+			return err
+		}
+		return arity(767, "n->get_num_args() == 2", count == 2)
+	case 38, 39, 48, 49:
+		if err := fresh(806); err != nil {
+			return err
+		}
+		return arity(807, "n->get_num_args() == 1", count == 1)
+	case 40:
+		return arity(842, "n->get_num_args() == 1", count == 1)
+	default:
+		return nil
+	}
+}
+
+func assertBVOperatorWidth(line int32, condition string, left, right []ast.ASTHandle) error {
+	return bvAssert(line, condition, func() (bool, error) { return len(left) == len(right), nil })
+}
+
+func assertBVExtractBounds(low, high uint32) error {
+	return bvAssert(849, "start <= end", func() (bool, error) { return low <= high, nil })
+}
+
+func assertBVAtomArity(operation int32, count int) error {
+	switch operation {
+	case 52, 53, 54:
+		return bvAssert(919, "n->get_num_args() == 2", func() (bool, error) { return count == 2, nil })
+	case 22, 23:
+		return bvAssert(954, "n->get_num_args() == 2", func() (bool, error) { return count == 2, nil })
+	default:
+		return nil
+	}
+}
+
+func retainedBVTermOperation(operation int32) bool {
+	switch operation {
+	case 0, 4, 5, 6, 17, 18, 19, 20, 21, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 56, 57, 58:
+		return true
+	default:
+		return false
+	}
+}
+
+func retainedBVAtomOperation(operation int32) bool {
+	switch operation {
+	case 22, 23, 52, 53, 54, 55, 59, 60:
+		return true
+	default:
+		return false
+	}
+}
+
 func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation int32) (bits []ast.ASTHandle, handled bool, result error) {
 	s := t.state
 	if operation == 56 {
@@ -81,6 +165,13 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 	arguments, err := call.argumentBits(expression, reverse)
 	if err != nil {
 		return nil, true, err
+	}
+	if operation == 44 {
+		if len(arguments) == 2 {
+			if err = assertBVOperatorWidth(710, "arg1_bits.size() == arg2_bits.size()", arguments[0], arguments[1]); err != nil {
+				return nil, true, err
+			}
+		}
 	}
 	if operation == 42 || operation == 43 || operation == 44 {
 		bit, err := t.nativeAtomDefinition(operation, arguments)
@@ -117,6 +208,9 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 		// in descending order, keeping their order at every binary call.
 		bits = arguments[len(arguments)-1]
 		for i := len(arguments) - 2; i >= 0; i-- {
+			if err = assertBVOperatorWidth(733, "arg_bits.size() == bits.size()", arguments[i], bits); err != nil {
+				return nil, true, err
+			}
 			refs, err = binary(arguments[i], bits)
 			if err != nil {
 				return nil, true, err
@@ -153,6 +247,9 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 			if err != nil {
 				return nil, true, err
 			}
+			if err = assertBVExtractBounds(low, high); err != nil {
+				return nil, true, err
+			}
 			if low > high || uint64(high) >= uint64(len(arguments[0])) {
 				return nil, true, ast.ErrASTDomain
 			}
@@ -176,10 +273,20 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 		bits, err = t.retainNativeBits(bits)
 		return bits, true, err
 	default:
-		if len(arguments) != 2 || len(arguments[0]) == 0 || len(arguments[0]) != len(arguments[1]) {
+		if len(arguments) != 2 || len(arguments[0]) == 0 {
 			return nil, true, ast.ErrASTDomain
 		}
 		left, right := arguments[0], arguments[1]
+		widthLine := int32(710)
+		if operation == 5 {
+			widthLine = 774
+		}
+		if err = assertBVOperatorWidth(widthLine, "arg1_bits.size() == arg2_bits.size()", left, right); err != nil {
+			return nil, true, err
+		}
+		if len(left) != len(right) {
+			return nil, true, ast.ErrASTDomain
+		}
 		switch operation {
 		case 5:
 			var carry ast.ASTRef
@@ -219,6 +326,9 @@ func (t *SMTBitVectorTheory) operationBits(expression ast.ASTHandle, operation i
 // The live scalar bit-blaster consumers produce reductions, comparison atoms,
 // and overflow atoms. Their owned output survives recursive gate internalization.
 func (t *SMTBitVectorTheory) nativeAtomDefinition(operation int32, arguments [][]ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := assertBVAtomArity(operation, len(arguments)); err != nil {
+		return ast.ASTHandle{}, err
+	}
 	engine, err := t.nativeBitBlaster()
 	if err != nil {
 		return ast.ASTHandle{}, err
