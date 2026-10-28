@@ -404,9 +404,11 @@ digraph packages {
   "smtcore" -> "math/automata";
   "smtcore" -> "math/euclid";
   "smtcore" -> "math/grobner";
+  "smtcore" -> "math/polynomial";
   "smtcore" -> "math/simplex";
   "smtcore" -> "model";
   "smtcore" -> "model/fpa";
+  "smtcore" -> "nlsat";
   "smtcore" -> "parsers/util";
   "smtcore" -> "smtcore/proto_model";
   "smtcore" -> "solver";
@@ -426,6 +428,7 @@ digraph packages {
   "smtcore" -> "util/messages";
   "smtcore" -> "util/numeral";
   "smtcore" -> "util/params";
+  "smtcore" -> "util/prime";
   "smtcore" -> "util/random";
   "smtcore" -> "util/statistics";
   "smtcore" -> "util/stopwatch";

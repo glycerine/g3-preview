@@ -91606,7 +91606,8 @@
         "pkg/nlsat/clause_store.go",
         "pkg/nlsat/search_state.go",
         "pkg/nlsat/search_propagation.go",
-        "pkg/nlsat/search_witness.go"
+        "pkg/nlsat/search_witness.go",
+        "pkg/nlsat/univariate_conjunction.go"
       ],
       "tests": [
         "pkg/nlsat/assumption_manager_test.go",
@@ -91654,7 +91655,11 @@
         "TestSearchWitnessIntegerGapDefersIntegralityCheck",
         "TestSearchWitnessFullDomainAndStageGuards",
         "TestSearchWitnessIrrationalAndStoppedAssignmentOwnership",
-        "TestSearchSelectedWitnessPrebuiltCPPOracle"
+        "TestSearchSelectedWitnessPrebuiltCPPOracle",
+        "TestUnivariateConjunctionRejectsMixedVariablesAndOwnsDomain",
+        "TestSMTLibRunnerUnivariateNRA",
+        "TestSMTLibRunnerUnivariateNRAUnsupported",
+        "TestSMTSolverUnivariateNRAAPI"
       ],
       "conditionals": [
         {
@@ -92182,7 +92187,8 @@
         "Native maps/slices and existing concrete idgen replace source STL/container mechanisms; source vector capacity/failure machinery is not ported. Reflected native factory/root storage and charged PolynomialRef owner headers differ from the C++ layout and introduce Go reservation frontiers; the consecutive cold-root ladder covers this fixture through success, including an actual refusal after Boolean publication. Explicit native owner/precondition guards are not a whole C++ diagnostic-prefix audit. The component is an actual solver subobject, not a fake Solver: source true-clause construction, clause factories/sorting/watches, explanation/search, complete TRACE/display frontiers and general solver/tactic integration remain pending. Both whole-unit audit flags remain false.",
         "Go native maps/slices and sort.Slice replace C++ containers/std::sort; the project comparator and successful ordering are tested independently, while a stopped Go sort may have a different partial permutation than C++ std::sort. Reflected clause-storage extent includes native owning-progress and acquired-prefix bookkeeping and differs from the C++ packed object, allocator class and reservation counts. The cold allocation campaigns qualify the actual native fixture, not every C++ allocation or TRACE/display prefix. The true unit clause is constructed and watched but is not propagated by an invented search engine. Arithmetic reordering, trail, explanation/projection, propagation/search, full solver construction/API and nonlinear tactic integration remain pending. Both whole-unit audit flags remain false.",
         "This is an actual trail/propagation component, not a completed Solver or replacement Boolean-only engine. Native slices replace source vectors; Go-local bookkeeping and reflected owner extents are not C++ allocator/capacity emulation. Native explicit continuations preserve safe ownership of reached exception prefixes, including a saved-but-untransferred domain entry, without claiming every C++ TRACE/display/lexical/physical prefix was audited. The existing Go evaluator returns one owned infeasible-set reference, which is transferred into the real current local. Actual main search, witness selection, explanation/projection, resolution/conflict analysis, public constructor/parameters and nonlinear goal/tactic/backend integration remain unported or incomplete; both whole-unit audit flags stay false.",
-        "select_witness core operations are now present, but source cpp1194-1197 TRACE/display ordering, full solver construction/parameter application, integer search_check branching, explanation/projection, resolution and the main search/backend/SMT-LIB runner remain unaudited or unported. All whole-source audit flags remain false. New witness verification uses 32 selected-value counterexamples against the existing prebuilt build/z3, integer/fractional/irrational cases, exact random draw counts and interrupted lexical ownership; these local checks do not establish complete NLSAT or SMT solving."
+        "select_witness core operations are now present, but source cpp1194-1197 TRACE/display ordering, full solver construction/parameter application, integer search_check branching, explanation/projection, resolution and the main search/backend/SMT-LIB runner remain unaudited or unported. All whole-source audit flags remain false. New witness verification uses 32 selected-value counterexamples against the existing prebuilt build/z3, integer/fractional/irrational cases, exact random draw counts and interrupted lexical ownership; these local checks do not establish complete NLSAT or SMT solving.",
+        "Integration increment: a guarded real univariate conjunction service composes the actual inequality evaluator, owned infeasible intervals, interval union and complement witness selection. It rejects mixed-variable polynomials even when their maximum variable matches. The service borrows polynomial/algebraic managers, owns its evaluator/assignment/allocator/domain and closes them explicitly. SMT QF_NRA CLI/API integration now consumes this path with exact algebraic models and incremental scopes. This is a concrete specialization, not the complete source solver constructor, Boolean/multivariate search, explanations, projection loop or conflict resolution; whole-unit status and audit flags remain partial/false."
       ]
     },
     {
@@ -120067,7 +120073,8 @@
         "pkg/cmd/g3/test_vectors/queue_factory_fallback_scopes.smt2",
         "pkg/smtcore/smt_case_split_assertions.go",
         "pkg/smtcore/smt_case_split_assertions_test.go",
-        "pkg/smtcore/smt_relevancy_retirement_test.go"
+        "pkg/smtcore/smt_relevancy_retirement_test.go",
+        "pkg/smtcore/smt_univariate_nra.go"
       ],
       "tests": [
         "TestSMTIncrementalCongruenceAndDisequalityNestedRollback",
@@ -120338,7 +120345,10 @@
         "TestSMTCaseSplitSourceScopeAssertionsAndRestorationOrder",
         "TestSMTCaseSplitSourceGoalHeapAssertionsAndRecovery",
         "TestSMTCaseSplitSourceTheoryRandomAssertionsAndErasedOperands",
-        "TestSMTRelevancyBaseMarksSurviveScopedInternalization"
+        "TestSMTRelevancyBaseMarksSurviveScopedInternalization",
+        "TestSMTLibRunnerUnivariateNRA",
+        "TestSMTLibRunnerUnivariateNRAUnsupported",
+        "TestSMTSolverUnivariateNRAAPI"
       ],
       "conditionals": [
         {
@@ -122482,7 +122492,8 @@
         "Replaced per-search selector construction and per-update/per-check RNG restart with retained context lifetime. Five regression groups cover all 49 initial/current queue-mode combinations, actual repeated searches and user scopes, setup via check or push, borrowed phase updates and stopped-owner refusal, fresh-context selection, and continued strategy6 priority admission after case_split changes. Source theory-aware successful selection returns before consulting the phase-hint map; regression requires the hinted second variable to win while retaining the default false phase. Source defaults phase_caching_on=400, phase_caching_off=100 and random_var_freq=0.01 have no retained public update in smt_params.cpp; no dynamic setters were invented. Two overlay negative controls reject queue recreation and repeated RNG reseeding. Registered scoped SMT-LIB option-update vector matches prebuilt C++. This closes the bounded queue lifetime discrepancy only; remaining diagnostics, full context display composition and broader context/engine closure remain partial.",
         "Audited56 raw diagnostic occurrences:24 live TRACE sites now wired,1 commented TRACE excluded,31 SASSERT sites still require exact per-site assertion closure. Random traces include reserved true-variable selections before normal fallback. Relevance events trace candidate IDs and actual queue snapshots; push/pop cursors, secondary-goal erase-before-decision, labeled goal before publication and theory priority before mutation are emitted at retained call sites. Nine groups verify exact source bytes/headers across all consumer profiles, independent AST stream with native TRACE erased, every physical candidate-trace refusal prefix, lazy erasure, operand evaluation after refused headers, explicit endl, closed manager stream, and read-only availability. Go final-check availability previously invoked NextCaseSplit for profiles3/5, advancing random child selection and emitting duplicate decision records; now scans retained members without consuming RNG, cursor, heap or traces. Overlay controls reject the old decision probe and removal of mandatory AST records. Factory fallback warning/parameter-mutation fidelity (cpp1230-1240), the31 assertion mappings, full context display composition and whole-unit closure remain open; no partial-unit promotion.",
         "Factory now emits exactly one source-priority warning when relevancy and auto_config both disallow modes3-5; disabled or refused warning streams still permit mutation. Unknown numeric strategies use the source switch default activity queue while retaining the parameter value (tested7,61,UINT_MAX; scoped C++ vector includes61). Five factory groups verify all7 modes plus defaults, both fallback conditions, solver-update restoration versus borrowed/copy ownership, warning/RNG/mutation/allocation prefix with an actual allocation refusal, runtime warning controls and existing-context retention. Registered six-check scoped vector matches prebuilt C++ exactly on both stdout and warning stderr. No whole-unit promotion.",
-        "The previous31 pending SASSERT sites now have concrete call-site mappings (85,173,174,208,343,354,391,399,411,418,436,514,542,585,591,603,610,625,775,786,831,841,850,859,867,874,892,916,918,1167,1169). Five assertion groups exercise enabled/disabled/native profiles, exact diagnostic identity and action, duplicate heap admission, relevance candidate/admission guards, scope counts/restoration order, goal secondary inconsistencies/indices and recovery, and negative/empty random-selection preconditions. Two overlays reject missing borrowed factory mutation and bypassed source assertion gates. All24 TRACE sites were mapped previously; complete queue method/owner closure and full context display composition still require the remaining audit. Source-unit statuses and audit flags stay unchanged."
+        "The previous31 pending SASSERT sites now have concrete call-site mappings (85,173,174,208,343,354,391,399,411,418,436,514,542,585,591,603,610,625,775,786,831,841,850,859,867,874,892,916,918,1167,1169). Five assertion groups exercise enabled/disabled/native profiles, exact diagnostic identity and action, duplicate heap admission, relevance candidate/admission guards, scope counts/restoration order, goal secondary inconsistencies/indices and recovery, and negative/empty random-selection preconditions. Two overlays reject missing borrowed factory mutation and bypassed source assertion gates. All24 TRACE sites were mapped previously; complete queue method/owner closure and full context display composition still require the remaining audit. Source-unit statuses and audit flags stay unchanged.",
+        "Go integration increment: original QF_NRA assertions are held by scoped AST references independently of preprocessing, allowing a guarded univariate polynomial conjunction path before ordinary internalization. It uses the actual Expr2Polynomial translator with a single pinned real constant and positive common denominator, NLSAT infeasible domains, exact complement witnesses and the normal generated-model publication path. Irrational witnesses are copied across numerical owners into the AST arithmetic plugin. Unsupported syntax, multiple variables, proofs, nonempty assumptions and translated kernels retain the existing backend. CLI tests compare SAT/UNSAT and evaluated model truth against prebuilt C++; API tests cover powers, repeated models and push/pop. This does not complete general nonlinear/backend integration or source ownership audits."
       ]
     },
     {

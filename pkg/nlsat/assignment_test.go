@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/cmd_context"
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
@@ -19,6 +19,7 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -35,20 +36,33 @@ func assignmentFixture(t *testing.T) (*polynomial.AlgebraicManager, *arena.Budge
 }
 func assignmentFixtureWithLimit(t *testing.T) (*polynomial.AlgebraicManager, *arena.Budget, *control.Reslimit) {
 	t.Helper()
-	c, err := cmd_context.NewStandaloneContext()
+	// Keep this numerical fixture independent of the command/SMT composition
+	// root: the production SMT backend now consumes NLSAT.
+	budget := arena.NewBudget(1 << 40)
+	symbols, err := usymbol.NewManager(usymbol.Config{Budget: budget})
 	assignmentMust(t, err)
-	var budget *arena.Budget
+	q, err := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
+	assignmentMust(t, err)
 	t.Cleanup(func() {
-		assignmentMust(t, c.Close())
-		if budget != nil && budget.Used() != 0 {
+		assignmentMust(t, q.Close())
+		assignmentMust(t, symbols.Close())
+		if budget.Used() != 0 {
 			t.Fatal("assignment fixture retained bytes", budget.Used())
 		}
 	})
-	m, err := c.Manager()
+	context, err := uparams.NewParamsContext(symbols, q, uparams.ParamsConfig{Budget: budget})
 	assignmentMust(t, err)
-	budget = m.Budget()
-	g, err := c.GlobalParameters()
+	t.Cleanup(func() { assignmentMust(t, context.Close()) })
+	catalog, err := uparams.NewGlobalParamsCatalog(symbols, uparams.GlobalParamsCatalogConfig{Budget: budget})
 	assignmentMust(t, err)
+	t.Cleanup(func() { assignmentMust(t, catalog.Close()) })
+	g, err := uparams.NewGlobalParamsService(symbols, context, uparams.GlobalParamsConfig{Budget: budget, Catalog: catalog})
+	assignmentMust(t, err)
+	t.Cleanup(func() { assignmentMust(t, g.Close()) })
+	assignmentMust(t, g.InitializeSource())
+	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: q, Budget: budget})
+	assignmentMust(t, err)
+	t.Cleanup(func() { assignmentMust(t, m.Close()) })
 	previous, err := uparams.BindProcessGlobalParamsService(g)
 	assignmentMust(t, err)
 	t.Cleanup(func() { _, err := uparams.BindProcessGlobalParamsService(previous); assignmentMust(t, err) })

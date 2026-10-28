@@ -829,6 +829,10 @@ func (s *SMTSolver) Translate(manager *ast.ASTManager, params *uparams.ParamsRef
 	if err != nil {
 		return nil, err
 	}
+	// Kernel translation currently copies preprocessed assertions/converters;
+	// preserve that existing path until original NRA snapshots are translated.
+	next.kernel.nraInputsValid = false
+
 	// context::copy_plugins preserves concrete arithmetic types, with fresh
 	// solver data and the parameter owner chosen by each mk_fresh constructor.
 	if err = next.kernel.copyArithmeticPlugin(s.kernel); err != nil {

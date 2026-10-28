@@ -2133,7 +2133,8 @@
         "search_propagation.go",
         "search_state.go",
         "search_witness.go",
-        "sign_table.go"
+        "sign_table.go",
+        "univariate_conjunction.go"
       ]
     },
     {
@@ -2582,9 +2583,11 @@
         "math/automata",
         "math/euclid",
         "math/grobner",
+        "math/polynomial",
         "math/simplex",
         "model",
         "model/fpa",
+        "nlsat",
         "parsers/util",
         "smtcore/proto_model",
         "solver",
@@ -2604,6 +2607,7 @@
         "util/messages",
         "util/numeral",
         "util/params",
+        "util/prime",
         "util/random",
         "util/statistics",
         "util/stopwatch",
@@ -2769,6 +2773,7 @@
         "smt_theory_lifecycle.go",
         "smt_theory_propagation.go",
         "smt_types.go",
+        "smt_univariate_nra.go",
         "smt_utvpi_cycle.go",
         "smt_utvpi_graph.go",
         "smt_utvpi_linearizer.go",

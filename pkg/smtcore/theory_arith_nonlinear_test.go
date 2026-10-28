@@ -193,6 +193,8 @@ func TestSMTNonlinearCandidateRejectsRelaxedProduct(t *testing.T) {
 	s, err := NewSMTSolver(m, nil, "QF_NRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	// Exercise the rational tableau guard independently of the exact NRA path.
+	s.kernel.nraInputsValid = false
 	s.kernel.preprocess = false
 	family, err := m.ArithmeticFamilyID()
 	astTestMust(t, err)

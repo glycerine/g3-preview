@@ -29,6 +29,10 @@ type SMTKernelAssertion struct {
 }
 
 type SMTKernel struct {
+	univariateNRA      *smtNRAWorkspace
+	nraInputs          []ast.ASTRef
+	nraScopes          []int
+	nraInputsValid     bool
 	queueWarnings      *diagnostic.WarningService // Borrowed factory diagnostics; nil uses process warnings.
 	caseSplitQueue     *SMTActivityCaseSplitQueue
 	booleanSetupSeeded bool
@@ -155,7 +159,8 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 		return nil, errors.Join(err, names.Close(), macroManager.Close(), manager.DelRef(&proof), internalizer.Close())
 	}
 	kernel := &SMTKernel{
-		manager: manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof, assertedMacros: macroManager, definedNames: names, bvSharing: sharing,
+		nraInputsValid: true,
+		manager:        manager, checker: checker, relevancy: relevancy, internalizer: internalizer, unsatProof: proof, assertedMacros: macroManager, definedNames: names, bvSharing: sharing,
 		smtState: SMTParamsState{
 			MaxConflicts: ^uint32(0), InvDecay: 1.052, RandomInitialActivity: 1, RandomVarFreq: 0.01, CaseSplitStrategy: 1, RestartStrategy: 1, RestartInitial: 100, RestartFactor: 1.1,
 			RestartAdaptive: true, AgilityFactor: 0.9999, RestartAgilityThreshold: 0.18, SimplifyClauses: true,
@@ -648,7 +653,25 @@ func (k *SMTKernel) RegisterTheory(theory SMTTheoryInternalizer) error {
 	return k.internalizer.RegisterTheory(theory)
 }
 
-func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) error {
+func (k *SMTKernel) Assert(formula, proof ast.ASTHandle) (err error) {
+	if k == nil || k.manager == nil {
+		return ast.ErrASTHandle
+	}
+	if k.setupLogic != "QF_NRA" || !k.nraInputsValid || k.assertedFormulasInconsistent() {
+		return k.assertFormulaCore(formula, proof)
+	}
+	ref, err := k.manager.NewRef(formula)
+	if err != nil {
+		return err
+	}
+	if err = k.assertFormulaCore(formula, proof); err != nil {
+		k.nraInputsValid = false
+		return errors.Join(err, k.manager.DelRef(&ref))
+	}
+	k.nraInputs = append(k.nraInputs, ref)
+	return nil
+}
+func (k *SMTKernel) assertFormulaCore(formula, proof ast.ASTHandle) error {
 	if err := k.open(); err != nil {
 		return err
 	}
@@ -870,6 +893,7 @@ func (k *SMTKernel) Push() error {
 		return errors.Join(err, k.internalizer.PopScopes(1), k.bvSharing.PopScope(1), k.definedNames.Pop(1), k.assertedMacros.PopScope(1), k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1))
 	}
 	k.scopes = append(k.scopes, len(k.assertions))
+	k.nraScopes = append(k.nraScopes, len(k.nraInputs))
 	k.assertedScopeConflicts = append(k.assertedScopeConflicts, k.assertedInconsistent)
 	return nil
 }
@@ -913,6 +937,10 @@ func (k *SMTKernel) Pop(count uint32) error {
 	if k.assertedHead > limit {
 		k.assertedHead = limit
 	}
+	if err := k.restoreNRAInputs(k.nraScopes[level]); err != nil {
+		return err
+	}
+	k.nraScopes = k.nraScopes[:level]
 	k.scopes = k.scopes[:level]
 	k.assertedInconsistent = k.assertedScopeConflicts[level]
 	k.assertedScopeConflicts = k.assertedScopeConflicts[:level]
@@ -1014,6 +1042,9 @@ func (k *SMTKernel) Check() (result lbool.LBool, resultErr error) {
 	}
 	if len(assumptions) != 0 {
 		return k.checkConfiguredAssumptions(assumptions)
+	}
+	if result, handled, err := k.tryUnivariateNRA(); handled || err != nil {
+		return k.finalizeCheck(result, err)
 	}
 	if err := k.internalizeCheckAssertions(); err != nil {
 		return lbool.Undef, err
@@ -1264,6 +1295,15 @@ func (k *SMTKernel) Close() error {
 	}
 	if k.closed {
 		return nil
+	}
+	if k.univariateNRA != nil {
+		if err := k.univariateNRA.Close(); err != nil {
+			return err
+		}
+		k.univariateNRA = nil
+	}
+	if err := k.restoreNRAInputs(0); err != nil {
+		return err
 	}
 	var result error
 	result = errors.Join(result, k.clearLiteralResults())

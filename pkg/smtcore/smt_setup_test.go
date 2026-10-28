@@ -271,7 +271,7 @@ func TestSMTUnknownLogicSetupInstallsMixedArithmetic(t *testing.T) {
 			status, err := smtSetupProfileCheck(solver)
 			astTestMust(t, err)
 			want := lbool.Undef
-			if test.integer {
+			if test.integer || test.logic == "QF_NRA" {
 				want = lbool.True
 			}
 			if status != want {

@@ -81,6 +81,11 @@ func (k *SMTKernel) checkConfiguredAssumptions(assumptions []ast.ASTHandle) (res
 			return lbool.Undef, fmt.Errorf("assumption %d: %w", index, ast.ErrASTDomain)
 		}
 	}
+	if len(assumptions) == 0 {
+		if result, handled, err := k.tryUnivariateNRA(); handled || err != nil {
+			return k.finalizeCheck(result, err)
+		}
+	}
 	if err := k.internalizeCheckAssertions(); err != nil {
 		return lbool.Undef, err
 	}
