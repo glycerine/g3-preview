@@ -164,15 +164,9 @@ func (c *Context) writeAssignmentPair(out io.Writer, name string, value bool, fi
 	if err != nil {
 		return err
 	}
-	quoted, err := usmt2.IsSMT2QuotedSymbol(c.manager.Symbols, symbol)
+	name, err = c.smt2SymbolName(symbol)
 	if err != nil {
 		return err
-	}
-	if quoted {
-		name, err = usmt2.MkSMT2QuotedSymbol(c.manager.Symbols, symbol, nil)
-		if err != nil {
-			return err
-		}
 	}
 	if !*first {
 		if _, err = io.WriteString(out, " "); err != nil {
@@ -181,6 +175,56 @@ func (c *Context) writeAssignmentPair(out io.Writer, name string, value bool, fi
 	}
 	*first = false
 	_, err = fmt.Fprintf(out, "(%s %t)", name, value)
+	return err
+}
+
+func (c *Context) smt2SymbolName(symbol usymbol.Symbol) (string, error) {
+	name, err := c.manager.Symbols.String(symbol)
+	if err != nil {
+		return "", err
+	}
+	quoted, err := usmt2.IsSMT2QuotedSymbol(c.manager.Symbols, symbol)
+	if err != nil {
+		return "", err
+	}
+	if quoted {
+		name, err = usmt2.MkSMT2QuotedSymbol(c.manager.Symbols, symbol, nil)
+		if err != nil {
+			return "", err
+		}
+	}
+	return name, nil
+}
+
+// WriteLabels displays the relevant Simplify-style labels from the latest
+// satisfiable or unknown result.
+func (c *Context) WriteLabels(out io.Writer) error {
+	if err := c.valid(); err != nil {
+		return err
+	}
+	if _, err := c.Manager(); err != nil {
+		return err
+	}
+	if !c.checked || c.status != lbool.True && c.status != lbool.Undef {
+		return fmt.Errorf("labels are not available")
+	}
+	labels, err := c.checkSatResult().Labels()
+	if err != nil {
+		return err
+	}
+	if _, err = io.WriteString(out, "(labels"); err != nil {
+		return err
+	}
+	for _, label := range labels {
+		name, e := c.smt2SymbolName(label)
+		if e != nil {
+			return e
+		}
+		if _, err = fmt.Fprintf(out, " %s", name); err != nil {
+			return err
+		}
+	}
+	_, err = io.WriteString(out, ")\n")
 	return err
 }
 
