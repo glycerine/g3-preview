@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -39,6 +40,7 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 		return err
 	}
 	printResult := true
+	printProof := false
 	for p.token != RightParenToken && p.token != EOFToken {
 		if p.token != KeywordToken {
 			return fmt.Errorf("invalid simplify command, keyword expected")
@@ -48,11 +50,15 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 		if err = p.advance(); err != nil {
 			return err
 		}
-		if key == "print" {
+		if key == "print" || key == "print_proofs" {
 			if p.token != SymbolToken || p.scanner.ID() != "true" && p.scanner.ID() != "false" {
 				return fmt.Errorf("invalid simplify parameter value, true or false expected")
 			}
-			printResult = p.scanner.ID() == "true"
+			if key == "print" {
+				printResult = p.scanner.ID() == "true"
+			} else {
+				printProof = p.scanner.ID() == "true"
+			}
 			if err = p.advance(); err != nil {
 				return err
 			}
@@ -91,21 +97,38 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 			return err
 		}
 	}
-	result, err := p.context.Simplify(expression, &settings)
+	result, proof, err := p.context.SimplifyWithProof(expression, &settings, printProof)
 	if err != nil {
 		return err
 	}
-	defer func() { resultErr = errors.Join(resultErr, m.DelRef(&result)) }()
-	if !printResult {
-		return nil
+	defer func() {
+		if proof != (ast.ASTRef{}) {
+			resultErr = errors.Join(resultErr, m.DelRef(&proof))
+		}
+		resultErr = errors.Join(resultErr, m.DelRef(&result))
+	}()
+	if printResult {
+		simplified, e := m.RefGet(result)
+		if e != nil {
+			return e
+		}
+		if e = p.context.WriteExpression(p.out, simplified); e != nil {
+			return e
+		}
+		if _, e = fmt.Fprintln(p.out); e != nil {
+			return e
+		}
 	}
-	simplified, err := m.RefGet(result)
-	if err != nil {
-		return err
+	if printProof {
+		proofExpression, e := m.RefGet(proof)
+		if e != nil {
+			return e
+		}
+		if e = p.context.WriteExpression(p.out, proofExpression); e != nil {
+			return e
+		}
+		_, e = fmt.Fprintln(p.out)
+		return e
 	}
-	if err = p.context.WriteExpression(p.out, simplified); err != nil {
-		return err
-	}
-	_, err = fmt.Fprintln(p.out)
-	return err
+	return nil
 }

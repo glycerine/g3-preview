@@ -20,17 +20,18 @@ func TestSMT2SimplifyCommandEndToEnd(t *testing.T) {
 			t.Error(err)
 		}
 	})
-	script := `(set-logic QF_LIA)
+	script := `(set-option :produce-proofs true)(set-logic QF_LIA)
 (declare-const x Int)(declare-const y Int)
 (simplify (+ 0 (* 1 x) 2 3))
 (simplify (* (+ x y) (+ x y)) :som true)
 (simplify (and true (= (+ 1 2) 3)))
-(simplify (+ x 0) :print false)`
+(simplify (+ x 0) :print false)
+(simplify (+ 1 2) :print-proofs true)`
 	var output bytes.Buffer
 	if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
 		t.Fatal(err, output.String())
 	}
-	want := "(+ 5 x)\n(+ (* x x) (* 2 x y) (* y y))\ntrue\n"
+	want := "(+ 5 x)\n(+ (* x x) (* 2 x y) (* y y))\ntrue\n3\n(rewrite (= (+ 1 2) 3))\n"
 	if output.String() != want {
 		t.Fatal("simplify output", output.String(), "want", want)
 	}

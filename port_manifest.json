@@ -43981,7 +43981,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "simplify_cmd default term rewriting, theory-rewriter parameter validation, som/flat normalization and conditional result printing (simplify_cmd.cpp:30-96,140-153)",
+          "name": "simplify_cmd term and optional rewrite-proof production, theory-rewriter parameter validation, som/flat normalization and conditional result printing (simplify_cmd.cpp:30-109,140-153)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/simplify.go",
           "go_targets": ["pkg/cmd_context/simplify.go"],
@@ -43989,7 +43989,7 @@
         }
       ],
       "ownership": ["Each command owns its local ParamsRef, parameter descriptors and simplified AST reference; the context call owns and closes the temporary TheoryRewriter."],
-      "deviations": ["Proof/statistics printing, timeout/rlimit command wrappers, caught simplifier diagnostics and the lazy sequence-expression solver callback remain unported."]
+      "deviations": ["Statistics printing, timeout/rlimit command wrappers, caught simplifier diagnostics and the lazy sequence-expression solver callback remain unported."]
     },
     {
       "path": "src/cmd_context/simplify_cmd.h",

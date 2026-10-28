@@ -1,3 +1,4 @@
+(set-option :produce-proofs true)
 (set-logic QF_LIA)
 (declare-const x Int)
 (declare-const y Int)
@@ -5,3 +6,4 @@
 (simplify (* (+ x y) (+ x y)) :som true)
 (simplify (and true (= (+ 1 2) 3)))
 (simplify (+ x 0) :print false)
+(simplify (+ 1 2) :print-proofs true)
