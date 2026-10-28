@@ -1,9 +1,12 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.cpp find_macros_core and commit;
 // src/smt/smt_model_generator.cpp register_macros.
-package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/macros"
@@ -154,6 +157,16 @@ func (k *SMTKernel) applyPendingQuasiMacros() (result error) {
 }
 
 func (g *SMTModelGenerator) registerAssertedMacros(manager *macros.Manager) (result error) {
+	count := 0
+	if manager != nil {
+		count = manager.NumMacros()
+	}
+	if err := g.traceModel("model", "register_macros", 512, func() bool { return true }, func(out io.Writer) error {
+		_, traceErr := fmt.Fprintf(out, "num. macros: %d\n", count)
+		return traceErr
+	}); err != nil {
+		return err
+	}
 	if manager == nil || !manager.HasMacros() {
 		return nil
 	}
@@ -169,6 +182,21 @@ func (g *SMTModelGenerator) registerAssertedMacros(manager *macros.Manager) (res
 		}
 		definition, err := g.manager.RefGet(out)
 		if err != nil {
+			return err
+		}
+		if err = g.traceModel("model", "register_macros", 518, func() bool { return true }, func(traceOut io.Writer) error {
+			if traceErr := g.manager.DisplayDeclarationHead(traceOut, declaration); traceErr != nil {
+				return traceErr
+			}
+			if _, traceErr := io.WriteString(traceOut, "\n"); traceErr != nil {
+				return traceErr
+			}
+			if traceErr := g.displayModelExpression(traceOut, definition); traceErr != nil {
+				return traceErr
+			}
+			_, traceErr := io.WriteString(traceOut, "\n")
+			return traceErr
+		}); err != nil {
 			return err
 		}
 		arity, err := g.manager.GetArity(declaration)

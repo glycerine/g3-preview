@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSMTModelGeneratorHonorsDisabledRelevancyForValuesAndFunctions(t *testing.T) {
@@ -164,7 +165,17 @@ func TestSMTModelGeneratorFreshSourcesAndDependencyOrder(t *testing.T) {
 	if first != nodes[0] || second != fresh || third != nodes[1] || fourth != nodes[2] {
 		t.Fatal("dependency order", first, second, third, fourth)
 	}
-	if _, err = generator.MkExtraFreshValue(boolSort); !errors.Is(err, ast.ErrASTDomain) {
+	if smtcoreSourceDebug {
+		debug, _ := newLRASourceAssertionContext(t)
+		astTestMust(t, debug.EnableAssertions(true))
+	}
+	_, err = generator.MkExtraFreshValue(boolSort)
+	if smtcoreSourceDebug {
+		var exception z3exception.DefaultException
+		if !errors.As(err, &exception) || exception.Message() != "assertion violation" {
+			t.Fatal("finite fresh source assertion", err)
+		}
+	} else if !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal("finite fresh placeholder", err)
 	}
 }
@@ -266,6 +277,10 @@ func TestSMTModelGeneratorBuildsAndPinsRootValues(t *testing.T) {
 func TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse(t *testing.T) {
 	for _, enode := range []bool{false, true} {
 		t.Run(fmt.Sprint(enode), func(t *testing.T) {
+			if enode && smtcoreSourceDebug {
+				debug, _ := newLRASourceAssertionContext(t)
+				astTestMust(t, debug.EnableAssertions(true))
+			}
 			m, config := smtModelGeneratorFixture(t)
 			expression := smtRelevancyBool(t, m, "model-unassigned-boolean")
 			context, err := NewSMTCheckerContext(m)
@@ -287,7 +302,8 @@ func TestSMTModelGeneratorUnassignedBooleanCandidateDefaultsToFalse(t *testing.T
 			astTestMust(t, generator.InitializeModel(config))
 			err = generator.BuildStateValues(state)
 			if enode && smtcoreSourceDebug {
-				if !errors.Is(err, ast.ErrASTDomain) {
+				var exception z3exception.DefaultException
+				if !errors.As(err, &exception) || exception.Message() != "assertion violation" {
 					t.Fatal("missing native undefined-enode debug guard", err)
 				}
 				return
