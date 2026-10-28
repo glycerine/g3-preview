@@ -1,7 +1,8 @@
 //go:build g3debug && g3trace
 
-// Source: src/sat/sat_elim_eqs.cpp:205-207.
 package sat
+
+// Source: src/sat/sat_elim_eqs.cpp:205-207.
 
 import (
 	"bytes"

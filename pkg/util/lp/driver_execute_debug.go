@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/test/lp.cpp:3133-3138,3160-3194. Source debug-only branches.
 package lp
+
+// Source: src/test/lp.cpp:3133-3138,3160-3194. Source debug-only branches.
 
 type lpDriverDebug struct {
 	Swaps    *SwapTestDriver

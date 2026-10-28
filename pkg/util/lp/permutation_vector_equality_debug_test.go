@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/lp/lp_settings.hpp:94-103; permutation_matrix.hpp:104,137.
 package lp
+
+// Source: src/util/lp/lp_settings.hpp:94-103; permutation_matrix.hpp:104,137.
 
 import (
 	"fmt"

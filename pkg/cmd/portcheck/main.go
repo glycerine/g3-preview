@@ -52,6 +52,9 @@ func run(root, p string, generate bool) error {
 	if err := portcheck.CheckNoGenerics(goRoot); err != nil {
 		return err
 	}
+	if err := portcheck.CheckPackageComments(goRoot); err != nil {
+		return err
+	}
 	m, err := portcheck.Load(p)
 	if err != nil {
 		return err

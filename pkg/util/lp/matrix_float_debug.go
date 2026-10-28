@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/lp/matrix.hpp:27-72; dense_matrix.hpp:183-197.
 package lp
+
+// Source: src/util/lp/matrix.hpp:27-72; dense_matrix.hpp:183-197.
 
 import "math"
 

@@ -1,8 +1,9 @@
 //go:build g3debug
 
+package lp
+
 // Source: src/test/lp.cpp:626-668,713-720,3133-3138;
 // src/util/lp/sparse_matrix.hpp:66-105.
-package lp
 
 import (
 	"fmt"

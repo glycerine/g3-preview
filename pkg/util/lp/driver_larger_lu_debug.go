@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/test/lp.cpp:182-224,326-369,372-411,456-500.
 package lp
+
+// Source: src/test/lp.cpp:182-224,326-369,372-411,456-500.
 
 import (
 	"io"

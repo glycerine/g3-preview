@@ -1,7 +1,8 @@
 //go:build !g3checked
 
-// Concrete MPFF scalar packing.
 package numeral
+
+// Concrete MPFF scalar packing.
 
 type ffRef uint32
 

@@ -1,7 +1,8 @@
 //go:build g3debug && g3trace
 
-// Source: src/sat/sat_model_converter.cpp:181-183.
 package sat
+
+// Source: src/sat/sat_model_converter.cpp:181-183.
 
 import (
 	"bytes"

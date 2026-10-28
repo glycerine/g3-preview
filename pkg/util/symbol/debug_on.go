@@ -1,6 +1,7 @@
 //go:build g3debug
 
-// Source: src/util/symbol.h:96.
 package symbol
+
+// Source: src/util/symbol.h:96.
 
 const sourceDebug = true

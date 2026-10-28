@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/lp/matrix.hpp:75-129; lu.hpp:48-83; lp_settings.h:377-379.
 package lp
+
+// Source: src/util/lp/matrix.hpp:75-129; lu.hpp:48-83; lp_settings.h:377-379.
 
 import "io"
 

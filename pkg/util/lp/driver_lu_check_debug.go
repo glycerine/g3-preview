@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/test/lp.cpp:2656-2665; lp_settings.hpp:94-123.
 package lp
+
+// Source: src/test/lp.cpp:2656-2665; lp_settings.hpp:94-123.
 
 import "math"
 

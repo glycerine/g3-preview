@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/test/lp.cpp:182-224,226-324, retained --test_small_lu.
 package lp
+
+// Source: src/test/lp.cpp:182-224,226-324, retained --test_small_lu.
 
 import (
 	"fmt"

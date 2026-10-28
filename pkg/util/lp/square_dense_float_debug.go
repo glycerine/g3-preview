@@ -1,8 +1,9 @@
 //go:build g3debug
 
+package lp
+
 // Source: src/util/lp/square_dense_submatrix.h:222-227;
 // src/util/lp/square_dense_submatrix.hpp:354-363.
-package lp
 
 func (m *FloatSquareDenseSubmatrix) RowCount() uint32    { return m.Parent.Dimension() }
 func (m *FloatSquareDenseSubmatrix) ColumnCount() uint32 { return m.RowCount() }

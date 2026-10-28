@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/test/lp.cpp:413-453, retained test_larger_lu_with_holes.
 package lp
+
+// Source: src/test/lp.cpp:413-453, retained test_larger_lu_with_holes.
 
 import "io"
 

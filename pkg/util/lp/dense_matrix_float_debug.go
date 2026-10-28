@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/lp/dense_matrix.h/.hpp; retained double/double debug consumers.
 package lp
+
+// Source: src/util/lp/dense_matrix.h/.hpp; retained double/double debug consumers.
 
 // FloatDebugMatrix is the concrete double-valued source debug matrix interface.
 // Existing static, permutation, eta and square-dense matrices implement it.

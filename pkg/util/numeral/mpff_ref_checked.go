@@ -1,7 +1,8 @@
 //go:build g3checked
 
-// Checked generation adaptation.
 package numeral
+
+// Checked generation adaptation.
 
 type ffRef uint64
 

@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/mpz.cpp selected Lehmer and ExtendedGCD SASSERT sites.
 package numeral
+
+// Source: src/util/mpz.cpp selected Lehmer and ExtendedGCD SASSERT sites.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

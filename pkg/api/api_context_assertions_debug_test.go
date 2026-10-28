@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/api/api_context.cpp:39,216; src/util/debug.h:63.
 package api
+
+// Source: src/api/api_context.cpp:39,216; src/util/debug.h:63.
 
 import (
 	"errors"

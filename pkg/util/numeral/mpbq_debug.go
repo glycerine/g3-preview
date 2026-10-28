@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source MPBQ_DEBUG rational actions.
 package numeral
+
+// Source MPBQ_DEBUG rational actions.
 
 func (m *BinaryRationalManager) debugSelected(l, u, r *BinaryRational) error {
 	yes, e := m.LessEqual(l, r)

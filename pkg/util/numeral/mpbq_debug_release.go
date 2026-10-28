@@ -1,7 +1,8 @@
 //go:build !g3debug
 
-// Source MPBQ_DEBUG absent.
 package numeral
+
+// Source MPBQ_DEBUG absent.
 
 func (m *BinaryRationalManager) debugSelected(l, u, r *BinaryRational) error { return nil }
 func (m *BinaryRationalManager) debugEnclosure(qm *RationalManager, q *Rational, l, u *BinaryRational) error {

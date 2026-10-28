@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/lp/lu.hpp:640-686,947-958; sparse_matrix.h debug matrix view.
 package lp
+
+// Source: src/util/lp/lu.hpp:640-686,947-958; sparse_matrix.h debug matrix view.
 
 func (m *FloatSparseMatrix) RowCount() uint32                     { return m.Dimension() }
 func (m *FloatSparseMatrix) ColumnCount() uint32                  { return m.Dimension() }

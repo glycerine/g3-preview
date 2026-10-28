@@ -1,7 +1,8 @@
 //go:build g3checked && g3debug
 
-// Source: src/util/mpf.cpp:1519-1569; src/ast/fpa_decl_plugin.cpp.
 package ast
+
+// Source: src/util/mpf.cpp:1519-1569; src/ast/fpa_decl_plugin.cpp.
 
 import (
 	"errors"

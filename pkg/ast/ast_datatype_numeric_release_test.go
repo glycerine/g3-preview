@@ -1,7 +1,8 @@
 //go:build g3checked && g3debug
 
-// Source: datatype::decl::plugin::finalize and datatype::util::~util.
 package ast
+
+// Source: datatype::decl::plugin::finalize and datatype::util::~util.
 
 import (
 	"errors"

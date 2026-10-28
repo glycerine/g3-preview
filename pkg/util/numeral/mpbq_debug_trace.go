@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/mpbq.cpp:167,195, reached only with MPBQ_DEBUG.
 package numeral
+
+// Source: src/util/mpbq.cpp:167,195, reached only with MPBQ_DEBUG.
 
 import (
 	"io"

@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/lp/lu.h:66-82; src/util/lp/lu.hpp:96-108.
 package lp
+
+// Source: src/util/lp/lu.h:66-82; src/util/lp/lu.hpp:96-108.
 
 func (m *FloatDiagonalMatrix) SetDimension(n uint32) { m.length = n }
 func (m *FloatDiagonalMatrix) RowCount() uint32      { return m.length }

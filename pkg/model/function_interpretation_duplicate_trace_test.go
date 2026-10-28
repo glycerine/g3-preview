@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/model/func_interp.cpp:200-216; src/util/trace.h:40-46.
 package model_test
+
+// Source: src/model/func_interp.cpp:200-216; src/util/trace.h:40-46.
 
 import (
 	"errors"

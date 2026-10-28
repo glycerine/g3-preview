@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/test/lp.cpp:503-508, retained test_lu parent sequence.
 package lp
+
+// Source: src/test/lp.cpp:503-508, retained test_lu parent sequence.
 
 import (
 	"io"

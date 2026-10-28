@@ -1,7 +1,8 @@
 //go:build linux
 
-// Source: src/util/debug.cpp:88-107.
 package diagnostic
+
+// Source: src/util/debug.cpp:88-107.
 
 import (
 	"os/exec"

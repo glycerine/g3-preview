@@ -1,9 +1,10 @@
 //go:build g3debug
 
+package numeral
+
 // Source: src/util/inf_eps_rational.h:121-128;
 // src/util/inf_rational.h:125-165; src/util/inf_int_rational.h:112-152;
 // src/util/debug.h:63.
-package numeral
 
 import (
 	"errors"

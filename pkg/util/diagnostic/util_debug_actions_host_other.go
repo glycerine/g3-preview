@@ -1,7 +1,8 @@
 //go:build !linux
 
-// Source: src/util/debug.cpp:72-118; src/util/debug.h:42-56.
 package diagnostic
+
+// Source: src/util/debug.cpp:72-118; src/util/debug.h:42-56.
 
 const debugHostLinux = false
 

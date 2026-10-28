@@ -1,7 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/mpz.cpp extended gcd Z3DEBUG diagnostic.
 package numeral
+
+// Source: src/util/mpz.cpp extended gcd Z3DEBUG diagnostic.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 
