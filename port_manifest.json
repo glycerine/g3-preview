@@ -5994,14 +5994,24 @@
       "path": "src/api/api_tactic.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/api/api_solver.go"],
+      "tests": ["TestSMTContextCheckSatUsingPublishesTacticModel"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained named tactic construction and application to the current assertion goal, with model/result publication; standalone public goal transformation, probes, combinators, and tactic metadata remain open",
+          "status": "partial",
+          "go_target": "pkg/api/api_solver.go",
+          "go_targets": ["pkg/cmd_context/tactic_commands.go"],
+          "tests": ["TestSMTContextCheckSatUsingPublishesTacticModel"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The initial Go API exposes retained built-in tactics by name as an owning SMTContext check operation; it does not reproduce opaque C tactic handles."
+      ]
     },
     {
       "path": "src/api/api_tactic.h",

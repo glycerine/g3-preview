@@ -209,6 +209,34 @@ func TestSMTContextOptimizationObjectivesAndSoftConstraints(t *testing.T) {
 	})
 }
 
+func TestSMTContextCheckSatUsingPublishesTacticModel(t *testing.T) {
+	f := newSMTAPIFixture(t, "QF_LIA", nil)
+	x := f.arithmeticVariable("api-tactic-x", true)
+	four := f.pin(f.m.ArithmeticIntegerNumeralText("4"))
+	equality := f.pin(f.m.MkEq(x, four))
+	astTestMust(t, f.c.Assert(equality))
+	status, err := f.c.CheckSatUsing("qflia")
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("tactic status", status)
+	}
+	md, err := f.c.Model()
+	astTestMust(t, err)
+	declaration, err := f.m.GetDecl(x)
+	astTestMust(t, err)
+	value, err := md.ConstantInterpretation(declaration)
+	astTestMust(t, err)
+	text, integer, matched, err := f.m.ArithmeticNumeralText(value)
+	astTestMust(t, err)
+	if !matched || !integer || text != "4" {
+		t.Fatal("tactic model value", text, integer, matched)
+	}
+	astTestMust(t, md.DecRef())
+	if _, err = f.c.CheckSatUsing("not-a-retained-tactic"); err == nil {
+		t.Fatal("unknown tactic accepted")
+	}
+}
+
 func TestSMTContextUnsatCoreAndProofResults(t *testing.T) {
 	t.Run("core", func(t *testing.T) {
 		f := newSMTAPIFixture(t, "QF_UF", func(c *SMTContext) {

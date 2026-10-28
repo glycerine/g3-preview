@@ -173,6 +173,24 @@ func (c *SMTContext) CheckSat(assumptions ...ast.ASTHandle) (lbool.LBool, error)
 	return c.command.CheckSat(assumptions)
 }
 
+// CheckSatUsing checks the current assertions with a retained built-in tactic.
+// The tactic is local to this call; its model, proof, core, reason, and
+// statistics are published as the context's latest result.
+func (c *SMTContext) CheckSatUsing(name string) (status lbool.LBool, resultErr error) {
+	if err := c.open(); err != nil {
+		return lbool.Undef, err
+	}
+	selected, err := c.command.NewBuiltinTactic(name)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if err = selected.IncRef(); err != nil {
+		return lbool.Undef, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, selected.DecRef()) }()
+	return c.command.CheckSatUsing(selected, nil)
+}
+
 // Model returns one owning reference. The caller must call DecRef.
 func (c *SMTContext) Model() (*model.ModelCore, error) {
 	if err := c.open(); err != nil {
