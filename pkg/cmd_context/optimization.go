@@ -338,8 +338,16 @@ func (c *Context) checkOptimize(assumptions []ast.ASTHandle, continuation bool) 
 		return lbool.Undef, err
 	}
 	var optimized *opt.ArithmeticResult
+	if priority != "pareto" {
+		if err = c.closeParetoBackend(); err != nil {
+			return lbool.Undef, err
+		}
+	}
 	if priority == "box" {
 		optimized, err = c.checkOptimizeBox(assumptions, continuation)
+	} else if priority == "pareto" {
+		c.optimizationBoxActive = false
+		optimized, err = c.checkOptimizePareto(assumptions, continuation)
 	} else {
 		c.optimizationBoxActive = false
 		optimized, err = c.checkOptimizeLex(assumptions)

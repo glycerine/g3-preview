@@ -5,6 +5,7 @@ package smt2
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -278,5 +279,46 @@ func TestSMT2BoxOptimizationEndToEnd(t *testing.T) {
 	want := "sat (objectives (x 5) (y 5) ) ((x 5) (y 0)) sat (objectives (x 5) (y 5) ) ((x 0) (y 5)) unsat"
 	if got := strings.Join(strings.Fields(output.String()), " "); got != want {
 		t.Fatal("box optimization output", got, "want", want)
+	}
+}
+
+func TestSMT2ParetoOptimizationEndToEnd(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	var script strings.Builder
+	script.WriteString(`(set-option :produce-models true)(set-option :opt.priority pareto)
+(set-logic QF_LIA)(declare-const x Int)(declare-const y Int)
+(assert (and (>= x 0) (>= y 0) (= (+ x y) 5)))
+(maximize x)(maximize y)`)
+	for i := 0; i < 6; i++ {
+		script.WriteString(`(check-sat)(get-value (x y))`)
+	}
+	script.WriteString(`(check-sat)`)
+	var output bytes.Buffer
+	if err = ParseCommands(context, strings.NewReader(script.String()), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	got := strings.Join(strings.Fields(output.String()), " ")
+	satCount := 0
+	for _, field := range strings.Fields(output.String()) {
+		if field == "sat" {
+			satCount++
+		}
+	}
+	if satCount != 6 || !strings.HasSuffix(got, "unsat") {
+		t.Fatal("Pareto status sequence", got)
+	}
+	for x := 0; x <= 5; x++ {
+		point := "((x " + fmt.Sprint(x) + ") (y " + fmt.Sprint(5-x) + "))"
+		if strings.Count(got, point) != 1 {
+			t.Fatal("Pareto frontier point", point, got)
+		}
 	}
 }

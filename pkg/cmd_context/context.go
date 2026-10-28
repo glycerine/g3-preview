@@ -88,6 +88,8 @@ type Context struct {
 	softObjectiveTrail               []int
 	optimizationBoxNext              int
 	optimizationBoxActive            bool
+	optimizationParetoActive         bool
+	optimizationParetoBackend        *smtcore.SMTSolver
 	scopes                           []scope
 	PrintSuccess, GlobalDeclarations bool
 	checked                          bool
@@ -840,6 +842,9 @@ func (c *Context) resetManagerState() error {
 	var construction *portfolio.FDConstructionFailure
 	if errors.As(c.initializationError, &construction) && construction.CleanupPending() {
 		return construction
+	}
+	if err := c.closeParetoBackend(); err != nil {
+		return err
 	}
 	if err := c.clearCheckSatResult(); err != nil {
 		return err
