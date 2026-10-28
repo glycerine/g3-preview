@@ -137471,6 +137471,7 @@
         "pkg/smtcore/theory_arith_nested.go",
         "pkg/smtcore/theory_arith_nested_test.go",
         "pkg/smtcore/theory_arith_nested_mixed_test.go",
+        "pkg/cmd/g3/test_vectors/nested_rational_high_degree.smt2",
         "pkg/smtcore/theory_arith_grobner_order.go",
         "pkg/smtcore/theory_arith_cluster.go",
         "pkg/smtcore/theory_arith_cluster_test.go",
@@ -137932,11 +137933,12 @@
           ]
         },
         {
-          "name": "get_polynomial_info, p2expr, degree/factor, horner, cross_nested and interval consistency for active nonlinear comparison polynomials: most-frequent variable nesting, two-term completing-square rule, integer coefficient normalization and sort guards",
-          "status": "partial",
+          "name": "get_polynomial_info, p2expr, degree/factor, horner, cross_nested and interval consistency for active nonlinear comparison polynomials: most-frequent variable nesting, two-term completing-square rule, integer coefficient normalization, rational-coefficient multivariate and high-degree forms, sort guards and scope recovery",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_arith_nested.go",
           "go_targets": [
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/nested_rational_high_degree.smt2"
           ],
           "tests": [
             "TestSMTCrossNestedArithmeticScopedProofs",

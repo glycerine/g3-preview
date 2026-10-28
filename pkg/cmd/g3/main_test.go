@@ -770,6 +770,7 @@ var scriptResults = map[string]string{
 	"nonlinear_completed_square.smt2":              "unsat\n",
 	"nonlinear_nested_multivariate.smt2":           "unsat\nsat\n",
 	"nonlinear_nested_integer.smt2":                "unsat\n",
+	"nested_rational_high_degree.smt2":             "unsat\nunsat\nsat\n((x 1.0)\n (y 2.0)\n ((+ (* (/ 1 2) x x y) (* (- 1) x y) (* (/ 3 2) y)) 2.0))\n",
 	"linearized_product_real_scopes.smt2":          "sat\n((y 1.0))\nsat\n((y (/ 1.0 2.0)))\nsat\n((y (- 1.0)))\n",
 	"linearized_product_integer_scopes.smt2":       "unsat\nsat\n((y 1))\n",
 	"nonlinear_integer_factor_scopes.smt2":         "unsat\nsat\n",
