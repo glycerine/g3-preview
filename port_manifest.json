@@ -127611,7 +127611,7 @@
       "path": "src/smt/smt_model_checker.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_model_checker.go",
         "pkg/smtcore/smt_quantifier_manager.go",
@@ -127725,12 +127725,17 @@
         },
         {
           "name": "auxiliary-context and model-finder integration surface",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_model_checker.go",
           "tests": [
             "TestSMTSolverMBQIFindsPatternlessBooleanCounterexample",
             "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
-            "TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples"
+            "TestSMTSolverMBQIBlocksAndCollectsMultipleIntegerCounterexamples",
+            "TestSMTModelCheckerAuxiliarySnapshotAndConcretePlugins",
+            "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
+            "TestSMTModelCheckerAuxiliaryAllocationFrontiers",
+            "TestSMTModelCheckerFiniteSkolemUniverseAndScopeRecovery",
+            "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse"
           ]
         },
         {
