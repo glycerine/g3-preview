@@ -44,6 +44,27 @@ func (c *Context) WriteValues(out io.Writer, expressions []ast.ASTHandle) (resul
 	return c.WriteValuesWithText(out, expressions, nil)
 }
 
+// Evaluate evaluates an expression in the latest model and returns one owning
+// AST reference. The caller must release it through Manager.DelRef.
+func (c *Context) Evaluate(expression ast.ASTHandle, completion bool) (result ast.ASTRef, resultErr error) {
+	md, err := c.Model()
+	if err != nil {
+		return result, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, md.DecRef()) }()
+	evaluator, err := model.NewModelEvaluator(md, c.config.ModelEvaluator)
+	if evaluator != nil {
+		defer func() { resultErr = errors.Join(resultErr, evaluator.Close()) }()
+	}
+	if err != nil {
+		return result, err
+	}
+	if err = evaluator.SetModelCompletion(completion); err != nil {
+		return result, err
+	}
+	return evaluator.EvaluateValue(expression)
+}
+
 func (c *Context) WriteAssertions(out io.Writer) error {
 	if err := c.valid(); err != nil {
 		return err

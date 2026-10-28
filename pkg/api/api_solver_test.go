@@ -237,6 +237,34 @@ func TestSMTContextCheckSatUsingPublishesTacticModel(t *testing.T) {
 	}
 }
 
+func TestSMTContextEvaluateReturnsOwningValue(t *testing.T) {
+	f := newSMTAPIFixture(t, "QF_LIA", nil)
+	x := f.arithmeticVariable("api-eval-x", true)
+	four := f.pin(f.m.ArithmeticIntegerNumeralText("4"))
+	one := f.pin(f.m.ArithmeticIntegerNumeralText("1"))
+	equality := f.pin(f.m.MkEq(x, four))
+	sum := f.pin(f.m.MkArithmeticAdd(x, one))
+	if _, err := f.c.Evaluate(sum, false); err == nil {
+		t.Fatal("evaluation accepted before a model was available")
+	}
+	astTestMust(t, f.c.Assert(equality))
+	status, err := f.c.CheckSat()
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("evaluation status", status)
+	}
+	value, err := f.c.Evaluate(sum, false)
+	astTestMust(t, err)
+	defer func() { astTestMust(t, f.m.DelRef(&value)) }()
+	handle, err := f.m.RefGet(value)
+	astTestMust(t, err)
+	text, integer, matched, err := f.m.ArithmeticNumeralText(handle)
+	astTestMust(t, err)
+	if !matched || !integer || text != "5" {
+		t.Fatal("evaluated value", text, integer, matched)
+	}
+}
+
 func TestSMTContextUnsatCoreAndProofResults(t *testing.T) {
 	t.Run("core", func(t *testing.T) {
 		f := newSMTAPIFixture(t, "QF_UF", func(c *SMTContext) {

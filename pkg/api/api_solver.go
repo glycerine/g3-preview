@@ -199,6 +199,15 @@ func (c *SMTContext) Model() (*model.ModelCore, error) {
 	return c.command.Model()
 }
 
+// Evaluate evaluates an expression in the latest model and returns one owning
+// AST reference. The caller must release it through Manager.DelRef.
+func (c *SMTContext) Evaluate(expression ast.ASTHandle, completion bool) (ast.ASTRef, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	return c.command.Evaluate(expression, completion)
+}
+
 // UnsatCore returns borrowed tracked labels from the most recent result.
 func (c *SMTContext) UnsatCore() ([]ast.ASTHandle, error) {
 	if err := c.open(); err != nil {

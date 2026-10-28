@@ -5644,14 +5644,24 @@
       "path": "src/api/api_model.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/api/api_solver.go"],
+      "tests": ["TestSMTContextEvaluateReturnsOwningValue"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Z3_model_eval retained expression evaluation with optional model completion (api_model.cpp:160-174); model enumeration and interpretation mutation remain open",
+          "status": "partial",
+          "go_target": "pkg/api/api_solver.go",
+          "go_targets": ["pkg/cmd_context/results.go"],
+          "tests": ["TestSMTContextEvaluateReturnsOwningValue"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "SMTContext.Evaluate borrows the latest published model and returns an explicit owning ASTRef instead of saving the result on an opaque C context trail."
+      ]
     },
     {
       "path": "src/api/api_model.h",
