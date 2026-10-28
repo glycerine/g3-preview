@@ -38,6 +38,7 @@ type PropositionalEngine struct {
 	guard      *astrewriter.TheoryRewriter
 	scopes     []*base.RuleSet
 	predicates map[ast.ASTHandle]*predicateState
+	compiled   bool
 	queried    bool
 	closed     bool
 }
@@ -929,6 +930,61 @@ func (e *PropositionalEngine) saturate() error {
 	return nil
 }
 
+func (e *PropositionalEngine) tryCompiledSaturation() (used bool, resultErr error) {
+	execution, termination, err := rel.CompileFiniteRules(e.relations, e.set)
+	if errors.Is(err, rel.ErrCompilerUnsupported) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	context, err := rel.NewExecutionContextWithRelations(e.relations, nil)
+	if err != nil {
+		return true, errors.Join(err, execution.Close(), termination.Close())
+	}
+	defer func() {
+		resultErr = errors.Join(resultErr, execution.Close(), termination.Close(), context.Close())
+	}()
+	for _, state := range e.predicates {
+		if err = state.table.Reset(); err != nil {
+			return true, err
+		}
+	}
+	complete, err := execution.Perform(context)
+	if err != nil {
+		return true, err
+	}
+	terminated, terminationErr := termination.Perform(context)
+	if terminationErr != nil {
+		return true, terminationErr
+	}
+	if !complete || !terminated {
+		return true, ErrPropositionalEngine
+	}
+	if err = execution.ProcessAllCosts(); err != nil {
+		return true, err
+	}
+	for declaration, state := range e.predicates {
+		table, found, x := e.relations.TryGetRelation(declaration)
+		if x != nil {
+			return true, x
+		}
+		if found {
+			state.table = table
+		}
+	}
+	return true, nil
+}
+
+// LastQueryUsedCompiledCode reports whether the most recent query ran the
+// relational instruction compiler instead of the direct finite evaluator.
+func (e *PropositionalEngine) LastQueryUsedCompiledCode() (bool, error) {
+	if err := e.open(); err != nil {
+		return false, err
+	}
+	return e.compiled, nil
+}
+
 // QueryPredicate returns true exactly when the registered predicate relation
 // contains at least one tuple after positive Horn saturation.
 func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.LBool, error) {
@@ -956,7 +1012,14 @@ func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.L
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
 	}
-	if err = e.saturate(); err != nil {
+	e.compiled, err = e.tryCompiledSaturation()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if !e.compiled {
+		err = e.saturate()
+	}
+	if err != nil {
 		return lbool.Undef, err
 	}
 	count, err := state.table.Len()

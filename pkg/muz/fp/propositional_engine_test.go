@@ -82,6 +82,11 @@ func TestPropositionalEngineMatchesCPPFixedpointQueries(t *testing.T) {
 	got := make([]lbool.LBool, 2)
 	got[0], err = engine.Query(applications["R"])
 	fpMust(t, err)
+	compiled, err := engine.LastQueryUsedCompiledCode()
+	fpMust(t, err)
+	if !compiled {
+		t.Fatal("ground and identity Horn program bypassed relational bytecode")
+	}
 	got[1], err = engine.Query(applications["U"])
 	fpMust(t, err)
 
@@ -140,6 +145,11 @@ func TestPropositionalEngineExecutesStratifiedNegation(t *testing.T) {
 	fpMust(t, err)
 	if status != lbool.True {
 		t.Fatal("stratified negative Horn rule was not derived", status)
+	}
+	compiled, err := engine.LastQueryUsedCompiledCode()
+	fpMust(t, err)
+	if compiled {
+		t.Fatal("unsupported negated rule was partially compiled")
 	}
 }
 
