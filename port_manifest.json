@@ -80697,9 +80697,9 @@
       "path": "src/muz/base/dl_context.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/base/hnf.go", "pkg/muz/dataflow/reachability.go"],
+      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"],
       "assertions": [
         {
           "line": 82,
@@ -80764,17 +80764,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Narrow exact register_predicate/add_rule/close-reopen/query orchestration for positive zero-arity Horn programs, including HNF ingestion, stratification finalization, and lbool reachability results (dl_context.cpp:344-361,456-469,680-738,861-889)",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"]
+        }
+      ],
+      "ownership": [
+        "PropositionalEngine owns its RuleManager and RuleSet, borrows the AST manager, reopens derived rule state before mutation, and releases the set before the manager."
+      ],
+      "deviations": [
+        "This is an explicitly bounded integration slice, not the general dl_context: only registered zero-arity Boolean predicates and positive predicate-only Horn tails execute. Finite domains, facts tables, parameters, transformations, answers/models/proofs, push/pop, and general engine selection remain open."
+      ]
     },
     {
       "path": "src/muz/base/dl_context.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/fp/propositional_engine.go"],
+      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"],
       "conditionals": [
         {
           "line": 19,
@@ -80795,9 +80806,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained positive-propositional subset of context predicate registration, rule addition, query, and owned lifecycle surface (dl_context.h:127-616)",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"]
+        }
+      ],
+      "ownership": [
+        "The narrow Go engine is a single explicit owner rather than exposing the full native context aggregate before its remaining members exist."
+      ],
+      "deviations": [
+        "The complete context public surface and general relational/fixedpoint state remain unported."
+      ]
     },
     {
       "path": "src/muz/base/dl_costs.cpp",
@@ -80861,9 +80883,9 @@
       "path": "src/muz/base/dl_engine_base.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/fp/propositional_engine.go"],
+      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"],
       "conditionals": [
         {
           "line": 19,
@@ -80876,9 +80898,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete query and cleanup contract for the first exact positive-propositional fixedpoint engine slice (dl_engine_base.h:40-114)",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"]
+        }
+      ],
+      "ownership": [
+        "PropositionalEngine.Close is idempotent and releases all engine-owned rule state; query inputs and the AST manager are borrowed."
+      ],
+      "deviations": [
+        "The general engine interface, engine enumeration/factory, answers, models, proofs, statistics, levels, covers, cancellation, and non-propositional engines remain open."
+      ]
     },
     {
       "path": "src/muz/base/dl_rule.cpp",

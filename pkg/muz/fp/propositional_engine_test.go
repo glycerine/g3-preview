@@ -1,0 +1,151 @@
+package fp_test
+
+// Source: src/muz/base/dl_context.cpp query orchestration and the native
+// fixedpoint Datalog result for the positive propositional Horn fragment.
+
+import (
+	"errors"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/cmd_context"
+	_ "github.com/glycerine/g3/pkg/engine"
+	"github.com/glycerine/g3/pkg/muz/fp"
+	"github.com/glycerine/g3/pkg/util/lbool"
+)
+
+func fpMust(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func fpReference(t *testing.T, script string) []string {
+	t.Helper()
+	path := os.Getenv("G3_CPP_REFERENCE")
+	if path == "" {
+		var err error
+		path, err = filepath.Abs("../../../build/z3")
+		fpMust(t, err)
+	}
+	if _, err := os.Stat(path); err != nil {
+		t.Skip("C++ reference executable unavailable:", err)
+	}
+	command := exec.Command(path, "-in")
+	command.Stdin = strings.NewReader(script)
+	output, err := command.CombinedOutput()
+	if err != nil {
+		t.Fatal(err, string(output))
+	}
+	return strings.Fields(string(output))
+}
+
+func TestPropositionalEngineMatchesCPPFixedpointQueries(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngine(manager)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	declarations := make(map[string]ast.ASTHandle)
+	applications := make(map[string]ast.ASTHandle)
+	for _, name := range []string{"P", "Q", "R", "U"} {
+		symbol, e := manager.Symbols.Intern("fp-" + name)
+		fpMust(t, e)
+		declarations[name], e = manager.MkFuncDecl(symbol, nil, boolean, ast.ASTFuncDeclInfo{})
+		fpMust(t, e)
+		applications[name], e = manager.MkApp(declarations[name], nil)
+		fpMust(t, e)
+		fpMust(t, engine.RegisterPredicate(declarations[name]))
+	}
+	add := func(formula ast.ASTHandle, name string) {
+		t.Helper()
+		reference, e := manager.NewRef(formula)
+		fpMust(t, e)
+		t.Cleanup(func() { fpMust(t, manager.DelRef(&reference)) })
+		fpMust(t, engine.AddRule(formula, name))
+	}
+	add(applications["P"], "fact-P")
+	for _, edge := range []struct{ from, to string }{{"P", "Q"}, {"Q", "R"}} {
+		formula, e := manager.MkImplies(applications[edge.from], applications[edge.to])
+		fpMust(t, e)
+		add(formula, edge.from+"-"+edge.to)
+	}
+	got := make([]lbool.LBool, 2)
+	got[0], err = engine.Query(applications["R"])
+	fpMust(t, err)
+	got[1], err = engine.Query(applications["U"])
+	fpMust(t, err)
+
+	cpp := fpReference(t, `(set-option :fixedpoint.engine datalog)
+(declare-rel P ())
+(declare-rel Q ())
+(declare-rel R ())
+(declare-rel U ())
+(rule P)
+(rule (=> P Q))
+(rule (=> Q R))
+(query R :print-answer false)
+(query U :print-answer false)
+`)
+	if len(cpp) != 2 {
+		t.Fatal("C++ fixedpoint output", cpp)
+	}
+	want := map[lbool.LBool]string{lbool.True: "sat", lbool.False: "unsat"}
+	for i := range got {
+		if cpp[i] != want[got[i]] {
+			t.Fatal("fixedpoint differential", i, got[i], cpp[i])
+		}
+	}
+}
+
+func TestPropositionalEngineRefusesRicherHornFragments(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngine(manager)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	unaryName, err := manager.Symbols.Intern("fp-unary")
+	fpMust(t, err)
+	unary, err := manager.MkFuncDecl(unaryName, []ast.ASTHandle{boolean}, boolean, ast.ASTFuncDeclInfo{})
+	fpMust(t, err)
+	if err = engine.RegisterPredicate(unary); !errors.Is(err, fp.ErrPropositionalHorn) {
+		t.Fatal("nonzero-arity predicate accepted", err)
+	}
+	applications := make(map[string]ast.ASTHandle)
+	for _, name := range []string{"P", "Q"} {
+		symbol, e := manager.Symbols.Intern("fp-refuse-" + name)
+		fpMust(t, e)
+		declaration, e := manager.MkFuncDecl(symbol, nil, boolean, ast.ASTFuncDeclInfo{})
+		fpMust(t, e)
+		applications[name], e = manager.MkApp(declaration, nil)
+		fpMust(t, e)
+		fpMust(t, engine.RegisterPredicate(declaration))
+	}
+	negated, err := manager.MkNot(applications["P"])
+	fpMust(t, err)
+	formula, err := manager.MkImplies(negated, applications["Q"])
+	fpMust(t, err)
+	formulaRef, err := manager.NewRef(formula)
+	fpMust(t, err)
+	defer func() { fpMust(t, manager.DelRef(&formulaRef)) }()
+	fpMust(t, engine.AddRule(formula, "negative"))
+	_, err = engine.Query(applications["Q"])
+	if !errors.Is(err, fp.ErrPropositionalHorn) {
+		t.Fatal("negative Horn rule accepted", err)
+	}
+}
