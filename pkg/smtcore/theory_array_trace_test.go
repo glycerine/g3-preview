@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"strings"
 	"testing"
@@ -335,5 +336,35 @@ func TestSMTFullArrayConstructorSourceTraces(t *testing.T) {
 		if !strings.Contains(trace, want) {
 			t.Fatalf("missing source full-array trace %q in %q", want, trace)
 		}
+	}
+}
+
+func TestSMTFullArraySourceShapeGuards(t *testing.T) {
+	manager := astTestManager(t)
+	family, err := manager.RegisterArrayPlugin()
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, manager, nil)
+	theory, err := NewSMTArrayTheory(family)
+	astTestMust(t, err)
+	astTestMust(t, state.RegisterTheory(theory))
+	boolean, err := manager.MkBoolSort()
+	astTestMust(t, err)
+	arraySort, err := manager.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+	astTestMust(t, err)
+	value, err := manager.MkTrue()
+	astTestMust(t, err)
+	constant, err := manager.MkConstArray(arraySort, value)
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(constant, false))
+	node := state.context.enodes[constant]
+	variable := node.TheoryVar(family)
+	if err = theory.addParentMap(variable, node); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("non-map parent accepted", err)
+	}
+	if err = theory.setMapInputsUpward(node); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("non-map upward constructor accepted", err)
+	}
+	if _, err = theory.instantiateConstructorRead(constant, constant); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("non-select observer accepted", err)
 	}
 }

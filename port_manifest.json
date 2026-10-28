@@ -139741,7 +139741,7 @@
       "path": "src/smt/theory_array_full.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array_as_array_triggers_test.go",
         "pkg/cmd/g3/test_vectors/array_as_array_direct_core_scopes.smt2",
@@ -140227,9 +140227,30 @@
           ]
         },
         {
-          "name": "Remaining final retained-consumer/source audit of array algorithms and model integration",
-          "status": "unported",
-          "tests": []
+          "name": "final full-array retained-source audit: constructor/observer shapes, map arity, private-class trails, epsilon ownership, default/read fingerprints, model integration and all live SASSERT boundaries",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_full_axioms.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_default_values.go",
+            "pkg/smtcore/theory_array_full_defaults.go",
+            "pkg/smtcore/theory_array_full_parents.go",
+            "pkg/smtcore/theory_array_model.go",
+            "pkg/smtcore/theory_array_constructor_merge_test.go",
+            "pkg/smtcore/theory_array_epsilon_test.go",
+            "pkg/smtcore/theory_array_full_axioms_test.go",
+            "pkg/smtcore/theory_array_full_defaults_test.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTFullArraySourceShapeGuards",
+            "TestSMTFullArrayConstructorSourceTraces",
+            "TestSMTFullArrayCanonicalConstructorReadAxioms",
+            "TestSMTFullArrayCanonicalConstructorDefaultAxioms",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
+            "TestSMTFullArrayEpsilonCacheOwnsValuesAcrossTemporaryReferences"
+          ]
         },
         {
           "name": "map, const and as-array select axioms including propagation through equal arrays",
@@ -140270,7 +140291,7 @@
       "path": "src/smt/theory_array_full.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array_as_array_triggers_test.go",
         "pkg/cmd/g3/test_vectors/array_as_array_direct_core_scopes.smt2",
@@ -140601,9 +140622,30 @@
           ]
         },
         {
-          "name": "Remaining final retained-consumer/source audit of array algorithms and model integration",
-          "status": "unported",
-          "tests": []
+          "name": "final full-array retained-source audit: constructor/observer shapes, map arity, private-class trails, epsilon ownership, default/read fingerprints, model integration and all live SASSERT boundaries",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_full_axioms.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_default_values.go",
+            "pkg/smtcore/theory_array_full_defaults.go",
+            "pkg/smtcore/theory_array_full_parents.go",
+            "pkg/smtcore/theory_array_model.go",
+            "pkg/smtcore/theory_array_constructor_merge_test.go",
+            "pkg/smtcore/theory_array_epsilon_test.go",
+            "pkg/smtcore/theory_array_full_axioms_test.go",
+            "pkg/smtcore/theory_array_full_defaults_test.go",
+            "pkg/smtcore/theory_array_model_test.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTFullArraySourceShapeGuards",
+            "TestSMTFullArrayConstructorSourceTraces",
+            "TestSMTFullArrayCanonicalConstructorReadAxioms",
+            "TestSMTFullArrayCanonicalConstructorDefaultAxioms",
+            "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
+            "TestSMTArrayConstructorMergesMarkClassUpwardAndRollback",
+            "TestSMTFullArrayEpsilonCacheOwnsValuesAcrossTemporaryReferences"
+          ]
         },
         {
           "name": "complete retained full-array internalization, constructor axiom and scoped metadata interface",

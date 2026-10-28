@@ -68,8 +68,22 @@ func (t *SMTArrayTheory) instantiateConstructorRead(observer, constructor ast.AS
 	if read == nil || len(read.arguments) < 2 {
 		return false, ast.ErrASTDomain
 	}
+	readOp, readArray, err := t.arrayOperation(observer)
+	if err != nil || !readArray || readOp != ast.ASTArrayOpSelect {
+		if err != nil {
+			return false, err
+		}
+		return false, ast.ErrASTDomain
+	}
 	constructorNode := s.context.enodes[constructor]
 	if constructorNode == nil {
+		return false, ast.ErrASTDomain
+	}
+	constructorArgs, err := s.manager.GetNumArgs(constructor)
+	if err != nil {
+		return false, err
+	}
+	if op == ast.ASTArrayOpConst && constructorArgs != 1 || op == ast.ASTArrayOpMap && constructorArgs == 0 || op == ast.ASTArrayOpAsArray && constructorArgs != 0 {
 		return false, ast.ErrASTDomain
 	}
 	if op == ast.ASTArrayOpMap {
@@ -255,6 +269,13 @@ func (t *SMTArrayTheory) mappedReadValue(constructor ast.ASTHandle, indices []as
 	count, err := m.GetNumArgs(constructor)
 	if err != nil {
 		return ast.ASTHandle{}, err
+	}
+	arity, err := m.GetArity(function)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if count == 0 || count != arity {
+		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
 	values := make([]ast.ASTHandle, 0, count)
 	for i := uint32(0); i < count; i++ {

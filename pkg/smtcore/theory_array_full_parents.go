@@ -40,12 +40,32 @@ func (t *SMTArrayTheory) addParentMap(variable SMTTheoryVar, mapped *SMTEnode) e
 	if variable < 0 || int(variable) >= len(t.arrayData) {
 		return ast.ErrASTDomain
 	}
+	if mapped == nil {
+		return ast.ErrASTDomain
+	}
+	op, array, err := t.arrayOperation(mapped.owner)
+	if err != nil || !array || op != ast.ASTArrayOpMap {
+		if err != nil {
+			return err
+		}
+		return ast.ErrASTDomain
+	}
 	data := t.arrayData[t.arrayUnion.Find(uint32(variable))]
 	data.parentMaps = append(data.parentMaps, mapped)
 	return t.arrayTrail.PushUndo(func() { data.parentMaps = data.parentMaps[:len(data.parentMaps)-1] })
 }
 
 func (t *SMTArrayTheory) setMapInputsUpward(mapped *SMTEnode) error {
+	if mapped == nil {
+		return ast.ErrASTDomain
+	}
+	op, array, err := t.arrayOperation(mapped.owner)
+	if err != nil || !array || op != ast.ASTArrayOpMap {
+		if err != nil {
+			return err
+		}
+		return ast.ErrASTDomain
+	}
 	if err := t.traceFullArrayExpression("set_prop_upward", 143, mapped.owner); err != nil {
 		return err
 	}

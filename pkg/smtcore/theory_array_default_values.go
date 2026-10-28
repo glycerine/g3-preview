@@ -1,5 +1,6 @@
-// Source: src/smt/theory_array_full.cpp default constructor value expressions.
 package smtcore
+
+// Source: src/smt/theory_array_full.cpp default constructor value expressions.
 
 import "github.com/glycerine/g3/pkg/ast"
 
@@ -25,6 +26,13 @@ func (t *SMTArrayTheory) defaultConstructorValue(array ast.ASTHandle, op int32) 
 		if countErr != nil {
 			return ast.ASTHandle{}, countErr
 		}
+		arity, arityErr := state.manager.GetArity(function)
+		if arityErr != nil {
+			return ast.ASTHandle{}, arityErr
+		}
+		if count == 0 || count != arity {
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
 		arguments := make([]ast.ASTHandle, 0, count)
 		for index := uint32(0); index < count; index++ {
 			input, argErr := state.manager.GetArg(array, index)
@@ -39,6 +47,13 @@ func (t *SMTArrayTheory) defaultConstructorValue(array ast.ASTHandle, op int32) 
 		}
 		value, err = state.manager.MkApp(function, arguments)
 	case ast.ASTArrayOpStore:
+		count, countErr := state.manager.GetNumArgs(array)
+		if countErr != nil || count < 3 {
+			if countErr != nil {
+				return ast.ASTHandle{}, countErr
+			}
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
 		large, largeErr := t.arrayHasLargeDomain(array)
 		if largeErr != nil {
 			return ast.ASTHandle{}, largeErr
@@ -54,10 +69,6 @@ func (t *SMTArrayTheory) defaultConstructorValue(array ast.ASTHandle, op int32) 
 		if large {
 			value = baseDefault
 			break
-		}
-		count, countErr := state.manager.GetNumArgs(array)
-		if countErr != nil || count < 3 {
-			return ast.ASTHandle{}, countErr
 		}
 		conditions := make([]ast.ASTHandle, 0, count-2)
 		for index := uint32(1); index+1 < count; index++ {
