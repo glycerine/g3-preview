@@ -117,6 +117,53 @@ func TestStructuredFactoryValueSetActualAssertionOwner(t *testing.T) {
 	}
 }
 
+func TestStructuredFactoryValueSetPublishesBeforeSortReference(t *testing.T) {
+	for _, kind := range []string{"array", "datatype"} {
+		t.Run(kind, func(t *testing.T) {
+			m, _, base, sort := structuredOwnerFixture(t, kind)
+			var occupied []ast.ASTRef
+			t.Cleanup(func() {
+				m.Budget().FailAfter(-1)
+				for i := range occupied {
+					protoMust(t, m.DelRef(&occupied[i]))
+				}
+			})
+
+			// Consume recycled reference records and the current native page.
+			// The first attempted page growth then refuses without consuming a
+			// record, leaving valueSet at that same real source frontier.
+			m.Budget().FailAfter(0)
+			for len(occupied) < 4096 {
+				ref, err := m.NewRef(ast.ASTHandle{})
+				if errors.Is(err, arena.ErrInjectedFailure) {
+					break
+				}
+				protoMust(t, err)
+				occupied = append(occupied, ref)
+			}
+			if len(occupied) == 4096 {
+				t.Fatal("reference page frontier not reached")
+			}
+
+			set, err := base.valueSet(sort)
+			if !errors.Is(err, arena.ErrInjectedFailure) || set != nil {
+				t.Fatal("sort-reference refusal", set, err)
+			}
+			published := base.sets[sort]
+			if published == nil || len(base.sorts) != 0 {
+				t.Fatal("source map publication or sort-reference prefix", published, len(base.sorts))
+			}
+
+			m.Budget().FailAfter(-1)
+			set, err = base.valueSet(sort)
+			protoMust(t, err)
+			if set != published || len(base.sorts) != 0 {
+				t.Fatal("warm lookup retried the source sort push", set == published, len(base.sorts))
+			}
+		})
+	}
+}
+
 type structuredCloseDuringTrace struct {
 	bytes.Buffer
 	factory   ValueFactory

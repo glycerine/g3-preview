@@ -32,12 +32,16 @@ func (f *structuredFactory) valueSet(s ast.ASTHandle) (*factoryValueSet, error) 
 	}
 	set := f.sets[s]
 	if set == nil {
+		// Source publishes the allocated set in m_sort2value_set before
+		// m_sorts.push_back acquires the sort.  Preserve that failure prefix:
+		// a refused sort reference leaves the empty set discoverable, and a
+		// later lookup does not retry the source push_back.
+		set = &factoryValueSet{seen: make(map[ast.ASTHandle]struct{})}
+		f.sets[s] = set
 		ref, err := f.manager.NewRef(s)
 		if err != nil {
 			return nil, err
 		}
-		set = &factoryValueSet{seen: make(map[ast.ASTHandle]struct{})}
-		f.sets[s] = set
 		f.sorts = append(f.sorts, ref)
 	}
 	if err := valueFactoryAssert("src/smt/proto_model/struct_factory.cpp", 30, "set != 0", func() bool { return set != nil }); err != nil {

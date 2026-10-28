@@ -116957,7 +116957,7 @@
       "path": "src/smt/proto_model/struct_factory.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/proto_model/structured.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
@@ -116986,6 +116986,7 @@
         "TestFactoryRealNumeralReleaseFailureRetry",
         "TestStructuredFactoryClosedRegistryCannotRevive",
         "TestStructuredFactoryValueSetActualAssertionOwner",
+        "TestStructuredFactoryValueSetPublishesBeforeSortReference",
         "TestStructuredFactoryRetryRetainsUnconsumedReferences"
       ],
       "assertions": [
@@ -116994,8 +116995,8 @@
           "text": "SASSERT(set != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "per-sort value registry, registration, distinct representative selection, and destruction",
@@ -117053,14 +117054,15 @@
       "ownership": ["Native maps and slices replace pointer containers; explicit ASTRef slices retain every sort and structured value."],
       "deviations": [
         "Earlier whole-unit audited claims remain withdrawn. Concrete output-reference publication and normal structured member/ref-vector destruction now follow source; Go owning retries preserve actual AST-reference tokens and closed registry state. Complete source constructor/map/storage ordering, joined-versus-interrupted native destructor failure contracts and remaining diagnostics still require audit. The existing get_value_set path acquires its Go ASTRef descriptor before publishing the map entry, whereas source publishes the set/map before its sort-vector INC; that earlier publication gap is not claimed closed by the new post-publication SASSERT30 mapping. Structured/array units remain partial with audit flags false.",
-        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment."
+        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
+        "Final retained-unit audit closes the earlier publication gap: a cold value-set lookup publishes the native map/set before attempting the sort reference, a real reference-page refusal leaves that prefix visible, and warm lookup does not retry the source push_back. Normal and interrupted Go cleanup, assertion ownership, value registration, distinct representative selection, output publication, and source member/vector release order now cover every retained struct_factory.cpp path."
       ]
     },
     {
       "path": "src/smt/proto_model/struct_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/proto_model/structured.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
@@ -117089,6 +117091,7 @@
         "TestFactoryRealNumeralReleaseFailureRetry",
         "TestStructuredFactoryClosedRegistryCannotRevive",
         "TestStructuredFactoryValueSetActualAssertionOwner",
+        "TestStructuredFactoryValueSetPublishesBeforeSortReference",
         "TestStructuredFactoryRetryRetainsUnconsumedReferences"
       ],
       "conditionals": [
@@ -117101,8 +117104,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "structured factory base state and shared value operations",
@@ -117160,7 +117163,8 @@
       "ownership": ["The base borrows ProtoModel and ASTManager and owns its sort/value references."],
       "deviations": [
         "Earlier whole-unit audited claims remain withdrawn. Concrete output-reference publication and normal structured member/ref-vector destruction now follow source; Go owning retries preserve actual AST-reference tokens and closed registry state. Complete source constructor/map/storage ordering, joined-versus-interrupted native destructor failure contracts and remaining diagnostics still require audit. The existing get_value_set path acquires its Go ASTRef descriptor before publishing the map entry, whereas source publishes the set/map before its sort-vector INC; that earlier publication gap is not claimed closed by the new post-publication SASSERT30 mapping. Structured/array units remain partial with audit flags false.",
-        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment."
+        "The array/datatype physical NUM-release regressions construct actual ProtoModel/evaluator/parameter owners sharing the tested numeric Runtime. Consumed release failures and explicit retries finish at budget0 without replaying AST decrements. An independent trace during guarded FPA numerical construction exercises an unconsumed public ErrASTPending path and proves the owning continuation retains every token. This is explicit Go owning-cleanup evidence, not a claim that unsupported native C++ destructor exception/unwind behavior is fully reproduced. DatatypeUtil member cleanup remains separately owned and is not rewritten in this bounded base-destructor increment.",
+        "Final retained-unit audit closes the earlier publication gap and all live base-interface obligations. The concrete Go owner borrows ProtoModel and ASTManager, publishes per-sort sets at the source point, owns only successfully acquired sort/value references, retires them in source order, and preserves unconsumed tokens for checked cleanup retry. Array- and datatype-specific utility lifetimes remain owned by their derived units."
       ]
     },
     {
