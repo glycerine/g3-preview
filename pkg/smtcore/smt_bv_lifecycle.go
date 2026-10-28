@@ -1,5 +1,6 @@
-// Source: theory_bv::mk_fresh and context::copy_plugins/register_plugin.
 package smtcore
+
+// Source: theory_bv::mk_fresh and context::copy_plugins/register_plugin.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: theory_array::mk_fresh, theory_array_full::mk_fresh and copy_plugins.
 package smtcore
+
+// Source: theory_array::mk_fresh, theory_array_full::mk_fresh and copy_plugins.
 
 func (k *SMTKernel) copyArrayPlugin(source *SMTKernel) error {
 	if !source.preprocessingSetupDone {

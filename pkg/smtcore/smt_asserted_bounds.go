@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.h cheap_quant_fourier_motzkin;
 // src/smt/asserted_formulas.cpp simplify_fmls, reduce.
-package smtcore
 
 import (
 	"errors"

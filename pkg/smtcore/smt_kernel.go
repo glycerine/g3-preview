@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_kernel.h and src/smt/smt_kernel.cpp retained assertion,
 // scope, setup, check, and context-access facade.
-package smtcore
 
 import (
 	"errors"

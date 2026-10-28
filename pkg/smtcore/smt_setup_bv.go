@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_setup.cpp setup_QF_BV, setup_QF_AUFBV,
 // setup_QF_BVRE, setup_QF_FP and setup_QF_FPBV.
-package smtcore
 
 func (k *SMTKernel) setupBitVectorLogicPolicy() error {
 	arrays := false

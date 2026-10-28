@@ -1,5 +1,6 @@
-// Source: theory_array::internalize_term and setup::setup_arrays (AR_SIMPLE).
 package smtcore
+
+// Source: theory_array::internalize_term and setup::setup_arrays (AR_SIMPLE).
 
 import "github.com/glycerine/g3/pkg/ast"
 
