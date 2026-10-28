@@ -117833,7 +117833,7 @@
       "path": "src/smt/smt_case_split_queue.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_case_split_queue.go",
         "pkg/smtcore/smt_theory_aware_branching.go",
@@ -118091,8 +118091,8 @@
           "text": "SASSERT(m_context.get_num_b_internalized() > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "activity-based and random-frequency selection, delayed search-variable promotion, retained activity cache, cached assignment phases, conservative conflict-phase invalidation, phase-cache cycling, always-false/true, source-random, and literal-occurrence phase strategies",
@@ -118350,7 +118350,7 @@
       "path": "src/smt/smt_case_split_queue.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_case_split_queue.go",
         "pkg/smtcore/smt_theory_aware_branching.go",
@@ -118476,8 +118476,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "next activity/random-frequency case split, delayed search-variable promotion, activity retention across reinternalization, configured phase selection, phase-cache lifecycle, and conservative conflict-phase invalidation consumed by the retained activity-based search",
