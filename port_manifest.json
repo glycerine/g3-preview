@@ -137083,11 +137083,18 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "integer strict-bound normalization, integral-model checks and source Boolean branch/Gomory-cut integration",
-          "status": "partial",
+          "name": "integer strict-bound normalization, integral candidate repair, mixed-column model checks, source Boolean branch/Gomory-cut alternation, equality branching, GCD and Euclidean integration",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_linear.go",
           "tests": [
-            "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic"
+            "TestSMTSolverSetupUsesPartialLinearIntegerArithmetic",
+            "TestSMTNormalizeArithmeticIntegerBound",
+            "TestSMTArithmeticCandidateFloorsFractionalIntegers",
+            "TestSMTIntegerFreedomPatchingScopedModels",
+            "TestSMTIntegerBranchAndGomoryScopesProofsAndModels",
+            "TestSMTIntegerEqualityBranchWitnessScopesProofsAndModels",
+            "TestSMTIntegerGCDAndExtendedGCDScopedProofs",
+            "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels"
           ]
         },
         {
@@ -137287,14 +137294,15 @@
           ]
         },
         {
-          "name": "apply_euclidean_solver option wiring, theory-owned numeral manager, scoped numeric bounds and premise propagation through comparison-expression replay",
-          "status": "partial",
+          "name": "apply_euclidean_solver option wiring, theory-owned numeral manager and temporary bridge lifetime, scoped numeric bounds, normalized premise propagation through stable comparison-expression replay, arbitrary-precision coefficients, proofs, models and disabled-mode behavior",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_euclidean.go",
           "go_targets": [
             "pkg/cmd/g3/main_test.go"
           ],
           "tests": [
             "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels",
+            "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -138210,7 +138218,7 @@
       "path": "src/smt/theory_arith_pp.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_arith_linear.go",
         "pkg/smtcore/smt_solver.go",
@@ -138255,8 +138263,8 @@
           ]
         },
         {
-          "name": "tableau, variable, bound, atom, interval, and SMT-LIB diagnostic display helpers",
-          "status": "unported",
+          "name": "tableau, variable, bound, atom, interval, row-shape/statistics, and SMT-LIB diagnostic display helpers have no retained non-TRACE caller; the only direct display_bounds_in_smtlib call is commented out",
+          "status": "dead",
           "go_target": null,
           "tests": []
         },
@@ -138272,7 +138280,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The retained public solver statistics path collects arithmetic theory counters through a concrete optional Go interface. Trace-only arithmetic tableau renderers have no current Go caller and remain unported."
+        "The retained public solver statistics path collects arithmetic theory counters through a concrete optional Go interface. Trace-only arithmetic tableau renderers have no retained non-TRACE caller and are intentionally excluded under the retained-consumer rule; the only direct display_bounds_in_smtlib call is commented out."
       ]
     },
     {
