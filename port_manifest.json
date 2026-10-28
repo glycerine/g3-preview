@@ -136241,8 +136241,8 @@
           ]
         },
         {
-          "name": "collect_fixed_var_justifications and extended GCD endpoint provenance: preserve normalized signed row coefficients and lower/upper endpoint order, omit unrelated assertions, retain conservative premises for derived bounds without explanation chains",
-          "status": "partial",
+          "name": "collect_fixed_var_justifications and extended GCD endpoint provenance: preserve normalized signed row coefficients and lower/upper endpoint order, omit unrelated assertions, and recursively expand flattened plain-derived endpoint explanations with source caller coefficients",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_gcd.go",
           "go_targets": [
             "pkg/math/simplex/bound_dependency.go",
@@ -136259,6 +136259,7 @@
             "TestArithmeticGCDExplanationNormalizedEndpoints",
             "TestSMTArithmeticReplayBoundDependenciesAndScaling",
             "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
+            "TestSMTArithmeticGCDExpandsDerivedBoundChains",
             "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
             "TestASTParameterRatExactOwningCopy",
             "TestSMTIntegerGCDAndExtendedGCDScopedProofs"
@@ -137126,8 +137127,8 @@
           ]
         },
         {
-          "name": "retained deferred gcd_test over fractional integer basic rows: precise assertion-bound dependencies and source coefficient parameters; derived-bound explanation chains remain incomplete",
-          "status": "partial",
+          "name": "retained deferred gcd_test over fractional integer basic rows: precise assertion and recursively flattened derived-bound dependencies, normalized source coefficient parameters, extended-GCD endpoint order, mixed-real guards, scoped proofs and conflicts",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_gcd.go",
           "go_targets": [
             "pkg/cmd/g3/main_test.go",
@@ -137148,6 +137149,7 @@
             "TestBoundDependenciesOwnCoefficientsAndInvalidateModelBounds",
             "TestArithmeticGCDExplanationNormalizedEndpoints",
             "TestSMTArithmeticReplayBoundDependenciesAndScaling",
+            "TestSMTArithmeticGCDExpandsDerivedBoundChains",
             "TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions",
             "TestSMTArithmeticAntecedentParameterOrderAndOwnership",
             "TestASTParameterRatExactOwningCopy"

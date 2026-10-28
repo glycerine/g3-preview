@@ -105,6 +105,58 @@ func TestSMTArithmeticGCDExplanationExcludesUnrelatedAssertions(t *testing.T) {
 	}
 }
 
+func TestSMTArithmeticGCDExpandsDerivedBoundChains(t *testing.T) {
+	for _, extended := range []bool{false, true} {
+		for _, sign := range []int64{-1, 1} {
+			solver := simplex.NewSolver(nil)
+			column, coefficient := uint32(2), big.NewRat(sign, 2)
+			if extended {
+				_, err := solver.AddRationalRow(1, []uint32{1, 0}, []big.Rat{*big.NewRat(5, 1), *big.NewRat(2*sign, 1)})
+				astTestMust(t, err)
+				column, coefficient = 0, big.NewRat(2*sign, 5)
+			} else {
+				_, err := solver.AddRationalRow(0, []uint32{0, 1, 2}, []big.Rat{*big.NewRat(2, 1), *big.NewRat(4, 1), *big.NewRat(sign, 1)})
+				astTestMust(t, err)
+			}
+			origin := simplex.NewSolver(nil)
+			dependency := []simplex.BoundDependency{{Literal: NewSMTLiteral(19, false).Index(), Coefficient: *big.NewRat(7, 3)}}
+			astTestMust(t, origin.SetLowerWithDependencies(7, simplex.RationalInfinitesimal(big.NewRat(1, 1)), dependency))
+			astTestMust(t, origin.SetUpperWithDependencies(7, simplex.RationalInfinitesimal(big.NewRat(2, 1)), dependency))
+			explanation := smtArithmeticPlainBoundExplanation(origin, []simplex.ArithmeticBoundUse{{Column: 7, Lower: true}, {Column: 7, Lower: false}})
+			if explanation == nil || len(explanation.dependencies) != 1 {
+				t.Fatal("derived GCD explanation", explanation)
+			}
+			upper := int64(1)
+			if extended {
+				upper = 2
+			}
+			_, err := smtTightenReplaySimplexBound(solver, column, true, simplex.RationalInfinitesimal(big.NewRat(1, 1)), explanation)
+			astTestMust(t, err)
+			_, err = smtTightenReplaySimplexBound(solver, column, false, simplex.RationalInfinitesimal(big.NewRat(upper, 1)), explanation)
+			astTestMust(t, err)
+			result, checks, uses, err := solver.ArithmeticGCDWithExplanation(map[uint32]bool{0: true, 1: true})
+			astTestMust(t, err)
+			want := simplex.ArithmeticGCDConflict
+			if extended {
+				want = simplex.ArithmeticExtendedGCDConflict
+			}
+			if result != want || checks != 1 || len(uses) != 2 {
+				t.Fatal(result, checks, uses)
+			}
+			antecedents, known, err := smtArithmeticExplainBounds(solver, uses, true, nil)
+			astTestMust(t, err)
+			if !known || len(antecedents.literals) != 2 || len(antecedents.literalCoefficients) != 2 {
+				t.Fatal("derived GCD chain", known, antecedents)
+			}
+			for index := range antecedents.literals {
+				if antecedents.literals[index] != NewSMTLiteral(19, false) || antecedents.literalCoefficients[index].Cmp(coefficient) != 0 {
+					t.Fatal("derived GCD coefficient", antecedents.literals, antecedents.literalCoefficients, coefficient)
+				}
+			}
+		}
+	}
+}
+
 func TestSMTArithmeticAntecedentParameterOrderAndOwnership(t *testing.T) {
 	m, _ := smtModelGeneratorFixture(t)
 	var ante smtArithmeticAntecedents
