@@ -114,9 +114,11 @@ func (c *Context) checkOptimize(assumptions []ast.ASTHandle) (status lbool.LBool
 	if err = result.SetModel(optimized.Model); err != nil {
 		return lbool.Undef, err
 	}
-	if optimized.Status == lbool.True && len(c.objectives) == 1 {
-		c.objectives[0].value = optimized.Value
-		c.objectives[0].valueReady = optimized.Optimal
+	if optimized.Status == lbool.True && len(c.objectives) == len(optimized.Values) {
+		for i := range c.objectives {
+			c.objectives[i].value = optimized.Values[i]
+			c.objectives[i].valueReady = optimized.Optimal
+		}
 	}
 	c.tacticResult = result
 	c.status, c.checked = optimized.Status, true
@@ -165,9 +167,21 @@ func (c *Context) writeObjectiveValue(out io.Writer, objective *optimizationObje
 		return err
 	}
 	value := &objective.value.Finite
-	if value.Infinity.Sign() != 0 || value.Epsilon.Sign() != 0 {
-		return fmt.Errorf("opt: infinitesimal objective display is not yet available")
+	sort, err := c.manager.GetSort(objective.expression)
+	if err != nil {
+		return err
 	}
-	_, err := io.WriteString(out, value.Main.RatString())
-	return err
+	kind, err := c.manager.GetDeclKind(sort)
+	if err != nil {
+		return err
+	}
+	ref, err := opt.ArithmeticValueExpression(c.manager, value, kind == 1)
+	if err != nil {
+		return err
+	}
+	h, err := c.manager.RefGet(ref)
+	if err == nil {
+		err = c.WriteExpression(out, h)
+	}
+	return errors.Join(err, c.manager.DelRef(&ref))
 }

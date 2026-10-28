@@ -818,8 +818,10 @@ var scriptResults = map[string]string{
 	"uf_congruence.smt2":                           "unsat\n",
 	"linear_integer.smt2":                          "sat\n((x 4))\nunsat\nsat\n",
 	"linear_real.smt2":                             "sat\n((x (/ 3.0 2.0)))\n",
+	"lexicographic_integer_optimization.smt2":      "sat\n(objectives\n (x 3)\n (y 2)\n)\n((x 3)\n (y 2))\nsat\n(objectives\n (x 0)\n (y 5)\n)\n((x 0)\n (y 5))\n",
 	"bit_vector.smt2":                              "sat\n((x #xf))\n",
 	"bounded_integer_optimization.smt2":            "sat\n(objectives\n (x 3)\n)\n((x 3))\nsat\n(objectives\n (x 0)\n)\n((x 0))\n",
+	"bounded_real_strict_optimization.smt2":        "sat\n(objectives\n (x (+ 5.0 (* (- 1.0) epsilon)))\n)\n((x (/ 9.0 2.0)))\nsat\n(objectives\n (x epsilon)\n)\n((x (/ 1.0 2.0)))\n",
 	"array_read_store.smt2":                        "unsat\n",
 	"quantified_boolean.smt2":                      "unsat\n",
 	"parallel_let.smt2":                            "sat\n((p true))\n",
@@ -829,6 +831,7 @@ var scriptResults = map[string]string{
 	"indexed_bit_vector.smt2":                      "unsat\n",
 	"nary_equality.smt2":                           "unsat\n",
 	"unknown_static_classifier.smt2":               "sat\n((xr 1.0)\n (yr 2.0))\nsat\n((xi 2)\n (yi 3))\nsat\n((ur 4.0)\n ((fr ur) 7.0))\nsat\n((ui 6)\n ((fi ui) 9))\n",
+	"unbounded_real_optimization.smt2":             "sat\n(objectives\n (x oo)\n)\n((x 0.0))\nsat\n(objectives\n (x (* (- 1) oo))\n)\n((x 0.0))\n",
 }
 
 func TestSMTLibRunnerScripts(t *testing.T) {

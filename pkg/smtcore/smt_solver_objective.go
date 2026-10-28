@@ -6,12 +6,15 @@ package smtcore
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/math/simplex"
+	"github.com/glycerine/g3/pkg/tactic"
 )
 
 type smtArithmeticObjectiveTheory interface {
 	AddObjective(ast.ASTHandle) (SMTTheoryVar, error)
 	ObjectiveValue(SMTTheoryVar) (SMTArithmeticObjectiveValue, error)
 	MaximizeObjective(SMTTheoryVar) (SMTArithmeticObjectiveValue, ast.ASTHandle, bool, error)
+	MakeObjectiveLowerBound(*tactic.FilterModelConverter, SMTTheoryVar, simplex.Infinitesimal) (ast.ASTHandle, error)
 }
 
 func (s *SMTSolver) arithmeticObjectiveTheory() (smtArithmeticObjectiveTheory, error) {
@@ -81,6 +84,16 @@ func (s *SMTSolver) MaximizeObjective(index uint32) (SMTArithmeticObjectiveValue
 		return SMTArithmeticObjectiveValue{}, ast.ASTHandle{}, false, err
 	}
 	return objective.theory.MaximizeObjective(objective.variable)
+}
+
+// MakeObjectiveLowerBound creates the concrete theory atom that commits an
+// optimized lower bound for a subsequent lexicographic objective.
+func (s *SMTSolver) MakeObjectiveLowerBound(index uint32, filter *tactic.FilterModelConverter, value simplex.Infinitesimal) (ast.ASTHandle, error) {
+	objective, err := s.objective(index)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return objective.theory.MakeObjectiveLowerBound(filter, objective.variable, value)
 }
 
 // ResetObjectives releases every objective term retained by this solver.

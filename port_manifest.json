@@ -92867,7 +92867,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained maximize, minimize and get-objectives commands for one arithmetic objective, including scoped rollback (opt_cmds.cpp:115-180)",
+          "name": "retained maximize, minimize and get-objectives commands for arithmetic objectives, including scoped rollback (opt_cmds.cpp:115-180)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
           "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"]
@@ -92904,7 +92904,7 @@
       "component": "opt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go", "pkg/opt/bound_expression.go", "pkg/opt/bound_expression_test.go", "pkg/cmd_context/optimization.go", "pkg/parsers/smt2/optimization_test.go"],
+      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go", "pkg/opt/bound_expression.go", "pkg/opt/bound_expression_test.go", "pkg/opt/arithmetic_value_expression.go", "pkg/cmd_context/optimization.go", "pkg/parsers/smt2/optimization_test.go"],
       "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult", "TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"],
       "conditionals": [
         {
@@ -92978,6 +92978,12 @@
           "status": "partial",
           "go_target": "pkg/cmd_context/optimization.go",
           "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"]
+        },
+        {
+          "name": "objective display conversion for exact finite, infinitesimal and unbounded arithmetic results (opt_context.cpp:1264-1283,1352-1381)",
+          "status": "partial",
+          "go_target": "pkg/opt/arithmetic_value_expression.go",
+          "tests": ["TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": [],
@@ -93238,7 +93244,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "dedicated SMT optimization backend, concrete arithmetic-theory objective dispatch, blocker loop and best-model preservation (opt_solver.cpp:32-53,93-132,195-250,342-431)",
+          "name": "dedicated SMT optimization backend, concrete arithmetic-theory objective dispatch, lower-bound commitment, blocker loops and best-model preservation (opt_solver.cpp:32-53,93-132,195-250,342-431)",
           "status": "partial",
           "go_target": "pkg/opt/arithmetic_solver.go",
           "tests": ["TestSMTSolverArithmeticObjectiveFacade", "TestSMT2BoundedIntegerOptimizationEndToEnd"]
@@ -93276,7 +93282,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/opt/arithmetic_solver.go", "pkg/parsers/smt2/optimization_test.go"],
-      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd"],
+      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
       "assertions": [
         {
           "line": 113,
@@ -93319,10 +93325,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "bounded single arithmetic objective setup and exact blocker iteration for maximize/minimize (optsmt.cpp:93-153,463-521)",
+          "name": "bounded, strict and unbounded single arithmetic objectives plus attained lexicographic objective setup and exact blocker iteration (optsmt.cpp:93-221,463-521,583-591)",
           "status": "partial",
           "go_target": "pkg/opt/arithmetic_solver.go",
-          "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd"]
+          "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": [],
