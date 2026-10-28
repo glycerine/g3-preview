@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/muz/pdr"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func TestContextInitializesHornProgramAndAnswersInitialQueries(t *testing.T) {
@@ -170,6 +171,28 @@ func TestContextBoundedQueryTraversesTaggedHornChain(t *testing.T) {
 	pdrMust(t, err)
 	if status != lbool.True {
 		t.Fatal("unbounded Horn chain query", status)
+	}
+	stats := statistics.New()
+	pdrMust(t, context.CollectStatistics(stats))
+	foundNodes, foundDepth := false, false
+	for index := 0; index < stats.Size(); index++ {
+		switch stats.Key(index) {
+		case "PDR num unfoldings":
+			foundNodes = stats.IsUint(index) && stats.UintValue(index) >= 2
+		case "PDR max depth":
+			foundDepth = stats.IsUint(index) && stats.UintValue(index) >= 2
+		}
+	}
+	if !foundNodes || !foundDepth {
+		t.Fatal("PDR search statistics", foundNodes, foundDepth)
+	}
+	pdrMust(t, context.ResetStatistics())
+	stats.Reset()
+	pdrMust(t, context.CollectStatistics(stats))
+	for index := 0; index < stats.Size(); index++ {
+		if stats.Key(index) == "PDR num unfoldings" || stats.Key(index) == "PDR max depth" || stats.Key(index) == "PDR inductive level" {
+			t.Fatal("reset retained PDR search statistic", stats.Key(index))
+		}
 	}
 
 	pdrMust(t, context.Close())

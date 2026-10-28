@@ -264,7 +264,13 @@ func (c *Context) CollectStatistics(destination *statistics.Statistics) error {
 			return err
 		}
 	}
-	return c.owner.CollectStatistics(destination)
+	if err := c.owner.CollectStatistics(destination); err != nil {
+		return err
+	}
+	destination.UpdateUint("PDR num unfoldings", c.nodes)
+	destination.UpdateUint("PDR max depth", c.maxDepth)
+	destination.UpdateUint("PDR inductive level", c.inductive)
+	return nil
 }
 
 func (c *Context) ResetStatistics() error {
@@ -276,7 +282,11 @@ func (c *Context) ResetStatistics() error {
 			return err
 		}
 	}
-	return c.owner.ResetStatistics()
+	if err := c.owner.ResetStatistics(); err != nil {
+		return err
+	}
+	c.nodes, c.maxDepth, c.inductive = 0, 0, 0
+	return nil
 }
 
 func (c *Context) Close() (result error) {

@@ -83014,7 +83014,7 @@
           ]
         },
         {
-          "name": "frame reachability expansion, tagged rule selection, child obligations, blocking, propagation and top-level PDR solve loop (pdr_context.cpp:1544-1769,1893-2215)",
+          "name": "frame reachability expansion, tagged rule selection, child obligations, blocking, propagation, top-level PDR solve loop and search statistics (pdr_context.cpp:1544-1769,1893-2215,2325-2349)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/context_solve.go",
           "tests": [
@@ -83133,7 +83133,7 @@
           ]
         },
         {
-          "name": "retained unbounded context frame expansion, tagged rule selection, child obligations, blocking and propagation loop",
+          "name": "retained unbounded context frame expansion, tagged rule selection, child obligations, blocking, propagation and search-statistics surface",
           "status": "partial",
           "go_target": "pkg/muz/pdr/context_solve.go",
           "tests": [
