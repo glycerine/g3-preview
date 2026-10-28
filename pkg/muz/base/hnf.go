@@ -158,34 +158,41 @@ func (n *HornNormalizer) operator(expression ast.ASTHandle) (int32, bool, error)
 }
 
 func (n *HornNormalizer) stripForall(formula ast.ASTHandle) (ast.ASTHandle, hornPrefix, error) {
-	kind, err := n.manager.GetKind(formula)
-	if err != nil || kind != ast.ASTQuantifier {
-		return formula, hornPrefix{}, err
-	}
-	forall, err := n.manager.IsForall(formula)
-	if err != nil {
-		return ast.ASTHandle{}, hornPrefix{}, err
-	}
-	if !forall {
-		return formula, hornPrefix{}, nil
-	}
-	count, err := n.manager.GetNumDeclarations(formula)
-	if err != nil {
-		return ast.ASTHandle{}, hornPrefix{}, err
-	}
-	prefix := hornPrefix{sorts: make([]ast.ASTHandle, count), names: make([]usymbol.Symbol, count)}
-	for i := uint32(0); i < count; i++ {
-		prefix.sorts[i], err = n.manager.GetDeclarationSort(formula, i)
+	current := formula
+	prefix := hornPrefix{}
+	for {
+		kind, err := n.manager.GetKind(current)
+		if err != nil || kind != ast.ASTQuantifier {
+			return current, prefix, err
+		}
+		forall, err := n.manager.IsForall(current)
 		if err != nil {
 			return ast.ASTHandle{}, hornPrefix{}, err
 		}
-		prefix.names[i], err = n.manager.GetDeclarationName(formula, i)
+		if !forall {
+			return current, prefix, nil
+		}
+		count, err := n.manager.GetNumDeclarations(current)
+		if err != nil {
+			return ast.ASTHandle{}, hornPrefix{}, err
+		}
+		for i := uint32(0); i < count; i++ {
+			sort, e := n.manager.GetDeclarationSort(current, i)
+			if e != nil {
+				return ast.ASTHandle{}, hornPrefix{}, e
+			}
+			name, e := n.manager.GetDeclarationName(current, i)
+			if e != nil {
+				return ast.ASTHandle{}, hornPrefix{}, e
+			}
+			prefix.sorts = append(prefix.sorts, sort)
+			prefix.names = append(prefix.names, name)
+		}
+		current, err = n.manager.GetQuantifierBody(current)
 		if err != nil {
 			return ast.ASTHandle{}, hornPrefix{}, err
 		}
 	}
-	body, err := n.manager.GetQuantifierBody(formula)
-	return body, prefix, err
 }
 
 func (n *HornNormalizer) bind(prefix hornPrefix, body ast.ASTHandle, locals *[]ast.ASTRef) (ast.ASTHandle, error) {

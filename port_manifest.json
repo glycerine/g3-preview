@@ -80886,7 +80886,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/rule.go", "pkg/muz/base/rule_formula.go", "pkg/muz/base/hnf.go"],
-      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal", "TestHornNormalizerMergesConsecutiveUniversalPrefix", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
       "assertions": [
         {
           "line": 64,
@@ -80948,7 +80948,7 @@
           "name": "mk_rule_core HNF integration: normalize a general retained formula, register fresh predicates, and add every resulting Horn rule (dl_rule.cpp:173-183)",
           "status": "ported",
           "go_target": "pkg/muz/base/hnf.go",
-          "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"]
+          "tests": ["TestHornNormalizerMergesConsecutiveUniversalPrefix", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"]
         }
       ],
       "ownership": [],
@@ -81499,7 +81499,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/hnf.go"],
-      "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
+      "tests": ["TestHornNormalizerMergesConsecutiveUniversalPrefix", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
       "assertions": [
         {
           "line": 231,
@@ -81529,7 +81529,7 @@
           "name": "No-proof HNF worklist, implication/conjunction extraction, singleton disjunction splitting, fresh predicate construction, disjunctive definition memoization, universal-prefix reconstruction, and reset-local result collection (hnf.cpp:71-138,223-292,347-421,481-511)",
           "status": "partial",
           "go_target": "pkg/muz/base/hnf.go",
-          "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"]
+          "tests": ["TestHornNormalizerMergesConsecutiveUniversalPrefix", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"]
         }
       ],
       "ownership": [
@@ -81545,7 +81545,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/hnf.go"],
-      "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
+      "tests": ["TestHornNormalizerMergesConsecutiveUniversalPrefix", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
       "conditionals": [
         {
           "line": 25,
@@ -81563,7 +81563,7 @@
           "name": "hnf no-proof construction, invocation, fresh-predicate result access, and reset-local lifecycle surface (hnf.h:29-50)",
           "status": "partial",
           "go_target": "pkg/muz/base/hnf.go",
-          "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"]
+          "tests": ["TestHornNormalizerMergesConsecutiveUniversalPrefix", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"]
         }
       ],
       "ownership": [

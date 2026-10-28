@@ -11,6 +11,52 @@ import (
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
+func TestHornNormalizerMergesConsecutiveUniversalPrefix(t *testing.T) {
+	f := newRuleSetFixture(t, "P")
+	boolean, err := f.manager.MkBoolSort()
+	ruleMust(t, err)
+	x, err := f.manager.MkVar(0, boolean)
+	ruleMust(t, err)
+	implication, err := f.manager.MkImplies(x, f.app["P"])
+	ruleMust(t, err)
+	innerName, err := f.manager.Symbols.Intern("hnf-inner")
+	ruleMust(t, err)
+	inner, err := f.manager.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{boolean}, Names: []symbol.Symbol{innerName}, Body: implication,
+	})
+	ruleMust(t, err)
+	outerName, err := f.manager.Symbols.Intern("hnf-outer")
+	ruleMust(t, err)
+	formula, err := f.manager.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{boolean}, Names: []symbol.Symbol{outerName}, Body: inner,
+	})
+	ruleMust(t, err)
+	formulaRef, err := f.manager.NewRef(formula)
+	ruleMust(t, err)
+	defer func() { ruleMust(t, f.manager.DelRef(&formulaRef)) }()
+
+	normalizer, err := base.NewHornNormalizer(f.manager, "prefix")
+	ruleMust(t, err)
+	normalized, err := normalizer.Normalize(formula)
+	ruleMust(t, err)
+	defer func() { ruleMust(t, normalized.Close()) }()
+	if len(normalized.Formulas) != 1 || len(normalized.FreshPredicates) != 0 {
+		t.Fatal("universal-prefix normalization shape", len(normalized.Formulas), len(normalized.FreshPredicates))
+	}
+	result, err := f.manager.RefGet(normalized.Formulas[0])
+	ruleMust(t, err)
+	if count, err := f.manager.GetNumDeclarations(result); err != nil || count != 2 {
+		t.Fatal("merged universal declaration count", count, err)
+	}
+	body, err := f.manager.GetQuantifierBody(result)
+	ruleMust(t, err)
+	antecedent, err := f.manager.GetArg(body, 0)
+	ruleMust(t, err)
+	if index, err := f.manager.GetVarIndex(antecedent); err != nil || index != 0 {
+		t.Fatal("merged prefix changed inner de Bruijn index", index, err)
+	}
+}
+
 func TestHornNormalizerKeepsVariableAntecedent(t *testing.T) {
 	f := newRuleSetFixture(t, "P")
 	set, err := base.NewRuleSet(f.rules)
