@@ -26,8 +26,8 @@ func TestSMTSolverUnivariateNRAAPI(t *testing.T) {
 		astTestMust(t, e)
 		return h
 	}
-	// The API supports polynomial powers even before '^' is exposed by the
-	// SMT-LIB declaration plugin. No parser coverage is claimed for that syntax.
+	// The API supports polynomial powers; QF_NRA intentionally excludes '^'
+	// from its SMT-LIB operator names, matching the source declaration plugin.
 	cube, err := m.MkFamilyApp(family, 18, nil, []ast.ASTHandle{x, numeral(3)})
 	astTestMust(t, err)
 	equal, err := m.MkEq(cube, numeral(2))
