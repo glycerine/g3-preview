@@ -139271,6 +139271,20 @@
           ]
         },
         {
+          "name": "base array axiom/store/read TRACE sites at lines 70, 106, 131, 162, 170, 174, 184, 201 and 205 with compile/tag gating and sticky stream refusal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_read_queue.go",
+            "pkg/smtcore/theory_array_full_axioms.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayStoreReadSourceTracesAndRefusal"
+          ]
+        },
+        {
           "name": "remaining base array diagnostic/trace integration and model completion audit",
           "status": "unported",
           "tests": []
@@ -139574,6 +139588,20 @@
           ],
           "tests": [
             "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation"
+          ]
+        },
+        {
+          "name": "base array axiom/store/read TRACE sites at lines 70, 106, 131, 162, 170, 174, 184, 201 and 205 with compile/tag gating and sticky stream refusal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_read_queue.go",
+            "pkg/smtcore/theory_array_full_axioms.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayStoreReadSourceTracesAndRefusal"
           ]
         },
         {

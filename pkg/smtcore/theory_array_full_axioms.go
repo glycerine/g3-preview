@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_array_full.cpp instantiate_select_const_axiom,
 // instantiate_select_map_axiom, instantiate_select_as_array_axiom,
 // try_assign_eq, and pop_scope_eh.
-package smtcore
 
 import (
 	"errors"
@@ -28,7 +29,7 @@ func (t *SMTArrayTheory) tryAssignArrayEquality(left, right ast.ASTHandle) (bool
 	if err = t.markArrayEqualityRelevant(literal); err != nil {
 		return false, err
 	}
-	if err = t.state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal}); err != nil {
+	if err = t.assertArrayAxiom([]SMTLiteral{literal}); err != nil {
 		return false, err
 	}
 	return true, nil

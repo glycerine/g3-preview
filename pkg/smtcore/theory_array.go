@@ -281,6 +281,9 @@ func (t *SMTArrayTheory) assertStoreAxiomCore(store ast.ASTHandle) error {
 	if err != nil {
 		return err
 	}
+	if err = t.traceArrayExpressions("array", "assert_store_axiom1_core", 106, "", selected, value); err != nil {
+		return err
+	}
 	proofs, err := state.manager.ProofsEnabled()
 	if err != nil {
 		return err
@@ -295,7 +298,7 @@ func (t *SMTArrayTheory) assertStoreAxiomCore(store ast.ASTHandle) error {
 				return err
 			}
 		}
-		return state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{literal})
+		return t.assertArrayAxiom([]SMTLiteral{literal})
 	}
 	if err = state.Internalize(selected, false); err != nil {
 		return err
@@ -481,7 +484,7 @@ func (t *SMTArrayTheory) assertExtensionalityCore(left, right ast.ASTHandle) err
 			}
 		}
 	}
-	if err = state.addTheoryAxiom(t.FamilyID(), []SMTLiteral{arrayEquality, selectEquality.Negated()}); err != nil {
+	if err = t.assertArrayAxiom([]SMTLiteral{arrayEquality, selectEquality.Negated()}); err != nil {
 		return err
 	}
 	return nil

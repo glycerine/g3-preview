@@ -1,7 +1,13 @@
-// Source: theory_array_base::assert_store_axiom2 and assert_store_axiom2_core.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+// Source: theory_array_base::assert_store_axiom2 and assert_store_axiom2_core.
+
+import (
+	"fmt"
+	"io"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
 
 type smtArrayReadFingerprint struct {
 	store   ast.ASTHandle
@@ -32,7 +38,27 @@ func (t *SMTArrayTheory) queueStoreReadAxiom(read, store ast.ASTHandle, upward b
 		return false, nil
 	}
 	if !t.insertArrayReadFingerprint(store, indices) {
+		if err = t.emitArrayTrace("array", "assert_store_axiom2", 205, nil, func(out io.Writer) error {
+			storeID, err := storeNode.OwnerID()
+			if err != nil {
+				return err
+			}
+			readID, err := readNode.OwnerID()
+			if err != nil {
+				return err
+			}
+			_, err = fmt.Fprintf(out, "axiom already instantiated: #%d #%d\n", storeID, readID)
+			return err
+		}); err != nil {
+			return false, err
+		}
 		return false, nil
+	}
+	if err = t.emitArrayTrace("array", "assert_store_axiom2", 201, nil, func(out io.Writer) error {
+		_, err := io.WriteString(out, "adding axiom2 to todo queue\n")
+		return err
+	}); err != nil {
+		return false, err
 	}
 	t.readTodo = append(t.readTodo, smtArrayAxiomPair{observer: read, array: store})
 	if upward {
@@ -74,12 +100,47 @@ func (t *SMTArrayTheory) assertStoreReadAxiomCore(read, store ast.ASTHandle) err
 		return err
 	}
 	readNode, storeNode := s.context.enodes[read], s.context.enodes[store]
+	if readNode == nil || storeNode == nil {
+		return ast.ErrASTDomain
+	}
+	if err = t.emitArrayTrace("array", "assert_store_axiom2_core", 131, nil, func(out io.Writer) error {
+		storeID, err := storeNode.OwnerID()
+		if err != nil {
+			return err
+		}
+		readID, err := readNode.OwnerID()
+		if err != nil {
+			return err
+		}
+		if _, err = fmt.Fprintf(out, "generating axiom2: #%d #%d\n", storeID, readID); err != nil {
+			return err
+		}
+		if err := displayArrayTraceExpression(s.manager, out, store); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(out, "\n"); err != nil {
+			return err
+		}
+		if err := displayArrayTraceExpression(s.manager, out, read); err != nil {
+			return err
+		}
+		_, err = io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return err
+	}
 	var consequence SMTLiteral
 	var consequenceExpr ast.ASTHandle
 	initialized := false
 	for i := 1; i < len(readNode.arguments); i++ {
 		left, right := storeNode.arguments[i], readNode.arguments[i]
 		if left.root == right.root {
+			if err = t.emitArrayTrace("array_bug", "assert_store_axiom2_core", 162, nil, func(out io.Writer) error {
+				_, err := io.WriteString(out, "indexes are equal... skipping...\n")
+				return err
+			}); err != nil {
+				return err
+			}
 			continue
 		}
 		if !initialized {
@@ -99,7 +160,16 @@ func (t *SMTArrayTheory) assertStoreReadAxiomCore(read, store ast.ASTHandle) err
 				return err
 			}
 			if selected == fallback {
+				if err = t.emitArrayTrace("array_bug", "assert_store_axiom2_core", 170, nil, func(out io.Writer) error {
+					_, err := io.WriteString(out, "sel1 and sel2 are equal:\n")
+					return err
+				}); err != nil {
+					return err
+				}
 				break
+			}
+			if err = t.traceArrayExpressions("array", "assert_store_axiom2_core", 174, "", selected, fallback); err != nil {
+				return err
 			}
 			consequenceExpr, err = s.mkEqualityAtom(selected, fallback)
 			if err != nil {
@@ -133,7 +203,19 @@ func (t *SMTArrayTheory) assertStoreReadAxiomCore(read, store ast.ASTHandle) err
 				return err
 			}
 		}
-		if err = s.addTheoryAxiom(t.FamilyID(), []SMTLiteral{antecedent, consequence}); err != nil {
+		if err = t.emitArrayTrace("array", "assert_store_axiom2_core", 184, nil, func(out io.Writer) error {
+			if _, err := io.WriteString(out, "asserting axiom2: "); err != nil {
+				return err
+			}
+			if err := antecedent.DisplayCompact(out, s.manager, s.boolExpr); err != nil {
+				return err
+			}
+			_, err := io.WriteString(out, "\n")
+			return err
+		}); err != nil {
+			return err
+		}
+		if err = t.assertArrayAxiom([]SMTLiteral{antecedent, consequence}); err != nil {
 			return err
 		}
 	}
