@@ -110266,7 +110266,9 @@
         "pkg/smtcore/smt_arith_eq_adapter_display_test.go",
         "pkg/smtcore/smt_arith_eq_adapter_diagnostics.go",
         "pkg/smtcore/smt_arith_eq_adapter_diagnostics_test.go",
-        "pkg/smtcore/smt_context_display_full.go"
+        "pkg/smtcore/smt_context_display_full.go",
+        "pkg/smtcore/theory_dense_diff_equality.go",
+        "pkg/smtcore/theory_dense_diff_equality_test.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
@@ -110290,7 +110292,11 @@
         "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases",
         "TestSMTArithmeticEqualityAdapterRetainedDiagnostics",
         "TestSMTArithmeticEqualityAdapterTraceBadbitAndAssertionGate",
-        "TestSMTContextDisplayFullCompositionAndRefusal"
+        "TestSMTContextDisplayFullCompositionAndRefusal",
+        "TestSMTDenseDifferenceEagerEqualityAxiomControl",
+        "TestSMTDenseDifferenceForcesDifferenceEqualityWithNumeral",
+        "TestSMTDenseDifferenceEqualityPhaseAndProofHint",
+        "TestSMTDenseDifferenceEqualityRestartRecreatesEagerDisabledAxioms"
       ],
       "assertions": [
         {
@@ -110409,7 +110415,9 @@
         "pkg/smtcore/smt_arith_eq_adapter_display_test.go",
         "pkg/smtcore/smt_arith_eq_adapter_diagnostics.go",
         "pkg/smtcore/smt_arith_eq_adapter_diagnostics_test.go",
-        "pkg/smtcore/smt_context_display_full.go"
+        "pkg/smtcore/smt_context_display_full.go",
+        "pkg/smtcore/theory_dense_diff_equality.go",
+        "pkg/smtcore/theory_dense_diff_equality_test.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
@@ -110432,7 +110440,11 @@
         "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases",
         "TestSMTArithmeticEqualityAdapterRetainedDiagnostics",
         "TestSMTArithmeticEqualityAdapterTraceBadbitAndAssertionGate",
-        "TestSMTContextDisplayFullCompositionAndRefusal"
+        "TestSMTContextDisplayFullCompositionAndRefusal",
+        "TestSMTDenseDifferenceEagerEqualityAxiomControl",
+        "TestSMTDenseDifferenceForcesDifferenceEqualityWithNumeral",
+        "TestSMTDenseDifferenceEqualityPhaseAndProofHint",
+        "TestSMTDenseDifferenceEqualityRestartRecreatesEagerDisabledAxioms"
       ],
       "conditionals": [
         {
@@ -142740,7 +142752,11 @@
         "pkg/smtcore/theory_dense_diff_display_test.go",
         "pkg/smtcore/theory_dense_diff_statistics.go",
         "pkg/smtcore/theory_dense_diff_statistics_test.go",
-        "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
+        "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
+        "pkg/smtcore/theory_dense_diff_equality.go",
+        "pkg/smtcore/theory_dense_diff_equality_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/basic_dense_forced_equality.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -142764,7 +142780,13 @@
         "TestSMTDenseDifferenceDisplayInfinitesimalText",
         "TestSMTDenseDifferenceDisplayThroughContext",
         "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
-        "TestSMTBasicArithmeticModesBeforeFirstBoundary"
+        "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+        "TestSMTDenseDifferenceEagerEqualityAxiomControl",
+        "TestSMTDenseDifferenceForcesDifferenceEqualityWithNumeral",
+        "TestSMTDenseDifferenceEqualityPhaseAndProofHint",
+        "TestSMTDenseDifferenceEqualityRestartRecreatesEagerDisabledAxioms",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -142805,7 +142827,7 @@
           ]
         },
         {
-          "name": "remaining dense setup routes, full arithmetic control fidelity and theory_opt objective callbacks",
+          "name": "remaining dense setup routes, arithmetic control fidelity and theory_opt objective callbacks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -142835,6 +142857,24 @@
           "tests": [
             "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
             "TestSMTBasicArithmeticModesBeforeFirstBoundary"
+          ]
+        },
+        {
+          "name": "internalize_eq_eh forced difference/numeral form, eager attached-variable guard, numeral-side triangle bounds, binary bounds, true-first propagation, scoped duplicate suppression, equality/disequality events, eager restart recreation and triangle proof hints",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dense_diff_equality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dense_diff_equality_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/basic_dense_forced_equality.smt2"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceEagerEqualityAxiomControl",
+            "TestSMTDenseDifferenceForcesDifferenceEqualityWithNumeral",
+            "TestSMTDenseDifferenceEqualityPhaseAndProofHint",
+            "TestSMTDenseDifferenceEqualityRestartRecreatesEagerDisabledAxioms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         },
         {
@@ -142909,7 +142949,11 @@
         "pkg/smtcore/theory_dense_diff_display_test.go",
         "pkg/smtcore/theory_dense_diff_statistics.go",
         "pkg/smtcore/theory_dense_diff_statistics_test.go",
-        "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
+        "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
+        "pkg/smtcore/theory_dense_diff_equality.go",
+        "pkg/smtcore/theory_dense_diff_equality_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/basic_dense_forced_equality.smt2"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -142933,7 +142977,13 @@
         "TestSMTDenseDifferenceDisplayInfinitesimalText",
         "TestSMTDenseDifferenceDisplayThroughContext",
         "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
-        "TestSMTBasicArithmeticModesBeforeFirstBoundary"
+        "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+        "TestSMTDenseDifferenceEagerEqualityAxiomControl",
+        "TestSMTDenseDifferenceForcesDifferenceEqualityWithNumeral",
+        "TestSMTDenseDifferenceEqualityPhaseAndProofHint",
+        "TestSMTDenseDifferenceEqualityRestartRecreatesEagerDisabledAxioms",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -142998,7 +143048,7 @@
           ]
         },
         {
-          "name": "remaining dense setup routes, full arithmetic control fidelity and theory_opt objective callbacks",
+          "name": "remaining dense setup routes, arithmetic control fidelity and theory_opt objective callbacks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -143028,6 +143078,24 @@
           "tests": [
             "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
             "TestSMTBasicArithmeticModesBeforeFirstBoundary"
+          ]
+        },
+        {
+          "name": "internalize_eq_eh forced difference/numeral form, eager attached-variable guard, numeral-side triangle bounds, binary bounds, true-first propagation, scoped duplicate suppression, equality/disequality events, eager restart recreation and triangle proof hints",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dense_diff_equality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dense_diff_equality_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/basic_dense_forced_equality.smt2"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceEagerEqualityAxiomControl",
+            "TestSMTDenseDifferenceForcesDifferenceEqualityWithNumeral",
+            "TestSMTDenseDifferenceEqualityPhaseAndProofHint",
+            "TestSMTDenseDifferenceEqualityRestartRecreatesEagerDisabledAxioms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         },
         {
@@ -143100,7 +143168,11 @@
         "pkg/smtcore/theory_dense_diff_display_test.go",
         "pkg/smtcore/theory_dense_diff_statistics.go",
         "pkg/smtcore/theory_dense_diff_statistics_test.go",
-        "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
+        "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
+        "pkg/smtcore/theory_dense_diff_equality.go",
+        "pkg/smtcore/theory_dense_diff_equality_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/basic_dense_forced_equality.smt2"
       ],
       "tests": [
         "TestSMTDenseDifferenceClosureExplanationsAndRollback",
@@ -143122,7 +143194,13 @@
         "TestSMTDenseDifferenceDisplayInfinitesimalText",
         "TestSMTDenseDifferenceDisplayThroughContext",
         "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
-        "TestSMTBasicArithmeticModesBeforeFirstBoundary"
+        "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+        "TestSMTDenseDifferenceEagerEqualityAxiomControl",
+        "TestSMTDenseDifferenceForcesDifferenceEqualityWithNumeral",
+        "TestSMTDenseDifferenceEqualityPhaseAndProofHint",
+        "TestSMTDenseDifferenceEqualityRestartRecreatesEagerDisabledAxioms",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
       ],
       "conditionals": [
         {
@@ -143295,7 +143373,7 @@
           ]
         },
         {
-          "name": "remaining dense setup routes, full arithmetic control fidelity and theory_opt objective callbacks",
+          "name": "remaining dense setup routes, arithmetic control fidelity and theory_opt objective callbacks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -143325,6 +143403,24 @@
           "tests": [
             "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
             "TestSMTBasicArithmeticModesBeforeFirstBoundary"
+          ]
+        },
+        {
+          "name": "internalize_eq_eh forced difference/numeral form, eager attached-variable guard, numeral-side triangle bounds, binary bounds, true-first propagation, scoped duplicate suppression, equality/disequality events, eager restart recreation and triangle proof hints",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dense_diff_equality.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dense_diff_equality_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/basic_dense_forced_equality.smt2"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceEagerEqualityAxiomControl",
+            "TestSMTDenseDifferenceForcesDifferenceEqualityWithNumeral",
+            "TestSMTDenseDifferenceEqualityPhaseAndProofHint",
+            "TestSMTDenseDifferenceEqualityRestartRecreatesEagerDisabledAxioms",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         },
         {

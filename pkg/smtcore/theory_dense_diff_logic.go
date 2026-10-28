@@ -58,6 +58,7 @@ func NewSMTDenseDiffTheory(family ast.FamilyID) (*SMTDenseDiffTheory, error) {
 func (t *SMTDenseDiffTheory) ConfigureArithmetic(config SMTArithState) error {
 	t.config = config
 	t.adapter.lazy = config.LazyAdapter
+	t.adapter.binary = config.AddBinaryBounds
 	return nil
 }
 
@@ -353,33 +354,7 @@ func (t *SMTDenseDiffTheory) propagateCell(source, target int) error {
 	return nil
 }
 
-func (t *SMTDenseDiffTheory) InternalizeEquality(expression ast.ASTHandle, variable int32) error {
-	left, err := t.state.manager.GetArg(expression, 0)
-	if err != nil {
-		return err
-	}
-	sort, err := t.state.manager.GetSort(left)
-	if err != nil {
-		return err
-	}
-	integer, err := t.syntax.integerSort(sort)
-	if err != nil {
-		return err
-	}
-	if integer {
-		return t.syntax.InternalizeEquality(expression, variable)
-	}
-	real := SMTRealDiffTheory{SMTIntegerDiffTheory: &t.syntax}
-	return real.InternalizeEquality(expression, variable)
-}
-func (t *SMTDenseDiffTheory) NewEquality(left, right SMTTheoryVar) error {
-	return t.adapter.NewEquality(left, right)
-}
-func (t *SMTDenseDiffTheory) NewDisequality(left, right SMTTheoryVar) error {
-	return t.adapter.NewDisequality(left, right)
-}
 func (t *SMTDenseDiffTheory) InitializeSearch() error { return t.adapter.InitializeSearch() }
-func (t *SMTDenseDiffTheory) Restart() error          { return t.adapter.Restart() }
 
 func (t *SMTDenseDiffTheory) PushScope() error {
 	if err := t.SMTTheoryBase.PushScope(); err != nil {

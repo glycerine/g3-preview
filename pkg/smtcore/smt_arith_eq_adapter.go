@@ -25,6 +25,7 @@ type smtArithmeticEqualityAdapter struct {
 	trail     []smtArithmeticEqualityPair
 	limits    []int
 	restart   []smtArithmeticEqualityPair
+	hint      []ast.ASTParameter
 	numAxioms uint64
 	lazy      bool
 	binary    bool
