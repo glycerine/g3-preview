@@ -11,7 +11,19 @@ func (e *PropositionalEngine) SelectEngine(name string) error {
 		return err
 	}
 	switch name {
-	case "auto-config", "datalog":
+	case "auto-config":
+		e.backend = "datalog"
+		for _, state := range e.predicates {
+			if state.table == nil {
+				if e.params == nil || e.globals == nil {
+					return fmt.Errorf("muz/fp: fixedpoint auto-config requires parameter services for infinite-domain predicates")
+				}
+				e.backend = "pdr"
+				break
+			}
+		}
+		return nil
+	case "datalog":
 		e.backend = "datalog"
 		return nil
 	case "pdr", "spacer":

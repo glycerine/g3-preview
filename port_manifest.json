@@ -80739,7 +80739,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/fp/pdr_engine.go", "pkg/muz/base/hnf.go", "pkg/muz/dataflow/reachability.go", "pkg/muz/rel/table.go", "pkg/muz/rel/relation_manager.go", "pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
-      "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPDREngineMatchesCPPIntegerHornQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"],
+      "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPDREngineMatchesCPPIntegerHornQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"],
       "assertions": [
         {
           "line": 82,
@@ -80822,7 +80822,7 @@
           "name": "infinite-domain predicate registration and PDR/Spacer query dispatch through the retained rule context",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
-          "tests": ["TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]
+          "tests": ["TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP"]
         }
       ],
       "ownership": [
@@ -82560,15 +82560,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/register_engine.go", "pkg/cmd_context/fixedpoint.go"],
-      "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"],
+      "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete DATALOG_ENGINE and PDR/SPACER_ENGINE selection, including auto-config Datalog selection and explicit refusal of remaining unavailable engines (dl_register_engine.cpp:26-58)",
+          "name": "Concrete DATALOG_ENGINE and PDR/SPACER_ENGINE selection, including finite-domain Datalog versus infinite-domain PDR auto-configuration and explicit refusal of remaining unavailable engines (dl_register_engine.cpp:26-58)",
           "status": "partial",
           "go_target": "pkg/muz/fp/register_engine.go",
-          "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]
+          "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP"]
         }
       ],
       "ownership": [
@@ -82584,7 +82584,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/register_engine.go", "pkg/cmd_context/fixedpoint.go"],
-      "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"],
+      "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP"],
       "conditionals": [
         {
           "line": 19,
@@ -82602,7 +82602,7 @@
           "name": "Retained concrete engine-selection surface for Datalog and PDR/Spacer backends (dl_register_engine.h:25-33)",
           "status": "partial",
           "go_target": "pkg/muz/fp/register_engine.go",
-          "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]
+          "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP"]
         }
       ],
       "ownership": [
@@ -83187,6 +83187,7 @@
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+        "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
       ],
@@ -83210,6 +83211,7 @@
           "tests": [
             "TestPDREngineMatchesCPPIntegerHornQueries",
             "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+            "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
           ]
@@ -83242,6 +83244,7 @@
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+        "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
       ],
@@ -83265,6 +83268,7 @@
           "tests": [
             "TestPDREngineMatchesCPPIntegerHornQueries",
             "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+            "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
           ]

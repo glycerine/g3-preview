@@ -416,3 +416,33 @@ func TestSMT2FixedpointSpacerIntegerQueriesMatchCPP(t *testing.T) {
 		t.Fatal("spacer integer SMT-LIB differential", output.String(), cpp)
 	}
 }
+
+func TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	context.PrintSuccess = false
+	script := `(declare-rel P (Int))
+(declare-rel Q (Int))
+(declare-rel U (Int))
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (P x) (Q x)))
+(query Q :print-answer false)
+(query U :print-answer false)
+`
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	if output.String() != cpp || cpp != "sat\nunsat\n" {
+		t.Fatal("auto-config integer SMT-LIB differential", output.String(), cpp)
+	}
+}
