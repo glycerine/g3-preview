@@ -115634,10 +115634,12 @@
       "methods": [
         {
           "name": "auxiliary declaration construction, as-array interpretations, representative arguments, distinct pair construction, and fresh arrays",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/proto_model/array_factory.go",
           "tests": [
-            "TestArrayAndDatatypeFactories"
+            "TestArrayAndDatatypeFactories",
+            "TestFloatingPointFactoryArrayRangeConsumer",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals"
           ]
         },
         {
@@ -115736,10 +115738,12 @@
       "methods": [
         {
           "name": "array value-factory construction and complete value-generation interface",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/proto_model/array_factory.go",
           "tests": [
-            "TestArrayAndDatatypeFactories"
+            "TestArrayAndDatatypeFactories",
+            "TestFloatingPointFactoryArrayRangeConsumer",
+            "TestFactoryOutputsArrayConsumesAndReleasesRangeLocals"
           ]
         },
         {
