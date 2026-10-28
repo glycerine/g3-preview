@@ -80766,7 +80766,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained register_predicate/add_rule/close-reopen/query orchestration for finite-domain Horn programs, including implicit-variable binding, HNF ingestion, stratified negation, dependency-ordered table saturation, tuple answers, and lbool results (dl_context.cpp:344-469,680-738,861-889)",
+          "name": "Retained register_predicate/add_rule/close-reopen/query orchestration for finite-domain Horn programs, including implicit-variable binding, HNF ingestion, stratified negation, finite equality/distinct guards, dependency-ordered table saturation, tuple answers, and lbool results (dl_context.cpp:344-469,680-738,861-889)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"]
@@ -80783,7 +80783,7 @@
         "PropositionalEngine owns its RuleManager, RuleSet, VariableBinder, and finite predicate tables; it borrows the AST manager, reopens derived rule state before mutation, and releases all owned references before the manager."
       ],
       "deviations": [
-        "This is an explicitly bounded integration slice, not the general dl_context: registered finite-domain predicates and stratified positive/negative predicate Horn tails execute by exact dependency-ordered table saturation and produce finite tuple-answer formulas. Interpreted tails, optimized compilation, parameters, transformations, models/proofs, and general engine selection remain open."
+        "This is an explicitly bounded integration slice, not the general dl_context: registered finite-domain predicates, stratified positive/negative predicate tails, and finite Boolean/equality/distinct interpreted guards execute by exact dependency-ordered table saturation and produce finite tuple-answer formulas. Arithmetic interpreted guards, optimized compilation, parameters, transformations, models/proofs, and general engine selection remain open."
       ]
     },
     {
@@ -82433,7 +82433,7 @@
         "cmd_context.Context owns and closes the lazily created fixedpoint engine before declarations and the AST manager; parser command references are temporary and clear after the engine retains rules."
       ],
       "deviations": [
-        "This command slice accepts declare-rel, declare-var, optional rule names, scoped rules, declaration queries, finite variable expansion, stratified negation, and finite tuple-answer formulas for the finite-domain backend. Rule bounds, certificates, statistics, remaining query parameters, and general fixedpoint engines remain open; unavailable requested output is refused explicitly."
+        "This command slice accepts declare-rel, declare-var, optional rule names, scoped rules, declaration queries, finite variable expansion, stratified negation, finite equality/distinct guards, and finite tuple-answer formulas for the finite-domain backend. Rule bounds, certificates, statistics, remaining query parameters, and general fixedpoint engines remain open; unavailable requested output is refused explicitly."
       ]
     },
     {

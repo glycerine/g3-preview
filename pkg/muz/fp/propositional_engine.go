@@ -7,6 +7,7 @@ package fp
 import (
 	"errors"
 	"fmt"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/muz/base"
@@ -192,7 +193,7 @@ func (e *PropositionalEngine) validateFragment() error {
 		uninterpreted, uErr := rule.UninterpretedTailSize()
 		tailSize, tErr := rule.TailSize()
 		x = errors.Join(x, pErr, uErr, tErr)
-		if x == nil && (positive > uninterpreted || uninterpreted != tailSize) {
+		if x == nil && (positive > uninterpreted || uninterpreted > tailSize) {
 			x = ErrPropositionalHorn
 		}
 		for j := 0; x == nil && j < uninterpreted; j++ {
@@ -364,6 +365,267 @@ func (e *PropositionalEngine) expandUnbound(application ast.ASTHandle, state *pr
 	return bindings, nil
 }
 
+func (e *PropositionalEngine) expandExpressionVariables(root ast.ASTHandle, bindings []variableBinding) ([]variableBinding, error) {
+	variables := make(map[uint32]ast.ASTHandle)
+	stack := []ast.ASTHandle{root}
+	for len(stack) != 0 {
+		last := len(stack) - 1
+		current := stack[last]
+		stack = stack[:last]
+		kind, err := e.manager.GetKind(current)
+		if err != nil {
+			return nil, err
+		}
+		if kind == ast.ASTVar {
+			index, x := e.manager.GetVarIndex(current)
+			if x != nil {
+				return nil, x
+			}
+			if _, found := variables[index]; !found {
+				variables[index], x = e.manager.GetSort(current)
+				if x != nil {
+					return nil, x
+				}
+			}
+			continue
+		}
+		if kind != ast.ASTApp {
+			return nil, ErrPropositionalHorn
+		}
+		count, err := e.manager.GetNumArgs(current)
+		if err != nil {
+			return nil, err
+		}
+		for i := count; i > 0; i-- {
+			argument, x := e.manager.GetArg(current, i-1)
+			if x != nil {
+				return nil, x
+			}
+			stack = append(stack, argument)
+		}
+	}
+	indices := make([]uint32, 0, len(variables))
+	for index := range variables {
+		indices = append(indices, index)
+	}
+	sort.Slice(indices, func(i, j int) bool { return indices[i] < indices[j] })
+	for _, index := range indices {
+		size, err := e.manager.GetSortSize(variables[index])
+		if err != nil || !size.IsFinite() {
+			return nil, ErrPropositionalHorn
+		}
+		domain, err := size.Size()
+		if err != nil {
+			return nil, err
+		}
+		next := make([]variableBinding, 0)
+		for _, binding := range bindings {
+			if _, found := binding[index]; found {
+				next = append(next, binding)
+				continue
+			}
+			for value := uint64(0); value < domain; value++ {
+				expanded := cloneBinding(binding)
+				expanded[index] = rel.Element(value)
+				next = append(next, expanded)
+			}
+		}
+		bindings = next
+	}
+	return bindings, nil
+}
+
+func (e *PropositionalEngine) finiteValue(expression ast.ASTHandle, binding variableBinding) (rel.Element, error) {
+	kind, err := e.manager.GetKind(expression)
+	if err != nil {
+		return 0, err
+	}
+	if kind == ast.ASTVar {
+		index, x := e.manager.GetVarIndex(expression)
+		if x != nil {
+			return 0, x
+		}
+		value, found := binding[index]
+		if !found {
+			return 0, ErrPropositionalHorn
+		}
+		return value, nil
+	}
+	sort, err := e.manager.GetSort(expression)
+	if err != nil {
+		return 0, err
+	}
+	return e.relations.EncodeValue(sort, expression)
+}
+
+func (e *PropositionalEngine) evaluateCondition(expression ast.ASTHandle, binding variableBinding) (bool, error) {
+	if e.manager.IsTrue(expression) {
+		return true, nil
+	}
+	if e.manager.IsFalse(expression) {
+		return false, nil
+	}
+	kind, err := e.manager.GetKind(expression)
+	if err != nil {
+		return false, err
+	}
+	if kind == ast.ASTVar {
+		value, x := e.finiteValue(expression, binding)
+		return value != 0, x
+	}
+	if kind != ast.ASTApp {
+		return false, ErrPropositionalHorn
+	}
+	operator, err := e.manager.GetDeclKind(expression)
+	if err != nil {
+		return false, err
+	}
+	count, err := e.manager.GetNumArgs(expression)
+	if err != nil {
+		return false, err
+	}
+	argument := func(index uint32) (ast.ASTHandle, error) { return e.manager.GetArg(expression, index) }
+	switch operator {
+	case ast.ASTOpNot:
+		if count != 1 {
+			return false, ErrPropositionalHorn
+		}
+		child, x := argument(0)
+		if x != nil {
+			return false, x
+		}
+		value, x := e.evaluateCondition(child, binding)
+		return !value, x
+	case ast.ASTOpAnd, ast.ASTOpOr:
+		result := operator == ast.ASTOpAnd
+		for i := uint32(0); i < count; i++ {
+			child, x := argument(i)
+			if x != nil {
+				return false, x
+			}
+			value, x := e.evaluateCondition(child, binding)
+			if x != nil {
+				return false, x
+			}
+			if operator == ast.ASTOpAnd {
+				result = result && value
+			} else {
+				result = result || value
+			}
+		}
+		return result, nil
+	case ast.ASTOpEq, ast.ASTOpOEq:
+		if count != 2 {
+			return false, ErrPropositionalHorn
+		}
+		left, x := argument(0)
+		if x != nil {
+			return false, x
+		}
+		right, x := argument(1)
+		if x != nil {
+			return false, x
+		}
+		leftSort, x := e.manager.GetSort(left)
+		if x != nil {
+			return false, x
+		}
+		boolean, x := e.manager.MkBoolSort()
+		if x != nil {
+			return false, x
+		}
+		if leftSort == boolean {
+			leftValue, y := e.evaluateCondition(left, binding)
+			if y != nil {
+				return false, y
+			}
+			rightValue, y := e.evaluateCondition(right, binding)
+			return leftValue == rightValue, y
+		}
+		leftValue, x := e.finiteValue(left, binding)
+		if x != nil {
+			return false, x
+		}
+		rightValue, x := e.finiteValue(right, binding)
+		return leftValue == rightValue, x
+	case ast.ASTOpDistinct:
+		seen := make(map[rel.Element]bool)
+		for i := uint32(0); i < count; i++ {
+			child, x := argument(i)
+			if x != nil {
+				return false, x
+			}
+			value, x := e.finiteValue(child, binding)
+			if x != nil {
+				return false, x
+			}
+			if seen[value] {
+				return false, nil
+			}
+			seen[value] = true
+		}
+		return true, nil
+	case ast.ASTOpIff, ast.ASTOpXor, ast.ASTOpImplies:
+		if count != 2 {
+			return false, ErrPropositionalHorn
+		}
+		left, x := argument(0)
+		if x != nil {
+			return false, x
+		}
+		right, x := argument(1)
+		if x != nil {
+			return false, x
+		}
+		leftValue, x := e.evaluateCondition(left, binding)
+		if x != nil {
+			return false, x
+		}
+		rightValue, x := e.evaluateCondition(right, binding)
+		if x != nil {
+			return false, x
+		}
+		if operator == ast.ASTOpIff {
+			return leftValue == rightValue, nil
+		}
+		if operator == ast.ASTOpXor {
+			return leftValue != rightValue, nil
+		}
+		return !leftValue || rightValue, nil
+	case ast.ASTOpIte:
+		if count != 3 {
+			return false, ErrPropositionalHorn
+		}
+		condition, x := argument(0)
+		if x != nil {
+			return false, x
+		}
+		branch, x := e.evaluateCondition(condition, binding)
+		if x != nil {
+			return false, x
+		}
+		index := uint32(2)
+		if branch {
+			index = 1
+		}
+		selected, x := argument(index)
+		if x != nil {
+			return false, x
+		}
+		return e.evaluateCondition(selected, binding)
+	}
+	sort, err := e.manager.GetSort(expression)
+	if err != nil {
+		return false, err
+	}
+	boolean, err := e.manager.MkBoolSort()
+	if err == nil && sort == boolean {
+		value, x := e.finiteValue(expression, binding)
+		return value != 0, x
+	}
+	return false, ErrPropositionalHorn
+}
+
 func (e *PropositionalEngine) evaluateRule(rule *base.Rule) (changed bool, result error) {
 	defer func() { result = errors.Join(result, rule.Close()) }()
 	bindings := []variableBinding{{}}
@@ -447,6 +709,34 @@ func (e *PropositionalEngine) evaluateRule(rule *base.Rule) (changed bool, resul
 				}
 			}
 			if !excluded {
+				next = append(next, binding)
+			}
+		}
+		bindings = next
+	}
+	tails, err := rule.TailSize()
+	if err != nil {
+		return false, err
+	}
+	for i := uninterpreted; i < tails; i++ {
+		condition, negated, x := rule.Tail(i)
+		if x != nil {
+			return false, x
+		}
+		if negated {
+			return false, ErrPropositionalHorn
+		}
+		bindings, x = e.expandExpressionVariables(condition, bindings)
+		if x != nil {
+			return false, x
+		}
+		next := make([]variableBinding, 0, len(bindings))
+		for _, binding := range bindings {
+			accepted, y := e.evaluateCondition(condition, binding)
+			if y != nil {
+				return false, y
+			}
+			if accepted {
 				next = append(next, binding)
 			}
 		}
