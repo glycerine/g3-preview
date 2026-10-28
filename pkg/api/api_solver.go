@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"math/big"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/cmd_context"
@@ -357,6 +358,32 @@ func (c *SMTContext) ExecuteSMT2(input io.Reader, output io.Writer) error {
 		return ErrSMTContextOwner
 	}
 	return smt2.ParseCommands(c.command, input, output)
+}
+
+// WriteSMT2 exports the complete current declaration/assertion scope state as
+// a replayable SMT-LIB command stream. It deliberately omits check-sat, so a
+// consumer may append diagnostics or continue mutating the reconstructed
+// context.
+func (c *SMTContext) WriteSMT2(output io.Writer) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if output == nil {
+		return ErrSMTContextOwner
+	}
+	return c.command.WriteReplaySMT2(output)
+}
+
+// SMT2 returns the replay stream produced by WriteSMT2.
+func (c *SMTContext) SMT2() (string, error) {
+	if err := c.open(); err != nil {
+		return "", err
+	}
+	var output strings.Builder
+	if err := c.command.WriteReplaySMT2(&output); err != nil {
+		return "", err
+	}
+	return output.String(), nil
 }
 
 func (c *SMTContext) ResetAssertions() error {

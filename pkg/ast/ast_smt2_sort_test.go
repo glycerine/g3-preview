@@ -49,6 +49,11 @@ func TestASTSMT2SortSourceBuiltinAndParametricFormats(t *testing.T) {
 	stringSort := m.external(m.sequencePlugin.stringSort)
 	custom, err := m.MkSort(astTestSymbol(t, m, "Custom"), ASTSortInfo{})
 	paramsMust(t, err)
+	userArgument, err := m.NewParameterAST(boolSort)
+	paramsMust(t, err)
+	userParametric, err := m.MkUninterpretedSort(astTestSymbol(t, m, "UserBox"), []ASTParameter{userArgument})
+	paramsMust(t, err)
+	paramsMust(t, m.DelParameter(&userArgument))
 	typeName, err := m.NewParameterSymbol(astTestSymbol(t, m, "Box"))
 	paramsMust(t, err)
 	typeArg, err := m.NewParameterAST(boolSort)
@@ -71,7 +76,7 @@ func TestASTSMT2SortSourceBuiltinAndParametricFormats(t *testing.T) {
 		{bvSort, "(_ BitVec 13)"}, {arraySort, "(Array Bool (_ BitVec 13))"},
 		{floatSort, "(_ FloatingPoint 8 24)"}, {stringSort, "String"},
 		{seqSort, "(Seq Bool)"}, {reSort, "(RegEx Bool)"},
-		{parametric, "(Box Bool)"}, {custom, "Custom"},
+		{parametric, "(Box Bool)"}, {userParametric, "(UserBox Bool)"}, {custom, "Custom"},
 	} {
 		format, e := m.SMT2PPSort(tc.sort)
 		paramsMust(t, e)

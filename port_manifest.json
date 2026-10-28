@@ -5889,6 +5889,8 @@
       "go_targets": [
         "pkg/api/api_solver.go",
         "pkg/api/api_solver_test.go",
+        "pkg/api/api_smt2_state_test.go",
+        "pkg/cmd_context/replay_smt2.go",
         "pkg/cmd_context/result_access.go",
         "pkg/parsers/smt2/commands.go"
       ],
@@ -5899,6 +5901,9 @@
         "TestSMTContextImpliedEqualities",
         "TestSMTContextAssertSMT2TransactionalFinalAssertions",
         "TestSMTContextExecuteSMT2SharesSessionWithGoAPI",
+        "TestSMTContextSMT2ReplaysDeclarationsAssertionsAndScopes",
+        "TestSMTContextSMT2ReplaysParametricSortsAndNestedConstantArrays",
+        "TestSMTContextWriteSMT2GuardsAndMatchesStringForm",
         "TestSMTContextUnknownReason",
         "TestSMTContextCopiesShareClose"
       ],
@@ -5906,10 +5911,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Public strategic solver construction and retained assert/assert-and-track, assertion enumeration, push/pop/scope depth, check/check-assumptions, model, proof, unsat-core, reason-unknown, copied statistics, owning consequence results, implied-equality partitions, transactional assertion loading and stateful SMT-LIB command execution",
+          "name": "Public strategic solver construction and retained assert/assert-and-track, assertion enumeration, push/pop/scope depth, check/check-assumptions, model, proof, unsat-core, reason-unknown, copied statistics, owning consequence results, implied-equality partitions, transactional assertion loading, stateful SMT-LIB command execution, and replayable declaration/assertion scope export",
           "status": "partial",
           "go_target": "pkg/api/api_solver.go",
-          "go_targets": ["pkg/cmd_context/result_access.go", "pkg/parsers/smt2/commands.go"],
+          "go_targets": ["pkg/cmd_context/result_access.go", "pkg/cmd_context/replay_smt2.go", "pkg/parsers/smt2/commands.go"],
           "tests": [
             "TestSMTContextEndToEndModelScopesAndAssumptions",
             "TestSMTContextUnsatCoreAndProofResults",
@@ -5917,12 +5922,15 @@
             "TestSMTContextImpliedEqualities",
             "TestSMTContextAssertSMT2TransactionalFinalAssertions",
             "TestSMTContextExecuteSMT2SharesSessionWithGoAPI",
+            "TestSMTContextSMT2ReplaysDeclarationsAssertionsAndScopes",
+            "TestSMTContextSMT2ReplaysParametricSortsAndNestedConstantArrays",
+            "TestSMTContextWriteSMT2GuardsAndMatchesStringForm",
             "TestSMTContextUnknownReason"
           ]
         }
       ],
       "ownership": [
-        "SMTContext owns the command context, strategic solver, AST manager and independent runtime services. Returned models transfer one owning reference to the caller; core/proof handles remain borrowed from the last result. Copied SMTContext values share one close state. AssertSMT2 owns an isolated parser context and pins all translated target formulas until publication and cleanup. ExecuteSMT2 borrows caller streams for one parse and retains declarations, assertions, scopes and check results in the same owning command context across API calls."
+        "SMTContext owns the command context, strategic solver, AST manager and independent runtime services. Returned models transfer one owning reference to the caller; core/proof handles remain borrowed from the last result. Copied SMTContext values share one close state. AssertSMT2 owns an isolated parser context and pins all translated target formulas until publication and cleanup. ExecuteSMT2 borrows caller streams for one parse and retains declarations, assertions, scopes and check results in the same owning command context across API calls. WriteSMT2 borrows its writer synchronously and exports no AST ownership."
       ],
       "deviations": [
         "The retained surface is idiomatic Go over concrete AST handles, not opaque C handles. Consequence expressions return concrete owning ASTRefs instead of an opaque AST-vector wrapper. Implied equalities return a Go slice of class identifiers. AssertSMT2 streams are parsed transactionally in an isolated Go command context, translated into the target manager, and publish only the final assertion set; check commands are syntax-checked and ignored as in solver_from_stream. ExecuteSMT2 instead runs the complete command stream against the live API context and exposes its results to later typed API calls. Solver translation, construction from tactics, DIMACS file loading, parameter descriptors and string display remain unported at this API layer."
@@ -5934,7 +5942,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/api/api_solver.go"],
-      "tests": ["TestSMTContextCopiesShareClose"],
+      "tests": ["TestSMTContextCopiesShareClose", "TestSMTContextSMT2ReplaysDeclarationsAssertionsAndScopes", "TestSMTContextSMT2ReplaysParametricSortsAndNestedConstantArrays", "TestSMTContextWriteSMT2GuardsAndMatchesStringForm"],
       "conditionals": [
         {
           "line": 18,
@@ -14247,7 +14255,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "ast_pp_util collect overloads, declaration removal, dependency-ordered declaration display and neat/legacy assertion display",
+          "name": "ast_pp_util collect overloads, declaration and sort suppression, borrowed collection inspection, dependency-ordered declaration display and neat/legacy assertion display",
           "status": "ported",
           "go_target": "pkg/ast/ast_pp_util.go",
           "tests": [
@@ -41684,6 +41692,8 @@
         "pkg/cmd_context/runtime.go",
         "pkg/cmd_context/applications.go",
         "pkg/cmd_context/results.go",
+        "pkg/cmd_context/replay_smt2.go",
+        "pkg/api/api_smt2_state_test.go",
         "pkg/cmd_context/context_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd_context/macros.go",

@@ -144,9 +144,13 @@ func (m *ASTManager) SMT2PPSort(sort ASTHandle) (ASTHandle, error) {
 			return m.FormatSeq1("Seq", []ASTHandle{inner})
 		}
 		return m.FormatSeq1("RegEx", []ASTHandle{inner})
-	case v.datatypeSort && len(v.params) > 1:
-		args := make([]ASTHandle, 0, len(v.params)-1)
-		for _, p := range v.params[1:] {
+	case (v.datatypeSort && len(v.params) > 1) || ((v.family == NullFamilyID || v.family == 4) && len(v.params) > 0):
+		parameters := v.params
+		if v.datatypeSort {
+			parameters = parameters[1:]
+		}
+		args := make([]ASTHandle, 0, len(parameters))
+		for _, p := range parameters {
 			if p.kind != ASTParameterAST {
 				return ASTHandle{}, ErrASTDomain
 			}

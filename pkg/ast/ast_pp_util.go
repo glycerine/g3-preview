@@ -5,9 +5,10 @@ package ast
 import "io"
 
 type ASTPPUtil struct {
-	manager   *ASTManager
-	collector *astDeclCollector
-	removed   map[ASTHandle]bool
+	manager      *ASTManager
+	collector    *astDeclCollector
+	removed      map[ASTHandle]bool
+	removedSorts map[ASTHandle]bool
 }
 
 func NewASTPPUtil(manager *ASTManager) (*ASTPPUtil, error) {
@@ -18,8 +19,39 @@ func NewASTPPUtil(manager *ASTManager) (*ASTPPUtil, error) {
 		return nil, err
 	}
 	return &ASTPPUtil{
-		manager: manager, collector: newASTDeclCollector(manager, false), removed: make(map[ASTHandle]bool),
+		manager: manager, collector: newASTDeclCollector(manager, false), removed: make(map[ASTHandle]bool), removedSorts: make(map[ASTHandle]bool),
 	}, nil
+}
+
+// RemoveSort suppresses a previously emitted sort while retaining it as a
+// dependency for ordering declarations collected later.
+func (p *ASTPPUtil) RemoveSort(sort ASTHandle) error {
+	if p == nil || p.manager == nil || p.removedSorts == nil {
+		return ErrASTHandle
+	}
+	if kind, err := p.manager.GetKind(sort); err != nil {
+		return err
+	} else if kind != ASTSort {
+		return ErrASTDomain
+	}
+	p.removedSorts[sort] = true
+	return nil
+}
+
+// CollectedDeclarations returns borrowed declarations reached so far.
+func (p *ASTPPUtil) CollectedDeclarations() ([]ASTHandle, error) {
+	if p == nil || p.collector == nil {
+		return nil, ErrASTHandle
+	}
+	return append([]ASTHandle(nil), p.collector.decls...), nil
+}
+
+// CollectedSorts returns borrowed user and datatype sorts reached so far.
+func (p *ASTPPUtil) CollectedSorts() ([]ASTHandle, error) {
+	if p == nil || p.collector == nil {
+		return nil, ErrASTHandle
+	}
+	return append([]ASTHandle(nil), p.collector.sorts...), nil
 }
 
 func (p *ASTPPUtil) Collect(expr ASTHandle) error {
@@ -67,6 +99,9 @@ func (p *ASTPPUtil) DisplayDeclarations(out io.Writer) error {
 		return err
 	}
 	for _, sort := range p.collector.sorts {
+		if p.removedSorts[sort] {
+			continue
+		}
 		if err = legacy.DisplayAST(out, sort, 0, nil); err != nil {
 			return err
 		}
