@@ -141,3 +141,20 @@ func TestSMT2FixedpointQueryRefusesUnavailableOutputParameters(t *testing.T) {
 		})
 	}
 }
+
+func TestSMT2FixedpointQueryRefusesUnportedEngine(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	script := "(set-option :fixedpoint.engine spacer)\n(declare-rel P ())\n(query P)\n"
+	err = smt2.ParseCommands(context, strings.NewReader(script), &bytes.Buffer{})
+	if err == nil || !strings.Contains(err.Error(), "fixedpoint engine spacer is not ported") {
+		t.Fatal("unported fixedpoint engine accepted", err)
+	}
+}

@@ -82398,7 +82398,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go", "pkg/cmd/g3/main_test.go", "pkg/cmd/g3/test_vectors/fixedpoint_propositional.smt2"],
-      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestPropositionalEngineScopeGuards", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
+      "tests": ["TestSMT2FixedpointEmptyProgramQueryMatchesCPP", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters", "TestSMT2FixedpointQueryRefusesUnportedEngine", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestPropositionalEngineScopeGuards", "TestPropositionalEngineSelection", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"],
       "assertions": [
         {
           "line": 305,
@@ -82480,22 +82480,33 @@
       "path": "src/muz/fp/dl_register_engine.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/fp/register_engine.go", "pkg/cmd_context/fixedpoint.go"],
+      "tests": ["TestPropositionalEngineSelection", "TestSMT2FixedpointQueryRefusesUnportedEngine"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete DATALOG_ENGINE factory selection for the retained positive propositional backend, including auto-config selection and explicit unavailable-engine refusal (dl_register_engine.cpp:26-58)",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/register_engine.go",
+          "tests": ["TestPropositionalEngineSelection", "TestSMT2FixedpointQueryRefusesUnportedEngine"]
+        }
+      ],
+      "ownership": [
+        "The selected Datalog engine remains owned by cmd_context.Context; selection itself borrows the engine and creates no additional owner."
+      ],
+      "deviations": [
+        "PDR/QPDR, Spacer, BMC/QBMC, tabulation, CLP, duality, and DDNF engine constructors remain unported and are rejected explicitly instead of falling through to Datalog."
+      ]
     },
     {
       "path": "src/muz/fp/dl_register_engine.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/fp/register_engine.go", "pkg/cmd_context/fixedpoint.go"],
+      "tests": ["TestPropositionalEngineSelection", "TestSMT2FixedpointQueryRefusesUnportedEngine"],
       "conditionals": [
         {
           "line": 19,
@@ -82508,9 +82519,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Retained concrete engine-selection surface for the Datalog backend (dl_register_engine.h:25-33)",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/register_engine.go",
+          "tests": ["TestPropositionalEngineSelection", "TestSMT2FixedpointQueryRefusesUnportedEngine"]
+        }
+      ],
+      "ownership": [
+        "Go uses the concrete PropositionalEngine owner directly rather than a base-pointer allocation layer."
+      ],
+      "deviations": [
+        "The factory surface will expand only as retained concrete higher fixedpoint engines are ported."
+      ]
     },
     {
       "path": "src/muz/fp/horn_tactic.cpp",
@@ -94169,6 +94191,7 @@
         "TestSMT2FixedpointPropositionalQueriesMatchCPP",
         "TestSMT2FixedpointRuleScopesMatchCPP",
         "TestSMT2FixedpointQueryRefusesUnavailableOutputParameters",
+        "TestSMT2FixedpointQueryRefusesUnportedEngine",
         "TestSMT2ParserPushLocalShiftsFreeVariables",
         "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders",
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",

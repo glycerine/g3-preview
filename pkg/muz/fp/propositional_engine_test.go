@@ -181,3 +181,24 @@ func TestPropositionalEngineScopeGuards(t *testing.T) {
 		t.Fatal("post-query pop accepted", err)
 	}
 }
+
+func TestPropositionalEngineSelection(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngine(manager)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	for _, name := range []string{"auto-config", "datalog"} {
+		if err = engine.SelectEngine(name); err != nil {
+			t.Fatal(name, err)
+		}
+	}
+	for _, name := range []string{"spacer", "unknown"} {
+		if err = engine.SelectEngine(name); err == nil {
+			t.Fatal("unavailable engine accepted", name)
+		}
+	}
+}

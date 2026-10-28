@@ -5,6 +5,8 @@ package cmd_context
 // the exact positive zero-arity fragment exposed by muz/fp.
 
 import (
+	"fmt"
+
 	"github.com/glycerine/g3/pkg/ast"
 	muzfp "github.com/glycerine/g3/pkg/muz/fp"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -79,6 +81,16 @@ func (c *Context) PopFixedpoint() error {
 func (c *Context) QueryFixedpoint(declaration ast.ASTHandle) (lbool.LBool, error) {
 	engine, err := c.fixedpointContext()
 	if err != nil {
+		return lbool.Undef, err
+	}
+	selection, supported, err := c.GetOption(":fixedpoint.engine")
+	if err != nil {
+		return lbool.Undef, err
+	}
+	if !supported {
+		return lbool.Undef, fmt.Errorf("cmd_context: fixedpoint.engine option is unavailable")
+	}
+	if err = engine.SelectEngine(selection); err != nil {
 		return lbool.Undef, err
 	}
 	manager, err := c.Manager()
