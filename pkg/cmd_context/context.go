@@ -14,6 +14,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
+	muzfp "github.com/glycerine/g3/pkg/muz/fp"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic/portfolio"
@@ -71,6 +72,7 @@ type Context struct {
 	params                           uparams.ParamsRef
 	paramsReady                      bool
 	manager                          *ast.ASTManager
+	fixedpoint                       *muzfp.PropositionalEngine
 	solver                           solver.Solver
 	tacticResult                     *solver.SimpleCheckSatResult
 	retainedSolverResult             solver.Solver
@@ -952,6 +954,12 @@ func (c *Context) resetManagerState() error {
 	}
 	if err := c.clearCheckSatResult(); err != nil {
 		return err
+	}
+	if c.fixedpoint != nil {
+		if err := c.fixedpoint.Close(); err != nil {
+			return err
+		}
+		c.fixedpoint = nil
 	}
 	if c.solver != nil {
 		if err := c.solver.Close(); err != nil {

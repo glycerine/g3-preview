@@ -405,6 +405,31 @@ func (p *commandParser) command() (bool, error) {
 		if _, err = p.context.DeclareFunction(function, domain, rangeSort); err != nil {
 			return false, err
 		}
+	case "declare-rel":
+		relation, err := p.symbol()
+		if err != nil {
+			return false, err
+		}
+		if err = p.expect(LeftParenToken); err != nil {
+			return false, err
+		}
+		var domain []ast.ASTHandle
+		for p.token != RightParenToken {
+			sort, x := p.sort()
+			if x != nil {
+				return false, x
+			}
+			domain = append(domain, sort)
+		}
+		if err = p.advance(); err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if _, err = p.context.DeclareRelation(relation, domain); err != nil {
+			return false, err
+		}
 	case "define-fun", "define-const":
 		if err := p.defineFunction(name == "define-fun"); err != nil {
 			return false, err
@@ -422,6 +447,24 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		if err = p.context.AssertWithText(expression, named, displayText); err != nil {
+			return false, err
+		}
+	case "rule":
+		expression, _, err := p.expression()
+		if err != nil {
+			return false, err
+		}
+		name := ""
+		if p.token != RightParenToken {
+			name, err = p.symbol()
+			if err != nil {
+				return false, err
+			}
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if err = p.context.AddFixedpointRule(expression, name); err != nil {
 			return false, err
 		}
 	case "assert-soft":
@@ -524,6 +567,30 @@ func (p *commandParser) command() (bool, error) {
 				return false, err
 			}
 			if err = p.context.ValidateInfoStatus(status); err != nil {
+				return false, err
+			}
+		}
+		success = false
+	case "query":
+		declaration, err := p.functionDeclarationReference()
+		if err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if !p.ignoreChecks {
+			status, x := p.context.QueryFixedpoint(declaration)
+			if x != nil {
+				return false, x
+			}
+			text := "unknown"
+			if status == lbool.True {
+				text = "sat"
+			} else if status == lbool.False {
+				text = "unsat"
+			}
+			if _, err = fmt.Fprintln(p.out, text); err != nil {
 				return false, err
 			}
 		}

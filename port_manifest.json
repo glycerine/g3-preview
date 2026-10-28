@@ -80698,8 +80698,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/base/hnf.go", "pkg/muz/dataflow/reachability.go"],
-      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"],
+      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/base/hnf.go", "pkg/muz/dataflow/reachability.go", "pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
+      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"],
       "assertions": [
         {
           "line": 82,
@@ -80769,7 +80769,7 @@
           "name": "Narrow exact register_predicate/add_rule/close-reopen/query orchestration for positive zero-arity Horn programs, including HNF ingestion, stratification finalization, and lbool reachability results (dl_context.cpp:344-361,456-469,680-738,861-889)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
-          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"]
+          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"]
         }
       ],
       "ownership": [
@@ -80784,8 +80784,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/fp/propositional_engine.go"],
-      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"],
+      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
+      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"],
       "conditionals": [
         {
           "line": 19,
@@ -80811,7 +80811,7 @@
           "name": "Retained positive-propositional subset of context predicate registration, rule addition, query, and owned lifecycle surface (dl_context.h:127-616)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
-          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"]
+          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"]
         }
       ],
       "ownership": [
@@ -80884,8 +80884,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/fp/propositional_engine.go"],
-      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"],
+      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
+      "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"],
       "conditionals": [
         {
           "line": 19,
@@ -80903,7 +80903,7 @@
           "name": "Concrete query and cleanup contract for the first exact positive-propositional fixedpoint engine slice (dl_engine_base.h:40-114)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
-          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"]
+          "tests": ["TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments", "TestSMT2FixedpointPropositionalQueriesMatchCPP"]
         }
       ],
       "ownership": [
@@ -82382,9 +82382,9 @@
       "path": "src/muz/fp/dl_cmds.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go", "pkg/muz/fp/propositional_engine.go"],
+      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineRefusesRicherHornFragments"],
       "assertions": [
         {
           "line": 305,
@@ -82401,17 +82401,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Narrow declare-rel, rule, and query command execution for positive zero-arity Horn programs (dl_cmds.cpp:64-313)",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP"]
+        }
+      ],
+      "ownership": [
+        "cmd_context.Context owns and closes the lazily created fixedpoint engine before declarations and the AST manager; parser command references are temporary and clear after the engine retains rules."
+      ],
+      "deviations": [
+        "This first command slice accepts declare-rel, optional rule names, and declaration queries only for the exact positive zero-arity backend. declare-var, relation representations, rule bounds, query parameters, answers, certificates, statistics, and general fixedpoint engines remain open."
+      ]
     },
     {
       "path": "src/muz/fp/dl_cmds.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
+      "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP"],
       "conditionals": [
         {
           "line": 18,
@@ -82424,9 +82435,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Registration surface for the retained declare-rel, rule, and query command subset (dl_cmds.h:23-34)",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": ["TestSMT2FixedpointPropositionalQueriesMatchCPP"]
+        }
+      ],
+      "ownership": [
+        "Go command dispatch is package-owned and stateless; fixedpoint session state is owned by cmd_context.Context."
+      ],
+      "deviations": [
+        "The remaining fixedpoint command registrations and richer command argument surfaces are not yet ported."
+      ]
     },
     {
       "path": "src/muz/fp/dl_register_engine.cpp",
