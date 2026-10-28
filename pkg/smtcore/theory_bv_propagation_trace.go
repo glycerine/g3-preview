@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -129,6 +130,22 @@ func (t *SMTBitVectorTheory) traceBVMergeInconsistent(first, second SMTTheoryVar
 		if _, err := io.WriteString(out, "inconsistent "); err != nil {
 			return err
 		}
+		if err := t.DisplayVariable(out, first); err != nil {
+			return err
+		}
+		if err := t.DisplayVariable(out, second); err != nil {
+			return err
+		}
+		_, err := fmt.Fprintf(out, "idx: %d\n", index)
+		return err
+	})
+}
+
+func (t *SMTBitVectorTheory) traceBVMergeComplement(first, second SMTTheoryVar, index int, bit1, bit2 SMTLiteral) error {
+	if !diagnostic.DebugBuild || bit1 != bit2.Negated() {
+		return nil
+	}
+	return t.emitBVTrace("bv_bug", "merge_eh", 1416, func(out io.Writer) error {
 		if err := t.DisplayVariable(out, first); err != nil {
 			return err
 		}

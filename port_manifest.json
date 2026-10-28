@@ -141302,7 +141302,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control and conversion source traces are ported, while remaining operator TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, conversion and private union-find diagnostics are ported, while remaining operator TRACE/SASSERT diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -141346,6 +141346,21 @@
           "tests": [
             "TestSMTBVConversionSourceTrace",
             "TestSMTBVFrontendFixedRelevantAndScopeSourceTrace"
+          ]
+        },
+        {
+          "name": "Private merge_zero_one_bits and merge_eh diagnostics at theory_bv.cpp:1416,1447,1463-1499: conditional complementary-bit display, native unreachable guard, equal widths, clean auxiliary polarity columns, complementary literal/size assertions and post-reset validation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv_private.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_propagation.go",
+            "pkg/smtcore/theory_bv_propagation_trace.go",
+            "pkg/smtcore/theory_bv_union_find_diagnostics_test.go"
+          ],
+          "tests": [
+            "TestSMTBVZeroOneMergeSourceAssertionSites",
+            "TestSMTBVMergeComplementConditionalSourceTrace",
+            "TestSMTBVNativeConstantSummaryConflictCommitsAndUnmerges"
           ]
         },
         {
@@ -141846,7 +141861,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control and conversion source traces are ported, while remaining operator TRACE/SASSERT and specialization-level union-find diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, conversion and private union-find diagnostics are ported, while remaining operator TRACE/SASSERT diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -141890,6 +141905,21 @@
           "tests": [
             "TestSMTBVConversionSourceTrace",
             "TestSMTBVFrontendFixedRelevantAndScopeSourceTrace"
+          ]
+        },
+        {
+          "name": "Private merge_zero_one_bits and merge_eh diagnostics at theory_bv.cpp:1416,1447,1463-1499: conditional complementary-bit display, native unreachable guard, equal widths, clean auxiliary polarity columns, complementary literal/size assertions and post-reset validation",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv_private.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_propagation.go",
+            "pkg/smtcore/theory_bv_propagation_trace.go",
+            "pkg/smtcore/theory_bv_union_find_diagnostics_test.go"
+          ],
+          "tests": [
+            "TestSMTBVZeroOneMergeSourceAssertionSites",
+            "TestSMTBVMergeComplementConditionalSourceTrace",
+            "TestSMTBVNativeConstantSummaryConflictCommitsAndUnmerges"
           ]
         },
         {

@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/util/union_find.h:48-152, specialized for theory_bv;
 // src/smt/theory_bv.cpp:33-39,1319-1332,1383-1504,1554-1581.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 
@@ -133,10 +134,23 @@ func (t *SMTBitVectorTheory) mergeZeroOneBits(root, child SMTTheoryVar) (bool, e
 	if err != nil {
 		return false, err
 	}
+	if err = bvAssert(1463, "bv_size == get_bv_size(r2)", func() (bool, error) {
+		childNode, e := t.Enode(child)
+		if e != nil {
+			return false, e
+		}
+		childWidth, e := t.state.manager.BitVectorSize(childNode.owner)
+		return width == childWidth, e
+	}); err != nil {
+		return false, err
+	}
 	for sign := range t.mergeAux {
 		for uint64(len(t.mergeAux[sign])) < uint64(width)+1 {
 			t.mergeAux[sign] = append(t.mergeAux[sign], SMTNullTheoryVar)
 		}
+	}
+	if err = t.assertBVMergeAux(1472, width); err != nil {
+		return false, err
 	}
 	for _, bit := range t.zeroOneBits[root] {
 		sign := 0
@@ -161,6 +175,19 @@ func (t *SMTBitVectorTheory) mergeZeroOneBits(root, child SMTTheoryVar) (bool, e
 		}
 		other := t.mergeAux[1-sign][bit.index]
 		if other != SMTNullTheoryVar {
+			if err = bvAssert(1486, "m_bits[v1][it->m_idx] == ~(m_bits[v2][it->m_idx])", func() (bool, error) {
+				if other < 0 || bit.variable < 0 || int(other) >= len(t.bitLiterals) || int(bit.variable) >= len(t.bitLiterals) || uint64(bit.index) >= uint64(len(t.bitLiterals[other])) || uint64(bit.index) >= uint64(len(t.bitLiterals[bit.variable])) {
+					return false, ast.ErrASTDomain
+				}
+				return t.bitLiterals[other][bit.index] == t.bitLiterals[bit.variable][bit.index].Negated(), nil
+			}); err != nil {
+				return false, err
+			}
+			if err = bvAssert(1487, "m_bits[v1].size() == m_bits[v2].size()", func() (bool, error) {
+				return len(t.bitLiterals[other]) == len(t.bitLiterals[bit.variable]), nil
+			}); err != nil {
+				return false, err
+			}
 			if err = t.newStaticBitDisequality(other, bit.variable, bit.index); err != nil {
 				return false, err
 			}
@@ -174,5 +201,22 @@ func (t *SMTBitVectorTheory) mergeZeroOneBits(root, child SMTTheoryVar) (bool, e
 		}
 	}
 	reset()
+	if err = t.assertBVMergeAux(1499, width); err != nil {
+		return false, err
+	}
 	return true, nil
+}
+
+func (t *SMTBitVectorTheory) assertBVMergeAux(line int32, width uint32) error {
+	return bvAssert(line, "m_merge_aux[0][i] == null_theory_var || m_merge_aux[1][i] == null_theory_var", func() (bool, error) {
+		if uint64(width) > uint64(len(t.mergeAux[0])) || uint64(width) > uint64(len(t.mergeAux[1])) {
+			return false, ast.ErrASTDomain
+		}
+		for i := uint32(0); i < width; i++ {
+			if t.mergeAux[0][i] != SMTNullTheoryVar && t.mergeAux[1][i] != SMTNullTheoryVar {
+				return false, nil
+			}
+		}
+		return true, nil
+	})
 }

@@ -5,6 +5,7 @@ package smtcore
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -276,6 +277,9 @@ func (t *SMTBitVectorTheory) mergeBitClasses(root, child, first, second SMTTheor
 		changed := false
 		for index := 0; index < len(t.bitLiterals[first]); index++ {
 			bit1, bit2 := t.bitLiterals[first][index], t.bitLiterals[second][index]
+			if err = t.traceBVMergeComplement(first, second, index, bit1, bit2); err != nil {
+				return err
+			}
 			if err = bvAssert(1417, "bit1 != ~bit2", func() (bool, error) { return bit1 != bit2.Negated(), nil }); err != nil {
 				return err
 			}
@@ -312,6 +316,9 @@ func (t *SMTBitVectorTheory) mergeBitClasses(root, child, first, second SMTTheor
 			}
 			if s.inconsistent {
 				return nil
+			}
+			if value1 != lbool.Undef && value2 != lbool.Undef && value1 != value2 {
+				return diagnostic.BorrowProcessDebugContext().UnreachableSource("src/smt/theory_bv.cpp", 1447)
 			}
 		}
 		if !changed {
