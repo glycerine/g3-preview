@@ -115712,6 +115712,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/proto_model/array_factory.go",
+        "pkg/smtcore/proto_model/array_factory_trace.go",
+        "pkg/smtcore/proto_model/array_factory_trace_source_test.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
         "pkg/smtcore/proto_model/output_helpers_test.go",
         "pkg/smtcore/proto_model/output_source_test.go",
@@ -115723,6 +115725,9 @@
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
+        "TestArrayFactorySourceTraces",
+        "TestArrayFactoryTraceBadbitDoesNotChangeSomeValue",
+        "TestArrayFactorySourceAssertionGates",
         "TestFactoryOutputsDatalogConstructionFailurePrefixes",
         "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
         "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
@@ -115764,6 +115769,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Source TRACE/DEBUG_CODE/SASSERT diagnostics at array_factory.cpp:64,79,96,108-109,117,152,163,203, including sort/expression printing and native ostream badbit continuation",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/array_factory.go",
+            "pkg/smtcore/proto_model/array_factory_trace.go",
+            "pkg/smtcore/proto_model/array_factory_trace_source_test.go"
+          ],
+          "tests": [
+            "TestArrayFactorySourceTraces",
+            "TestArrayFactoryTraceBadbitDoesNotChangeSomeValue",
+            "TestArrayFactorySourceAssertionGates"
+          ]
+        },
         {
           "name": "auxiliary declaration construction, as-array interpretations, representative arguments, distinct pair construction, and fresh arrays",
           "status": "ported",
@@ -115828,6 +115847,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/proto_model/array_factory.go",
+        "pkg/smtcore/proto_model/array_factory_trace.go",
+        "pkg/smtcore/proto_model/array_factory_trace_source_test.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
         "pkg/smtcore/proto_model/output_helpers_test.go",
         "pkg/smtcore/proto_model/output_source_test.go",
@@ -115839,6 +115860,9 @@
       ],
       "tests": [
         "TestArrayAndDatatypeFactories",
+        "TestArrayFactorySourceTraces",
+        "TestArrayFactoryTraceBadbitDoesNotChangeSomeValue",
+        "TestArrayFactorySourceAssertionGates",
         "TestFactoryOutputsDatalogConstructionFailurePrefixes",
         "TestFactoryOutputsFirstAssignmentStopsSecondConstruction",
         "TestFactoryOutputsFrozenUniverseRefusalLeavesBothOwners",
@@ -115868,6 +115892,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Complete retained array-factory diagnostic interface, including source TRACE/DEBUG_CODE/SASSERT sites and sort/expression rendering",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/proto_model/array_factory.go",
+            "pkg/smtcore/proto_model/array_factory_trace.go",
+            "pkg/smtcore/proto_model/array_factory_trace_source_test.go"
+          ],
+          "tests": [
+            "TestArrayFactorySourceTraces",
+            "TestArrayFactoryTraceBadbitDoesNotChangeSomeValue",
+            "TestArrayFactorySourceAssertionGates"
+          ]
+        },
         {
           "name": "array value-factory construction and complete value-generation interface",
           "status": "ported",

@@ -2,6 +2,7 @@ package protomodel
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
@@ -79,11 +80,20 @@ func (f *ArrayFactory) someArguments(s ast.ASTHandle) ([]ast.ASTHandle, error) {
 	return args, nil
 }
 func (f *ArrayFactory) SomeValue(s ast.ASTHandle) (ast.ASTHandle, error) {
-	set, err := f.valueSet(s)
-	if err != nil {
+	if err := f.open(); err != nil {
 		return ast.ASTHandle{}, err
 	}
-	if len(set.values) != 0 {
+	if err := f.trace("array_factory", "get_some_value", 64, nil, func(out io.Writer) error {
+		if err := arrayFactoryDisplayAST(f.manager, out, s); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	set := f.sets[s]
+	if set != nil && len(set.values) != 0 {
 		return set.values[0], nil
 	}
 	v, fi, err := f.makeInterpretation(s)
@@ -105,6 +115,12 @@ func (f *ArrayFactory) SomeValue(s ast.ASTHandle) (ast.ASTHandle, error) {
 	return v, fi.InsertEntry(args, result)
 }
 func (f *ArrayFactory) makeTwo(s ast.ASTHandle) (ok bool, result error) {
+	if err := valueFactoryAssert("src/smt/proto_model/array_factory.cpp", 79, "!m_sort2value_set.find(s, set) || set->size() == 0", func() bool {
+		set := f.sets[s]
+		return set == nil || len(set.values) == 0
+	}); err != nil {
+		return false, err
+	}
 	first, err := f.manager.NewRef(ast.ASTHandle{})
 	if err != nil {
 		return false, err
@@ -158,7 +174,16 @@ func (f *ArrayFactory) makeTwo(s ast.ASTHandle) (ok bool, result error) {
 	if err != nil {
 		return false, err
 	}
-	return true, fi2.InsertEntry(args, r2)
+	if err = fi2.InsertEntry(args, r2); err != nil {
+		return false, err
+	}
+	if err = valueFactoryAssert("src/smt/proto_model/array_factory.cpp", 96, "m_sort2value_set.find(s, set) && set->size() == 2", func() bool {
+		set := f.sets[s]
+		return set != nil && len(set.values) == 2
+	}); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 func (f *ArrayFactory) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bool, error) {
 	if err := f.open(); err != nil {
@@ -172,6 +197,12 @@ func (f *ArrayFactory) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bo
 		}
 	}
 	set = f.sets[s]
+	if err := valueFactoryAssert("src/smt/proto_model/array_factory.cpp", 108, "set != 0", func() bool { return set != nil }); err != nil {
+		return false, err
+	}
+	if err := valueFactoryAssert("src/smt/proto_model/array_factory.cpp", 109, "set->size() > 0", func() bool { return set != nil && len(set.values) > 0 }); err != nil {
+		return false, err
+	}
 	if set == nil || len(set.values) == 0 {
 		return false, ast.ErrASTDomain
 	}
@@ -187,6 +218,9 @@ func (f *ArrayFactory) SomeValues(s ast.ASTHandle, first, second ast.ASTRef) (bo
 			return false, err
 		}
 		return !value.IsNull(), nil
+	}
+	if err := valueFactoryAssert("src/smt/proto_model/array_factory.cpp", 117, "set->size() >= 2", func() bool { return len(set.values) >= 2 }); err != nil {
+		return false, err
 	}
 	if err := f.manager.SetRef(second, set.values[1]); err != nil {
 		return false, err
@@ -218,6 +252,18 @@ func (f *ArrayFactory) FreshValue(s ast.ASTHandle) (out ast.ASTHandle, result er
 		}
 		return v, fi.InsertEntry(args, rangeValue)
 	}
+	if err = f.trace("array_factory_bug", "get_fresh_value", 152, nil, func(out io.Writer) error {
+		if _, err := io.WriteString(out, "array fresh value: using fresh index, range: "); err != nil {
+			return err
+		}
+		if err := arrayFactoryDisplayAST(f.manager, out, rangeSort); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return ast.ASTHandle{}, err
+	}
 	first, err := f.manager.NewRef(ast.ASTHandle{})
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -242,6 +288,38 @@ func (f *ArrayFactory) FreshValue(s ast.ASTHandle) (out ast.ASTHandle, result er
 	}
 	pairOK, err := f.model.SomeValues(rangeSort, first, second)
 	if err != nil || !pairOK {
+		if err == nil {
+			err = f.trace("array_factory_bug", "get_fresh_value", 203, nil, func(out io.Writer) error {
+				_, err := io.WriteString(out, "failed to build fresh array value\n")
+				return err
+			})
+		}
+		return ast.ASTHandle{}, err
+	}
+	r1, err := f.manager.RefGet(first)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	r2, err := f.manager.RefGet(second)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = f.trace("array_factory_bug", "get_fresh_value", 163, nil, func(out io.Writer) error {
+		if _, err := io.WriteString(out, "v1: "); err != nil {
+			return err
+		}
+		if err := arrayFactoryDisplayAST(f.manager, out, r1); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(out, " v2: "); err != nil {
+			return err
+		}
+		if err := arrayFactoryDisplayAST(f.manager, out, r2); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
 		return ast.ASTHandle{}, err
 	}
 	a1, a2 := make([]ast.ASTHandle, len(domain)), make([]ast.ASTHandle, len(domain))
@@ -268,21 +346,19 @@ func (f *ArrayFactory) FreshValue(s ast.ASTHandle) (out ast.ASTHandle, result er
 		a2[i] = a1[i]
 	}
 	if !found {
+		if err = f.trace("array_factory_bug", "get_fresh_value", 203, nil, func(out io.Writer) error {
+			_, err := io.WriteString(out, "failed to build fresh array value\n")
+			return err
+		}); err != nil {
+			return ast.ASTHandle{}, err
+		}
 		return ast.ASTHandle{}, nil
 	}
 	v, fi, err := f.makeInterpretation(s)
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
-	r1, err := f.manager.RefGet(first)
-	if err != nil {
-		return ast.ASTHandle{}, err
-	}
 	if err = fi.InsertEntry(a1, r1); err != nil {
-		return ast.ASTHandle{}, err
-	}
-	r2, err := f.manager.RefGet(second)
-	if err != nil {
 		return ast.ASTHandle{}, err
 	}
 	return v, fi.InsertEntry(a2, r2)
