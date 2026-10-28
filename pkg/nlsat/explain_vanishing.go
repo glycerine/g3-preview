@@ -30,7 +30,12 @@ func (n *explanationAssumptions) vanishingAssert(line int32, expression string, 
 	}
 	return atomAssert("nlsat_explain.cpp", line, expression, !constant)
 }
-func (n *explanationAssumptions) finishVanishing(owning bool) (err error) {
+func (n *explanationAssumptions) finishVanishing(owning bool) error {
+	return n.finishVanishingPhase(owning, owning)
+}
+
+// A caller's older locals die before any unjoined child allocation is aborted.
+func (n *explanationAssumptions) finishVanishingPhase(owning, abort bool) (err error) {
 	s := &n.vanishing
 	if !s.active {
 		return nil
@@ -85,6 +90,8 @@ func (n *explanationAssumptions) finishVanishing(owning bool) (err error) {
 				s.refs[i] = nil
 			}
 		}
+	}
+	if abort {
 		if err = s.predicate.CleanupRetained(); err != nil {
 			return err
 		}

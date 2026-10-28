@@ -2116,6 +2116,7 @@
         "evaluator_polynomial.go",
         "explain_assumptions.go",
         "explain_minimize.go",
+        "explain_normalize.go",
         "explain_vanishing.go",
         "explain_worklist.go",
         "gparams_catalog_collectors.go",

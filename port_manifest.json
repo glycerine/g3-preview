@@ -90438,7 +90438,8 @@
         "pkg/nlsat/explain_worklist.go",
         "pkg/nlsat/explain_assumptions.go",
         "pkg/nlsat/scoped_literal_vector.go",
-        "pkg/nlsat/explain_vanishing.go"
+        "pkg/nlsat/explain_vanishing.go",
+        "pkg/nlsat/explain_normalize.go"
       ],
       "tests": [
         "TestExplanationMinimizeOrderOwningAppendAndRegistryGrowth",
@@ -90474,7 +90475,18 @@
         "TestExplanationVanishingAllZeroAndVariableDescent",
         "TestExplanationVanishingAllocationStopsAndRetry",
         "TestExplanationVanishingLexicalOrderAndCleanupCallbackGuard",
-        "TestExplanationVanishingConstantSourceGuard"
+        "TestExplanationVanishingConstantSourceGuard",
+        "TestExplanationNormalizePrebuiltCPPOracle",
+        "TestExplanationNormalizeVanishingAndLowerStage",
+        "TestExplanationNormalizeEvenZeroConstantAndIdentity",
+        "TestExplanationVanishingVectorStableCompaction",
+        "TestExplanationNormalizeCoreCompactionAndFalseReset",
+        "TestExplanationNormalizeRawNegativeSign",
+        "TestExplanationNormalizeAllocationStopsAndRetry",
+        "TestExplanationVanishingVectorPreservesBorrowedSET",
+        "TestExplanationNormalizeCorePreservesBorrowedPendingSET",
+        "TestExplanationNormalizeRetainedFactorParity",
+        "TestExplanationNormalizeLexicalVectorDestruction"
       ],
       "conditionals": [
         {
@@ -90789,6 +90801,24 @@
             "TestExplanationVanishingLexicalOrderAndCleanupCallbackGuard",
             "TestExplanationVanishingConstantSourceGuard"
           ]
+        },
+        {
+          "name": "Actual polynomial-vector vanishing elimination and stable compaction; scalar/core literal normalization with lower-stage assumptions (cpp355-370,395-501)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/explain_normalize.go",
+          "tests": [
+            "TestExplanationNormalizePrebuiltCPPOracle",
+            "TestExplanationNormalizeVanishingAndLowerStage",
+            "TestExplanationNormalizeEvenZeroConstantAndIdentity",
+            "TestExplanationVanishingVectorStableCompaction",
+            "TestExplanationNormalizeCoreCompactionAndFalseReset",
+            "TestExplanationNormalizeRawNegativeSign",
+            "TestExplanationNormalizeAllocationStopsAndRetry",
+            "TestExplanationVanishingVectorPreservesBorrowedSET",
+            "TestExplanationNormalizeCorePreservesBorrowedPendingSET",
+            "TestExplanationNormalizeRetainedFactorParity",
+            "TestExplanationNormalizeLexicalVectorDestruction"
+          ]
         }
       ],
       "ownership": [
@@ -90796,13 +90826,16 @@
         "Concrete projectionWorklist borrows the actual search atom factory, polynomial core and canonical cache. MkUnique precedes membership lookup; the ID mark is published before the owning vector push. Removal resets the borrowed output first, acquires selected polynomial references before clearing marks, compacts survivors with real INC-before-DEC SET (including self-assignment) and retires the tail forward before changing extent. Search owns native component/partial constructor storage and closes it before releasing parent borrowers. Cleanup acknowledges only the owned vector; an interrupted caller-output reset or canonical-cache call retains its own authority. A qualified actual output-deletion refusal preserves callback count, memory state, old extent and old zero-reference polynomial until its output owner explicitly acknowledges it. No counters or published source marks are repaired.",
         "A stopped worklist vector Close keeps the search pending guard active after lexical cleanup. The corresponding test releases the canonical-cache lease through its actual Reset owner, reaches a genuine final-reference deletion callback refusal, then resumes vector destruction without replaying that callback or allowing search entry. Worklist ID membership now uses the narrow PolynomialID query rather than unrelated Info fields.",
         "Concrete explanationAssumptions binds the real search/assignment/evaluator, canonical polynomial cache and atom factory. It owns its factor vector, one lexical PolynomialRef, literal output and exact per-invocation literal marks. Source factor reference destruction runs once; explicit cleanup acknowledges only its own retained vector/ref/marks/output, preserving older numerical, cache and interval scopes. Parent search closes it before its borrowed services; running/failed/partial constructors block search entry. Literal-index marks include polarity, marks precede owning push, and successful source reset clears marks over the actual result. Raw algebraic sign values are preserved.",
-        "Scalar vanishing elimination owns the actual lc and reduct lexical references and embeds only concrete accepted coefficient/predicate receipts. Reduct dies before lc; a source destructor refusal is retained without retrying it in a second source epilogue. Owning cleanup resumes real consumed DECs and releases unpublished assignment references separately, then acknowledges only the exact accepted child generations. The caller polynomial stays borrowed and observes each actual in-place source reduct assignment. Nested zero-factor locals die before these older references; cleanup and parent entry are guarded during callbacks."
+        "Scalar vanishing elimination owns the actual lc and reduct lexical references and embeds only concrete accepted coefficient/predicate receipts. Reduct dies before lc; a source destructor refusal is retained without retrying it in a second source epilogue. Owning cleanup resumes real consumed DECs and releases unpublished assignment references separately, then acknowledges only the exact accepted child generations. The caller polynomial stays borrowed and observes each actual in-place source reduct assignment. Nested zero-factor locals die before these older references; cleanup and parent entry are guarded during callbacks.",
+        "Normalization owns the actual polynomial_ref_vector ps, native parity slice and later p reference; the vector elimination overload owns only its local p and borrows its input vector. Nested scalar lc/reduct lexical cleanup precedes caller p, then local ps; accepted unjoined scalar children are aborted only after those older locals. Source destructor refusals are retained without repeating owning DECs, and callbacks cannot enter component cleanup or search. Borrowed polynomial/literal vector SET/SHRINK/RESET remains exclusively that caller owner's continuation; outer cleanup never adopts it. Core compaction acquires replacement atom leases through real INC-before-DEC SET, drops true literals stably, resets the full core on false and releases the final tail forward."
       ],
       "deviations": [
         "Only the retained core-minimization routines are ported here; public explain constructor/operator, normalization, vanishing-coefficient elimination, projection, simplification, result display/TRACE and solver resolution/main-search integration remain unported or unaudited. Native charged component storage and Go slices replace C++ object/vector layouts; no identical std::vector growth or allocation-prefix claim is made. The source empty-todo assertion at1373 remains observable for the qualified redundant order tested by TestExplanationMinimizeSourceEmptyTodoGuard; release still terminates by reconstructing the already-full core. No source progress or reference repair suppresses that difference. Thirty-six prebuilt C++ qfnra-nlsat queries verify unsatisfiability and deletion-minimality of nine reduced cores; these prove core properties rather than identical C++ internal selection order or whole-backend completeness. Source preconditions remain caller obligations.",
         "This implements only the actual retained projection worklist prerequisite. Vanishing-coefficient elimination, normalization, projection algorithms, complete explain construction/interface and solver resolution/main-search integration remain unported or unaudited. Native charged component/vector headers and Go slices differ from C++ field/std::vector allocation layouts; no identical vector allocation frontier is claimed. Five worklist tests include a 100-step independent membership/order/reference model, actual canonical duplicates, reset/reinsert behavior, source constant guard and both constructor reservations. Existing C++ NLSAT oracles remain enabled in package profiles; there is no new claim of arithmetic/projection theorem completeness from ownership-only worklist checks.",
         "This is the retained assumption-generation prerequisite, not complete explanation construction or normalization. Vanishing-coefficient elimination, normalization, projection and public explanation/solver wiring remain pending. Four profiles, 36 prebuilt C++ disagreement queries, a native consecutive allocation sweep through success36 and callback/older-owner tests pass. Actual source polynomial display emits diagnostic monomial notation, so the C++ oracle independently serializes real polynomial terms to SMT-LIB instead of changing that diagnostic printer. Native slice/header allocations do not claim C++ vector-layout/frontier equivalence; full TRACE and whole-unit ownership audits remain incomplete.",
-        "The scalar retained elim_vanishing routine is implemented; earlier notes calling all vanishing elimination pending are superseded only for cpp313-348. The vector overload, literal normalization, actual projection, complete explanation construction and solver search remain pending. Native reference headers/slices do not claim source object-layout/allocation-frontier identity; full lexical/physical/TRACE audits remain incomplete."
+        "The scalar retained elim_vanishing routine is implemented; earlier notes calling all vanishing elimination pending are superseded only for cpp313-348. The vector overload, literal normalization, actual projection, complete explanation construction and solver search remain pending. Native reference headers/slices do not claim source object-layout/allocation-frontier identity; full lexical/physical/TRACE audits remain incomplete.",
+        "Correctness fix relative to cpp432: test sign < 0 for odd lower-stage factors instead of sign == -1. The real algebraic rational fast path returns raw integer-numerator signs (for example -2); exact -1 loses negative polarity and has the independent counterexample y=-2,x=1 for y*x>0 versus x>0. Numeral sign representation is unchanged. Canonical prebuilt C++ mathematical checks validate the corrected Go equivalences and separately confirm the source-condition counterexample; they do not claim direct invocation of C++ internal normalize. The later unported cpp1137 exact -1 condition needs the same audit when reached.",
+        "This supersedes earlier notes marking vector elimination/literal normalization entirely pending, but complete explanation construction/parameter binding, projection, simplification and main search remain required. Source TRACE, complete descendant allocation/lexical/physical audits and C++ layout/frontier equivalence are not claimed. All whole-unit flags remain false."
       ]
     },
     {
@@ -91345,7 +91378,8 @@
         "pkg/nlsat/explain_minimize.go",
         "pkg/nlsat/search_state.go",
         "pkg/nlsat/scoped_literal_vector.go",
-        "pkg/nlsat/explain_assumptions.go"
+        "pkg/nlsat/explain_assumptions.go",
+        "pkg/nlsat/explain_normalize.go"
       ],
       "tests": [
         "TestExplanationMinimizeOrderOwningAppendAndRegistryGrowth",
@@ -91359,7 +91393,9 @@
         "TestExplanationMinimizeCleanupPreservesOlderMarks",
         "TestScopedLiteralVectorSetShrinkAndMultiplicity",
         "TestScopedLiteralVectorSetBoundsOwnsOnlyIncoming",
-        "TestScopedLiteralVectorStoppedSetAndShrinkContinueExactDEC"
+        "TestScopedLiteralVectorStoppedSetAndShrinkContinueExactDEC",
+        "TestExplanationNormalizeCoreCompactionAndFalseReset",
+        "TestExplanationNormalizeCorePreservesBorrowedPendingSET"
       ],
       "conditionals": [
         {
@@ -91413,7 +91449,8 @@
       ],
       "ownership": [
         "The actual minimization result stores Go literal values and acquires one live atomFactory reference per appended occurrence. Reset walks forward and records consumed reference drops and only the exact pending atom retirement. Older output remains owned across append and component cleanup; it is retired only by explicit resetResult or component/parent close. Source set, shrink, swap, scoped_literal and other retained consumers remain pending; this is not a universal solver adapter or fake complete Solver.",
-        "The shared concrete scopedLiteralVector now serves actual minimization and assumption output. SET acquires incoming ownership before reading the old slot, including self-aliases. A stopped old DEC records only its consumed lease and exact atom retirement; explicit abort retires only those accepted operations and the unpublished incoming lease, leaving a null owning slot after the old lease was consumed. SHRINK releases the tail forward before publishing its new extent. Pending/reset callback entry is guarded. Pure Boolean/null literals use actual factory no-op reference behavior."
+        "The shared concrete scopedLiteralVector now serves actual minimization and assumption output. SET acquires incoming ownership before reading the old slot, including self-aliases. A stopped old DEC records only its consumed lease and exact atom retirement; explicit abort retires only those accepted operations and the unpublished incoming lease, leaving a null owning slot after the old lease was consumed. SHRINK releases the tail forward before publishing its new extent. Pending/reset callback entry is guarded. Pure Boolean/null literals use actual factory no-op reference behavior.",
+        "The actual normalize(scoped_literal_vector&,max) consumer now uses this concrete vector's owning SET/SHRINK/RESET. Surviving literal order and duplicate leases are preserved, true results are removed and false results reset the core. Component cleanup does not consume an older borrowed vector SET; qualified pending incoming leases/refcounts remain unchanged until that vector owner acknowledges them."
       ],
       "deviations": [
         "No C++ standard-library vector is ported. Only the actual minimization result consumer is represented by a concrete native Go owning slice with source INC-before-push and forward DEC-before-clear. The remaining scoped literal/vector consumers and whole-header methods/ownership audits remain incomplete.",
@@ -243851,7 +243888,8 @@
         "pkg/opt/bound_expressions_test.go",
         "pkg/opt/bound_expression.go",
         "pkg/opt/bound_expression_test.go",
-        "pkg/math/polynomial/polynomial_ref_vector_projection.go"
+        "pkg/math/polynomial/polynomial_ref_vector_projection.go",
+        "pkg/nlsat/explain_normalize.go"
       ],
       "tests": [
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
@@ -243933,7 +243971,11 @@
         "TestOptBoundExpressionSourceBranchesAndOwnedResult",
         "TestPolynomialProjectionVectorSetShrinkReferenceMultiplicity",
         "TestPolynomialProjectionVectorStoppedShrinkOwnsForwardTail",
-        "TestPolynomialProjectionVectorSetRefusalAndShrinkGuard"
+        "TestPolynomialProjectionVectorSetRefusalAndShrinkGuard",
+        "TestPolynomialReferenceVectorSourceFinalizeStoppedDEC",
+        "TestExplanationNormalizeLexicalVectorDestruction",
+        "TestExplanationVanishingVectorStableCompaction",
+        "TestExplanationVanishingVectorPreservesBorrowedSET"
       ],
       "conditionals": [
         {
@@ -244229,11 +244271,22 @@
             "TestPolynomialProjectionVectorStoppedShrinkOwnsForwardTail",
             "TestPolynomialProjectionVectorSetRefusalAndShrinkGuard"
           ]
+        },
+        {
+          "name": "Concrete polynomial reference-vector lexical forward destruction, without adopting stopped DEC/SET/SHRINK; retained normalization compaction consumer",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_ref.go",
+          "tests": [
+            "TestPolynomialReferenceVectorSourceFinalizeStoppedDEC",
+            "TestExplanationNormalizeLexicalVectorDestruction",
+            "TestExplanationVanishingVectorStableCompaction"
+          ]
         }
       ],
       "ownership": [
         "Polynomial reference vectors, including Newton values and caller PSC outputs, use native []Polynomial storage. Actual INC-before-publication, SET incoming INC before old DEC, ascending reset and stopped reference destruction remain. Container growth/free has no Runtime faultpoints or charged backing; removed push-allocation receipts and obsolete incoming-growth failure fixtures. A 4097-entry independent association/count regression covers null entries, SET, reset, zero resize and reuse with Runtime reservations disabled. Cached display counts now stop at current native logical bounds after callback reset instead of reading retained backing tail. Actual reference/numeral constructors and destructor failure checks remain; no whole-unit completion credit is added.",
-        "PolynomialRefVector.Set uses the existing actual accepted SET frame: incoming INC precedes the old index read and DEC. Shrink begins at the requested tail boundary, consumes forward DECs and publishes the new logical extent only after all tail releases. A callback refusal retains the exact consumed-DEC cursor and original extent; ordinary writes/reset refuse pending shrink. Explicit own-vector CleanupRetained finishes only accepted SET/SHRINK/RESET work. Close finishes an interrupted shrink tail before resetting the surviving prefix; no already consumed DEC is replayed. No unrelated vector or polynomial/numerical manager operation is acknowledged."
+        "PolynomialRefVector.Set uses the existing actual accepted SET frame: incoming INC precedes the old index read and DEC. Shrink begins at the requested tail boundary, consumes forward DECs and publishes the new logical extent only after all tail releases. A callback refusal retains the exact consumed-DEC cursor and original extent; ordinary writes/reset refuse pending shrink. Explicit own-vector CleanupRetained finishes only accepted SET/SHRINK/RESET work. Close finishes an interrupted shrink tail before resetting the surviving prefix; no already consumed DEC is replayed. No unrelated vector or polynomial/numerical manager operation is acknowledged.",
+        "PolynomialRefVector.SourceFinalize uses the actual source forward reset, preserving the first stopped DEC and refusing pending SET/SHRINK rather than consuming them. Owning Close resumes the exact consumed decrement and remaining tail. A genuine deletion callback checks non-replay and order. Normalization's local owning vector uses the source phase after its younger polynomial reference; borrowed input vectors receive no outer cleanup authority. Native Go slices and concrete polynomial references remain in use."
       ],
       "deviations": [
         "No generic RefVectorCore, RefVector, or SRefVector exists in Go. Current AST, polynomial, and s-expression targets use concrete typed owners; remaining specializations should stay beside their consumers.",

@@ -19,6 +19,7 @@ type explanationAssumptions struct {
 	factors                 *polynomial.PolynomialRefVector
 	localFactor             *polynomial.PolynomialRef
 	vanishing               explanationVanishingScope
+	normalization           explanationNormalizationScope
 	output                  scopedLiteralVector
 	alreadyAdded            []bool
 	marked                  []uint32
@@ -71,7 +72,7 @@ func (n *explanationAssumptions) start() error {
 	if err := n.search.open(); err != nil {
 		return err
 	}
-	if n.resultActive || n.localFactor != nil || n.vanishing.active {
+	if n.resultActive || n.localFactor != nil || n.vanishing.active || n.normalization.active {
 		return ErrSearchPending
 	}
 	n.running, n.resultActive = true, true
@@ -253,7 +254,11 @@ func (n *explanationAssumptions) cleanup() error {
 	}
 	n.running = true
 	defer func() { n.running = false }()
-	if err := n.finishVanishing(true); err != nil {
+	if n.normalization.active {
+		if err := n.finishNormalization(true); err != nil {
+			return err
+		}
+	} else if err := n.finishVanishing(true); err != nil {
 		return err
 	}
 	if n.localFactor != nil {

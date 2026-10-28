@@ -345,6 +345,29 @@ func (v *PolynomialRefVector) Reset() error {
 	}
 	return v.state.reset(v.owner)
 }
+
+// SourceFinalize runs the actual forward lexical reset, without adopting a
+// previously stopped DEC, SET or SHRINK. Close resumes owning cleanup.
+func (v *PolynomialRefVector) SourceFinalize() error {
+	if v == nil || v.self != v {
+		return ErrPolynomialOwner
+	}
+	if v.closed {
+		return nil
+	}
+	if v.state.setExecuting || v.state.resetExecuting {
+		return ErrPolynomialPending
+	}
+	v.closing = true
+	if err := v.state.resetMode(v.owner, false); err != nil {
+		return err
+	}
+	v.owner.integer.Budget().Release(v.header)
+	v.header = 0
+	v.closed = true
+	return nil
+}
+
 func (v *PolynomialRefVector) Close() error {
 	if v == nil || v.self != v {
 		return ErrPolynomialOwner
