@@ -1,9 +1,8 @@
-package
+package tactic_test
 
 // Source: src/tactic/model_converter.cpp:127-151,164-174;
 // src/util/buffer.h:25-48,68-82,94-96; src/util/vector.h:443-447.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
-tactic_test
 
 import (
 	"github.com/glycerine/g3/pkg/model"

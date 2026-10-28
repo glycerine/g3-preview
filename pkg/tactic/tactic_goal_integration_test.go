@@ -1,9 +1,8 @@
-package
+package tactic_test
 
 // Source: src/tactic/goal.cpp:26-30,111-190,240-329,498-631,656-707;
 // src/tactic/goal.h:39-143.
 // Licensed under the MIT license. Source author: Leonardo de Moura (2011).
-tactic_test
 
 import (
 	"github.com/glycerine/g3/pkg/sat"

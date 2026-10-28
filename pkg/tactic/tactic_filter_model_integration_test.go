@@ -1,9 +1,8 @@
-package
+package tactic_test
 
 // Source: src/tactic/filter_model_converter.cpp:23-57;
 // src/tactic/filter_model_converter.h:26-49.
 // Licensed under the MIT license. Source author: Leonardo de Moura.
-tactic_test
 
 import (
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
