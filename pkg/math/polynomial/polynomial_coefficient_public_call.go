@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:3297-3312,7038-7040;
+// Source: src/math/polynomial/polynomial.cpp:3264-3277,3297-3312,7034-7040;
 // src/util/obj_ref.h. Retained nlsat_explain.cpp:335 caller assignment.
 package polynomial
 
@@ -21,11 +21,23 @@ type PolynomialCoefficientCall struct {
 // CoeffWithReductInto follows lc = coeff(p,x,k,reduct): reduct is assigned by
 // the callee before the returned coefficient is acquired by lc. INC precedes
 // the old lc DEC, including when the input aliases either caller reference.
-func (m *MultivariatePolynomialCore) CoeffWithReductInto(p Polynomial, x, k uint32, lc, reduct *PolynomialRef, call *PolynomialCoefficientCall) (err error) {
+func (m *MultivariatePolynomialCore) CoeffWithReductInto(p Polynomial, x, k uint32, lc, reduct *PolynomialRef, call *PolynomialCoefficientCall) error {
+	if reduct == nil {
+		return ErrPolynomialOwner
+	}
+	return m.coefficientInto(p, x, k, lc, reduct, call)
+}
+
+// CoeffInto is the retained lc = coeff(p,x,k) overload. It does not construct
+// or assign a reduct, and preserves that overload's actual source trace path.
+func (m *MultivariatePolynomialCore) CoeffInto(p Polynomial, x, k uint32, lc *PolynomialRef, call *PolynomialCoefficientCall) error {
+	return m.coefficientInto(p, x, k, lc, nil, call)
+}
+func (m *MultivariatePolynomialCore) coefficientInto(p Polynomial, x, k uint32, lc, reduct *PolynomialRef, call *PolynomialCoefficientCall) (err error) {
 	if err = m.check(); err != nil {
 		return err
 	}
-	if call == nil || (call.self != nil && call.self != call) || lc == nil || reduct == nil || lc.owner != m || reduct.owner != m {
+	if call == nil || (call.self != nil && call.self != call) || lc == nil || lc.owner != m || (reduct != nil && reduct.owner != m) {
 		return ErrPolynomialOwner
 	}
 	if call.active || call.executing {
@@ -34,10 +46,12 @@ func (m *MultivariatePolynomialCore) CoeffWithReductInto(p Polynomial, x, k uint
 	if err = lc.open(); err != nil {
 		return err
 	}
-	if err = reduct.open(); err != nil {
-		return err
+	if reduct != nil {
+		if err = reduct.open(); err != nil {
+			return err
+		}
 	}
-	if lc.root.assigning || reduct.root.assigning {
+	if lc.root.assigning || (reduct != nil && reduct.root.assigning) {
 		return ErrPolynomialPending
 	}
 	*call = PolynomialCoefficientCall{self: call, owner: m, active: true, executing: true}
@@ -45,7 +59,11 @@ func (m *MultivariatePolynomialCore) CoeffWithReductInto(p Polynomial, x, k uint
 		call.executing = false
 		err = errors.Join(err, call.FinishSource())
 	}()
-	result, err := m.coeffCoreWithReceipts(p, x, k, &reduct.root, &call.coefficient, &call.append, &call.factory)
+	var rest *polynomialReference
+	if reduct != nil {
+		rest = &reduct.root
+	}
+	result, err := m.coeffCoreWithReceipts(p, x, k, rest, &call.coefficient, &call.append, &call.factory)
 	if err != nil {
 		return err
 	}

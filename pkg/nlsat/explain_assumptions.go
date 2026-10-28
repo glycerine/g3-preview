@@ -20,6 +20,13 @@ type explanationAssumptions struct {
 	localFactor             *polynomial.PolynomialRef
 	vanishing               explanationVanishingScope
 	normalization           explanationNormalizationScope
+	projectionTodo          *projectionWorklist
+	pscTmp                  *polynomial.PolynomialRefVector
+	psc                     explanationPSCScope
+	resultant               explanationResultantScope
+	factorProjection        bool
+	projectionFactors       explanationProjectionFactorScope
+	leading                 explanationLeadingScope
 	output                  scopedLiteralVector
 	alreadyAdded            []bool
 	marked                  []uint32
@@ -72,7 +79,7 @@ func (n *explanationAssumptions) start() error {
 	if err := n.search.open(); err != nil {
 		return err
 	}
-	if n.resultActive || n.localFactor != nil || n.vanishing.active || n.normalization.active {
+	if n.resultActive || n.localFactor != nil || n.vanishing.active || n.normalization.active || n.projectionFactors.active || n.leading.active || n.psc.active || n.resultant.active {
 		return ErrSearchPending
 	}
 	n.running, n.resultActive = true, true
@@ -254,7 +261,15 @@ func (n *explanationAssumptions) cleanup() error {
 	}
 	n.running = true
 	defer func() { n.running = false }()
-	if n.normalization.active {
+	if n.psc.active || n.resultant.active {
+		if err := n.finishProjectionResultant(true, true); err != nil {
+			return err
+		}
+	} else if n.projectionFactors.active || n.leading.active {
+		if err := n.finishProjectionLeading(true, true); err != nil {
+			return err
+		}
+	} else if n.normalization.active {
 		if err := n.finishNormalization(true); err != nil {
 			return err
 		}
@@ -266,6 +281,11 @@ func (n *explanationAssumptions) cleanup() error {
 			return err
 		}
 		n.localFactor = nil
+	}
+	if n.pscTmp != nil {
+		if err := n.pscTmp.CleanupRetained(); err != nil {
+			return err
+		}
 	}
 	if n.factors != nil {
 		if err := n.factors.CleanupRetained(); err != nil {
@@ -313,6 +333,13 @@ func (n *explanationAssumptions) close() error {
 		}
 		n.factors = nil
 	}
+	if n.pscTmp != nil {
+		if err := n.pscTmp.Close(); err != nil {
+			return err
+		}
+		n.pscTmp = nil
+	}
+	n.projectionTodo = nil
 	n.search.explanationAssumptions = nil
 	n.search.store.atoms.ineq.budget.Release(n.header)
 	n.header = 0

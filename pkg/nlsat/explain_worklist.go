@@ -67,6 +67,24 @@ func (p *projectionWorklist) insert(value polynomial.Polynomial) (err error) {
 	if err = p.open(); err != nil {
 		return err
 	}
+	return p.insertCore(value)
+}
+
+// The actual explanation caller is already executing and borrowing this
+// worklist. Validate that specific binding instead of opening a second search.
+func (p *projectionWorklist) insertFromExplanation(n *explanationAssumptions, value polynomial.Polynomial) error {
+	if err := p.owner(); err != nil {
+		return err
+	}
+	if n == nil || n.self != n || n.search != p.search || n.search.explanationAssumptions != n || n.projectionTodo != p || !n.running {
+		return ErrSearchOwner
+	}
+	if p.running || p.failed || p.set == nil {
+		return ErrSearchPending
+	}
+	return p.insertCore(value)
+}
+func (p *projectionWorklist) insertCore(value polynomial.Polynomial) (err error) {
 	p.running = true
 	defer func() { p.running = false; p.failed = err != nil }()
 	f := p.search.store.atoms.ineq

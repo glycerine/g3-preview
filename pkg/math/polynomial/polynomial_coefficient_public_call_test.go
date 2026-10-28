@@ -152,3 +152,32 @@ func TestPolynomialReferenceSourceFinalizeDoesNotRetryStoppedAssignment(t *testi
 		t.Fatal("owning close replayed old DEC or lost incoming", info.RefCount, calls)
 	}
 }
+
+func TestPolynomialCoefficientOwningSimpleCall(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c := m.core
+	p := polynomialQueryTerms(t, c, []int32{3, 5, 7}, [][]MonomialPower{{{0, 1}, {1, 2}}, {{1, 1}}, nil})
+	lc, err := NewPolynomialRef(c)
+	serviceMust(t, err)
+	t.Cleanup(func() { serviceMust(t, lc.Close()) })
+	serviceMust(t, lc.Assign(p))
+	var call PolynomialCoefficientCall
+	for _, row := range []struct {
+		k    uint32
+		want map[[3]uint32]int64
+	}{{2, map[[3]uint32]int64{{1, 0, 0}: 3}}, {1, map[[3]uint32]int64{{}: 5}}, {0, map[[3]uint32]int64{{}: 7}}, {7, map[[3]uint32]int64{}}} {
+		serviceMust(t, c.CoeffInto(p, 1, row.k, lc, &call))
+		result, err := lc.Get()
+		serviceMust(t, err)
+		polynomialQueryExpect(t, c, result, row.want)
+		serviceMust(t, call.CleanupRetained())
+	}
+	serviceMust(t, lc.Assign(p))
+	input, err := lc.Get()
+	serviceMust(t, err)
+	serviceMust(t, c.CoeffInto(input, 1, 2, lc, &call))
+	result, err := lc.Get()
+	serviceMust(t, err)
+	polynomialQueryExpect(t, c, result, map[[3]uint32]int64{{1, 0, 0}: 3})
+	serviceMust(t, call.CleanupRetained())
+}

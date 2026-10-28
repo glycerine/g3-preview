@@ -142,7 +142,7 @@ func (r *searchState) open() error {
 	if r.projection != nil && (r.projection.running || r.projection.failed || r.projection.set == nil) {
 		return ErrSearchPending
 	}
-	if r.explanationAssumptions != nil && (r.explanationAssumptions.running || r.explanationAssumptions.failed || r.explanationAssumptions.factors == nil) {
+	if r.explanationAssumptions != nil && (r.explanationAssumptions.running || r.explanationAssumptions.failed || r.explanationAssumptions.factors == nil || (r.explanationAssumptions.projectionTodo != nil && r.explanationAssumptions.pscTmp == nil)) {
 		return ErrSearchPending
 	}
 	if err := r.store.open(); err != nil {
