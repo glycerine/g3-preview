@@ -83181,11 +83181,14 @@
         "pkg/muz/fp/pdr_engine.go",
         "pkg/muz/fp/register_engine.go",
         "pkg/cmd_context/fixedpoint.go",
-        "pkg/parsers/smt2/fixedpoint_commands_test.go"
+        "pkg/parsers/smt2/fixedpoint_commands_test.go",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_integer.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
-        "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+        "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
       ],
       "assertions": [
         {
@@ -83206,7 +83209,9 @@
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [
             "TestPDREngineMatchesCPPIntegerHornQueries",
-            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
           ]
         },
         {
@@ -83231,11 +83236,14 @@
       "go_targets": [
         "pkg/muz/fp/pdr_engine.go",
         "pkg/muz/fp/register_engine.go",
-        "pkg/cmd_context/fixedpoint.go"
+        "pkg/cmd_context/fixedpoint.go",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_integer.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
-        "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+        "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
       ],
       "conditionals": [
         {
@@ -83256,7 +83264,9 @@
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [
             "TestPDREngineMatchesCPPIntegerHornQueries",
-            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2"
           ]
         },
         {

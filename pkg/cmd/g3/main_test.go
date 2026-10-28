@@ -339,6 +339,7 @@ func TestSMTLibRunnerBitBlastStepFrontiers(t *testing.T) {
 
 var scriptResults = map[string]string{
 	"fixedpoint_propositional.smt2":                "unsat\nsat\ntrue\nunsat\n",
+	"fixedpoint_pdr_integer.smt2":                  "sat\nunsat\n",
 	"horn_tactic_finite.smt2":                      "unsat\nsat\nunsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"fixedpoint_finite_relations.smt2":             "sat\n(and (= (:var 0) true) (= (:var 1) false))\nsat\n(= (:var 0) #b10)\nsat\nsat\n(= (:var 0) #b01)\nsat\n(= (:var 0) #b10)\nsat\nsat\nunsat\nsat\n(= (:var 0) #b10)\nsat\nsat\nunsat\nsat\nunsat\nsat\n(= (:var 0) false)\nsat\nunsat\n",
 	"array_as_array_combined_fallback_gap.smt2":    "sat\nunsat\nsat\n",
