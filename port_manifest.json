@@ -80978,9 +80978,9 @@
       "path": "src/muz/base/dl_rule_set.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/base/rule_set.go"],
+      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle"],
       "assertions": [
         {
           "line": 82,
@@ -81085,7 +81085,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "rule_set retained rule ownership, grouped head index, add/delete/reset lifecycle, dependency population, reopen/finalize, strongly connected component stratification, and stratified-negation rejection (dl_rule_set.cpp:70-157,278-485,570-758); predicate inheritance, output predicates, founded splitting, display, and dependency mutation remain open",
+          "status": "partial",
+          "go_target": "pkg/muz/base/rule_set.go",
+          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -81093,9 +81100,9 @@
       "path": "src/muz/base/dl_rule_set.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/base/rule_set.go"],
+      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle"],
       "conditionals": [
         {
           "line": 19,
@@ -81122,7 +81129,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete rule_dependencies and rule_set storage/query/finalization surface with explicit retained Rule wrappers; remaining output-predicate mappings and display/profile interfaces stay open",
+          "status": "partial",
+          "go_target": "pkg/muz/base/rule_set.go",
+          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
