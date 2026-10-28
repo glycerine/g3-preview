@@ -103,6 +103,9 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CloseChecked() error {
+	if m != nil && m.self == m && m.core.nonzeroConstantPending() {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.destructorTraceRunning {
 		return ErrPolynomialPending
 	}

@@ -67,6 +67,7 @@ type MultivariatePolynomialCore struct {
 	somNormalizationOwner                                                                      polynomialSOMNormalizeInvocationReceipt
 	normalizationOwner                                                                         polynomialNormalizeInvocationReceipt
 	constantCoefficientInvocation                                                              polynomialConstantCoefficientScope
+	nonzeroConstant                                                                            polynomialNonzeroConstantScope
 	factorsOwner                                                                               *PolynomialFactors
 	powerGeneration                                                                            uint64
 	display                                                                                    polynomialDisplayState
@@ -269,6 +270,9 @@ func (m *MultivariatePolynomialCore) Error() string {
 }
 func (m *MultivariatePolynomialCore) Unwrap() error { return m.originalCause }
 func (m *MultivariatePolynomialCore) check() error {
+	if m.nonzeroConstantPending() && !m.nonzeroConstant.executing {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning || m.renameTraceRunning || m.gcdTraceRunning || m.dividesTrace.running || m.quadraticTraceCallback() || m.evaluationTraceCallback()) {
 		return ErrPolynomialPending
 	}
@@ -463,6 +467,9 @@ func (m *MultivariatePolynomialCore) MkTerms(as []unumeral.Int, ms []Monomial) (
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
+	if m.nonzeroConstantPending() {
+		return ErrPolynomialPending
+	}
 	if m.cacheExecuting() || m.sparseExecuting(nil) {
 		return ErrPolynomialPending
 	}

@@ -152,6 +152,9 @@ func (v *PolynomialNewtonVector) sourceFinalizeMember() error {
 }
 
 func (m *MultivariatePolynomialManager) SourceFinalize() error {
+	if m != nil && m.self == m && m.core.nonzeroConstantPending() {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.core != nil {
 		if e := m.core.pendingLexSortCause(); e != nil {
 			return e
