@@ -142737,7 +142737,10 @@
         "pkg/smtcore/theory_dense_diff_objective.go",
         "pkg/smtcore/theory_diff_logic_objective.go",
         "pkg/smtcore/theory_dense_diff_display.go",
-        "pkg/smtcore/theory_dense_diff_display_test.go"
+        "pkg/smtcore/theory_dense_diff_display_test.go",
+        "pkg/smtcore/theory_dense_diff_statistics.go",
+        "pkg/smtcore/theory_dense_diff_statistics_test.go",
+        "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -142759,7 +142762,9 @@
         "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker",
         "TestSMTDenseObjectiveNativeOptimizationCaller",
         "TestSMTDenseDifferenceDisplayInfinitesimalText",
-        "TestSMTDenseDifferenceDisplayThroughContext"
+        "TestSMTDenseDifferenceDisplayThroughContext",
+        "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
+        "TestSMTBasicArithmeticModesBeforeFirstBoundary"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -142800,7 +142805,7 @@
           ]
         },
         {
-          "name": "remaining dense setup routes, full arithmetic control fidelity, statistics and theory_opt objective callbacks",
+          "name": "remaining dense setup routes, full arithmetic control fidelity and theory_opt objective callbacks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -142816,6 +142821,20 @@
           "tests": [
             "TestSMTDenseDifferenceDisplayInfinitesimalText",
             "TestSMTDenseDifferenceDisplayThroughContext"
+          ]
+        },
+        {
+          "name": "32-bit assertion/propagation counters, arithmetic equality-adapter contribution and source-order statistics collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dense_diff_statistics.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dense_diff_logic.go",
+            "pkg/smtcore/theory_dense_diff_statistics_test.go",
+            "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary"
           ]
         },
         {
@@ -142887,7 +142906,10 @@
         "pkg/smtcore/theory_dense_diff_objective.go",
         "pkg/smtcore/theory_diff_logic_objective.go",
         "pkg/smtcore/theory_dense_diff_display.go",
-        "pkg/smtcore/theory_dense_diff_display_test.go"
+        "pkg/smtcore/theory_dense_diff_display_test.go",
+        "pkg/smtcore/theory_dense_diff_statistics.go",
+        "pkg/smtcore/theory_dense_diff_statistics_test.go",
+        "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
       ],
       "tests": [
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -142909,7 +142931,9 @@
         "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker",
         "TestSMTDenseObjectiveNativeOptimizationCaller",
         "TestSMTDenseDifferenceDisplayInfinitesimalText",
-        "TestSMTDenseDifferenceDisplayThroughContext"
+        "TestSMTDenseDifferenceDisplayThroughContext",
+        "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
+        "TestSMTBasicArithmeticModesBeforeFirstBoundary"
       ],
       "conditionals": [
         {
@@ -142974,7 +142998,7 @@
           ]
         },
         {
-          "name": "remaining dense setup routes, full arithmetic control fidelity, statistics and theory_opt objective callbacks",
+          "name": "remaining dense setup routes, full arithmetic control fidelity and theory_opt objective callbacks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -142990,6 +143014,20 @@
           "tests": [
             "TestSMTDenseDifferenceDisplayInfinitesimalText",
             "TestSMTDenseDifferenceDisplayThroughContext"
+          ]
+        },
+        {
+          "name": "32-bit assertion/propagation counters, arithmetic equality-adapter contribution and source-order statistics collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dense_diff_statistics.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dense_diff_logic.go",
+            "pkg/smtcore/theory_dense_diff_statistics_test.go",
+            "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary"
           ]
         },
         {
@@ -143059,7 +143097,10 @@
         "pkg/smtcore/theory_dense_diff_objective.go",
         "pkg/smtcore/theory_diff_logic_objective.go",
         "pkg/smtcore/theory_dense_diff_display.go",
-        "pkg/smtcore/theory_dense_diff_display_test.go"
+        "pkg/smtcore/theory_dense_diff_display_test.go",
+        "pkg/smtcore/theory_dense_diff_statistics.go",
+        "pkg/smtcore/theory_dense_diff_statistics_test.go",
+        "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
       ],
       "tests": [
         "TestSMTDenseDifferenceClosureExplanationsAndRollback",
@@ -143079,7 +143120,9 @@
         "TestSMTDenseObjectiveConfiguredModelRefreshAndBlocker",
         "TestSMTDenseObjectiveNativeOptimizationCaller",
         "TestSMTDenseDifferenceDisplayInfinitesimalText",
-        "TestSMTDenseDifferenceDisplayThroughContext"
+        "TestSMTDenseDifferenceDisplayThroughContext",
+        "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
+        "TestSMTBasicArithmeticModesBeforeFirstBoundary"
       ],
       "conditionals": [
         {
@@ -143252,7 +143295,7 @@
           ]
         },
         {
-          "name": "remaining dense setup routes, full arithmetic control fidelity, statistics and theory_opt objective callbacks",
+          "name": "remaining dense setup routes, full arithmetic control fidelity and theory_opt objective callbacks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -143268,6 +143311,20 @@
           "tests": [
             "TestSMTDenseDifferenceDisplayInfinitesimalText",
             "TestSMTDenseDifferenceDisplayThroughContext"
+          ]
+        },
+        {
+          "name": "32-bit assertion/propagation counters, arithmetic equality-adapter contribution and source-order statistics collection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_dense_diff_statistics.go",
+          "go_targets": [
+            "pkg/smtcore/theory_dense_diff_logic.go",
+            "pkg/smtcore/theory_dense_diff_statistics_test.go",
+            "pkg/smtcore/smt_setup_basic_arithmetic_test.go"
+          ],
+          "tests": [
+            "TestSMTDenseDifferenceStatisticsSourceOperationsAndCollection",
+            "TestSMTBasicArithmeticModesBeforeFirstBoundary"
           ]
         },
         {

@@ -37,6 +37,7 @@ type SMTDenseDiffTheory struct {
 	unsupported bool
 	values      []smtInfRational
 	delta       big.Rat
+	statistics  smtDenseDiffStatistics
 }
 
 func NewSMTDenseDiffTheory(family ast.FamilyID) (*SMTDenseDiffTheory, error) {
@@ -279,6 +280,7 @@ func (t *SMTDenseDiffTheory) Assign(variable int32, truth bool) error {
 		return nil
 	}
 	a := &t.atoms[i]
+	t.statistics.assertions++
 	source, target := a.source, a.target
 	var offset smtInfRational
 	offset.Set(&a.offset)
@@ -330,6 +332,7 @@ func (t *SMTDenseDiffTheory) propagateCell(source, target int) error {
 		if !implied {
 			continue
 		}
+		t.statistics.propagations++
 		reason, err := t.matrix.antecedents(source, target)
 		if err != nil {
 			return err

@@ -83,6 +83,17 @@ func TestSMTBasicArithmeticModesBeforeFirstBoundary(t *testing.T) {
 						if _, ok := k.internalizer.theories[family].(*SMTDenseDiffTheory); !ok {
 							t.Fatal("dense mode not selected")
 						}
+						stats := statistics.New()
+						astTestMust(t, solver.CollectStatistics(stats))
+						found := false
+						for i := 0; i < stats.Size(); i++ {
+							if stats.Key(i) == "dd assertions" {
+								found = stats.IsUint(i) && stats.UintValue(i) != 0
+							}
+						}
+						if !found {
+							t.Fatal("solver statistics omitted the selected dense backend")
+						}
 					case 4:
 						if _, ok := k.internalizer.theories[family].(*SMTUTVPITheory); !ok {
 							t.Fatal("UTVPI mode not selected")
