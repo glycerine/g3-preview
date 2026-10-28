@@ -128598,7 +128598,7 @@
         },
         {
           "name": "hint_solver m_residue and m_satisfied scoped quantifier-set storage",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_quantifier_set.go",
           "tests": [
             "TestModelFinderScopedQuantifierSetTrailsAndEvents",
@@ -128608,7 +128608,7 @@
         },
         {
           "name": "hint_solver update_satisfied_residue with scoped set undo and quantifier_info chosen-function reset",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_hint_search.go",
           "tests": [
             "TestModelFinderHintSatisfiedResidueSourceScopeTransitions"
@@ -128624,7 +128624,7 @@
         },
         {
           "name": "hint_solver preprocess, Q_f/Q_f_def/f2defs construction and get_candidates_from_residue",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_hint_indexes.go",
           "tests": [
             "TestModelFinderHintPreprocessIndexesAndResidueCandidates"

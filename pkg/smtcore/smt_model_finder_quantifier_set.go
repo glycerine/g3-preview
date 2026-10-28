@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/util/backtrackable_set.h:28-100; concrete qset/qsset uses in
 // src/smt/smt_model_finder.cpp:2739-2864.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 

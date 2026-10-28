@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp:2609-2616,2948-2996.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp:2609-2616,2948-2996.
 
 import "github.com/glycerine/g3/pkg/ast"
 
