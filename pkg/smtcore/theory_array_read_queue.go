@@ -28,6 +28,24 @@ func (t *SMTArrayTheory) queueStoreReadAxiom(read, store ast.ASTHandle, upward b
 	if readNode == nil || storeNode == nil || len(readNode.arguments) < 2 || len(storeNode.arguments) != len(readNode.arguments)+1 {
 		return false, ast.ErrASTDomain
 	}
+	line, tag, label := 207, "array", "axiom 2a"
+	if upward {
+		line, tag, label = 215, "array_axiom2b", "axiom 2b"
+	}
+	if err = t.emitSimpleArrayTrace(tag, "instantiate_axiom2", line, nil, func(out io.Writer) error {
+		readID, err := readNode.OwnerID()
+		if err != nil {
+			return err
+		}
+		storeID, err := storeNode.OwnerID()
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "%s: #%d #%d\n", label, readID, storeID)
+		return err
+	}); err != nil {
+		return false, err
+	}
 	allEqual := true
 	indices := make([]*SMTEnode, len(readNode.arguments)-1)
 	for i := range indices {

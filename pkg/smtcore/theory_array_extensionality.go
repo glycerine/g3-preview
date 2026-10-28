@@ -3,6 +3,7 @@ package smtcore
 // Source: theory_array::new_diseq_eh and theory_array_base extensionality queue.
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -40,12 +41,44 @@ func (t *SMTArrayTheory) NewDisequality(left, right SMTTheoryVar) error {
 	if err != nil || family != t.FamilyID() || !t.extensional {
 		return err
 	}
+	if err = t.emitSimpleArrayTrace("ext", "new_diseq_eh", 308, nil, func(out io.Writer) error {
+		if _, err := io.WriteString(out, "extensionality:\n"); err != nil {
+			return err
+		}
+		if err := displayArrayTraceExpression(s.manager, out, first.owner); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(out, "\n"); err != nil {
+			return err
+		}
+		if err := displayArrayTraceExpression(s.manager, out, second.owner); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return err
+	}
 	return t.instantiateArrayExtensionality(first, second)
 }
 
 func (t *SMTArrayTheory) instantiateArrayExtensionality(first, second *SMTEnode) error {
 	if !t.extensional {
 		return nil
+	}
+	if err := t.emitSimpleArrayTrace("array", "instantiate_extensionality", 226, nil, func(out io.Writer) error {
+		leftID, err := first.OwnerID()
+		if err != nil {
+			return err
+		}
+		rightID, err := second.OwnerID()
+		if err != nil {
+			return err
+		}
+		_, err = fmt.Fprintf(out, "extensionality: #%d #%d\n", leftID, rightID)
+		return err
+	}); err != nil {
+		return err
 	}
 	leftID, err := first.OwnerID()
 	if err != nil {

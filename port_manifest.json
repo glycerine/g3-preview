@@ -138216,6 +138216,8 @@
         "pkg/cmd/g3/test_vectors/array_explicit_extensionality_scopes.smt2",
         "pkg/smtcore/theory_array_display.go",
         "pkg/smtcore/theory_array_display_test.go",
+        "pkg/smtcore/theory_array_trace.go",
+        "pkg/smtcore/theory_array_trace_test.go",
         "pkg/smtcore/theory_array_model.go",
         "pkg/smtcore/theory_array_model_test.go",
         "pkg/smtcore/theory_array_full_parents.go",
@@ -138258,6 +138260,7 @@
         "TestSMTFullArrayExplicitExtensionalityOriginalFingerprint",
         "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
         "TestSMTFullArrayDisplayConstructorLists",
+        "TestSMTOrdinaryArraySourceTraces",
         "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation",
         "TestSMTFullArrayConstructorModelsDefaultAndMapPropagation",
         "TestSMTArrayParentsPrivateMergesDelayedUpwardAndRollback",
@@ -138545,6 +138548,21 @@
             "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "Retained theory_array.cpp TRACE sites for merges, variable creation, parent scheduling, upward propagation, store/read/extensionality axioms, term internalization, relevant ITEs and final-check status",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_read_queue.go",
+            "pkg/smtcore/theory_array_extensionality.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTOrdinaryArraySourceTraces"
           ]
         },
         {
@@ -138861,6 +138879,21 @@
           "tests": [
             "TestSMTArrayDisplayPrivateRootsParentsAndScopes",
             "TestSMTFullArrayDisplayConstructorLists"
+          ]
+        },
+        {
+          "name": "Retained theory_array.cpp TRACE sites declared by the ordinary array class: merges, variable creation, parent scheduling, upward propagation, store/read/extensionality axioms, term internalization, relevant ITEs and final-check status",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_read_queue.go",
+            "pkg/smtcore/theory_array_extensionality.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTOrdinaryArraySourceTraces"
           ]
         },
         {

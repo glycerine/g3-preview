@@ -368,3 +368,80 @@ func TestSMTFullArraySourceShapeGuards(t *testing.T) {
 		t.Fatal("non-select observer accepted", err)
 	}
 }
+
+func TestSMTOrdinaryArraySourceTraces(t *testing.T) {
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	for _, tag := range []string{"array", "array_bug", "array_axiom2b", "ext"} {
+		tags.Enable(tag)
+	}
+	manager := smtArrayTraceManager(t, tags)
+	family, err := manager.RegisterArrayPlugin()
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, manager, nil)
+	theory, err := NewSMTArrayTheory(family)
+	astTestMust(t, err)
+	astTestMust(t, state.RegisterTheory(theory))
+	theory.arrayConfig.Laziness = 0
+	boolean, err := manager.MkBoolSort()
+	astTestMust(t, err)
+	arraySort, err := manager.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+	astTestMust(t, err)
+	no, err := manager.MkFalse()
+	astTestMust(t, err)
+	yes, err := manager.MkTrue()
+	astTestMust(t, err)
+	first, err := manager.MkConstArray(arraySort, no)
+	astTestMust(t, err)
+	second, err := manager.MkConstArray(arraySort, yes)
+	astTestMust(t, err)
+	store, err := manager.MkFamilyApp(family, ast.ASTArrayOpStore, nil, []ast.ASTHandle{first, yes, yes})
+	astTestMust(t, err)
+	for _, expression := range []ast.ASTHandle{first, second, store} {
+		astTestMust(t, state.Internalize(expression, false))
+	}
+	firstVar := state.context.enodes[first].TheoryVar(family)
+	storeVar := state.context.enodes[store].TheoryVar(family)
+	secondVar := state.context.enodes[second].TheoryVar(family)
+	astTestMust(t, theory.NewEquality(firstVar, storeVar))
+	read, err := manager.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{store, yes})
+	astTestMust(t, err)
+	astTestMust(t, state.Internalize(read, false))
+	_, err = theory.queueStoreReadAxiom(read, store, true)
+	astTestMust(t, err)
+	astTestMust(t, theory.NewDisequality(firstVar, secondVar))
+	condition := smtRelevancyBool(t, manager, "array-ordinary-trace-condition")
+	choice, err := manager.MkIte(condition, first, second)
+	astTestMust(t, err)
+	astTestMust(t, theory.Relevant(choice))
+	_, err = theory.FinalCheck()
+	astTestMust(t, err)
+
+	if !tags.ShouldTrace("array") {
+		if output.Len() != 0 {
+			t.Fatal("compiled-out ordinary array traces executed", output.String())
+		}
+		return
+	}
+	trace := output.String()
+	for _, want := range []string{
+		"[array_bug] internalize_term src/smt/theory_array.cpp:267",
+		"[array_bug] internalize_term_core src/smt/theory_array.cpp:241",
+		"[array] mk_var src/smt/theory_array.cpp:77",
+		"[array] instantiate_axiom1 src/smt/theory_array.cpp:200",
+		"[array] merge_eh src/smt/theory_array.cpp:48",
+		"[array] merge_eh src/smt/theory_array.cpp:62",
+		"[array] set_prop_upward src/smt/theory_array.cpp:146",
+		"[array] add_parent_select src/smt/theory_array.cpp:98",
+		"[array] instantiate_axiom2 src/smt/theory_array.cpp:207",
+		"[array_axiom2b] instantiate_axiom2 src/smt/theory_array.cpp:215",
+		"[ext] new_diseq_eh src/smt/theory_array.cpp:308",
+		"[array] instantiate_extensionality src/smt/theory_array.cpp:226",
+		"[array] relevant_eh src/smt/theory_array.cpp:318",
+		"[array] final_check_eh src/smt/theory_array.cpp:385",
+	} {
+		if !strings.Contains(trace, want) {
+			t.Fatalf("missing ordinary array source trace %q in %q", want, trace)
+		}
+	}
+}

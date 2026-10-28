@@ -173,6 +173,9 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 			return false, err
 		}
 	}
+	if err = t.traceSimpleArrayExpression("array_bug", "internalize_term", 267, "", expression); err != nil {
+		return false, err
+	}
 	op, array, err := t.arrayOperation(expression)
 	if err != nil || !array {
 		return false, err
@@ -185,6 +188,9 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 			return false, err
 		}
 		return false, nil
+	}
+	if err = t.traceSimpleArrayExpression("array_bug", "internalize_term_core", 241, "", expression); err != nil {
+		return false, err
 	}
 	count, err := state.manager.GetNumArgs(expression)
 	if err != nil {
@@ -266,6 +272,9 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 func (t *SMTArrayTheory) assertStoreAxiom(store ast.ASTHandle) error {
 	if t.stores[store] {
 		return nil
+	}
+	if err := t.traceSimpleArrayExpression("array", "instantiate_axiom1", 200, "axiom 1:\n", store); err != nil {
+		return err
 	}
 	t.stores[store] = true
 	t.storeTrail = append(t.storeTrail, store)
@@ -667,10 +676,22 @@ func (t *SMTArrayTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	if err != nil {
 		return SMTFinalCheckGiveUp, err
 	}
+	status := SMTFinalCheckDone
 	if delayed || interfaces {
+		status = SMTFinalCheckContinue
+	} else if t.unsupported {
+		status = SMTFinalCheckGiveUp
+	}
+	if err = t.emitSimpleArrayTrace("array", "final_check_eh", 385, nil, func(out io.Writer) error {
+		_, writeErr := fmt.Fprintf(out, "m_found_unsupported_op: %t %d\n", t.unsupported, status)
+		return writeErr
+	}); err != nil {
+		return SMTFinalCheckGiveUp, err
+	}
+	if status == SMTFinalCheckContinue {
 		return SMTFinalCheckContinue, nil
 	}
-	if t.unsupported {
+	if status == SMTFinalCheckGiveUp {
 		return SMTFinalCheckGiveUp, nil
 	}
 	return SMTFinalCheckDone, nil
