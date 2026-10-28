@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	astrewriter "github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/muz/base"
+	muzpdr "github.com/glycerine/g3/pkg/muz/pdr"
 	"github.com/glycerine/g3/pkg/muz/rel"
 	"github.com/glycerine/g3/pkg/muz/transforms"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -28,6 +29,25 @@ type predicateState struct {
 	table *rel.HashTable
 }
 
+func (e *PropositionalEngine) predicateState(declaration ast.ASTHandle) (*predicateState, error) {
+	arity, err := e.manager.GetArity(declaration)
+	if err != nil {
+		return nil, err
+	}
+	sorts := make([]ast.ASTHandle, arity)
+	for index := uint32(0); index < arity; index++ {
+		sorts[index], err = e.manager.GetDomain(declaration, index)
+		if err != nil {
+			return nil, err
+		}
+	}
+	table, tableErr := e.relations.GetRelation(declaration)
+	if tableErr != nil && !errors.Is(tableErr, rel.ErrTable) {
+		return nil, tableErr
+	}
+	return &predicateState{sorts: sorts, table: table}, nil
+}
+
 // PropositionalEngine owns the retained rule, finite-relation, and optional
 // ground-guard rewriting services.
 type PropositionalEngine struct {
@@ -37,6 +57,10 @@ type PropositionalEngine struct {
 	binder     *base.VariableBinder
 	relations  *rel.RelationManager
 	guard      *astrewriter.TheoryRewriter
+	params     *uparams.ParamsContext
+	globals    *uparams.GlobalParamsService
+	backend    string
+	pdr        *muzpdr.Context
 	scopes     []*base.RuleSet
 	predicates map[ast.ASTHandle]*predicateState
 	compiled   bool
@@ -55,6 +79,8 @@ func NewPropositionalEngineWithServices(manager *ast.ASTManager, context *uparam
 	if err != nil {
 		return nil, errors.Join(err, engine.Close())
 	}
+	engine.params = context
+	engine.globals = globals
 	return engine, nil
 }
 
@@ -80,7 +106,7 @@ func NewPropositionalEngine(manager *ast.ASTManager) (*PropositionalEngine, erro
 	}
 	return &PropositionalEngine{
 		manager: manager, rules: rules, set: set, binder: binder, relations: relations,
-		predicates: make(map[ast.ASTHandle]*predicateState),
+		predicates: make(map[ast.ASTHandle]*predicateState), backend: "datalog",
 	}, nil
 }
 
@@ -113,18 +139,14 @@ func (e *PropositionalEngine) RegisterPredicate(declaration ast.ASTHandle) error
 	if rangeSort != boolean {
 		return ErrPropositionalHorn
 	}
-	sorts, _, err := e.relations.PredicateSignature(declaration)
-	if err != nil {
-		return err
-	}
 	if err = e.rules.RegisterPredicate(declaration); err != nil {
 		return err
 	}
-	table, err := e.relations.GetRelation(declaration)
+	state, err := e.predicateState(declaration)
 	if err != nil {
 		return err
 	}
-	e.predicates[declaration] = &predicateState{sorts: sorts, table: table}
+	e.predicates[declaration] = state
 	return nil
 }
 
@@ -249,15 +271,11 @@ func (e *PropositionalEngine) normalizeSimpleJoins() (resultErr error) {
 		return err
 	}
 	for _, declaration := range plugin.FreshPredicates() {
-		sorts, _, x := e.relations.PredicateSignature(declaration)
+		state, x := e.predicateState(declaration)
 		if x != nil {
 			return x
 		}
-		table, x := e.relations.GetRelation(declaration)
-		if x != nil {
-			return x
-		}
-		e.predicates[declaration] = &predicateState{sorts: sorts, table: table}
+		e.predicates[declaration] = state
 	}
 	return nil
 }
@@ -1017,6 +1035,13 @@ func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.L
 		return lbool.Undef, ErrPropositionalHorn
 	}
 	e.queried = true
+	if e.backend == "pdr" {
+		e.compiled = false
+		return e.queryPDR(declaration)
+	}
+	if state.table == nil {
+		return lbool.Undef, ErrPropositionalHorn
+	}
 	finalized, err := e.set.IsFinalized()
 	if err != nil {
 		return lbool.Undef, err
@@ -1058,6 +1083,9 @@ func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.L
 func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTRef, result error) {
 	if err := e.open(); err != nil {
 		return answer, err
+	}
+	if e.backend == "pdr" {
+		return answer, fmt.Errorf("muz/fp: PDR answer reconstruction is not ported")
 	}
 	state := e.predicates[declaration]
 	if state == nil || !e.queried {
@@ -1163,6 +1191,10 @@ func (e *PropositionalEngine) Close() (result error) {
 	if e.closed {
 		return nil
 	}
+	if e.pdr != nil {
+		result = errors.Join(result, e.pdr.Close())
+		e.pdr = nil
+	}
 	for i := len(e.scopes) - 1; i >= 0; i-- {
 		result = errors.Join(result, e.scopes[i].Close())
 	}
@@ -1188,6 +1220,7 @@ func (e *PropositionalEngine) Close() (result error) {
 		e.relations = nil
 	}
 	e.predicates = nil
+	e.params, e.globals = nil, nil
 	e.closed = true
 	return result
 }

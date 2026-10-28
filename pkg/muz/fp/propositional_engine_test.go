@@ -112,6 +112,72 @@ func TestPropositionalEngineMatchesCPPFixedpointQueries(t *testing.T) {
 	}
 }
 
+func TestPDREngineMatchesCPPIntegerHornQueries(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	globals, err := context.GlobalParameters()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngineWithServices(manager, globals.Context, globals)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	fpMust(t, engine.SelectEngine("pdr"))
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	arithmetic, err := manager.ArithmeticFamilyID()
+	fpMust(t, err)
+	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
+	fpMust(t, err)
+	declarations := make(map[string]ast.ASTHandle)
+	for _, name := range []string{"P", "Q", "U"} {
+		symbol, x := manager.Symbols.Intern("pdr-integer-" + name)
+		fpMust(t, x)
+		declarations[name], x = manager.MkFuncDecl(symbol, []ast.ASTHandle{integer}, boolean, ast.ASTFuncDeclInfo{})
+		fpMust(t, x)
+		fpMust(t, engine.RegisterPredicate(declarations[name]))
+	}
+	zero, err := manager.ArithmeticIntegerNumeralText("0")
+	fpMust(t, err)
+	pZero, err := manager.MkApp(declarations["P"], []ast.ASTHandle{zero})
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(pZero, "integer-fact"))
+	xName, err := manager.Symbols.Intern("pdr-integer-x")
+	fpMust(t, err)
+	x, err := manager.MkConst(xName, integer)
+	fpMust(t, err)
+	fpMust(t, engine.RegisterVariable(x))
+	pX, err := manager.MkApp(declarations["P"], []ast.ASTHandle{x})
+	fpMust(t, err)
+	qX, err := manager.MkApp(declarations["Q"], []ast.ASTHandle{x})
+	fpMust(t, err)
+	step, err := manager.MkImplies(pX, qX)
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(step, "integer-step"))
+	gotReachable, err := engine.QueryPredicate(declarations["Q"])
+	fpMust(t, err)
+	gotUnreachable, err := engine.QueryPredicate(declarations["U"])
+	fpMust(t, err)
+	if gotReachable != lbool.True || gotUnreachable != lbool.False {
+		t.Fatal("PDR integer Horn results", gotReachable, gotUnreachable)
+	}
+
+	cpp := fpReference(t, `(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(declare-rel Q (Int))
+(declare-rel U (Int))
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (P x) (Q x)))
+(query Q :print-answer false)
+(query U :print-answer false)
+`)
+	if len(cpp) != 2 || cpp[0] != "sat" || cpp[1] != "unsat" {
+		t.Fatal("C++ PDR fixedpoint output", cpp)
+	}
+}
+
 func TestPropositionalEngineCompilesSimpleJoinNormalization(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)

@@ -386,7 +386,7 @@ func TestSMT2FixedpointRejectsUnstratifiedNegation(t *testing.T) {
 	}
 }
 
-func TestSMT2FixedpointQueryRefusesUnportedEngine(t *testing.T) {
+func TestSMT2FixedpointSpacerIntegerQueriesMatchCPP(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	if err != nil {
 		t.Fatal(err)
@@ -396,9 +396,23 @@ func TestSMT2FixedpointQueryRefusesUnportedEngine(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
-	script := "(set-option :fixedpoint.engine spacer)\n(declare-rel P ())\n(query P)\n"
-	err = smt2.ParseCommands(context, strings.NewReader(script), &bytes.Buffer{})
-	if err == nil || !strings.Contains(err.Error(), "fixedpoint engine spacer is not ported") {
-		t.Fatal("unported fixedpoint engine accepted", err)
+	context.PrintSuccess = false
+	script := `(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(declare-rel Q (Int))
+(declare-rel U (Int))
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (P x) (Q x)))
+(query Q :print-answer false)
+(query U :print-answer false)
+`
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	if output.String() != cpp || cpp != "sat\nunsat\n" {
+		t.Fatal("spacer integer SMT-LIB differential", output.String(), cpp)
 	}
 }

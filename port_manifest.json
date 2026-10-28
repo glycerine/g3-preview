@@ -80738,8 +80738,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/base/hnf.go", "pkg/muz/dataflow/reachability.go", "pkg/muz/rel/table.go", "pkg/muz/rel/relation_manager.go", "pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
-      "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"],
+      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/fp/pdr_engine.go", "pkg/muz/base/hnf.go", "pkg/muz/dataflow/reachability.go", "pkg/muz/rel/table.go", "pkg/muz/rel/relation_manager.go", "pkg/cmd_context/fixedpoint.go", "pkg/parsers/smt2/commands.go"],
+      "tests": ["TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads", "TestFiniteCompilerOrdersFactsAndIdentityRules", "TestPropositionalEngineMatchesCPPFixedpointQueries", "TestPDREngineMatchesCPPIntegerHornQueries", "TestPropositionalEngineExecutesStratifiedNegation", "TestPropositionalEngineScopeGuards", "TestSMT2FixedpointPropositionalQueriesMatchCPP", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointFiniteRelationsMatchCPP", "TestSMT2FixedpointFiniteVariableExpansionMatchesCPP", "TestSMT2FixedpointRejectsUnstratifiedNegation", "TestSMT2FixedpointRuleScopesMatchCPP"],
       "assertions": [
         {
           "line": 82,
@@ -80817,13 +80817,19 @@
           "status": "ported",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": ["TestPropositionalEngineScopeGuards", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
+        },
+        {
+          "name": "infinite-domain predicate registration and PDR/Spacer query dispatch through the retained rule context",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/pdr_engine.go",
+          "tests": ["TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]
         }
       ],
       "ownership": [
         "PropositionalEngine owns its RuleManager, RuleSet, VariableBinder, RelationManager with finite predicate tables, and optional AST theory rewriter. Compiled instruction blocks own their predicate references and per-rule accounting parents until execution completes; the engine borrows the AST manager and releases all owned references before it."
       ],
       "deviations": [
-        "This is an explicitly bounded integration slice, not the general dl_context: stratified finite rules with zero, one, or two positive tails, negated predicates, recursion, constants, repeated variables, equijoins, Cartesian joins, projection, duplication, permutation, and unbound finite variables use relational bytecode; interpreted and wider multi-tail rules use the exact dependency-ordered fallback evaluator and produce finite tuple-answer formulas. Recursive bytecode uses semi-naive one-tail-at-a-time delta substitution within finalized predicate strata. Non-ground or infinite-domain arithmetic, parameters, transformations, models/proofs, and general engine selection remain open."
+        "The Datalog slice remains finite-domain and produces tuple answers. Infinite-domain positive Horn rules may now dispatch through PDR/Spacer, but PDR answer/certificate/model/proof reconstruction, background assertions, full transformations, parameters and broader engine selection remain open."
       ]
     },
     {
@@ -82554,22 +82560,22 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/register_engine.go", "pkg/cmd_context/fixedpoint.go"],
-      "tests": ["TestPropositionalEngineSelection", "TestSMT2FixedpointQueryRefusesUnportedEngine"],
+      "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete DATALOG_ENGINE factory selection for the retained positive propositional backend, including auto-config selection and explicit unavailable-engine refusal (dl_register_engine.cpp:26-58)",
+          "name": "Concrete DATALOG_ENGINE and PDR/SPACER_ENGINE selection, including auto-config Datalog selection and explicit refusal of remaining unavailable engines (dl_register_engine.cpp:26-58)",
           "status": "partial",
           "go_target": "pkg/muz/fp/register_engine.go",
-          "tests": ["TestPropositionalEngineSelection", "TestSMT2FixedpointQueryRefusesUnportedEngine"]
+          "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]
         }
       ],
       "ownership": [
         "The selected Datalog engine remains owned by cmd_context.Context; selection itself borrows the engine and creates no additional owner."
       ],
       "deviations": [
-        "PDR/QPDR, Spacer, BMC/QBMC, tabulation, CLP, duality, and DDNF engine constructors remain unported and are rejected explicitly instead of falling through to Datalog."
+        "PDR and its Spacer alias dispatch to the Go PDR context. QPDR, BMC/QBMC, tabulation, CLP, duality, and DDNF remain unported and are rejected explicitly instead of falling through to Datalog."
       ]
     },
     {
@@ -82578,7 +82584,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/register_engine.go", "pkg/cmd_context/fixedpoint.go"],
-      "tests": ["TestPropositionalEngineSelection", "TestSMT2FixedpointQueryRefusesUnportedEngine"],
+      "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"],
       "conditionals": [
         {
           "line": 19,
@@ -82593,10 +82599,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained concrete engine-selection surface for the Datalog backend (dl_register_engine.h:25-33)",
+          "name": "Retained concrete engine-selection surface for Datalog and PDR/Spacer backends (dl_register_engine.h:25-33)",
           "status": "partial",
           "go_target": "pkg/muz/fp/register_engine.go",
-          "tests": ["TestPropositionalEngineSelection", "TestSMT2FixedpointQueryRefusesUnportedEngine"]
+          "tests": ["TestPropositionalEngineSelection", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]
         }
       ],
       "ownership": [
@@ -83170,9 +83176,17 @@
       "path": "src/muz/pdr/pdr_dl_interface.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/fp/pdr_engine.go",
+        "pkg/muz/fp/register_engine.go",
+        "pkg/cmd_context/fixedpoint.go",
+        "pkg/parsers/smt2/fixedpoint_commands_test.go"
+      ],
+      "tests": [
+        "TestPDREngineMatchesCPPIntegerHornQueries",
+        "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+      ],
       "assertions": [
         {
           "line": 179,
@@ -83184,18 +83198,45 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "PDR/Spacer engine selection, finalized rule-set handoff, per-query context initialization and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/pdr_engine.go",
+          "tests": [
+            "TestPDREngineMatchesCPPIntegerHornQueries",
+            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+          ]
+        },
+        {
+          "name": "cover, answer/certificate, model/proof, transformed-rule reuse and slice/unfold/coalesce integration",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "PropositionalEngine owns the current PDR Context and closes/replaces it before each new PDR query or engine shutdown; rule and parameter services are borrowed."
+      ],
+      "deviations": [
+        "The current integration rebuilds PDR state per query instead of applying native rule-subsumption reuse. It deliberately refuses PDR answer reconstruction until trace/certificate support is ported."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_dl_interface.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/fp/pdr_engine.go",
+        "pkg/muz/fp/register_engine.go",
+        "pkg/cmd_context/fixedpoint.go"
+      ],
+      "tests": [
+        "TestPDREngineMatchesCPPIntegerHornQueries",
+        "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -83207,10 +83248,30 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained query and engine-selection surface",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/pdr_engine.go",
+          "tests": [
+            "TestPDREngineMatchesCPPIntegerHornQueries",
+            "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"
+          ]
+        },
+        {
+          "name": "cover, statistics reset/collection, certificate, answer, model, proof and parameter-update surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The fixedpoint engine owns its concrete PDR Context directly rather than through the native engine_base pointer."
+      ],
+      "deviations": [
+        "Only query dispatch is exposed while answer and diagnostic surfaces await PDR trace reconstruction."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_farkas_learner.cpp",

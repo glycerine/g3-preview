@@ -4,17 +4,23 @@ package fp
 
 import "fmt"
 
-// SelectEngine applies the retained factory branch. Auto-configuration selects
-// Datalog for the exact positive propositional fragment; other native engines
-// remain explicit until their concrete Go implementations exist.
+// SelectEngine applies the retained factory branch. Spacer is the public alias
+// for the PDR engine in the native fixedpoint frontend.
 func (e *PropositionalEngine) SelectEngine(name string) error {
 	if err := e.open(); err != nil {
 		return err
 	}
 	switch name {
 	case "auto-config", "datalog":
+		e.backend = "datalog"
 		return nil
-	case "pdr", "spacer", "bmc", "tab", "clp", "duality", "ddnf", "qpdr", "qbmc":
+	case "pdr", "spacer":
+		if e.params == nil || e.globals == nil {
+			return fmt.Errorf("muz/fp: fixedpoint engine %s requires parameter services", name)
+		}
+		e.backend = "pdr"
+		return nil
+	case "bmc", "tab", "clp", "duality", "ddnf", "qpdr", "qbmc":
 		return fmt.Errorf("muz/fp: fixedpoint engine %s is not ported", name)
 	default:
 		return fmt.Errorf("muz/fp: unknown fixedpoint engine %s", name)
