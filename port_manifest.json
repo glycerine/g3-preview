@@ -54803,7 +54803,8 @@
         "pkg/math/polynomial/polynomial_flip_sign.go",
         "pkg/math/polynomial/polynomial_ref_vector_projection.go",
         "pkg/math/polynomial/polynomial_nonzero_coefficient.go",
-        "pkg/math/polynomial/polynomial_coefficient_public_call.go"
+        "pkg/math/polynomial/polynomial_coefficient_public_call.go",
+        "pkg/math/polynomial/polynomial_derivative_public_call.go"
       ],
       "tests": [
         "TestPolynomialDividesTraceZeroKeepsOlderAlgorithmReceipt",
@@ -55725,7 +55726,11 @@
         "TestPolynomialCoefficientOwningCallPreservesOlderInvocation",
         "TestPolynomialReferenceSourceFinalizeDoesNotRetryStoppedAssignment",
         "TestPolynomialNonzeroConstantCallExactAcceptedGeneration",
-        "TestPolynomialCoefficientOwningSimpleCall"
+        "TestPolynomialCoefficientOwningSimpleCall",
+        "TestPolynomialDerivativeOwningCallValuesAliasAndFiniteField",
+        "TestPolynomialDerivativeOwningCallAllocationPrefixes",
+        "TestPolynomialDerivativeCallStoppedNumeralSourceAndOwningPhases",
+        "TestPolynomialDerivativeCallOwnsOnlyAcceptedOrphanGeneration"
       ],
       "conditionals": [
         {
@@ -60383,6 +60388,17 @@
             "TestProjectionLeadingCoefficientsFactorAndSkipConstants",
             "TestProjectionLeadingConstantDoesNotConstructCoefficient"
           ]
+        },
+        {
+          "name": "Concrete p_prime = derivative(p,x) owning assignment with exact invocation and orphan-generation cleanup (cpp4507-4528,7228-7229)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_derivative_public_call.go",
+          "tests": [
+            "TestPolynomialDerivativeOwningCallValuesAliasAndFiniteField",
+            "TestPolynomialDerivativeOwningCallAllocationPrefixes",
+            "TestPolynomialDerivativeCallStoppedNumeralSourceAndOwningPhases",
+            "TestPolynomialDerivativeCallOwnsOnlyAcceptedOrphanGeneration"
+          ]
         }
       ],
       "ownership": [
@@ -60525,7 +60541,8 @@
         "Projection membership uses PolynomialID, which reads only the scalar ID word and masks the lexical-sort flag. It does not adopt polynomial references or inspect the reference-count, size, monomial or coefficient fields. A qualified uninitialized scalar-prefix fixture verifies this narrow query and restores the genuine owning location before destruction.",
         "NonzeroConstantCoefficient owns the actual lexical scoped numeral and only the const_coeff receipt accepted by this invocation. Source child lexical cleanup precedes NUM destruction; explicit owning acknowledgment drains only the reached copy/normalization allocations after that NUM destructor. Active predicate state guards core and manager source/owning destruction before progress. Refused entry preserves older const_coeff/copy scope and raw TLS prefix. A genuine failed late SET allocation can be retried after exact cleanup; a later failed Rem scratch replacement preserves the source TMP hole and remains non-readable after allocation cleanup, without counter or scratch-member repair. Native continuation metadata is charged in the real core header, rather than a fictitious source call allocation.",
         "PolynomialCoefficientCall captures only the real coefficient, cheap-append and factory invocations accepted by coeff-with-reduct. The callee assigns reduct before the returned coefficient INC/old-lc DEC; factory handoff follows actual caller acquisition. The call owns no borrowed output reference and charges no invented source allocation. Separate source/owning cleanup phases preserve caller destruction order, reject executing/copy owners and never adopt an older or newer callee merely because it reused the same buffers. PolynomialNonzeroConstantCall is stamped inside actual predicate entry, and exact generation matching prevents refused/stale cleanup from touching a replacement call.",
-        "CoeffInto now exposes the actual no-reduct caller assignment through the existing concrete PolynomialCoefficientCall. It shares typed receipt/handoff mechanics with the live reduct overload but calls coeffCoreWithReceipts with no reduct, constructs no dummy output and preserves the source overload-specific trace path. Independent symbolic/constant/missing coefficients and input/output aliasing are checked; projection uses the actual returned coefficient INC and exact accepted factory handoff. Whole-unit audits remain partial."
+        "CoeffInto now exposes the actual no-reduct caller assignment through the existing concrete PolynomialCoefficientCall. It shares typed receipt/handoff mechanics with the live reduct overload but calls coeffCoreWithReceipts with no reduct, constructs no dummy output and preserves the source overload-specific trace path. Independent symbolic/constant/missing coefficients and input/output aliasing are checked; projection uses the actual returned coefficient INC and exact accepted factory handoff. Whole-unit audits remain partial.",
+        "PolynomialDerivativeCall captures the existing derivative receipt at actual acceptance, after the callee's own source guards. Caller output INC precedes old-output DEC. FinishSource only observes the callee's already-attempted NUM destruction and preserves a stopped source destructor; FinishRetainedLocals resumes those exact NUMs before older caller references die, and CleanupRetained retires unjoined children afterward. Pending zero-coefficient monomial cohorts keep their exact invocation ownership across source completion and cannot be adopted by stale receipts or copied call objects. No dummy coefficient/result storage or additional source reservation is introduced."
       ],
       "deviations": [
         "Divisibility TRACE cpp5155-5156 now precedes the zero shortcut and algorithm locals; cpp5181-5182 reports remainder/divisor and the actual optional quotient after monomial reference assignment. Direct polynomial display uses a separate exact diagnostic invocation and display generation. The compound caller receipt captures that pre-local child independently of the existing algorithm/prelude tuple, preserving the disabled-trace zero shortcut and its untouched older receipt. Exact cleanup rejects copied/stale diagnostic frames. Callback guards cover executing header/body/footer writes. Broader source failure/consumer audits remain open; no whole-unit promotion is claimed.",
@@ -60668,7 +60685,8 @@
         "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is implemented with separate source failure and TRACE obligations remaining. The cpp2598 left-sample trace now uses the actual source display and protects its live sample across trace callbacks; disabled tracing does not read the sample, failed output preserves computations, and formatter allocation failure preserves isolated roots before sign publication. The cpp2578 input/assignment/root trace block now displays the actual polynomial, collects variables with the retained source Vars algorithm into a native local slice, rereads each assigned value separately for root and interval display, and displays each isolated root before precision refinement. Exact records, erased/no-root gates, sticky output failure, repeated-getter failure and callback refusal before manager/root-vector mutation are checked. Complete descendant allocation/destructor composition and eager constructor audits remain open.",
         "Whole-unit audits are reopened: the prior ported/true flags recorded the private flip_sign_if_lm_neg/reference-update helpers but did not provide the retained external NLSAT public forwarding entry. That public path is now implemented and tested for graded-lex selection, raw-result alias/content semantics and exact accepted-child cleanup. Native additional receipt/header state differs from C++ layout. All source allocation/lexical/diagnostic frontiers of the new public entry are not yet audited, so the unit is partial with both whole-audit flags false; existing individually verified methods retain their recorded evidence.",
         "This adds the concrete predicate needed by retained normalization, not a complete polynomial/source ownership audit. Independent missing/symbolic/constant and finite-field cases, actual late TLS copy and remainder-scratch failures, parent guards, source debug/erased-variable guard and older-scope isolation are checked. The complete vanishing-coefficient/explanation pipeline remains pending; no full cpp/h audit flag is promoted.",
-        "This exposes the concrete retained normalization caller boundary, not a generic callback/template adapter or complete source audit. Independent contents/aliases, two cold allocation failures through success, older invocation isolation, genuine stopped reference assignment and exact stale predicate-generation guards are checked. Whole-unit flags remain false."
+        "This exposes the concrete retained normalization caller boundary, not a generic callback/template adapter or complete source audit. Independent contents/aliases, two cold allocation failures through success, older invocation isolation, genuine stopped reference assignment and exact stale predicate-generation guards are checked. Whole-unit flags remain false.",
+        "New tests cover independent derivative values, input/output aliasing, field-normalized modular coefficients, large numeric allocation prefixes, a real stopped late TLS NUM destructor, and old/new orphan-generation isolation. A warmed small-coefficient path legitimately needed no new reservation; the failure sweep therefore uses a genuine large numerical allocation. Native object metadata remains different from C++ layout; whole-unit audits stay partial."
       ],
       "trace_polynomial_display_dispatch_audit": {
         "source": "src/math/polynomial/polynomial.cpp",
@@ -61262,7 +61280,8 @@
         "pkg/math/polynomial/polynomial_flip_sign.go",
         "pkg/math/polynomial/polynomial_ref_vector_projection.go",
         "pkg/math/polynomial/polynomial_nonzero_coefficient.go",
-        "pkg/math/polynomial/polynomial_coefficient_public_call.go"
+        "pkg/math/polynomial/polynomial_coefficient_public_call.go",
+        "pkg/math/polynomial/polynomial_derivative_public_call.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -61893,7 +61912,11 @@
         "TestPolynomialCoefficientOwningCallPreservesOlderInvocation",
         "TestPolynomialReferenceSourceFinalizeDoesNotRetryStoppedAssignment",
         "TestPolynomialNonzeroConstantCallExactAcceptedGeneration",
-        "TestPolynomialCoefficientOwningSimpleCall"
+        "TestPolynomialCoefficientOwningSimpleCall",
+        "TestPolynomialDerivativeOwningCallValuesAliasAndFiniteField",
+        "TestPolynomialDerivativeOwningCallAllocationPrefixes",
+        "TestPolynomialDerivativeCallStoppedNumeralSourceAndOwningPhases",
+        "TestPolynomialDerivativeCallOwnsOnlyAcceptedOrphanGeneration"
       ],
       "conditionals": [
         {
@@ -64179,6 +64202,17 @@
             "TestProjectionLeadingCoefficientsFactorAndSkipConstants",
             "TestProjectionLeadingConstantDoesNotConstructCoefficient"
           ]
+        },
+        {
+          "name": "Concrete p_prime = derivative(p,x) owning assignment with exact invocation and orphan-generation cleanup (cpp4507-4528,7228-7229)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_derivative_public_call.go",
+          "tests": [
+            "TestPolynomialDerivativeOwningCallValuesAliasAndFiniteField",
+            "TestPolynomialDerivativeOwningCallAllocationPrefixes",
+            "TestPolynomialDerivativeCallStoppedNumeralSourceAndOwningPhases",
+            "TestPolynomialDerivativeCallOwnsOnlyAcceptedOrphanGeneration"
+          ]
         }
       ],
       "ownership": [
@@ -64247,7 +64281,8 @@
         "Projection membership uses PolynomialID, which reads only the scalar ID word and masks the lexical-sort flag. It does not adopt polynomial references or inspect the reference-count, size, monomial or coefficient fields. A qualified uninitialized scalar-prefix fixture verifies this narrow query and restores the genuine owning location before destruction.",
         "NonzeroConstantCoefficient owns the actual lexical scoped numeral and only the const_coeff receipt accepted by this invocation. Source child lexical cleanup precedes NUM destruction; explicit owning acknowledgment drains only the reached copy/normalization allocations after that NUM destructor. Active predicate state guards core and manager source/owning destruction before progress. Refused entry preserves older const_coeff/copy scope and raw TLS prefix. A genuine failed late SET allocation can be retried after exact cleanup; a later failed Rem scratch replacement preserves the source TMP hole and remains non-readable after allocation cleanup, without counter or scratch-member repair. Native continuation metadata is charged in the real core header, rather than a fictitious source call allocation.",
         "PolynomialCoefficientCall captures only the real coefficient, cheap-append and factory invocations accepted by coeff-with-reduct. The callee assigns reduct before the returned coefficient INC/old-lc DEC; factory handoff follows actual caller acquisition. The call owns no borrowed output reference and charges no invented source allocation. Separate source/owning cleanup phases preserve caller destruction order, reject executing/copy owners and never adopt an older or newer callee merely because it reused the same buffers. PolynomialNonzeroConstantCall is stamped inside actual predicate entry, and exact generation matching prevents refused/stale cleanup from touching a replacement call.",
-        "CoeffInto now exposes the actual no-reduct caller assignment through the existing concrete PolynomialCoefficientCall. It shares typed receipt/handoff mechanics with the live reduct overload but calls coeffCoreWithReceipts with no reduct, constructs no dummy output and preserves the source overload-specific trace path. Independent symbolic/constant/missing coefficients and input/output aliasing are checked; projection uses the actual returned coefficient INC and exact accepted factory handoff. Whole-unit audits remain partial."
+        "CoeffInto now exposes the actual no-reduct caller assignment through the existing concrete PolynomialCoefficientCall. It shares typed receipt/handoff mechanics with the live reduct overload but calls coeffCoreWithReceipts with no reduct, constructs no dummy output and preserves the source overload-specific trace path. Independent symbolic/constant/missing coefficients and input/output aliasing are checked; projection uses the actual returned coefficient INC and exact accepted factory handoff. Whole-unit audits remain partial.",
+        "PolynomialDerivativeCall captures the existing derivative receipt at actual acceptance, after the callee's own source guards. Caller output INC precedes old-output DEC. FinishSource only observes the callee's already-attempted NUM destruction and preserves a stopped source destructor; FinishRetainedLocals resumes those exact NUMs before older caller references die, and CleanupRetained retires unjoined children afterward. Pending zero-coefficient monomial cohorts keep their exact invocation ownership across source completion and cannot be adopted by stale receipts or copied call objects. No dummy coefficient/result storage or additional source reservation is introduced."
       ],
       "deviations": [
         "Algebraic exact sign evaluation mathematical-path increment (algebraic_numbers.cpp:1979-2188,3041-3043): EvalSign now connects optimistic rationals, rational elimination, interval refinement and exact resultant fallback. It creates y-p_prime in the private MM, stable-sorts actual variables by defining-polynomial degree, eliminates each source variable using its actual defining polynomial, converts into persistent eval-sign UP storage and computes the nonzero-root lower bound through an actually issued Knuth receipt. Saved intervals and +/-2^-k bounds follow source declaration/destruction order; exact refinement returns a strict sign or zero, restoring overrefined inputs, or restarts after rational discovery. The global converter binds an actual accepted algebraic caller and preserves existing public behavior. A real cancellation sweep exposed GCD source cleanup dropping an exact-division receipt while its earlier remainder-buffer arithmetic invocation still owned rows; pending detection now retains that precise child. Independent tests cover exact square/sum-of-squares zeros, signed sqrt(2)+sqrt(3)-3, mixed quadratic/cubic degree order, rational restart and raw-inline rational sign. The expected resultant y^4+12*y^3+44*y^2+48*y-8 and source input-interval restoration are checked independently. Every reached algebraic/resultant checkpoint cancellation/owning-cleanup/retry frontier passes in ordinary and checked/debug/trace profiles on CPUs 8-16. Full allocation-failure/callback/TRACE/eager-constructor and complete polynomial/AST audits remain partial; no whole-unit completion credit.",
@@ -64331,7 +64366,8 @@
         "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is implemented with separate source failure and TRACE obligations remaining. The cpp2598 left-sample trace now uses the actual source display and protects its live sample across trace callbacks; disabled tracing does not read the sample, failed output preserves computations, and formatter allocation failure preserves isolated roots before sign publication. The cpp2578 input/assignment/root trace block now displays the actual polynomial, collects variables with the retained source Vars algorithm into a native local slice, rereads each assigned value separately for root and interval display, and displays each isolated root before precision refinement. Exact records, erased/no-root gates, sticky output failure, repeated-getter failure and callback refusal before manager/root-vector mutation are checked. Complete descendant allocation/destructor composition and eager constructor audits remain open.",
         "Whole-unit audits are reopened: the prior ported/true flags recorded the private flip_sign_if_lm_neg/reference-update helpers but did not provide the retained external NLSAT public forwarding entry. That public path is now implemented and tested for graded-lex selection, raw-result alias/content semantics and exact accepted-child cleanup. Native additional receipt/header state differs from C++ layout. All source allocation/lexical/diagnostic frontiers of the new public entry are not yet audited, so the unit is partial with both whole-audit flags false; existing individually verified methods retain their recorded evidence.",
         "This adds the concrete predicate needed by retained normalization, not a complete polynomial/source ownership audit. Independent missing/symbolic/constant and finite-field cases, actual late TLS copy and remainder-scratch failures, parent guards, source debug/erased-variable guard and older-scope isolation are checked. The complete vanishing-coefficient/explanation pipeline remains pending; no full cpp/h audit flag is promoted.",
-        "This exposes the concrete retained normalization caller boundary, not a generic callback/template adapter or complete source audit. Independent contents/aliases, two cold allocation failures through success, older invocation isolation, genuine stopped reference assignment and exact stale predicate-generation guards are checked. Whole-unit flags remain false."
+        "This exposes the concrete retained normalization caller boundary, not a generic callback/template adapter or complete source audit. Independent contents/aliases, two cold allocation failures through success, older invocation isolation, genuine stopped reference assignment and exact stale predicate-generation guards are checked. Whole-unit flags remain false.",
+        "New tests cover independent derivative values, input/output aliasing, field-normalized modular coefficients, large numeric allocation prefixes, a real stopped late TLS NUM destructor, and old/new orphan-generation isolation. A warmed small-coefficient path legitimately needed no new reservation; the failure sweep therefore uses a genuine large numerical allocation. Native object metadata remains different from C++ layout; whole-unit audits stay partial."
       ]
     },
     {
@@ -90477,7 +90513,8 @@
         "pkg/nlsat/explain_vanishing.go",
         "pkg/nlsat/explain_normalize.go",
         "pkg/nlsat/explain_projection_coefficients.go",
-        "pkg/nlsat/explain_projection_psc.go"
+        "pkg/nlsat/explain_projection_psc.go",
+        "pkg/nlsat/explain_projection_discriminant.go"
       ],
       "tests": [
         "TestExplanationMinimizeOrderOwningAppendAndRegistryGrowth",
@@ -90536,7 +90573,11 @@
         "TestProjectionPSCZeroChainAndPairwiseResultants",
         "TestProjectionPSCRefusalPreservesOlderCacheScope",
         "TestProjectionPSCStopsAfterFirstNonconstant",
-        "TestProjectionCoefficientsAndPSCPrebuiltCPPOracle"
+        "TestProjectionCoefficientsAndPSCPrebuiltCPPOracle",
+        "TestProjectionDiscriminantsPrebuiltCPPOracle",
+        "TestProjectionDiscriminantsQuadraticCubicAndLinearSkip",
+        "TestProjectionDiscriminantVanishingAndRepeatedRoot",
+        "TestProjectionDiscriminantAllocationStopsAndRetry"
       ],
       "conditionals": [
         {
@@ -90896,6 +90937,17 @@
             "TestProjectionPSCStopsAfterFirstNonconstant",
             "TestProjectionCoefficientsAndPSCPrebuiltCPPOracle"
           ]
+        },
+        {
+          "name": "Actual psc_discriminant: skip degree below two, acquire derivative then project PSC (cpp670-683)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/explain_projection_discriminant.go",
+          "tests": [
+            "TestProjectionDiscriminantsPrebuiltCPPOracle",
+            "TestProjectionDiscriminantsQuadraticCubicAndLinearSkip",
+            "TestProjectionDiscriminantVanishingAndRepeatedRoot",
+            "TestProjectionDiscriminantAllocationStopsAndRetry"
+          ]
         }
       ],
       "ownership": [
@@ -90905,7 +90957,8 @@
         "Concrete explanationAssumptions binds the real search/assignment/evaluator, canonical polynomial cache and atom factory. It owns its factor vector, one lexical PolynomialRef, literal output and exact per-invocation literal marks. Source factor reference destruction runs once; explicit cleanup acknowledges only its own retained vector/ref/marks/output, preserving older numerical, cache and interval scopes. Parent search closes it before its borrowed services; running/failed/partial constructors block search entry. Literal-index marks include polarity, marks precede owning push, and successful source reset clears marks over the actual result. Raw algebraic sign values are preserved.",
         "Scalar vanishing elimination owns the actual lc and reduct lexical references and embeds only concrete accepted coefficient/predicate receipts. Reduct dies before lc; a source destructor refusal is retained without retrying it in a second source epilogue. Owning cleanup resumes real consumed DECs and releases unpublished assignment references separately, then acknowledges only the exact accepted child generations. The caller polynomial stays borrowed and observes each actual in-place source reduct assignment. Nested zero-factor locals die before these older references; cleanup and parent entry are guarded during callbacks.",
         "Normalization owns the actual polynomial_ref_vector ps, native parity slice and later p reference; the vector elimination overload owns only its local p and borrows its input vector. Nested scalar lc/reduct lexical cleanup precedes caller p, then local ps; accepted unjoined scalar children are aborted only after those older locals. Source destructor refusals are retained without repeating owning DECs, and callbacks cannot enter component cleanup or search. Borrowed polynomial/literal vector SET/SHRINK/RESET remains exclusively that caller owner's continuation; outer cleanup never adopts it. Core compaction acquires replacement atom leases through real INC-before-DEC SET, drops true literals stably, resets the full core on false and releases the final tail forward.",
-        "Projection binds the actual existing search-owned canonical worklist and factor setting, and owns its persistent PSC output vector. Guarded insertion shares the real worklist algorithm while validating the specific executing explanation caller; idle/foreign callers cannot bypass search guards. Factor expansion owns one lexical f, leading coefficients own p then lc, PSC selection owns s, and pairwise resultants own p then q. Nested scalar/factor/PSC lexical destruction finishes before older caller locals; accepted unjoined polynomial children are aborted only after those locals. Exact coefficient/predicate receipts remain concrete and generation-bound. The shared factor-vector extent is reread each iteration as in source."
+        "Projection binds the actual existing search-owned canonical worklist and factor setting, and owns its persistent PSC output vector. Guarded insertion shares the real worklist algorithm while validating the specific executing explanation caller; idle/foreign callers cannot bypass search guards. Factor expansion owns one lexical f, leading coefficients own p then lc, PSC selection owns s, and pairwise resultants own p then q. Nested scalar/factor/PSC lexical destruction finishes before older caller locals; accepted unjoined polynomial children are aborted only after those locals. Exact coefficient/predicate receipts remain concrete and generation-bound. The shared factor-vector extent is reread each iteration as in source.",
+        "Discriminant projection owns the source p and later p_prime references, and borrows its input vector/cache. The derivative call captures only its actual accepted invocation. Younger derivative NUM destruction and nested PSC lexical scopes finish before caller p_prime/p; unjoined derivative/PSC children are acknowledged afterward. Callback entry remains guarded by the real explanation execution state. No complete projection/explanation constructor or search is implied."
       ],
       "deviations": [
         "Only the retained core-minimization routines are ported here; public explain constructor/operator, normalization, vanishing-coefficient elimination, projection, simplification, result display/TRACE and solver resolution/main-search integration remain unported or unaudited. Native charged component storage and Go slices replace C++ object/vector layouts; no identical std::vector growth or allocation-prefix claim is made. The source empty-todo assertion at1373 remains observable for the qualified redundant order tested by TestExplanationMinimizeSourceEmptyTodoGuard; release still terminates by reconstructing the already-full core. No source progress or reference repair suppresses that difference. Thirty-six prebuilt C++ qfnra-nlsat queries verify unsatisfiability and deletion-minimality of nine reduced cores; these prove core properties rather than identical C++ internal selection order or whole-backend completeness. Source preconditions remain caller obligations.",
@@ -90914,7 +90967,8 @@
         "The scalar retained elim_vanishing routine is implemented; earlier notes calling all vanishing elimination pending are superseded only for cpp313-348. The vector overload, literal normalization, actual projection, complete explanation construction and solver search remain pending. Native reference headers/slices do not claim source object-layout/allocation-frontier identity; full lexical/physical/TRACE audits remain incomplete.",
         "Correctness fix relative to cpp432: test sign < 0 for odd lower-stage factors instead of sign == -1. The real algebraic rational fast path returns raw integer-numerator signs (for example -2); exact -1 loses negative polarity and has the independent counterexample y=-2,x=1 for y*x>0 versus x>0. Numeral sign representation is unchanged. Canonical prebuilt C++ mathematical checks validate the corrected Go equivalences and separately confirm the source-condition counterexample; they do not claim direct invocation of C++ internal normalize. The later unported cpp1137 exact -1 condition needs the same audit when reached.",
         "This supersedes earlier notes marking vector elimination/literal normalization entirely pending, but complete explanation construction/parameter binding, projection, simplification and main search remain required. Source TRACE, complete descendant allocation/lexical/physical audits and C++ layout/frontier equivalence are not claimed. All whole-unit flags remain false.",
-        "These are retained projection callees, not the complete project loop or explanation constructor. Discriminant/derivative processing, cell/root literal construction, projection control flow, simplification and main search remain pending. Binding the real persistent PSC vector is an explicit partial constructor step; cleanup does not make an interrupted constructor usable, and the eager full C++ constructor/layout/frontier is not claimed. Borrowed cache PSC/factor/unique/numerical owners acknowledge their own accepted work; explanation cleanup never adopts an older cache continuation. The native pairwise loop avoids unsigned size-1 underflow for empty invalid callers; retained source callers provide a nonempty stage. Complete TRACE and descendant allocation/physical audits remain open; whole-unit flags stay false."
+        "These are retained projection callees, not the complete project loop or explanation constructor. Discriminant/derivative processing, cell/root literal construction, projection control flow, simplification and main search remain pending. Binding the real persistent PSC vector is an explicit partial constructor step; cleanup does not make an interrupted constructor usable, and the eager full C++ constructor/layout/frontier is not claimed. Borrowed cache PSC/factor/unique/numerical owners acknowledge their own accepted work; explanation cleanup never adopts an older cache continuation. The native pairwise loop avoids unsigned size-1 underflow for empty invalid callers; retained source callers provide a nonempty stage. Complete TRACE and descendant allocation/physical audits remain open; whole-unit flags stay false.",
+        "Discriminant projection is now supplied; cell/root construction, the main projection loop, full explanations and search/backend integration remain pending. Quadratic/cubic/repeated-root cases, 120 prebuilt C++ checks, composed failure/retry and concrete derivative ownership are covered. Full source TRACE/eager constructor/descendant allocation audits remain partial. Integration work is now prioritized over completing every audit before an end-to-end path."
       ]
     },
     {

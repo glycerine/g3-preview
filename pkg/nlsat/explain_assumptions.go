@@ -24,6 +24,7 @@ type explanationAssumptions struct {
 	pscTmp                  *polynomial.PolynomialRefVector
 	psc                     explanationPSCScope
 	resultant               explanationResultantScope
+	discriminant            explanationDiscriminantScope
 	factorProjection        bool
 	projectionFactors       explanationProjectionFactorScope
 	leading                 explanationLeadingScope
@@ -79,7 +80,7 @@ func (n *explanationAssumptions) start() error {
 	if err := n.search.open(); err != nil {
 		return err
 	}
-	if n.resultActive || n.localFactor != nil || n.vanishing.active || n.normalization.active || n.projectionFactors.active || n.leading.active || n.psc.active || n.resultant.active {
+	if n.resultActive || n.localFactor != nil || n.vanishing.active || n.normalization.active || n.projectionFactors.active || n.leading.active || n.psc.active || n.resultant.active || n.discriminant.active {
 		return ErrSearchPending
 	}
 	n.running, n.resultActive = true, true
@@ -261,7 +262,11 @@ func (n *explanationAssumptions) cleanup() error {
 	}
 	n.running = true
 	defer func() { n.running = false }()
-	if n.psc.active || n.resultant.active {
+	if n.discriminant.active {
+		if err := n.finishProjectionDiscriminant(true, true); err != nil {
+			return err
+		}
+	} else if n.psc.active || n.resultant.active {
 		if err := n.finishProjectionResultant(true, true); err != nil {
 			return err
 		}
