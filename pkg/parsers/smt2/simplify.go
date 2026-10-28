@@ -41,6 +41,7 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 	}
 	printResult := true
 	printProof := false
+	printStatistics := false
 	for p.token != RightParenToken && p.token != EOFToken {
 		if p.token != KeywordToken {
 			return fmt.Errorf("invalid simplify command, keyword expected")
@@ -50,14 +51,16 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 		if err = p.advance(); err != nil {
 			return err
 		}
-		if key == "print" || key == "print_proofs" {
+		if key == "print" || key == "print_proofs" || key == "print_statistics" {
 			if p.token != SymbolToken || p.scanner.ID() != "true" && p.scanner.ID() != "false" {
 				return fmt.Errorf("invalid simplify parameter value, true or false expected")
 			}
 			if key == "print" {
 				printResult = p.scanner.ID() == "true"
-			} else {
+			} else if key == "print_proofs" {
 				printProof = p.scanner.ID() == "true"
+			} else {
+				printStatistics = p.scanner.ID() == "true"
 			}
 			if err = p.advance(); err != nil {
 				return err
@@ -97,7 +100,7 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 			return err
 		}
 	}
-	result, proof, err := p.context.SimplifyWithProof(expression, &settings, printProof)
+	result, proof, details, err := p.context.SimplifyWithDetails(expression, &settings, printProof, printStatistics)
 	if err != nil {
 		return err
 	}
@@ -127,8 +130,16 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 		if e = p.context.WriteExpression(p.out, proofExpression); e != nil {
 			return e
 		}
-		_, e = fmt.Fprintln(p.out)
-		return e
+		if _, e = fmt.Fprintln(p.out); e != nil {
+			return e
+		}
+	}
+	if printStatistics {
+		megabyte := float64(1024 * 1024)
+		_, err = fmt.Fprintf(p.out, "(:time %.2f :num-steps %d :memory %.2f :max-memory %.2f :cache-size: %d :num-nodes-before %d :num-shared %d :num-nodes %d)\n",
+			details.Seconds, details.Steps, float64(details.MemoryBytes)/megabyte, float64(details.MaximumMemoryBytes)/megabyte,
+			details.CacheSize, details.NodesBefore, details.SharedNodes, details.NodesAfter)
+		return err
 	}
 	return nil
 }

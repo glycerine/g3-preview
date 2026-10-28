@@ -4,6 +4,7 @@ package smt2
 
 import (
 	"bytes"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -34,6 +35,27 @@ func TestSMT2SimplifyCommandEndToEnd(t *testing.T) {
 	want := "(+ 5 x)\n(+ (* x x) (* 2 x y) (* y y))\ntrue\n3\n(rewrite (= (+ 1 2) 3))\n"
 	if output.String() != want {
 		t.Fatal("simplify output", output.String(), "want", want)
+	}
+}
+
+func TestSMT2SimplifyCommandStatistics(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	var output bytes.Buffer
+	script := `(simplify (+ 1 2) :print false :print-statistics true)`
+	if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	pattern := regexp.MustCompile(`^\(:time [0-9]+\.[0-9]{2} :num-steps 1 :memory [0-9]+\.[0-9]{2} :max-memory [0-9]+\.[0-9]{2} :cache-size: 0 :num-nodes-before 3 :num-shared 0 :num-nodes 1\)\n$`)
+	if !pattern.MatchString(output.String()) {
+		t.Fatal("simplify statistics", output.String())
 	}
 }
 
