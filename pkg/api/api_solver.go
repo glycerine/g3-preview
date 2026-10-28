@@ -285,6 +285,19 @@ func (c *SMTContext) AssertSMT2(input io.Reader) (result error) {
 	return nil
 }
 
+// ExecuteSMT2 executes a complete SMT-LIB command stream against this context
+// and writes command responses to output. Declarations, assertions, scopes and
+// results remain available to subsequent API calls and script executions.
+func (c *SMTContext) ExecuteSMT2(input io.Reader, output io.Writer) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if input == nil || output == nil {
+		return ErrSMTContextOwner
+	}
+	return smt2.ParseCommands(c.command, input, output)
+}
+
 func (c *SMTContext) ResetAssertions() error {
 	if err := c.open(); err != nil {
 		return err

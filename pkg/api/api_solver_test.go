@@ -4,6 +4,7 @@ package api
 // unsat-core, proof and reason-unknown operations.
 
 import (
+	"bytes"
 	"errors"
 	"strings"
 	"testing"
@@ -16,6 +17,36 @@ type smtAPIFixture struct {
 	t *testing.T
 	c *SMTContext
 	m *ast.ASTManager
+}
+
+func TestSMTContextExecuteSMT2SharesSessionWithGoAPI(t *testing.T) {
+	c, err := NewSMTContext()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, c.Close()) })
+	var output bytes.Buffer
+	script := `(set-logic QF_UF)(declare-const p Bool)(assert p)(check-sat)`
+	astTestMust(t, c.ExecuteSMT2(strings.NewReader(script), &output))
+	if output.String() != "sat\n" {
+		t.Fatal("first script output", output.String())
+	}
+	assertions, err := c.Assertions()
+	astTestMust(t, err)
+	if len(assertions) != 1 {
+		t.Fatal("script assertion visibility", len(assertions))
+	}
+	md, err := c.Model()
+	astTestMust(t, err)
+	astTestMust(t, md.DecRef())
+
+	output.Reset()
+	script = `(push)(assert (not p))(check-sat)(pop)(check-sat)`
+	astTestMust(t, c.ExecuteSMT2(strings.NewReader(script), &output))
+	if output.String() != "unsat\nsat\n" {
+		t.Fatal("continued script output", output.String())
+	}
+	if err = c.ExecuteSMT2(nil, &output); !errors.Is(err, ErrSMTContextOwner) {
+		t.Fatal("nil script reader", err)
+	}
 }
 
 func newSMTAPIFixture(t *testing.T, logic string, configure func(*SMTContext)) *smtAPIFixture {
