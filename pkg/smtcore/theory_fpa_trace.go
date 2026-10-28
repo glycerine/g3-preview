@@ -209,3 +209,10 @@ func (t *SMTFloatingPointTheory) traceFPADependencies(generator *SMTModelGenerat
 		return diagnostic.WriteTraceEndl(out)
 	})
 }
+
+func (t *SMTFloatingPointTheory) traceFPAFinalCheck() error {
+	return t.emitFPATrace("t_fpa", "final_check_eh", 717, nil, func(out io.Writer) error {
+		_, err := io.WriteString(out, "final_check_eh\n")
+		return err
+	})
+}

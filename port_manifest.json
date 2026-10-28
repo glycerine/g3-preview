@@ -144393,6 +144393,8 @@
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
         "pkg/smtcore/theory_fpa_trace.go",
+        "pkg/smtcore/theory_fpa_final_check.go",
+        "pkg/smtcore/theory_fpa_final_check_test.go",
         "pkg/smtcore/theory_fpa_internalize_trace_test.go",
         "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go",
         "pkg/smtcore/smt_fpa_lifecycle.go",
@@ -144427,6 +144429,8 @@
         "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace",
         "TestSMTFPAModelLifecycleAndDependencySourceTrace",
         "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop",
+        "TestSMTFPAFinalCheckSourceTraceAndInvariant",
+        "TestSMTFPAFinalCheckTraceStreamRefusalDoesNotStop",
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
         "TestSMTFloatingPointWrappedConstantAndScopes",
         "TestSMTFloatingPointConversionTermsAndArithmetic",
@@ -144730,13 +144734,15 @@
           ]
         },
         {
-          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy, model initialization/value selection and all dependency branches (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
+          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy, final check, model initialization/value selection and all dependency branches (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647,717,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_fpa.go",
             "pkg/smtcore/theory_fpa_trace.go",
             "pkg/smtcore/theory_fpa_internalize_trace_test.go",
-            "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go"
+            "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go",
+            "pkg/smtcore/theory_fpa_final_check.go",
+            "pkg/smtcore/theory_fpa_final_check_test.go"
           ],
           "tests": [
             "TestSMTFPAInternalizeAtomAndTermSourceTrace",
@@ -144744,7 +144750,21 @@
             "TestSMTFPAConversionCacheSourceTrace",
             "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace",
             "TestSMTFPAModelLifecycleAndDependencySourceTrace",
-            "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop"
+            "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop",
+            "TestSMTFPAFinalCheckSourceTraceAndInvariant",
+            "TestSMTFPAFinalCheckTraceStreamRefusalDoesNotStop"
+          ]
+        },
+        {
+          "name": "theory_fpa::final_check_eh returns done after the retained trace and checks that converter side constraints were drained (theory_fpa.cpp:716-720)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_fpa_final_check.go",
+            "pkg/smtcore/theory_fpa_final_check_test.go"
+          ],
+          "tests": [
+            "TestSMTFPAFinalCheckSourceTraceAndInvariant",
+            "TestSMTFPAFinalCheckTraceStreamRefusalDoesNotStop"
           ]
         },
         {
@@ -144869,6 +144889,8 @@
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
         "pkg/smtcore/theory_fpa_trace.go",
+        "pkg/smtcore/theory_fpa_final_check.go",
+        "pkg/smtcore/theory_fpa_final_check_test.go",
         "pkg/smtcore/theory_fpa_internalize_trace_test.go",
         "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go",
         "pkg/smtcore/smt_fpa_lifecycle.go",
@@ -144900,6 +144922,8 @@
         "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace",
         "TestSMTFPAModelLifecycleAndDependencySourceTrace",
         "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop",
+        "TestSMTFPAFinalCheckSourceTraceAndInvariant",
+        "TestSMTFPAFinalCheckTraceStreamRefusalDoesNotStop",
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
         "TestSMTFloatingPointModelFinalizesConvertedFunction",
         "TestFPA2BVRewriterConstructorAllocationFrontiers",
@@ -144971,13 +144995,15 @@
           ]
         },
         {
-          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy, model initialization/value selection and all dependency branches (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
+          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy, final check, model initialization/value selection and all dependency branches (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647,717,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_fpa.go",
             "pkg/smtcore/theory_fpa_trace.go",
             "pkg/smtcore/theory_fpa_internalize_trace_test.go",
-            "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go"
+            "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go",
+            "pkg/smtcore/theory_fpa_final_check.go",
+            "pkg/smtcore/theory_fpa_final_check_test.go"
           ],
           "tests": [
             "TestSMTFPAInternalizeAtomAndTermSourceTrace",
@@ -144985,7 +145011,21 @@
             "TestSMTFPAConversionCacheSourceTrace",
             "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace",
             "TestSMTFPAModelLifecycleAndDependencySourceTrace",
-            "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop"
+            "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop",
+            "TestSMTFPAFinalCheckSourceTraceAndInvariant",
+            "TestSMTFPAFinalCheckTraceStreamRefusalDoesNotStop"
+          ]
+        },
+        {
+          "name": "theory_fpa::final_check_eh returns done after the retained trace and checks that converter side constraints were drained (theory_fpa.cpp:716-720)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_fpa_final_check.go",
+            "pkg/smtcore/theory_fpa_final_check_test.go"
+          ],
+          "tests": [
+            "TestSMTFPAFinalCheckSourceTraceAndInvariant",
+            "TestSMTFPAFinalCheckTraceStreamRefusalDoesNotStop"
           ]
         },
         {
