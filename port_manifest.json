@@ -137219,8 +137219,8 @@
           ]
         },
         {
-          "name": "mk_polynomial_ge and Gomory propagation integration: retain defining polynomials for fixed comparison columns, propagate conditional cuts with endpoint coefficients before cut normalization, and restore scopes; derived-bound explanation chains remain incomplete",
-          "status": "partial",
+          "name": "mk_polynomial_ge and Gomory propagation integration: retain defining polynomials for fixed comparison columns, propagate conditional cuts with endpoint coefficients before cut normalization, recursively expand flattened derived-bound premises, preserve proof ownership, and restore scopes",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_integer_branch_cut.go",
           "go_targets": [
             "pkg/cmd/g3/main_test.go",
@@ -137238,16 +137238,19 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference",
             "TestArithmeticGomoryIntegerCutExcludesCandidateAndPreservesSolutions",
-            "TestArithmeticGomorySingleTermDirectionsAndMixedReals"
+            "TestArithmeticGomorySingleTermDirectionsAndMixedReals",
+            "TestSMTArithmeticGomoryExpandsDerivedBoundChains"
           ]
         },
         {
-          "name": "Euclidean plain-derived bound proof dependencies preserve the old endpoint and Normalize fixed-equation premises; explanation chains through other derived-bound producers remain incomplete",
-          "status": "partial",
+          "name": "Euclidean plain-derived bound proof dependencies preserve the old endpoint and Normalize fixed-equation premises, deduplicate flattened dependency chains from all retained derived-bound producers, replay comparison-polynomial bounds by stable keys, and restore scopes",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_euclidean.go",
           "tests": [
             "TestSMTEuclideanBridgeCongruenceScopesProofsAndModels",
-            "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays"
+            "TestSMTArithmeticPlainDerivedBoundDeduplicatesAndReplays",
+            "TestSMTArithmeticGCDExpandsDerivedBoundChains",
+            "TestSMTArithmeticGomoryExpandsDerivedBoundChains"
           ],
           "go_targets": [
             "pkg/smtcore/theory_arith_bound_dependency.go",

@@ -157,6 +157,43 @@ func TestSMTArithmeticGCDExpandsDerivedBoundChains(t *testing.T) {
 	}
 }
 
+func TestSMTArithmeticGomoryExpandsDerivedBoundChains(t *testing.T) {
+	solver := simplex.NewSolver(nil)
+	row, err := solver.AddRationalRow(0, []uint32{0, 1, 2, 3}, []big.Rat{*big.NewRat(4, 1), *big.NewRat(-2, 1), *big.NewRat(-1, 1), *big.NewRat(-2, 1)})
+	astTestMust(t, err)
+	origin := simplex.NewSolver(nil)
+	dependency := []simplex.BoundDependency{{Literal: NewSMTLiteral(23, false).Index(), Coefficient: *big.NewRat(5, 7)}}
+	astTestMust(t, origin.SetLowerWithDependencies(7, simplex.RationalInfinitesimal(new(big.Rat)), dependency))
+	explanation := smtArithmeticPlainBoundExplanation(origin, []simplex.ArithmeticBoundUse{{Column: 7, Lower: true}})
+	if explanation == nil || len(explanation.dependencies) != 1 {
+		t.Fatal("derived Gomory explanation", explanation)
+	}
+	for _, column := range []uint32{1, 2} {
+		_, err = smtTightenReplaySimplexBound(solver, column, true, simplex.RationalInfinitesimal(new(big.Rat)), explanation)
+		astTestMust(t, err)
+	}
+	one := simplex.RationalInfinitesimal(big.NewRat(1, 1))
+	_, err = smtTightenReplaySimplexBound(solver, 3, true, one, explanation)
+	astTestMust(t, err)
+	_, err = smtTightenReplaySimplexBound(solver, 3, false, one, explanation)
+	astTestMust(t, err)
+	cut, ready, err := solver.ArithmeticGomory(row, map[uint32]bool{0: true, 1: true, 2: true, 3: true})
+	astTestMust(t, err)
+	if !ready || cut.Conflict || len(cut.Bounds) != 3 {
+		t.Fatal(cut, ready)
+	}
+	antecedents, known, err := smtArithmeticExplainBounds(solver, cut.Bounds, true, nil)
+	astTestMust(t, err)
+	if !known || len(antecedents.literals) != 3 || len(antecedents.literalCoefficients) != 3 {
+		t.Fatal("derived Gomory chain", known, antecedents)
+	}
+	for index, coefficient := range []*big.Rat{big.NewRat(1, 1), big.NewRat(1, 2), big.NewRat(1, 1)} {
+		if antecedents.literals[index] != NewSMTLiteral(23, false) || antecedents.literalCoefficients[index].Cmp(coefficient) != 0 {
+			t.Fatal("derived Gomory coefficient", antecedents.literals, antecedents.literalCoefficients)
+		}
+	}
+}
+
 func TestSMTArithmeticAntecedentParameterOrderAndOwnership(t *testing.T) {
 	m, _ := smtModelGeneratorFixture(t)
 	var ante smtArithmeticAntecedents
