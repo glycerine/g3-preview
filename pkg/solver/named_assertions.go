@@ -1,5 +1,6 @@
-// Source: src/solver/solver_na2as.h; src/solver/solver_na2as.cpp.
 package solver
+
+// Source: src/solver/solver_na2as.h; src/solver/solver_na2as.cpp.
 
 import (
 	"errors"
@@ -171,6 +172,7 @@ func (n *NamedAssertions) restore(size uint32) error {
 			continue
 		}
 		if err := n.manager.DelRef(&n.assumptions[i]); err != nil {
+			n.closing = true
 			return err
 		}
 	}

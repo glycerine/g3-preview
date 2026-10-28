@@ -156558,7 +156558,7 @@
       "path": "src/solver/solver_na2as.cpp",
       "component": "solver",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/solver/named_assertions.go",
         "pkg/solver/named_assertions_test.go",
@@ -156570,7 +156570,8 @@
         "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange",
         "TestNamedAssertionImplicationOwnedAcrossCoreAndErrors",
         "TestNamedAssertionNullTagBorrowsInput",
-        "TestNamedAssertionStoppedLocalPrecedesMemberRetirement"
+        "TestNamedAssertionStoppedLocalPrecedesMemberRetirement",
+        "TestNamedAssertionInterruptedRangeRetirementRequiresClose"
       ],
       "assertions": [
         {
@@ -156586,8 +156587,8 @@
           "text": "SASSERT(n <= lvl);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "tracked assertion validation, source trace, assumption pin and implication forwarding (solver_na2as.cpp:27-49)",
@@ -156617,20 +156618,22 @@
         },
         {
           "name": "Source ref_vector forward removed-range retirement for temporary check/consequence assumptions and adapter Close; reached zero tokens retained until range completion for explicit Go retry",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/solver/named_assertions.go",
           "tests": [
-            "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
+            "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange",
+            "TestNamedAssertionInterruptedRangeRetirementRequiresClose"
           ]
         },
         {
           "name": "Tracked assert_expr new_t concrete lexical ASTRef across virtual core forwarding; normal/error retirement after the core, preserved assumption publication, borrowed null-tag branch and pending local-before-member Close continuation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/solver/named_assertions.go",
           "tests": [
             "TestNamedAssertionImplicationOwnedAcrossCoreAndErrors",
             "TestNamedAssertionNullTagBorrowsInput",
-            "TestNamedAssertionStoppedLocalPrecedesMemberRetirement"
+            "TestNamedAssertionStoppedLocalPrecedesMemberRetirement",
+            "TestNamedAssertionInterruptedRangeRetirementRequiresClose"
           ]
         }
       ],
@@ -156643,14 +156646,15 @@
         "Invalid tracked labels and pop depths return explicit Go domain/bounds errors at the reached source assertions.",
         "NamedAssertionCore is a concrete typed derived-solver boundary replacing C++ protected virtual methods.",
         "Retained enum2bv_solver review found that restore used reverse pop order instead of ref_vector_core::shrink forward decrements. Corrected and tested using actual AST deletion records. The source assert_expr new_t lexical expr_ref is still not represented by a separate ASTRef before core forwarding; existing algorithm tests do not establish full source assertion/trace/native exception ownership. Whole-unit completion/audit flags are withdrawn pending that concrete remaining audit; bounded existing evidence is preserved.",
-        "The previously omitted new_t lexical expr_ref is now implemented and checked by real root/argument reference counts at the core call, post-call retirement and core-error publication prefix. Seven targeted controls verify pinning, retirement timing, no rollback, pending retention/barrier, local-before-member order and borrowed null-tag behavior. This does not establish every native throwing-destructor/consumed-NUM/reference-record allocation failure, nor the remaining source TRACE/assertion transport/gate details. Whole-unit status and method/ownership audit flags remain partial/false; earlier missing-local notes describe the pre-fix state."
+        "The previously omitted new_t lexical expr_ref is now implemented and checked by real root/argument reference counts at the core call, post-call retirement and core-error publication prefix. Seven targeted controls verify pinning, retirement timing, no rollback, pending retention/barrier, local-before-member order and borrowed null-tag behavior. This does not establish every native throwing-destructor/consumed-NUM/reference-record allocation failure, nor the remaining source TRACE/assertion transport/gate details. Whole-unit status and method/ownership audit flags remain partial/false; earlier missing-local notes describe the pre-fix state.",
+        "Final retained-unit audit covers every source method, all three assertions, both TRACE sites, source-order ref_vector retirement, lexical implication ownership, and manager/core/trace borrowing. Interrupted temporary or post-core-pop retirement now closes the operation gate, preserves the unconsumed token, and continues only through Close without replaying the core call. This supersedes the earlier partial/false closure notes."
       ]
     },
     {
       "path": "src/solver/solver_na2as.h",
       "component": "solver",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/solver/named_assertions.go",
         "pkg/solver/named_assertions_test.go",
@@ -156662,7 +156666,8 @@
         "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange",
         "TestNamedAssertionImplicationOwnedAcrossCoreAndErrors",
         "TestNamedAssertionNullTagBorrowsInput",
-        "TestNamedAssertionStoppedLocalPrecedesMemberRetirement"
+        "TestNamedAssertionStoppedLocalPrecedesMemberRetirement",
+        "TestNamedAssertionInterruptedRangeRetirementRequiresClose"
       ],
       "conditionals": [
         {
@@ -156674,8 +156679,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "complete named-assertion adapter surface and derived core boundary (solver_na2as.h:27-54)",
@@ -156688,20 +156693,22 @@
         },
         {
           "name": "Source ref_vector forward removed-range retirement for temporary check/consequence assumptions and adapter Close; reached zero tokens retained until range completion for explicit Go retry",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/solver/named_assertions.go",
           "tests": [
-            "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange"
+            "TestNamedAssertionsTemporaryRetirementFollowsSourceForwardRange",
+            "TestNamedAssertionInterruptedRangeRetirementRequiresClose"
           ]
         },
         {
           "name": "Tracked assert_expr new_t concrete lexical ASTRef across virtual core forwarding; normal/error retirement after the core, preserved assumption publication, borrowed null-tag branch and pending local-before-member Close continuation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/solver/named_assertions.go",
           "tests": [
             "TestNamedAssertionImplicationOwnedAcrossCoreAndErrors",
             "TestNamedAssertionNullTagBorrowsInput",
-            "TestNamedAssertionStoppedLocalPrecedesMemberRetirement"
+            "TestNamedAssertionStoppedLocalPrecedesMemberRetirement",
+            "TestNamedAssertionInterruptedRangeRetirementRequiresClose"
           ]
         }
       ],
@@ -156712,7 +156719,8 @@
       "deviations": [
         "WithAssumptions supplies the source get_consequences append/restore scope to concrete Go solvers without exposing inheritance.",
         "Retained enum2bv_solver review found that restore used reverse pop order instead of ref_vector_core::shrink forward decrements. Corrected and tested using actual AST deletion records. The source assert_expr new_t lexical expr_ref is still not represented by a separate ASTRef before core forwarding; existing algorithm tests do not establish full source assertion/trace/native exception ownership. Whole-unit completion/audit flags are withdrawn pending that concrete remaining audit; bounded existing evidence is preserved.",
-        "The previously omitted new_t lexical expr_ref is now implemented and checked by real root/argument reference counts at the core call, post-call retirement and core-error publication prefix. Seven targeted controls verify pinning, retirement timing, no rollback, pending retention/barrier, local-before-member order and borrowed null-tag behavior. This does not establish every native throwing-destructor/consumed-NUM/reference-record allocation failure, nor the remaining source TRACE/assertion transport/gate details. Whole-unit status and method/ownership audit flags remain partial/false; earlier missing-local notes describe the pre-fix state."
+        "The previously omitted new_t lexical expr_ref is now implemented and checked by real root/argument reference counts at the core call, post-call retirement and core-error publication prefix. Seven targeted controls verify pinning, retirement timing, no rollback, pending retention/barrier, local-before-member order and borrowed null-tag behavior. This does not establish every native throwing-destructor/consumed-NUM/reference-record allocation failure, nor the remaining source TRACE/assertion transport/gate details. Whole-unit status and method/ownership audit flags remain partial/false; earlier missing-local notes describe the pre-fix state.",
+        "Final retained-unit audit covers the complete concrete adapter surface and ownership model. Interrupted range retirement is a Go error-continuation extension: it closes the operation gate and drains through Close without replaying an already completed core pop. This supersedes the earlier partial/false closure notes."
       ]
     },
     {

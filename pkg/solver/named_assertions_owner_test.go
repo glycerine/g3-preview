@@ -190,3 +190,60 @@ func TestNamedAssertionStoppedLocalPrecedesMemberRetirement(t *testing.T) {
 		t.Fatal("retry replayed or retained pin", refs)
 	}
 }
+
+func TestNamedAssertionInterruptedRangeRetirementRequiresClose(t *testing.T) {
+	for _, mode := range []string{"check", "pop"} {
+		t.Run(mode, func(t *testing.T) {
+			base := solverTestManager(t)
+			writer := &namedOwnerStopWriter{}
+			tags := diagnostic.NewTraceTagsWithWriter(writer)
+			m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: base.Symbols, Numerals: base.NumeralService(), Budget: base.Budget(), TraceTags: tags})
+			solverMust(t, e)
+			t.Cleanup(func() { solverMust(t, m.Close()) })
+			solverMust(t, m.RegisterDeclarationPlugins())
+			core := &namedCoreFixture{}
+			n, e := NewNamedAssertions(m, core)
+			solverMust(t, e)
+			t.Cleanup(func() { solverMust(t, n.Close()) })
+			tag := namedOwnerConst(t, m, "interrupted-na-tag-"+mode)
+			if mode == "pop" {
+				solverMust(t, n.Push())
+				solverMust(t, n.AssertTracked(tag, tag))
+			}
+			sort, e := m.FloatingPointSort(3, 4)
+			solverMust(t, e)
+			tags.Enable("ast")
+			if !tags.ShouldTrace("ast") {
+				t.Skip("requires source trace build")
+			}
+			var operationErr error
+			writer.action = func() {
+				if mode == "check" {
+					_, operationErr = n.CheckSat([]ast.ASTHandle{tag})
+				} else {
+					operationErr = n.Pop(1)
+				}
+			}
+			_, e = m.MkFPAZeroOfSort(sort, false)
+			solverMust(t, e)
+			if !writer.called || !errors.Is(operationErr, ast.ErrASTPending) || !n.closing {
+				t.Fatal("retirement interruption did not close operation gate", writer.called, operationErr, n.closing)
+			}
+			if _, e = n.NumAssumptions(); !errors.Is(e, ast.ErrASTPending) {
+				t.Fatal("partially retired adapter remained callable", e)
+			}
+			if mode == "pop" && core.pops != 1 {
+				t.Fatal("core pop was not completed exactly once", core.pops)
+			}
+			solverMust(t, n.Close())
+			if mode == "pop" && core.pops != 1 {
+				t.Fatal("cleanup replayed core pop", core.pops)
+			}
+			refs, e := m.GetRefCount(tag)
+			solverMust(t, e)
+			if refs != 1 {
+				t.Fatal("cleanup retained or replayed assumption", refs)
+			}
+		})
+	}
+}
