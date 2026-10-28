@@ -23,92 +23,6 @@ func (c *Context) closeNode(node *ModelNode) error {
 	return nil
 }
 
-func (c *Context) createChildrenExact(node *ModelNode) (resultErr error) {
-	modelCore, found, err := node.Model()
-	if err != nil {
-		return err
-	}
-	if !found {
-		return ast.ErrASTDomain
-	}
-	rule, err := node.transformer.selectRule(modelCore)
-	if err != nil {
-		return err
-	}
-	if err = node.SetRule(rule.rule); err != nil {
-		return err
-	}
-	out, err := c.manager.NewRef(ast.ASTHandle{})
-	if err != nil {
-		return err
-	}
-	defer func() { resultErr = errors.Join(resultErr, c.manager.DelRef(&out)) }()
-	references := make([]ast.ASTRef, 0)
-	defer func() {
-		for index := len(references) - 1; index >= 0; index-- {
-			resultErr = errors.Join(resultErr, c.manager.DelRef(&references[index]))
-		}
-	}()
-	for predecessorIndex, predecessor := range rule.predecessors {
-		equalities := make([]ast.ASTHandle, 0, len(predecessor.signature))
-		for _, signature := range predecessor.signature {
-			oldDeclaration, x := c.owner.OldToOld(signature, 0, uint32(predecessorIndex))
-			if x != nil {
-				return x
-			}
-			oldState, x := c.manager.MkApp(oldDeclaration, nil)
-			if x != nil {
-				return x
-			}
-			found, x := predecessor.modelConstant(modelCore, oldState, out)
-			if x != nil {
-				return x
-			}
-			if !found {
-				return ast.ErrASTDomain
-			}
-			value, x := c.manager.RefGet(out)
-			if x != nil {
-				return x
-			}
-			newDeclaration, x := c.owner.OldToNew(signature, 0)
-			if x != nil {
-				return x
-			}
-			newState, x := c.manager.MkApp(newDeclaration, nil)
-			if x != nil {
-				return x
-			}
-			equality, x := c.manager.MkEq(newState, value)
-			if x != nil {
-				return x
-			}
-			reference, x := c.manager.NewRef(equality)
-			if x != nil {
-				return x
-			}
-			references = append(references, reference)
-			equalities = append(equalities, equality)
-		}
-		cube, x := c.manager.MkAndArray(equalities)
-		if x != nil {
-			return x
-		}
-		child, x := NewModelNode(node, cube, predecessor, node.level-1)
-		if x != nil {
-			return x
-		}
-		c.nodes++
-		if child.depth > c.maxDepth {
-			c.maxDepth = child.depth
-		}
-		if x = c.search.AddLeaf(child); x != nil {
-			return x
-		}
-	}
-	return node.CheckPreClosed()
-}
-
 func (c *Context) expandNode(node *ModelNode) (resultStatus lbool.LBool, resultErr error) {
 	if node == nil || !node.IsOpen() {
 		return lbool.Undef, ast.ErrASTDomain
@@ -140,7 +54,7 @@ func (c *Context) expandNode(node *ModelNode) (resultStatus lbool.LBool, resultE
 		if node.level == 0 {
 			return lbool.True, c.closeNode(node)
 		}
-		return lbool.True, c.createChildrenExact(node)
+		return lbool.True, c.createChildrenProjected(node)
 	}
 	if check.Status == lbool.False {
 		lemma, x := c.owner.NotAnd(check.Core)
@@ -215,8 +129,8 @@ func (c *Context) propagate(maximum uint32) (bool, error) {
 }
 
 // Solve runs the retained frame-expansion and propagation loop for the query
-// predicate. Child projection currently uses exact model values; native
-// implicant minimization and QE generalization are added on top of this loop.
+// predicate. Child projection preserves transition literals between predecessor
+// states; native implicant minimization and QE generalization refine that cube.
 func (c *Context) Solve(queryDeclaration ast.ASTHandle) (lbool.LBool, error) {
 	if err := c.open(); err != nil {
 		return lbool.Undef, err
