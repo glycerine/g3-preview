@@ -5869,12 +5869,15 @@
       "go_targets": [
         "pkg/api/api_solver.go",
         "pkg/api/api_solver_test.go",
-        "pkg/cmd_context/result_access.go"
+        "pkg/cmd_context/result_access.go",
+        "pkg/parsers/smt2/commands.go"
       ],
       "tests": [
         "TestSMTContextEndToEndModelScopesAndAssumptions",
         "TestSMTContextUnsatCoreAndProofResults",
         "TestSMTContextConsequencesOwnReturnedExpressions",
+        "TestSMTContextImpliedEqualities",
+        "TestSMTContextAssertSMT2TransactionalFinalAssertions",
         "TestSMTContextUnknownReason",
         "TestSMTContextCopiesShareClose"
       ],
@@ -5882,24 +5885,25 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Public strategic solver construction and retained assert/assert-and-track, assertion enumeration, push/pop/scope depth, check/check-assumptions, model, proof, unsat-core, reason-unknown, copied statistics, owning consequence results and implied-equality partitions",
+          "name": "Public strategic solver construction and retained assert/assert-and-track, assertion enumeration, push/pop/scope depth, check/check-assumptions, model, proof, unsat-core, reason-unknown, copied statistics, owning consequence results, implied-equality partitions and transactional SMT-LIB assertion loading",
           "status": "partial",
           "go_target": "pkg/api/api_solver.go",
-          "go_targets": ["pkg/cmd_context/result_access.go"],
+          "go_targets": ["pkg/cmd_context/result_access.go", "pkg/parsers/smt2/commands.go"],
           "tests": [
             "TestSMTContextEndToEndModelScopesAndAssumptions",
             "TestSMTContextUnsatCoreAndProofResults",
             "TestSMTContextConsequencesOwnReturnedExpressions",
             "TestSMTContextImpliedEqualities",
+            "TestSMTContextAssertSMT2TransactionalFinalAssertions",
             "TestSMTContextUnknownReason"
           ]
         }
       ],
       "ownership": [
-        "SMTContext owns the command context, strategic solver, AST manager and independent runtime services. Returned models transfer one owning reference to the caller; core/proof handles remain borrowed from the last result. Copied SMTContext values share one close state."
+        "SMTContext owns the command context, strategic solver, AST manager and independent runtime services. Returned models transfer one owning reference to the caller; core/proof handles remain borrowed from the last result. Copied SMTContext values share one close state. AssertSMT2 owns an isolated parser context and pins all translated target formulas until publication and cleanup."
       ],
       "deviations": [
-        "The retained surface is idiomatic Go over concrete AST handles, not opaque C handles. Consequence expressions return concrete owning ASTRefs instead of an opaque AST-vector wrapper. Implied equalities return a Go slice of class identifiers. Solver translation, construction from tactics/SMT-LIB streams, parameter descriptors and string display remain unported at this API layer."
+        "The retained surface is idiomatic Go over concrete AST handles, not opaque C handles. Consequence expressions return concrete owning ASTRefs instead of an opaque AST-vector wrapper. Implied equalities return a Go slice of class identifiers. SMT-LIB streams are parsed transactionally in an isolated Go command context, translated into the target manager, and publish only the final assertion set; check commands are syntax-checked and ignored as in solver_from_stream. Solver translation, construction from tactics, DIMACS file loading, parameter descriptors and string display remain unported at this API layer."
       ]
     },
     {
@@ -94266,17 +94270,20 @@
           ]
         },
         {
-          "name": "ParseCommands retained dispatch: set-logic, Boolean set-option, metadata consumption, nullary declare-sort, declare-fun/const, assert, push/pop, check-sat/assuming and result commands",
+          "name": "ParseCommands retained dispatch plus ParseAssertions solver-loading mode: set-logic, Boolean set-option, metadata consumption, nullary declare-sort, declare-fun/const, assert, push/pop, check-sat/assuming and result commands",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/commands.go",
           "tests": [
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference",
             "TestSMT2CommandsRejectMalformedInputBeforeEffects",
-            "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess"
+            "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
+            "TestSMTContextAssertSMT2TransactionalFinalAssertions",
+            "TestSMT2ParseAssertionsIgnoresCheckCommands"
           ],
           "go_targets": [
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/api/api_solver.go"
           ]
         },
         {
@@ -94740,17 +94747,20 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "ParseCommands retained dispatch: set-logic, Boolean set-option, metadata consumption, nullary declare-sort, declare-fun/const, assert, push/pop, check-sat/assuming and result commands",
+          "name": "ParseCommands retained dispatch plus ParseAssertions solver-loading mode: set-logic, Boolean set-option, metadata consumption, nullary declare-sort, declare-fun/const, assert, push/pop, check-sat/assuming and result commands",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/commands.go",
           "tests": [
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference",
             "TestSMT2CommandsRejectMalformedInputBeforeEffects",
-            "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess"
+            "TestSMT2ExitStopsBeforeTrailingInputAndPrintsSuccess",
+            "TestSMTContextAssertSMT2TransactionalFinalAssertions",
+            "TestSMT2ParseAssertionsIgnoresCheckCommands"
           ],
           "go_targets": [
-            "pkg/cmd/g3/main_test.go"
+            "pkg/cmd/g3/main_test.go",
+            "pkg/api/api_solver.go"
           ]
         },
         {

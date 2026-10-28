@@ -5,6 +5,7 @@ package api
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -211,6 +212,64 @@ func TestSMTContextImpliedEqualities(t *testing.T) {
 	if classes[0] != classes[1] || classes[0] == classes[2] {
 		t.Fatal("implied equality partition", classes)
 	}
+}
+
+func TestSMTContextAssertSMT2TransactionalFinalAssertions(t *testing.T) {
+	f := newSMTAPIFixture(t, "QF_UF", nil)
+	status, err := f.c.CheckSat()
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("initial status", status)
+	}
+	script := `(set-logic QF_UF)
+(declare-const p Bool)
+(assert p)
+(check-sat)
+(assert (not p))`
+	astTestMust(t, f.c.AssertSMT2(strings.NewReader(script)))
+	assertions, err := f.c.Assertions()
+	astTestMust(t, err)
+	if len(assertions) != 2 {
+		t.Fatal("loaded assertion count", len(assertions))
+	}
+	if _, err = f.c.command.FindFunctionDeclaration("p", nil, nil, ast.ASTHandle{}); err == nil {
+		t.Fatal("temporary parser declaration leaked into API context")
+	}
+	status, err = f.c.CheckSat()
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("loaded assertion status", status)
+	}
+
+	before := len(assertions)
+	err = f.c.AssertSMT2(strings.NewReader("(assert true)(assert"))
+	if err == nil {
+		t.Fatal("malformed SMT-LIB accepted")
+	}
+	assertions, assertErr := f.c.Assertions()
+	astTestMust(t, assertErr)
+	if len(assertions) != before {
+		t.Fatal("failed parse published an assertion", len(assertions), before)
+	}
+
+	t.Run("arithmetic-plugins", func(t *testing.T) {
+		arithmetic := newSMTAPIFixture(t, "QF_LIA", nil)
+		status, err := arithmetic.c.CheckSat()
+		astTestMust(t, err)
+		if status != lbool.True {
+			t.Fatal("initial arithmetic status", status)
+		}
+		script := `(set-logic QF_LIA)
+(declare-const x Int)
+(assert (= x 3))
+(assert (= x 4))`
+		astTestMust(t, arithmetic.c.AssertSMT2(strings.NewReader(script)))
+		status, err = arithmetic.c.CheckSat()
+		astTestMust(t, err)
+		if status != lbool.False {
+			t.Fatal("translated arithmetic status", status)
+		}
+	})
 }
 
 func TestSMTContextUnknownReason(t *testing.T) {

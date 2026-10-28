@@ -1,6 +1,7 @@
+package smt2
+
 // Source: src/cmd_context/tactic_cmds.cpp sexpr2tactic and mk_using_params;
 // src/parsers/smt2/smt2parser.cpp command argument parsing.
-package smt2
 
 import (
 	"errors"
@@ -242,7 +243,7 @@ func (p *commandParser) tacticParameter(c *uparams.ParamsContext, settings *upar
 	return p.advance()
 }
 
-func (p *commandParser) checkSatUsing() (err error) {
+func (p *commandParser) checkSatUsing(execute bool) (err error) {
 	if p.token == RightParenToken {
 		return fmt.Errorf("check-sat-using needs a tactic argument")
 	}
@@ -276,6 +277,9 @@ func (p *commandParser) checkSatUsing() (err error) {
 	}
 	if err = p.requireEnd(); err != nil {
 		return err
+	}
+	if !execute {
+		return nil
 	}
 	status, err := p.context.CheckSatUsing(selected, &options)
 	if err != nil {

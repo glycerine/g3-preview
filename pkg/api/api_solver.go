@@ -6,11 +6,13 @@ package api
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/cmd_context"
 	_ "github.com/glycerine/g3/pkg/engine" // generated parameter collectors
 	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/parsers/smt2"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -220,6 +222,67 @@ func (c *SMTContext) ImpliedEqualities(terms []ast.ASTHandle) (lbool.LBool, []ui
 		return lbool.Undef, nil, err
 	}
 	return c.command.ImpliedEqualities(terms)
+}
+
+// AssertSMT2 parses an SMT-LIB stream and adds its final assertion set. Check
+// commands are parsed but not executed, matching the native solver-from-stream
+// API. Parsing is transactional: malformed input adds no assertions.
+func (c *SMTContext) AssertSMT2(input io.Reader) (result error) {
+	if err := c.open(); err != nil {
+		return err
+	}
+	target, err := c.command.Manager()
+	if err != nil {
+		return err
+	}
+	parsed, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, parsed.Close()) }()
+	if err = smt2.ParseAssertions(parsed, input); err != nil {
+		return err
+	}
+	source, err := parsed.Manager()
+	if err != nil {
+		return err
+	}
+	translator, err := ast.NewASTTranslation(source, target, true)
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, translator.Close()) }()
+	assertions, err := parsed.Assertions()
+	if err != nil {
+		return err
+	}
+	translated := make([]ast.ASTRef, 0, len(assertions))
+	defer func() {
+		for i := range translated {
+			result = errors.Join(result, target.DelRef(&translated[i]))
+		}
+	}()
+	for _, assertion := range assertions {
+		formula, translateErr := translator.Translate(assertion)
+		if translateErr != nil {
+			return translateErr
+		}
+		ref, refErr := target.NewRef(formula)
+		if refErr != nil {
+			return refErr
+		}
+		translated = append(translated, ref)
+	}
+	for i := range translated {
+		formula, refErr := target.RefGet(translated[i])
+		if refErr != nil {
+			return refErr
+		}
+		if err = c.command.Assert(formula, ""); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (c *SMTContext) ResetAssertions() error {

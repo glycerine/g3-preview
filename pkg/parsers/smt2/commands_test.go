@@ -22,6 +22,34 @@ func TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput(t *testing.T) {
 	testArithmeticStrategicDIMACS(t, "QF_LIA")
 }
 
+func TestSMT2ParseAssertionsIgnoresCheckCommands(t *testing.T) {
+	c, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := c.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	script := `(set-logic QF_UF)
+(declare-const p Bool)
+(assert p)
+(check-sat)
+(check-sat-using smt)`
+	if err = ParseAssertions(c, strings.NewReader(script)); err != nil {
+		t.Fatal(err)
+	}
+	assertions, err := c.Assertions()
+	if err != nil || len(assertions) != 1 {
+		t.Fatal("final assertions", len(assertions), err)
+	}
+	reason, err := c.ReasonUnknown()
+	if err != nil || reason != "state of the most recent check-sat command is not known" {
+		t.Fatal("check command executed", reason, err)
+	}
+}
+
 func testArithmeticStrategicDIMACS(t *testing.T, logic string) {
 	t.Helper()
 	c, err := cmd_context.NewStandaloneContext()

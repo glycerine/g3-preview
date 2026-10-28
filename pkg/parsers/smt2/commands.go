@@ -1,6 +1,7 @@
+package smt2
+
 // Source: src/parsers/smt2/smt2parser.cpp command dispatch and retained
 // declaration/assertion/check commands; src/cmd_context/basic_cmds.cpp.
-package smt2
 
 import (
 	"errors"
@@ -30,12 +31,24 @@ type commandParser struct {
 	shifter            *rewriter.VarShifter
 	ignoreUserPatterns bool
 	ignoreBadPatterns  bool
+	ignoreChecks       bool
 }
 
 // ParseCommands executes the retained SMT-LIB command grammar against Context.
 // Unsupported commands fail explicitly. Command-local AST references are
 // released after execution; the context owns declarations and assertions.
 func ParseCommands(context *cmd_context.Context, input io.Reader, out io.Writer) (result error) {
+	return parseCommands(context, input, out, false)
+}
+
+// ParseAssertions parses a solver-loading SMT-LIB stream. Check commands are
+// syntax-checked but not executed or printed; callers consume the context's
+// final assertion set only, matching api_solver.cpp solver_from_stream.
+func ParseAssertions(context *cmd_context.Context, input io.Reader) error {
+	return parseCommands(context, input, io.Discard, true)
+}
+
+func parseCommands(context *cmd_context.Context, input io.Reader, out io.Writer, ignoreChecks bool) (result error) {
 	if err := context.SetRegularOutput(out); err != nil {
 		return err
 	}
@@ -62,7 +75,7 @@ func ParseCommands(context *cmd_context.Context, input io.Reader, out io.Writer)
 	if err != nil {
 		return err
 	}
-	p := &commandParser{context: context, scanner: scanner, out: out}
+	p := &commandParser{context: context, scanner: scanner, out: out, ignoreChecks: ignoreChecks}
 	defer func() {
 		result = errors.Join(result, p.clearCommand())
 		if p.shifter != nil {
@@ -332,7 +345,7 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 	case "check-sat-using":
-		if err := p.checkSatUsing(); err != nil {
+		if err := p.checkSatUsing(!p.ignoreChecks); err != nil {
 			return false, err
 		}
 		success = false
@@ -347,19 +360,21 @@ func (p *commandParser) command() (bool, error) {
 		if p.token != RightParenToken {
 			return false, fmt.Errorf("unexpected check-sat argument")
 		}
-		status, err := p.context.CheckSat(assumptions)
-		if err != nil {
-			return false, err
-		}
-		text := "unknown"
-		if status == lbool.True {
-			text = "sat"
-		}
-		if status == lbool.False {
-			text = "unsat"
-		}
-		if _, err = fmt.Fprintln(p.out, text); err != nil {
-			return false, err
+		if !p.ignoreChecks {
+			status, err := p.context.CheckSat(assumptions)
+			if err != nil {
+				return false, err
+			}
+			text := "unknown"
+			if status == lbool.True {
+				text = "sat"
+			}
+			if status == lbool.False {
+				text = "unsat"
+			}
+			if _, err = fmt.Fprintln(p.out, text); err != nil {
+				return false, err
+			}
 		}
 		success = false
 	case "get-info":
