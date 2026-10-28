@@ -83016,7 +83016,7 @@
           ]
         },
         {
-          "name": "frame reachability expansion, tagged rule selection, model-value substitution, predecessor-literal partitioning, child obligations, blocking, propagation, top-level PDR solve loop and search statistics (pdr_context.cpp:1544-1769,1893-2215,2255-2335)",
+          "name": "frame reachability expansion, tagged rule selection, QE-lite/model-value projection, predecessor-literal partitioning, child obligations, blocking, propagation, top-level PDR solve loop and search statistics (pdr_context.cpp:1544-1769,1893-2215,2255-2335)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/context_solve.go",
           "tests": [
@@ -83026,7 +83026,7 @@
           ]
         },
         {
-          "name": "cover/model conversion, rule/model trace reconstruction and model-implicant/QE child-state generalization",
+          "name": "cover/model conversion, rule/model trace reconstruction and model-implicant child-state minimization",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83034,12 +83034,13 @@
       ],
       "ownership": [
         "PredicateTransformer owns its head/system/property AST references, PropSolver, and ReachableCache. It closes both context consumers before releasing AST pins; returned signatures, formulas, and cores borrow AST handles while requested models retain explicit ownership.",
-        "ModelSearch owns its root and complete descendant tree. ModelNode owns one state AST reference plus optional retained model and rule references; reset releases descendants bottom-up after removing frontier/cache links."
+        "ModelSearch owns its root and complete descendant tree. ModelNode owns one state AST reference plus optional retained model and rule references; reset releases descendants bottom-up after removing frontier/cache links.",
+        "Context owns the reusable QE-lite projector and, when the caller supplies no cooperation service, a private cooperation owner. Both close before transformers and the shared PDR manager."
       ],
       "deviations": [
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
         "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth.",
-        "Solve now drives the unbounded native frame/model-search loop and partitions projected transition literals among predecessor states. Current-variable elimination uses model substitution directly; native model-implicant minimization and preceding QE-lite reduction remain explicit port obligations."
+        "Solve now drives the unbounded native frame/model-search loop, applies the native QE-lite constant-elimination overload, and partitions projected transition literals among predecessor states. Native model-implicant minimization before QE remains an explicit port obligation."
       ]
     },
     {
@@ -83138,7 +83139,7 @@
           ]
         },
         {
-          "name": "retained unbounded context frame expansion, tagged rule selection, model substitution, predecessor-literal partitioning, child obligations, blocking, propagation and search-statistics surface",
+          "name": "retained unbounded context frame expansion, tagged rule selection, QE-lite/model substitution, predecessor-literal partitioning, child obligations, blocking, propagation and search-statistics surface",
           "status": "partial",
           "go_target": "pkg/muz/pdr/context_solve.go",
           "tests": [
@@ -83148,7 +83149,7 @@
           ]
         },
         {
-          "name": "remaining pred_transformer cover/model surface plus model trace/proof reconstruction, core_generalizer and model-implicant/QE generalization",
+          "name": "remaining pred_transformer cover/model surface plus model trace/proof reconstruction, core_generalizer and model-implicant minimization",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83156,12 +83157,13 @@
       ],
       "ownership": [
         "PredicateTransformer is the concrete Go owner for its proposition solver, reachable cache, and retained AST state.",
-        "ModelSearch owns the ModelNode tree; nodes own their state, optional model and optional rule references."
+        "ModelSearch owns the ModelNode tree; nodes own their state, optional model and optional rule references.",
+        "Context owns its QE-lite projector and any fallback cooperation service created for callers that supplied only parameter services."
       ],
       "deviations": [
         "The Go frame API uses explicit methods and returned result values rather than C++ reference outputs and scoped mutable solver settings.",
         "CheckBounded remains a finite-depth context operation for early integration coverage.",
-        "Solve partitions projected transition literals into child cubes after model-substituting current and auxiliary state. Native model-implicant minimization and the preceding QE-lite reduction remain unported."
+        "Solve applies QE-lite before model-substituting any surviving current and auxiliary state, then partitions projected transition literals into child cubes. Native model-implicant minimization remains unported."
       ]
     },
     {

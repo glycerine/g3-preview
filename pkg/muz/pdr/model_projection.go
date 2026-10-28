@@ -107,6 +107,49 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 			resultErr = errors.Join(resultErr, c.manager.DelRef(&references[index]))
 		}
 	}()
+	if c.lite != nil && len(eliminated) != 0 {
+		formula, x := c.manager.MkAndArray(forms)
+		if x != nil {
+			return x
+		}
+		formulaRef, x := c.manager.NewRef(formula)
+		if x != nil {
+			return x
+		}
+		references = append(references, formulaRef)
+		variableRefs := make([]ast.ASTRef, 0, len(eliminated))
+		defer func() {
+			for index := len(variableRefs) - 1; index >= 0; index-- {
+				resultErr = errors.Join(resultErr, c.manager.DelRef(&variableRefs[index]))
+			}
+		}()
+		for _, variable := range eliminated {
+			reference, y := c.manager.NewRef(variable)
+			if y != nil {
+				return y
+			}
+			variableRefs = append(variableRefs, reference)
+		}
+		if x = c.lite.EliminateConstants(&variableRefs, formulaRef); x != nil {
+			return x
+		}
+		eliminated = eliminated[:0]
+		for _, reference := range variableRefs {
+			variable, y := c.manager.RefGet(reference)
+			if y != nil {
+				return y
+			}
+			eliminated = append(eliminated, variable)
+		}
+		formula, x = c.manager.RefGet(formulaRef)
+		if x != nil {
+			return x
+		}
+		forms, x = c.manager.FlattenAnd([]ast.ASTHandle{formula})
+		if x != nil {
+			return x
+		}
+	}
 	projected := make([]ast.ASTHandle, 0, len(forms))
 	for _, formula := range forms {
 		reference, x := c.substituteModelValues(modelCore, node.transformer, formula, eliminated)

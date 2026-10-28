@@ -8,7 +8,9 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/muz/base"
+	"github.com/glycerine/g3/pkg/qe"
 	"github.com/glycerine/g3/pkg/smtcore"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -25,6 +27,9 @@ type Context struct {
 	transformers map[ast.ASTHandle]*PredicateTransformer
 	order        []ast.ASTHandle
 	search       *ModelSearch
+	lite         *qe.Lite
+	cooperation  *cooperate.Cooperation
+	ownedCoop    bool
 	lastResult   lbool.LBool
 	query        *PredicateTransformer
 	expanded     uint32
@@ -43,7 +48,30 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, err
 	}
-	return &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(false), lastResult: lbool.Undef}, nil
+	result := &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(false), lastResult: lbool.Undef}
+	fail := func(cause error) (*Context, error) {
+		cleanup := result.Close()
+		if cleanup != nil {
+			return result, errors.Join(cause, cleanup)
+		}
+		return nil, cause
+	}
+	if config.Globals == nil {
+		return result, nil
+	}
+	result.cooperation = config.ModelEvaluator.Cooperation
+	if result.cooperation == nil {
+		result.cooperation, err = cooperate.NewCooperation(manager.Budget())
+		if err != nil {
+			return fail(err)
+		}
+		result.ownedCoop = true
+	}
+	result.lite, err = qe.NewLite(manager, params, true, qe.Config{Context: config.Params, Globals: config.Globals, Cooperation: result.cooperation, Trace: config.ModelEvaluator.Trace})
+	if err != nil {
+		return fail(err)
+	}
+	return result, nil
 }
 
 func (c *Context) open() error {
@@ -302,6 +330,12 @@ func (c *Context) Close() (result error) {
 		}
 		c.search = nil
 	}
+	if c.lite != nil {
+		if err := c.lite.Close(); err != nil {
+			return err
+		}
+		c.lite = nil
+	}
 	for index := len(c.order) - 1; index >= 0; index-- {
 		declaration := c.order[index]
 		if transformer := c.transformers[declaration]; transformer != nil {
@@ -315,12 +349,21 @@ func (c *Context) Close() (result error) {
 	if result == nil {
 		result = errors.Join(result, c.owner.Close())
 	}
+	if result == nil && c.ownedCoop && c.cooperation != nil {
+		result = c.cooperation.Close()
+		if result == nil {
+			c.cooperation = nil
+			c.ownedCoop = false
+		}
+	}
 	if result == nil {
 		c.manager = nil
 		c.owner = nil
 		c.transformers = nil
 		c.order = nil
 		c.search = nil
+		c.lite = nil
+		c.cooperation = nil
 		c.query = nil
 		c.closed = true
 	}
