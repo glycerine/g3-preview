@@ -9,6 +9,7 @@ import (
 	"io"
 	"math/big"
 
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/simplex"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -184,6 +185,10 @@ func (t *SMTLinearArithmeticTheory) propagateFixedEquality(solver *simplex.Solve
 // Derive bounds through canonical equality and comparison rows. The caller
 // owns replay and records only bounds supported by unconditional assertions.
 func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex.Solver) (bool, error) {
+	maxLemmaSize := t.maxLemmaSize
+	if maxLemmaSize == 0 {
+		maxLemmaSize = 128
+	}
 	for column := uint32(0); column < solver.NumVariables(); column++ {
 		row, basic := solver.BasicRow(column)
 		if !basic {
@@ -193,9 +198,9 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex
 		if err != nil {
 			return false, err
 		}
-		if len(entries) >= 128 {
+		if uint64(len(entries)) >= uint64(maxLemmaSize) {
 			continue
-		} // Source default max_lemma_size.
+		}
 		for _, target := range entries {
 			for _, lower := range []bool{true, false} {
 				var bound simplex.Infinitesimal
@@ -246,4 +251,216 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticRowBounds(solver *simplex
 		}
 	}
 	return false, nil
+}
+
+// Source propagate_bounds turns an implied row endpoint into the corresponding
+// unassigned Boolean arithmetic atom. The replay tableau owns endpoint values;
+// the context justification owns copied logical premises and proof parameters.
+func (t *SMTLinearArithmeticTheory) propagateArithmeticBoundAtoms() error {
+	if t.boundPropagation == 0 || t.conflictCount >= t.propagationThreshold {
+		return nil
+	}
+	// Source row propagation computes implications without installing derived
+	// numeric bounds into the candidate tableau. Use a separate logical replay:
+	// only a published Boolean consequence may affect the next live rebuild.
+	solver, status, err := t.buildSimplex()
+	if err != nil {
+		return err
+	}
+	if status == lbool.False {
+		return t.derivedBoundConflict(solver)
+	}
+	if status == lbool.Undef {
+		return nil
+	}
+	bases := make([]uint32, len(t.atoms))
+	coefficientBases := make(map[string]uint32)
+	for index := range t.atoms {
+		atom := &t.atoms[index]
+		if !atom.supported {
+			continue
+		}
+		key := smtArithmeticCoefficientKey(&atom.form)
+		if base, found := coefficientBases[key]; found {
+			bases[index] = base
+			continue
+		}
+		base := t.nextSimplex + uint32(index)
+		bases[index] = base
+		coefficientBases[key] = base
+	}
+	proofs, err := t.state.manager.ProofsEnabled()
+	if err != nil {
+		return err
+	}
+	for index := range t.atoms {
+		atom := &t.atoms[index]
+		if !atom.supported || atom.decided {
+			continue
+		}
+		positive := NewSMTLiteral(atom.variable, false)
+		assignment, err := t.state.Assignment(positive)
+		if err != nil {
+			return err
+		}
+		if assignment != lbool.Undef {
+			continue
+		}
+		base := bases[index]
+		for _, truth := range []bool{true, false} {
+			lower, threshold := smtLinearAtomBound(atom, truth, t.integralAtom(atom))
+			endpoint, explanation, found, err := t.impliedArithmeticRowEndpoint(solver, base, lower)
+			if err != nil {
+				return err
+			}
+			if !found || lower && endpoint.Cmp(&threshold) < 0 || !lower && endpoint.Cmp(&threshold) > 0 {
+				continue
+			}
+			var antecedents smtArithmeticAntecedents
+			for _, dependency := range explanation.dependencies {
+				if err = smtArithmeticPushDependency(&antecedents, dependency, &dependency.Coefficient, proofs, t.equalityBounds); err != nil {
+					return err
+				}
+			}
+			literal := NewSMTLiteral(atom.variable, !truth)
+			if err = t.assignArithmeticBoundLiteral(literal, &antecedents); err != nil {
+				return err
+			}
+			break
+		}
+	}
+	return nil
+}
+
+// impliedArithmeticRowEndpoint computes the strongest currently justified
+// endpoint for one column without installing it. This is the source
+// imply_bound_for_monomial operation: integer normalization happens only when
+// comparing against an integer atom threshold, never by changing the tableau.
+func (t *SMTLinearArithmeticTheory) impliedArithmeticRowEndpoint(solver *simplex.Solver, column uint32, lower bool) (simplex.Infinitesimal, *smtArithmeticBoundExplanation, bool, error) {
+	var best simplex.Infinitesimal
+	var explanation *smtArithmeticBoundExplanation
+	found := false
+	if lower {
+		if endpoint, exists := solver.Lower(column); exists {
+			if reason := smtArithmeticCopyBoundExplanation(solver, column, true); reason != nil {
+				best, explanation, found = endpoint, reason, true
+			}
+		}
+	} else if endpoint, exists := solver.Upper(column); exists {
+		if reason := smtArithmeticCopyBoundExplanation(solver, column, false); reason != nil {
+			best, explanation, found = endpoint, reason, true
+		}
+	}
+	maxLemmaSize := t.maxLemmaSize
+	if maxLemmaSize == 0 {
+		maxLemmaSize = 128
+	}
+	for basic := uint32(0); basic < solver.NumVariables(); basic++ {
+		row, exists := solver.BasicRow(basic)
+		if !exists {
+			continue
+		}
+		entries, err := solver.RowEntries(row)
+		if err != nil {
+			return simplex.Infinitesimal{}, nil, false, err
+		}
+		if uint64(len(entries)) >= uint64(maxLemmaSize) {
+			continue
+		}
+		for _, target := range entries {
+			if target.Variable != column {
+				continue
+			}
+			var candidate simplex.Infinitesimal
+			var uses []simplex.ArithmeticBoundUse
+			finite := true
+			for _, other := range entries {
+				if other.Variable == column {
+					continue
+				}
+				coefficient := new(big.Rat).Neg(new(big.Rat).Quo(other.Coefficient, target.Coefficient))
+				useLower := lower == (coefficient.Sign() > 0)
+				endpoint, endpointFound := solver.Upper(other.Variable)
+				if useLower {
+					endpoint, endpointFound = solver.Lower(other.Variable)
+				}
+				if !endpointFound {
+					finite = false
+					break
+				}
+				candidate.Infinity.Add(&candidate.Infinity, new(big.Rat).Mul(coefficient, &endpoint.Infinity))
+				candidate.Main.Add(&candidate.Main, new(big.Rat).Mul(coefficient, &endpoint.Main))
+				candidate.Epsilon.Add(&candidate.Epsilon, new(big.Rat).Mul(coefficient, &endpoint.Epsilon))
+				uses = append(uses, simplex.ArithmeticBoundUse{Column: other.Variable, Lower: useLower, Coefficient: *coefficient})
+			}
+			if !finite {
+				continue
+			}
+			reason := smtArithmeticWeightedBoundExplanation(solver, uses)
+			if reason == nil {
+				continue
+			}
+			if !found || lower && candidate.Cmp(&best) > 0 || !lower && candidate.Cmp(&best) < 0 {
+				best, explanation, found = candidate, reason, true
+			}
+		}
+	}
+	return best, explanation, found, nil
+}
+
+func (t *SMTLinearArithmeticTheory) assignArithmeticBoundLiteral(literal SMTLiteral, antecedents *smtArithmeticAntecedents) (result error) {
+	if antecedents == nil {
+		return ast.ErrASTDomain
+	}
+	m := t.state.manager
+	parameters, err := antecedents.parameters(m, "assign-bounds")
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, smtArithmeticReleaseParameters(m, parameters)) }()
+	if uint64(len(antecedents.literals)) < uint64(t.smallLemmaSize) && len(antecedents.equalities) == 0 {
+		clause := make([]SMTLiteral, 0, len(antecedents.literals)+1)
+		for _, premise := range antecedents.literals {
+			clause = append(clause, premise.Negated())
+		}
+		clause = append(clause, literal)
+		var justification *SMTTheoryLemmaJustification
+		proofs, err := m.ProofsEnabled()
+		if err != nil {
+			return err
+		}
+		if proofs {
+			justification, err = NewSMTTheoryLemmaJustification(m, t.FamilyID(), clause, t.state.boolExpr, parameters)
+			if err != nil {
+				return err
+			}
+		}
+		var owner SMTJustification
+		if justification != nil {
+			owner = justification
+		}
+		beforeClauses, beforeOwners := len(t.state.clauses), len(t.state.ownedJustifications)
+		err = t.state.addClauseKindWithJustificationAndDeleteHandler(clause, false, SMTClauseAuxLemma, ast.ASTHandle{}, owner, nil)
+		if justification != nil && len(t.state.clauses) == beforeClauses && len(t.state.ownedJustifications) == beforeOwners {
+			err = errors.Join(err, justification.Release(m))
+		}
+		if err != nil {
+			return err
+		}
+	} else {
+		owner, err := NewSMTExtTheoryPropagationJustification(m, t.FamilyID(), antecedents.literals, antecedents.equalities, literal, parameters)
+		if err != nil {
+			return err
+		}
+		justification, err := NewSMTBooleanJustification(owner)
+		if err != nil {
+			return errors.Join(err, owner.Release(m))
+		}
+		if err = t.state.AssignLiteral(literal, justification); err != nil {
+			return errors.Join(err, owner.Release(m))
+		}
+		t.state.ownedJustifications = append(t.state.ownedJustifications, owner)
+	}
+	t.statistics.boundPropagations++
+	return nil
 }

@@ -120320,6 +120320,8 @@
         "pkg/smtcore/theory_arith_nonlinear_strategy_test.go",
         "pkg/smtcore/theory_arith_fixed_bounds.go",
         "pkg/smtcore/theory_arith_fixed_bounds_test.go",
+        "pkg/smtcore/theory_arith_bound_propagation_test.go",
+        "pkg/cmd/g3/test_vectors/row_bound_propagation_scopes.smt2",
         "pkg/smtcore/theory_arith_shared.go",
         "pkg/smtcore/smt_assume_eq.go",
         "pkg/smtcore/smt_assume_eq_test.go",
@@ -136132,14 +136134,18 @@
           ]
         },
         {
-          "name": "propagate_bounds retained affine definition rows carry nonlinear interval bounds through preprocessor aliases before and after monomial propagation",
+          "name": "propagate_bounds: retained affine definition rows carry nonlinear interval bounds through preprocessor aliases before and after monomial propagation; every eligible small tableau row derives strict/rational/integer endpoints and publishes implied unassigned Boolean bounds with exact premises, source small-lemma or external justification ownership, propagation-mode and conflict-threshold gates, statistics, and scope restoration; stronger-lemma premise relaxation remains partial",
           "status": "partial",
-          "go_target": "pkg/smtcore/theory_arith_nonlinear.go",
+          "go_target": "pkg/smtcore/theory_arith_fixed_bounds.go",
           "go_targets": [
-            "pkg/cmd/g3/main_test.go"
+            "pkg/smtcore/theory_arith_nonlinear.go",
+            "pkg/smtcore/theory_arith_bound_propagation_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/row_bound_propagation_scopes.smt2"
           ],
           "tests": [
             "TestSMTNonlinearGrobnerExpandedSquareScopedProofs",
+            "TestSMTArithmeticRowsPropagateBooleanBounds",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]

@@ -117,7 +117,8 @@ type smtLinearArithmeticStatistics struct {
 	maxMin                                               uint64
 	crossNested                                          uint64
 	conflicts, addRows, pivots, assertLower, assertUpper uint64
-	fixedEqualities, offsetEqualities, branches          uint64
+	fixedEqualities, offsetEqualities, boundPropagations uint64
+	branches                                             uint64
 	grobner                                              uint64
 	nonlinearBranches                                    uint64
 }
@@ -135,6 +136,8 @@ type SMTLinearArithmeticTheory struct {
 	equalityBounds                       []smtArithmeticEqualityEndpoints
 	propagateEqualities                  bool
 	propagationThreshold                 uint32
+	boundPropagation                     uint32
+	maxLemmaSize, smallLemmaSize         uint32
 	pivotStrategy, blandThreshold        uint32
 	conflictCount                        uint32
 	pendingBounds                        []smtArithmeticReplayBound
@@ -228,6 +231,9 @@ func newSMTLinearArithmeticTheory(family ast.FamilyID, integer bool) (*SMTLinear
 	t := &SMTLinearArithmeticTheory{
 		propagateEqualities:   true,
 		propagationThreshold:  ^uint32(0),
+		boundPropagation:      2,
+		maxLemmaSize:          128,
+		smallLemmaSize:        16,
 		blandThreshold:        1000,
 		strongerLemmas:        true,
 		branchCutRatio:        2,
@@ -267,6 +273,8 @@ func (t *SMTLinearArithmeticTheory) ConfigureArithmetic(config SMTArithState) er
 	t.equalityBoundsEnabled = config.EqBounds
 	t.propagateEqualities = config.PropagateEqs
 	t.propagationThreshold = config.PropagationThreshold
+	t.boundPropagation = config.BoundProp
+	t.maxLemmaSize, t.smallLemmaSize = config.MaxLemmaSize, config.SmallLemmaSize
 	t.pivotStrategy, t.blandThreshold = config.PivotStrategy, config.BlandsRuleThreshold
 	t.solver.SetArithmeticPivotPolicy(t.pivotStrategy, t.blandThreshold)
 	t.strongerLemmas = config.StrongerLemmas
@@ -1560,8 +1568,11 @@ func (t *SMTLinearArithmeticTheory) Propagate() error {
 		}
 	}
 	feasible, err := t.rebuild()
-	if err != nil || feasible || state.inconsistent {
+	if err != nil || state.inconsistent {
 		return err
+	}
+	if feasible {
+		return t.propagateArithmeticBoundAtoms()
 	}
 	t.recordArithmeticConflict()
 	literals := make([]SMTLiteral, 0, len(t.assertions))
@@ -2182,6 +2193,7 @@ func (t *SMTLinearArithmeticTheory) CollectStatistics(target *statistics.Statist
 	target.UpdateUint64("arith assert upper", t.statistics.assertUpper)
 	target.UpdateUint64("arith fixed eqs", t.statistics.fixedEqualities)
 	target.UpdateUint64("arith offset eqs", t.statistics.offsetEqualities)
+	target.UpdateUint64("arith bound prop", t.statistics.boundPropagations)
 	target.UpdateUint64("arith ineq splits", t.statistics.branches)
 	target.UpdateUint64("arith eq adapter", t.equalityAdapter.NumAxioms())
 	target.UpdateUint64("arith grobner", t.statistics.grobner)
