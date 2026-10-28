@@ -2139,6 +2139,7 @@
         "search_state.go",
         "search_witness.go",
         "sign_table.go",
+        "solver.go",
         "univariate_conjunction.go"
       ]
     },
