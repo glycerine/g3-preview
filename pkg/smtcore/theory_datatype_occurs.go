@@ -1,5 +1,6 @@
-// Source: theory_datatype.cpp occurs_check and occurs_check_explain.
 package smtcore
+
+// Source: theory_datatype.cpp occurs_check and occurs_check_explain.
 
 import (
 	"io"

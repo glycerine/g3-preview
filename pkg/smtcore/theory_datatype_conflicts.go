@@ -1,5 +1,6 @@
-// Source: theory_datatype::sign_recognizer_conflict and merge_eh.
 package smtcore
+
+// Source: theory_datatype::sign_recognizer_conflict and merge_eh.
 
 import (
 	"errors"

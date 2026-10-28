@@ -1,5 +1,6 @@
-// Source: theory_datatype::mk_split and datatype::util constructor preferences.
 package smtcore
+
+// Source: theory_datatype::mk_split and datatype::util constructor preferences.
 
 import (
 	"fmt"

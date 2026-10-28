@@ -142000,7 +142000,7 @@
       "path": "src/smt/theory_datatype.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_datatype.go",
         "pkg/smtcore/smt_singleton_datatype_test.go",
@@ -142378,9 +142378,24 @@
           ]
         },
         {
-          "name": "Remaining datatype assertions, empty-recognizer context TRACE and broader context integration audit",
-          "status": "partial",
-          "tests": []
+          "name": "Complete retained datatype assertion, empty-recognizer context TRACE and context integration audit",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_metadata.go",
+            "pkg/smtcore/theory_datatype_occurs.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/theory_datatype_split.go",
+            "pkg/smtcore/theory_datatype_trace.go",
+            "pkg/smtcore/theory_datatype_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeEmptyRecognizerTracePrecedesDomainGuard",
+            "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+            "TestSMTDatatypeMergedFalseRecognizersPropagateWithSourceEvidence",
+            "TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery",
+            "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks"
+          ]
         },
         {
           "name": "mk_split: activate exactly one cached nonrecursive recognizer, mark existing irrelevant slots without changing phase, await relevant unassigned/true slots, advance false preferred slots in constructor declaration order, set true-first only on newly created splits, and preserve scope rollback; no all-constructor exhaustiveness/pairwise clauses",
@@ -142642,14 +142657,15 @@
         "Added source datatype TRACE sites 524,538,461,556 in traversal/publication order. Trace tails display the actual retained conflict equalities, including the already documented Go correction for the C++ closing-premise omission; this does not claim identical defective C++ proof-edge lists. Exact leaf entry/enter/exit, cached-skip and sticky ostream checks accompany existing proof/non-proof, one/three-node and repeated-scope cycle evidence tests. Native/disabled tags erase formatter operands. Remaining datatype diagnostic/assertion/context audit stays open.",
         "Recognizer application construction is separated from internalization so mk_split emits its creation record before ctx.internalize(...,false). All retained recognizerLiteral callers use the source non-gate context. Constructor diagnostics precede constructor-statistic mutation; assignment prints source ostream Boolean 0/1; private merge precedes imported-recognizer records; an already relevant unassigned split emits only the preferred-constructor record while retaining its source split-call count. Remaining sort/relevance/conflict diagnostics, source guards/statistics width and broader context audit remain incomplete.",
         "All five datatype statistics now use source uint32 counters. Actual occurs traversal, split, reconstruction, constructor internalization and update-field publication wrap at the source boundary; the old uint64 implementation failed all five cases with 4294967296. Collection matches source order and datatype update ax spelling. Sort diagnostics precede the attached-variable return; relevance diagnostics precede the recognizer filter/registration, with independent datatype_bug and native erasure. Go ResetStatistics remains an extra helper, not a new kernel reset callback. Conflict diagnostics, source guards and broader datatype/context audit remain partial.",
-        "Added recognizer_conflict and datatype_conflict packets at source sites 177/780. Both retained propagate_recognizer callers now preserve the actual triggering recognizer. Batched negative assignments demonstrate that the first theory callback, not the last assignment, supplies the exhaustion prefix; diagnostics preserve declaration-order negative literal premises and actual merged-class equality evidence before installing the conflict. Source guards, empty-recognizer context display and broader context integration remain open."
+        "Added recognizer_conflict and datatype_conflict packets at source sites 177/780. Both retained propagate_recognizer callers now preserve the actual triggering recognizer. Batched negative assignments demonstrate that the first theory callback, not the last assignment, supplies the exhaustion prefix; diagnostics preserve declaration-order negative literal premises and actual merged-class equality evidence before installing the conflict. Source guards, empty-recognizer context display and broader context integration remain open.",
+        "Completed the retained TRACE/SASSERT/context audit. The empty recognizer invariant now emits source CTRACE site 750 with the complete logical-context display before returning the explicit domain guard; disabled/native trace erasure and sticky ostream refusal preserve the guard result. Existing typed shape, union-find root, constructor/recognizer slot, assignment, occurs evidence, value dependency and split-result guards cover the remaining live assertions. The source cleanup-only mark vectors map to invocation-scoped Go traversal state."
       ]
     },
     {
       "path": "src/smt/theory_datatype.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_datatype.go",
         "pkg/smtcore/smt_datatype_lifecycle.go",
@@ -142758,8 +142774,8 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "retained datatype interface; remaining TRACE/assertion and context integration audit",
-          "status": "partial",
+          "name": "retained datatype interface with complete TRACE/assertion and context integration audit",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_datatype.go",
           "tests": [
             "TestSMTDatatypeRecognizerCases",
@@ -142796,9 +142812,24 @@
           ]
         },
         {
-          "name": "Remaining datatype assertions, empty-recognizer context TRACE and broader context integration audit",
-          "status": "partial",
-          "tests": []
+          "name": "Complete retained datatype assertions, empty-recognizer context TRACE and broader context integration audit",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_datatype.go",
+            "pkg/smtcore/theory_datatype_metadata.go",
+            "pkg/smtcore/theory_datatype_occurs.go",
+            "pkg/smtcore/theory_datatype_recognizers.go",
+            "pkg/smtcore/theory_datatype_split.go",
+            "pkg/smtcore/theory_datatype_trace.go",
+            "pkg/smtcore/theory_datatype_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTDatatypeEmptyRecognizerTracePrecedesDomainGuard",
+            "TestSMTDatatypeWatchRegistrationAndScopedSlots",
+            "TestSMTDatatypeMergedFalseRecognizersPropagateWithSourceEvidence",
+            "TestSMTDatatypeOccursEvidenceOrderAndScopeRecovery",
+            "TestSMTDatatypeSplitAdvancesInDeclarationOrderAndBacktracks"
+          ]
         },
         {
           "name": "mk_split: activate exactly one cached nonrecursive recognizer, mark existing irrelevant slots without changing phase, await relevant unassigned/true slots, advance false preferred slots in constructor declaration order, set true-first only on newly created splits, and preserve scope rollback; no all-constructor exhaustiveness/pairwise clauses",

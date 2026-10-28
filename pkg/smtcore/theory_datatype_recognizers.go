@@ -1,8 +1,10 @@
-// Source: theory_datatype::propagate_recognizer.
 package smtcore
+
+// Source: theory_datatype::propagate_recognizer.
 
 import (
 	"errors"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -17,6 +19,9 @@ func (t *SMTDatatypeTheory) propagateRecognizer(variable SMTTheoryVar, trigger *
 		return err
 	}
 	if len(data.recognizers) == 0 {
+		if err = t.traceDatatypeEmptyRecognizers(); err != nil {
+			return err
+		}
 		return ast.ErrASTDomain
 	}
 	node := t.variables[root]

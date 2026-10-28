@@ -2,6 +2,7 @@ package smtcore
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -12,6 +13,37 @@ import (
 
 func smtDatatypeTraceRecord(tag, function string, line int, body string) string {
 	return fmt.Sprintf("-------- [%s] %s src/smt/theory_datatype.cpp:%d ---------\n%s------------------------------------------------\n", tag, function, line, body)
+}
+
+func TestSMTDatatypeEmptyRecognizerTracePrecedesDomainGuard(t *testing.T) {
+	_, dt, x, _, _ := smtDatatypeSplitFixture(t)
+	s, err := dt.State()
+	astTestMust(t, err)
+	variable := s.context.enodes[x].TheoryVar(dt.FamilyID())
+
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("datatype")
+	dt.trace = tags
+	err = dt.propagateRecognizer(variable, nil)
+	if !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("empty recognizer guard", err)
+	}
+	if tags.ShouldTrace("datatype") {
+		want := "-------- [datatype] propagate_recognizer src/smt/theory_datatype.cpp:750 ---------\nLogical context:\n"
+		if !strings.HasPrefix(output.String(), want) {
+			t.Fatal("empty recognizer context trace", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("native empty-recognizer trace was not erased")
+	}
+
+	dt.trace = diagnostic.NewTraceTagsWithWriter(smtPBDisplayFailure{})
+	dt.trace.Enable("datatype")
+	err = dt.propagateRecognizer(variable, nil)
+	if !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("sticky trace stream masked empty recognizer guard", err)
+	}
 }
 
 func TestSMTDatatypeExhaustionTraceUsesTriggerAndOrderedEvidence(t *testing.T) {

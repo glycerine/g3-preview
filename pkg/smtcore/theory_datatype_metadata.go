@@ -1,5 +1,6 @@
-// Source: theory_datatype var_data, merge_eh and add_recognizer.
 package smtcore
+
+// Source: theory_datatype var_data, merge_eh and add_recognizer.
 
 import (
 	"fmt"

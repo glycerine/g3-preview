@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_datatype.cpp and src/smt/theory_datatype.h retained
 // constructor, accessor and recognizer axioms.
-package smtcore
 
 import (
 	"fmt"

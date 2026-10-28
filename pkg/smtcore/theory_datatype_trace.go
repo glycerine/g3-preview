@@ -1,5 +1,6 @@
-// Source: src/smt/theory_datatype.cpp retained internalization/equality TRACE.
 package smtcore
+
+// Source: src/smt/theory_datatype.cpp retained internalization/equality TRACE.
 
 import (
 	"errors"
@@ -125,6 +126,16 @@ func (t *SMTDatatypeTheory) traceDatatypeRecognizerExhaustion(trigger *SMTEnode,
 			_, _ = io.WriteString(out, "\n")
 		}
 		return nil
+	})
+}
+
+func (t *SMTDatatypeTheory) traceDatatypeEmptyRecognizers() error {
+	return t.emitDatatype("datatype", "propagate_recognizer", 750, func(out io.Writer) error {
+		s, err := t.State()
+		if err != nil {
+			return err
+		}
+		return s.DisplayContext(out)
 	})
 }
 

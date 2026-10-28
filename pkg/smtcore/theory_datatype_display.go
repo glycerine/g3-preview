@@ -1,5 +1,6 @@
-// Source: src/smt/theory_datatype.cpp display and display_var.
 package smtcore
+
+// Source: src/smt/theory_datatype.cpp display and display_var.
 
 import (
 	"errors"

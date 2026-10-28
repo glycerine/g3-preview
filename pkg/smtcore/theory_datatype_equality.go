@@ -1,5 +1,6 @@
-// Source: theory_datatype::assert_eq_axiom and dt_eq_justification.
 package smtcore
+
+// Source: theory_datatype::assert_eq_axiom and dt_eq_justification.
 
 import (
 	"fmt"
