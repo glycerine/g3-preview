@@ -131099,7 +131099,7 @@
       "path": "src/smt/smt_setup.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array_shared.go",
         "pkg/smtcore/theory_array_shared_test.go",
@@ -131386,8 +131386,8 @@
           ]
         },
         {
-          "name": "explicit arithmetic and array logic classification, setup_unknown all-theory fallback, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA/QF_AUFLIA/LRA/UFLRA and retained AUFLIA/AUFLIA+/AUFLIA-/UFNIA linear-subset theory selection, native shared QF_UFBV array/bit-vector and quantified array routing, and concrete mixed linear arithmetic for the general fallback and quantified mixed routes; remaining nonlinear arithmetic algorithms stay partial (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409,891-905)",
-          "status": "partial",
+          "name": "explicit arithmetic and array logic classification, setup_unknown all-theory fallback, concrete QF_RDL/QF_IDL/QF_UFIDL/QF_LRA/QF_LIA/QF_UFLRA/QF_UFLIA/QF_AUFLIA/LRA/UFLRA and retained AUFLIA/AUFLIA+/AUFLIA-/UFNIA theory selection, native shared QF_UFBV array/bit-vector and quantified array routing, and concrete mixed arithmetic for general and quantified routes (src/smt/smt_setup.cpp:64-123,236-279,327-337,396-409,891-1008)",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
             "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -131403,12 +131403,13 @@
             "TestSMTLinearRealLogicSetupUsesConcreteArithmetic",
             "TestSMTQuantifiedIntegerLogicSetupUsesConcreteLinearSubset",
             "TestSMTUnknownLogicSetupInstallsMixedArithmetic",
-            "TestSMTAllSetupIncludesArrays"
+            "TestSMTAllSetupIncludesArrays",
+            "TestSMTUnknownStaticSetupClassifiesLinearArithmetic"
           ]
         },
         {
           "name": "static-feature auto configuration plus concrete finite-domain, sequence, string and floating-point theory selection",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
             "TestSMTDatatypeQFDTSetup",
@@ -131443,8 +131444,8 @@
           ]
         },
         {
-          "name": "bound-elimination setup policy only: first-push logic mode versus first-check quantifier features, auto_config guard, explicit quantified arithmetic logic routing and hidden policy retention across parameter updates; remaining setup policies and mixed arithmetic backend selection remain incomplete",
-          "status": "partial",
+          "name": "bound-elimination setup policy: first-push logic mode versus first-check quantifier features, auto_config guard, explicit quantified arithmetic routing and hidden policy retention across parameter updates",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_bounds.go",
           "go_targets": [
             "pkg/smtcore/smt_kernel.go"
@@ -131613,7 +131614,7 @@
         },
         {
           "name": "QF_IDL default/static scalar policy, difference/real/UF rejection, unit random activity, dense feature tuning, >5000-constant relevance guard and first-boundary lifetime; select integer simplex for the normal route and per-column mixed integrality for static proof mode; concrete dense backend selection is recorded separately",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
           "go_targets": [
             "pkg/smtcore/smt_setup.go",
@@ -131669,7 +131670,7 @@
         },
         {
           "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption is now connected",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
           "go_targets": [
             "pkg/smtcore/smt_setup_ufidl_test.go",
@@ -131810,7 +131811,7 @@
       "path": "src/smt/smt_setup.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_setup_basic_arithmetic_test.go",
         "pkg/smtcore/theory_utvpi.go",
@@ -132011,8 +132012,8 @@
           ]
         },
         {
-          "name": "retained explicit-logic setup entry point",
-          "status": "partial",
+          "name": "retained explicit-logic and automatic static-feature setup entry points",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup.go",
           "tests": [
             "TestSMTSolverSetupUsesLinearRealArithmetic",
@@ -132026,14 +132027,31 @@
           ]
         },
         {
-          "name": "complete setup state, configuration modes, feature-driven overloads, and all concrete theory setup helpers",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "complete retained setup state, configuration modes, feature-driven overloads, and concrete theory setup helpers",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup.go",
+          "go_targets": [
+            "pkg/smtcore/smt_asserted_bounds.go",
+            "pkg/smtcore/smt_setup_unknown.go",
+            "pkg/smtcore/smt_setup_basic_arithmetic.go",
+            "pkg/smtcore/smt_setup_difference.go",
+            "pkg/smtcore/smt_setup_integer.go",
+            "pkg/smtcore/smt_setup_real.go",
+            "pkg/smtcore/smt_setup_simple.go",
+            "pkg/smtcore/smt_setup_array.go",
+            "pkg/smtcore/smt_setup_bv.go",
+            "pkg/smtcore/smt_setup_quantified.go"
+          ],
+          "tests": [
+            "TestSMTUnknownStaticSetupClassifiesLinearArithmetic",
+            "TestSMTSetupAndCheckSeparatesStaticAndIncrementalModes",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
         },
         {
-          "name": "bound-elimination setup policy only: first-push logic mode versus first-check quantifier features, auto_config guard, explicit quantified arithmetic logic routing and hidden policy retention across parameter updates; remaining setup policies and mixed arithmetic backend selection remain incomplete",
-          "status": "partial",
+          "name": "bound-elimination setup policy: first-push logic mode versus first-check quantifier features, auto_config guard, explicit quantified arithmetic routing and hidden policy retention across parameter updates",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_asserted_bounds.go",
           "go_targets": [
             "pkg/smtcore/smt_kernel.go"
@@ -132186,7 +132204,7 @@
         },
         {
           "name": "QF_IDL default/static scalar policy, difference/real/UF rejection, unit random activity, dense feature tuning, >5000-constant relevance guard and first-boundary lifetime; select integer simplex for the normal route and per-column mixed integrality for static proof mode; concrete dense backend selection is recorded separately",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
           "go_targets": [
             "pkg/smtcore/smt_setup.go",
@@ -132304,7 +132322,7 @@
         },
         {
           "name": "QF_UFIDL setup source branching: first-push integer simplex, static proof-mode mixed arithmetic, no-UF dense selection independent of auto_config_simplex, real-only feature rejection, selective Eq2Ineq/PropagateEqs controls, and dense early-return preservation of phase/restart/equality-bound fields; direct EqBounds equality-event consumption is now connected",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup_difference.go",
           "go_targets": [
             "pkg/smtcore/smt_setup_ufidl_test.go",
@@ -132563,12 +132581,19 @@
           ]
         },
         {
-          "name": "registered concrete theory-plugin copying during translation: retained arithmetic, BV, FPA, array, sequence/string, datatype and pseudo-Boolean types are preserved; other theory families remain incomplete",
-          "status": "partial",
+          "name": "registered concrete theory-plugin copying during translation: retained arithmetic, BV, FPA, array, sequence/string, datatype and pseudo-Boolean types are preserved; Datalog setup constructs the source-equivalent fresh owner",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_solver.go",
           "tests": [
+            "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
+            "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
             "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
-            "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence"
+            "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence",
+            "TestSMTArrayTranslationBackendsOwnersModelsAndScopes",
+            "TestSMTSequenceTranslationPreservesConfiguredBackendAndModels",
+            "TestSMTDatatypeTranslationAndAuxiliaryPreserveParameterOwner",
+            "TestSMTPBConstructorSnapshotTranslationAndAuxiliary",
+            "TestSMTDatalogFreshTranslationAndAuxiliaryOwners"
           ]
         },
         {
