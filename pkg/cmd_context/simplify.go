@@ -7,6 +7,8 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/smtcore"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
@@ -15,6 +17,43 @@ type SimplifyDetails struct {
 	Seconds                                                float64
 	Steps, CacheSize, NodesBefore, SharedNodes, NodesAfter uint32
 	MemoryBytes, MaximumMemoryBytes                        uint64
+}
+
+type simplifyExpressionSolver struct {
+	context *Context
+	backend *smtcore.SMTSolver
+}
+
+func (s *simplifyExpressionSolver) CheckSatisfiable(expression ast.ASTHandle) (status lbool.LBool, resultErr error) {
+	if s == nil || s.context == nil {
+		return lbool.Undef, ast.ErrASTHandle
+	}
+	if s.backend == nil {
+		backend, err := smtcore.NewSMTSolver(s.context.manager, &s.context.params, s.context.logic, s.context.config)
+		if err != nil {
+			return lbool.Undef, err
+		}
+		s.backend = backend
+	}
+	if err := s.backend.Push(); err != nil {
+		return lbool.Undef, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, s.backend.Pop(1)) }()
+	if err := s.backend.Assert(expression); err != nil {
+		return lbool.Undef, err
+	}
+	return s.backend.CheckSat(nil)
+}
+
+func (s *simplifyExpressionSolver) Close() error {
+	if s == nil || s.backend == nil {
+		return nil
+	}
+	err := s.backend.Close()
+	if err == nil {
+		s.backend = nil
+	}
+	return err
 }
 
 // Simplify rewrites one term with command-local theory-rewriter parameters.
@@ -54,6 +93,11 @@ func (c *Context) SimplifyWithDetails(expression ast.ASTHandle, params *uparams.
 		}
 		return result, proof, details, err
 	}
+	checker := &simplifyExpressionSolver{context: c}
+	if err = value.SetSolver(checker); err != nil {
+		return result, proof, details, errors.Join(err, value.Close())
+	}
+	defer func() { resultErr = errors.Join(resultErr, checker.Close()) }()
 	defer func() { resultErr = errors.Join(resultErr, value.Close()) }()
 	result, err = m.NewRef(ast.ASTHandle{})
 	if err != nil {

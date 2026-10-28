@@ -43975,13 +43975,13 @@
       "component": "cmd_context",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/cmd_context/simplify.go", "pkg/parsers/smt2/simplify.go", "pkg/cmd/g3/test_vectors/simplify_command.smt2"],
+      "go_targets": ["pkg/cmd_context/simplify.go", "pkg/parsers/smt2/simplify.go", "pkg/cmd/g3/test_vectors/simplify_command.smt2", "pkg/cmd/g3/test_vectors/simplify_sequence_command.smt2"],
       "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMT2SimplifyCommandStatistics", "TestSMT2SimplifyCommandRejectsUnknownParameterBeforeOutput", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
         {
-          "name": "simplify_cmd term and optional rewrite-proof production, theory-rewriter parameter validation, som/flat normalization, conditional result printing and statistics fields (simplify_cmd.cpp:30-148)",
+          "name": "simplify_cmd term and optional rewrite-proof production, lazy SMT sequence-expression callback, theory-rewriter parameter validation, som/flat normalization, conditional result printing and statistics fields (simplify_cmd.cpp:30-148)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/simplify.go",
           "go_targets": ["pkg/cmd_context/simplify.go"],
@@ -43989,7 +43989,7 @@
         }
       ],
       "ownership": ["Each command owns its local ParamsRef, parameter descriptors and simplified AST reference; the context call owns and closes the temporary TheoryRewriter."],
-      "deviations": ["Timeout/rlimit command wrappers, caught simplifier diagnostics and the lazy sequence-expression solver callback remain unported. Timing and allocator fields use the Go runtime services while preserving the source output schema."]
+      "deviations": ["Timeout/rlimit command wrappers and caught simplifier diagnostics remain unported. Timing and allocator fields use the Go runtime services while preserving the source output schema."]
     },
     {
       "path": "src/cmd_context/simplify_cmd.h",
