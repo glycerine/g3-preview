@@ -5,6 +5,7 @@ package smtcore
 
 import (
 	"bytes"
+	"io"
 	"strings"
 	"testing"
 
@@ -30,6 +31,14 @@ func arithmeticEqualityTraceFixture(t *testing.T) (*arithmeticObjectiveFixture, 
 
 func requireArithmeticEqualityTrace(t *testing.T, output string, sites ...string) {
 	t.Helper()
+	gate := diagnostic.NewTraceTagsWithWriter(io.Discard)
+	gate.Enable("arith_eq")
+	if !gate.ShouldTrace("arith_eq") {
+		if output != "" {
+			t.Fatalf("erased arithmetic equality TRACE emitted output:\n%s", output)
+		}
+		return
+	}
 	for _, site := range sites {
 		if !strings.Contains(output, site) {
 			t.Fatalf("missing %q in arithmetic equality trace:\n%s", site, output)
