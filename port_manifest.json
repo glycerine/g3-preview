@@ -144045,7 +144045,7 @@
       "path": "src/smt/theory_diff_logic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
@@ -144092,8 +144092,8 @@
           ]
         },
         {
-          "name": "Basic setup_arith modes 0/1/2/3 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex or dense matrix; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
-          "status": "partial",
+          "name": "Basic setup_arith modes 0/1/2/3/4/5 at disabled-auto-config or unknown-logic first push: disabled checkpoint, mixed infinitesimal graph, mixed simplex, dense matrix, UTVPI or infinite arithmetic; pre-boundary parameter updates, strict Int versus Real complements, typed model numerals and rejection of fractional Int candidates",
+          "status": "ported",
           "go_target": "pkg/smtcore/smt_setup_basic_arithmetic.go",
           "go_targets": [
             "pkg/smtcore/theory_diff_logic_real.go",
@@ -144117,8 +144117,10 @@
           ]
         },
         {
-          "name": "Small-integer sidl_ext and srdl_ext template instantiations",
-          "status": "unported"
+          "name": "Small-integer sidl_ext and srdl_ext template instantiations are unreachable: setup_arith selects them only when constructor-fixed m_arith_fixnum is true, and the complete source tree has no writer that can make it true",
+          "status": "dead_deleted",
+          "go_targets": [],
+          "tests": []
         },
         {"name": "Retained arbitrary-precision rdl_ext real/mixed optimization (including Int-valued terms through the live mixed backend): add_objective/internalize_objective ordered concrete terms and source numeral accumulator; graph-node/edge/objective simplex indices; incremental update_simplex rows and active upper bounds; value, maximize, strict/nonstrict mk_ineq/mk_gt/mk_ge, exact epsilon and finite model delta; owned objective cores, graph-edge-pop cache invalidation and manager resource limit (theory_diff_logic_def.h:1079-1404; pop_scope_eh:345-349)", "status": "ported", "go_targets": ["pkg/smtcore/theory_diff_logic_objective.go", "pkg/smtcore/theory_diff_logic_integer.go", "pkg/smtcore/theory_diff_logic_real.go"], "tests": ["TestSMTDiffObjectiveBoundsBlockersAndRepeatedPop", "TestSMTDiffObjectiveWeightedCoreAndConstants", "TestSMTDiffObjectiveStrictRealAndUnbounded", "TestSMTDiffObjectiveCompilerSourceDomainAndValueCopies", "TestSMTDiffObjectiveConfiguredSolverPublishesModelAndBlocks", "TestSMTDiffObjectiveResourceStopPreservesNativeInfinityConvention", "TestSMTDiffObjectiveCoreOwnsScopedExpressions", "TestSMTDiffObjectiveNegativeAndReversedDifferenceBlockers", "TestSMTDiffObjectiveIncrementalEdgesReuseCanonicalRows", "TestSMTDiffObjectiveNativeOptimizationCaller"]},
         {"name": "Standalone idl_ext/fidl sparse optimization selector branches are unreachable: m_arith_int_only/m_arith_fixnum are initialized false in theory_arith_params.h:148-149, have no retained writers, and smt_setup.cpp int_only branches require those values. Newly introduced standalone Go optimizer methods and their unused pop-cache hook are deleted; shared syntax/compiler/core helpers and live rdl_ext behavior remain.", "status": "dead_deleted", "go_targets": [], "tests": []}
@@ -267796,6 +267798,20 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 2,
     "full_suite_qualification": "The whole repository suite was not rerun for this manifest-only promotion; full pkg/smtcore passed immediately before it."
+  },
+  "latest_theory_diff_logic_instances_whole_audit": {
+    "source_units": [
+      "src/smt/theory_diff_logic.cpp"
+    ],
+    "scope": "Whole retained theory_diff_logic.cpp explicit-instantiation audit: Go provides concrete arbitrary-precision integer and real/mixed difference-logic theories, setup modes 0 through 5 select their retained arithmetic backends at the first boundary, and objective callbacks retain exact rational/infinitesimal numerals, scoped cores, graph-pop invalidation and resource-stop behavior. The sidl_ext and srdl_ext fixed-width emissions are unreachable because setup_arith requires m_arith_fixnum, which is constructor-fixed false and has no writer anywhere in the source tree. Standalone integer-only selector branches are likewise unreachable because m_arith_int_only has no writer. No universal template adapter or unused fixed-width backend is added. Focused setup, graph and objective tests, pkg/portcheck and the retained C++-differential runner groups pass.",
+    "focused_tests": [
+      "go test ./pkg/smtcore -run TestSMTBasicArithmetic|TestSMT(Integer|Real)DiffTheory|TestSMTDiffObjective",
+      "go test ./pkg/portcheck",
+      "go test ./pkg/cmd/g3 -run TestSMTLibRunner(Scripts|CPPReference)$"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 2,
+    "full_suite_qualification": "The whole repository suite was not rerun for this manifest-only promotion; the complete smtcore package passed immediately before it."
   },
   "latest_smt_theory_header_whole_audit": {
     "source_units": [
