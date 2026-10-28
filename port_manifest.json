@@ -85674,9 +85674,9 @@
       "path": "src/muz/rel/dl_relation_manager.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/rel/relation_manager.go", "pkg/muz/rel/table.go"],
+      "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues"],
       "assertions": [
         {
           "line": 71,
@@ -85813,17 +85813,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Finite predicate-domain to table signature conversion and Bool/bit-vector/Datalog finite numeral fact conversion in both directions (dl_relation_manager.cpp:373-451)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/relation_manager.go",
+          "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues"]
+        }
+      ],
+      "ownership": [
+        "RelationManager borrows its AST manager. Encode paths return caller-owned Go facts; decode paths return explicit owning AST references and release partial results on failure."
+      ],
+      "deviations": [
+        "Plugin registration/selection, relation storage, operation factory fallbacks, functional tables, and non-table relation implementations remain open. Only bounded finite sorts with concrete native numeral encodings are accepted."
+      ]
     },
     {
       "path": "src/muz/rel/dl_relation_manager.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/rel/relation_manager.go", "pkg/muz/rel/table.go"],
+      "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues"],
       "conditionals": [
         {
           "line": 19,
@@ -85878,9 +85889,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete finite relation/table signature and fact conversion surface (dl_relation_manager.h:112-137)",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/relation_manager.go",
+          "tests": ["TestRelationManagerFiniteSignatureAndFactRoundTrip", "TestRelationManagerRejectsInfiniteAndWrongSortValues"]
+        }
+      ],
+      "ownership": [
+        "The concrete Go manager exposes typed conversions directly and does not introduce the unused universal C++ plugin adapter surface."
+      ],
+      "deviations": [
+        "The remainder of relation_manager's plugin, storage, and relational-operation factory surface remains unported."
+      ]
     },
     {
       "path": "src/muz/rel/dl_sieve_relation.cpp",
