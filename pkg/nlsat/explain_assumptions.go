@@ -18,6 +18,7 @@ type explanationAssumptions struct {
 	search                  *searchState
 	factors                 *polynomial.PolynomialRefVector
 	localFactor             *polynomial.PolynomialRef
+	vanishing               explanationVanishingScope
 	output                  scopedLiteralVector
 	alreadyAdded            []bool
 	marked                  []uint32
@@ -70,7 +71,7 @@ func (n *explanationAssumptions) start() error {
 	if err := n.search.open(); err != nil {
 		return err
 	}
-	if n.resultActive || n.localFactor != nil {
+	if n.resultActive || n.localFactor != nil || n.vanishing.active {
 		return ErrSearchPending
 	}
 	n.running, n.resultActive = true, true
@@ -183,9 +184,9 @@ func (n *explanationAssumptions) addZeroAssumption(p polynomial.Polynomial) (err
 		return err
 	}
 	defer func() {
-		closeErr := n.localFactor.Close()
+		complete, closeErr := n.localFactor.SourceFinalize()
 		err = errors.Join(err, closeErr)
-		if closeErr == nil {
+		if closeErr == nil && complete {
 			n.localFactor = nil
 		}
 	}()
@@ -249,6 +250,11 @@ func (n *explanationAssumptions) cleanup() error {
 	}
 	if n.running {
 		return ErrSearchPending
+	}
+	n.running = true
+	defer func() { n.running = false }()
+	if err := n.finishVanishing(true); err != nil {
+		return err
 	}
 	if n.localFactor != nil {
 		if err := n.localFactor.Close(); err != nil {

@@ -22,7 +22,37 @@ func (m *MultivariatePolynomialCore) nonzeroConstantPending() bool {
 	return m != nil && m.self == m && m.nonzeroConstant.active
 }
 
-func (m *MultivariatePolynomialCore) NonzeroConstantCoefficient(p Polynomial, x, k uint32) (result bool, err error) {
+// PolynomialNonzeroConstantCall names only an actually accepted predicate call.
+// A refused call does not change it or acquire another invocation's cleanup.
+type PolynomialNonzeroConstantCall struct {
+	owner      *MultivariatePolynomialCore
+	invocation uint64
+}
+
+func (call *PolynomialNonzeroConstantCall) CleanupRetained() error {
+	if call == nil || call.owner == nil {
+		return nil
+	}
+	m := call.owner
+	if m.self != m {
+		return ErrPolynomialOwner
+	}
+	if !m.nonzeroConstant.active || m.nonzeroConstant.invocation != call.invocation {
+		return nil
+	}
+	return m.CleanupNonzeroConstantCoefficient()
+}
+
+func (m *MultivariatePolynomialCore) NonzeroConstantCoefficient(p Polynomial, x, k uint32) (bool, error) {
+	return m.nonzeroConstantCoefficientWithCall(p, x, k, nil)
+}
+
+// NonzeroConstantCoefficientWithCall records the invocation at actual entry,
+// before the callee can refuse or acquire numeral storage.
+func (m *MultivariatePolynomialCore) NonzeroConstantCoefficientWithCall(p Polynomial, x, k uint32, call *PolynomialNonzeroConstantCall) (bool, error) {
+	return m.nonzeroConstantCoefficientWithCall(p, x, k, call)
+}
+func (m *MultivariatePolynomialCore) nonzeroConstantCoefficientWithCall(p Polynomial, x, k uint32, call *PolynomialNonzeroConstantCall) (result bool, err error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
@@ -34,6 +64,9 @@ func (m *MultivariatePolynomialCore) NonzeroConstantCoefficient(p Polynomial, x,
 		return false, arena.ErrBounds
 	}
 	*s = polynomialNonzeroConstantScope{invocation: s.invocation + 1, active: true, executing: true, numeralConstructed: true}
+	if call != nil {
+		*call = PolynomialNonzeroConstantCall{owner: m, invocation: s.invocation}
+	}
 	defer func() {
 		s.executing = false
 		s.bodyCause = err

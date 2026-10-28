@@ -145,6 +145,34 @@ func (r *PolynomialRef) Get() (Polynomial, error) {
 	return r.root.value, nil
 }
 func (r *PolynomialRef) Reset() error { return r.Assign(Polynomial{}) }
+
+// SourceFinalize runs the lexical reference destructor once. It does not
+// acknowledge an already stopped DEC or abort an unpublished assignment INC;
+// Close is the separate owning continuation for those accepted operations.
+// complete reports whether no unpublished assignment ownership remains.
+func (r *PolynomialRef) SourceFinalize() (complete bool, err error) {
+	if r.quasiResultantPending() {
+		return false, ErrPolynomialPending
+	}
+	if r == nil || r.self != r {
+		return false, ErrPolynomialOwner
+	}
+	if r.closed {
+		return true, nil
+	}
+	r.closing = true
+	if err := r.root.closeValue(r.owner, false); err != nil {
+		return false, err
+	}
+	if r.root.assigning || r.root.incoming != (Polynomial{}) {
+		return false, nil
+	}
+	r.owner.integer.Budget().Release(r.header)
+	r.header = 0
+	r.closed = true
+	return true, nil
+}
+
 func (r *PolynomialRef) Close() error {
 	if r.quasiResultantPending() {
 		return ErrPolynomialPending

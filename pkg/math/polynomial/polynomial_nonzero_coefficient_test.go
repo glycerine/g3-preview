@@ -252,3 +252,33 @@ func TestPolynomialNonzeroConstantCoefficientFailedBodyGuardsParentBeforeProgres
 	}
 	serviceMust(t, c.CleanupNonzeroConstantCoefficient())
 }
+
+func TestPolynomialNonzeroConstantCallExactAcceptedGeneration(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c := m.core
+	var old, refused, current PolynomialNonzeroConstantCall
+	_, err := c.NonzeroConstantCoefficientWithCall(Polynomial{}, 0, 0, &old)
+	if !errors.Is(err, ErrPolynomialOwner) || old.owner != c || old.invocation == 0 {
+		t.Fatal("accepted predicate did not stamp real generation", err)
+	}
+	before := c.nonzeroConstant
+	_, err = c.NonzeroConstantCoefficientWithCall(Polynomial{}, 0, 0, &refused)
+	if !errors.Is(err, ErrPolynomialPending) || refused.owner != nil {
+		t.Fatal("refused call adopted pending predicate", err)
+	}
+	serviceMust(t, refused.CleanupRetained())
+	if c.nonzeroConstant != before {
+		t.Fatal("refused receipt changed actual owner")
+	}
+	serviceMust(t, old.CleanupRetained())
+	_, err = c.NonzeroConstantCoefficientWithCall(Polynomial{}, 0, 0, &current)
+	if !errors.Is(err, ErrPolynomialOwner) || old.invocation == current.invocation {
+		t.Fatal("actual later generation not established", err)
+	}
+	before = c.nonzeroConstant
+	serviceMust(t, old.CleanupRetained())
+	if c.nonzeroConstant != before {
+		t.Fatal("stale receipt retired replacement predicate")
+	}
+	serviceMust(t, current.CleanupRetained())
+}
