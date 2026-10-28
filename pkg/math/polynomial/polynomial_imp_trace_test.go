@@ -36,13 +36,15 @@ func TestPolynomialImpDestructorLeakTrace(t *testing.T) {
 	serviceMust(t, e)
 	serviceMust(t, m.SourceFinalize())
 	want := ""
-	if polynomialSourceDebug && tags.ShouldTrace("polynomial") {
+	if tags.ShouldTrace("polynomial") {
 		want = "-------- [polynomial] del src/math/polynomial/polynomial.cpp:2421 ---------\n" +
 			"deleting: 0\n------------------------------------------------\n" +
 			"-------- [polynomial] del src/math/polynomial/polynomial.cpp:2421 ---------\n" +
-			"deleting: 1\n------------------------------------------------\n" +
-			"-------- [polynomial] ~imp src/math/polynomial/polynomial.cpp:2357 ---------\n" +
-			"leaked polynomials\nx0^2\n------------------------------------------------\n"
+			"deleting: 1\n------------------------------------------------\n"
+		if polynomialSourceDebug {
+			want += "-------- [polynomial] ~imp src/math/polynomial/polynomial.cpp:2357 ---------\n" +
+				"leaked polynomials\nx0^2\n------------------------------------------------\n"
+		}
 	}
 	if output.String() != want || m.destructorTraceRunning {
 		t.Fatalf("source imp destructor trace: got %q, want %q, active=%v", output.String(), want, m.destructorTraceRunning)

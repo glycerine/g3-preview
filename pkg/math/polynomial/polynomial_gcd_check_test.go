@@ -39,11 +39,14 @@ func TestPolynomialGCDMGCDCheckUsesIndependentPRS(t *testing.T) {
 		t.Fatal("mgcd_check changed modular GCD result")
 	}
 	got := trace.String()
+	// Ordinary modular GCD also computes univariate PRS specializations.
+	// The independent debug check uses the original multivariate x1 input.
+	independent := "gcd prs with x1 for\nu: "
 	if polynomialSourceDebug && tags.ShouldTrace("polynomial_gcd") {
-		if !strings.Contains(got, "[polynomial_gcd] gcd_prs src/math/polynomial/polynomial.cpp:3556") {
+		if !strings.Contains(got, independent) {
 			t.Fatalf("mgcd_check did not run independent PRS: %q", got)
 		}
-	} else if strings.Contains(got, "[polynomial_gcd] gcd_prs src/math/polynomial/polynomial.cpp:3556") {
+	} else if strings.Contains(got, independent) {
 		t.Fatalf("release build ran debug-only mgcd_check: %q", got)
 	}
 	if strings.Contains(got, "[mgcd_bug]") {

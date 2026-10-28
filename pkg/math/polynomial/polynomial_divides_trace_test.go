@@ -3,10 +3,10 @@ package polynomial
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
@@ -193,45 +193,43 @@ func TestPolynomialDividesTraceZeroKeepsOlderAlgorithmReceipt(t *testing.T) {
 	if !enabled {
 		t.Skip("TRACE compiled out")
 	}
-	reached := false
-	for ordinal := int64(0); ordinal < 32 && !reached; ordinal++ {
-		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
-			m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{5, 4, 0}}})
-			c := m.core
-			q := polynomialQueryTerms(t, c, []int32{1}, [][]MonomialPower{{{0, 2}, {1, 2}}})
-			var receipt polynomialDividesInvocationReceipt
-			budget := c.integer.Budget()
-			budget.FailAfter(ordinal)
-			_, cause := c.dividesWithReceipt(q, p, &receipt)
-			budget.FailAfter(-1)
-			defer func() {
-				serviceMust(t, c.cleanupDividesInvocation(&receipt, false))
-				serviceMust(t, c.cleanupDividesInvocation(&receipt, true))
-			}()
-			if cause == nil || !c.dividesInvocationPending(&receipt) {
-				return
-			}
-			reached = true
-			before := receipt
-			var out bytes.Buffer
-			tags := diagnostic.NewTraceTagsWithWriter(&out)
-			tags.Enable("polynomial")
-			tags.Enable("divides")
-			c.monomials.config.Trace = tags
-			defer tags.Finalize()
-			answer, e := c.dividesWithReceipt(c.zero, c.zero, &receipt)
-			serviceMust(t, e)
-			if !answer || receipt.trace.core != c || out.Len() == 0 {
-				t.Fatal("actual zero diagnostic invocation was not issued")
-			}
-			algorithm := receipt
-			algorithm.trace = before.trace
-			if algorithm != before {
-				t.Fatal("zero diagnostics replaced older algorithm/prelude authority")
-			}
-		})
+	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{5, 4, 0}}})
+	c := m.core
+	q := polynomialQueryTerms(t, c, []int32{1}, [][]MonomialPower{{{0, 2}, {1, 2}}})
+	var receipt polynomialDividesInvocationReceipt
+	var limit control.Reslimit
+	limit.InitEmbedded(c.integer.Budget())
+	previousCheckpoint := c.config.Checkpoint
+	c.config.Checkpoint = limit.Inc
+	t.Cleanup(func() { c.config.Checkpoint = previousCheckpoint; limit.Close() })
+	// Cancel at the actual algorithm checkpoint. Small release numerals and
+	// warm allocator pages need not make any fallible budget reservation.
+	limit.Cancel()
+	_, cause := c.dividesWithReceipt(q, p, &receipt)
+	limit.ResetCancel()
+	defer func() {
+		serviceMust(t, c.cleanupDividesInvocation(&receipt, false))
+		serviceMust(t, c.cleanupDividesInvocation(&receipt, true))
+	}()
+	if cause == nil || limit.Count() != 1 || !c.dividesInvocationPending(&receipt) {
+		t.Fatal("actual checkpoint did not retain an algorithm invocation", cause, limit.Count())
 	}
-	if !reached {
-		t.Fatal("no genuinely retained algorithm invocation reached")
+	before := receipt
+	var out bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&out)
+	tags.Enable("polynomial")
+	tags.Enable("divides")
+	c.monomials.config.Trace = tags
+	defer tags.Finalize()
+	answer, e := c.dividesWithReceipt(c.zero, c.zero, &receipt)
+	serviceMust(t, e)
+	if !answer || receipt.trace.core != c || out.Len() == 0 {
+		t.Fatal("actual zero diagnostic invocation was not issued")
 	}
+	algorithm := receipt
+	algorithm.trace = before.trace
+	if algorithm != before {
+		t.Fatal("zero diagnostics replaced older algorithm/prelude authority")
+	}
+
 }
