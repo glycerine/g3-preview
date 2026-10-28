@@ -691,7 +691,24 @@ func (t *SMTBitVectorTheory) NewDisequality(left, right SMTTheoryVar) error {
 		return err
 	}
 	leftBits, rightBits := t.bitLiterals[left], t.bitLiterals[right]
+	if err = bvAssert(1115, "m_bits[v1].size() == m_bits[v2].size()", func() (bool, error) { return len(leftBits) == len(rightBits), nil }); err != nil {
+		return err
+	}
 	if len(leftBits) == 0 || len(leftBits) != len(rightBits) {
+		return ast.ErrASTDomain
+	}
+	leftWidth, err := state.manager.BitVectorSize(leftNode.owner)
+	if err != nil {
+		return err
+	}
+	rightWidth, err := state.manager.BitVectorSize(rightNode.owner)
+	if err != nil {
+		return err
+	}
+	if err = bvAssert(1121, "get_bv_size(v1) == get_bv_size(v2)", func() (bool, error) { return leftWidth == rightWidth, nil }); err != nil {
+		return err
+	}
+	if leftWidth != rightWidth {
 		return ast.ErrASTDomain
 	}
 	equality, err := t.MkEqualityLiteral(leftNode.owner, rightNode.owner, true)

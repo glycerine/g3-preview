@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_bv.cpp:75-137,210-220,263-297,1163-1185;
 // theory_bv.h var_pos_occ and bit_atom.
-package smtcore
 
 import (
 	"fmt"
@@ -355,6 +356,14 @@ func (t *SMTBitVectorTheory) newStaticBitDisequality(left, right SMTTheoryVar, i
 	}
 	other, err := t.Enode(right)
 	if err != nil {
+		return err
+	}
+	if err = bvAssert(226, "m_bits[v1][idx] == ~m_bits[v2][idx]", func() (bool, error) {
+		if left < 0 || right < 0 || int(left) >= len(t.bitLiterals) || int(right) >= len(t.bitLiterals) || uint64(index) >= uint64(len(t.bitLiterals[left])) || uint64(index) >= uint64(len(t.bitLiterals[right])) {
+			return false, ast.ErrASTDomain
+		}
+		return t.bitLiterals[left][index] == t.bitLiterals[right][index].Negated(), nil
+	}); err != nil {
 		return err
 	}
 	t.statistics.diseqStatic++

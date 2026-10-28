@@ -124,6 +124,9 @@ func (t *SMTBitVectorTheory) propagateBits() error {
 				return ast.ErrASTDomain
 			}
 			consequent := t.bitLiterals[other][index]
+			if err = bvAssert(1212, "bit != ~bit2", func() (bool, error) { return bit != consequent.Negated(), nil }); err != nil {
+				return err
+			}
 			otherValue, err := s.Assignment(consequent)
 			if err != nil {
 				return err
@@ -160,6 +163,23 @@ func (t *SMTBitVectorTheory) assignBit(consequent SMTLiteral, from, to SMTTheory
 	if err != nil {
 		return err
 	}
+	if err = bvAssert(1239, "ctx.get_assignment(antecedent) == l_true", func() (bool, error) {
+		value, e := s.Assignment(antecedent)
+		return value == lbool.True, e
+	}); err != nil {
+		return err
+	}
+	if err = bvAssert(1240, "m_bits[v2][idx].var() == consequent.var()", func() (bool, error) {
+		if to < 0 || int(to) >= len(t.bitLiterals) || uint64(index) >= uint64(len(t.bitLiterals[to])) {
+			return false, ast.ErrASTDomain
+		}
+		return t.bitLiterals[to][index].Var() == consequent.Var(), nil
+	}); err != nil {
+		return err
+	}
+	if err = bvAssert(1241, "consequent.var() != antecedent.var()", func() (bool, error) { return consequent.Var() != antecedent.Var(), nil }); err != nil {
+		return err
+	}
 	owner := &smtBVBitEqualityJustification{SMTJustificationBase: NewSMTJustificationBase(true), first: first, second: second, theory: t.FamilyID(), consequent: consequent, antecedent: antecedent}
 	wrapped, err := NewSMTBooleanJustification(owner)
 	if err != nil {
@@ -187,6 +207,9 @@ func (t *SMTBitVectorTheory) assignBit(consequent SMTLiteral, from, to SMTTheory
 		}
 	}
 	entries, exists := t.bitAtoms[consequent.Var()]
+	if err = bvAssert(1265, "a->is_bit()", func() (bool, error) { return exists, nil }); err != nil {
+		return err
+	}
 	if !exists {
 		return ast.ErrASTDomain
 	}
@@ -213,6 +236,11 @@ func (t *SMTBitVectorTheory) mergeBitClasses(root, child, first, second SMTTheor
 		return err
 	}
 	t.propagationQueue = t.propagationQueue[:0]
+	if err = bvAssert(1394, "bits1.size() == bits2.size()", func() (bool, error) {
+		return len(t.bitLiterals[first]) == len(t.bitLiterals[second]), nil
+	}); err != nil {
+		return err
+	}
 	if len(t.bitLiterals[first]) != len(t.bitLiterals[second]) {
 		return ast.ErrASTDomain
 	}
@@ -221,6 +249,9 @@ func (t *SMTBitVectorTheory) mergeBitClasses(root, child, first, second SMTTheor
 		changed := false
 		for index := 0; index < len(t.bitLiterals[first]); index++ {
 			bit1, bit2 := t.bitLiterals[first][index], t.bitLiterals[second][index]
+			if err = bvAssert(1417, "bit1 != ~bit2", func() (bool, error) { return bit1 != bit2.Negated(), nil }); err != nil {
+				return err
+			}
 			value1, err := s.Assignment(bit1)
 			if err != nil {
 				return err

@@ -55,6 +55,11 @@ func (t *SMTBitVectorTheory) fixedVariable(variable SMTTheoryVar) error {
 			return err
 		}
 		valid = oldWidth == width
+		if valid {
+			if err = bvAssert(469, "get_bv_size(v) == get_bv_size(v2)", func() (bool, error) { return width == oldWidth, nil }); err != nil {
+				return err
+			}
+		}
 	}
 	if valid {
 		oldValue, oldFixed, err := t.fixedLiteralValue(old)

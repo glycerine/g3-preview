@@ -141264,15 +141264,25 @@
           ]
         },
         {
-          "name": "static and dynamic disequalities, explicit and congruence equalities, and fixed-value equality discovery",
-          "status": "partial",
+          "name": "static and dynamic disequalities, explicit and congruence equalities, fixed-value equality discovery, and retained source assertion gates at lines 226,469,1115,1121,1212,1239-1241,1265,1394,1417",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_bv.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_occurrences.go",
+            "pkg/smtcore/theory_bv_fixed.go",
+            "pkg/smtcore/theory_bv_propagation.go",
+            "pkg/smtcore/theory_bv_private.go",
+            "pkg/smtcore/theory_bv_invariants.go"
+          ],
           "tests": [
             "TestSMTBitVectorExpandsDynamicDisequality",
             "TestSMTBitVectorPublishesStaticDisequality",
             "TestSMTBitVectorDiscoversFixedEquality",
             "TestSMTBitVectorMergesNativeClasses",
-            "TestSMTBitVectorCongruentTermsPropagateBits"
+            "TestSMTBitVectorCongruentTermsPropagateBits",
+            "TestSMTBVNativeMergeCallbackErrorStopsBeforeLink",
+            "TestSMTBVNativeMergeRepeatedPropagationAndSourceJustifications",
+            "TestSMTBVFixedEqualitySourceClauseSchedule"
           ]
         },
         {

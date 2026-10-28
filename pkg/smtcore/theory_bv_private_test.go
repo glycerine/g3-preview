@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -207,13 +208,19 @@ func TestSMTBVNativeAssignUsesClassAndRepeatedPositions(t *testing.T) {
 }
 
 func TestSMTBVNativeMergeCallbackErrorStopsBeforeLink(t *testing.T) {
+	_, report := newLRASourceAssertionContext(t)
 	m, s, bv := bvOccurrenceFixture(t)
 	p, q := smtRelevancyBool(t, m, "error-p"), smtRelevancyBool(t, m, "error-q")
 	_, lv := bvNativeWord(t, m, s, bv, p)
 	_, rv := bvNativeWord(t, m, s, bv, p, q)
 	before := len(bv.privateTrail)
 	err := bv.NewEquality(lv, rv)
-	if !errors.Is(err, ast.ErrASTDomain) || len(bv.privateTrail) != before || bv.privateFind[lv] != lv || bv.privateFind[rv] != rv {
+	if diagnostic.DebugBuild {
+		bvInvariantFailure(t, err, report, 1394, "bits1.size() == bits2.size()")
+	} else if !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("callback refusal", err)
+	}
+	if len(bv.privateTrail) != before || bv.privateFind[lv] != lv || bv.privateFind[rv] != rv {
 		t.Fatal("callback refusal linked forest", err, bv.privateFind)
 	}
 }
