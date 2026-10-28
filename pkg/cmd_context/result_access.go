@@ -8,7 +8,42 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
+
+// Assertions returns the borrowed formulas in command-session order.
+func (c *Context) Assertions() ([]ast.ASTHandle, error) {
+	if err := c.valid(); err != nil {
+		return nil, err
+	}
+	result := make([]ast.ASTHandle, len(c.assertions))
+	for i := range c.assertions {
+		result[i] = c.assertions[i].expression
+	}
+	return result, nil
+}
+
+func (c *Context) ScopeLevel() (uint32, error) {
+	if err := c.valid(); err != nil {
+		return 0, err
+	}
+	return uint32(len(c.scopes)), nil
+}
+
+// Statistics returns an owning Go copy of the current solver statistics.
+func (c *Context) Statistics() (statistics.Statistics, error) {
+	if err := c.valid(); err != nil {
+		return statistics.Statistics{}, err
+	}
+	if _, err := c.Manager(); err != nil {
+		return statistics.Statistics{}, err
+	}
+	var result statistics.Statistics
+	if err := c.checkSatResult().CollectStatistics(&result); err != nil {
+		return statistics.Statistics{}, err
+	}
+	return result, nil
+}
 
 // UnsatCore returns a borrowed copy of the most recent unsatisfiable result's
 // tracked labels. The handles remain owned by the context result.

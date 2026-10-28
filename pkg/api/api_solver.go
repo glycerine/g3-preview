@@ -12,6 +12,7 @@ import (
 	_ "github.com/glycerine/g3/pkg/engine" // generated parameter collectors
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 var ErrSMTContextOwner = errors.New("api: invalid or closed SMT context")
@@ -99,6 +100,14 @@ func (c *SMTContext) AssertTracked(formula ast.ASTHandle, name string) error {
 	return c.command.Assert(formula, name)
 }
 
+// Assertions returns the borrowed asserted formulas in insertion order.
+func (c *SMTContext) Assertions() ([]ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return nil, err
+	}
+	return c.command.Assertions()
+}
+
 func (c *SMTContext) Push() error {
 	if err := c.open(); err != nil {
 		return err
@@ -111,6 +120,13 @@ func (c *SMTContext) Pop(count uint32) error {
 		return err
 	}
 	return c.command.Pop(count)
+}
+
+func (c *SMTContext) ScopeLevel() (uint32, error) {
+	if err := c.open(); err != nil {
+		return 0, err
+	}
+	return c.command.ScopeLevel()
 }
 
 // CheckSat checks the current assertions under temporary assumptions.
@@ -150,6 +166,14 @@ func (c *SMTContext) ReasonUnknown() (string, error) {
 		return "", err
 	}
 	return c.command.ReasonUnknown()
+}
+
+// Statistics returns an owning Go copy of the current solver statistics.
+func (c *SMTContext) Statistics() (statistics.Statistics, error) {
+	if err := c.open(); err != nil {
+		return statistics.Statistics{}, err
+	}
+	return c.command.Statistics()
 }
 
 func (c *SMTContext) ResetAssertions() error {

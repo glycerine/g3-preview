@@ -60,6 +60,11 @@ func TestSMTContextEndToEndModelScopesAndAssumptions(t *testing.T) {
 	four := f.pin(f.m.ArithmeticIntegerNumeralText("4"))
 	equalFour := f.pin(f.m.MkEq(x, four))
 	astTestMust(t, f.c.Assert(equalFour))
+	assertions, err := f.c.Assertions()
+	astTestMust(t, err)
+	if len(assertions) != 1 || assertions[0] != equalFour {
+		t.Fatal("assertion order", assertions)
+	}
 	status, err := f.c.CheckSat()
 	astTestMust(t, err)
 	if status != lbool.True {
@@ -77,8 +82,18 @@ func TestSMTContextEndToEndModelScopesAndAssumptions(t *testing.T) {
 		t.Fatal("model value", text, integer, matched)
 	}
 	astTestMust(t, md.DecRef())
+	stats, err := f.c.Statistics()
+	astTestMust(t, err)
+	if stats.Size() == 0 {
+		t.Fatal("missing solver statistics")
+	}
 
 	astTestMust(t, f.c.Push())
+	level, err := f.c.ScopeLevel()
+	astTestMust(t, err)
+	if level != 1 {
+		t.Fatal("scope level", level)
+	}
 	five := f.pin(f.m.ArithmeticIntegerNumeralText("5"))
 	equalFive := f.pin(f.m.MkEq(x, five))
 	astTestMust(t, f.c.Assert(equalFive))
@@ -88,6 +103,11 @@ func TestSMTContextEndToEndModelScopesAndAssumptions(t *testing.T) {
 		t.Fatal("scoped contradiction", status)
 	}
 	astTestMust(t, f.c.Pop(1))
+	level, err = f.c.ScopeLevel()
+	astTestMust(t, err)
+	if level != 0 {
+		t.Fatal("popped scope level", level)
+	}
 	boolean := f.pin(f.m.MkBoolSort())
 	assumptionName, err := f.m.Symbols.Intern("api-assumption")
 	astTestMust(t, err)
