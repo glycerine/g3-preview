@@ -1,0 +1,143 @@
+package transforms_test
+
+// Source: src/muz/transforms/dl_mk_coi_filter.cpp top-down and bottom-up
+// reachability pruning.
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/cmd_context"
+	_ "github.com/glycerine/g3/pkg/engine"
+	"github.com/glycerine/g3/pkg/muz/base"
+	"github.com/glycerine/g3/pkg/muz/transforms"
+)
+
+func coneMust(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+type coneFixture struct {
+	manager      *ast.ASTManager
+	rules        *base.RuleManager
+	set          *base.RuleSet
+	declarations map[string]ast.ASTHandle
+	applications map[string]ast.ASTHandle
+}
+
+func newConeFixture(t *testing.T, names ...string) *coneFixture {
+	t.Helper()
+	context, err := cmd_context.NewStandaloneContext()
+	coneMust(t, err)
+	t.Cleanup(func() { coneMust(t, context.Close()) })
+	manager, err := context.Manager()
+	coneMust(t, err)
+	rules, err := base.NewRuleManager(manager)
+	coneMust(t, err)
+	t.Cleanup(func() { coneMust(t, rules.Close()) })
+	set, err := base.NewRuleSet(rules)
+	coneMust(t, err)
+	t.Cleanup(func() { coneMust(t, set.Close()) })
+	boolean, err := manager.MkBoolSort()
+	coneMust(t, err)
+	f := &coneFixture{manager: manager, rules: rules, set: set,
+		declarations: make(map[string]ast.ASTHandle), applications: make(map[string]ast.ASTHandle)}
+	for _, name := range names {
+		symbol, e := manager.Symbols.Intern("cone-" + name)
+		coneMust(t, e)
+		f.declarations[name], e = manager.MkFuncDecl(symbol, nil, boolean, ast.ASTFuncDeclInfo{})
+		coneMust(t, e)
+		f.applications[name], e = manager.MkApp(f.declarations[name], nil)
+		coneMust(t, e)
+		coneMust(t, rules.RegisterPredicate(f.declarations[name]))
+	}
+	return f
+}
+
+func (f *coneFixture) add(t *testing.T, formula ast.ASTHandle, name string) {
+	t.Helper()
+	reference, err := f.manager.NewRef(formula)
+	coneMust(t, err)
+	t.Cleanup(func() { coneMust(t, f.manager.DelRef(&reference)) })
+	coneMust(t, f.rules.AddFormula(f.set, formula, name))
+}
+
+func (f *coneFixture) edge(t *testing.T, from, to string) {
+	t.Helper()
+	formula, err := f.manager.MkImplies(f.applications[from], f.applications[to])
+	coneMust(t, err)
+	f.add(t, formula, from+"-"+to)
+}
+
+func TestConeOfInfluencePrunesOutsideAndUnfoundedRules(t *testing.T) {
+	f := newConeFixture(t, "P", "Q", "R", "X", "S", "U", "V")
+	f.add(t, f.applications["P"], "fact-P")
+	f.edge(t, "P", "Q")
+	f.edge(t, "Q", "R")
+	f.edge(t, "X", "S")
+	f.add(t, f.applications["U"], "fact-U")
+	f.edge(t, "U", "V")
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["R"]))
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["S"]))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("cone fixture rejected")
+	}
+
+	filtered, err := transforms.ConeOfInfluence(f.set)
+	coneMust(t, err)
+	if filtered == nil {
+		t.Fatal("changed cone returned nil")
+	}
+	defer func() { coneMust(t, filtered.Close()) }()
+	if count, err := filtered.Len(); err != nil || count != 3 {
+		t.Fatal("filtered rule count", count, err)
+	}
+	wantHeads := map[ast.ASTHandle]int{
+		f.declarations["P"]: 1,
+		f.declarations["Q"]: 1,
+		f.declarations["R"]: 1,
+	}
+	for i := 0; i < 3; i++ {
+		rule, e := filtered.Rule(i)
+		coneMust(t, e)
+		head, e := rule.HeadDeclaration()
+		coneMust(t, e)
+		wantHeads[head]--
+		coneMust(t, rule.Close())
+	}
+	for head, remaining := range wantHeads {
+		if remaining != 0 {
+			t.Fatal("filtered head multiplicity", head, remaining)
+		}
+	}
+	outputs, err := filtered.OutputPredicates()
+	coneMust(t, err)
+	if len(outputs) != 2 || outputs[0] != f.declarations["R"] || outputs[1] != f.declarations["S"] {
+		t.Fatal("filtered outputs", outputs)
+	}
+	if finalized, err := filtered.IsFinalized(); err != nil || !finalized {
+		t.Fatal("filtered finalization", finalized, err)
+	}
+}
+
+func TestConeOfInfluenceReturnsNilWhenUnchanged(t *testing.T) {
+	f := newConeFixture(t, "P")
+	f.add(t, f.applications["P"], "fact-P")
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["P"]))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("single-fact cone rejected")
+	}
+	filtered, err := transforms.ConeOfInfluence(f.set)
+	coneMust(t, err)
+	if filtered != nil {
+		coneMust(t, filtered.Close())
+		t.Fatal("unchanged cone returned a replacement")
+	}
+}

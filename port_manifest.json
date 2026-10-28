@@ -81012,7 +81012,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/rule_set.go"],
-      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition"],
+      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition", "TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"],
       "assertions": [
         {
           "line": 82,
@@ -81122,7 +81122,7 @@
           "name": "rule_set retained rule ownership, grouped head index, add/delete/copy/replace/reset lifecycle, predicate inheritance and output mappings, dependency population, reopen/finalize, strongly connected component stratification, stratified-negation rejection, and founded splitting (dl_rule_set.cpp:70-485,570-758); display/profile and standalone dependency restrict/remove/sort operations remain open",
           "status": "partial",
           "go_target": "pkg/muz/base/rule_set.go",
-          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition"]
+          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition", "TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"]
         }
       ],
       "ownership": [],
@@ -81134,7 +81134,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/rule_set.go"],
-      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition"],
+      "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition", "TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"],
       "conditionals": [
         {
           "line": 19,
@@ -81166,7 +81166,7 @@
           "name": "Concrete rule_dependencies and rule_set storage/query/finalization/copy/output-mapping surface with explicit retained Rule wrappers; remaining display/profile interfaces stay open",
           "status": "partial",
           "go_target": "pkg/muz/base/rule_set.go",
-          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition"]
+          "tests": ["TestRuleSetFinalizesDependenciesAndStratifiedNegation", "TestRuleSetRejectsNegativeDependencyCycle", "TestRuleSetPredicateMappingsCopiesAndFoundedPartition", "TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"]
         }
       ],
       "ownership": [],
@@ -89404,28 +89404,39 @@
       "path": "src/muz/transforms/dl_mk_coi_filter.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/transforms/coi.go", "pkg/muz/dataflow/reachability.go"],
+      "tests": ["TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"],
       "assertions": [
         {
           "line": 73,
           "text": "SASSERT(!new_tail);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "operator(), top_down and bottom_up rule pruning: output-cone filtering, positive foundedness filtering, unreachable negative-tail simplification, predicate inheritance, source count-based no-change behavior, and finalized replacement construction (dl_mk_coi_filter.cpp:24-155)",
+          "status": "partial",
+          "go_target": "pkg/muz/transforms/coi.go",
+          "tests": ["TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"]
+        }
+      ],
+      "ownership": [
+        "Each changed pass returns one finalized owning RuleSet, closes every temporary Rule wrapper and discarded intermediate set, and retains source rules through RuleSet.Add."
+      ],
+      "deviations": [
+        "Fixedpoint-context fact-table bailout and extension_model_converter construction remain pending the Go dl_context/model-converter integration; the rule-pruning semantics are live."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_coi_filter.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/transforms/coi.go"],
+      "tests": ["TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"],
       "conditionals": [
         {
           "line": 20,
@@ -89436,11 +89447,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_coi_filter callable transformation surface and its top-down/bottom-up pass composition (dl_mk_coi_filter.h:27-47)",
+          "status": "partial",
+          "go_target": "pkg/muz/transforms/coi.go",
+          "tests": ["TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"]
+        }
+      ],
+      "ownership": [
+        "ConeOfInfluence returns nil for source no-change or transfers one finalized RuleSet owner to its caller."
+      ],
+      "deviations": [
+        "Registration as a prioritized rule_transformer::plugin remains pending the transformer/context port."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_different.h",

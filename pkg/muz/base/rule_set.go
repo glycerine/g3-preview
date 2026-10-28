@@ -59,6 +59,14 @@ func (s *RuleSet) open() error {
 	return s.manager.open()
 }
 
+// RuleManager returns the borrowed manager used to construct rules in this set.
+func (s *RuleSet) RuleManager() (*RuleManager, error) {
+	if err := s.open(); err != nil {
+		return nil, err
+	}
+	return s.manager, nil
+}
+
 func (s *RuleSet) ruleHeadDeclaration(rule *Rule) (ast.ASTHandle, error) {
 	state, err := rule.open()
 	if err != nil {
