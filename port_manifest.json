@@ -141302,7 +141302,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, conversion and private union-find diagnostics are ported, while remaining operator TRACE/SASSERT diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, construction and private union-find diagnostics are ported, while remaining operator/conversion TRACE/SASSERT diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -141361,6 +141361,21 @@
             "TestSMTBVZeroOneMergeSourceAssertionSites",
             "TestSMTBVMergeComplementConditionalSourceTrace",
             "TestSMTBVNativeConstantSummaryConflictCommitsAndUnmerges"
+          ]
+        },
+        {
+          "name": "BV construction diagnostics at theory_bv.cpp:77-156,217,244,280-313,529-537: bit2bool entry/reentry, owner enode and theory-variable publication, empty/new occurrence ownership, constant literals, Boolean theory classification, init_bits and numeral width contracts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv_occurrences.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_private.go",
+            "pkg/smtcore/theory_bv_construction_diagnostics_test.go"
+          ],
+          "tests": [
+            "TestSMTBVConstructionSourceAssertionSites",
+            "TestSMTBVBitOccurrencesPreservePositionsSignsAndSourceHeadOrder",
+            "TestSMTBVBitOccurrencesScopeUndoAfterCoreNodeRetirement"
           ]
         },
         {
@@ -141861,7 +141876,7 @@
           ]
         },
         {
-          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, conversion and private union-find diagnostics are ported, while remaining operator TRACE/SASSERT diagnostics remain incomplete",
+          "name": "Retained display/TRACE/SASSERT consumers: full native BV display uses private roots; fixed-bit, equality, propagation, frontend/control, construction and private union-find diagnostics are ported, while remaining operator/conversion TRACE/SASSERT diagnostics remain incomplete",
           "status": "partial"
         },
         {
@@ -141920,6 +141935,21 @@
             "TestSMTBVZeroOneMergeSourceAssertionSites",
             "TestSMTBVMergeComplementConditionalSourceTrace",
             "TestSMTBVNativeConstantSummaryConflictCommitsAndUnmerges"
+          ]
+        },
+        {
+          "name": "BV construction diagnostics at theory_bv.cpp:77-156,217,244,280-313,529-537: bit2bool entry/reentry, owner enode and theory-variable publication, empty/new occurrence ownership, constant literals, Boolean theory classification, init_bits and numeral width contracts",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv_occurrences.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv.go",
+            "pkg/smtcore/theory_bv_private.go",
+            "pkg/smtcore/theory_bv_construction_diagnostics_test.go"
+          ],
+          "tests": [
+            "TestSMTBVConstructionSourceAssertionSites",
+            "TestSMTBVBitOccurrencesPreservePositionsSignsAndSourceHeadOrder",
+            "TestSMTBVBitOccurrencesScopeUndoAfterCoreNodeRetirement"
           ]
         },
         {

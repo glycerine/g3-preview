@@ -101,6 +101,9 @@ func (t *SMTBitVectorTheory) restorePrivateTrail(scope smtBVScope) error {
 			t.privateFind, t.privateNext, t.privateSize = t.privateFind[:n], t.privateNext[:n], t.privateSize[:n]
 		case smtBVNewOccurrence:
 			entries := t.bitAtoms[event.boolean]
+			if err := bvAssert(217, "m_atom->m_occs", func() (bool, error) { return len(entries) != 0, nil }); err != nil {
+				return err
+			}
 			if len(entries) == 0 || len(t.bitOccurrenceTrail) == 0 {
 				return ast.ErrASTDomain
 			}

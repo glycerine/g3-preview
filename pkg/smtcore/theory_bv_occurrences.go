@@ -89,6 +89,9 @@ func (t *SMTBitVectorTheory) addBitOccurrence(boolean int32, variable SMTTheoryV
 		}
 	}
 	if !exists {
+		if err := bvAssert(293, "b->m_occs == 0", func() (bool, error) { return len(occurrences) == 0, nil }); err != nil {
+			return err
+		}
 		t.bitAtoms[boolean] = nil
 		t.bitAtomTrail = append(t.bitAtomTrail, boolean)
 		t.privateTrail = append(t.privateTrail, smtBVPrivateTrail{kind: smtBVNewAtom, boolean: boolean})
@@ -126,24 +129,48 @@ func (t *SMTBitVectorTheory) registerBitLiteral(expression ast.ASTHandle, index 
 	}
 	t.bitLiterals[variable] = append(bits, literal)
 	if literal.Var() == SMTTrueBoolVar {
+		if err = bvAssert(244, "m_bits[v][idx] == true_literal || m_bits[v][idx] == false_literal", func() (bool, error) {
+			return literal == SMTTrueLiteral || literal == SMTFalseLiteral, nil
+		}); err != nil {
+			return err
+		}
 		t.zeroOneBits[variable] = append(t.zeroOneBits[variable], smtBVZeroOneBit{variable: variable, index: index, isTrue: literal == SMTTrueLiteral})
 		return nil
 	}
-	if literal.Var() != SMTTrueBoolVar {
-		data, err := s.BooleanData(literal.Var())
-		if err != nil {
+	data, err := s.BooleanData(literal.Var())
+	if err != nil {
+		return err
+	}
+	theoryID := data.Theory()
+	if theoryID == t.FamilyID() {
+		if err = bvAssert(280, "a && a->is_bit()", func() (bool, error) {
+			_, exists := t.bitAtoms[literal.Var()]
+			return exists, nil
+		}); err != nil {
 			return err
 		}
-		if !data.IsTheoryAtom() {
-			if err = s.SetVariableTheory(literal.Var(), t.FamilyID()); err != nil {
-				return err
-			}
+		if _, exists := t.bitAtoms[literal.Var()]; !exists {
+			return ast.ErrASTDomain
+		}
+	} else {
+		if err = bvAssert(287, "th_id == null_theory_id", func() (bool, error) { return theoryID == SMTNullTheoryID, nil }); err != nil {
+			return err
+		}
+		if theoryID != SMTNullTheoryID {
+			return ast.ErrASTDomain
+		}
+		if err = s.SetVariableTheory(literal.Var(), t.FamilyID()); err != nil {
+			return err
+		}
+		if err = bvAssert(289, "ctx.get_var_theory(l.var()) == get_id()", func() (bool, error) {
+			data, e := s.BooleanData(literal.Var())
+			return e == nil && data.Theory() == t.FamilyID(), e
+		}); err != nil {
+			return err
 		}
 	}
-	if literal.Var() != SMTTrueBoolVar {
-		if err = t.findNewBitDisequalities(variable, index, literal); err != nil {
-			return err
-		}
+	if err = t.findNewBitDisequalities(variable, index, literal); err != nil {
+		return err
 	}
 	return t.addBitOccurrence(literal.Var(), variable, index)
 }
@@ -201,6 +228,12 @@ func (t *SMTBitVectorTheory) internalizeBitProjection(expression ast.ASTHandle) 
 	if err != nil {
 		return false, err
 	}
+	if err = bvAssert(77, "!ctx.b_internalized(n)", func() (bool, error) {
+		_, found := s.BoolVar(expression)
+		return !found, nil
+	}); err != nil {
+		return false, err
+	}
 	owner, err := s.manager.GetArg(expression, 0)
 	if err != nil {
 		return false, err
@@ -209,11 +242,17 @@ func (t *SMTBitVectorTheory) internalizeBitProjection(expression ast.ASTHandle) 
 	if err = s.Internalize(owner, false); err != nil {
 		return false, err
 	}
+	if missing {
+		if err = bvAssert(87, "ctx.e_internalized(first_arg)", func() (bool, error) { return s.context.enodes[owner] != nil, nil }); err != nil {
+			return false, err
+		}
+	}
 	node := s.context.enodes[owner]
 	if node == nil {
 		return false, ast.ErrASTDomain
 	}
-	if node.TheoryVar(t.FamilyID()) == SMTNullTheoryVar {
+	missingVariable := node.TheoryVar(t.FamilyID()) == SMTNullTheoryVar
+	if missingVariable {
 		approximate, err := t.approximateTerm(owner)
 		if err != nil {
 			return false, err
@@ -252,6 +291,14 @@ func (t *SMTBitVectorTheory) internalizeBitProjection(expression ast.ASTHandle) 
 			}
 		}
 	}
+	if missingVariable {
+		if err = bvAssert(124, "ctx.b_internalized(n)", func() (bool, error) {
+			_, found := s.BoolVar(expression)
+			return found, nil
+		}); err != nil {
+			return false, err
+		}
+	}
 	if _, found := s.BoolVar(expression); found {
 		return true, nil
 	}
@@ -284,11 +331,22 @@ func (t *SMTBitVectorTheory) internalizeBitProjection(expression ast.ASTHandle) 
 		}
 		return true, nil
 	}
+	if err = bvAssert(127, "v_arg != null_theory_var", func() (bool, error) {
+		return node.TheoryVar(t.FamilyID()) != SMTNullTheoryVar, nil
+	}); err != nil {
+		return false, err
+	}
 	variable, err := s.MkBoolVar(expression)
 	if err != nil {
 		return false, err
 	}
 	if err = s.SetVariableTheory(variable, t.FamilyID()); err != nil {
+		return false, err
+	}
+	if err = bvAssert(134, "a->m_occs == 0", func() (bool, error) {
+		entries, exists := t.bitAtoms[variable]
+		return !exists || len(entries) == 0, nil
+	}); err != nil {
 		return false, err
 	}
 	if err = t.addBitOccurrence(variable, node.TheoryVar(t.FamilyID()), index); err != nil {

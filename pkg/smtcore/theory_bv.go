@@ -528,6 +528,11 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 			return false, err
 		}
 	}
+	if err = bvAssert(156, "e->get_th_var(get_id()) != null_theory_var", func() (bool, error) {
+		return node.TheoryVar(t.FamilyID()) != SMTNullTheoryVar, nil
+	}); err != nil {
+		return false, err
+	}
 	if op == 58 {
 		if state.relevancy == nil || !state.relevancy.enabled {
 			if err = t.assertBVToIntAxiom(expression); err != nil {
@@ -540,6 +545,24 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	if err != nil {
 		return false, err
 	}
+	width, err := state.manager.BitVectorSize(expression)
+	if err != nil {
+		return false, err
+	}
+	if op == smtBVOpNumeral {
+		if err = bvAssert(529, "bits.size() == sz", func() (bool, error) { return uint64(len(bits)) == uint64(width), nil }); err != nil {
+			return false, err
+		}
+	} else if op != 37 && op != 40 && op != 57 {
+		if err = bvAssert(311, "v != null_theory_var", func() (bool, error) {
+			return node.TheoryVar(t.FamilyID()) != SMTNullTheoryVar, nil
+		}); err != nil {
+			return false, err
+		}
+		if err = bvAssert(313, "get_bv_size(n) == sz", func() (bool, error) { return uint64(len(bits)) == uint64(width), nil }); err != nil {
+			return false, err
+		}
+	}
 	for index, bit := range bits {
 		if err = state.Internalize(bit, true); err != nil {
 			return false, fmt.Errorf("bit-vector bit %d: %w", index, err)
@@ -547,6 +570,11 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 		literal, literalErr := state.Literal(bit)
 		if literalErr != nil {
 			return false, literalErr
+		}
+		if op == smtBVOpNumeral && literal != SMTTrueLiteral {
+			if err = bvAssert(537, "m.is_false(l)", func() (bool, error) { return literal == SMTFalseLiteral, nil }); err != nil {
+				return false, err
+			}
 		}
 		// Native concat/extract splice existing literals directly, numerals use
 		// internalize_num, and int2bv uses mk_bits. Other retained term paths
