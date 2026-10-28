@@ -124587,7 +124587,7 @@
       "path": "src/smt/smt_context_pp.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_array_display.go",
         "pkg/smtcore/theory_array_display_test.go",
@@ -267783,6 +267783,19 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_native_checkpoint": "17ecadb7"
+  },
+  "latest_smt_context_pp_whole_audit": {
+    "source_units": [
+      "src/smt/smt_context_pp.cpp"
+    ],
+    "scope": "Whole retained smt_context_pp.cpp audit: Go implements last-failure strings; asserted formulas; Boolean/enode definitions; compact clauses and binary watches; assignment, equivalence-class and AST/enode maps; hot variables and relevant expressions; theory dispatch; complete context composition; declaration registries; statistics used by retained consumers; and both lemma-as-SMT-problem overload families. Concrete arithmetic, BV, array, datatype, FPA, PB, sequence/string, difference-logic and datalog theory displays are dispatched through their retained printers. Direct Go writers report short writes while file-style source paths preserve sticky output failure and operand ordering. Remaining low-level watch/detail, parent-equality, normalized-enode, subexpression and justification trace printers have no retained consumer and remain reference-only; no synthetic public display adapter is added. Focused context/theory display and lemma tests plus pkg/portcheck pass.",
+    "focused_tests": [
+      "go test ./pkg/smtcore -run TestSMTContextDisplay|TestSMT.*Display|TestSMTLemmaProblem",
+      "go test ./pkg/portcheck"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 2,
+    "full_suite_qualification": "The whole repository suite was not rerun for this manifest-only promotion; full pkg/smtcore passed immediately before it."
   },
   "latest_smt_theory_header_whole_audit": {
     "source_units": [
