@@ -139259,6 +139259,18 @@
           ]
         },
         {
+          "name": "array_value_proc model table TRACE at mk_value line 944, including canonical array root, observed reads, explicit default and sticky stream refusal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_model_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation"
+          ]
+        },
+        {
           "name": "remaining base array diagnostic/trace integration and model completion audit",
           "status": "unported",
           "tests": []
@@ -139550,6 +139562,18 @@
             "TestSMTArrayExtensionalitySkipsKnownDisequalReads",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "array_value_proc model table TRACE at mk_value line 944, including canonical array root, observed reads, explicit default and sticky stream refusal",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_model_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation"
           ]
         },
         {

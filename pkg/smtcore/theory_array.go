@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: retained store/select axiom fragment of src/smt/theory_array_base.h,
 // src/smt/theory_array_base.cpp, src/smt/theory_array.h, and
 // src/smt/theory_array.cpp.
-package smtcore
 
 import (
 	"errors"
@@ -826,6 +827,9 @@ func (t *SMTArrayTheory) arrayTableModelValue(node *SMTEnode, generator *SMTMode
 		}
 		procedure.dependencies = append(procedure.dependencies, dependency)
 		procedure.entries++
+	}
+	if err := t.traceArrayModelValue(generator, node, data.selects[node.root], data.defaults[root]); err != nil {
+		return nil, err
 	}
 	return procedure, nil
 }

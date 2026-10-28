@@ -1,18 +1,29 @@
 package smtcore
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+type smtArrayRefusingTraceWriter struct{}
+
+func (smtArrayRefusingTraceWriter) Write([]byte) (int, error) { return 0, io.ErrClosedPipe }
 
 func TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation(t *testing.T) {
 	for _, infinite := range []bool{false, true} {
 		for _, overwritten := range []bool{false, true} {
 			t.Run(fmt.Sprint(infinite, "/", overwritten), func(t *testing.T) {
+				var trace bytes.Buffer
+				tags := diagnostic.NewTraceTagsWithWriter(&trace)
+				tags.Enable("array")
 				m, cfg := smtModelGeneratorFixture(t)
 				family, err := m.RegisterArrayPlugin()
 				astTestMust(t, err)
@@ -65,6 +76,7 @@ func TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation(t *testing.T) {
 				t.Cleanup(func() { astTestMust(t, generator.Close()) })
 				astTestMust(t, generator.SetContext(context))
 				astTestMust(t, generator.InitializeModel(cfg))
+				generator.trace = tags
 				astTestMust(t, theory.InitializeModel(generator))
 				data := theory.modelData
 				if data == nil || data.unspecified {
@@ -90,6 +102,21 @@ func TestSMTArrayModelDefaultPartitionAndStoreSelectPropagation(t *testing.T) {
 				}
 				firstProcedure, err := theory.ModelValue(nodes[0], generator)
 				astTestMust(t, err)
+				if tags.ShouldTrace("array") {
+					for _, want := range []string{
+						"-------- [array] mk_value src/smt/theory_array_base.cpp:944 ---------\n",
+						"model-propagation-base\n",
+					} {
+						if !strings.Contains(trace.String(), want) {
+							t.Fatalf("missing array model trace %q in %q", want, trace.String())
+						}
+					}
+				} else if trace.Len() != 0 {
+					t.Fatal("compiled-out array trace executed", trace.String())
+				}
+				closedTags := diagnostic.NewTraceTagsWithWriter(smtArrayRefusingTraceWriter{})
+				closedTags.Enable("array")
+				generator.trace = closedTags
 				lastProcedure, err := theory.ModelValue(nodes[2], generator)
 				astTestMust(t, err)
 				if infinite {
