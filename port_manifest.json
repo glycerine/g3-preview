@@ -128857,7 +128857,8 @@
         "TestSMTIncompleteTheoryCandidateKeepsFirstFunctionEntry",
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
         "TestSMTModelGeneratorBooleanPublicationPhases",
-        "TestSMTModelGeneratorFallbackPreservesOnlyModelValues"
+        "TestSMTModelGeneratorFallbackPreservesOnlyModelValues",
+        "TestSMTModelGeneratorUsesFreshValueForUnattachedTheoryRoot"
       ],
       "assertions": [
         {
@@ -128993,7 +128994,7 @@
           "text": "SASSERT(!m_model);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -129008,7 +129009,8 @@
             "TestSMTModelGeneratorPublishesFunctionInterpretation",
             "TestSMTModelGeneratorFinalizesTheories",
             "TestSMTModelGeneratorRegistersExistingModelValues",
-            "TestSMTIntegerDiffTheoryBuildsModelValues"
+            "TestSMTIntegerDiffTheoryBuildsModelValues",
+            "TestSMTModelGeneratorUsesFreshValueForUnattachedTheoryRoot"
           ]
         },
         {
@@ -129021,8 +129023,9 @@
           ]
         },
         {
-          "name": "remaining model-assembly completeness audit (src/smt/smt_model_generator.cpp)",
-          "status": "unported"
+          "name": "remaining retained model-generator TRACE/CTRACE and source-debug assertion diagnostics (src/smt/smt_model_generator.cpp)",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt_model_generator.go"
         },
         {
           "name": "mk_model ordering: initialize theory factories, register all relevant existing model values, then discover value procedures and allocate fresh fallback values independently of enode insertion order",
@@ -129131,6 +129134,7 @@
           ],
           "tests": [
             "TestSMTModelGeneratorFallbackPreservesOnlyModelValues",
+            "TestSMTModelGeneratorUsesFreshValueForUnattachedTheoryRoot",
             "TestSMTModelGeneratorRegistersExistingModelValues",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
@@ -129150,14 +129154,14 @@
       "deviations": [
         "The source iterative traversal, last-pushed-first order, shared per-sort implicit-dependency cache and source-debug-only second child visit are preserved. True dependency cycles retain the Go ast.ErrASTDomain guard for invalid input rather than reaching native missing-value assertions during construction.",
         "Model initialization is independent of per-enode value construction, matching the source virtual init_model/build_models distinction. A PB initializer registers its live factory although it has no ModelValue implementation; Boolean roots retain assignment wrappers and no unused PB value-procedure adapter is added.",
-        "The previously recorded opposite-valued symbolic-power candidate mismatch is resolved by preserving native arithmetic final_check_core ordering: finish the integer/shared-equality/nonlinear round before unsupported-operation give-up. The expanded registered candidate-model CLI script now queries f(a)=true, f(b)=false and a distinct fixed argument across scopes, exactly matching C++. Direct generator fixtures independently verify THEORY-only duplicate suppression and unchanged complete/conflict-limit/quantifier insertion/debug behavior. Full remaining arithmetic and model assembly audits are still open; no source status promotion."
+        "The previously recorded opposite-valued symbolic-power candidate mismatch is resolved by preserving native arithmetic final_check_core ordering: finish the integer/shared-equality/nonlinear round before unsupported-operation give-up. The expanded registered candidate-model CLI script now queries f(a)=true, f(b)=false and a distinct fixed argument across scopes, exactly matching C++. Direct generator fixtures independently verify THEORY-only duplicate suppression and unchanged complete/conflict-limit/quantifier insertion/debug behavior. Functional model assembly is audited; retained TRACE/CTRACE and source-debug diagnostic fidelity remains open."
       ]
     },
     {
       "path": "src/smt/smt_model_generator.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_model_generator.go",
         "pkg/smtcore/smt_model_generator_test.go",
@@ -129204,7 +129208,8 @@
         "TestSMTLibRunnerCPPReference",
         "TestSMTUnsupportedArithmeticFinishesSharedAssignmentsBeforeGiveUp",
         "TestSMTModelGeneratorBooleanPublicationPhases",
-        "TestSMTModelGeneratorFallbackPreservesOnlyModelValues"
+        "TestSMTModelGeneratorFallbackPreservesOnlyModelValues",
+        "TestSMTModelGeneratorUsesFreshValueForUnattachedTheoryRoot"
       ],
       "conditionals": [
         {
@@ -129238,11 +129243,11 @@
           "text": "proto_model & get_model() { SASSERT(m_model); return *m_model; }"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Generator-owned context/proto-model state, relevant-root procedure discovery, fresh sources, root values, pinned ASTs, factory/value access, dependency ordering, constant/function publication, existing-value registration, theory finalization and final-model transfer (src/smt/smt_model_generator.h:177-225)",
+          "name": "Generator-owned context/proto-model state, relevant-root procedure discovery, fresh sources, root values, pinned ASTs, factory/value access, dependency ordering, constant/function publication, existing-value registration, theory finalization and final-model transfer (src/smt/smt_model_generator.h:177-224)",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_generator.go",
           "tests": [
@@ -129253,7 +129258,8 @@
             "TestSMTModelGeneratorPublishesFunctionInterpretation",
             "TestSMTModelGeneratorFinalizesTheories",
             "TestSMTModelGeneratorRegistersExistingModelValues",
-            "TestSMTIntegerDiffTheoryBuildsModelValues"
+            "TestSMTIntegerDiffTheoryBuildsModelValues",
+            "TestSMTModelGeneratorUsesFreshValueForUnattachedTheoryRoot"
           ]
         },
         {
@@ -129275,8 +129281,8 @@
           ]
         },
         {
-          "name": "Hidden declarations and remaining model construction audit (remaining src/smt/smt_model_generator.h:177-232)",
-          "status": "unported"
+          "name": "model_generator::hide and hidden-declaration filtering state (src/smt/smt_model_generator.h:225-231)",
+          "status": "excluded"
         },
         {
           "name": "mk_model ordering: initialize theory factories, register all relevant existing model values, then discover value procedures and allocate fresh fallback values independently of enode insertion order",
@@ -129354,6 +129360,7 @@
           ],
           "tests": [
             "TestSMTModelGeneratorFallbackPreservesOnlyModelValues",
+            "TestSMTModelGeneratorUsesFreshValueForUnattachedTheoryRoot",
             "TestSMTModelGeneratorRegistersExistingModelValues",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
@@ -129370,7 +129377,8 @@
       ],
       "deviations": [
         "The source tagged dependency union is represented by explicit Go fields and checked accessors. Invalid assertion domains return ast.ErrASTDomain.",
-        "The previously recorded opposite-valued symbolic-power candidate mismatch is resolved by preserving native arithmetic final_check_core ordering: finish the integer/shared-equality/nonlinear round before unsupported-operation give-up. The expanded registered candidate-model CLI script now queries f(a)=true, f(b)=false and a distinct fixed argument across scopes, exactly matching C++. Direct generator fixtures independently verify THEORY-only duplicate suppression and unchanged complete/conflict-limit/quantifier insertion/debug behavior. Full remaining arithmetic and model assembly audits are still open; no source status promotion."
+        "The source hide(func_decl*) API and m_hidden_ufs state have no caller anywhere under src/. The only related retained site is an unimplemented TODO in context::assert_distinct saying its auxiliary declarations may be hidden in the future. They are excluded under the retained-consumer rule; Go publishes the same declarations as the current source execution.",
+        "The previously recorded opposite-valued symbolic-power candidate mismatch is resolved by preserving native arithmetic final_check_core ordering: finish the integer/shared-equality/nonlinear round before unsupported-operation give-up. The expanded registered candidate-model CLI script now queries f(a)=true, f(b)=false and a distinct fixed argument across scopes, exactly matching C++. Direct generator fixtures independently verify THEORY-only duplicate suppression and unchanged complete/conflict-limit/quantifier insertion/debug behavior."
       ]
     },
     {

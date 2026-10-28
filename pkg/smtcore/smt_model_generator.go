@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_generator.cpp dependency ordering and fresh-value
 // source management.
-package smtcore
 
 import (
 	"errors"
