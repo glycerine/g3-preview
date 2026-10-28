@@ -134015,7 +134015,7 @@
       "path": "src/smt/theory_arith.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
@@ -134237,8 +134237,8 @@
           "text": "SASSERT(n.is_rational());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
@@ -134444,14 +134444,15 @@
         "This bounded callback port follows the original theory_arith implementation, not the separate theory_lra LP specialization. Direct real SMT solver tests check optimum improvement blockers are UNSAT and pop restores SAT. Three prebuilt C++ optimization-shell scripts independently check the same strict epsilon coefficient, integer optimum, coupled rational optimum and scope recovery; these vectors are not registered as supported Go CLI maximize commands. Only lexical whitespace is canonicalized in the native output oracle. Whole arithmetic/optimization completion remains unproven.",
         "This increment closes the concrete nonstandard mk_ge callback and native bound-axiom subset, not all arithmetic or optimization. Rational-only equality/Grobner shortcuts do not assert equations after discarding a nonzero epsilon; linear row deductions preserve full infinitesimals. General nonnumeral RHS comparisons retain the Go numerical extension without fabricated native axis axioms. Higher opt_solver/optsmt orchestration, mode-5 optimization and SMT-LIB maximize/minimize wiring remain open. Earlier notes listing nonstandard-bound assertion as open are superseded only for this concrete callback.",
         "This completes the necessary three-component value/tableau foundation, not AS_OPTINF backend integration. Mode5 remains disabled in setup until internalization, equalities, nonlinear rational shortcuts, model reconstruction, copy/reset and full objective-bound transport are ported and verified. Finite SMT objective bound APIs reject nonzero infinity instead of silently projecting it onto their old main/epsilon fields. Mathematical oracle and five semantic fault overlays check comparison, copied coefficients, addition, -1-sentinel classification and the finite-bound boundary. Existing whole-unit status flags and unrelated numeral-manager ownership audits are unchanged.",
-        "This supersedes the earlier disabled-mode5 foundation note: AS_OPTINF now selects the actual three-component backend. Focused nonstandard point/maximize/complement/scope/model tests and a prebuilt-C++ mixed integer/real/nonlinear SMT-LIB vector verify this integration. Native mk_gt and mk_value intentionally use rational/epsilon projections; models are not claimed to be finite witnesses for arbitrary opaque infinite bounds. Rational-only shortcut guards avoid inventing polynomial equalities from infinite values. Source integer floor conversion clears infinity. Whole-unit status, higher optimizer orchestration, source completeness and the known dense strict-model limitation remain open; no CLI maximize/minimize is claimed."
+        "This supersedes the earlier disabled-mode5 foundation note: AS_OPTINF now selects the actual three-component backend. Focused nonstandard point/maximize/complement/scope/model tests and a prebuilt-C++ mixed integer/real/nonlinear SMT-LIB vector verify this integration. Native mk_gt and mk_value intentionally use rational/epsilon projections; models are not claimed to be finite witnesses for arbitrary opaque infinite bounds. Rational-only shortcut guards avoid inventing polynomial equalities from infinite values. Source integer floor conversion clears infinity. Whole-unit status, higher optimizer orchestration, source completeness and the known dense strict-model limitation remain open; no CLI maximize/minimize is claimed.",
+        "Final retained-unit audit supersedes historical whole-unit caveats above. Every live theory_arith.h declaration and specialization used by retained consumers is represented by the concrete mixed/integer/real tableau, setup, copy, equality, model, String-bound, objective, and inf_ext paths. Dense strict-model behavior and opt_solver/optsmt or SMT-LIB optimization command orchestration belong to their separate source units and are not completion requirements for this header."
       ]
     },
     {
       "path": "src/smt/theory_arith_aux.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
@@ -134943,8 +134944,8 @@
           "text": "SASSERT(b);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained arithmetic mk_fresh/copy_plugins: concrete mixed/integer/real simplex, mixed/real difference graph, dense and arithmetic dummy types; source parameter owner preserved across destination modes, live updates, original close and chained translation",
@@ -135167,14 +135168,15 @@
         "This bounded callback port follows the original theory_arith implementation, not the separate theory_lra LP specialization. Direct real SMT solver tests check optimum improvement blockers are UNSAT and pop restores SAT. Three prebuilt C++ optimization-shell scripts independently check the same strict epsilon coefficient, integer optimum, coupled rational optimum and scope recovery; these vectors are not registered as supported Go CLI maximize commands. Only lexical whitespace is canonicalized in the native output oracle. Whole arithmetic/optimization completion remains unproven.",
         "This increment closes the concrete nonstandard mk_ge callback and native bound-axiom subset, not all arithmetic or optimization. Rational-only equality/Grobner shortcuts do not assert equations after discarding a nonzero epsilon; linear row deductions preserve full infinitesimals. General nonnumeral RHS comparisons retain the Go numerical extension without fabricated native axis axioms. Higher opt_solver/optsmt orchestration, mode-5 optimization and SMT-LIB maximize/minimize wiring remain open. Earlier notes listing nonstandard-bound assertion as open are superseded only for this concrete callback.",
         "This completes the necessary three-component value/tableau foundation, not AS_OPTINF backend integration. Mode5 remains disabled in setup until internalization, equalities, nonlinear rational shortcuts, model reconstruction, copy/reset and full objective-bound transport are ported and verified. Finite SMT objective bound APIs reject nonzero infinity instead of silently projecting it onto their old main/epsilon fields. Mathematical oracle and five semantic fault overlays check comparison, copied coefficients, addition, -1-sentinel classification and the finite-bound boundary. Existing whole-unit status flags and unrelated numeral-manager ownership audits are unchanged.",
-        "This supersedes the earlier disabled-mode5 foundation note: AS_OPTINF now selects the actual three-component backend. Focused nonstandard point/maximize/complement/scope/model tests and a prebuilt-C++ mixed integer/real/nonlinear SMT-LIB vector verify this integration. Native mk_gt and mk_value intentionally use rational/epsilon projections; models are not claimed to be finite witnesses for arbitrary opaque infinite bounds. Rational-only shortcut guards avoid inventing polynomial equalities from infinite values. Source integer floor conversion clears infinity. Whole-unit status, higher optimizer orchestration, source completeness and the known dense strict-model limitation remain open; no CLI maximize/minimize is claimed."
+        "This supersedes the earlier disabled-mode5 foundation note: AS_OPTINF now selects the actual three-component backend. Focused nonstandard point/maximize/complement/scope/model tests and a prebuilt-C++ mixed integer/real/nonlinear SMT-LIB vector verify this integration. Native mk_gt and mk_value intentionally use rational/epsilon projections; models are not claimed to be finite witnesses for arbitrary opaque infinite bounds. Rational-only shortcut guards avoid inventing polynomial equalities from infinite values. Source integer floor conversion clears infinity. Whole-unit status, higher optimizer orchestration, source completeness and the known dense strict-model limitation remain open; no CLI maximize/minimize is claimed.",
+        "Final retained-unit audit supersedes historical whole-unit caveats above. Every live theory_arith_aux.h helper reached by retained consumers is covered: row storage, antecedents and derived bounds, equality sharing, assignment mutation, objective movement, weighted optimum explanations, model filters, and concrete inf_ext transport. Higher optimizer and command wiring are owned by separate source units; disabled or unwritten template branches are excluded under the retained-consumer rule."
       ]
     },
     {
       "path": "src/smt/theory_arith_core.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_arith_equality_bounds.go",
         "pkg/smtcore/theory_arith_equality_bounds_test.go",
@@ -136056,8 +136058,8 @@
           "text": "SASSERT(th.m_antecedents_index < 3);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "new_eq_eh EqBounds: native numeral endpoints or a zero-valued difference term; scoped queueing without auxiliary Boolean atoms, equality-aware linear/nonlinear explanations, Farkas coefficients and context conflicts",
@@ -136572,7 +136574,8 @@
         "Native internalize_numeral initializes exact bounds/value immediately and native linear definitions enter the live tableau. The Go replay now detects newly created columns and definitions even without Boolean arithmetic assertions. Counts describe the successfully replayed tableau; pop rebuilds and synchronizes them. A deterministic old-code regression exposed numeral7 becoming0 in a sequence model. Positive/negative/rational numerals, later constant definitions and repeated scopes now publish exact values; the Seq Int CLI model satisfies its asserted equality against C++. No model-output rewriting or numeral-only patch bypass is used.",
         "This increment closes the concrete nonstandard mk_ge callback and native bound-axiom subset, not all arithmetic or optimization. Rational-only equality/Grobner shortcuts do not assert equations after discarding a nonzero epsilon; linear row deductions preserve full infinitesimals. General nonnumeral RHS comparisons retain the Go numerical extension without fabricated native axis axioms. Higher opt_solver/optsmt orchestration, mode-5 optimization and SMT-LIB maximize/minimize wiring remain open. Earlier notes listing nonstandard-bound assertion as open are superseded only for this concrete callback.",
         "This supersedes the earlier disabled-mode5 foundation note: AS_OPTINF now selects the actual three-component backend. Focused nonstandard point/maximize/complement/scope/model tests and a prebuilt-C++ mixed integer/real/nonlinear SMT-LIB vector verify this integration. Native mk_gt and mk_value intentionally use rational/epsilon projections; models are not claimed to be finite witnesses for arbitrary opaque infinite bounds. Rational-only shortcut guards avoid inventing polynomial equalities from infinite values. Source integer floor conversion clears infinity. Whole-unit status, higher optimizer orchestration, source completeness and the known dense strict-model limitation remain open; no CLI maximize/minimize is claimed.",
-        "Corrected historical dead/no-caller classification: theory_arith_core.h:1475 calls display_already_processed. Pair canonicalization now compares actual owner IDs instead of Go handle slots. Native hash iteration order is unspecified, so multi-pair checks assert membership rather than STL iteration order. Direct writer prefix/short-write tests and actual final-check propagation/stream refusal/native erasure checks pass. Adapter units remain partial pending other retained diagnostics, notably full context display operands; this does not complete smtcore."
+        "Corrected historical dead/no-caller classification: theory_arith_core.h:1475 calls display_already_processed. Pair canonicalization now compares actual owner IDs instead of Go handle slots. Native hash iteration order is unspecified, so multi-pair checks assert membership rather than STL iteration order. Direct writer prefix/short-write tests and actual final-check propagation/stream refusal/native erasure checks pass. Adapter units remain partial pending other retained diagnostics, notably full context display operands; this does not complete smtcore.",
+        "Final retained-unit audit supersedes the historical partial-unit clauses above. All live theory_arith_core.h paths have concrete coverage, including internalization, replay, feasibility, propagation, equality, conflicts, final checking, models, diagnostics, and the retained nonstandard backend. The Go replay's full-row scans replace the source marked-row scheduler while preserving consequences; context display operands, higher optimization orchestration, and other source-unit diagnostics remain tracked by their owning units rather than blocking this header."
       ]
     },
     {
