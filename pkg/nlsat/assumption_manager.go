@@ -44,7 +44,21 @@ type assumptionManager struct {
 	allocation                       umemory.SmallAllocatorAllocationOutcome
 	allocationFailed                 bool
 	header                           uint64
+	deleteSerial, activeDelete       uint64
+	clauses                          *clauseStore
 	executing, closed                bool
+}
+
+type assumptionDeletionReceipt struct {
+	owner  *assumptionManager
+	serial uint64
+}
+
+type assumptionLeafReceipt struct {
+	owner      *assumptionManager
+	allocation umemory.SmallAllocatorAllocationOutcome
+	failed     bool
+	leaf       *AssumptionSet
 }
 
 func newAssumptionManager(a *umemory.SmallAllocator) (*assumptionManager, error) {
@@ -102,8 +116,17 @@ func assumptionAssert(line int32, text string, ok bool) error {
 	return diagnostic.DebugAssertionFailure(d, "src/util/dependency.h", line, text)
 }
 func (m *assumptionManager) allocate(leaf bool) (*AssumptionSet, error) {
+	return m.allocateWithLeafReceipt(leaf, nil)
+}
+func (m *assumptionManager) allocateWithLeafReceipt(leaf bool, receipt *assumptionLeafReceipt) (*AssumptionSet, error) {
+	previous := m.executing
+	m.executing = true
+	defer func() { m.executing = previous }()
 	n := uint64(reflect.TypeOf(AssumptionSet{}).Size())
 	raw, started, err := m.allocator.AllocateWithOutcomeStarted(n, &m.allocation)
+	if receipt != nil && started {
+		*receipt = assumptionLeafReceipt{owner: m, allocation: m.allocation, failed: err != nil}
+	}
 	if err != nil {
 		m.allocationFailed = started
 		return nil, err
@@ -111,18 +134,62 @@ func (m *assumptionManager) allocate(leaf bool) (*AssumptionSet, error) {
 	d := &AssumptionSet{owner: m, leaf: leaf, raw: raw, extent: n}
 	d.self = d
 	m.live[d] = struct{}{}
+	if receipt != nil {
+		receipt.owner, receipt.leaf = m, d
+	}
 	return d, nil
 }
 func (m *assumptionManager) mkLeaf(v Assumption) (*AssumptionSet, error) {
+	return m.mkLeafWithReceipt(v, nil)
+}
+func (m *assumptionManager) mkLeafWithReceipt(v Assumption, receipt *assumptionLeafReceipt) (*AssumptionSet, error) {
 	if err := m.open(); err != nil {
 		return nil, err
 	}
-	d, err := m.allocate(true)
+	d, err := m.allocateWithLeafReceipt(true, receipt)
 	if err != nil {
 		return nil, err
 	}
 	d.value = v
 	return d, nil
+}
+
+func (m *assumptionManager) cleanupLeaf(receipt *assumptionLeafReceipt) error {
+	if err := m.owner(); err != nil {
+		return err
+	}
+	if receipt == nil || receipt.owner != m {
+		return nil
+	}
+	if receipt.failed && m.allocator.MatchesAllocationOutcome(&receipt.allocation) {
+		if err := m.allocator.CleanupPending(); err != nil {
+			return err
+		}
+		m.allocationFailed = false
+		receipt.failed = false
+	}
+	if d := receipt.leaf; d != nil && !d.closed {
+		if err := m.open(); err != nil {
+			return err
+		}
+		if err := m.check(d); err != nil {
+			return err
+		}
+		if !d.leaf || d.refs != 0 {
+			return ErrAssumptionLive
+		}
+		// This concrete leaf was created with zero references and never
+		// acquired by the failed clause. Retire it directly, without an
+		// invented INC/DEC pair or touching another deletion invocation.
+		m.executing = true
+		err := m.free(d)
+		m.executing = false
+		if err != nil {
+			return err
+		}
+	}
+	*receipt = assumptionLeafReceipt{}
+	return nil
 }
 func (m *assumptionManager) mkJoin(a, b *AssumptionSet) (*AssumptionSet, error) {
 	if err := m.open(); err != nil {
@@ -162,6 +229,9 @@ func (m *assumptionManager) incRef(d *AssumptionSet) error {
 	return nil
 }
 func (m *assumptionManager) decRef(d *AssumptionSet) error {
+	return m.decRefWithReceipt(d, nil)
+}
+func (m *assumptionManager) decRefWithReceipt(d *AssumptionSet, receipt *assumptionDeletionReceipt) error {
 	if err := m.open(); err != nil {
 		return err
 	}
@@ -177,11 +247,19 @@ func (m *assumptionManager) decRef(d *AssumptionSet) error {
 	if d.refs == 0 {
 		return arena.ErrBounds
 	}
+	if d.refs == 1 && m.deleteSerial == ^uint64(0) {
+		return arena.ErrBounds
+	}
 	d.refs--
 	if d.refs != 0 {
 		return nil
 	}
 	m.mode = 2
+	m.deleteSerial++
+	m.activeDelete = m.deleteSerial
+	if receipt != nil {
+		*receipt = assumptionDeletionReceipt{m, m.activeDelete}
+	}
 	m.deleteRoot = d
 	d.deleting = true
 	m.executing = true
@@ -276,6 +354,17 @@ func (m *assumptionManager) drainDelete() error {
 		m.current = nil
 	}
 	m.mode = 0
+	m.activeDelete = 0
+	return nil
+}
+
+func (m *assumptionManager) cleanupDeletion(receipt *assumptionDeletionReceipt) error {
+	if err := m.owner(); err != nil {
+		return err
+	}
+	if receipt != nil && receipt.owner == m && receipt.serial == m.activeDelete && m.mode == 2 {
+		return m.cleanup()
+	}
 	return nil
 }
 func (m *assumptionManager) unmark() {
@@ -373,6 +462,12 @@ func (m *assumptionManager) cleanup() error {
 func (m *assumptionManager) close() error {
 	if m != nil && m.self == m && m.closed {
 		return nil
+	}
+	if m != nil && m.self == m && m.clauses != nil {
+		if m.clauses.running {
+			return ErrAssumptionPending
+		}
+		return ErrAssumptionLive
 	}
 	if err := m.cleanup(); err != nil {
 		return err

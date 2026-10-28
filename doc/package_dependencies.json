@@ -2094,6 +2094,7 @@
         "util/random"
       ],
       "production_files": [
+        "arithmetic_variables.go",
         "assignment.go",
         "assumption.go",
         "assumption_manager.go",
@@ -2101,6 +2102,8 @@
         "atom_factory.go",
         "boolean_variables.go",
         "clause.go",
+        "clause_order.go",
+        "clause_store.go",
         "evaluator.go",
         "evaluator_interval_ref.go",
         "evaluator_intervals.go",

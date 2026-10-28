@@ -89959,10 +89959,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/nlsat/clause.go"
+        "pkg/nlsat/clause.go",
+        "pkg/nlsat/clause_store.go"
       ],
       "tests": [
-        "pkg/nlsat/clause_justification_test.go"
+        "pkg/nlsat/clause_justification_test.go",
+        "TestClauseStoreIndependentLiteralOrderWatchesAndReferenceMultiplicity",
+        "TestClauseStoreAssumptionsPartialINCAndActualDeletionContinuation",
+        "TestClauseStoreConsumedAtomDECAndIDRetirementOrder"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -89979,7 +89983,8 @@
         }
       ],
       "ownership": [
-        "The placement initializer fills solver-supplied fixed-capacity literal storage and copies its input. It borrows the assumption-set pointer without changing references; the source solver factory separately acquires literal/assumption references. Shrink changes only the active size, retaining the original 31-bit allocation capacity, hidden literal fields and assumption identity. Mutable literal access returns the actual slot."
+        "The placement initializer fills solver-supplied fixed-capacity literal storage and copies its input. It borrows the assumption-set pointer without changing references; the source solver factory separately acquires literal/assumption references. Shrink changes only the active size, retaining the original 31-bit allocation capacity, hidden literal fields and assumption identity. Mutable literal access returns the actual slot.",
+        "Actual retained NLSAT solver consumer integration now constructs the placement clause over owning allocator storage, acquires literal/assumption references outside the constructor, sorts the active literals, publishes/watches the clause and releases references in source order during retirement. The native storage owner keeps its charged original extent for deallocation. This is not a claim about unsupported post-construction resizing or complete source diagnostic/allocation frontiers; full source audits remain open."
       ],
       "deviations": [
         "Go slices/fields and reflected native storage extents replace C++ flexible-array layout. The actual solver clause allocation, reference acquisition, sorting, watches and deletion are not yet wired. Full allocation/lexical and diagnostic audits remain open; source index/shrink assertions are connected. Both whole-source audit flags remain false."
@@ -89991,10 +89996,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/nlsat/clause.go"
+        "pkg/nlsat/clause.go",
+        "pkg/nlsat/clause_store.go"
       ],
       "tests": [
-        "pkg/nlsat/clause_justification_test.go"
+        "pkg/nlsat/clause_justification_test.go",
+        "TestClauseStoreIndependentLiteralOrderWatchesAndReferenceMultiplicity",
+        "TestClauseStoreAssumptionsPartialINCAndActualDeletionContinuation",
+        "TestClauseStoreConsumedAtomDECAndIDRetirementOrder"
       ],
       "conditionals": [
         {
@@ -90035,7 +90044,8 @@
         }
       ],
       "ownership": [
-        "The placement initializer fills solver-supplied fixed-capacity literal storage and copies its input. It borrows the assumption-set pointer without changing references; the source solver factory separately acquires literal/assumption references. Shrink changes only the active size, retaining the original 31-bit allocation capacity, hidden literal fields and assumption identity. Mutable literal access returns the actual slot."
+        "The placement initializer fills solver-supplied fixed-capacity literal storage and copies its input. It borrows the assumption-set pointer without changing references; the source solver factory separately acquires literal/assumption references. Shrink changes only the active size, retaining the original 31-bit allocation capacity, hidden literal fields and assumption identity. Mutable literal access returns the actual slot.",
+        "Actual retained NLSAT solver consumer integration now constructs the placement clause over owning allocator storage, acquires literal/assumption references outside the constructor, sorts the active literals, publishes/watches the clause and releases references in source order during retirement. The native storage owner keeps its charged original extent for deallocation. This is not a claim about unsupported post-construction resizing or complete source diagnostic/allocation frontiers; full source audits remain open."
       ],
       "deviations": [
         "Go slices/fields and reflected native storage extents replace C++ flexible-array layout. The actual solver clause allocation, reference acquisition, sorting, watches and deletion are not yet wired. Full allocation/lexical and diagnostic audits remain open; source index/shrink assertions are connected. Both whole-source audit flags remain false."
@@ -91100,7 +91110,10 @@
         "pkg/nlsat/assumption_manager.go",
         "pkg/nlsat/inequality_atom_cache.go",
         "pkg/nlsat/boolean_variables.go",
-        "pkg/nlsat/atom_factory.go"
+        "pkg/nlsat/atom_factory.go",
+        "pkg/nlsat/arithmetic_variables.go",
+        "pkg/nlsat/clause_order.go",
+        "pkg/nlsat/clause_store.go"
       ],
       "tests": [
         "pkg/nlsat/assumption_manager_test.go",
@@ -91119,7 +91132,19 @@
         "TestAtomFactoryRootHashCollisionAndOwnerGuards",
         "TestAtomFactoryCleanupPreservesIndependentAllocatorPrefix",
         "TestAtomFactoryRootReachedAssertionsAndConstructorRefusals",
-        "TestAtomFactoryRegisteredRootsAndInequalitiesPrebuiltCPPOracle"
+        "TestAtomFactoryRegisteredRootsAndInequalitiesPrebuiltCPPOracle",
+        "TestClauseStoreArithmeticMetadataTrueClauseAndOwnerLifetimes",
+        "TestClauseStoreIndependentLiteralOrderWatchesAndReferenceMultiplicity",
+        "TestClauseStoreAssumptionsPartialINCAndActualDeletionContinuation",
+        "TestClauseStoreColdAllocationConsumesIDsAndRecovers",
+        "TestClauseStoreConsumedAssumptionDECAfterRootRetirement",
+        "TestClauseStoreStaleAssumptionReceiptPreservesNewerDeletion",
+        "TestClauseStoreConsumedAtomDECAndIDRetirementOrder",
+        "TestClauseStoreInputAssumptionLeafTransferAndRefusals",
+        "TestClauseStoreSourceDegreeQueriesAndFreshMetadataGuard",
+        "TestClauseStoreInputLiteralIdentityAndNullAssumption",
+        "TestClauseStoreRefusedLeafAndClausePreserveOlderPhysicalPrefix",
+        "TestClauseStoreConstructedTruthAndLiteralPreservationPrebuiltCPPOracle"
       ],
       "conditionals": [
         {
@@ -91550,18 +91575,53 @@
             "TestAtomFactoryRootReachedAssertionsAndConstructorRefusals",
             "TestAtomFactoryRegisteredRootsAndInequalitiesPrebuiltCPPOracle"
           ]
+        },
+        {
+          "name": "Actual mk_var parallel arithmetic metadata and true Boolean variable/unit-clause primitive (cpp195-201,411-425)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/arithmetic_variables.go",
+          "go_targets": [
+            "pkg/nlsat/clause_store.go"
+          ],
+          "tests": [
+            "TestClauseStoreArithmeticMetadataTrueClauseAndOwnerLifetimes",
+            "TestClauseStoreSourceDegreeQueriesAndFreshMetadataGuard"
+          ]
+        },
+        {
+          "name": "max_var/max_bvar/degree queries, project literal comparator, owning clause factories, assumption-leaf overload, watch attachment and staged retirement (cpp300-387,601-720)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/clause_store.go",
+          "go_targets": [
+            "pkg/nlsat/clause_order.go"
+          ],
+          "tests": [
+            "TestClauseStoreIndependentLiteralOrderWatchesAndReferenceMultiplicity",
+            "TestClauseStoreAssumptionsPartialINCAndActualDeletionContinuation",
+            "TestClauseStoreColdAllocationConsumesIDsAndRecovers",
+            "TestClauseStoreConsumedAssumptionDECAfterRootRetirement",
+            "TestClauseStoreStaleAssumptionReceiptPreservesNewerDeletion",
+            "TestClauseStoreConsumedAtomDECAndIDRetirementOrder",
+            "TestClauseStoreInputAssumptionLeafTransferAndRefusals",
+            "TestClauseStoreSourceDegreeQueriesAndFreshMetadataGuard",
+            "TestClauseStoreInputLiteralIdentityAndNullAssumption",
+            "TestClauseStoreRefusedLeafAndClausePreserveOlderPhysicalPrefix",
+            "TestClauseStoreConstructedTruthAndLiteralPreservationPrebuiltCPPOracle"
+          ]
         }
       ],
       "ownership": [
         "The retained NLSAT dconfig has ref_count=false for leaf values. Its actual SmallAllocator-backed dependency nodes have zero factory references and acquire references to join children; aliases acquire none. Thirty-bit counters and node marks preserve the source algorithm. Interrupted traversal retains reached marks/output until explicit cleanup. Iterative deletion preserves left-to-right child decrements, parent retirement then LIFO queued children, with stored consumed-decrement/push and allocator-release progress. The manager borrows its allocator and rejects closing with live nodes.",
         "The concrete inner inequality cache borrows the real polynomial manager, canonical polynomial cache and SmallAllocator. It normalizes leading signs, canonicalizes each ordered factor, constructs a zero-reference/null-Boolean atom and inserts before acquiring factor references. Duplicate temporary storage is retired without modifying the existing atom header or acquiring factor references. Concrete PolynomialRef owners retain each new factor independently of polynomial-cache reset. Retirement erases the table first and releases factors/storage separately, leaving the source Boolean-variable deletion step to the still-unported outer solver. Stopped accepted lexical sorting is acknowledged explicitly through PolynomialCache.CleanupUnique before factory temporary cleanup; stale cleanup preserves independent older lexical work.",
-        "The atomFactory owns the actual inequality/root tables and Boolean arrays over the retained polynomial manager/cache/SmallAllocator. New inequalities acquire their factors through the inner factory before Boolean registration; roots insert and publish Boolean registration before acquiring their polynomial reference. Duplicate roots retire temporary storage and preserve the existing Boolean slot, atom counter and factor count. Zero-reference atoms are erased from their table before Boolean deletion/recycling and polynomial/storage release. Retirement stores its reached stage so a real watch assertion or release refusal cannot replay a consumed Boolean deletion. Native partial constructor/factory prefixes have explicit owning cleanup; independently older allocator work is preserved through exact allocation outcomes. The registry uses the real Runtime out-of-memory flag to suppress ID recycling, and deletion leaves values/levels/justifications unchanged until reused initialization."
+        "The atomFactory owns the actual inequality/root tables and Boolean arrays over the retained polynomial manager/cache/SmallAllocator. New inequalities acquire their factors through the inner factory before Boolean registration; roots insert and publish Boolean registration before acquiring their polynomial reference. Duplicate roots retire temporary storage and preserve the existing Boolean slot, atom counter and factor count. Zero-reference atoms are erased from their table before Boolean deletion/recycling and polynomial/storage release. Retirement stores its reached stage so a real watch assertion or release refusal cannot replay a consumed Boolean deletion. Native partial constructor/factory prefixes have explicit owning cleanup; independently older allocator work is preserved through exact allocation outcomes. The registry uses the real Runtime out-of-memory flag to suppress ID recycling, and deletion leaves values/levels/justifications unchanged until reused initialization.",
+        "The actual clauseStore binds the concrete atom/assumption owners sharing the same allocator and starts with a fresh polynomial variable manager. mk_var creates the real polynomial variable before integer/watch/infeasible/equality/permutation initialization; existing borrowed variables are rejected rather than assigned invented metadata. Clause construction consumes an ID before allocation, copies literals, INCs each occurrence in input order and then the assumption, uses the project comparator through Go sort.Slice, publishes the original/learned list and attaches the appropriate maximum-variable watch. Retirement removes the list entry, detaches, recycles the ID, releases sorted literal references, then the assumption and storage. Accepted atom/dependency deletion progress prevents replay of consumed DECs, including dependency stops after the original root has been freed. Zero-reference input assumption leaves are transferred through the real clause INC or explicitly retired after a failed clause acquisition, without a synthetic INC/DEC repair. Leaf allocation outcomes and dependency deletion generations grant only exact accepted-callee cleanup; older physical allocations and newer independently pending DAG deletions are preserved. Borrowed parent Close refuses while the clause store remains live."
       ],
       "deviations": [
         "The NLSAT assumption specialization is concrete and AST-independent: leaf values carry either a frontend attachment identity or a borrowed pointer to an actual input literal. Nonzero-sized attachment tokens preserve distinct native identities; the retained goal frontend must map its concrete AST dependencies to these identities when integrated. Equal-valued literals at different input positions remain distinct. No any-valued callback/value adapter or C++ standard-library container is introduced. Native Go layouts/array capacities differ from source; caller output slices use Go storage. Every allocation/lexical/diagnostic frontier and full solver integration remain unaudited.",
         "Only the actual retained assumption-manager/dconfig subobject is implemented by this entry. The solver constructor, Boolean-variable arrays, atom canonicalization/factories, clause/watch integration, assumption-check/core protocol, explanation/search, root permutation, model handling and own diagnostics remain unported. This is not a complete NLSAT solver or substitute general backend.",
         "Go maps/slices replace source hashtable/vector internals. Native reflected storage extents and per-factor PolynomialRef owner headers differ from the C++ packed atom layout and introduce native allocation frontiers; focused failures verify native cleanup, not identical C++ allocation counts. Inner factory TRACE/display frontiers, complete physical/lexical ownership audit, outer Boolean registration, root factory, explanation and search remain unported or unaudited. Both whole-unit audit flags remain false.",
-        "Native maps/slices and existing concrete idgen replace source STL/container mechanisms; source vector capacity/failure machinery is not ported. Reflected native factory/root storage and charged PolynomialRef owner headers differ from the C++ layout and introduce Go reservation frontiers; the consecutive cold-root ladder covers this fixture through success, including an actual refusal after Boolean publication. Explicit native owner/precondition guards are not a whole C++ diagnostic-prefix audit. The component is an actual solver subobject, not a fake Solver: source true-clause construction, clause factories/sorting/watches, explanation/search, complete TRACE/display frontiers and general solver/tactic integration remain pending. Both whole-unit audit flags remain false."
+        "Native maps/slices and existing concrete idgen replace source STL/container mechanisms; source vector capacity/failure machinery is not ported. Reflected native factory/root storage and charged PolynomialRef owner headers differ from the C++ layout and introduce Go reservation frontiers; the consecutive cold-root ladder covers this fixture through success, including an actual refusal after Boolean publication. Explicit native owner/precondition guards are not a whole C++ diagnostic-prefix audit. The component is an actual solver subobject, not a fake Solver: source true-clause construction, clause factories/sorting/watches, explanation/search, complete TRACE/display frontiers and general solver/tactic integration remain pending. Both whole-unit audit flags remain false.",
+        "Go native maps/slices and sort.Slice replace C++ containers/std::sort; the project comparator and successful ordering are tested independently, while a stopped Go sort may have a different partial permutation than C++ std::sort. Reflected clause-storage extent includes native owning-progress and acquired-prefix bookkeeping and differs from the C++ packed object, allocator class and reservation counts. The cold allocation campaigns qualify the actual native fixture, not every C++ allocation or TRACE/display prefix. The true unit clause is constructed and watched but is not propagated by an invented search engine. Arithmetic reordering, trail, explanation/projection, propagation/search, full solver construction/API and nonlinear tactic integration remain pending. Both whole-unit audit flags remain false."
       ]
     },
     {
@@ -190125,13 +190185,29 @@
             "TestAssumptionDeletionSourceOrderThroughAllocatorReuse",
             "TestAssumptionAndLazyOwnersPreserveEachOthersPendingAllocation"
           ]
+        },
+        {
+          "name": "Concrete NLSAT accepted leaf allocation and DAG-deletion acknowledgements for owning clause construction/retirement",
+          "status": "platform_replacement",
+          "go_target": "pkg/nlsat/assumption_manager.go",
+          "go_targets": [
+            "pkg/nlsat/clause_store.go"
+          ],
+          "tests": [
+            "TestClauseStoreConsumedAssumptionDECAfterRootRetirement",
+            "TestClauseStoreStaleAssumptionReceiptPreservesNewerDeletion",
+            "TestClauseStoreInputAssumptionLeafTransferAndRefusals",
+            "TestClauseStoreInputLiteralIdentityAndNullAssumption",
+            "TestClauseStoreRefusedLeafAndClausePreserveOlderPhysicalPrefix"
+          ]
         }
       ],
       "ownership": [
         "Actual AST manager embeds dependency and array owners eagerly; FIFO identity traversal, real AST retain/release and LIFO deletion callbacks. Project RC30 wrapping and charged leaf/join16/24 records remain; dependency FIFO/LIFO worklists and persistent-array scratch use native Go slices without container arena charges or intrusive fallback links. Actual cold manager/header/payload and persistent-array object overlaps remain charged. Persistent arrays have12-byte capacity/initialized backing and preserve finite retained pointer/patch behavior; see PORT_PROGRESS.md#audit-ast-dependency-packet-md.",
         "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers.",
         "The SMT nonlinear-arithmetic specialization stores borrowed concrete *smtArithmeticBound leaves in a search-scoped DAG; Go reachability replaces region allocation while reset and scope rollback retire manager ownership.",
-        "The retained NLSAT dconfig has ref_count=false for leaf values. Its actual SmallAllocator-backed dependency nodes have zero factory references and acquire references to join children; aliases acquire none. Thirty-bit counters and node marks preserve the source algorithm. Interrupted traversal retains reached marks/output until explicit cleanup. Iterative deletion preserves left-to-right child decrements, parent retirement then LIFO queued children, with stored consumed-decrement/push and allocator-release progress. The manager borrows its allocator and rejects closing with live nodes."
+        "The retained NLSAT dconfig has ref_count=false for leaf values. Its actual SmallAllocator-backed dependency nodes have zero factory references and acquire references to join children; aliases acquire none. Thirty-bit counters and node marks preserve the source algorithm. Interrupted traversal retains reached marks/output until explicit cleanup. Iterative deletion preserves left-to-right child decrements, parent retirement then LIFO queued children, with stored consumed-decrement/push and allocator-release progress. The manager borrows its allocator and rejects closing with live nodes.",
+        "The retained NLSAT instantiation now records each actually accepted final-DEC invocation and keeps that identity while iterative deletion advances beyond the original root. A stale clause receipt cannot acknowledge a later independent deletion. Concrete leaf scopes retain the actual allocator outcome and zero-reference factory result until a real clause INC transfers ownership; failed acquisition discards only its own unreferenced leaf. Allocation execution guards prevent same-manager reentry before publishing node ownership. Other dependency_manager instantiations remain separately scoped."
       ],
       "deviations": [
         "Source-undefined allocation/lifetime domains have explicit Go continuation and typed guards. Temporary copied-prefix cleanup releases only successful ownership acquisitions; source write-before-INC and debug RC0 refusal consumption are distinct. Copy-only Get returns retained raw tokens; actual later dereference guards generation. Source internal parray/Reroot debug checkpoints, TRACE/address printing, owning aliases and scoped configurations remain open. No whole-unit audit or full solver claim; no generics.",

@@ -36,6 +36,7 @@ type atomFactory struct {
 	allocationFailed bool
 	ineqCall         bool
 	retiring         ArithmeticAtom
+	clauses          *clauseStore
 	retireStage      uint8
 	header           uint64
 	running, failed  bool
@@ -458,6 +459,12 @@ func (f *atomFactory) cleanup() error {
 func (f *atomFactory) close() error {
 	if f != nil && f.self == f && f.closed {
 		return nil
+	}
+	if f != nil && f.self == f && f.clauses != nil {
+		if f.clauses.running {
+			return ErrAtomCachePending
+		}
+		return ErrAtomCacheLive
 	}
 	if err := f.cleanup(); err != nil {
 		return err
