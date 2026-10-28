@@ -505,6 +505,23 @@ func (t *SMTBitVectorTheory) InternalizeTerm(expression ast.ASTHandle) (bool, er
 	if err != nil {
 		return false, err
 	}
+	switch op {
+	case smtBVOpNumeral:
+		if err = bvAssert(518, "!get_context().e_internalized(n)", func() (bool, error) { return state.context.enodes[expression] == nil, nil }); err != nil {
+			return false, err
+		}
+	case 58:
+		if err = bvAssert(555, "!get_context().e_internalized(n)", func() (bool, error) { return state.context.enodes[expression] == nil, nil }); err != nil {
+			return false, err
+		}
+	case 57:
+		if err = bvAssert(623, "!get_context().e_internalized(n)", func() (bool, error) { return state.context.enodes[expression] == nil, nil }); err != nil {
+			return false, err
+		}
+		if err = bvAssert(624, "n->get_num_args() == 1", func() (bool, error) { return count == 1, nil }); err != nil {
+			return false, err
+		}
+	}
 	for i := uint32(0); i < count; i++ {
 		argument, argErr := state.manager.GetArg(expression, i)
 		if argErr != nil {

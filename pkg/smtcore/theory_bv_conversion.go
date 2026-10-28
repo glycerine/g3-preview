@@ -94,6 +94,15 @@ func (t *SMTBitVectorTheory) assertBVToIntAxiom(expression ast.ASTHandle) (resul
 	if err != nil {
 		return err
 	}
+	if err = bvAssert(571, "get_context().e_internalized(n)", func() (bool, error) { return s.context.enodes[expression] != nil, nil }); err != nil {
+		return err
+	}
+	if err = bvAssert(572, "m_util.is_bv2int(n)", func() (bool, error) {
+		op, own, e := t.operation(expression)
+		return own && op == 58, e
+	}); err != nil {
+		return err
+	}
 	if err = t.traceBVBVToIntAxiom(expression); err != nil {
 		return err
 	}
@@ -101,6 +110,9 @@ func (t *SMTBitVectorTheory) assertBVToIntAxiom(expression ast.ASTHandle) (resul
 	defer func() { result = errors.Join(result, c.close()) }()
 	argument, err := s.manager.GetArg(expression, 0)
 	if err != nil {
+		return err
+	}
+	if err = bvAssert(578, "m_util.is_bv_sort(m.get_sort(k))", func() (bool, error) { return s.manager.IsBitVector(argument) }); err != nil {
 		return err
 	}
 	bits, err := c.bits(argument)
@@ -171,6 +183,15 @@ func (t *SMTBitVectorTheory) assertBVToIntAxiom(expression ast.ASTHandle) (resul
 func (t *SMTBitVectorTheory) assertIntToBVAxiom(expression ast.ASTHandle) (result error) {
 	s, err := t.State()
 	if err != nil {
+		return err
+	}
+	if err = bvAssert(644, "get_context().e_internalized(n)", func() (bool, error) { return s.context.enodes[expression] != nil, nil }); err != nil {
+		return err
+	}
+	if err = bvAssert(645, "m_util.is_int2bv(n)", func() (bool, error) {
+		op, own, e := t.operation(expression)
+		return own && op == 57, e
+	}); err != nil {
 		return err
 	}
 	c := smtBVExpressionCall{theory: t}
