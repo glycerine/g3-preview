@@ -1,5 +1,6 @@
-// Source: src/smt/tactic/smt_tactic.cpp/.h.
 package smtcore
+
+// Source: src/smt/tactic/smt_tactic.cpp/.h.
 
 import (
 	"errors"
