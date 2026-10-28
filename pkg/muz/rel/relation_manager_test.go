@@ -30,6 +30,11 @@ func TestRelationManagerFiniteSignatureAndFactRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() {
+		if err := relations.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
 	boolean, err := manager.MkBoolSort()
 	if err != nil {
 		t.Fatal(err)
@@ -123,6 +128,7 @@ func TestRelationManagerRejectsInfiniteAndWrongSortValues(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() { _ = relations.Close() })
 	integer, err := context.LookupSort("Int")
 	if err != nil {
 		t.Fatal(err)
@@ -147,5 +153,72 @@ func TestRelationManagerRejectsInfiniteAndWrongSortValues(t *testing.T) {
 	}
 	if _, err = relations.DecodeValue(boolean, 2); err == nil {
 		t.Fatal("out-of-domain table value accepted")
+	}
+}
+
+func TestRelationManagerOwnsStoredPredicateRelations(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = context.Close() })
+	manager, err := context.Manager()
+	if err != nil {
+		t.Fatal(err)
+	}
+	relations, err := rel.NewRelationManager(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = relations.Close() })
+	boolean, err := manager.MkBoolSort()
+	if err != nil {
+		t.Fatal(err)
+	}
+	name, err := manager.Symbols.Intern("stored-relation")
+	if err != nil {
+		t.Fatal(err)
+	}
+	predicate, err := manager.MkFuncDecl(name, []ast.ASTHandle{boolean}, boolean, ast.ASTFuncDeclInfo{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	table, err := relations.GetRelation(predicate)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count, x := table.Len(); x != nil || count != 0 {
+		t.Fatal("new relation", count, x)
+	}
+	if _, err = table.Add(rel.Fact{1}); err != nil {
+		t.Fatal(err)
+	}
+	stored, found, err := relations.TryGetRelation(predicate)
+	if err != nil || !found || stored != table {
+		t.Fatal("stored relation identity", stored, found, err)
+	}
+	replacement, err := table.Clone()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = relations.StoreRelation(predicate, replacement); err != nil {
+		t.Fatal(err)
+	}
+	stored, found, err = relations.TryGetRelation(predicate)
+	if err != nil || !found || stored != replacement {
+		t.Fatal("replacement relation identity", stored, found, err)
+	}
+	wrongSignature, err := rel.NewSignature([]uint64{3})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = relations.StoreRelation(predicate, rel.NewHashTable(wrongSignature)); err == nil {
+		t.Fatal("mismatched stored relation accepted")
+	}
+	if err = relations.ResetRelations(); err != nil {
+		t.Fatal(err)
+	}
+	if stored, found, err = relations.TryGetRelation(predicate); err != nil || found || stored != nil {
+		t.Fatal("reset relation remained stored", stored, found, err)
 	}
 }

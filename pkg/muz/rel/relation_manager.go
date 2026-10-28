@@ -10,10 +10,12 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-// RelationManager borrows an AST manager and converts between finite-domain
-// relation values and concrete table elements.
+// RelationManager borrows an AST manager, owns stored finite predicate tables,
+// and converts between finite-domain relation values and table elements.
 type RelationManager struct {
-	manager *ast.ASTManager
+	manager   *ast.ASTManager
+	relations map[ast.ASTHandle]*HashTable
+	closed    bool
 }
 
 func NewRelationManager(manager *ast.ASTManager) (*RelationManager, error) {
@@ -23,14 +25,104 @@ func NewRelationManager(manager *ast.ASTManager) (*RelationManager, error) {
 	if err := manager.RegisterDeclarationPlugins(); err != nil {
 		return nil, err
 	}
-	return &RelationManager{manager: manager}, nil
+	return &RelationManager{manager: manager, relations: make(map[ast.ASTHandle]*HashTable)}, nil
 }
 
 func (m *RelationManager) open() error {
-	if m == nil || m.manager == nil {
+	if m == nil || m.closed || m.manager == nil || m.relations == nil {
 		return ErrTable
 	}
 	return nil
+}
+
+// TryGetRelation returns the borrowed table stored for predicate.
+func (m *RelationManager) TryGetRelation(predicate ast.ASTHandle) (*HashTable, bool, error) {
+	if err := m.open(); err != nil {
+		return nil, false, err
+	}
+	table, found := m.relations[predicate]
+	return table, found, nil
+}
+
+// GetRelation returns the borrowed table stored for predicate, creating and
+// storing an empty finite table on first use.
+func (m *RelationManager) GetRelation(predicate ast.ASTHandle) (*HashTable, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	if table := m.relations[predicate]; table != nil {
+		return table, nil
+	}
+	_, signature, err := m.PredicateSignature(predicate)
+	if err != nil {
+		return nil, err
+	}
+	table := NewHashTable(signature)
+	if err = m.StoreRelation(predicate, table); err != nil {
+		return nil, err
+	}
+	return table, nil
+}
+
+// StoreRelation transfers ownership of table to the manager. The predicate is
+// retained on first insertion and the previous table is replaced.
+func (m *RelationManager) StoreRelation(predicate ast.ASTHandle, table *HashTable) error {
+	if err := m.open(); err != nil {
+		return err
+	}
+	if err := table.open(); err != nil {
+		return err
+	}
+	_, expected, err := m.PredicateSignature(predicate)
+	if err != nil {
+		return err
+	}
+	actual, err := table.Signature()
+	if err != nil {
+		return err
+	}
+	if !expected.equal(actual) {
+		return fmt.Errorf("%w: stored relation signature differs from predicate", ErrTable)
+	}
+	if _, found := m.relations[predicate]; !found {
+		if err = m.manager.IncRef(predicate); err != nil {
+			return err
+		}
+	}
+	m.relations[predicate] = table
+	return nil
+}
+
+// ResetRelations releases every retained predicate and drops its owned table.
+func (m *RelationManager) ResetRelations() (result error) {
+	if err := m.open(); err != nil {
+		return err
+	}
+	for predicate := range m.relations {
+		consumed, err := m.manager.DecRefConsumed(predicate)
+		result = errors.Join(result, err)
+		if consumed {
+			delete(m.relations, predicate)
+		}
+	}
+	return result
+}
+
+func (m *RelationManager) Close() (result error) {
+	if m == nil {
+		return ErrTable
+	}
+	if m.closed {
+		return nil
+	}
+	result = m.ResetRelations()
+	if len(m.relations) != 0 {
+		return errors.Join(result, ErrTable)
+	}
+	m.closed = true
+	m.manager = nil
+	m.relations = nil
+	return result
 }
 
 func (m *RelationManager) sortDomain(sort ast.ASTHandle) (uint64, error) {

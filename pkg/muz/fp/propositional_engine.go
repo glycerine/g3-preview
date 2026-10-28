@@ -111,14 +111,18 @@ func (e *PropositionalEngine) RegisterPredicate(declaration ast.ASTHandle) error
 	if rangeSort != boolean {
 		return ErrPropositionalHorn
 	}
-	sorts, signature, err := e.relations.PredicateSignature(declaration)
+	sorts, _, err := e.relations.PredicateSignature(declaration)
 	if err != nil {
 		return err
 	}
 	if err = e.rules.RegisterPredicate(declaration); err != nil {
 		return err
 	}
-	e.predicates[declaration] = &predicateState{sorts: sorts, table: rel.NewHashTable(signature)}
+	table, err := e.relations.GetRelation(declaration)
+	if err != nil {
+		return err
+	}
+	e.predicates[declaration] = &predicateState{sorts: sorts, table: table}
 	return nil
 }
 
@@ -1092,7 +1096,10 @@ func (e *PropositionalEngine) Close() (result error) {
 		result = errors.Join(result, e.binder.Close())
 		e.binder = nil
 	}
-	e.relations = nil
+	if e.relations != nil {
+		result = errors.Join(result, e.relations.Close())
+		e.relations = nil
+	}
 	e.predicates = nil
 	e.closed = true
 	return result

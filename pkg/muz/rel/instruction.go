@@ -35,6 +35,7 @@ type ExecutionStats struct {
 type ExecutionContext struct {
 	registers   []*HashTable
 	annotations map[uint32]string
+	relations   *RelationManager
 	terminate   func() bool
 	stats       ExecutionStats
 	closed      bool
@@ -42,6 +43,15 @@ type ExecutionContext struct {
 
 func NewExecutionContext(terminate func() bool) *ExecutionContext {
 	return &ExecutionContext{annotations: make(map[uint32]string), terminate: terminate}
+}
+
+// NewExecutionContextWithRelations borrows relations for load/store
+// instructions executed by the context.
+func NewExecutionContextWithRelations(relations *RelationManager, terminate func() bool) (*ExecutionContext, error) {
+	if err := relations.open(); err != nil {
+		return nil, err
+	}
+	return &ExecutionContext{annotations: make(map[uint32]string), relations: relations, terminate: terminate}, nil
 }
 
 func (c *ExecutionContext) open() error {
