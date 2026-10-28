@@ -45,8 +45,12 @@ func TestMonomialConstructorBindsMemoryChunkTrace(t *testing.T) {
 		address := fmt.Sprintf("%p", ownedAllocator)
 		alloc := "alloc " + address + " src/math/polynomial/polynomial.cpp:783 small_object_allocator " + strconv.FormatUint(ownerExtent, 10) + "\n"
 		dealloc := "dealloc " + address + " src/math/polynomial/polynomial.cpp:803\n"
-		if strings.Count(output.String(), alloc) != 1 || strings.Count(output.String(), dealloc) != 1 || strings.Index(output.String(), alloc) >= strings.Index(output.String(), dealloc) {
-			t.Fatal("direct monomial close allocator trace", output.String())
+		if diagnostic.DebugBuild {
+			if strings.Count(output.String(), alloc) != 1 || strings.Count(output.String(), dealloc) != 1 || strings.Index(output.String(), alloc) >= strings.Index(output.String(), dealloc) {
+				t.Fatal("direct monomial close allocator trace", output.String())
+			}
+		} else if strings.Contains(output.String(), alloc) || strings.Contains(output.String(), dealloc) {
+			t.Fatal("release trace emitted debug-only owner records", output.String())
 		}
 		for _, want := range []string{"alloc 0x", "src/util/small_object_allocator.cpp:132 chunk 8192\n", "dealloc 0x", "src/util/small_object_allocator.cpp:44\n"} {
 			if !strings.Contains(output.String(), want) {
