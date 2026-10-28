@@ -73,6 +73,14 @@ func TestSMTArrayStoreReadSourceTracesAndRefusal(t *testing.T) {
 			if !theory.unsupported {
 				t.Fatal("as-array did not retain the unsupported-operation marker")
 			}
+			constant, err := manager.MkConstArray(arraySort, value)
+			astTestMust(t, err)
+			astTestMust(t, state.Internalize(constant, false))
+			baseVariable := state.context.enodes[base].TheoryVar(family)
+			constantVariable := state.context.enodes[constant].TheoryVar(family)
+			astTestMust(t, theory.setArrayUpward(uint32(baseVariable)))
+			astTestMust(t, theory.setStoreBaseUpward(state.context.enodes[store]))
+			astTestMust(t, theory.NewEquality(baseVariable, constantVariable))
 			if closed {
 				return
 			}
@@ -96,6 +104,12 @@ func TestSMTArrayStoreReadSourceTracesAndRefusal(t *testing.T) {
 				"[array_map_bug] assert_store_axiom2_core src/smt/theory_array_base.cpp:185",
 				"[array_axiom] assert_axiom src/smt/theory_array_base.cpp:70",
 				"[array] found_unsupported_op src/smt/theory_array_base.cpp:36",
+				"[array] internalize_term src/smt/theory_array_full.cpp:260",
+				"[array] set_prop_upward src/smt/theory_array_full.cpp:115",
+				"[array] set_prop_upward src/smt/theory_array_full.cpp:143",
+				"[array] add_parent_select src/smt/theory_array_full.cpp:394",
+				"[array] relevant_eh src/smt/theory_array_full.cpp:428",
+				"[array] merge_eh src/smt/theory_array_full.cpp:359",
 			} {
 				if !strings.Contains(trace, want) {
 					t.Fatalf("missing source array trace %q in %q", want, trace)
@@ -243,6 +257,83 @@ func TestSMTArrayModelDefaultAndMergeSourceTraces(t *testing.T) {
 	} {
 		if !strings.Contains(trace, want) {
 			t.Fatalf("missing source array model trace %q in %q", want, trace)
+		}
+	}
+}
+
+func TestSMTFullArrayConstructorSourceTraces(t *testing.T) {
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	for _, tag := range []string{"array", "array_map_bug", "array_axiom", "mk_var_bug"} {
+		tags.Enable(tag)
+	}
+	manager := smtArrayTraceManager(t, tags)
+	family, err := manager.RegisterArrayPlugin()
+	astTestMust(t, err)
+	_, _, state := smtInternalizerFixture(t, manager, nil)
+	state.theoryRewriter = smtQuickTheoryRewriter(t, manager)
+	theory, err := NewSMTArrayTheory(family)
+	astTestMust(t, err)
+	astTestMust(t, state.RegisterTheory(theory))
+	boolean, err := manager.MkBoolSort()
+	astTestMust(t, err)
+	arraySort, err := manager.MkArraySort(ast.SliceArguments([]ast.ASTHandle{boolean}), boolean)
+	astTestMust(t, err)
+	yes, err := manager.MkTrue()
+	astTestMust(t, err)
+	no, err := manager.MkFalse()
+	astTestMust(t, err)
+	constant, err := manager.MkConstArray(arraySort, yes)
+	astTestMust(t, err)
+	x := smtRelevancyBool(t, manager, "array-map-trace-x")
+	notX, err := manager.MkNot(x)
+	astTestMust(t, err)
+	mapFunction, err := manager.GetDecl(notX)
+	astTestMust(t, err)
+	mapped, err := manager.MkArrayMap(mapFunction, ast.SliceArguments([]ast.ASTHandle{constant}))
+	astTestMust(t, err)
+	asFunction, err := manager.MkFuncDecl(astTestSymbol(t, manager, "array-as-trace-function"), []ast.ASTHandle{boolean}, boolean, ast.ASTFuncDeclInfo{})
+	astTestMust(t, err)
+	asArray, err := manager.MkAsArray(asFunction)
+	astTestMust(t, err)
+	store, err := manager.MkFamilyApp(family, ast.ASTArrayOpStore, nil, []ast.ASTHandle{constant, yes, no})
+	astTestMust(t, err)
+	for _, constructor := range []ast.ASTHandle{constant, mapped, asArray, store} {
+		astTestMust(t, state.Internalize(constructor, false))
+		if _, err := theory.instantiateConstructorDefault(constructor); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, constructor := range []ast.ASTHandle{constant, mapped, asArray} {
+		observer, err := manager.MkFamilyApp(family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{constructor, yes})
+		astTestMust(t, err)
+		astTestMust(t, state.Internalize(observer, false))
+		if _, err := theory.instantiateConstructorRead(observer, constructor); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if !tags.ShouldTrace("array") {
+		if output.Len() != 0 {
+			t.Fatal("compiled-out full array traces executed", output.String())
+		}
+		return
+	}
+	trace := output.String()
+	for _, want := range []string{
+		"[array] instantiate_default_const_axiom src/smt/theory_array_full.cpp:573",
+		"[array] instantiate_default_map_axiom src/smt/theory_array_full.cpp:546",
+		"[array] instantiate_default_as_array_axiom src/smt/theory_array_full.cpp:587",
+		"[array] instantiate_default_store_axiom src/smt/theory_array_full.cpp:707",
+		"[array_map_bug] instantiate_select_map_axiom src/smt/theory_array_full.cpp:481",
+		"[array_map_bug] instantiate_select_map_axiom src/smt/theory_array_full.cpp:489",
+		"[array] instantiate_select_map_axiom src/smt/theory_array_full.cpp:492",
+		"[array_map_bug] instantiate_select_map_axiom src/smt/theory_array_full.cpp:524",
+		"[array] instantiate_select_const_axiom src/smt/theory_array_full.cpp:642",
+		"[array] instantiate_select_as_array_axiom src/smt/theory_array_full.cpp:678",
+		"[array] try_assign_eq src/smt/theory_array_full.cpp:787",
+	} {
+		if !strings.Contains(trace, want) {
+			t.Fatalf("missing source full-array trace %q in %q", want, trace)
 		}
 	}
 }

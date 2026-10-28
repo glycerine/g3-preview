@@ -140200,6 +140200,33 @@
           ]
         },
         {
+          "name": "full array lifecycle TRACE sites for upward propagation, term internalization, private-class merge, parent-select registration and relevance",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_full_parents.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayStoreReadSourceTracesAndRefusal"
+          ]
+        },
+        {
+          "name": "full array constructor TRACE sites for map invocation/fingerprints/equalities, const/map/store/as-array defaults and reads, and ordered equality publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_full_axioms.go",
+            "pkg/smtcore/theory_array_full_defaults.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTFullArrayConstructorSourceTraces"
+          ]
+        },
+        {
           "name": "Remaining final retained-consumer/source audit of array algorithms and model integration",
           "status": "unported",
           "tests": []
@@ -140544,6 +140571,33 @@
             "TestSMTArrayBooleanGateEnodesRetainAntecedentsAndScope",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
+          ]
+        },
+        {
+          "name": "full array lifecycle TRACE sites for upward propagation, term internalization, private-class merge, parent-select registration and relevance",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array.go",
+            "pkg/smtcore/theory_array_parents.go",
+            "pkg/smtcore/theory_array_full_parents.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTArrayStoreReadSourceTracesAndRefusal"
+          ]
+        },
+        {
+          "name": "full array constructor TRACE sites for map invocation/fingerprints/equalities, const/map/store/as-array defaults and reads, and ordered equality publication",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_array_trace.go",
+          "go_targets": [
+            "pkg/smtcore/theory_array_full_axioms.go",
+            "pkg/smtcore/theory_array_full_defaults.go",
+            "pkg/smtcore/theory_array_trace_test.go"
+          ],
+          "tests": [
+            "TestSMTFullArrayConstructorSourceTraces"
           ]
         },
         {

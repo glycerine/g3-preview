@@ -168,6 +168,11 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 	if err != nil {
 		return false, err
 	}
+	if !t.simple {
+		if err = t.traceFullArrayExpression("internalize_term", 260, expression); err != nil {
+			return false, err
+		}
+	}
 	op, array, err := t.arrayOperation(expression)
 	if err != nil || !array {
 		return false, err

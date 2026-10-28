@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/theory_array_full.cpp instantiate_default_const_axiom,
 // instantiate_default_map_axiom, instantiate_default_store_axiom,
 // instantiate_default_as_array_axiom, and add_parent_default.
-package smtcore
 
 import (
 	"errors"
@@ -49,15 +50,23 @@ func (t *SMTArrayTheory) instantiateConstructorDefault(constructor ast.ASTHandle
 	}
 	t.defaultFingerprints[node.root] = true
 	t.defaultFingerprintTrail = append(t.defaultFingerprintTrail, node.root)
+	line, function := 0, ""
 	switch op {
 	case ast.ASTArrayOpConst:
 		t.statistics.defaultConst++
+		line, function = 573, "instantiate_default_const_axiom"
 	case ast.ASTArrayOpMap:
 		t.statistics.defaultMap++
+		line, function = 546, "instantiate_default_map_axiom"
 	case ast.ASTArrayOpStore:
 		t.statistics.defaultStore++
+		line, function = 707, "instantiate_default_store_axiom"
 	case ast.ASTArrayOpAsArray:
 		t.statistics.defaultAsArray++
+		line, function = 587, "instantiate_default_as_array_axiom"
+	}
+	if err = t.traceFullArrayExpression(function, line, constructor); err != nil {
+		return false, err
 	}
 	value, err := t.defaultConstructorValue(constructor, op)
 	if err != nil {

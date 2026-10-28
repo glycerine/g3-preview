@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: theory_array_full mk_var, parent maps, constructor merges,
 // default initialization and delayed select-map propagation.
-package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 
@@ -45,6 +46,9 @@ func (t *SMTArrayTheory) addParentMap(variable SMTTheoryVar, mapped *SMTEnode) e
 }
 
 func (t *SMTArrayTheory) setMapInputsUpward(mapped *SMTEnode) error {
+	if err := t.traceFullArrayExpression("set_prop_upward", 143, mapped.owner); err != nil {
+		return err
+	}
 	for _, input := range mapped.arguments {
 		variable := input.TheoryVar(t.FamilyID())
 		if variable < 0 {

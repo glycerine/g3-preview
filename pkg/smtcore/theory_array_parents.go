@@ -1,8 +1,12 @@
-// Source: theory_array var_data, private union-find, parent registration,
-// merge_eh, set_prop_upward, relevant_eh and assert_delayed_axioms.
 package smtcore
 
+// Source: theory_array var_data, private union-find, parent registration,
+// merge_eh, set_prop_upward, relevant_eh and assert_delayed_axioms.
+
 import (
+	"fmt"
+	"io"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/backtrack"
 )
@@ -87,7 +91,24 @@ func (t *SMTArrayTheory) addParentSelect(variable SMTTheoryVar, read *SMTEnode) 
 	if variable < 0 || int(variable) >= len(t.arrayData) {
 		return ast.ErrASTDomain
 	}
-	data := t.arrayData[t.arrayUnion.Find(uint32(variable))]
+	root := t.arrayUnion.Find(uint32(variable))
+	if !t.simple {
+		if err := t.emitFullArrayTrace("array", "add_parent_select", 394, nil, func(out io.Writer) error {
+			if _, err := fmt.Fprintf(out, "%d select parent: ", variable); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(t.state.manager, out, read.owner); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\n"); err != nil {
+				return err
+			}
+			return t.DisplayVariable(out, SMTTheoryVar(root))
+		}); err != nil {
+			return err
+		}
+	}
+	data := t.arrayData[root]
 	data.parentSelects = append(data.parentSelects, read)
 	if err := t.arrayTrail.PushUndo(func() { data.parentSelects = data.parentSelects[:len(data.parentSelects)-1] }); err != nil {
 		return err
@@ -125,6 +146,11 @@ func (t *SMTArrayTheory) addParentStore(variable SMTTheoryVar, store *SMTEnode) 
 }
 
 func (t *SMTArrayTheory) setStoreBaseUpward(store *SMTEnode) error {
+	if !t.simple {
+		if err := t.traceFullArrayExpression("set_prop_upward", 143, store.owner); err != nil {
+			return err
+		}
+	}
 	variable := store.arguments[0].TheoryVar(t.FamilyID())
 	if variable < 0 {
 		return ast.ErrASTDomain
@@ -136,13 +162,22 @@ func (t *SMTArrayTheory) setArrayUpward(variable uint32) error {
 	if t.arrayConfig.Weak {
 		return nil
 	}
-	data := t.arrayData[t.arrayUnion.Find(variable)]
+	root := t.arrayUnion.Find(variable)
+	data := t.arrayData[root]
 	if data.propUpward {
 		return nil
 	}
 	data.propUpward = true
 	if err := t.arrayTrail.PushUndo(func() { data.propUpward = false }); err != nil {
 		return err
+	}
+	if !t.simple {
+		if err := t.emitFullArrayTrace("array", "set_prop_upward", 115, nil, func(out io.Writer) error {
+			_, err := fmt.Fprintf(out, "#%d\n", root)
+			return err
+		}); err != nil {
+			return err
+		}
 	}
 	for _, store := range data.stores {
 		if err := t.setStoreBaseUpward(store); err != nil {
@@ -201,7 +236,33 @@ func (t *SMTArrayTheory) mergeArrayClasses(root, child uint32) error {
 		}
 	}
 	if !t.simple {
-		return t.mergeFullArrayClasses(root, second)
+		if err := t.mergeFullArrayClasses(root, second); err != nil {
+			return err
+		}
+		return t.emitFullArrayTrace("array", "merge_eh", 359, nil, func(out io.Writer) error {
+			if int(root) >= len(t.variables) || int(child) >= len(t.variables) {
+				return ast.ErrASTDomain
+			}
+			if err := displayArrayTraceExpression(t.state.manager, out, t.variables[root].owner); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\n"); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(t.state.manager, out, t.variables[child].owner); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\nmerge in\n"); err != nil {
+				return err
+			}
+			if err := t.DisplayVariable(out, SMTTheoryVar(child)); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "after merge\n"); err != nil {
+				return err
+			}
+			return t.DisplayVariable(out, SMTTheoryVar(root))
+		})
 	}
 	return nil
 }
@@ -214,6 +275,11 @@ func (t *SMTArrayTheory) Relevant(expression ast.ASTHandle) error {
 	s, err := t.State()
 	if err != nil {
 		return err
+	}
+	if !t.simple {
+		if err = t.traceFullArrayExpression("relevant_eh", 428, expression); err != nil {
+			return err
+		}
 	}
 	node := s.context.enodes[expression]
 	if node == nil {

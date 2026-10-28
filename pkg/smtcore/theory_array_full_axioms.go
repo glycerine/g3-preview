@@ -6,6 +6,8 @@ package smtcore
 
 import (
 	"errors"
+	"fmt"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -17,6 +19,21 @@ type smtArrayExpressionPair struct {
 // tryAssignArrayEquality caches ordered expression pairs, independently of
 // the canonical ordering used to construct the equality's Boolean atom.
 func (t *SMTArrayTheory) tryAssignArrayEquality(left, right ast.ASTHandle) (bool, error) {
+	if err := t.emitFullArrayTrace("array", "try_assign_eq", 787, nil, func(out io.Writer) error {
+		if err := displayArrayTraceExpression(t.state.manager, out, left); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(out, "\n==\n"); err != nil {
+			return err
+		}
+		if err := displayArrayTraceExpression(t.state.manager, out, right); err != nil {
+			return err
+		}
+		_, err := io.WriteString(out, "\n")
+		return err
+	}); err != nil {
+		return false, err
+	}
 	pair := smtArrayExpressionPair{left: left, right: right}
 	if t.equalityAxioms[pair] {
 		return false, nil
@@ -51,14 +68,69 @@ func (t *SMTArrayTheory) instantiateConstructorRead(observer, constructor ast.AS
 	if read == nil || len(read.arguments) < 2 {
 		return false, ast.ErrASTDomain
 	}
+	constructorNode := s.context.enodes[constructor]
+	if constructorNode == nil {
+		return false, ast.ErrASTDomain
+	}
+	if op == ast.ASTArrayOpMap {
+		if err = t.emitFullArrayTrace("array_map_bug", "instantiate_select_map_axiom", 481, nil, func(out io.Writer) error {
+			readID, err := read.OwnerID()
+			if err != nil {
+				return err
+			}
+			mapID, err := constructorNode.OwnerID()
+			if err != nil {
+				return err
+			}
+			if _, err = fmt.Fprintf(out, "invoked instantiate_select_map_axiom\n%d %d\n", readID, mapID); err != nil {
+				return err
+			}
+			if err = displayArrayTraceExpression(s.manager, out, observer); err != nil {
+				return err
+			}
+			if _, err = io.WriteString(out, "\n"); err != nil {
+				return err
+			}
+			if err = displayArrayTraceExpression(s.manager, out, constructor); err != nil {
+				return err
+			}
+			_, err = io.WriteString(out, "\n")
+			return err
+		}); err != nil {
+			return false, err
+		}
+	}
 	if !t.insertArrayReadFingerprint(constructor, read.arguments[1:]) {
 		return false, nil
+	}
+	if op == ast.ASTArrayOpMap {
+		if err = t.emitFullArrayTrace("array_map_bug", "instantiate_select_map_axiom", 489, nil, func(out io.Writer) error {
+			_, err := io.WriteString(out, "new axiom\n")
+			return err
+		}); err != nil {
+			return false, err
+		}
+		if err = t.emitFullArrayTrace("array", "instantiate_select_map_axiom", 492, nil, func(out io.Writer) error {
+			if err := displayArrayTraceExpression(s.manager, out, constructor); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\n"); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, observer); err != nil {
+				return err
+			}
+			_, err := io.WriteString(out, "\n")
+			return err
+		}); err != nil {
+			return false, err
+		}
 	}
 	arguments := []ast.ASTHandle{constructor}
 	for _, index := range read.arguments[1:] {
 		arguments = append(arguments, index.owner)
 	}
-	selected, err := s.manager.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, arguments)
+	selected, err := t.makeArraySelect(arguments)
 	if err != nil {
 		return false, err
 	}
@@ -97,6 +169,70 @@ func (t *SMTArrayTheory) instantiateConstructorRead(observer, constructor ast.AS
 			return false, err
 		}
 	}
+	switch op {
+	case ast.ASTArrayOpMap:
+		if err = t.emitFullArrayTrace("array_map_bug", "instantiate_select_map_axiom", 524, nil, func(out io.Writer) error {
+			if _, err := io.WriteString(out, "select-map axiom\n"); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, selected); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\n=\n"); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, value); err != nil {
+				return err
+			}
+			_, err := io.WriteString(out, "\n")
+			return err
+		}); err != nil {
+			return false, err
+		}
+	case ast.ASTArrayOpConst, ast.ASTArrayOpAsArray:
+		line, kind, function := 642, "const", "instantiate_select_const_axiom"
+		if op == ast.ASTArrayOpAsArray {
+			line, kind, function = 678, "as-array", "instantiate_select_as_array_axiom"
+		}
+		if err = t.emitFullArrayTrace("array", function, line, nil, func(out io.Writer) error {
+			if _, err := fmt.Fprintf(out, "new select-%s axiom...\n%s: ", kind, kind); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, constructor); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\nselect: "); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, observer); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\nselected: "); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, selected); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(out, "\nvalue: "); err != nil {
+				return err
+			}
+			if err := displayArrayTraceExpression(s.manager, out, value); err != nil {
+				return err
+			}
+			selectedID, err := s.manager.GetASTID(selected)
+			if err != nil {
+				return err
+			}
+			valueID, err := s.manager.GetASTID(value)
+			if err != nil {
+				return err
+			}
+			_, err = fmt.Fprintf(out, "\n#%d = #%d\n", selectedID, valueID)
+			return err
+		}); err != nil {
+			return false, err
+		}
+	}
 	if err = s.Internalize(selected, false); err != nil {
 		return false, err
 	}
@@ -127,7 +263,7 @@ func (t *SMTArrayTheory) mappedReadValue(constructor ast.ASTHandle, indices []as
 			return ast.ASTHandle{}, err
 		}
 		arguments := append([]ast.ASTHandle{input}, indices...)
-		value, err := m.MkFamilyApp(t.FamilyID(), ast.ASTArrayOpSelect, nil, arguments)
+		value, err := t.makeArraySelect(arguments)
 		if err != nil {
 			return ast.ASTHandle{}, err
 		}

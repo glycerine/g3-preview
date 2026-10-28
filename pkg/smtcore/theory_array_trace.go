@@ -10,6 +10,14 @@ import (
 )
 
 func (t *SMTArrayTheory) emitArrayTrace(tag, function string, line int, condition func() bool, body func(io.Writer) error) error {
+	return t.emitArrayTraceAt("src/smt/theory_array_base.cpp", tag, function, line, condition, body)
+}
+
+func (t *SMTArrayTheory) emitFullArrayTrace(tag, function string, line int, condition func() bool, body func(io.Writer) error) error {
+	return t.emitArrayTraceAt("src/smt/theory_array_full.cpp", tag, function, line, condition, body)
+}
+
+func (t *SMTArrayTheory) emitArrayTraceAt(file, tag, function string, line int, condition func() bool, body func(io.Writer) error) error {
 	state, err := t.State()
 	if err != nil {
 		return err
@@ -22,7 +30,7 @@ func (t *SMTArrayTheory) emitArrayTrace(tag, function string, line int, conditio
 		condition = func() bool { return true }
 	}
 	var operandErr error
-	err = tags.EmitConditional(tag, function, "src/smt/theory_array_base.cpp", line, condition, func(out io.Writer) error {
+	err = tags.EmitConditional(tag, function, file, line, condition, func(out io.Writer) error {
 		operandErr = body(assertedTraceWriter{out})
 		return operandErr
 	})
@@ -33,6 +41,20 @@ func (t *SMTArrayTheory) emitArrayTrace(tag, function string, line int, conditio
 		return nil
 	}
 	return err
+}
+
+func (t *SMTArrayTheory) traceFullArrayExpression(function string, line int, expression ast.ASTHandle) error {
+	return t.emitFullArrayTrace("array", function, line, nil, func(out io.Writer) error {
+		state, err := t.State()
+		if err != nil {
+			return err
+		}
+		if err = displayArrayTraceExpression(state.manager, out, expression); err != nil {
+			return err
+		}
+		_, err = io.WriteString(out, "\n")
+		return err
+	})
 }
 
 func (t *SMTArrayTheory) traceArrayExpressions(tag, function string, line int, prefix string, expressions ...ast.ASTHandle) error {
