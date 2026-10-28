@@ -99,6 +99,28 @@ func TestRuleManagerClassifiesAndOwnsNativeTailLayout(t *testing.T) {
 	if name, err := rule.Name(); err != nil || name != "native-order" {
 		t.Fatal("rule name", name, err)
 	}
+	formula, err := rule.ToFormula()
+	ruleMust(t, err)
+	formulaHandle, err := manager.RefGet(formula)
+	ruleMust(t, err)
+	if kind, err := manager.GetKind(formulaHandle); err != nil || kind != ast.ASTQuantifier {
+		t.Fatal("rule formula kind", kind, err)
+	}
+	if count, err := manager.GetNumDeclarations(formulaHandle); err != nil || count != 1 {
+		t.Fatal("rule formula binders", count, err)
+	}
+	body, err := manager.GetQuantifierBody(formulaHandle)
+	ruleMust(t, err)
+	if operator, err := manager.GetDeclKind(body); err != nil || operator != ast.ASTOpImplies {
+		t.Fatal("rule formula body", operator, err)
+	}
+	used, err := ast.NewASTUsedVars(manager)
+	ruleMust(t, err)
+	ruleMust(t, used.Collect(formulaHandle))
+	if used.NumVars() != 0 {
+		t.Fatal("rule formula retained free variables", used.NumVars())
+	}
+	ruleMust(t, manager.DelRef(&formula))
 	retained, err := rule.Retain()
 	ruleMust(t, err)
 	if err := rule.Close(); err != nil {

@@ -7,8 +7,10 @@ package base
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/ast"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 var ErrRuleOwner = errors.New("muz/base: invalid or closed rule owner")
@@ -306,6 +308,92 @@ func (r *Rule) IsInTail(declaration ast.ASTHandle, onlyPositive bool) (bool, err
 		}
 	}
 	return false, nil
+}
+
+// ToFormula converts the rule to its universally quantified Horn formula and
+// returns one owning AST reference.
+func (r *Rule) ToFormula() (result ast.ASTRef, resultErr error) {
+	state, err := r.open()
+	if err != nil {
+		return result, err
+	}
+	body := make([]ast.ASTHandle, len(state.tail))
+	for i, entry := range state.tail {
+		body[i] = entry.handle
+		if entry.negated {
+			body[i], err = state.manager.MkNot(entry.handle)
+			if err != nil {
+				return result, err
+			}
+		}
+	}
+	formula := state.head
+	switch len(body) {
+	case 0:
+	case 1:
+		formula, err = state.manager.MkImplies(body[0], formula)
+	default:
+		var conjunction ast.ASTHandle
+		conjunction, err = state.manager.MkAndArgs(body)
+		if err == nil {
+			formula, err = state.manager.MkImplies(conjunction, formula)
+		}
+	}
+	if err != nil {
+		return result, err
+	}
+	used, err := ast.NewASTUsedVars(state.manager)
+	if err != nil {
+		return result, err
+	}
+	if err = used.Collect(formula); err != nil {
+		return result, err
+	}
+	count := used.MaxFoundVarIndexPlusOne()
+	if count != 0 {
+		boolean, e := state.manager.MkBoolSort()
+		if e != nil {
+			return result, e
+		}
+		sorts := make([]ast.ASTHandle, count)
+		for i := uint32(0); i < count; i++ {
+			sort := used.Contains(i)
+			if sort.IsNull() {
+				sort = boolean
+			}
+			sorts[count-1-i] = sort
+		}
+		usedSymbols, e := ast.NewUsedSymbols(state.manager)
+		if e != nil {
+			return result, e
+		}
+		if e = usedSymbols.Collect(formula, false); e != nil {
+			return result, e
+		}
+		names := make([]usymbol.Symbol, 0, count)
+		for round := 0; uint32(len(names)) < count; round++ {
+			for letter := 'A'; letter <= 'Z' && uint32(len(names)) < count; letter++ {
+				spelling := string(letter)
+				if round != 0 {
+					spelling += strconv.Itoa(round)
+				}
+				name, x := state.manager.Symbols.Intern(spelling)
+				if x != nil {
+					return result, x
+				}
+				if usedSymbols.Contains(name) {
+					continue
+				}
+				usedSymbols.Insert(name)
+				names = append(names, name)
+			}
+		}
+		formula, err = state.manager.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: sorts, Names: names, Body: formula})
+		if err != nil {
+			return result, err
+		}
+	}
+	return state.manager.NewRef(formula)
 }
 
 func (r *Rule) Close() (result error) {
