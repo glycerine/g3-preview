@@ -5097,7 +5097,9 @@
         "pkg/api/api_context_warning.go",
         "pkg/api/api_ast_map_memory_trace.go",
         "pkg/api/api_goal_object.go",
-        "pkg/api/api_trace.go"
+        "pkg/api/api_trace.go",
+        "pkg/api/api_solver.go",
+        "pkg/cmd_context/result_access.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -5111,7 +5113,11 @@
         "TestAPIContextObjectCloseUsesNativeFreeIDStorage",
         "TestAPIContextNativeResultGrowthAndReferenceRelease",
         "TestAPIContextSourceObjectAndTrailAssertions",
-        "TestAPIContextSortCheckWarningAndErrorState"
+        "TestAPIContextSortCheckWarningAndErrorState",
+        "TestSMTContextEndToEndModelScopesAndAssumptions",
+        "TestSMTContextUnsatCoreAndProofResults",
+        "TestSMTContextUnknownReason",
+        "TestSMTContextCopiesShareClose"
       ],
       "assertions": [
         {
@@ -5130,6 +5136,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Owning idiomatic Go SMT context: independent manager/services, logic and option selection, assertion scopes, assumptions, model/core/proof/unknown-result access and shared-copy close lifecycle",
+          "status": "partial",
+          "go_target": "pkg/api/api_solver.go",
+          "go_targets": [
+            "pkg/api/api_solver_test.go",
+            "pkg/cmd_context/result_access.go"
+          ],
+          "tests": [
+            "TestSMTContextEndToEndModelScopesAndAssumptions",
+            "TestSMTContextUnsatCoreAndProofResults",
+            "TestSMTContextUnknownReason",
+            "TestSMTContextCopiesShareClose"
+          ]
+        },
         {
           "name": "Z3_toggle_warning_messages forwards its Boolean gate to the process warning service at api_context.cpp:364-368",
           "status": "ported",
@@ -5177,7 +5198,7 @@
       "deviations": [
         "The api_context.cpp:39 zero-reference SASSERT follows the process assertion switch and debugger action before the Go invalid-owner guard; a continuing debugger action leaves the reference count intact. The api_context.cpp:216 membership SASSERT rejects null and foreign AST handles before the existing Go AST ownership guard.",
         "The api_context.cpp:114 DEBUG_CODE warning is emitted before each uncollected API object is removed, and warning_msg remains nonthrowing. Go uses the concrete destructor type name in place of compiler-specific C++ typeid(...).name() text; release builds erase the call.",
-        "Native result storage supersedes former source vector header/growth/refusal credit in this member grouping. Real AST reference callbacks and object destructor ordering remain; native backing creates no emulated Runtime/Budget events. This does not claim a general ref_vector implementation or complete API context construction."
+        "Native result storage supersedes former source vector header/growth/refusal credit in this member grouping. Real AST reference callbacks and object destructor ordering remain; native backing creates no emulated Runtime/Budget events. The new public SMTContext owns a complete independent Go solver context, but does not claim the opaque C ABI context, callback/error-handler registry, or a general ref_vector implementation."
       ]
     },
     {
@@ -5186,7 +5207,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/api/api_context_results.go"
+        "pkg/api/api_context_results.go",
+        "pkg/api/api_solver.go",
+        "pkg/cmd_context/result_access.go"
       ],
       "tests": [
         "TestAPIContextResultsExplicitReferencesAndAlias",
@@ -5195,7 +5218,11 @@
         "TestAPIContextGoalRootSurvivesExplicitResultResetAndDrains",
         "TestAPIContextResultsCopiedAndForeignOwnerGuards",
         "TestAPIContextObjectCloseUsesNativeFreeIDStorage",
-        "TestAPIContextNativeResultGrowthAndReferenceRelease"
+        "TestAPIContextNativeResultGrowthAndReferenceRelease",
+        "TestSMTContextEndToEndModelScopesAndAssumptions",
+        "TestSMTContextUnsatCoreAndProofResults",
+        "TestSMTContextUnknownReason",
+        "TestSMTContextCopiesShareClose"
       ],
       "conditionals": [
         {
@@ -5834,22 +5861,47 @@
       "path": "src/api/api_solver.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/api/api_solver.go",
+        "pkg/api/api_solver_test.go",
+        "pkg/cmd_context/result_access.go"
+      ],
+      "tests": [
+        "TestSMTContextEndToEndModelScopesAndAssumptions",
+        "TestSMTContextUnsatCoreAndProofResults",
+        "TestSMTContextUnknownReason",
+        "TestSMTContextCopiesShareClose"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Public strategic solver construction and retained assert/assert-and-track, push/pop, check/check-assumptions, model, proof, unsat-core and reason-unknown operations",
+          "status": "partial",
+          "go_target": "pkg/api/api_solver.go",
+          "go_targets": ["pkg/cmd_context/result_access.go"],
+          "tests": [
+            "TestSMTContextEndToEndModelScopesAndAssumptions",
+            "TestSMTContextUnsatCoreAndProofResults",
+            "TestSMTContextUnknownReason"
+          ]
+        }
+      ],
+      "ownership": [
+        "SMTContext owns the command context, strategic solver, AST manager and independent runtime services. Returned models transfer one owning reference to the caller; core/proof handles remain borrowed from the last result. Copied SMTContext values share one close state."
+      ],
+      "deviations": [
+        "The retained surface is idiomatic Go over concrete AST handles, not opaque C handles. Solver translation, construction from tactics/SMT-LIB streams, parameter descriptors, assertion enumeration, statistics/string display, consequences and implied equalities remain unported at this API layer."
+      ]
     },
     {
       "path": "src/api/api_solver.h",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/api/api_solver.go"],
+      "tests": ["TestSMTContextCopiesShareClose"],
       "conditionals": [
         {
           "line": 18,
@@ -5863,8 +5915,8 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership": ["SMTContext is the owning public Go solver wrapper; copies share one state and Close is idempotent."],
+      "deviations": ["The C Z3_solver_ref wrapper and ABI reference-count calls are replaced by Go ownership and Close."]
     },
     {
       "path": "src/api/api_stats.cpp",
