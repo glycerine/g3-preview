@@ -73,3 +73,62 @@ func TestSMTSolverUnivariateNRAAPI(t *testing.T) {
 		t.Fatal("pop failed to restore original input", status)
 	}
 }
+
+func TestSMTSolverSeparableMultivariableNRAAPI(t *testing.T) {
+	m, cfg := smtModelGeneratorFixture(t)
+	s, err := NewSMTSolver(m, nil, "QF_NRA", SMTSolverConfig{Params: cfg.Context, ModelEvaluator: cfg})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	astTestMust(t, s.SetProduceModels(true))
+	family, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	real, err := m.MkFamilySort(family, 0, nil)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "nra-api-separable-x"), real)
+	astTestMust(t, err)
+	y, err := m.MkConst(astTestSymbol(t, m, "nra-api-separable-y"), real)
+	astTestMust(t, err)
+	numeral := func(n int64) ast.ASTHandle {
+		h, e := m.ArithmeticNumeralRat(big.NewRat(n, 1), false)
+		astTestMust(t, e)
+		return h
+	}
+	square := func(v ast.ASTHandle) ast.ASTHandle {
+		h, e := m.MkFamilyApp(family, smtArithOpMul, nil, []ast.ASTHandle{v, v})
+		astTestMust(t, e)
+		return h
+	}
+	xEquation, err := m.MkEq(square(x), numeral(2))
+	astTestMust(t, err)
+	yEquation, err := m.MkEq(square(y), numeral(3))
+	astTestMust(t, err)
+	xPositive, err := m.MkFamilyApp(family, smtArithOpGT, nil, []ast.ASTHandle{x, numeral(0)})
+	astTestMust(t, err)
+	yNegative, err := m.MkFamilyApp(family, smtArithOpLT, nil, []ast.ASTHandle{y, numeral(0)})
+	astTestMust(t, err)
+	formula, err := m.MkAndArgs([]ast.ASTHandle{xEquation, yEquation, xPositive, yNegative})
+	astTestMust(t, err)
+	formulaRef, err := m.NewRef(formula)
+	astTestMust(t, err)
+	defer func() { astTestMust(t, m.DelRef(&formulaRef)) }()
+	astTestMust(t, s.Assert(formula))
+	status, err := s.CheckSat(nil)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal(status)
+	}
+	md, err := s.AcquireModel()
+	astTestMust(t, err)
+	evaluator, err := model.NewModelEvaluator(md, s.kernel.modelConfig)
+	astTestMust(t, err)
+	valueRef, err := evaluator.EvaluateValue(formula)
+	astTestMust(t, err)
+	value, err := m.RefGet(valueRef)
+	astTestMust(t, err)
+	if !m.IsTrue(value) {
+		t.Fatal("separable multivariable algebraic model violates its formula")
+	}
+	astTestMust(t, m.DelRef(&valueRef))
+	astTestMust(t, evaluator.Close())
+	astTestMust(t, md.DecRef())
+}

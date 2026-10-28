@@ -1,7 +1,8 @@
+package smtcore
+
 // Initial end-to-end QF_NRA Boolean-formula path. Reuses the ported AST
 // polynomial translator and NLSAT interval/witness engine; other inputs use
 // ordinary SMT.
-package smtcore
 
 import (
 	"errors"
@@ -25,7 +26,7 @@ type smtNRAAtom struct {
 	negative    bool
 }
 type smtNRAInput struct {
-	variable  ast.ASTHandle
+	variables []ast.ASTHandle
 	branches  [][]smtNRAAtom
 	nonlinear bool
 }
@@ -90,10 +91,12 @@ func (in *smtNRAInput) term(m *ast.ASTManager, h ast.ASTHandle, family ast.Famil
 		if sf != family || sk != 0 {
 			return false, false, nil
 		}
-		if !in.variable.IsNull() && in.variable != h {
-			return false, false, nil
+		for _, variable := range in.variables {
+			if variable == h {
+				return true, true, nil
+			}
 		}
-		in.variable = h
+		in.variables = append(in.variables, h)
 		return true, true, nil
 	}
 	if fid != family {
@@ -382,17 +385,37 @@ func (in *smtNRAInput) formula(k *SMTKernel, h ast.ASTHandle, negative bool, fam
 }
 
 type smtNRAWorkspace struct {
-	kernel      *SMTKernel
-	q           *unumeral.RationalManager
-	am          *polynomial.AlgebraicManager
-	pm          *polynomial.MultivariatePolynomialManager
-	convert     *ast.Expr2Polynomial
-	conjunction *nlsat.UnivariateConjunction
-	cooperation *cooperate.Cooperation
-	primes      *primegen.Generator
-	params      uparams.ParamsRef
-	paramsReady bool
-	witness     polynomial.Algebraic
+	kernel       *SMTKernel
+	q            *unumeral.RationalManager
+	am           *polynomial.AlgebraicManager
+	pm           *polynomial.MultivariatePolynomialManager
+	convert      *ast.Expr2Polynomial
+	conjunctions []*nlsat.UnivariateConjunction
+	cooperation  *cooperate.Cooperation
+	primes       *primegen.Generator
+	params       uparams.ParamsRef
+	paramsReady  bool
+	witnesses    []polynomial.Algebraic
+}
+
+func (w *smtNRAWorkspace) resetBranch() error {
+	for len(w.conjunctions) > 0 {
+		i := len(w.conjunctions) - 1
+		if err := w.conjunctions[i].Close(); err != nil {
+			return err
+		}
+		w.conjunctions = w.conjunctions[:i]
+	}
+	if w.am != nil {
+		for len(w.witnesses) > 0 {
+			i := len(w.witnesses) - 1
+			if err := w.am.Del(&w.witnesses[i]); err != nil {
+				return err
+			}
+			w.witnesses = w.witnesses[:i]
+		}
+	}
+	return nil
 }
 
 func (w *smtNRAWorkspace) Close() error {
@@ -401,11 +424,8 @@ func (w *smtNRAWorkspace) Close() error {
 			return err
 		}
 	}
-	if w.conjunction != nil {
-		if err := w.conjunction.Close(); err != nil {
-			return err
-		}
-		w.conjunction = nil
+	if err := w.resetBranch(); err != nil {
+		return err
 	}
 	if w.convert != nil {
 		if err := w.convert.Close(); err != nil {
@@ -420,9 +440,6 @@ func (w *smtNRAWorkspace) Close() error {
 		w.pm = nil
 	}
 	if w.am != nil {
-		if err := w.am.Del(&w.witness); err != nil {
-			return err
-		}
 		if err := w.am.Close(); err != nil {
 			return err
 		}
@@ -482,7 +499,13 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 			return lbool.Undef, false, nil
 		}
 	}
-	if !in.nonlinear || in.variable.IsNull() || k.paramGlobals == nil {
+	if !in.nonlinear || len(in.variables) == 0 || k.paramGlobals == nil {
+		return lbool.Undef, false, nil
+	}
+	// Keep established non-model arithmetic strategy consumers on their
+	// ordinary backend until the complete multivariate NLSAT search replaces
+	// this guarded exact-model specialization.
+	if len(in.variables) > 1 && !k.produceModel {
 		return lbool.Undef, false, nil
 	}
 	handled = true
@@ -528,14 +551,10 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 	if err != nil {
 		return
 	}
-	// Pin the one real constant to polynomial variable zero in the real mapper.
+	// Pin real constants to stable polynomial variables in first-seen order.
 	core, e := w.pm.ArithmeticCore()
 	if e != nil {
 		err = e
-		return
-	}
-	_, err = core.MkVar()
-	if err != nil {
 		return
 	}
 	mapping, e := w.convert.Mapping()
@@ -543,17 +562,32 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 		err = e
 		return
 	}
-	err = mapping.Insert(in.variable, 0)
-	if err != nil {
-		return
+	for i, variable := range in.variables {
+		created, e := core.MkVar()
+		if e != nil {
+			err = e
+			return
+		}
+		if created != uint32(i) {
+			err = ast.ErrASTDomain
+			return
+		}
+		if err = mapping.Insert(variable, created); err != nil {
+			return
+		}
 	}
 	sat := false
 	for _, branch := range in.branches {
-		w.conjunction, err = nlsat.NewUnivariateConjunction(w.am, w.pm, 0)
-		if err != nil {
-			return
+		for variable := range in.variables {
+			conjunction, e := nlsat.NewUnivariateConjunction(w.am, w.pm, uint32(variable))
+			if e != nil {
+				err = e
+				return
+			}
+			w.conjunctions = append(w.conjunctions, conjunction)
 		}
 		for _, a := range branch {
+			unsupported := false
 			difference, e := k.manager.MkFamilyApp(family, smtArithOpSub, nil, []ast.ASTHandle{a.left, a.right})
 			if e != nil {
 				err = e
@@ -583,25 +617,52 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 				e = de
 			}
 			if e == nil {
-				e = w.conjunction.Add(value, a.kind, a.negative)
+				variable := uint32(0)
+				max, me := core.MaxVariable(value)
+				if me == nil && max != nlsat.NullVariable {
+					var univariate bool
+					univariate, me = core.IsUnivariate(value)
+					if me == nil && (!univariate || uint64(max) >= uint64(len(w.conjunctions))) {
+						unsupported = true
+					}
+					variable = max
+				}
+				if me == nil && !unsupported {
+					e = w.conjunctions[variable].Add(value, a.kind, a.negative)
+				} else if me != nil {
+					e = me
+				}
 			}
 			e = errors.Join(e, d.Close(), p.Close())
 			if e != nil {
 				err = e
 				return
 			}
+			if unsupported {
+				handled = false
+				result = lbool.Undef
+				return
+			}
 		}
-		sat, err = w.conjunction.Check(&w.witness)
-		if err != nil {
-			return
+		sat = true
+		for _, conjunction := range w.conjunctions {
+			w.witnesses = append(w.witnesses, polynomial.Algebraic{})
+			ok, e := conjunction.Check(&w.witnesses[len(w.witnesses)-1])
+			if e != nil {
+				err = e
+				return
+			}
+			if !ok {
+				sat = false
+				break
+			}
 		}
 		if sat {
 			break
 		}
-		if err = w.conjunction.Close(); err != nil {
+		if err = w.resetBranch(); err != nil {
 			return
 		}
-		w.conjunction = nil
 	}
 	if !sat {
 		return lbool.False, true, nil
@@ -621,40 +682,36 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 			err = errors.Join(err, md.Close())
 		}
 	}()
-	rational, e := w.am.IsRational(&w.witness)
-	if e != nil {
-		err = e
-		return
-	}
-	var numeral ast.ASTHandle
-	if rational {
-		var r unumeral.Rational
-		err = w.am.ToRational(&w.witness, &r)
-		if err != nil {
-			return
-		}
-		text, e := w.q.String(&r)
-		e = errors.Join(e, w.q.Del(&r))
+	numeralFor := func(witness *polynomial.Algebraic) (ast.ASTHandle, error) {
+		rational, e := w.am.IsRational(witness)
 		if e != nil {
-			err = e
-			return
+			return ast.ASTHandle{}, e
 		}
-		number, ok := new(big.Rat).SetString(text)
-		if !ok {
-			err = ast.ErrASTDomain
-			return
+		if rational {
+			var r unumeral.Rational
+			if e = w.am.ToRational(witness, &r); e != nil {
+				return ast.ASTHandle{}, e
+			}
+			text, stringErr := w.q.String(&r)
+			stringErr = errors.Join(stringErr, w.q.Del(&r))
+			if stringErr != nil {
+				return ast.ASTHandle{}, stringErr
+			}
+			number, ok := new(big.Rat).SetString(text)
+			if !ok {
+				return ast.ASTHandle{}, ast.ErrASTDomain
+			}
+			return k.manager.ArithmeticNumeralRat(number, false)
 		}
-		numeral, err = k.manager.ArithmeticNumeralRat(number, false)
-	} else {
 		previous, e := uparams.BindProcessGlobalParamsService(k.paramGlobals)
 		if e != nil {
-			err = e
-			return
+			return ast.ASTHandle{}, e
 		}
 		target, e := k.manager.ArithmeticAlgebraicManager()
 		var value polynomial.Algebraic
+		var numeral ast.ASTHandle
 		if e == nil {
-			e = target.CopyFromCore(&value, w.am.AlgebraicRootCore, &w.witness)
+			e = target.CopyFromCore(&value, w.am.AlgebraicRootCore, witness)
 		}
 		if e == nil {
 			numeral, e = k.manager.ArithmeticAlgebraicNumeral(&value)
@@ -663,19 +720,22 @@ func (k *SMTKernel) tryUnivariateNRA() (result lbool.LBool, handled bool, err er
 			e = errors.Join(e, target.Del(&value))
 		}
 		_, restore := uparams.BindProcessGlobalParamsService(previous)
-		err = errors.Join(e, restore)
+		return numeral, errors.Join(e, restore)
 	}
-	if err != nil {
-		return
-	}
-	decl, e := k.manager.GetDecl(in.variable)
-	if e != nil {
-		err = e
-		return
-	}
-	err = md.Core().RegisterConstant(decl, numeral)
-	if err != nil {
-		return
+	for i, variable := range in.variables {
+		numeral, e := numeralFor(&w.witnesses[i])
+		if e != nil {
+			err = e
+			return
+		}
+		decl, e := k.manager.GetDecl(variable)
+		if e != nil {
+			err = e
+			return
+		}
+		if err = md.Core().RegisterConstant(decl, numeral); err != nil {
+			return
+		}
 	}
 	err = md.Core().IncRef()
 	if err != nil {
