@@ -352,6 +352,24 @@ func (c *PolynomialCache) MkUnique(p Polynomial) (Polynomial, error) {
 	defer c.endExecution()
 	return c.mkUnique(p)
 }
+
+// CleanupUnique acknowledges only a lexical sort actually accepted by this
+// cache's canonicalization call. It does not reset canonical representatives or
+// clear another caller's independent pending lexical sort.
+func (c *PolynomialCache) CleanupUnique() error {
+	if c == nil || c.self != c {
+		return ErrPolynomialOwner
+	}
+	if c.executing {
+		return ErrPolynomialPending
+	}
+	if c.closed {
+		return arena.ErrClosed
+	}
+	c.beginExecution()
+	defer c.endExecution()
+	return c.manager.cleanupLexSortInvocation(&c.hashLex)
+}
 func (c *PolynomialCache) mkUnique(p Polynomial) (Polynomial, error) {
 	// cpp143/146: pid reaches only polynomial::id, not the reference
 	// count or term count exposed by the whole-header Info adaptation.

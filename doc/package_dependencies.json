@@ -2102,6 +2102,7 @@
         "evaluator_intervals.go",
         "evaluator_polynomial.go",
         "gparams_catalog_collectors.go",
+        "inequality_atom_cache.go",
         "interval_set.go",
         "interval_set_operations.go",
         "justification.go",

@@ -64222,7 +64222,8 @@
         "pkg/math/polynomial/polynomial_cache_pending_psc_test.go",
         "pkg/math/polynomial/polynomial_cache_constructor_callback_test.go",
         "pkg/math/polynomial/polynomial_cache_replay_prefix_test.go",
-        "pkg/math/polynomial/polynomial_cache_publication_test.go"
+        "pkg/math/polynomial/polynomial_cache_publication_test.go",
+        "pkg/math/polynomial/polynomial_cache_unique_cleanup_test.go"
       ],
       "tests": [
         "TestPolynomialCacheKnownIDReadsOnlyIDField",
@@ -64250,7 +64251,9 @@
         "TestPolynomialCacheNestedCallsRestoreBorrowedCoreBinding",
         "TestPolynomialCacheStoppedResetRetainsBorrowedManager",
         "TestPolynomialCacheMultiplePendingBorrowsReleaseIndependently",
-        "TestPolynomialCacheStoppedDeletionRetainsBorrowedManager"
+        "TestPolynomialCacheStoppedDeletionRetainsBorrowedManager",
+        "TestPolynomialCacheUniqueCleanupAcceptedInvocation",
+        "TestPolynomialCacheUniqueCleanupPreservesOlderLexicalSort"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -64416,6 +64419,15 @@
             "TestPolynomialCacheNestedCallsRestoreBorrowedCoreBinding",
             "TestPolynomialCacheResetAndCloseCallbacksRetainExecutingOwner"
           ]
+        },
+        {
+          "name": "Explicit native canonicalization acknowledgement through the exact accepted lexical-sort invocation",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheUniqueCleanupAcceptedInvocation",
+            "TestPolynomialCacheUniqueCleanupPreservesOlderLexicalSort"
+          ]
         }
       ],
       "ownership": [
@@ -64423,7 +64435,8 @@
         "Canonical representatives acquire exactly one owning reference in refs after table insertion, then publish the cached-ID flag. Buckets and factor/PSC result arrays borrow those representatives. Duplicate canonical lookup adds no cache reference. Reset/Close release the actual owning vector; independent caller vectors keep their own references across cache reset. Manager/PM borrow without allocation or ownership.",
         "PSC misses publish result extent before per-slot canonicalization/replacement. Factor misses retain their actual constructed local, publish distinct canonical results, then run its literal source destructor. Failed construction does not run a class destructor. Only exact accepted factor/PSC callee receipts grant cleanup; independent older invocations remain untouched. Unwritten published slots are guarded from replay; pre-publication size-zero entries replay empty. Populated-hit reference stops retain only the successfully acquired caller prefix and never recompute the cached result.",
         "Constructor/operations/owning cleanup protect the actual borrowed manager through callbacks and restore enclosing synchronous scopes. Only stopped work retains a pending borrow, released after exact cleanup. Full/core source and owning destruction refuse before member progress. Reset replaces its separate actual imp owner after canonical cleanup, preserving manager identity and supporting an explicit continuation after replacement refusal.",
-        "Retained NLSAT interface evidence uses PM/Manager to construct the same concrete reference-vector consumer and preserves canonical identity and independent ownership across reset. This closes the cache library interface audit; the NLSAT algorithm port is a separate consumer task and broader polynomial/factor/algebraic source-unit audits remain open."
+        "Retained NLSAT interface evidence uses PM/Manager to construct the same concrete reference-vector consumer and preserves canonical identity and independent ownership across reset. This closes the cache library interface audit; the NLSAT algorithm port is a separate consumer task and broader polynomial/factor/algebraic source-unit audits remain open.",
+        "CleanupUnique releases only scratch belonging to the exact lexical-sort invocation accepted by MkUnique, preserving canonical representatives. An actual older independently stopped lexical sort survives a refused cache call and younger cleanup with identical first cause, generation, memory statistics and budget usage. This is an explicit native continuation helper, not a new C++ algorithm or completion claim for the NLSAT consumer."
       ],
       "deviations": [
         "Native Go hash buckets/maps and slices replace chashtable, svector and raw pointer-result storage. Container allocations have Go runtime semantics rather than synthetic C++ capacity/failure states. A separately charged real Go imp owner preserves the retained cache wrapper replacement and memory-trace lifetime. Borrowed scalar handles carry no additional numeral ownership.",
@@ -64460,7 +64473,8 @@
         "pkg/math/polynomial/polynomial_cache_pending_psc_test.go",
         "pkg/math/polynomial/polynomial_cache_constructor_callback_test.go",
         "pkg/math/polynomial/polynomial_cache_replay_prefix_test.go",
-        "pkg/math/polynomial/polynomial_cache_publication_test.go"
+        "pkg/math/polynomial/polynomial_cache_publication_test.go",
+        "pkg/math/polynomial/polynomial_cache_unique_cleanup_test.go"
       ],
       "tests": [
         "TestPolynomialCacheKnownIDReadsOnlyIDField",
@@ -64485,7 +64499,9 @@
         "TestPolynomialCacheNestedCallsRestoreBorrowedCoreBinding",
         "TestPolynomialCacheStoppedResetRetainsBorrowedManager",
         "TestPolynomialCacheMultiplePendingBorrowsReleaseIndependently",
-        "TestPolynomialCacheStoppedDeletionRetainsBorrowedManager"
+        "TestPolynomialCacheStoppedDeletionRetainsBorrowedManager",
+        "TestPolynomialCacheUniqueCleanupAcceptedInvocation",
+        "TestPolynomialCacheUniqueCleanupPreservesOlderLexicalSort"
       ],
       "conditionals": [
         {
@@ -64567,6 +64583,15 @@
             "TestPolynomialCacheBorrowedManagerSupportsRetainedReferenceConsumer",
             "TestPolynomialCacheManagerAccessorOwnerAndResetLifetime"
           ]
+        },
+        {
+          "name": "Explicit native canonicalization acknowledgement through the exact accepted lexical-sort invocation",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheUniqueCleanupAcceptedInvocation",
+            "TestPolynomialCacheUniqueCleanupPreservesOlderLexicalSort"
+          ]
         }
       ],
       "ownership": [
@@ -64574,7 +64599,8 @@
         "Canonical representatives acquire exactly one owning reference in refs after table insertion, then publish the cached-ID flag. Buckets and factor/PSC result arrays borrow those representatives. Duplicate canonical lookup adds no cache reference. Reset/Close release the actual owning vector; independent caller vectors keep their own references across cache reset. Manager/PM borrow without allocation or ownership.",
         "PSC misses publish result extent before per-slot canonicalization/replacement. Factor misses retain their actual constructed local, publish distinct canonical results, then run its literal source destructor. Failed construction does not run a class destructor. Only exact accepted factor/PSC callee receipts grant cleanup; independent older invocations remain untouched. Unwritten published slots are guarded from replay; pre-publication size-zero entries replay empty. Populated-hit reference stops retain only the successfully acquired caller prefix and never recompute the cached result.",
         "Constructor/operations/owning cleanup protect the actual borrowed manager through callbacks and restore enclosing synchronous scopes. Only stopped work retains a pending borrow, released after exact cleanup. Full/core source and owning destruction refuse before member progress. Reset replaces its separate actual imp owner after canonical cleanup, preserving manager identity and supporting an explicit continuation after replacement refusal.",
-        "Retained NLSAT interface evidence uses PM/Manager to construct the same concrete reference-vector consumer and preserves canonical identity and independent ownership across reset. This closes the cache library interface audit; the NLSAT algorithm port is a separate consumer task and broader polynomial/factor/algebraic source-unit audits remain open."
+        "Retained NLSAT interface evidence uses PM/Manager to construct the same concrete reference-vector consumer and preserves canonical identity and independent ownership across reset. This closes the cache library interface audit; the NLSAT algorithm port is a separate consumer task and broader polynomial/factor/algebraic source-unit audits remain open.",
+        "CleanupUnique releases only scratch belonging to the exact lexical-sort invocation accepted by MkUnique, preserving canonical representatives. An actual older independently stopped lexical sort survives a refused cache call and younger cleanup with identical first cause, generation, memory statistics and budget usage. This is an explicit native continuation helper, not a new C++ algorithm or completion claim for the NLSAT consumer."
       ],
       "deviations": [
         "Native Go hash buckets/maps and slices replace chashtable, svector and raw pointer-result storage. Container allocations have Go runtime semantics rather than synthetic C++ capacity/failure states. A separately charged real Go imp owner preserves the retained cache wrapper replacement and memory-trace lifetime. Borrowed scalar handles carry no additional numeral ownership.",
@@ -91071,12 +91097,18 @@
       "status": "partial",
       "go_targets": [
         "pkg/nlsat/assumption.go",
-        "pkg/nlsat/assumption_manager.go"
+        "pkg/nlsat/assumption_manager.go",
+        "pkg/nlsat/inequality_atom_cache.go"
       ],
       "tests": [
         "pkg/nlsat/assumption_manager_test.go",
         "pkg/nlsat/assumption_justification_pending_test.go",
-        "pkg/nlsat/clause_justification_test.go"
+        "pkg/nlsat/clause_justification_test.go",
+        "TestInequalityFactoryCanonicalIdentityParityOrderAndHeader",
+        "TestInequalityFactorySourceSignFlipAndEvaluator",
+        "TestInequalityFactoryAllocationCleanupAndReuse",
+        "TestInequalityFactoryRetirementOwnsFactorsAcrossPolynomialReset",
+        "TestInequalityFactoryCanonicalCubicPrebuiltCPPOracle"
       ],
       "conditionals": [
         {
@@ -91468,14 +91500,28 @@
             "TestAssumptionDeletionSourceOrderThroughAllocatorReuse",
             "TestAssumptionAndLazyOwnersPreserveEachOthersPendingAllocation"
           ]
+        },
+        {
+          "name": "Inner mk_ineq_atom canonical factory and split erase/factor-release retirement (nlsat_solver.cpp:454-458,476-483,510-545)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/inequality_atom_cache.go",
+          "tests": [
+            "TestInequalityFactoryCanonicalIdentityParityOrderAndHeader",
+            "TestInequalityFactorySourceSignFlipAndEvaluator",
+            "TestInequalityFactoryAllocationCleanupAndReuse",
+            "TestInequalityFactoryRetirementOwnsFactorsAcrossPolynomialReset",
+            "TestInequalityFactoryCanonicalCubicPrebuiltCPPOracle"
+          ]
         }
       ],
       "ownership": [
-        "The retained NLSAT dconfig has ref_count=false for leaf values. Its actual SmallAllocator-backed dependency nodes have zero factory references and acquire references to join children; aliases acquire none. Thirty-bit counters and node marks preserve the source algorithm. Interrupted traversal retains reached marks/output until explicit cleanup. Iterative deletion preserves left-to-right child decrements, parent retirement then LIFO queued children, with stored consumed-decrement/push and allocator-release progress. The manager borrows its allocator and rejects closing with live nodes."
+        "The retained NLSAT dconfig has ref_count=false for leaf values. Its actual SmallAllocator-backed dependency nodes have zero factory references and acquire references to join children; aliases acquire none. Thirty-bit counters and node marks preserve the source algorithm. Interrupted traversal retains reached marks/output until explicit cleanup. Iterative deletion preserves left-to-right child decrements, parent retirement then LIFO queued children, with stored consumed-decrement/push and allocator-release progress. The manager borrows its allocator and rejects closing with live nodes.",
+        "The concrete inner inequality cache borrows the real polynomial manager, canonical polynomial cache and SmallAllocator. It normalizes leading signs, canonicalizes each ordered factor, constructs a zero-reference/null-Boolean atom and inserts before acquiring factor references. Duplicate temporary storage is retired without modifying the existing atom header or acquiring factor references. Concrete PolynomialRef owners retain each new factor independently of polynomial-cache reset. Retirement erases the table first and releases factors/storage separately, leaving the source Boolean-variable deletion step to the still-unported outer solver. Stopped accepted lexical sorting is acknowledged explicitly through PolynomialCache.CleanupUnique before factory temporary cleanup; stale cleanup preserves independent older lexical work."
       ],
       "deviations": [
         "The NLSAT assumption specialization is concrete and AST-independent: leaf values carry either a frontend attachment identity or a borrowed pointer to an actual input literal. Nonzero-sized attachment tokens preserve distinct native identities; the retained goal frontend must map its concrete AST dependencies to these identities when integrated. Equal-valued literals at different input positions remain distinct. No any-valued callback/value adapter or C++ standard-library container is introduced. Native Go layouts/array capacities differ from source; caller output slices use Go storage. Every allocation/lexical/diagnostic frontier and full solver integration remain unaudited.",
-        "Only the actual retained assumption-manager/dconfig subobject is implemented by this entry. The solver constructor, Boolean-variable arrays, atom canonicalization/factories, clause/watch integration, assumption-check/core protocol, explanation/search, root permutation, model handling and own diagnostics remain unported. This is not a complete NLSAT solver or substitute general backend."
+        "Only the actual retained assumption-manager/dconfig subobject is implemented by this entry. The solver constructor, Boolean-variable arrays, atom canonicalization/factories, clause/watch integration, assumption-check/core protocol, explanation/search, root permutation, model handling and own diagnostics remain unported. This is not a complete NLSAT solver or substitute general backend.",
+        "Go maps/slices replace source hashtable/vector internals. Native reflected storage extents and per-factor PolynomialRef owner headers differ from the C++ packed atom layout and introduce native allocation frontiers; focused failures verify native cleanup, not identical C++ allocation counts. Inner factory TRACE/display frontiers, complete physical/lexical ownership audit, outer Boolean registration, root factory, explanation and search remain unported or unaudited. Both whole-unit audit flags remain false."
       ]
     },
     {
