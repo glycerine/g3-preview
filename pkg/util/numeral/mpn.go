@@ -1,7 +1,7 @@
-// Translated from src/util/mpn.h and src/util/mpn.cpp.
-
-// Package mpnum contains the fork's independent exact numerical algorithms.
+// Package numeral contains the fork's independent exact numerical algorithms.
 package numeral
+
+// Translated from src/util/mpn.h and src/util/mpn.cpp.
 
 func limb(a []uint32, i int) uint32 {
 	if i < len(a) {

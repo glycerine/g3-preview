@@ -1,5 +1,6 @@
-// portcheck is an opt-in maintainer inventory tool; semantic tests are hermetic.
 package main
+
+// portcheck is an opt-in maintainer inventory tool; semantic tests are hermetic.
 
 import (
 	"flag"

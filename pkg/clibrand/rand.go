@@ -1,12 +1,12 @@
-// Source dependency: src/math/polynomial/polynomial.cpp:4053-4068;
-// src/test/lp.cpp:1459.
-
 // Package clibrand supplies the shared C rand/srand stream for the selected
 // Linux/glibc source profile. It implements the mathematical recurrence
 // described by Peter Selinger at https://www.mathstat.dal.ca/~selinger/random/;
 // no libc implementation code is incorporated. Other libc profiles remain
 // separate portability obligations.
 package clibrand
+
+// Source dependency: src/math/polynomial/polynomial.cpp:4053-4068;
+// src/test/lp.cpp:1459.
 
 import "sync"
 

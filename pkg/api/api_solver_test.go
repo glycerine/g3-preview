@@ -272,6 +272,20 @@ func TestSMTContextAssertSMT2TransactionalFinalAssertions(t *testing.T) {
 	})
 }
 
+func TestSMTContextAssertSMT2ParametricDatatypeIntegration(t *testing.T) {
+	f := newSMTAPIFixture(t, "ALL", nil)
+	script := `(declare-datatype List (par (T) ((nil) (cons (head T) (tail (List T))))))
+(declare-const xs (List Bool))
+(assert (= xs (cons true nil)))
+(assert (not (head xs)))`
+	astTestMust(t, f.c.AssertSMT2(strings.NewReader(script)))
+	status, err := f.c.CheckSat()
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("translated parametric datatype status", status)
+	}
+}
+
 func TestSMTContextUnknownReason(t *testing.T) {
 	f := newSMTAPIFixture(t, "ALL", func(c *SMTContext) {
 		astTestMust(t, c.SetBoolOption("auto_config", false))
