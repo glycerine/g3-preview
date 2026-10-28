@@ -38,7 +38,23 @@ func (t *SMTArrayTheory) NewDisequality(left, right SMTTheoryVar) error {
 		return err
 	}
 	family, err := s.manager.GetFamilyID(sort)
-	if err != nil || family != t.FamilyID() || !t.extensional {
+	if err != nil {
+		return err
+	}
+	secondSort, err := s.manager.GetSort(second.owner)
+	if err != nil {
+		return err
+	}
+	secondFamily, err := s.manager.GetFamilyID(secondSort)
+	if err != nil {
+		return err
+	}
+	if family == t.FamilyID() {
+		if err = arraySourceAssert(307, "m_var_data[v2]->m_is_array", func() bool { return secondFamily == t.FamilyID() }); err != nil {
+			return err
+		}
+	}
+	if family != t.FamilyID() || secondFamily != t.FamilyID() || !t.extensional {
 		return err
 	}
 	if err = t.emitSimpleArrayTrace("ext", "new_diseq_eh", 308, nil, func(out io.Writer) error {
@@ -65,6 +81,35 @@ func (t *SMTArrayTheory) NewDisequality(left, right SMTTheoryVar) error {
 func (t *SMTArrayTheory) instantiateArrayExtensionality(first, second *SMTEnode) error {
 	if !t.extensional {
 		return nil
+	}
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	leftSort, err := state.manager.GetSort(first.owner)
+	if err != nil {
+		return err
+	}
+	rightSort, err := state.manager.GetSort(second.owner)
+	if err != nil {
+		return err
+	}
+	leftFamily, err := state.manager.GetFamilyID(leftSort)
+	if err != nil {
+		return err
+	}
+	rightFamily, err := state.manager.GetFamilyID(rightSort)
+	if err != nil {
+		return err
+	}
+	if err = arraySourceAssert(227, "is_array_sort(a1)", func() bool { return leftFamily == t.FamilyID() }); err != nil {
+		return err
+	}
+	if err = arraySourceAssert(228, "is_array_sort(a2)", func() bool { return rightFamily == t.FamilyID() }); err != nil {
+		return err
+	}
+	if leftFamily != t.FamilyID() || rightFamily != t.FamilyID() {
+		return ast.ErrASTDomain
 	}
 	if err := t.emitSimpleArrayTrace("array", "instantiate_extensionality", 226, nil, func(out io.Writer) error {
 		leftID, err := first.OwnerID()

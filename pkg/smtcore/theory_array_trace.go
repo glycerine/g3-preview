@@ -7,7 +7,34 @@ import (
 	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+func arraySourceAssert(line int32, condition string, evaluate func() bool) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil || !enabled {
+		return err
+	}
+	if !evaluate() {
+		return diagnostic.DebugAssertionFailure(d, "src/smt/theory_array.cpp", line, condition)
+	}
+	return nil
+}
+
+func arraySourceVerify(line int32, condition string, evaluate func() bool) error {
+	if evaluate() {
+		return nil
+	}
+	err := diagnostic.BorrowProcessDebugContext().VerifyFailure("src/smt/theory_array.cpp", line, condition)
+	if err != nil {
+		return err
+	}
+	return ast.ErrASTDomain
+}
 
 func (t *SMTArrayTheory) emitArrayTrace(tag, function string, line int, condition func() bool, body func(io.Writer) error) error {
 	return t.emitArrayTraceAt("src/smt/theory_array_base.cpp", tag, function, line, condition, body)

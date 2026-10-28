@@ -28,6 +28,27 @@ func (t *SMTArrayTheory) queueStoreReadAxiom(read, store ast.ASTHandle, upward b
 	if readNode == nil || storeNode == nil || len(readNode.arguments) < 2 || len(storeNode.arguments) != len(readNode.arguments)+1 {
 		return false, ast.ErrASTDomain
 	}
+	readOp, readArray, err := t.arrayOperation(read)
+	if err != nil {
+		return false, err
+	}
+	storeOp, storeArray, err := t.arrayOperation(store)
+	if err != nil {
+		return false, err
+	}
+	readLine, storeLine := int32(208), int32(209)
+	if upward {
+		readLine, storeLine = 216, 217
+	}
+	if err = arraySourceAssert(readLine, "is_select(select)", func() bool { return readArray && readOp == ast.ASTArrayOpSelect }); err != nil {
+		return false, err
+	}
+	if err = arraySourceAssert(storeLine, "is_store(store)", func() bool { return storeArray && storeOp == ast.ASTArrayOpStore }); err != nil {
+		return false, err
+	}
+	if !readArray || readOp != ast.ASTArrayOpSelect || !storeArray || storeOp != ast.ASTArrayOpStore {
+		return false, ast.ErrASTDomain
+	}
 	line, tag, label := 207, "array", "axiom 2a"
 	if upward {
 		line, tag, label = 215, "array_axiom2b", "axiom 2b"

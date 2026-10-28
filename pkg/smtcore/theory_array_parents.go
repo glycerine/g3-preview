@@ -51,8 +51,12 @@ func (t *SMTArrayTheory) CreateVariable(node *SMTEnode) (SMTTheoryVar, error) {
 	if err != nil {
 		return variable, err
 	}
-	if t.arrayUnion.MkVar() != uint32(variable) {
-		return SMTNullTheoryVar, ast.ErrASTDomain
+	unionVariable := t.arrayUnion.MkVar()
+	if err = arraySourceVerify(73, "r == static_cast<theory_var>(m_find.mk_var())", func() bool { return unionVariable == uint32(variable) }); err != nil {
+		return SMTNullTheoryVar, err
+	}
+	if err = arraySourceAssert(74, "r == static_cast<int>(m_var_data.size())", func() bool { return int(variable) == len(t.arrayData) }); err != nil {
+		return SMTNullTheoryVar, err
 	}
 	data := &smtArrayVarData{}
 	t.arrayData = append(t.arrayData, data)
@@ -97,7 +101,17 @@ func (t *SMTArrayTheory) CreateVariable(node *SMTEnode) (SMTTheoryVar, error) {
 }
 
 func (t *SMTArrayTheory) addParentSelect(variable SMTTheoryVar, read *SMTEnode) error {
-	if variable < 0 || int(variable) >= len(t.arrayData) {
+	if read == nil {
+		return ast.ErrASTDomain
+	}
+	op, array, err := t.arrayOperation(read.owner)
+	if err != nil {
+		return err
+	}
+	if err = arraySourceAssert(94, "is_select(s)", func() bool { return array && op == ast.ASTArrayOpSelect }); err != nil {
+		return err
+	}
+	if !array || op != ast.ASTArrayOpSelect || variable < 0 || int(variable) >= len(t.arrayData) {
 		return ast.ErrASTDomain
 	}
 	root := t.arrayUnion.Find(uint32(variable))
@@ -161,7 +175,17 @@ func (t *SMTArrayTheory) addParentSelect(variable SMTTheoryVar, read *SMTEnode) 
 }
 
 func (t *SMTArrayTheory) addParentStore(variable SMTTheoryVar, store *SMTEnode) error {
-	if variable < 0 || int(variable) >= len(t.arrayData) {
+	if store == nil {
+		return ast.ErrASTDomain
+	}
+	op, array, err := t.arrayOperation(store.owner)
+	if err != nil {
+		return err
+	}
+	if err = arraySourceAssert(116, "is_store(s)", func() bool { return array && op == ast.ASTArrayOpStore }); err != nil {
+		return err
+	}
+	if !array || op != ast.ASTArrayOpStore || variable < 0 || int(variable) >= len(t.arrayData) {
 		return ast.ErrASTDomain
 	}
 	data := t.arrayData[t.arrayUnion.Find(uint32(variable))]
@@ -225,6 +249,19 @@ func (t *SMTArrayTheory) setArrayUpward(variable uint32) error {
 }
 
 func (t *SMTArrayTheory) addArrayStore(variable uint32, store *SMTEnode) error {
+	if store == nil {
+		return ast.ErrASTDomain
+	}
+	op, array, err := t.arrayOperation(store.owner)
+	if err != nil {
+		return err
+	}
+	if err = arraySourceAssert(182, "is_store(s)", func() bool { return array && op == ast.ASTArrayOpStore }); err != nil {
+		return err
+	}
+	if !array || op != ast.ASTArrayOpStore || int(variable) >= len(t.arrayData) {
+		return ast.ErrASTDomain
+	}
 	data := t.arrayData[t.arrayUnion.Find(variable)]
 	// Retained AlwaysPropUpward is true: add_store marks the class before
 	// inserting the new constructor, then propagates through its new input.
@@ -236,6 +273,16 @@ func (t *SMTArrayTheory) addArrayStore(variable uint32, store *SMTEnode) error {
 		return err
 	}
 	for _, read := range data.parentSelects {
+		readOp, readArray, readErr := t.arrayOperation(read.owner)
+		if readErr != nil {
+			return readErr
+		}
+		if err = arraySourceAssert(192, "is_select(n)", func() bool { return readArray && readOp == ast.ASTArrayOpSelect }); err != nil {
+			return err
+		}
+		if !readArray || readOp != ast.ASTArrayOpSelect {
+			return ast.ErrASTDomain
+		}
 		if err := t.enqueueStoreReadAxiom(read.owner, store.owner); err != nil {
 			return err
 		}
@@ -244,6 +291,12 @@ func (t *SMTArrayTheory) addArrayStore(variable uint32, store *SMTEnode) error {
 }
 
 func (t *SMTArrayTheory) mergeArrayClasses(root, child uint32) error {
+	if err := arraySourceAssert(51, "v1 == find(v1)", func() bool { return root < uint32(len(t.arrayData)) && root == t.arrayUnion.Find(root) }); err != nil {
+		return err
+	}
+	if root >= uint32(len(t.arrayData)) || child >= uint32(len(t.arrayData)) {
+		return ast.ErrASTDomain
+	}
 	if err := t.emitSimpleArrayTrace("array", "merge_eh", 48, nil, func(out io.Writer) error {
 		if _, err := fmt.Fprintf(out, "merging v%d v%d\n", root, child); err != nil {
 			return err
@@ -354,7 +407,16 @@ func (t *SMTArrayTheory) Relevant(expression ast.ASTHandle) error {
 	}
 	if t.arrayConfig.Laziness != 0 && (op == ast.ASTArrayOpStore || op == ast.ASTArrayOpSelect) {
 		variable := node.arguments[0].TheoryVar(t.FamilyID())
+		if err = arraySourceAssert(325, "v_arg != null_theory_var", func() bool { return variable != SMTNullTheoryVar }); err != nil {
+			return err
+		}
+		if variable == SMTNullTheoryVar {
+			return ast.ErrASTDomain
+		}
 		if op == ast.ASTArrayOpStore {
+			if err = arraySourceAssert(330, "is_store(n)", func() bool { return true }); err != nil {
+				return err
+			}
 			err = t.addParentStore(variable, node)
 		} else {
 			err = t.addParentSelect(variable, node)

@@ -230,6 +230,9 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 		}
 		if t.arrayConfig.Laziness == 0 {
 			base := state.context.enodes[expression].arguments[0]
+			if err = arraySourceAssert(280, "v_arg != null_theory_var", func() bool { return base.TheoryVar(t.FamilyID()) != SMTNullTheoryVar }); err != nil {
+				return false, err
+			}
 			if err = t.addParentStore(base.TheoryVar(t.FamilyID()), state.context.enodes[expression]); err != nil {
 				return false, err
 			}
@@ -272,6 +275,16 @@ func (t *SMTArrayTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error)
 func (t *SMTArrayTheory) assertStoreAxiom(store ast.ASTHandle) error {
 	if t.stores[store] {
 		return nil
+	}
+	op, array, err := t.arrayOperation(store)
+	if err != nil {
+		return err
+	}
+	if err = arraySourceAssert(201, "is_store(store)", func() bool { return array && op == ast.ASTArrayOpStore }); err != nil {
+		return err
+	}
+	if !array || op != ast.ASTArrayOpStore {
+		return ast.ErrASTDomain
 	}
 	if err := t.traceSimpleArrayExpression("array", "instantiate_axiom1", 200, "axiom 1:\n", store); err != nil {
 		return err
@@ -560,7 +573,13 @@ func (t *SMTArrayTheory) ApplySortConstraint(node *SMTEnode, sort ast.ASTHandle)
 		return err
 	}
 	family, err := state.manager.GetFamilyID(sort)
-	if err != nil || family != t.FamilyID() || t.IsAttachedToVariable(node) {
+	if err != nil {
+		return err
+	}
+	if err = arraySourceAssert(293, "is_array_sort(s)", func() bool { return family == t.FamilyID() }); err != nil {
+		return err
+	}
+	if family != t.FamilyID() || t.IsAttachedToVariable(node) {
 		return err
 	}
 	_, err = t.CreateVariable(node)
@@ -646,7 +665,13 @@ func (t *SMTArrayTheory) PopScopes(count uint32) error {
 	t.defaultFingerprintTrail = t.defaultFingerprintTrail[:scope.defaultFingerprints]
 	t.unsupported = scope.unsupported
 	t.scopes = t.scopes[:level]
-	return t.SMTTheoryBase.PopScopes(count)
+	if err = t.SMTTheoryBase.PopScopes(count); err != nil {
+		return err
+	}
+	if err = arraySourceAssert(348, "m_find.get_num_vars() == m_var_data.size()", func() bool { return t.arrayUnion.GetNumVars() == uint32(len(t.arrayData)) }); err != nil {
+		return err
+	}
+	return arraySourceAssert(349, "m_find.get_num_vars() == get_num_vars()", func() bool { return t.arrayUnion.GetNumVars() == uint32(t.NumVariables()) })
 }
 
 func (t *SMTArrayTheory) FinalCheck() (SMTFinalCheckStatus, error) {
