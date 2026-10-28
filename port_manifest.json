@@ -116755,10 +116755,13 @@
       "methods": [
         {
           "name": "per-sort value registry, registration, distinct representative selection, and destruction",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/proto_model/structured.go",
           "tests": [
-            "TestArrayAndDatatypeFactories"
+            "TestArrayAndDatatypeFactories",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestStructuredFactoryClosedRegistryCannotRevive",
+            "TestStructuredFactoryRetryRetainsUnconsumedReferences"
           ]
         },
         {
@@ -116859,10 +116862,13 @@
       "methods": [
         {
           "name": "structured factory base state and shared value operations",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/proto_model/structured.go",
           "tests": [
-            "TestArrayAndDatatypeFactories"
+            "TestArrayAndDatatypeFactories",
+            "TestFactoryOutputsAliasFollowsSourceAssignments",
+            "TestStructuredFactoryClosedRegistryCannotRevive",
+            "TestStructuredFactoryRetryRetainsUnconsumedReferences"
           ]
         },
         {
@@ -117176,10 +117182,13 @@
       "methods": [
         {
           "name": "typed ValueFactory interface plus concrete basic, scalar numeral, and user-sort factory algorithms",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/proto_model/factory.go",
           "tests": [
-            "TestValueFactoriesSomeFreshFreezeAndNumericValues"
+            "TestValueFactoriesSomeFreshFreezeAndNumericValues",
+            "TestScalarFactorySourceUserRegisteredValuesAndFreeze",
+            "TestScalarFactorySourceNumeralExplicitValuesAndEnumeration",
+            "TestScalarFactorySourceBVExhaustionAndCursor"
           ]
         },
         {
