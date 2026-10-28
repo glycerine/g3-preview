@@ -264872,14 +264872,14 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "718d12aa14ce82ab0d1e406eaed41294dffbf556",
+    "commit": "33b03e03de0ee158193500b6c53d5b321d3adab5",
     "command": "go -C pkg test ./... -count=1 -timeout=35m",
-    "started_utc": "2026-10-28T03:15:15.116352+00:00",
-    "completed_utc": "2026-10-28T03:17:23.421194+00:00",
+    "started_utc": "2026-10-28T04:15:29.908862+00:00",
+    "completed_utc": "2026-10-28T04:18:18.694131+00:00",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-718d12aa.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-718d12aa.exit",
-    "verified_file": "/mnt/oldrog/tmp/g3-native-718d12aa.verified.json",
+    "log": "/mnt/oldrog/tmp/g3-native-33b03e03.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-33b03e03.exit",
+    "verified_file": "/mnt/oldrog/tmp/g3-native-33b03e03.verified.json",
     "cpu_affinity": [
       8,
       9,
@@ -264895,9 +264895,9 @@
     "package_timeout": "35m",
     "packages_with_ok_result": 90,
     "packages_without_test_files": 5,
-    "lp_seconds": 2.462,
+    "lp_seconds": 2.481,
     "checkout_held_unchanged": true,
-    "scope_warning": "Independently verified clean718d12aa14ce82ab0d1e406eaed41294dffbf556, unchanged at start/end/verification:95 packages exactly once,90 tested and5 without tests; canonical prebuilt build/z3 enabled, CPUs8-16/GOMAXPROCS4, insdict v0.14.6. Includes actual five-kind trail, five retained undo predicates, Boolean/arithmetic propagation, domain/reference transfer bookkeeping, equality selection and exact accepted interval/justification scope cleanup. Four NLSAT profiles pass;223 additional C++ domain/conflict/reason counterexamples are unsat (30 conflicts,65 lazy reasons), and23 compiling algorithm/ownership mutations are rejected. Default native suite skips guarded LP cases (LP2.462s); no full LP -short or whole tagged-suite claim. Main search, witness selection, explanation/projection, conflict resolution, constructor/parameters/reorder and general backend/CLI/API/higher-engine completion remain unproven or incomplete. Complete source TRACE/display/lexical/physical audits remain open; this checkpoint promotes no source-unit/API status or audit flag. Separate ledger CLI audit retains pre-existing file-path test-name errors; portcheck package tests pass."
+    "scope_warning": "Independently verified clean 33b03e03de0ee158193500b6c53d5b321d3adab5, unchanged at start/end/verification:95 packages exactly once,90 tested and5 without tests; canonical prebuilt build/z3 enabled, CPUs8-16/GOMAXPROCS4, insdict v0.14.6. Includes actual trail/propagation, witness selection, explanation core minimization, canonical projection worklist, narrow polynomial-ID query, concrete owning polynomial-vector SET/SHRINK/cleanup, control timer race-test repair and five tagged polynomial test corrections. Full NLSAT and focused polynomial prerequisite/trace families pass in four profiles; whole polynomial g3trace also passed. Worklist/vector verification rejects13 compiling mutations; separate independent-debug-PRS omission is also rejected. Default native suite skips guarded LP cases (LP2.481s); no full LP -short or whole-debug-suite claim. Whole debug/combined polynomial attempts timed out in the existing decimal-refinement prefix sweep; focused tagged gates pass. Normalization, actual projection, full explanation interface/constructor/parameter binding, conflict resolution/main search, integer branch/check and general backend/CLI/API/higher-engine completion remain unproven or incomplete. Full source TRACE/display/lexical/physical audits remain open, with no source-unit/API promotion from this checkpoint. Separate ledger CLI audit retains pre-existing file-path test-name errors; portcheck package tests pass."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
