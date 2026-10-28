@@ -141,3 +141,37 @@ func TestConeOfInfluenceReturnsNilWhenUnchanged(t *testing.T) {
 		t.Fatal("unchanged cone returned a replacement")
 	}
 }
+
+func TestRuleTransformerAppliesConePlugin(t *testing.T) {
+	f := newConeFixture(t, "P", "U")
+	f.add(t, f.applications["P"], "fact-P")
+	f.add(t, f.applications["U"], "fact-U")
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["P"]))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("transformer cone fixture rejected")
+	}
+	transformer := base.NewRuleTransformer()
+	t.Cleanup(func() { coneMust(t, transformer.Close()) })
+	coneMust(t, transformer.Register(transforms.NewConePlugin(0)))
+	modified, err := transformer.Apply(f.set)
+	coneMust(t, err)
+	if !modified {
+		t.Fatal("cone plugin did not report its pruning")
+	}
+	if count, err := f.set.Len(); err != nil || count != 1 {
+		t.Fatal("transformed rule count", count, err)
+	}
+	if finalized, err := f.set.IsFinalized(); err != nil || !finalized {
+		t.Fatal("transformed source finalization", finalized, err)
+	}
+	rule, err := f.set.Rule(0)
+	coneMust(t, err)
+	defer func() { coneMust(t, rule.Close()) }()
+	head, err := rule.HeadDeclaration()
+	coneMust(t, err)
+	if head != f.declarations["P"] {
+		t.Fatal("cone plugin retained wrong fact", head)
+	}
+}

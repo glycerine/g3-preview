@@ -81218,22 +81218,33 @@
       "path": "src/muz/base/dl_rule_transformer.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/base/rule_transformer.go", "pkg/muz/transforms/coi_plugin.go"],
+      "tests": ["TestRuleTransformerOrdersOwnsAndCancelsPlugins", "TestRuleTransformerSkipsAllowedDestratification", "TestRuleTransformerAppliesConePlugin"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Owned plugin reset/cancel/register lifecycle, descending priority ordering, no-op and changed-stage composition, destratification rejection, finalized intermediate ownership, and final rule replacement (dl_rule_transformer.cpp:29-128)",
+          "status": "ported",
+          "go_target": "pkg/muz/base/rule_transformer.go",
+          "tests": ["TestRuleTransformerOrdersOwnsAndCancelsPlugins", "TestRuleTransformerSkipsAllowedDestratification", "TestRuleTransformerAppliesConePlugin"]
+        }
+      ],
+      "ownership": [
+        "RuleTransformer owns registered plugins, an Apply invocation owns its copied current RuleSet and every non-nil plugin result, and discarded destratifying results are closed before continuing."
+      ],
+      "deviations": [
+        "plugin::remove_duplicate_tails remains pending its first retained Go transform consumer; context cancellation stopping between plugins remains with the future dl_context port."
+      ]
     },
     {
       "path": "src/muz/base/dl_rule_transformer.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/base/rule_transformer.go", "pkg/muz/transforms/coi_plugin.go"],
+      "tests": ["TestRuleTransformerOrdersOwnsAndCancelsPlugins", "TestRuleTransformerSkipsAllowedDestratification", "TestRuleTransformerAppliesConePlugin"],
       "conditionals": [
         {
           "line": 19,
@@ -81245,10 +81256,21 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "rule_transformer and plugin runtime surface: owned registration/reset, cancellation, priority, destratification metadata, transformation invocation, and close (dl_rule_transformer.h:31-107)",
+          "status": "partial",
+          "go_target": "pkg/muz/base/rule_transformer.go",
+          "tests": ["TestRuleTransformerOrdersOwnsAndCancelsPlugins", "TestRuleTransformerSkipsAllowedDestratification", "TestRuleTransformerAppliesConePlugin"]
+        }
+      ],
+      "ownership": [
+        "Register transfers a RuleTransformPlugin owner to RuleTransformer; Reset and Close release every plugin exactly once, while Apply borrows its input RuleSet and returns it finalized after replacement."
+      ],
+      "deviations": [
+        "The static duplicate-tail helper remains unported until a retained concrete transform requires it."
+      ]
     },
     {
       "path": "src/muz/base/dl_util.cpp",
@@ -89435,8 +89457,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/transforms/coi.go"],
-      "tests": ["TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"],
+      "go_targets": ["pkg/muz/transforms/coi.go", "pkg/muz/transforms/coi_plugin.go"],
+      "tests": ["TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged", "TestRuleTransformerAppliesConePlugin"],
       "conditionals": [
         {
           "line": 20,
@@ -89454,7 +89476,7 @@
           "name": "mk_coi_filter callable transformation surface and its top-down/bottom-up pass composition (dl_mk_coi_filter.h:27-47)",
           "status": "partial",
           "go_target": "pkg/muz/transforms/coi.go",
-          "tests": ["TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged"]
+          "tests": ["TestConeOfInfluencePrunesOutsideAndUnfoundedRules", "TestConeOfInfluenceReturnsNilWhenUnchanged", "TestRuleTransformerAppliesConePlugin"]
         }
       ],
       "ownership": [
