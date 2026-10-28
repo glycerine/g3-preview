@@ -154454,6 +154454,7 @@
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTUTVPILinearizationNormalizationAndRefusals",
+        "TestSMTUTVPINumeralsAndConcreteTermAliases",
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
         "TestSMTUTVPIGraphIntegerParityConflictAndRealRelaxation",
         "TestSMTUTVPIGraphBoundedIntegerEnumerationAndParityRepair",
@@ -154570,10 +154571,11 @@
         },
         {
           "name": "mk_term and mk_num: numerals and concrete unary aliases; Go per-enode variable attachment uses explicit unconditional alias edges",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_utvpi.go",
           "tests": [
             "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+            "TestSMTUTVPINumeralsAndConcreteTermAliases",
             "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal"
           ]
         },
@@ -154583,7 +154585,7 @@
           "tests": []
         },
         {
-          "name": "Source display/reset and remaining term-alias/control fidelity",
+          "name": "Source display/reset control fidelity",
           "status": "unported",
           "tests": []
         },
@@ -154651,6 +154653,7 @@
         "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
         "TestSMTUTVPIMixedBridgeAndSumModelRefusal",
         "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+        "TestSMTUTVPINumeralsAndConcreteTermAliases",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTUTVPIGraphEncodingWeightsAndCyclePremises",
@@ -154877,10 +154880,11 @@
         },
         {
           "name": "mk_term and mk_num: numerals and concrete unary aliases; Go per-enode variable attachment uses explicit unconditional alias edges",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_utvpi.go",
           "tests": [
             "TestSMTBasicArithmeticModesBeforeFirstBoundary",
+            "TestSMTUTVPINumeralsAndConcreteTermAliases",
             "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal"
           ]
         },
@@ -154890,7 +154894,7 @@
           "tests": []
         },
         {
-          "name": "Source display/reset and remaining term-alias/control fidelity",
+          "name": "Source display/reset control fidelity",
           "status": "unported",
           "tests": []
         },
