@@ -156,6 +156,43 @@ func TestSMT2FixedpointFiniteRelationsMatchCPP(t *testing.T) {
 	}
 }
 
+func TestSMT2FixedpointTwoTailJoinMatchesCPP(t *testing.T) {
+	script := `(set-option :fixedpoint.engine datalog)
+(declare-rel P (Bool Bool))
+(declare-rel Q (Bool Bool))
+(declare-rel R (Bool Bool))
+(declare-rel U (Bool Bool))
+(declare-var x Bool)
+(declare-var y Bool)
+(declare-var z Bool)
+(rule (P true false))
+(rule (P false true))
+(rule (Q false true))
+(rule (Q true false))
+(rule (=> (and (P x y) (Q y z)) (R z x)))
+(query R)
+(query U)
+`
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	context.PrintSuccess = false
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	if output.String() != cpp || cpp != "sat\nunsat\n" {
+		t.Fatal("two-tail fixedpoint SMT-LIB differential", output.String(), cpp)
+	}
+}
+
 func TestSMT2FixedpointEmptyProgramQueryMatchesCPP(t *testing.T) {
 	script := "(declare-rel P ())\n(query P)\n"
 	context, err := cmd_context.NewStandaloneContext()

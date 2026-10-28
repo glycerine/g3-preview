@@ -388,3 +388,116 @@ func TestFiniteCompilerAssemblesRepeatedPermutedAndUnboundHeads(t *testing.T) {
 	compilerWantFacts(t, table("All"), rel.Fact{0, 0}, rel.Fact{0, 1}, rel.Fact{1, 0}, rel.Fact{1, 1})
 	compilerWantFacts(t, table("Equal"), rel.Fact{0, 0}, rel.Fact{1, 1})
 }
+
+func TestFiniteCompilerJoinsTwoPositiveTails(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = command.Close() })
+	manager, err := command.Manager()
+	if err != nil {
+		t.Fatal(err)
+	}
+	relations, err := rel.NewRelationManager(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = relations.Close() })
+	rules, err := base.NewRuleManager(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = rules.Close() })
+	set, err := base.NewRuleSet(rules)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = set.Close() })
+	boolean, err := manager.MkBoolSort()
+	if err != nil {
+		t.Fatal(err)
+	}
+	domain := []ast.ASTHandle{boolean, boolean}
+	p := compilerDeclaration(t, manager, "join-P", domain, boolean)
+	q := compilerDeclaration(t, manager, "join-Q", domain, boolean)
+	r := compilerDeclaration(t, manager, "join-R", domain, boolean)
+	for _, predicate := range []ast.ASTHandle{p, q, r} {
+		if err = rules.RegisterPredicate(predicate); err != nil {
+			t.Fatal(err)
+		}
+	}
+	truth, err := manager.MkTrue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	falsity, err := manager.MkFalse()
+	if err != nil {
+		t.Fatal(err)
+	}
+	addFact := func(predicate ast.ASTHandle, values []ast.ASTHandle, name string) {
+		t.Helper()
+		head, x := manager.MkApp(predicate, values)
+		if x != nil {
+			t.Fatal(x)
+		}
+		compilerRule(t, rules, set, head, nil, name)
+	}
+	addFact(p, []ast.ASTHandle{truth, falsity}, "join-p-10")
+	addFact(p, []ast.ASTHandle{falsity, truth}, "join-p-01")
+	addFact(p, []ast.ASTHandle{truth, truth}, "join-p-11")
+	addFact(q, []ast.ASTHandle{falsity, truth}, "join-q-01")
+	addFact(q, []ast.ASTHandle{truth, falsity}, "join-q-10")
+	x, err := manager.MkVar(0, boolean)
+	if err != nil {
+		t.Fatal(err)
+	}
+	y, err := manager.MkVar(1, boolean)
+	if err != nil {
+		t.Fatal(err)
+	}
+	z, err := manager.MkVar(2, boolean)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pXY, err := manager.MkApp(p, []ast.ASTHandle{x, y})
+	if err != nil {
+		t.Fatal(err)
+	}
+	qYZ, err := manager.MkApp(q, []ast.ASTHandle{y, z})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rZX, err := manager.MkApp(r, []ast.ASTHandle{z, x})
+	if err != nil {
+		t.Fatal(err)
+	}
+	compilerRule(t, rules, set, rZX, []ast.ASTHandle{pXY, qYZ}, "join-shared-variable")
+	valid, err := set.Finalize()
+	if err != nil || !valid {
+		t.Fatal("finalize", valid, err)
+	}
+	execution, termination, err := rel.CompileFiniteRules(relations, set)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = execution.Close(); _ = termination.Close() })
+	context, err := rel.NewExecutionContextWithRelations(relations, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = context.Close() })
+	complete, err := execution.Perform(context)
+	if err != nil || !complete {
+		t.Fatal("join execution", complete, err)
+	}
+	complete, err = termination.Perform(context)
+	if err != nil || !complete {
+		t.Fatal("join termination", complete, err)
+	}
+	table, found, err := relations.TryGetRelation(r)
+	if err != nil || !found || table == nil {
+		t.Fatal("joined relation", table, found, err)
+	}
+	compilerWantFacts(t, table, rel.Fact{1, 1}, rel.Fact{0, 0}, rel.Fact{0, 1})
+}
