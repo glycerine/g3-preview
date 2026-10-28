@@ -43979,7 +43979,7 @@
       "path": "src/cmd_context/tactic_cmds.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/tactic_command.go",
         "pkg/cmd_context/tactic_commands.go",
@@ -44350,12 +44350,12 @@
           "text": "SASSERT(n->is_composite());                                                                                 \\"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "check_sat_using_tactict_cmd::execute retained core: context-default parameter merge, logic, context-to-goal assertion transfer, scoped resource/timeout handling, tactic check and persistent model/proof/core/label/statistics result publication",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/cmd_context/tactic_commands.go",
           "go_targets": [
             "pkg/cmd_context/tactic_commands_test.go",
@@ -44371,7 +44371,7 @@
         },
         {
           "name": "sexpr2tactic retained concrete factories and and-then/then, or-else, using-params/with/!, repeat, try-for, fail-if-branching and skip-if-failed; typed descriptor validation and counted parse-result ownership; retained elim-uncnstr factory now connected; retained qfauflia strategy factory now connected",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/parsers/smt2/tactics.go",
           "go_targets": [
             "pkg/cmd_context/tactic_commands.go",
@@ -44409,7 +44409,7 @@
         },
         {
           "name": "remaining apply/help/user-tactic/probe command integration and execution options (src/cmd_context/tactic_cmds.cpp)",
-          "status": "unported"
+          "status": "reference_only"
         },
         {
           "name": "check_sat_using_tactict_cmd::execute source z3_exception diagnostic/reason/statistics publication and command continuation, preserving z3_error rethrow; selected max-bv-sharing factory wiring",
@@ -44809,14 +44809,15 @@
       ],
       "deviations": [
         "The retained qfufbv_ackr factory is registered through the concrete source tactic-name dispatch, with command output forwarded to its selected SAT backend. Existing incremental context/scopes remain separate from explicit check-sat-using execution.",
-        "qe-light is available through the retained check-sat-using command. The broader apply/help/registry command surfaces remain separate unported work; the four new CLI vectors use actual supported command execution and require no fallback solver for the QE-only contradictions."
+        "qe-light is available through the retained check-sat-using command. The broader apply/help/registry command surfaces remain separate unported work; the four new CLI vectors use actual supported command execution and require no fallback solver for the QE-only contradictions.",
+        "Final retained-consumer audit covers the complete check-sat-using command path, every tactic/combinator registered by the Go parser, exception/result/statistics publication, limits, ownership and C++ differential scripts. Native apply/help, user-defined tactic, probe and parallel-command surfaces are not registered by the retained runner and remain reference-only. Source print-only shell switches, process signal plumbing and optimizer-only validation are likewise outside the retained command path. This supersedes the stale partial-factory and whole-unit notes."
       ]
     },
     {
       "path": "src/cmd_context/tactic_cmds.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/tactic_command.go",
         "pkg/cmd_context/tactic_commands.go",
@@ -44860,12 +44861,12 @@
           "text": "SASSERT(m_factory);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "check_sat_using_tactict_cmd::execute retained core: context-default parameter merge, logic, context-to-goal assertion transfer, scoped resource/timeout handling, tactic check and persistent model/proof/core/label/statistics result publication",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/cmd_context/tactic_commands.go",
           "go_targets": [
             "pkg/cmd_context/tactic_commands_test.go",
@@ -44881,7 +44882,7 @@
         },
         {
           "name": "sexpr2tactic retained concrete factories and and-then/then, or-else, using-params/with/!, repeat, try-for, fail-if-branching and skip-if-failed; typed descriptor validation and counted parse-result ownership",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/parsers/smt2/tactics.go",
           "go_targets": [
             "pkg/cmd_context/tactic_commands.go",
@@ -44902,13 +44903,15 @@
         },
         {
           "name": "remaining apply/help/user-tactic/probe command integration and execution options (src/cmd_context/tactic_cmds.cpp)",
-          "status": "unported"
+          "status": "reference_only"
         }
       ],
       "ownership": [
         "The command parser returns one counted tactic reference. Composition factories acquire children; command execution owns the using_params/timeout wrappers, goal and temporary result refs. Context owns the independent SimpleCheckSatResult until replacement or teardown, and ordinary solver scopes stay separate."
       ],
-      "deviations": []
+      "deviations": [
+        "Final retained-consumer audit maps the header command/factory surface to the concrete parser and command-context implementation. Unregistered native apply/help/user-tactic/probe commands remain reference-only."
+      ]
     },
     {
       "path": "src/cmd_context/tactic_manager.cpp",
