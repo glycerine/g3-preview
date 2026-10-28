@@ -80886,7 +80886,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/rule.go", "pkg/muz/base/rule_formula.go", "pkg/muz/base/hnf.go"],
-      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal", "TestHornNormalizerMergesConsecutiveUniversalPrefix", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal", "TestHornNormalizerMergesConsecutiveUniversalPrefix", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate", "TestReachabilityRunsFromIngestedHornProgram"],
       "assertions": [
         {
           "line": 64,
@@ -80936,7 +80936,7 @@
           "name": "rule_manager::mk concrete head/tail construction and native positive-predicate, negative-predicate, interpreted-tail layout; rule::norm_vars sparse de-Bruijn compaction; to_formula with source binder-sort reversal and collision-free names; check_valid_head; rule ownership, tail queries, negation and dependency lookup (dl_rule.cpp:467-607,833-901,939-1011)",
           "status": "partial",
           "go_target": "pkg/muz/base/rule.go",
-          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion"]
+          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestReachabilityRunsFromIngestedHornProgram"]
         },
         {
           "name": "Already-Horn mk_rule/mk_horn_rule fast path: universal-prefix removal, implication/conjunction extraction, compound predicate argument hoisting, negated predicate recognition, and explicit HNF-definition refusal (dl_rule.cpp:143-232,233-263,355-417,449-465)",
@@ -80960,7 +80960,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/rule.go", "pkg/muz/base/rule_formula.go"],
-      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal", "TestReachabilityRunsFromIngestedHornProgram"],
       "conditionals": [
         {
           "line": 20,
@@ -81000,7 +81000,7 @@
           "name": "Concrete rule and rule_manager retained representation, registered predicates, head/tail/name accessors, native tail partitions, variable normalization, formula conversion, and explicit shared Go ownership; general substitution, proof traces, HNF/query construction, and quantifier analysis remain open",
           "status": "partial",
           "go_target": "pkg/muz/base/rule.go",
-          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion"]
+          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestReachabilityRunsFromIngestedHornProgram"]
         }
       ],
       "ownership": [],
@@ -81846,22 +81846,31 @@
       "path": "src/muz/dataflow/dataflow.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/dataflow/reachability.go"],
+      "tests": ["TestReachabilityRunsFromIngestedHornProgram"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "reachability_info::null_fact zero-value definition (dataflow.cpp:21-23)",
+          "status": "ported",
+          "go_target": "pkg/muz/dataflow/reachability.go",
+          "tests": ["TestReachabilityRunsFromIngestedHornProgram"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "A missing Go map entry is the immutable false/null reachability fact, so no process-global object is required."
+      ]
     },
     {
       "path": "src/muz/dataflow/dataflow.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/dataflow/reachability.go", "pkg/muz/base/rule.go"],
+      "tests": ["TestReachabilityRunsFromIngestedHornProgram"],
       "conditionals": [
         {
           "line": 18,
@@ -81874,17 +81883,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete reachability dataflow_engine instantiation: bottom-up and top-down initialization, alternating worklists, rule dependency indexes, propagation, and fact lookup (dataflow.h:49-180)",
+          "status": "ported",
+          "go_target": "pkg/muz/dataflow/reachability.go",
+          "tests": ["TestReachabilityRunsFromIngestedHornProgram"]
+        }
+      ],
+      "ownership": [
+        "Each analysis snapshots borrowed predicate declarations while the finalized RuleSet is open and closes every temporary retained Rule immediately; the completed Boolean result owns no AST references."
+      ],
+      "deviations": [
+        "Only the live reachability instantiation is ported as a concrete Go implementation. The unused universal C++ Fact template and its join/intersect/debug surfaces are intentionally not reproduced."
+      ]
     },
     {
       "path": "src/muz/dataflow/reachability.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/dataflow/reachability.go"],
+      "tests": ["TestReachabilityRunsFromIngestedHornProgram"],
       "conditionals": [
         {
           "line": 17,
@@ -81901,10 +81921,19 @@
           "text": "SASSERT(m_reachable);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Complete reachability_info Boolean domain: bottom-up seed/propagation, top-down seed/propagation across every uninterpreted tail, null lookup, and reachability query (reachability.h:23-79)",
+          "status": "ported",
+          "go_target": "pkg/muz/dataflow/reachability.go",
+          "tests": ["TestReachabilityRunsFromIngestedHornProgram"]
+        }
+      ],
+      "ownership": [
+        "Reachability facts are ordinary Go booleans keyed by borrowed declaration handles; no source-owned AST or heap fact exists."
+      ],
       "deviations": []
     },
     {

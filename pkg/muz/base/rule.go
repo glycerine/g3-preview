@@ -309,6 +309,15 @@ func (r *Rule) Head() (ast.ASTHandle, error) {
 	return state.head, nil
 }
 
+// HeadDeclaration returns the borrowed predicate declaration of the rule head.
+func (r *Rule) HeadDeclaration() (ast.ASTHandle, error) {
+	state, err := r.open()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return state.manager.GetDecl(state.head)
+}
+
 func (r *Rule) Name() (string, error) {
 	state, err := r.open()
 	if err != nil {
@@ -350,6 +359,19 @@ func (r *Rule) Tail(index int) (ast.ASTHandle, bool, error) {
 		return ast.ASTHandle{}, false, fmt.Errorf("muz/base: tail index out of bounds")
 	}
 	return state.tail[index].handle, state.tail[index].negated, nil
+}
+
+// TailDeclaration returns the borrowed predicate declaration at an
+// uninterpreted-tail index.
+func (r *Rule) TailDeclaration(index int) (ast.ASTHandle, error) {
+	state, err := r.open()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if index < 0 || index >= state.uninterpreted {
+		return ast.ASTHandle{}, fmt.Errorf("muz/base: uninterpreted tail index out of bounds")
+	}
+	return state.manager.GetDecl(state.tail[index].handle)
 }
 
 func (r *Rule) HasNegation() (bool, error) {
