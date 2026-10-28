@@ -82769,9 +82769,15 @@
       "path": "src/muz/pdr/pdr_context.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/pdr/predicate_transformer.go",
+        "pkg/muz/pdr/predicate_transformer_test.go"
+      ],
+      "tests": [
+        "TestPredicateTransformerSignatureFramesAndReachability",
+        "TestPredicateTransformerPropagatesGlobalLemmaToInfinity"
+      ],
       "assertions": [
         {
           "line": 207,
@@ -82939,18 +82945,44 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "pred_transformer construction/signature, frame creation, formula collection, property insertion/strengthening, reachability checks/cache, propagation and statistics (pdr_context.cpp:74-362,477-532,704-747)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/predicate_transformer.go",
+          "tests": [
+            "TestPredicateTransformerSignatureFramesAndReachability",
+            "TestPredicateTransformerPropagatesGlobalLemmaToInfinity"
+          ]
+        },
+        {
+          "name": "rule-to-transition normalization, predecessor assumptions, cover/model conversion, model-node/search, generalization and top-level PDR solve loop",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "PredicateTransformer owns its head/system/property AST references, PropSolver, and ReachableCache. It closes both context consumers before releasing AST pins; returned signatures, formulas, and cores borrow AST handles while requested models retain explicit ownership."
+      ],
+      "deviations": [
+        "InitializeSystem accepts already-normalized initial and transition formulas so the frame engine is independently executable while rule normalization remains pending. Typed results replace mutable model/core output pointers."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_context.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/pdr/predicate_transformer.go",
+        "pkg/muz/pdr/predicate_transformer_test.go"
+      ],
+      "tests": [
+        "TestPredicateTransformerSignatureFramesAndReachability",
+        "TestPredicateTransformerPropagatesGlobalLemmaToInfinity"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -82984,10 +83016,30 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained pred_transformer signature, frame/property, reachability, propagation and statistics surface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/predicate_transformer.go",
+          "tests": [
+            "TestPredicateTransformerSignatureFramesAndReachability",
+            "TestPredicateTransformerPropagatesGlobalLemmaToInfinity"
+          ]
+        },
+        {
+          "name": "remaining pred_transformer rule/search surface plus model_node, model_search, core_generalizer and context",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "PredicateTransformer is the concrete Go owner for its proposition solver, reachable cache, and retained AST state."
+      ],
+      "deviations": [
+        "The Go frame API uses explicit methods and returned result values rather than C++ reference outputs and scoped mutable solver settings."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_dl_interface.cpp",

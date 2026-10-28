@@ -131,6 +131,16 @@ func (p *PropSolver) LevelCount() (uint32, error) {
 	return uint32(len(p.levelPositive)), nil
 }
 
+// EnsureLevel creates every frame guard through level. It exposes the source
+// add_level operation to predicate transformers without asserting a dummy
+// formula into a newly created frame.
+func (p *PropSolver) EnsureLevel(level uint32) error {
+	if err := p.open(); err != nil {
+		return err
+	}
+	return p.ensureLevel(level)
+}
+
 func (p *PropSolver) IsAuxSymbol(declaration ast.ASTHandle) (bool, error) {
 	if err := p.open(); err != nil {
 		return false, err

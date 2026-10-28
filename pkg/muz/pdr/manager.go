@@ -94,6 +94,14 @@ func (m *Manager) NewPropSolver(name string) (*PropSolver, error) {
 	return NewPropSolver(m.manager, m.contexts, background, name)
 }
 
+func (m *Manager) NewReachableCache(mode ReachableCacheMode) (*ReachableCache, error) {
+	background, err := m.Background()
+	if err != nil {
+		return nil, err
+	}
+	return NewReachableCache(m.manager, m.contexts, background, mode)
+}
+
 func oldIndex(index uint32) uint32 { return index + 1 }
 
 func (m *Manager) addState(prefix ast.ASTHandle) error {
