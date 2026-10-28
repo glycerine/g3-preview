@@ -73,6 +73,13 @@ func (p *projectionWorklist) insert(value polynomial.Polynomial) (err error) {
 // The actual explanation caller is already executing and borrowing this
 // worklist. Validate that specific binding instead of opening a second search.
 func (p *projectionWorklist) insertFromExplanation(n *explanationAssumptions, value polynomial.Polynomial) error {
+	if err := p.borrowedByExplanation(n); err != nil {
+		return err
+	}
+	return p.insertCore(value)
+}
+
+func (p *projectionWorklist) borrowedByExplanation(n *explanationAssumptions) error {
 	if err := p.owner(); err != nil {
 		return err
 	}
@@ -82,7 +89,7 @@ func (p *projectionWorklist) insertFromExplanation(n *explanationAssumptions, va
 	if p.running || p.failed || p.set == nil {
 		return ErrSearchPending
 	}
-	return p.insertCore(value)
+	return nil
 }
 func (p *projectionWorklist) insertCore(value polynomial.Polynomial) (err error) {
 	p.running = true
@@ -109,6 +116,15 @@ func (p *projectionWorklist) reset() (err error) {
 	if err = p.open(); err != nil {
 		return err
 	}
+	return p.resetCore()
+}
+func (p *projectionWorklist) resetFromExplanation(n *explanationAssumptions) error {
+	if err := p.borrowedByExplanation(n); err != nil {
+		return err
+	}
+	return p.resetCore()
+}
+func (p *projectionWorklist) resetCore() (err error) {
 	p.running = true
 	defer func() { p.running = false; p.failed = err != nil }()
 	n, err := p.set.Size()
@@ -165,10 +181,26 @@ func (p *projectionWorklist) empty() (bool, error) {
 	n, err := p.set.Size()
 	return n == 0, err
 }
+func (p *projectionWorklist) emptyFromExplanation(n *explanationAssumptions) (bool, error) {
+	if err := p.borrowedByExplanation(n); err != nil {
+		return false, err
+	}
+	count, err := p.set.Size()
+	return count == 0, err
+}
 func (p *projectionWorklist) removeMaxPolynomials(out *polynomial.PolynomialRefVector) (max uint32, err error) {
 	if err = p.open(); err != nil {
 		return NullVariable, err
 	}
+	return p.removeMaxPolynomialsCore(out)
+}
+func (p *projectionWorklist) removeMaxPolynomialsFromExplanation(n *explanationAssumptions, out *polynomial.PolynomialRefVector) (uint32, error) {
+	if err := p.borrowedByExplanation(n); err != nil {
+		return NullVariable, err
+	}
+	return p.removeMaxPolynomialsCore(out)
+}
+func (p *projectionWorklist) removeMaxPolynomialsCore(out *polynomial.PolynomialRefVector) (max uint32, err error) {
 	if out == nil {
 		return NullVariable, arena.ErrConfig
 	}

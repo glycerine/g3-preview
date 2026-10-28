@@ -25,7 +25,9 @@ type explanationAssumptions struct {
 	psc                     explanationPSCScope
 	resultant               explanationResultantScope
 	discriminant            explanationDiscriminantScope
+	cell                    explanationCellScope
 	factorProjection        bool
+	fullDimensional         bool
 	projectionFactors       explanationProjectionFactorScope
 	leading                 explanationLeadingScope
 	output                  scopedLiteralVector
@@ -80,7 +82,7 @@ func (n *explanationAssumptions) start() error {
 	if err := n.search.open(); err != nil {
 		return err
 	}
-	if n.resultActive || n.localFactor != nil || n.vanishing.active || n.normalization.active || n.projectionFactors.active || n.leading.active || n.psc.active || n.resultant.active || n.discriminant.active {
+	if n.resultActive || n.localFactor != nil || n.vanishing.active || n.normalization.active || n.projectionFactors.active || n.leading.active || n.psc.active || n.resultant.active || n.discriminant.active || n.cell.active {
 		return ErrSearchPending
 	}
 	n.running, n.resultActive = true, true
@@ -266,6 +268,10 @@ func (n *explanationAssumptions) cleanup() error {
 		if err := n.finishProjectionDiscriminant(true, true); err != nil {
 			return err
 		}
+	} else if n.cell.active {
+		if err := n.finishCell(); err != nil {
+			return err
+		}
 	} else if n.psc.active || n.resultant.active {
 		if err := n.finishProjectionResultant(true, true); err != nil {
 			return err
@@ -294,6 +300,11 @@ func (n *explanationAssumptions) cleanup() error {
 	}
 	if n.factors != nil {
 		if err := n.factors.CleanupRetained(); err != nil {
+			return err
+		}
+	}
+	if n.cell.roots != nil {
+		if err := n.cell.roots.CleanupRetained(); err != nil {
 			return err
 		}
 	}
@@ -343,6 +354,12 @@ func (n *explanationAssumptions) close() error {
 			return err
 		}
 		n.pscTmp = nil
+	}
+	if n.cell.roots != nil {
+		if err := n.cell.roots.Close(); err != nil {
+			return err
+		}
+		n.cell.roots = nil
 	}
 	n.projectionTodo = nil
 	n.search.explanationAssumptions = nil
