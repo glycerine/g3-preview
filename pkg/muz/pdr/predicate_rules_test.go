@@ -104,3 +104,93 @@ func TestPredicateTransformerNormalizesRulesIntoExecutableSystem(t *testing.T) {
 	pdrMust(t, owner.Close())
 	pdrMust(t, command.Close())
 }
+
+func TestPredicateTransformerCouplesPredecessorFramesByRuleTag(t *testing.T) {
+	command, manager, owner := pdrManagerFixture(t, 3)
+	boolean, err := manager.MkBoolSort()
+	pdrMust(t, err)
+	pDeclaration := pdrFunction(t, manager, "predecessor", []ast.ASTHandle{boolean}, boolean)
+	qDeclaration := pdrFunction(t, manager, "consumer", []ast.ASTHandle{boolean}, boolean)
+	ruleManager, err := base.NewRuleManager(manager)
+	pdrMust(t, err)
+	pdrMust(t, ruleManager.RegisterPredicate(pDeclaration))
+	pdrMust(t, ruleManager.RegisterPredicate(qDeclaration))
+	variable, err := manager.MkVar(0, boolean)
+	pdrMust(t, err)
+	truth, err := manager.MkTrue()
+	pdrMust(t, err)
+	pHead, err := manager.MkApp(pDeclaration, []ast.ASTHandle{variable})
+	pdrMust(t, err)
+	pConstraint, err := manager.MkEq(variable, truth)
+	pdrMust(t, err)
+	pRule, err := ruleManager.NewRule(pHead, []ast.ASTHandle{pConstraint}, nil, "p-initial")
+	pdrMust(t, err)
+	qHead, err := manager.MkApp(qDeclaration, []ast.ASTHandle{variable})
+	pdrMust(t, err)
+	pTail, err := manager.MkApp(pDeclaration, []ast.ASTHandle{variable})
+	pdrMust(t, err)
+	qRule, err := ruleManager.NewRule(qHead, []ast.ASTHandle{pTail}, nil, "q-step")
+	pdrMust(t, err)
+
+	pTransformer, err := pdr.NewPredicateTransformer(owner, pDeclaration, pdr.ReachableNoCache)
+	pdrMust(t, err)
+	qTransformer, err := pdr.NewPredicateTransformer(owner, qDeclaration, pdr.ReachableNoCache)
+	pdrMust(t, err)
+	transformers := map[ast.ASTHandle]*pdr.PredicateTransformer{
+		pDeclaration: pTransformer,
+		qDeclaration: qTransformer,
+	}
+	pdrMust(t, pTransformer.InitializeRules(transformers, []*base.Rule{pRule}))
+	pdrMust(t, qTransformer.InitializeRules(transformers, []*base.Rule{qRule}))
+	pdrMust(t, pRule.Close())
+	pdrMust(t, qRule.Close())
+
+	pSignature, err := pTransformer.Signature()
+	pdrMust(t, err)
+	pNewDeclaration, err := owner.OldToNew(pSignature[0], 0)
+	pdrMust(t, err)
+	pNew, err := manager.MkApp(pNewDeclaration, nil)
+	pdrMust(t, err)
+	qSignature, err := qTransformer.Signature()
+	pdrMust(t, err)
+	qNewDeclaration, err := owner.OldToNew(qSignature[0], 0)
+	pdrMust(t, err)
+	qNew, err := manager.MkApp(qNewDeclaration, nil)
+	pdrMust(t, err)
+	notQ, err := manager.MkNot(qNew)
+	pdrMust(t, err)
+
+	before, err := qTransformer.CheckReachable(1, notQ, false, false)
+	pdrMust(t, err)
+	if before.Status != lbool.True {
+		t.Fatal("predecessor property unexpectedly active before insertion", before.Status)
+	}
+	changed, err := pTransformer.AddProperty(pNew, 0)
+	pdrMust(t, err)
+	if !changed {
+		t.Fatal("predecessor property was ignored")
+	}
+	notQ, err = manager.MkNot(qNew)
+	pdrMust(t, err)
+	after, err := qTransformer.CheckReachable(1, notQ, false, false)
+	pdrMust(t, err)
+	if after.Status != lbool.False {
+		t.Fatal("tagged predecessor frame was not coupled to consumer", after.Status)
+	}
+	premises, err := qTransformer.Premises(0)
+	pdrMust(t, err)
+	if len(premises) < 3 {
+		t.Fatal("predecessor premises were omitted", len(premises))
+	}
+	propagation, err := qTransformer.PropagationFormula(1)
+	pdrMust(t, err)
+	if ground, x := manager.IsGround(propagation); x != nil || !ground {
+		t.Fatal("propagation formula is not ground", ground, x)
+	}
+
+	pdrMust(t, qTransformer.Close())
+	pdrMust(t, pTransformer.Close())
+	pdrMust(t, ruleManager.Close())
+	pdrMust(t, owner.Close())
+	pdrMust(t, command.Close())
+}

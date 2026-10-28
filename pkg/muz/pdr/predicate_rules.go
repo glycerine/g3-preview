@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/muz/base"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 type normalizedRule struct {
@@ -412,8 +413,180 @@ func (p *PredicateTransformer) InitializeRules(transformers map[ast.ASTHandle]*P
 	p.references = append(p.references, builder.references...)
 	p.rules = builder.rules
 	p.rulesReady = true
+	for _, rule := range p.rules {
+		for _, predecessor := range rule.predecessors {
+			predecessor.addUse(p)
+		}
+	}
 	committed = true
 	return nil
+}
+
+func (p *PredicateTransformer) addUse(user *PredicateTransformer) {
+	for _, prior := range p.uses {
+		if prior == user {
+			return
+		}
+	}
+	p.uses = append(p.uses, user)
+}
+
+func (p *PredicateTransformer) makeAssumptions(head ast.ASTHandle, formula ast.ASTHandle) ([]ast.ASTHandle, error) {
+	result := make([]ast.ASTHandle, 0)
+	for _, rule := range p.rules {
+		if rule.tag.IsNull() {
+			continue
+		}
+		for index, predecessor := range rule.predecessors {
+			if predecessor.head != head {
+				continue
+			}
+			implication, err := p.manager.MkImplies(rule.tag, formula)
+			if err != nil {
+				return nil, err
+			}
+			converted, err := p.owner.FormulaNewToOld(implication, uint32(index), false)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, converted)
+		}
+	}
+	return result, nil
+}
+
+func (p *PredicateTransformer) addChildProperty(child *PredicateTransformer, lemma ast.ASTHandle, level uint32) error {
+	if err := p.open(); err != nil {
+		return err
+	}
+	if level != InfinityLevel {
+		if err := p.EnsureLevel(level); err != nil {
+			return err
+		}
+	}
+	formulas, err := p.makeAssumptions(child.head, lemma)
+	if err != nil {
+		return err
+	}
+	for _, formula := range formulas {
+		if level == InfinityLevel {
+			err = p.solver.AddFormula(formula)
+		} else {
+			err = p.solver.AddLevelFormula(formula, level)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Premises returns this predicate's system formulas plus every predecessor's
+// frame formulas converted into the rule-tail state index.
+func (p *PredicateTransformer) Premises(level uint32) ([]ast.ASTHandle, error) {
+	if err := p.open(); err != nil {
+		return nil, err
+	}
+	if !p.rulesReady || !p.initialized || level == InfinityLevel {
+		return nil, ast.ErrASTDomain
+	}
+	background, err := p.owner.Background()
+	if err != nil {
+		return nil, err
+	}
+	result := []ast.ASTHandle{background}
+	if level == 0 {
+		result = append(result, p.initialState)
+	} else {
+		result = append(result, p.transition)
+	}
+	for _, rule := range p.rules {
+		for index, predecessor := range rule.predecessors {
+			formula, x := predecessor.Formulas(level, false)
+			if x != nil {
+				return nil, x
+			}
+			if p.manager.IsTrue(formula) {
+				continue
+			}
+			formula, x = p.owner.FormulaNewToOld(formula, uint32(index), true)
+			if x != nil {
+				return nil, x
+			}
+			result = append(result, formula)
+		}
+	}
+	return result, nil
+}
+
+// PropagationFormula builds the source PDR premise used to validate frame
+// lemmas, including tag-guarded predecessor frames.
+func (p *PredicateTransformer) PropagationFormula(level uint32) (ast.ASTHandle, error) {
+	if err := p.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if !p.rulesReady || level == InfinityLevel {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	conjunction := make([]ast.ASTHandle, 0)
+	if level == 0 {
+		conjunction = append(conjunction, p.initialState)
+	} else {
+		conjunction = append(conjunction, p.transition)
+	}
+	formulas, err := p.Formulas(level, true)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	conjunction = append(conjunction, formulas)
+	if level > 0 {
+		for _, rule := range p.rules {
+			if rule.tag.IsNull() {
+				continue
+			}
+			for index, predecessor := range rule.predecessors {
+				formula, x := predecessor.Formulas(level-1, false)
+				if x != nil {
+					return ast.ASTHandle{}, x
+				}
+				formula, x = p.owner.FormulaNewToOld(formula, uint32(index), false)
+				if x != nil {
+					return ast.ASTHandle{}, x
+				}
+				guarded, x := p.manager.MkImplies(rule.tag, formula)
+				if x != nil {
+					return ast.ASTHandle{}, x
+				}
+				conjunction = append(conjunction, guarded)
+			}
+		}
+	}
+	return p.manager.MkAndArray(conjunction)
+}
+
+// IsInvariant tests a property against the current frame. The inductive form
+// also adds tag-guarded self-predecessor assumptions.
+func (p *PredicateTransformer) IsInvariant(level uint32, property ast.ASTHandle, inductive, wantCore bool) (bool, bool, []ast.ASTHandle, error) {
+	if err := p.open(); err != nil {
+		return false, false, nil, err
+	}
+	if level == InfinityLevel {
+		return false, false, nil, ast.ErrASTDomain
+	}
+	negated, err := p.manager.MkNotSimplified(property)
+	if err != nil {
+		return false, false, nil, err
+	}
+	assumptions := []ast.ASTHandle{negated}
+	if inductive {
+		additional, x := p.makeAssumptions(p.head, property)
+		if x != nil {
+			return false, false, nil, x
+		}
+		assumptions = append(assumptions, additional...)
+	}
+	result, err := p.solver.CheckAtLevel(level, assumptions, wantCore, false)
+	return result.Status == lbool.False, result.AssumesLevel, result.Core, err
 }
 
 func (p *PredicateTransformer) Rules() ([]*base.Rule, error) {

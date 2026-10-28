@@ -38,6 +38,7 @@ type PredicateTransformer struct {
 	invariants    []ast.ASTHandle
 	propertyLevel map[ast.ASTHandle]uint32
 	rules         []*normalizedRule
+	uses          []*PredicateTransformer
 	references    []ast.ASTRef
 	propagations  uint32
 	initialized   bool
@@ -296,6 +297,17 @@ func (p *PredicateTransformer) AddProperty(lemma ast.ASTHandle, level uint32) (b
 			return changed, x
 		}
 		changed = changed || added
+		if added {
+			target := level
+			if target != InfinityLevel {
+				target++
+			}
+			for _, user := range p.uses {
+				if x = user.addChildProperty(p, conjunct, target); x != nil {
+					return changed, x
+				}
+			}
+		}
 	}
 	return changed, nil
 }
@@ -499,6 +511,7 @@ func (p *PredicateTransformer) Close() (result error) {
 		p.invariants = nil
 		p.propertyLevel = nil
 		p.rules = nil
+		p.uses = nil
 		p.references = nil
 		p.closed = true
 	}

@@ -82779,7 +82779,8 @@
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
         "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
-        "TestPredicateTransformerNormalizesRulesIntoExecutableSystem"
+        "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
+        "TestPredicateTransformerCouplesPredecessorFramesByRuleTag"
       ],
       "assertions": [
         {
@@ -82964,11 +82965,20 @@
           "status": "ported",
           "go_target": "pkg/muz/pdr/predicate_rules.go",
           "tests": [
-            "TestPredicateTransformerNormalizesRulesIntoExecutableSystem"
+            "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
+            "TestPredicateTransformerCouplesPredecessorFramesByRuleTag"
           ]
         },
         {
-          "name": "predecessor assumptions, cover/model conversion, model-node/search, generalization and top-level PDR solve loop",
+          "name": "pred_transformer predecessor premises, tag-guarded child properties, propagation formulas and inductive assumptions (pdr_context.cpp:192-252,324-345,428-475,706-732)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/predicate_rules.go",
+          "tests": [
+            "TestPredicateTransformerCouplesPredecessorFramesByRuleTag"
+          ]
+        },
+        {
+          "name": "cover/model conversion, model-node/search, generalization and top-level PDR solve loop",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -82995,7 +83005,8 @@
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
         "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
-        "TestPredicateTransformerNormalizesRulesIntoExecutableSystem"
+        "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
+        "TestPredicateTransformerCouplesPredecessorFramesByRuleTag"
       ],
       "conditionals": [
         {
@@ -83039,7 +83050,8 @@
           "tests": [
             "TestPredicateTransformerSignatureFramesAndReachability",
             "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
-            "TestPredicateTransformerNormalizesRulesIntoExecutableSystem"
+            "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
+            "TestPredicateTransformerCouplesPredecessorFramesByRuleTag"
           ]
         },
         {
