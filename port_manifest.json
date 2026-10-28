@@ -82774,13 +82774,16 @@
         "pkg/muz/pdr/predicate_transformer.go",
         "pkg/muz/pdr/predicate_transformer_test.go",
         "pkg/muz/pdr/predicate_rules.go",
-        "pkg/muz/pdr/predicate_rules_test.go"
+        "pkg/muz/pdr/predicate_rules_test.go",
+        "pkg/muz/pdr/context.go",
+        "pkg/muz/pdr/context_test.go"
       ],
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
         "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
         "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
-        "TestPredicateTransformerCouplesPredecessorFramesByRuleTag"
+        "TestPredicateTransformerCouplesPredecessorFramesByRuleTag",
+        "TestContextInitializesHornProgramAndAnswersInitialQueries"
       ],
       "assertions": [
         {
@@ -82978,6 +82981,14 @@
           ]
         },
         {
+          "name": "context construction, grouped rule/transformer allocation, dependency coupling and transformer initialization (pdr_context.cpp:1457-1542)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/context.go",
+          "tests": [
+            "TestContextInitializesHornProgramAndAnswersInitialQueries"
+          ]
+        },
+        {
           "name": "cover/model conversion, model-node/search, generalization and top-level PDR solve loop",
           "status": "unported",
           "go_target": null,
@@ -83000,13 +83011,16 @@
         "pkg/muz/pdr/predicate_transformer.go",
         "pkg/muz/pdr/predicate_transformer_test.go",
         "pkg/muz/pdr/predicate_rules.go",
-        "pkg/muz/pdr/predicate_rules_test.go"
+        "pkg/muz/pdr/predicate_rules_test.go",
+        "pkg/muz/pdr/context.go",
+        "pkg/muz/pdr/context_test.go"
       ],
       "tests": [
         "TestPredicateTransformerSignatureFramesAndReachability",
         "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
         "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
-        "TestPredicateTransformerCouplesPredecessorFramesByRuleTag"
+        "TestPredicateTransformerCouplesPredecessorFramesByRuleTag",
+        "TestContextInitializesHornProgramAndAnswersInitialQueries"
       ],
       "conditionals": [
         {
@@ -83051,7 +83065,16 @@
             "TestPredicateTransformerSignatureFramesAndReachability",
             "TestPredicateTransformerPropagatesGlobalLemmaToInfinity",
             "TestPredicateTransformerNormalizesRulesIntoExecutableSystem",
-            "TestPredicateTransformerCouplesPredecessorFramesByRuleTag"
+            "TestPredicateTransformerCouplesPredecessorFramesByRuleTag",
+            "TestContextInitializesHornProgramAndAnswersInitialQueries"
+          ]
+        },
+        {
+          "name": "retained context ownership, rule-set initialization, transformer lookup, background and statistics surface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/context.go",
+          "tests": [
+            "TestContextInitializesHornProgramAndAnswersInitialQueries"
           ]
         },
         {

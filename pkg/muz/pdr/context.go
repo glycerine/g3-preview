@@ -1,0 +1,303 @@
+package pdr
+
+// Source: retained context construction and init_rules orchestration in
+// src/muz/pdr/pdr_context.h and pdr_context.cpp.
+
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/muz/base"
+	"github.com/glycerine/g3/pkg/smtcore"
+	"github.com/glycerine/g3/pkg/util/lbool"
+	uparams "github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
+)
+
+var ErrContextOwner = errors.New("muz/pdr: invalid or closed context")
+
+// Context owns the PDR manager and the predicate transformers for one Horn
+// rule set. The conflict/search loop is layered on this initialized program.
+type Context struct {
+	manager      *ast.ASTManager
+	owner        *Manager
+	cacheMode    ReachableCacheMode
+	transformers map[ast.ASTHandle]*PredicateTransformer
+	order        []ast.ASTHandle
+	initialized  bool
+	closed       bool
+}
+
+func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumContexts uint32, cacheMode ReachableCacheMode, config smtcore.SMTSolverConfig) (*Context, error) {
+	if manager == nil || cacheMode > ReachableConstraintCache {
+		return nil, ErrContextOwner
+	}
+	owner, err := NewManager(manager, params, maximumContexts, config)
+	if err != nil {
+		return nil, err
+	}
+	return &Context{manager: manager, owner: owner, cacheMode: cacheMode}, nil
+}
+
+func (c *Context) open() error {
+	if c == nil || c.closed || c.manager == nil || c.owner == nil {
+		return ErrContextOwner
+	}
+	return c.owner.open()
+}
+
+func (c *Context) SetBackground(background ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	return c.owner.SetBackground(background)
+}
+
+func appendDeclaration(order *[]ast.ASTHandle, seen map[ast.ASTHandle]bool, declaration ast.ASTHandle) {
+	if !seen[declaration] {
+		seen[declaration] = true
+		*order = append(*order, declaration)
+	}
+}
+
+func closeRuleBuckets(buckets map[ast.ASTHandle][]*base.Rule) (result error) {
+	for _, rules := range buckets {
+		for _, rule := range rules {
+			result = errors.Join(result, rule.Close())
+		}
+	}
+	return result
+}
+
+// Initialize builds a transformer for every head or predicate-tail
+// declaration, then grounds each head's rules into its transition system.
+func (c *Context) Initialize(set *base.RuleSet) (resultErr error) {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized || set == nil {
+		return ast.ErrASTDomain
+	}
+	count, err := set.Len()
+	if err != nil {
+		return err
+	}
+	order := make([]ast.ASTHandle, 0)
+	seen := make(map[ast.ASTHandle]bool)
+	buckets := make(map[ast.ASTHandle][]*base.Rule)
+	defer func() { resultErr = errors.Join(resultErr, closeRuleBuckets(buckets)) }()
+	for index := 0; index < count; index++ {
+		rule, x := set.Rule(index)
+		if x != nil {
+			return x
+		}
+		head, x := rule.HeadDeclaration()
+		if x != nil {
+			return errors.Join(x, rule.Close())
+		}
+		appendDeclaration(&order, seen, head)
+		buckets[head] = append(buckets[head], rule)
+		uninterpreted, x := rule.UninterpretedTailSize()
+		if x != nil {
+			return x
+		}
+		for tail := 0; tail < uninterpreted; tail++ {
+			declaration, y := rule.TailDeclaration(tail)
+			if y != nil {
+				return y
+			}
+			appendDeclaration(&order, seen, declaration)
+		}
+	}
+	transformers := make(map[ast.ASTHandle]*PredicateTransformer, len(order))
+	committed := false
+	defer func() {
+		if committed {
+			return
+		}
+		for index := len(order) - 1; index >= 0; index-- {
+			if transformer := transformers[order[index]]; transformer != nil {
+				resultErr = errors.Join(resultErr, transformer.Close())
+			}
+		}
+	}()
+	for _, declaration := range order {
+		transformer, x := NewPredicateTransformer(c.owner, declaration, c.cacheMode)
+		if x != nil {
+			return x
+		}
+		transformers[declaration] = transformer
+	}
+	for _, declaration := range order {
+		if err = transformers[declaration].InitializeRules(transformers, buckets[declaration]); err != nil {
+			return err
+		}
+	}
+	c.transformers = transformers
+	c.order = order
+	c.initialized = true
+	committed = true
+	return nil
+}
+
+func (c *Context) Transformer(declaration ast.ASTHandle) (*PredicateTransformer, bool, error) {
+	if err := c.open(); err != nil {
+		return nil, false, err
+	}
+	if !c.initialized {
+		return nil, false, ast.ErrASTDomain
+	}
+	transformer, found := c.transformers[declaration]
+	return transformer, found, nil
+}
+
+func (c *Context) queryState(query ast.ASTHandle) (*PredicateTransformer, ast.ASTHandle, []ast.ASTRef, error) {
+	references := make([]ast.ASTRef, 0)
+	fail := func(err error) (*PredicateTransformer, ast.ASTHandle, []ast.ASTRef, error) {
+		for index := len(references) - 1; index >= 0; index-- {
+			err = errors.Join(err, c.manager.DelRef(&references[index]))
+		}
+		return nil, ast.ASTHandle{}, nil, err
+	}
+	kind, err := c.manager.GetKind(query)
+	if err != nil || kind != ast.ASTApp {
+		if err != nil {
+			return fail(err)
+		}
+		return fail(ast.ErrASTDomain)
+	}
+	declaration, err := c.manager.GetDecl(query)
+	if err != nil {
+		return fail(err)
+	}
+	transformer := c.transformers[declaration]
+	if transformer == nil {
+		return fail(ast.ErrASTDomain)
+	}
+	count, err := c.manager.GetNumArgs(query)
+	if err != nil || count != uint32(len(transformer.signature)) {
+		if err != nil {
+			return fail(err)
+		}
+		return fail(ast.ErrASTDomain)
+	}
+	equalities := make([]ast.ASTHandle, count)
+	for index := uint32(0); index < count; index++ {
+		stateDeclaration, x := c.owner.OldToNew(transformer.signature[index], 0)
+		if x != nil {
+			return fail(x)
+		}
+		state, x := c.manager.MkApp(stateDeclaration, nil)
+		if x != nil {
+			return fail(x)
+		}
+		argument, x := c.manager.GetArg(query, index)
+		if x != nil {
+			return fail(x)
+		}
+		equalities[index], x = c.manager.MkEq(state, argument)
+		if x != nil {
+			return fail(x)
+		}
+		reference, x := c.manager.NewRef(equalities[index])
+		if x != nil {
+			return fail(x)
+		}
+		references = append(references, reference)
+	}
+	state, err := c.manager.MkAndArray(equalities)
+	if err != nil {
+		return fail(err)
+	}
+	reference, err := c.manager.NewRef(state)
+	if err != nil {
+		return fail(err)
+	}
+	references = append(references, reference)
+	return transformer, state, references, nil
+}
+
+// CheckInitial tests a concrete predicate application against level zero. It
+// is the narrow executable query path used before the full model-search loop.
+func (c *Context) CheckInitial(query ast.ASTHandle, wantModel bool) (PropCheckResult, error) {
+	if err := c.open(); err != nil {
+		return PropCheckResult{}, err
+	}
+	if !c.initialized {
+		return PropCheckResult{}, ast.ErrASTDomain
+	}
+	transformer, state, references, err := c.queryState(query)
+	if err != nil {
+		return PropCheckResult{}, err
+	}
+	result, checkErr := transformer.CheckReachable(0, state, false, wantModel)
+	for index := len(references) - 1; index >= 0; index-- {
+		checkErr = errors.Join(checkErr, c.manager.DelRef(&references[index]))
+	}
+	return result, checkErr
+}
+
+func (c *Context) InitialStatus(query ast.ASTHandle) (lbool.LBool, error) {
+	result, err := c.CheckInitial(query, false)
+	return result.Status, err
+}
+
+func (c *Context) CollectStatistics(destination *statistics.Statistics) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if destination == nil {
+		return ErrContextOwner
+	}
+	for _, declaration := range c.order {
+		if err := c.transformers[declaration].CollectStatistics(destination); err != nil {
+			return err
+		}
+	}
+	return c.owner.CollectStatistics(destination)
+}
+
+func (c *Context) ResetStatistics() error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	for _, declaration := range c.order {
+		if err := c.transformers[declaration].ResetStatistics(); err != nil {
+			return err
+		}
+	}
+	return c.owner.ResetStatistics()
+}
+
+func (c *Context) Close() (result error) {
+	if c == nil || c.manager == nil {
+		return ErrContextOwner
+	}
+	if c.closed {
+		return nil
+	}
+	for index := len(c.order) - 1; index >= 0; index-- {
+		declaration := c.order[index]
+		if transformer := c.transformers[declaration]; transformer != nil {
+			if err := transformer.Close(); err != nil {
+				result = errors.Join(result, err)
+			} else {
+				c.transformers[declaration] = nil
+			}
+		}
+	}
+	if result == nil {
+		result = errors.Join(result, c.owner.Close())
+	}
+	if result == nil {
+		c.manager = nil
+		c.owner = nil
+		c.transformers = nil
+		c.order = nil
+		c.closed = true
+	}
+	return result
+}
