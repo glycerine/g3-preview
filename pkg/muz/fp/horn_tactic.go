@@ -164,10 +164,59 @@ func (t *HornTactic) isImplication(formula ast.ASTHandle) (bool, error) {
 	}
 }
 
+func (t *HornTactic) normalizePolarity(formula ast.ASTHandle, temporaries *[]ast.ASTRef) (ast.ASTHandle, error) {
+	positive := true
+	for {
+		kind, err := t.manager.GetKind(formula)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+		if kind == ast.ASTQuantifier {
+			forall, x := t.manager.IsForall(formula)
+			if x != nil {
+				return ast.ASTHandle{}, x
+			}
+			if (forall && positive) || (!forall && !positive) {
+				formula, x = t.manager.GetQuantifierBody(formula)
+				if x != nil {
+					return ast.ASTHandle{}, x
+				}
+				continue
+			}
+		}
+		if kind == ast.ASTApp {
+			operator, x := t.manager.GetDeclKind(formula)
+			if x != nil {
+				return ast.ASTHandle{}, x
+			}
+			if operator == ast.ASTOpNot {
+				formula, x = t.manager.GetArg(formula, 0)
+				if x != nil {
+					return ast.ASTHandle{}, x
+				}
+				positive = !positive
+				continue
+			}
+		}
+		break
+	}
+	if positive {
+		return formula, nil
+	}
+	negated, err := t.manager.MkNot(formula)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = t.pin(temporaries, negated); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return negated, nil
+}
+
 // classify applies the source tactic's disjunctive Horn-clause view. A clause
 // has at most one positive predicate; clauses without one are query bodies.
 func (t *HornTactic) classify(formula ast.ASTHandle, temporaries *[]ast.ASTRef) (rule bool, normalized ast.ASTHandle, err error) {
-	analysis, err := t.stripForall(formula)
+	analysis, err := t.normalizePolarity(formula, temporaries)
 	if err != nil {
 		return false, normalized, err
 	}

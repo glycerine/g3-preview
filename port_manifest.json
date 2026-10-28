@@ -82621,7 +82621,7 @@
         "The command context retains the tactic through the existing tactic reference-count protocol."
       ],
       "deviations": [
-        "Negative existential normalization, proof and model converters, horn-simplify, and general PDR or infinite-domain Horn solving remain unported."
+        "Proof and model converters, horn-simplify, and general PDR or infinite-domain Horn solving remain unported."
       ]
     },
     {
