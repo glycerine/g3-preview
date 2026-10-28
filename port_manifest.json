@@ -127231,7 +127231,7 @@
       "path": "src/smt/smt_model_checker.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_model_checker.go",
         "pkg/smtcore/smt_model_checker_inverse_test.go",
@@ -127375,6 +127375,25 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "complete retained definition inventory for model_checker constructor/destructor, quantifier flattening and manager binding, context-term recovery, finite-universe restrictions, negated candidate assertions, restricted/complete instance recovery, model-value scanning, blocking clauses, recursive checks, cached auxiliary context, iteration/restart/reset and deferred instance publication",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_checker_instances.go",
+            "pkg/smtcore/smt_model_checker_diagnostics.go",
+            "pkg/smtcore/smt_quantifier_manager.go"
+          ],
+          "tests": [
+            "TestSMTModelCheckerFindsFiniteBooleanCounterexample",
+            "TestSMTSolverMBQIFindsInfiniteIntegerCounterexample",
+            "TestSMTSolverMBQIRestrictsSkolemToBodyInstantiationSet",
+            "TestSMTRecursiveCheckerUsesRelevantCallsAndDirectGeneration",
+            "TestSMTModelCheckerAuxiliarySnapshotAndConcretePlugins",
+            "TestSMTModelCheckerAuxiliaryQueriesReuseCleanScopes",
+            "TestSMTModelCheckerRestartSkipsQuantifiersRemovedByPop"
+          ]
+        },
         {
           "name": "finite-universe binding enumeration, model-value-to-context-term recovery, candidate evaluation, pinned counterexample capture and deduplication at restart queue insertion",
           "status": "ported",
@@ -127685,7 +127704,7 @@
         "MBQI diagnostics borrow the existing process verbose stream; tracing is independent of verbosity. Output is flushed at source message boundaries. Disabled diagnostic paths avoid the stream; closed enabled streams return existing stream errors. Query failures are counted separately while preserving aggregate exhaustion, and strict recursive-validation retries retain the source initial validation-failure count. No new stream owner, model owner or generic callback adapter is introduced."
       ],
       "deviations": [
-        "Production checks now use the native cached auxiliary context for every bound variable, including Booleans and frozen finite universes. Fresh creation is innermost-first with declaration-ordered vectors; finite universe membership is asserted as disjunctions before the negated candidate body. Model-finder restrictions/inverse recovery include all original positions; the native second check and single complete-witness fallback are retained even when no restriction clause was added. Scoped queries retain current frozen fparams, concrete plugin copying, blocking and delayed instance ownership. Standalone typed checkers without an auxiliary factory still enumerate an explicitly supplied model for their existing Go callers; the explicit no-model-finder auxiliary test retains unrestricted collection. Broader class/diagnostic/consumer audits remain incomplete.",
+        "Production checks use the native cached auxiliary context for every bound variable, including Booleans and frozen finite universes. Fresh creation is innermost-first with declaration-ordered vectors; finite universe membership is asserted as disjunctions before the negated candidate body. Model-finder restrictions/inverse recovery include all original positions; the native second check and single complete-witness fallback are retained even when no restriction clause was added. Scoped queries retain current frozen fparams, concrete plugin copying, blocking and delayed instance ownership. Standalone typed checkers without an auxiliary factory still enumerate an explicitly supplied model for their existing Go callers; the explicit no-model-finder auxiliary test retains unrestricted collection. The completed 21-definition, assertion, ownership, diagnostic and consumer inventory closes smt_model_checker.cpp.",
         "The source full-registry empty guard is preserved when production supplies a filtered active list. Standalone typed checker callers can still supply explicit quantifiers without registering them; a nonempty explicit list is checked rather than discarded.",
         "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths."
       ]
