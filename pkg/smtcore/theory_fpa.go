@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_fpa.cpp and src/smt/theory_fpa.h floating-point
 // reduction to bit-vectors inside the incremental SMT context.
-package smtcore
 
 import (
 	"errors"

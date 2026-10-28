@@ -120004,6 +120004,8 @@
         "pkg/cmd/g3/test_vectors/array_full_boolean_witness_scopes.smt2",
         "pkg/smtcore/smt_bv_lifecycle.go",
         "pkg/smtcore/smt_bv_lifecycle_test.go",
+        "pkg/smtcore/smt_fpa_lifecycle.go",
+        "pkg/smtcore/smt_fpa_lifecycle_test.go",
         "pkg/smtcore/smt_conflict_polarity_test.go",
         "pkg/cmd/g3/test_vectors/bit_vector_symbolic_carry_scopes.smt2",
         "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
@@ -120196,6 +120198,7 @@
         "TestSMTBooleanClassAssignmentAfterMerge",
         "TestSMTArrayBooleanIndexExhaustion",
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
+        "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence",
         "TestSMTFailedConsequentConflictRetainsTrueOppositeAndFalseLemma",
         "TestSMTArithmeticTranslationBeforeSetupUsesDestinationSelection",
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
@@ -131902,6 +131905,8 @@
       "go_targets": [
         "pkg/smtcore/smt_bv_lifecycle.go",
         "pkg/smtcore/smt_bv_lifecycle_test.go",
+        "pkg/smtcore/smt_fpa_lifecycle.go",
+        "pkg/smtcore/smt_fpa_lifecycle_test.go",
         "pkg/smtcore/smt_arithmetic_lifecycle_test.go",
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/theory_utvpi_lifecycle_test.go",
@@ -131927,6 +131932,7 @@
       ],
       "tests": [
         "TestSMTBitVectorTranslationOwnersModelsAndIndependentScopes",
+        "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence",
         "TestSMTArithmeticTranslationBeforeSetupUsesDestinationSelection",
         "TestSMTArithmeticTranslationRetainsConcreteBackendsAndModels",
         "TestSMTArithmeticTranslationRetainsLiveSourceParameterOwner",
@@ -132094,11 +132100,12 @@
           ]
         },
         {
-          "name": "registered concrete theory-plugin copying during translation: retained arithmetic and BV types are preserved; other theory families remain incomplete",
+          "name": "registered concrete theory-plugin copying during translation: retained arithmetic, BV, FPA, array, sequence/string, datatype and pseudo-Boolean types are preserved; other theory families remain incomplete",
           "status": "partial",
           "go_target": "pkg/smtcore/smt_solver.go",
           "tests": [
-            "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState"
+            "TestSMTUTVPITranslationPreservesInstalledPluginAndIndependentState",
+            "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence"
           ]
         },
         {
@@ -143748,6 +143755,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
+        "pkg/smtcore/smt_fpa_lifecycle.go",
+        "pkg/smtcore/smt_fpa_lifecycle_test.go",
         "pkg/smtcore/proto_model/fpa_factory.go",
         "pkg/smtcore/smt_setup.go",
         "pkg/ast/fpa/fpa2bv_symbols.go",
@@ -143769,6 +143778,7 @@
         "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
+        "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence",
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
         "TestSMTFloatingPointWrappedConstantAndScopes",
         "TestSMTFloatingPointConversionTermsAndArithmetic",
@@ -144042,6 +144052,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "theory_fpa::mk_fresh constructs an independent destination-manager theory and context::copy_plugins reaches it during solver translation and auxiliary-context construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_fpa_lifecycle.go",
+          "tests": [
+            "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence"
+          ]
+        },
+        {
           "name": "wrapped FP and rounding-mode constants, conversion cache, atom and conversion-term bit-vector definitions, side constraints and scoped rollback",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_fpa.go",
@@ -144170,6 +144188,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/smtcore/theory_fpa.go",
+        "pkg/smtcore/smt_fpa_lifecycle.go",
+        "pkg/smtcore/smt_fpa_lifecycle_test.go",
         "pkg/smtcore/proto_model/fpa_factory.go",
         "pkg/ast/rewriter/fpa2bv_constructor_frontier_test.go",
         "pkg/tactic/smtlogics/qfufbv_ackr_tactic_test.go",
@@ -144188,6 +144208,7 @@
         "pkg/smtcore/proto_model/output_release_failure_test.go"
       ],
       "tests": [
+        "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence",
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
         "TestSMTFloatingPointModelFinalizesConvertedFunction",
         "TestFPA2BVRewriterConstructorAllocationFrontiers",
@@ -144247,6 +144268,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "theory_fpa::mk_fresh constructs a new theory owner against the destination context manager without retaining source converter, rewriter, trail, conversion, or scope state",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_fpa_lifecycle.go",
+          "tests": [
+            "TestSMTFloatingPointTranslationFreshStateAndSourceIndependence"
+          ]
+        },
         {
           "name": "floating-point value factory, model value dependency procedures and SMT theory interface",
           "status": "partial",

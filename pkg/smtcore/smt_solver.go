@@ -1,7 +1,8 @@
+package smtcore
+
 // Source: src/smt/smt_solver.h; src/smt/smt_solver.cpp retained kernel-backed
 // solver facade. Model, proof-result, consequence, mutex, core-extension, and
 // cross-manager kernel-copy operations remain with their kernel prerequisites.
-package smtcore
 
 import (
 	"errors"
@@ -186,6 +187,9 @@ func (s *SMTSolver) newAuxiliarySolver() (auxiliary *SMTSolver, resultErr error)
 		return auxiliary, err
 	}
 	if err = auxiliary.kernel.copyBitVectorPlugin(s.kernel); err != nil {
+		return auxiliary, err
+	}
+	if err = auxiliary.kernel.copyFloatingPointPlugin(s.kernel); err != nil {
 		return auxiliary, err
 	}
 	if err = auxiliary.kernel.copyArrayPlugin(s.kernel); err != nil {
@@ -839,6 +843,9 @@ func (s *SMTSolver) Translate(manager *ast.ASTManager, params *uparams.ParamsRef
 		return nil, errors.Join(err, next.Close())
 	}
 	if err = next.kernel.copyBitVectorPlugin(s.kernel); err != nil {
+		return nil, errors.Join(err, next.Close())
+	}
+	if err = next.kernel.copyFloatingPointPlugin(s.kernel); err != nil {
 		return nil, errors.Join(err, next.Close())
 	}
 	if err = next.kernel.copyArrayPlugin(s.kernel); err != nil {
