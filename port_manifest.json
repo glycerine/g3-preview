@@ -136153,11 +136153,23 @@
           ]
         },
         {
-          "name": "propagate_core retains linearized monomial equations and checks feasibility after installing their zero bounds even when nonlinear search is disabled",
-          "status": "partial",
+          "name": "propagate_core flushes pending bound axioms and equalities, installs scoped asserted and derived bounds, retains fixed-factor linearized monomial equations even when nonlinear search is disabled, repairs feasibility with exact conflict premises, and publishes post-feasibility row-bound consequences",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_linear.go",
+          "go_targets": [
+            "pkg/smtcore/theory_arith_nonlinear.go",
+            "pkg/smtcore/theory_arith_fixed_bounds.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/linearized_product_real_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/linearized_product_integer_scopes.smt2"
+          ],
           "tests": [
-            "TestSMTLinearizedMonomialScopesProofsAndModels"
+            "TestSMTLinearizedMonomialScopesProofsAndModels",
+            "TestSMTLinearMonomialZeroFactorExplainsBothBounds",
+            "TestSMTLinearMonomialAffineRowRetainsFixedFactorPremises",
+            "TestSMTArithmeticRowsPropagateBooleanBounds",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
           ]
         },
         {
