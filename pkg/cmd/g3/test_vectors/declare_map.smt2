@@ -1,0 +1,6 @@
+(set-logic ALL)
+(declare-map map-or (Int) (or (Bool Bool) Bool))
+(declare-const a (Array Int Bool))
+(declare-const b (Array Int Bool))
+(assert (not (= (select (map-or a b) 0) (or (select a 0) (select b 0)))))
+(check-sat)

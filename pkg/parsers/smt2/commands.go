@@ -296,6 +296,35 @@ func (p *commandParser) command() (bool, error) {
 		if _, err = p.context.DeclareSortConstructor(name, arity); err != nil {
 			return false, err
 		}
+	case "declare-map":
+		mapName, err := p.symbol()
+		if err != nil {
+			return false, err
+		}
+		if err = p.expect(LeftParenToken); err != nil {
+			return false, err
+		}
+		var indices []ast.ASTHandle
+		for p.token != RightParenToken {
+			sort, e := p.sort()
+			if e != nil {
+				return false, e
+			}
+			indices = append(indices, sort)
+		}
+		if err = p.advance(); err != nil {
+			return false, err
+		}
+		function, err := p.functionDeclarationReference()
+		if err != nil {
+			return false, err
+		}
+		if err = p.requireEnd(); err != nil {
+			return false, err
+		}
+		if _, err = p.context.DeclareMap(mapName, indices, function); err != nil {
+			return false, err
+		}
 	case "define-sort":
 		name, err := p.symbol()
 		if err != nil {

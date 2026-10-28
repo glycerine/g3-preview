@@ -40846,7 +40846,10 @@
         "pkg/parsers/smt2/info_test.go",
         "pkg/cmd/g3/test_vectors/get_info.smt2",
         "pkg/parsers/smt2/display_test.go",
-        "pkg/cmd/g3/test_vectors/display.smt2"
+        "pkg/cmd/g3/test_vectors/display.smt2",
+        "pkg/cmd_context/array_map.go",
+        "pkg/parsers/smt2/declare_map_test.go",
+        "pkg/cmd/g3/test_vectors/declare_map.smt2"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -40897,7 +40900,9 @@
         "TestSMT2GetInfoBuiltinsAndPersistentStatus",
         "TestSMT2InfoStatusValidationAndUnsupportedLocation",
         "TestSMT2DisplayUsesParsedExpressionPrinter",
-        "TestSMT2DisplayRejectsMissingAndTrailingTerms"
+        "TestSMT2DisplayRejectsMissingAndTrailingTerms",
+        "TestSMT2DeclareMapInstallsArrayAxiomAndScopes",
+        "TestSMT2DeclareMapRejectsEmptyIndicesAndNullaryFunctions"
       ],
       "conditionals": [
         {
@@ -41001,7 +41006,14 @@
           "tests": ["TestSMT2DisplayUsesParsedExpressionPrinter", "TestSMT2DisplayRejectsMissingAndTrailingTerms", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         },
         {
-          "name": "remaining help/declare-map/get-proof-graph commands, string output-channel setters and model completion policy",
+          "name": "declare-map command sort-list/function-reference parsing, concrete array-map declaration publication and scoped rollback (basic_cmds.cpp:745-808)",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/array_map.go",
+          "go_targets": ["pkg/cmd_context/context.go", "pkg/parsers/smt2/commands.go", "pkg/parsers/smt2/declare_map_test.go", "pkg/cmd/g3/test_vectors/declare_map.smt2"],
+          "tests": ["TestSMT2DeclareMapInstallsArrayAxiomAndScopes", "TestSMT2DeclareMapRejectsEmptyIndicesAndNullaryFunctions", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+        },
+        {
+          "name": "remaining help/get-proof-graph commands, string output-channel setters and model completion policy",
           "status": "reference_only",
           "go_target": null,
           "tests": []
@@ -93822,7 +93834,9 @@
         "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2",
         "pkg/parsers/smt2/command_globals_test.go",
         "pkg/parsers/smt2/expression_labels_test.go",
-        "pkg/cmd/g3/test_vectors/expression_labels.smt2"
+        "pkg/cmd/g3/test_vectors/expression_labels.smt2",
+        "pkg/parsers/smt2/declare_map_test.go",
+        "pkg/cmd/g3/test_vectors/declare_map.smt2"
       ],
       "tests": [
         "TestSMT2FunctionDeclarationReferenceErrors",
@@ -93850,6 +93864,8 @@
         "TestSMT2QuantifierAttributesRejectWrongScopesAndBadPatterns",
         "TestSMT2ExpressionLabelsPreserveAttributeNesting",
         "TestSMT2ExpressionLabelRequiresBooleanBodyAndSymbol",
+        "TestSMT2DeclareMapInstallsArrayAxiomAndScopes",
+        "TestSMT2DeclareMapRejectsEmptyIndicesAndNullaryFunctions",
         "TestSMT2TacticGrammarRejectsMalformedInputBeforeChecking",
         "TestSMT2TacticCombinatorsAndTypedParameters",
         "TestSMT2ConcreteDatatypeFormsAndDeclarationScopes",

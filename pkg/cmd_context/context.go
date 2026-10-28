@@ -574,6 +574,25 @@ func (c *Context) DeclareFunction(name string, domain []ast.ASTHandle, rangeSort
 	if err != nil {
 		return ast.ASTHandle{}, err
 	}
+	return c.publishFunctionDeclaration(name, d)
+}
+
+func (c *Context) publishFunctionDeclaration(name string, d ast.ASTHandle) (result ast.ASTHandle, err error) {
+	m, err := c.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	arity, err := m.GetArity(d)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	domain := make([]ast.ASTHandle, arity)
+	for i := uint32(0); i < arity; i++ {
+		domain[i], err = m.GetDomain(d, i)
+		if err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
 	ref, err := m.NewRef(d)
 	if err != nil {
 		return ast.ASTHandle{}, err
