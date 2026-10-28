@@ -1,7 +1,7 @@
 package rel
 
 // Source: src/muz/rel/dl_compiler.cpp retained load, register allocation,
-// ground-head assembly, nonrecursive ordering, union, and store paths.
+// finite rule assembly, dependency ordering, recursive fixpoint, and store paths.
 
 import (
 	"errors"
@@ -66,6 +66,7 @@ type finiteCompiler struct {
 	relations     *RelationManager
 	execution     *InstructionBlock
 	termination   *InstructionBlock
+	current       *InstructionBlock
 	predicateRegs map[ast.ASTHandle]uint32
 	signatures    []Signature
 	loaded        []ast.ASTHandle
@@ -111,6 +112,14 @@ func (c *finiteCompiler) append(block *InstructionBlock, instruction Instruction
 		return errors.Join(err, instruction.Close())
 	}
 	return nil
+}
+
+func (c *finiteCompiler) emit(instruction Instruction, rule *base.Rule) error {
+	block := c.execution
+	if c.current != nil {
+		block = c.current
+	}
+	return c.append(block, instruction, rule)
 }
 
 func (c *finiteCompiler) ensureLoaded(predicate ast.ASTHandle) error {
@@ -313,7 +322,7 @@ func (c *finiteCompiler) constantRegister(rule *base.Rule, sort ast.ASTHandle, d
 	if err != nil {
 		return 0, err
 	}
-	if err = c.append(c.execution, instruction, rule); err != nil {
+	if err = c.emit(instruction, rule); err != nil {
 		return 0, err
 	}
 	c.constants[key] = register
@@ -327,7 +336,7 @@ func (c *finiteCompiler) totalRegister(rule *base.Rule, predicate, sort ast.ASTH
 	}
 	signature := Signature{domains: []uint64{domain}}
 	register := c.fresh(signature)
-	if err := c.append(c.execution, NewTotalInstruction(signature, register), rule); err != nil {
+	if err := c.emit(NewTotalInstruction(signature, register), rule); err != nil {
 		return 0, err
 	}
 	c.totals[key] = register
@@ -340,7 +349,7 @@ func (c *finiteCompiler) emptyTotalRegister(rule *base.Rule, predicate ast.ASTHa
 	}
 	signature := Signature{}
 	register := c.fresh(signature)
-	if err := c.append(c.execution, NewTotalInstruction(signature, register), rule); err != nil {
+	if err := c.emit(NewTotalInstruction(signature, register), rule); err != nil {
 		return 0, err
 	}
 	c.emptyTotals[predicate] = register
@@ -358,7 +367,7 @@ func (c *finiteCompiler) project(register uint32, signature Signature, removed [
 	} else {
 		result = c.fresh(projected)
 	}
-	if err = c.append(c.execution, NewProjectionInstruction(register, removed, result), rule); err != nil {
+	if err = c.emit(NewProjectionInstruction(register, removed, result), rule); err != nil {
 		return 0, Signature{}, false, err
 	}
 	return result, projected, true, nil
@@ -378,7 +387,7 @@ func (c *finiteCompiler) appendColumn(current uint32, signature Signature, owned
 	} else {
 		result = c.fresh(joined)
 	}
-	if err = c.append(c.execution, NewJoinInstruction(current, columnRegister, nil, nil, result), rule); err != nil {
+	if err = c.emit(NewJoinInstruction(current, columnRegister, nil, nil, result), rule); err != nil {
 		return 0, Signature{}, false, false, err
 	}
 	return result, joined, true, true, nil
@@ -402,7 +411,7 @@ func (c *finiteCompiler) duplicateColumn(current uint32, signature Signature, co
 			return 0, Signature{}, false, err
 		}
 		single = c.fresh(one)
-		if err = c.append(c.execution, NewProjectionInstruction(current, removed, single), rule); err != nil {
+		if err = c.emit(NewProjectionInstruction(current, removed, single), rule); err != nil {
 			return 0, Signature{}, false, err
 		}
 		temporary = true
@@ -418,11 +427,11 @@ func (c *finiteCompiler) duplicateColumn(current uint32, signature Signature, co
 	} else {
 		result = c.fresh(joined)
 	}
-	if err = c.append(c.execution, NewJoinInstruction(current, single, []int{column}, []int{0}, result), rule); err != nil {
+	if err = c.emit(NewJoinInstruction(current, single, []int{column}, []int{0}, result), rule); err != nil {
 		return 0, Signature{}, false, err
 	}
 	if temporary {
-		if err = c.append(c.execution, NewDeallocateInstruction(single), rule); err != nil {
+		if err = c.emit(NewDeallocateInstruction(single), rule); err != nil {
 			return 0, Signature{}, false, err
 		}
 	}
@@ -481,7 +490,7 @@ func (c *finiteCompiler) reorder(current uint32, signature Signature, order []in
 		} else {
 			result = c.fresh(renamed)
 		}
-		if err = c.append(c.execution, NewRenameInstruction(current, cycle, result), rule); err != nil {
+		if err = c.emit(NewRenameInstruction(current, cycle, result), rule); err != nil {
 			return 0, Signature{}, false, err
 		}
 		current, signature, owned = result, renamed, true
@@ -707,7 +716,7 @@ func (c *finiteCompiler) prepareTail(rule *base.Rule, application ast.ASTHandle)
 		} else {
 			result = c.fresh(projected)
 		}
-		if x = c.append(c.execution, NewSelectEqualProjectInstruction(current, value, column, result), rule); x != nil {
+		if x = c.emit(NewSelectEqualProjectInstruction(current, value, column, result), rule); x != nil {
 			return 0, Signature{}, false, nil, x
 		}
 		current, signature, owned = result, projected, true
@@ -718,12 +727,12 @@ func (c *finiteCompiler) prepareTail(rule *base.Rule, application ast.ASTHandle)
 		}
 		if !owned {
 			result := c.fresh(signature)
-			if err = c.append(c.execution, NewCloneInstruction(current, result), rule); err != nil {
+			if err = c.emit(NewCloneInstruction(current, result), rule); err != nil {
 				return 0, Signature{}, false, nil, err
 			}
 			current, owned = result, true
 		}
-		if err = c.append(c.execution, NewFilterIdenticalInstruction(current, columns), rule); err != nil {
+		if err = c.emit(NewFilterIdenticalInstruction(current, columns), rule); err != nil {
 			return 0, Signature{}, false, nil, err
 		}
 	}
@@ -762,16 +771,16 @@ func (c *finiteCompiler) twoTailHead(rule finiteCompiledRule, predicate ast.ASTH
 		return 0, false, err
 	}
 	joined := c.fresh(joinedSignature)
-	if err = c.append(c.execution, NewJoinInstruction(left, right, leftJoin, rightJoin, joined), rule.rule); err != nil {
+	if err = c.emit(NewJoinInstruction(left, right, leftJoin, rightJoin, joined), rule.rule); err != nil {
 		return 0, false, err
 	}
 	if leftOwned {
-		if err = c.append(c.execution, NewDeallocateInstruction(left), rule.rule); err != nil {
+		if err = c.emit(NewDeallocateInstruction(left), rule.rule); err != nil {
 			return 0, false, err
 		}
 	}
 	if rightOwned && right != left {
-		if err = c.append(c.execution, NewDeallocateInstruction(right), rule.rule); err != nil {
+		if err = c.emit(NewDeallocateInstruction(right), rule.rule); err != nil {
 			return 0, false, err
 		}
 	}
@@ -785,7 +794,7 @@ func (c *finiteCompiler) twoTailHead(rule finiteCompiledRule, predicate ast.ASTH
 	return c.assembleHead(rule, predicate, joined, joinedSignature, true, true, variableColumns)
 }
 
-func (c *finiteCompiler) compileRule(rule finiteCompiledRule) error {
+func (c *finiteCompiler) compileRule(rule finiteCompiledRule, delta uint32) error {
 	predicate, err := c.manager.GetDecl(rule.head)
 	if err != nil {
 		return err
@@ -809,12 +818,84 @@ func (c *finiteCompiler) compileRule(rule finiteCompiledRule) error {
 	if !c.signatures[source].equal(c.signatures[target]) {
 		return fmt.Errorf("%w: compiled rule signatures differ", ErrCompilerUnsupported)
 	}
-	if err = c.append(c.execution, NewUnionInstruction(source, target, VoidRegister), rule.rule); err != nil {
+	if err = c.emit(NewUnionInstruction(source, target, delta), rule.rule); err != nil {
 		return err
 	}
 	if owned {
-		return c.append(c.execution, NewDeallocateInstruction(source), rule.rule)
+		return c.emit(NewDeallocateInstruction(source), rule.rule)
 	}
+	return nil
+}
+
+// compileRecursive emits an exact finite fixpoint loop. Each iteration reads
+// complete predicate relations and records only newly inserted tuples in the
+// next control deltas; replacing full reads with semi-naive tail deltas is a
+// performance refinement and does not change the resulting least fixpoint.
+func (c *finiteCompiler) compileRecursive(rules []finiteCompiledRule) (resultErr error) {
+	headOrder := make([]ast.ASTHandle, 0)
+	seen := make(map[ast.ASTHandle]bool)
+	currentDeltas := make(map[ast.ASTHandle]uint32)
+	nextDeltas := make(map[ast.ASTHandle]uint32)
+	for _, rule := range rules {
+		head, err := c.manager.GetDecl(rule.head)
+		if err != nil {
+			return err
+		}
+		if seen[head] {
+			continue
+		}
+		seen[head] = true
+		headOrder = append(headOrder, head)
+		signature := c.signatures[c.predicateRegs[head]]
+		currentDeltas[head] = c.fresh(signature)
+		nextDeltas[head] = c.fresh(signature)
+	}
+	for _, rule := range rules {
+		head, err := c.manager.GetDecl(rule.head)
+		if err != nil {
+			return err
+		}
+		if err = c.compileRule(rule, currentDeltas[head]); err != nil {
+			return err
+		}
+	}
+	body := NewInstructionBlock()
+	transferred := false
+	defer func() {
+		if !transferred {
+			resultErr = errors.Join(resultErr, body.Close())
+		}
+	}()
+	c.current = body
+	defer func() { c.current = nil }()
+	for _, head := range headOrder {
+		if err := c.emit(NewDeallocateInstruction(nextDeltas[head]), nil); err != nil {
+			return err
+		}
+	}
+	for _, rule := range rules {
+		head, err := c.manager.GetDecl(rule.head)
+		if err != nil {
+			return err
+		}
+		if err = c.compileRule(rule, nextDeltas[head]); err != nil {
+			return err
+		}
+	}
+	controls := make([]uint32, 0, len(headOrder))
+	for _, head := range headOrder {
+		current := currentDeltas[head]
+		controls = append(controls, current)
+		if err := c.emit(NewMoveInstruction(nextDeltas[head], current), nil); err != nil {
+			return err
+		}
+	}
+	c.current = nil
+	loop := NewWhileLoopInstruction(controls, body)
+	if err := c.append(c.execution, loop, nil); err != nil {
+		return err
+	}
+	transferred = true
 	return nil
 }
 
@@ -824,10 +905,6 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 		return err
 	}
 	defer func() { resultErr = errors.Join(resultErr, closeCompiledRules(rules)) }()
-	ordered, err := c.orderRules(rules)
-	if err != nil {
-		return err
-	}
 	for _, rule := range rules {
 		head, x := c.manager.GetDecl(rule.head)
 		if x != nil {
@@ -851,9 +928,19 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 			}
 		}
 	}
-	for _, rule := range ordered {
-		if err = c.compileRule(rule); err != nil {
+	ordered, err := c.orderRules(rules)
+	if err != nil {
+		if !errors.Is(err, ErrCompilerUnsupported) {
 			return err
+		}
+		if err = c.compileRecursive(rules); err != nil {
+			return err
+		}
+	} else {
+		for _, rule := range ordered {
+			if err = c.compileRule(rule, VoidRegister); err != nil {
+				return err
+			}
 		}
 	}
 	for _, predicate := range c.loaded {
@@ -868,8 +955,8 @@ func (c *finiteCompiler) compile(set *base.RuleSet) (resultErr error) {
 	return nil
 }
 
-// CompileFiniteRules compiles the currently retained nonrecursive finite rule
-// slice with up to two positive tails into execution and termination bytecode.
+// CompileFiniteRules compiles the currently retained positive finite rule slice
+// with up to two tails into execution and termination bytecode.
 // Ownership of both returned blocks transfers to the caller.
 func CompileFiniteRules(relations *RelationManager, set *base.RuleSet) (*InstructionBlock, *InstructionBlock, error) {
 	compiler, err := newFiniteCompiler(relations)

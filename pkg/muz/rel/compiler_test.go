@@ -501,3 +501,118 @@ func TestFiniteCompilerJoinsTwoPositiveTails(t *testing.T) {
 	}
 	compilerWantFacts(t, table, rel.Fact{1, 1}, rel.Fact{0, 0}, rel.Fact{0, 1})
 }
+
+func TestFiniteCompilerSaturatesRecursiveRules(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = command.Close() })
+	manager, err := command.Manager()
+	if err != nil {
+		t.Fatal(err)
+	}
+	relations, err := rel.NewRelationManager(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = relations.Close() })
+	rules, err := base.NewRuleManager(manager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = rules.Close() })
+	set, err := base.NewRuleSet(rules)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = set.Close() })
+	boolean, err := manager.MkBoolSort()
+	if err != nil {
+		t.Fatal(err)
+	}
+	domain := []ast.ASTHandle{boolean, boolean}
+	edge := compilerDeclaration(t, manager, "recursive-Edge", domain, boolean)
+	path := compilerDeclaration(t, manager, "recursive-Path", domain, boolean)
+	for _, predicate := range []ast.ASTHandle{edge, path} {
+		if err = rules.RegisterPredicate(predicate); err != nil {
+			t.Fatal(err)
+		}
+	}
+	truth, err := manager.MkTrue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	falsity, err := manager.MkFalse()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for index, values := range [][]ast.ASTHandle{{truth, falsity}, {falsity, truth}} {
+		fact, x := manager.MkApp(edge, values)
+		if x != nil {
+			t.Fatal(x)
+		}
+		compilerRule(t, rules, set, fact, nil, "recursive-edge-"+string(rune('0'+index)))
+	}
+	x, err := manager.MkVar(0, boolean)
+	if err != nil {
+		t.Fatal(err)
+	}
+	y, err := manager.MkVar(1, boolean)
+	if err != nil {
+		t.Fatal(err)
+	}
+	z, err := manager.MkVar(2, boolean)
+	if err != nil {
+		t.Fatal(err)
+	}
+	edgeXY, err := manager.MkApp(edge, []ast.ASTHandle{x, y})
+	if err != nil {
+		t.Fatal(err)
+	}
+	pathXY, err := manager.MkApp(path, []ast.ASTHandle{x, y})
+	if err != nil {
+		t.Fatal(err)
+	}
+	compilerRule(t, rules, set, pathXY, []ast.ASTHandle{edgeXY}, "recursive-seed")
+	pathXZ, err := manager.MkApp(path, []ast.ASTHandle{x, z})
+	if err != nil {
+		t.Fatal(err)
+	}
+	pathXY, err = manager.MkApp(path, []ast.ASTHandle{x, y})
+	if err != nil {
+		t.Fatal(err)
+	}
+	edgeYZ, err := manager.MkApp(edge, []ast.ASTHandle{y, z})
+	if err != nil {
+		t.Fatal(err)
+	}
+	compilerRule(t, rules, set, pathXZ, []ast.ASTHandle{pathXY, edgeYZ}, "recursive-step")
+	valid, err := set.Finalize()
+	if err != nil || !valid {
+		t.Fatal("finalize", valid, err)
+	}
+	execution, termination, err := rel.CompileFiniteRules(relations, set)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = execution.Close(); _ = termination.Close() })
+	context, err := rel.NewExecutionContextWithRelations(relations, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = context.Close() })
+	complete, err := execution.Perform(context)
+	if err != nil || !complete {
+		t.Fatal("recursive execution", complete, err)
+	}
+	complete, err = termination.Perform(context)
+	if err != nil || !complete {
+		t.Fatal("recursive termination", complete, err)
+	}
+	table, found, err := relations.TryGetRelation(path)
+	if err != nil || !found || table == nil {
+		t.Fatal("recursive path relation", table, found, err)
+	}
+	compilerWantFacts(t, table, rel.Fact{0, 0}, rel.Fact{0, 1}, rel.Fact{1, 0}, rel.Fact{1, 1})
+}

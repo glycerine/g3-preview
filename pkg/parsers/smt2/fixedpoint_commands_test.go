@@ -193,6 +193,41 @@ func TestSMT2FixedpointTwoTailJoinMatchesCPP(t *testing.T) {
 	}
 }
 
+func TestSMT2FixedpointRecursiveClosureMatchesCPP(t *testing.T) {
+	script := `(set-option :fixedpoint.engine datalog)
+(declare-rel Edge (Bool Bool))
+(declare-rel Path (Bool Bool))
+(declare-rel Goal ())
+(declare-var x Bool)
+(declare-var y Bool)
+(declare-var z Bool)
+(rule (Edge true false))
+(rule (Edge false true))
+(rule (=> (Edge x y) (Path x y)))
+(rule (=> (and (Path x y) (Edge y z)) (Path x z)))
+(rule (=> (Path true true) Goal))
+(query Goal)
+`
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	context.PrintSuccess = false
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	if output.String() != cpp || cpp != "sat\n" {
+		t.Fatal("recursive fixedpoint SMT-LIB differential", output.String(), cpp)
+	}
+}
+
 func TestSMT2FixedpointEmptyProgramQueryMatchesCPP(t *testing.T) {
 	script := "(declare-rel P ())\n(query P)\n"
 	context, err := cmd_context.NewStandaloneContext()
