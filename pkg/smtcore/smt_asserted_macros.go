@@ -43,6 +43,11 @@ func (k *SMTKernel) replacePendingMacroBatch(batch *macros.FormulaBatch) error {
 // swapPendingFormulaBatch copies already justified, flattened rows. Source
 // swap_asserted_formulas does not push, rewrite or poll cancellation again.
 func (k *SMTKernel) swapPendingFormulaBatch(batch *macros.FormulaBatch) (result error) {
+	if err := k.assertedSourceAssertion(323, "!inconsistent() || !formulas.empty()", func() (bool, error) {
+		return !k.assertedInconsistent || batch != nil && batch.Len() != 0, nil
+	}); err != nil {
+		return err
+	}
 	original := k.assertions
 	k.assertions = append([]SMTKernelAssertion(nil), original[:k.assertedHead]...)
 	defer func() {

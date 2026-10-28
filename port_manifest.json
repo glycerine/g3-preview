@@ -110698,7 +110698,7 @@
       "path": "src/smt/asserted_formulas.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_asserted_formulas.go",
         "pkg/smtcore/smt_asserted_propagate.go",
@@ -110808,7 +110808,11 @@
         "TestSMTContextDisplayDefinitionsShareVisitedAcrossActualOwners",
         "TestSMTContextDisplayHotVariablesThresholdDecayAndWidths",
         "TestSMTContextDisplayDefinitionsAndActivityWriterPrefixes",
-        "TestSMTContextDisplayDefinitionsAllocationRefusalRetainsInputs"
+        "TestSMTContextDisplayDefinitionsAllocationRefusalRetainsInputs",
+        "TestSMTAssertedAssertionAndScopeTraceMetadata",
+        "TestSMTAssertedScopeSourceAssertionGate",
+        "TestSMTAssertedNNFAndInjectivityTraceMetadata",
+        "TestSMTAssertedPropagationTraceMetadata"
       ],
       "conditionals": [
         {
@@ -110862,7 +110866,7 @@
           "text": "SASSERT(is_ground(lhs) && is_ground(rhs));"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -111135,9 +111139,20 @@
         },
         {
           "name": "remaining assertion/scope/value-propagation/NNF/injectivity diagnostic hooks and retained-method audit",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_diagnostics.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_asserted_propagate.go",
+            "pkg/smtcore/smt_asserted_nnf.go",
+            "pkg/smtcore/smt_asserted_injectivity.go"
+          ],
+          "tests": [
+            "TestSMTAssertedAssertionAndScopeTraceMetadata",
+            "TestSMTAssertedScopeSourceAssertionGate",
+            "TestSMTAssertedNNFAndInjectivityTraceMetadata",
+            "TestSMTAssertedPropagationTraceMetadata"
+          ]
         },
         {
           "name": "unused asserted_formulas::reset: retained kernel::reset destroys and reconstructs its context instead of calling this helper",
@@ -111204,7 +111219,7 @@
       "deviations": [
         "The retained kernel path stores the asserted-formula subset directly instead of constructing the full preprocessing manager.",
         "Go expands stored definitions before committing later assertions independently of new-discovery and ordinary-preprocessing flags. Definitions removed from the assertion list therefore remain effective after parameter changes and when quasi_macros is enabled without macro_finder.",
-        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining per-method diagnostic hooks and retained-method audit remain unfinished, so this source unit remains partial.",
+        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. The four polymorphic simplify methods marked UNREACHABLE are never dispatched because their concrete classes override operator(); Go uses direct typed pass functions and retains the corresponding impossible-path assertion guards without a universal adapter.",
         "IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE source profile, including smt.reducing; ordinary IF_VERBOSE labels remain live. Independent prebuilt C++ comparisons verify complete selected pass order and shared-expression totals for ground and macro assertions. The unused reset helper is not ported; the surrounding live reset lifecycle reconstructs the context.",
         "Shared definition output preserves Boolean, enode, then assertion traversal order while suppressing duplicate definitions and retaining duplicate asserted-root IDs. Hot-variable output uses strict activity/increment >10, width5 left-aligned AST IDs, width12 right-aligned defaultfloat values and six significant digits; real activity increments/decays verify both threshold and formatting. Full context dump remains open: source relevance strategies retain persistent queues and head positions, while the Go selection path currently scans relevance state. Reconstructing a queue-shaped dump from a scan would not establish source fidelity; actual queue state/callers need further porting."
       ]
@@ -111213,7 +111228,7 @@
       "path": "src/smt/asserted_formulas.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_asserted_formulas.go",
         "pkg/smtcore/smt_asserted_propagate.go",
@@ -111317,7 +111332,11 @@
         "TestSMTAssertedCommittedNumeralBindingNestedRollback",
         "TestSMTAssertedTemporaryPropagationBindingsDoNotEscape",
         "TestSMTAssertedEmptyPropagationRestoresBorrowedSubstitution",
-        "TestSMTAssertedSubstitutionAllocationFrontiers"
+        "TestSMTAssertedSubstitutionAllocationFrontiers",
+        "TestSMTAssertedAssertionAndScopeTraceMetadata",
+        "TestSMTAssertedScopeSourceAssertionGate",
+        "TestSMTAssertedNNFAndInjectivityTraceMetadata",
+        "TestSMTAssertedPropagationTraceMetadata"
       ],
       "conditionals": [
         {
@@ -111592,9 +111611,20 @@
         },
         {
           "name": "remaining assertion/scope/value-propagation/NNF/injectivity diagnostic hooks and retained-method audit",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_asserted_diagnostics.go",
+          "go_targets": [
+            "pkg/smtcore/smt_kernel.go",
+            "pkg/smtcore/smt_asserted_propagate.go",
+            "pkg/smtcore/smt_asserted_nnf.go",
+            "pkg/smtcore/smt_asserted_injectivity.go"
+          ],
+          "tests": [
+            "TestSMTAssertedAssertionAndScopeTraceMetadata",
+            "TestSMTAssertedScopeSourceAssertionGate",
+            "TestSMTAssertedNNFAndInjectivityTraceMetadata",
+            "TestSMTAssertedPropagationTraceMetadata"
+          ]
         },
         {
           "name": "unused asserted_formulas::reset: retained kernel::reset destroys and reconstructs its context instead of calling this helper",
@@ -111648,7 +111678,7 @@
       ],
       "deviations": [
         "The concrete retained subset is integrated with SMTKernel rather than exposed as a preprocessing class.",
-        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. Driver control flow is ported; remaining per-method diagnostic hooks and retained-method audit remain unfinished, so this source unit remains partial.",
+        "The bb_quantifiers source flag is initialized false and has no retained production writers; its unreachable quantified-BV pass is omitted. The four polymorphic simplify methods marked UNREACHABLE are never dispatched because their concrete classes override operator(); Go uses direct typed pass functions and retains the corresponding impossible-path assertion guards without a universal adapter.",
         "IF_IVERBOSE is erased in the selected _EXTERNAL_RELEASE source profile, including smt.reducing; ordinary IF_VERBOSE labels remain live. Independent prebuilt C++ comparisons verify complete selected pass order and shared-expression totals for ground and macro assertions. The unused reset helper is not ported; the surrounding live reset lifecycle reconstructs the context."
       ]
     },

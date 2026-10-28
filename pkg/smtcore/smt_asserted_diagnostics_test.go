@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -276,6 +277,131 @@ func TestSMTAssertedDriverTraceMetadataAndRefusals(t *testing.T) {
 		} else if out.Len() != 0 {
 			t.Fatal("erased or refused trace emitted output")
 		}
+	}
+}
+
+func TestSMTAssertedAssertionAndScopeTraceMetadata(t *testing.T) {
+	for _, closed := range []bool{false, true} {
+		m, s := smtAssertedNNFFixture(t, false)
+		var out bytes.Buffer
+		var writer io.Writer = &out
+		if closed {
+			writer = assertedRefusingTrace{}
+		}
+		tags := diagnostic.NewTraceTagsWithWriter(writer)
+		for _, tag := range []string{"assert_expr_bug", "asserted_formulas_bug", "asserted_formulas_scopes"} {
+			tags.Enable(tag)
+		}
+		s.kernel.modelConfig.Trace = tags
+		b, err := m.MkBoolSort()
+		astTestMust(t, err)
+		p, err := m.MkConst(astTestSymbol(t, m, "asserted-scope-trace-p"), b)
+		astTestMust(t, err)
+		astTestMust(t, s.Assert(p))
+		astTestMust(t, s.Push())
+		astTestMust(t, s.Pop(1))
+		if !closed && tags.ShouldTrace("assert_expr_bug") {
+			text := out.String()
+			for _, want := range []string{
+				"[assert_expr_bug] assert_expr src/smt/asserted_formulas.cpp:151",
+				"[assert_expr_bug] assert_expr src/smt/asserted_formulas.cpp:160",
+				"[asserted_formulas_bug] assert_expr src/smt/asserted_formulas.cpp:166",
+				"[asserted_formulas_scopes] push_scope src/smt/asserted_formulas.cpp:179",
+				"[asserted_formulas_scopes] push_scope src/smt/asserted_formulas.cpp:190",
+				"[asserted_formulas_scopes] pop_scope src/smt/asserted_formulas.cpp:194",
+				"[asserted_formulas_scopes] pop_scope src/smt/asserted_formulas.cpp:206",
+				"before push: 0\n", "after push: 1\n", "before pop 1 of 1\n", "after pop 1\n",
+			} {
+				if !strings.Contains(text, want) {
+					t.Fatalf("missing %q in asserted trace:\n%s", want, text)
+				}
+			}
+		} else if out.Len() != 0 {
+			t.Fatal("disabled or refused assertion trace emitted output", out.String())
+		}
+	}
+}
+
+func TestSMTAssertedScopeSourceAssertionGate(t *testing.T) {
+	_, _ = newLRASourceAssertionContext(t)
+	_, s := smtAssertedNNFFixture(t, false)
+	err := s.kernel.assertedSourceAssertion(178, "inconsistent() || m_qhead == m_formulas.size() || m.canceled()", func() (bool, error) {
+		return false, nil
+	})
+	checkLRASourceAssertionResult(t, err, true, nil)
+}
+
+func TestSMTAssertedNNFAndInjectivityTraceMetadata(t *testing.T) {
+	t.Run("nnf", func(t *testing.T) {
+		m, s := smtAssertedNNFFixture(t, false)
+		b, err := m.MkBoolSort()
+		astTestMust(t, err)
+		p, err := m.MkConst(astTestSymbol(t, m, "asserted-nnf-trace-p"), b)
+		astTestMust(t, err)
+		astTestMust(t, s.Assert(p))
+		s.kernel.preprocessState.NNFCNF = true
+		var out bytes.Buffer
+		tags := diagnostic.NewTraceTagsWithWriter(&out)
+		tags.Enable("nnf_bug")
+		s.kernel.modelConfig.Trace = tags
+		astTestMust(t, s.kernel.normalizePendingAssertions())
+		if tags.ShouldTrace("nnf_bug") {
+			for _, want := range []string{"src/smt/asserted_formulas.cpp:359", "src/smt/asserted_formulas.cpp:362", "i: 0 sz: 1\n", "processing:\nasserted-nnf-trace-p\n"} {
+				if !strings.Contains(out.String(), want) {
+					t.Fatal("missing NNF trace", want, out.String())
+				}
+			}
+		} else if out.Len() != 0 {
+			t.Fatal("disabled NNF trace", out.String())
+		}
+	})
+	t.Run("injectivity", func(t *testing.T) {
+		_, s, _, _, _ := smtAssertedInjectivityFixture(t, false)
+		var out bytes.Buffer
+		tags := diagnostic.NewTraceTagsWithWriter(&out)
+		tags.Enable("inj_axiom")
+		s.kernel.modelConfig.Trace = tags
+		astTestMust(t, s.kernel.refinePendingInjectivityAxioms())
+		if tags.ShouldTrace("inj_axiom") {
+			if !strings.Contains(out.String(), "[inj_axiom] simplify src/smt/asserted_formulas.cpp:617") || !strings.Contains(out.String(), "simplifying...\n") {
+				t.Fatal("injectivity trace", out.String())
+			}
+		} else if out.Len() != 0 {
+			t.Fatal("disabled injectivity trace", out.String())
+		}
+	})
+}
+
+func TestSMTAssertedPropagationTraceMetadata(t *testing.T) {
+	m, s := smtAssertedNNFFixture(t, false)
+	seven, err := m.ArithmeticIntegerNumeralText("7")
+	astTestMust(t, err)
+	sort, err := m.GetSort(seven)
+	astTestMust(t, err)
+	x, err := m.MkConst(astTestSymbol(t, m, "asserted-propagation-trace-x"), sort)
+	astTestMust(t, err)
+	equality, err := m.MkEq(x, seven)
+	astTestMust(t, err)
+	astTestMust(t, s.Assert(equality))
+	var out bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&out)
+	tags.Enable("propagate_values")
+	s.kernel.modelConfig.Trace = tags
+	astTestMust(t, s.kernel.propagatePendingAssertions())
+	if tags.ShouldTrace("propagate_values") {
+		text := out.String()
+		for _, want := range []string{
+			"src/smt/asserted_formulas.cpp:451", "before:\n",
+			"src/smt/asserted_formulas.cpp:461", "middle:\n",
+			"src/smt/asserted_formulas.cpp:469", "after:\n",
+			"src/smt/asserted_formulas.cpp:506", "insert asserted-propagation-trace-x -> 7\n",
+		} {
+			if !strings.Contains(text, want) {
+				t.Fatal("missing propagation trace", want, text)
+			}
+		}
+	} else if out.Len() != 0 {
+		t.Fatal("disabled propagation trace", out.String())
 	}
 }
 

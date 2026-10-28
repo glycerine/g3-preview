@@ -724,6 +724,11 @@ func (k *SMTKernel) assertFormulaCore(formula, proof ast.ASTHandle) error {
 	if k.assertedFormulasInconsistent() {
 		return nil
 	}
+	if k.preprocess {
+		if err = k.traceAssertedExpression("assert_expr_bug", "assert_expr", 151, "", formula); err != nil {
+			return err
+		}
+	}
 	hasQuantifiers, err := k.manager.HasQuantifiers(formula)
 	if err != nil {
 		return err
@@ -736,6 +741,11 @@ func (k *SMTKernel) assertFormulaCore(formula, proof ast.ASTHandle) error {
 		return err
 	}
 	if k.preprocess {
+		if err = k.traceAssertedExpression("assert_expr_bug", "assert_expr", 160, "after...\n", formula); err != nil {
+			return err
+		}
+	}
+	if k.preprocess {
 		defer k.manager.DecRef(formula)
 		if !proof.IsNull() {
 			defer k.manager.DecRef(proof)
@@ -745,7 +755,15 @@ func (k *SMTKernel) assertFormulaCore(formula, proof ast.ASTHandle) error {
 	limit := len(k.assertions)
 	wasInconsistent := k.assertedInconsistent
 	if err = k.pushAssertion(formula, proof); err == nil {
-		return nil
+		err = k.traceAssertedBody("asserted_formulas_bug", "assert_expr", 166, func(out io.Writer) error {
+			if _, traceErr := io.WriteString(out, "after assert_expr\n"); traceErr != nil {
+				return traceErr
+			}
+			return k.DisplayAssertedFormulas(out)
+		})
+		if err == nil {
+			return nil
+		}
 	}
 	for index := len(k.assertions); index > limit; index-- {
 		assertion := &k.assertions[index-1]
@@ -875,6 +893,20 @@ func (k *SMTKernel) Push() error {
 			return err
 		}
 	}
+	if err := k.assertedSourceAssertion(178, "inconsistent() || m_qhead == m_formulas.size() || m.canceled()", func() (bool, error) {
+		if k.assertedInconsistent || k.assertedHead == len(k.assertions) {
+			return true, nil
+		}
+		return k.manager.Canceled()
+	}); err != nil {
+		return err
+	}
+	if err := k.traceAssertedBody("asserted_formulas_scopes", "push_scope", 179, func(out io.Writer) error {
+		_, err := fmt.Fprintf(out, "before push: %d\n", len(k.scopes))
+		return err
+	}); err != nil {
+		return err
+	}
 	if err := k.manager.ScopedExprSubstitutionPush(k.assertedScopedSubst); err != nil {
 		return err
 	}
@@ -897,7 +929,18 @@ func (k *SMTKernel) Push() error {
 	k.scopes = append(k.scopes, len(k.assertions))
 	k.nraScopes = append(k.nraScopes, len(k.nraInputs))
 	k.assertedScopeConflicts = append(k.assertedScopeConflicts, k.assertedInconsistent)
-	return nil
+	if err := k.assertedSourceAssertion(184, "inconsistent() || s.m_formulas_lim == m_qhead || m.canceled()", func() (bool, error) {
+		if k.assertedInconsistent || k.scopes[len(k.scopes)-1] == k.assertedHead {
+			return true, nil
+		}
+		return k.manager.Canceled()
+	}); err != nil {
+		return err
+	}
+	return k.traceAssertedBody("asserted_formulas_scopes", "push_scope", 190, func(out io.Writer) error {
+		_, err := fmt.Fprintf(out, "after push: %d\n", len(k.scopes))
+		return err
+	})
 }
 
 func (k *SMTKernel) Pop(count uint32) error {
@@ -906,6 +949,12 @@ func (k *SMTKernel) Pop(count uint32) error {
 	}
 	if count == 0 || count > uint32(len(k.scopes)) {
 		return ast.ErrASTDomain
+	}
+	if err := k.traceAssertedBody("asserted_formulas_scopes", "pop_scope", 194, func(out io.Writer) error {
+		_, err := fmt.Fprintf(out, "before pop %d of %d\n", count, len(k.scopes))
+		return err
+	}); err != nil {
+		return err
 	}
 	level := len(k.scopes) - int(count)
 	limit := k.scopes[level]
@@ -947,9 +996,14 @@ func (k *SMTKernel) Pop(count uint32) error {
 	k.assertedInconsistent = k.assertedScopeConflicts[level]
 	k.assertedScopeConflicts = k.assertedScopeConflicts[:level]
 	if k.preprocessor != nil {
-		return k.flushAssertedCache()
+		if err := k.flushAssertedCache(); err != nil {
+			return err
+		}
 	}
-	return nil
+	return k.traceAssertedBody("asserted_formulas_scopes", "pop_scope", 206, func(out io.Writer) error {
+		_, err := fmt.Fprintf(out, "after pop %d\n", count)
+		return err
+	})
 }
 
 func (k *SMTKernel) ScopeLevel() uint32 {

@@ -1,9 +1,11 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.cpp propagate_values(),
 // update_substitution(), is_gt(), and compute_depth().
-package smtcore
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 )
@@ -68,6 +70,15 @@ func (k *SMTKernel) assertedGreater(left, right ast.ASTHandle, depth map[ast.AST
 	if lv != rv {
 		return !lv, nil
 	}
+	if err := k.assertedSourceAssertion(545, "is_ground(lhs) && is_ground(rhs)", func() (bool, error) {
+		leftGround, err := k.manager.IsGround(left)
+		if err != nil || !leftGround {
+			return false, err
+		}
+		return k.manager.IsGround(right)
+	}); err != nil {
+		return false, err
+	}
 	ld, err := k.assertedDepth(left, depth)
 	if err != nil {
 		return false, err
@@ -121,6 +132,9 @@ func (k *SMTKernel) assertedGreater(left, right ast.ASTHandle, depth map[ast.AST
 			return k.assertedGreater(la, ra, depth)
 		}
 	}
+	if err := k.assertedSourceAssertion(563, "UNREACHABLE", func() (bool, error) { return false, nil }); err != nil {
+		return false, err
+	}
 	return false, nil
 }
 
@@ -138,11 +152,17 @@ func (k *SMTKernel) addAssertionSubstitution(assertion SMTKernelAssertion, depth
 			if greater, err := k.assertedGreater(left, right, depth); err != nil {
 				return err
 			} else if greater {
+				if err = k.traceAssertedRewrite(506, "insert ", left, right); err != nil {
+					return err
+				}
 				return k.manager.ScopedExprSubstitutionInsert(k.assertedScopedSubst, left, right, assertion.Proof, ast.ASTDependency{})
 			}
 			if greater, err := k.assertedGreater(right, left, depth); err != nil {
 				return err
 			} else if greater {
+				if err = k.traceAssertedRewrite(511, "insert ", right, left); err != nil {
+					return err
+				}
 				proof := assertion.Proof
 				if !proof.IsNull() {
 					proof, err = k.manager.MkProofSymmetry(proof)
@@ -152,7 +172,7 @@ func (k *SMTKernel) addAssertionSubstitution(assertion SMTKernelAssertion, depth
 				}
 				return k.manager.ScopedExprSubstitutionInsert(k.assertedScopedSubst, right, left, proof, ast.ASTDependency{})
 			}
-			return nil
+			return k.traceAssertedExpression("propagate_values", "update_substitution", 515, "incompatible ", assertion.Formula)
 		}
 	}
 	key := assertion.Formula
@@ -224,6 +244,21 @@ func (k *SMTKernel) propagatePendingAssertions() (result error) {
 		if err := k.manager.ScopedExprSubstitutionPush(k.assertedScopedSubst); err != nil {
 			return err
 		}
+		label, line := "before:\n", 451
+		if reverse {
+			label, line = "middle:\n", 461
+		}
+		if err := k.traceAssertedBody("propagate_values", "propagate_values", line, func(out io.Writer) error {
+			if _, err := io.WriteString(out, label); err != nil {
+				return err
+			}
+			return k.DisplayAssertedFormulas(out)
+		}); err != nil {
+			if reverse {
+				return errors.Join(err, k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1), k.flushAssertedCache())
+			}
+			return errors.Join(err, k.flushAssertedCache(), k.manager.ScopedExprSubstitutionPop(k.assertedScopedSubst, 1))
+		}
 		func() {
 			defer func() {
 				if reverse {
@@ -250,6 +285,16 @@ func (k *SMTKernel) propagatePendingAssertions() (result error) {
 		}()
 		if result != nil {
 			return result
+		}
+		if reverse {
+			if err := k.traceAssertedBody("propagate_values", "propagate_values", 469, func(out io.Writer) error {
+				if _, err := io.WriteString(out, "after:\n"); err != nil {
+					return err
+				}
+				return k.DisplayAssertedFormulas(out)
+			}); err != nil {
+				return err
+			}
 		}
 	}
 	if changed {

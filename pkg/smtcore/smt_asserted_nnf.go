@@ -1,8 +1,11 @@
-// Source: src/smt/asserted_formulas.cpp asserted_formulas::nnf_cnf.
 package smtcore
+
+// Source: src/smt/asserted_formulas.cpp asserted_formulas::nnf_cnf.
 
 import (
 	"errors"
+	"fmt"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/macros"
@@ -34,7 +37,16 @@ func (k *SMTKernel) normalizePendingAssertions() (result error) {
 		return err
 	}
 	defer func() { result = errors.Join(result, batch.Close()) }()
+	if err = k.traceAssertedBody("nnf_bug", "nnf_cnf", 359, func(out io.Writer) error {
+		_, traceErr := fmt.Fprintf(out, "i: %d sz: %d\n", k.assertedHead, len(k.assertions))
+		return traceErr
+	}); err != nil {
+		return err
+	}
 	for _, assertion := range k.assertions[k.assertedHead:] {
+		if err = k.traceAssertedExpression("nnf_bug", "nnf_cnf", 362, "processing:\n", assertion.Formula); err != nil {
+			return err
+		}
 		if canceled, err := k.appendNormalizedAssertion(proc, batch, assertion); canceled || err != nil {
 			return err
 		}

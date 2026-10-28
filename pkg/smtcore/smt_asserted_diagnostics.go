@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.cpp reduce/invoke/display_ll,
 // get_total_size and check_well_sorted.
-package smtcore
 
 import (
 	"errors"
@@ -123,12 +124,7 @@ func (w assertedTraceWriter) Write(p []byte) (int, error) {
 }
 
 func (k *SMTKernel) traceAssertedState(tag, function string, line int, lowLevel bool) error {
-	tags := k.modelConfig.Trace
-	if tags == nil {
-		tags = diagnostic.BorrowProcessTraceTags()
-	}
-	err := tags.EmitConditional(tag, function, "src/smt/asserted_formulas.cpp", line, func() bool { return true }, func(out io.Writer) (result error) {
-		out = assertedTraceWriter{out}
+	return k.traceAssertedBody(tag, function, line, func(out io.Writer) (result error) {
 		if !lowLevel {
 			return k.DisplayAssertedFormulas(out)
 		}
@@ -147,10 +143,78 @@ func (k *SMTKernel) traceAssertedState(tag, function string, line int, lowLevel 
 		_, err = io.WriteString(out, text)
 		return err
 	})
+}
+
+func (k *SMTKernel) traceAssertedBody(tag, function string, line int, body func(io.Writer) error) error {
+	tags := k.modelConfig.Trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	var operandErr error
+	err := tags.EmitConditional(tag, function, "src/smt/asserted_formulas.cpp", line, func() bool { return true }, func(out io.Writer) error {
+		operandErr = body(assertedTraceWriter{out})
+		return operandErr
+	})
+	if operandErr != nil {
+		return operandErr
+	}
 	if tags.IsStreamFailure(err) {
 		return nil
 	}
 	return err
+}
+
+func (k *SMTKernel) traceAssertedExpression(tag, function string, line int, prefix string, expression ast.ASTHandle) error {
+	return k.traceAssertedBody(tag, function, line, func(out io.Writer) error {
+		if _, err := io.WriteString(out, prefix); err != nil {
+			return err
+		}
+		printer, err := ast.NewSimpleASTPrinterContext(k.manager, out, out)
+		if err != nil {
+			return err
+		}
+		if err = printer.DisplayExpr(out, expression, 0); err != nil {
+			return err
+		}
+		_, err = io.WriteString(out, "\n")
+		return err
+	})
+}
+
+func (k *SMTKernel) traceAssertedRewrite(line int, prefix string, left, right ast.ASTHandle) error {
+	return k.traceAssertedBody("propagate_values", "update_substitution", line, func(out io.Writer) error {
+		if _, err := io.WriteString(out, prefix); err != nil {
+			return err
+		}
+		printer, err := ast.NewSimpleASTPrinterContext(k.manager, out, out)
+		if err != nil {
+			return err
+		}
+		if err = printer.DisplayExpr(out, left, 0); err != nil {
+			return err
+		}
+		if _, err = io.WriteString(out, " -> "); err != nil {
+			return err
+		}
+		if err = printer.DisplayExpr(out, right, 0); err != nil {
+			return err
+		}
+		_, err = io.WriteString(out, "\n")
+		return err
+	})
+}
+
+func (k *SMTKernel) assertedSourceAssertion(line int32, condition string, test func() (bool, error)) error {
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil || !enabled {
+		return err
+	}
+	ok, err := test()
+	if err != nil || ok {
+		return err
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/smt/asserted_formulas.cpp", line, condition)
 }
 
 func (k *SMTKernel) traceAssertedMacros() error {

@@ -1,5 +1,6 @@
-// Source: src/smt/asserted_formulas.cpp push_assertion().
 package smtcore
+
+// Source: src/smt/asserted_formulas.cpp push_assertion().
 
 import (
 	"errors"
@@ -60,6 +61,11 @@ func (k *SMTKernel) AssertionInconsistencyProof() (ast.ASTHandle, error) {
 	for _, assertion := range k.assertions {
 		if k.manager.IsFalse(assertion.Formula) {
 			return assertion.Proof, nil
+		}
+	}
+	if k.assertedInconsistent {
+		if err := k.assertedSourceAssertion(610, "UNREACHABLE", func() (bool, error) { return false, nil }); err != nil {
+			return ast.ASTHandle{}, err
 		}
 	}
 	return ast.ASTHandle{}, nil

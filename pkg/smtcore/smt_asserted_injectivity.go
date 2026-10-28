@@ -1,9 +1,11 @@
+package smtcore
+
 // Source: src/smt/asserted_formulas.cpp refine_inj_axiom_fn::simplify and
 // simplify_fmls::operator().
-package smtcore
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/macros"
@@ -54,6 +56,28 @@ func (k *SMTKernel) refinePendingInjectivityAxioms() (result error) {
 					if err != nil {
 						return err
 					}
+				}
+				if err = k.traceAssertedBody("inj_axiom", "simplify", 617, func(traceOut io.Writer) error {
+					if _, traceErr := io.WriteString(traceOut, "simplifying...\n"); traceErr != nil {
+						return traceErr
+					}
+					printer, traceErr := ast.NewSimpleASTPrinterContext(k.manager, traceOut, traceOut)
+					if traceErr != nil {
+						return traceErr
+					}
+					if traceErr = printer.DisplayExpr(traceOut, assertion.Formula, 0); traceErr != nil {
+						return traceErr
+					}
+					if _, traceErr = io.WriteString(traceOut, "\n"); traceErr != nil {
+						return traceErr
+					}
+					if traceErr = printer.DisplayExpr(traceOut, row.Expression, 0); traceErr != nil {
+						return traceErr
+					}
+					_, traceErr = io.WriteString(traceOut, "\n")
+					return traceErr
+				}); err != nil {
+					return err
 				}
 			}
 		}
