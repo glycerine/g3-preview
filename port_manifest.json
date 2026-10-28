@@ -90327,9 +90327,22 @@
       "path": "src/nlsat/nlsat_explain.cpp",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/explain_minimize.go",
+        "pkg/nlsat/search_state.go"
+      ],
+      "tests": [
+        "TestExplanationMinimizeOrderOwningAppendAndRegistryGrowth",
+        "TestExplanationMinimizeRedundantAndConstantBranches",
+        "TestExplanationMinimizeRootAtomsAndParameterizedDomains",
+        "TestExplanationMinimizeSourceEmptyTodoGuard",
+        "TestExplanationMinimizeAllocationStopsOwnIntervals",
+        "TestExplanationMinimizeInfeasibleCoresPrebuiltCPPOracle",
+        "TestExplanationMinimizeConstructorAndParentClose",
+        "TestExplanationMinimizeConsumedResultDECContinuation",
+        "TestExplanationMinimizeCleanupPreservesOlderMarks"
+      ],
       "conditionals": [
         {
           "line": 811,
@@ -90584,9 +90597,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Actual minimize_core and alternating minimize passes (cpp1370-1437), excluding TRACE/display and full explanation functor",
+          "status": "partial",
+          "go_target": "pkg/nlsat/explain_minimize.go",
+          "tests": [
+            "TestExplanationMinimizeOrderOwningAppendAndRegistryGrowth",
+            "TestExplanationMinimizeRedundantAndConstantBranches",
+            "TestExplanationMinimizeRootAtomsAndParameterizedDomains",
+            "TestExplanationMinimizeSourceEmptyTodoGuard",
+            "TestExplanationMinimizeAllocationStopsOwnIntervals",
+            "TestExplanationMinimizeInfeasibleCoresPrebuiltCPPOracle",
+            "TestExplanationMinimizeConstructorAndParentClose",
+            "TestExplanationMinimizeConsumedResultDECContinuation",
+            "TestExplanationMinimizeCleanupPreservesOlderMarks"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete explanationMinimizer borrows the actual search/store/evaluator/assignment/interval owners, reads the live atom registry rather than copied slice headers, and owns only its source work vectors, two scoped interval references, exact union receipt and concrete scoped-literal output. The evaluator returned reference transfers into the inner inf local; a separate INC transfers the union into the outer accumulator. Inner inf is retired before the outer local. Interrupted consumed interval drops record the exact old/accepted set; owning cleanup retires only those sets and the matching union receipt, preserving independent older justification marks and numerical callees. Output appends acquire one actual atom reference per occurrence; forward reset records the actual consumed last DEC before resuming that atom factory retirement, never replaying or repairing counters. Search owns and closes this component before releasing its borrowed parents; pending explanation work blocks search entry."
+      ],
+      "deviations": [
+        "Only the retained core-minimization routines are ported here; public explain constructor/operator, normalization, vanishing-coefficient elimination, projection, simplification, result display/TRACE and solver resolution/main-search integration remain unported or unaudited. Native charged component storage and Go slices replace C++ object/vector layouts; no identical std::vector growth or allocation-prefix claim is made. The source empty-todo assertion at1373 remains observable for the qualified redundant order tested by TestExplanationMinimizeSourceEmptyTodoGuard; release still terminates by reconstructing the already-full core. No source progress or reference repair suppresses that difference. Thirty-six prebuilt C++ qfnra-nlsat queries verify unsatisfiability and deletion-minimality of nine reduced cores; these prove core properties rather than identical C++ internal selection order or whole-backend completeness. Source preconditions remain caller obligations."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_explain.h",
@@ -91123,9 +91157,22 @@
       "path": "src/nlsat/nlsat_scoped_literal_vector.h",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/nlsat/explain_minimize.go",
+        "pkg/nlsat/search_state.go"
+      ],
+      "tests": [
+        "TestExplanationMinimizeOrderOwningAppendAndRegistryGrowth",
+        "TestExplanationMinimizeRedundantAndConstantBranches",
+        "TestExplanationMinimizeRootAtomsAndParameterizedDomains",
+        "TestExplanationMinimizeSourceEmptyTodoGuard",
+        "TestExplanationMinimizeAllocationStopsOwnIntervals",
+        "TestExplanationMinimizeInfeasibleCoresPrebuiltCPPOracle",
+        "TestExplanationMinimizeConstructorAndParentClose",
+        "TestExplanationMinimizeConsumedResultDECContinuation",
+        "TestExplanationMinimizeCleanupPreservesOlderMarks"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -91148,9 +91195,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Concrete retained scoped_literal_vector output append, push_back and forward reset/destruction (h35-47,66-69)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/explain_minimize.go",
+          "tests": [
+            "TestExplanationMinimizeOrderOwningAppendAndRegistryGrowth",
+            "TestExplanationMinimizeRedundantAndConstantBranches",
+            "TestExplanationMinimizeRootAtomsAndParameterizedDomains",
+            "TestExplanationMinimizeSourceEmptyTodoGuard",
+            "TestExplanationMinimizeAllocationStopsOwnIntervals",
+            "TestExplanationMinimizeInfeasibleCoresPrebuiltCPPOracle",
+            "TestExplanationMinimizeConstructorAndParentClose",
+            "TestExplanationMinimizeConsumedResultDECContinuation",
+            "TestExplanationMinimizeCleanupPreservesOlderMarks"
+          ]
+        }
+      ],
+      "ownership": [
+        "The actual minimization result stores Go literal values and acquires one live atomFactory reference per appended occurrence. Reset walks forward and records consumed reference drops and only the exact pending atom retirement. Older output remains owned across append and component cleanup; it is retired only by explicit resetResult or component/parent close. Source set, shrink, swap, scoped_literal and other retained consumers remain pending; this is not a universal solver adapter or fake complete Solver."
+      ],
+      "deviations": [
+        "No C++ standard-library vector is ported. Only the actual minimization result consumer is represented by a concrete native Go owning slice with source INC-before-push and forward DEC-before-clear. The remaining scoped literal/vector consumers and whole-header methods/ownership audits remain incomplete."
+      ]
     },
     {
       "path": "src/nlsat/nlsat_solver.cpp",

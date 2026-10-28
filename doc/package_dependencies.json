@@ -2111,6 +2111,7 @@
         "evaluator_interval_ref.go",
         "evaluator_intervals.go",
         "evaluator_polynomial.go",
+        "explain_minimize.go",
         "gparams_catalog_collectors.go",
         "inequality_atom_cache.go",
         "interval_set.go",

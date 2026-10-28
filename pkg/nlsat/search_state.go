@@ -87,6 +87,7 @@ type searchState struct {
 	propRefs                        [3]evaluatorIntervalRef
 	propRetired                     []*IntervalSet
 	core                            []sat.Literal
+	minimizer                       *explanationMinimizer
 	header                          uint64
 	running, failed, closed         bool
 }
@@ -131,6 +132,9 @@ func (r *searchState) open() error {
 		return err
 	}
 	if r.running || r.failed || r.undoing {
+		return ErrSearchPending
+	}
+	if r.minimizer != nil && (r.minimizer.running || r.minimizer.failed || r.minimizer.resetting) {
 		return ErrSearchPending
 	}
 	if err := r.store.open(); err != nil {
@@ -475,6 +479,11 @@ func (r *searchState) cleanup() error {
 	}
 	r.running = true
 	defer func() { r.running = false }()
+	if r.minimizer != nil {
+		if err := r.minimizer.cleanup(); err != nil {
+			return err
+		}
+	}
 	if r.witnessActive {
 		// Only this invocation's lexical scoped_anum is owned here. Numerical
 		// callees retain responsibility for their own interrupted operations.
@@ -536,6 +545,11 @@ func (r *searchState) close() error {
 	}
 	r.running = true
 	defer func() { r.running = false }()
+	if r.minimizer != nil {
+		if err := r.minimizer.close(); err != nil {
+			return err
+		}
+	}
 	r.target = undoTarget{undoEmpty, 0}
 	r.undoing = true
 	if err := r.drainUndo(); err != nil {
