@@ -134282,7 +134282,7 @@
         },
         {
           "name": "antecedents, bounds, atoms, derived bounds, variable metadata and bound trail declarations",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_bounds.go",
           "tests": [
             "TestSMTArithmeticValueLexicographicAndAtomComplements",
@@ -134294,7 +134294,7 @@
         },
         {
           "name": "retained rational linear internalization, atom assignment, simplex feasibility, scope replay, equality axioms, and model values",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/smtcore/theory_arith_linear.go",
           "tests": [
             "TestSMTSolverSetupUsesLinearRealArithmetic",
