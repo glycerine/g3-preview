@@ -102,3 +102,38 @@ func TestSolverMixedLinearConflict(t *testing.T) {
 		}
 	}
 }
+
+func TestSolverIntegerBranchAndBound(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		terms []evaluatorTerm
+		want  lbool.LBool
+	}{
+		{"fractional-linear", []evaluatorTerm{{2, 1, 0}, {-1, 0, 0}}, lbool.False},
+		{"integral-quadratic", []evaluatorTerm{{1, 2, 0}, {-4, 0, 0}}, lbool.True},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			s := solverFixture(t)
+			x, err := s.MkVar(true)
+			assignmentMust(t, err)
+			if x != 0 {
+				t.Fatal("integer variable order", x)
+			}
+			solverUnit(t, s, AtomEQ, evaluatorPolynomial(t, s.evaluator, tc.terms...))
+			result, err := s.Check()
+			assignmentMust(t, err)
+			if result != tc.want {
+				t.Fatal("integer branch-and-bound result", result, tc.want)
+			}
+			if tc.want == lbool.True {
+				value, err := s.assignment.Value(0)
+				assignmentMust(t, err)
+				integer, err := s.config.Algebraic.IsInt(value)
+				assignmentMust(t, err)
+				if !integer {
+					t.Fatal("integer SAT model remained fractional")
+				}
+			}
+		})
+	}
+}

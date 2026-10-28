@@ -1,7 +1,7 @@
 package nlsat
 
-// Source: src/nlsat/nlsat_solver.cpp:167-231; nlsat_solver.h:38-55,64-112,
-// 172-205,214.
+// Source: src/nlsat/nlsat_solver.cpp:167-231,1258-1309;
+// nlsat_solver.h:38-55,64-112,172-205,214.
 
 import (
 	"errors"
@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type SolverConfig struct {
@@ -42,6 +43,11 @@ type Solver struct {
 	projection  *projectionWorklist
 	resolution  *searchResolution
 	closed      bool
+}
+
+type integerCut struct {
+	variable uint32
+	floor    unumeral.Rational
 }
 
 func NewSolver(config SolverConfig) (s *Solver, err error) {
@@ -209,7 +215,148 @@ func (s *Solver) Check() (lbool.LBool, error) {
 	if err := s.open(); err != nil {
 		return lbool.Undef, err
 	}
-	return s.search.search(s.resolution, s.explanation)
+	for {
+		result, err := s.search.search(s.resolution, s.explanation)
+		if err != nil || result != lbool.True {
+			return result, err
+		}
+		var cuts []integerCut
+		q, err := s.config.Algebraic.RationalManager()
+		if err != nil {
+			return lbool.Undef, err
+		}
+		releaseCuts := func() error {
+			var cause error
+			for i := len(cuts) - 1; i >= 0; i-- {
+				cause = errors.Join(cause, q.Del(&cuts[i].floor))
+			}
+			cuts = nil
+			return cause
+		}
+		for variable, integer := range s.clauses.vars.isInt {
+			if !integer {
+				continue
+			}
+			assigned, err := s.assignment.Contains(uint32(variable))
+			if err != nil {
+				return lbool.Undef, errors.Join(err, releaseCuts())
+			}
+			if !assigned {
+				continue
+			}
+			value, err := s.assignment.Value(uint32(variable))
+			if err != nil {
+				return lbool.Undef, errors.Join(err, releaseCuts())
+			}
+			integerValue, err := s.config.Algebraic.IsInt(value)
+			if err != nil {
+				return lbool.Undef, errors.Join(err, releaseCuts())
+			}
+			if integerValue {
+				continue
+			}
+			cut := integerCut{variable: uint32(variable)}
+			if err = s.integerFloor(value, &cut.floor); err != nil {
+				return lbool.Undef, errors.Join(err, q.Del(&cut.floor), releaseCuts())
+			}
+			cuts = append(cuts, cut)
+		}
+		if len(cuts) == 0 {
+			return lbool.True, nil
+		}
+		for i := range cuts {
+			if err := s.addIntegerCut(cuts[i].variable, &cuts[i].floor); err != nil {
+				return lbool.Undef, errors.Join(err, releaseCuts())
+			}
+		}
+		if err := releaseCuts(); err != nil {
+			return lbool.Undef, err
+		}
+	}
+}
+
+func (s *Solver) integerFloor(value *polynomial.Algebraic, out *unumeral.Rational) (err error) {
+	var lower polynomial.Algebraic
+	if err = s.config.Algebraic.IntLT(value, &lower); err != nil {
+		return err
+	}
+	defer func() { err = errors.Join(err, s.config.Algebraic.Del(&lower)) }()
+	if err = s.config.Algebraic.ToRational(&lower, out); err != nil {
+		return err
+	}
+	q, err := s.config.Algebraic.RationalManager()
+	if err != nil {
+		return err
+	}
+	for {
+		if err = q.Inc(out); err != nil {
+			return err
+		}
+		greater, err := s.config.Algebraic.GreaterRational(value, out)
+		if err != nil {
+			return err
+		}
+		if !greater {
+			return q.Dec(out)
+		}
+	}
+}
+
+func (s *Solver) addIntegerCut(variable uint32, floor *unumeral.Rational) (err error) {
+	q, err := s.config.Algebraic.RationalManager()
+	if err != nil {
+		return err
+	}
+	core, err := s.config.Polynomial.ArithmeticCore()
+	if err != nil {
+		return err
+	}
+	var one, upper, constant unumeral.Rational
+	defer func() { err = errors.Join(err, q.Del(&constant), q.Del(&upper), q.Del(&one)) }()
+	if err = q.SetInt32(&one, 1); err != nil {
+		return err
+	}
+	if err = q.Copy(&upper, floor); err != nil {
+		return err
+	}
+	if err = q.Inc(&upper); err != nil {
+		return err
+	}
+	lemma := make([]sat.Literal, 0, 2)
+	for _, bound := range []*unumeral.Rational{floor, &upper} {
+		if err = q.Copy(&constant, bound); err != nil {
+			return err
+		}
+		if err = q.Neg(&constant); err != nil {
+			return err
+		}
+		p, cause := core.MkRationalLinear([]unumeral.Rational{one}, []uint32{variable}, &constant)
+		if cause != nil {
+			return cause
+		}
+		ref, cause := polynomial.NewPolynomialRef(core)
+		if cause != nil {
+			return cause
+		}
+		if cause = ref.Assign(p); cause != nil {
+			return errors.Join(cause, ref.Close())
+		}
+		kind := AtomGT
+		if len(lemma) == 1 {
+			kind = AtomLT
+		}
+		literal, cause := s.MkInequality(kind, []polynomial.Polynomial{p}, []bool{false}, true)
+		cause = errors.Join(cause, ref.Close())
+		if cause != nil {
+			return cause
+		}
+		lemma = append(lemma, literal)
+		if err = q.Del(&constant); err != nil {
+			return err
+		}
+		constant = unumeral.Rational{}
+	}
+	return s.AddClause(lemma, Assumption{})
 }
 
 func (s *Solver) Value(variable uint32, out *polynomial.Algebraic) error {
