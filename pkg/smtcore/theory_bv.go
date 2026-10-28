@@ -909,7 +909,7 @@ func (t *SMTBitVectorTheory) FinalCheck() (SMTFinalCheckStatus, error) {
 	return SMTFinalCheckDone, nil
 }
 
-func (*SMTBitVectorTheory) Name() string { return "bv" }
+func (*SMTBitVectorTheory) Name() string { return "bit-vector" }
 
 func (t *SMTBitVectorTheory) CollectStatistics(target *statistics.Statistics) error {
 	if t == nil || target == nil {

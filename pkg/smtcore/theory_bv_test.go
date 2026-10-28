@@ -553,6 +553,11 @@ func TestSMTBitVectorBlastLimitGivesUnknown(t *testing.T) {
 	if status != lbool.Undef {
 		t.Fatal("large bit-vector approximation", status)
 	}
+	reason, err := solver.ReasonUnknown()
+	astTestMust(t, err)
+	if reason != "(incomplete (theory bit-vector))" {
+		t.Fatal("source bit-vector theory name", reason)
+	}
 }
 
 func TestSMTBitVectorToIntAxiom(t *testing.T) {

@@ -141315,6 +141315,17 @@
           ]
         },
         {
+          "name": "get_name retained incomplete-theory consumer uses the exact source bit-vector label in reason-unknown output",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_test.go"
+          ],
+          "tests": [
+            "TestSMTBitVectorBlastLimitGivesUnknown"
+          ]
+        },
+        {
           "name": "mk_new_diseq_axiom/new_eq_eh/assign_eh/merge_eh retained trace path: lazy source operands, static-disequality variable display, equality expressions and relevance, Boolean assignment and queue size, merge owner IDs, conflicts and bit-vector size",
           "status": "ported",
           "go_target": "pkg/smtcore/theory_bv_equality_trace.go",
@@ -141909,6 +141920,17 @@
           "tests": [
             "TestSMTBVOperatorSourceAssertionSites",
             "TestSMTBVUnsupportedOperatorSourceUnreachableAndTrace"
+          ]
+        },
+        {
+          "name": "get_name retained incomplete-theory consumer uses the exact source bit-vector label in reason-unknown output",
+          "status": "ported",
+          "go_target": "pkg/smtcore/theory_bv.go",
+          "go_targets": [
+            "pkg/smtcore/theory_bv_test.go"
+          ],
+          "tests": [
+            "TestSMTBitVectorBlastLimitGivesUnknown"
           ]
         },
         {
