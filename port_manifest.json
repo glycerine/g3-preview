@@ -80885,8 +80885,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/base/rule.go", "pkg/muz/base/rule_formula.go"],
-      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal"],
+      "go_targets": ["pkg/muz/base/rule.go", "pkg/muz/base/rule_formula.go", "pkg/muz/base/hnf.go"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion", "TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal", "TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
       "assertions": [
         {
           "line": 64,
@@ -80943,6 +80943,12 @@
           "status": "partial",
           "go_target": "pkg/muz/base/rule_formula.go",
           "tests": ["TestRuleManagerBuildsHornRuleFromQuantifiedFormula", "TestRuleManagerFormulaNegationAndNonHornRefusal"]
+        },
+        {
+          "name": "mk_rule_core HNF integration: normalize a general retained formula, register fresh predicates, and add every resulting Horn rule (dl_rule.cpp:173-183)",
+          "status": "ported",
+          "go_target": "pkg/muz/base/hnf.go",
+          "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"]
         }
       ],
       "ownership": [],
@@ -81491,9 +81497,9 @@
       "path": "src/muz/base/hnf.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/base/hnf.go"],
+      "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
       "assertions": [
         {
           "line": 231,
@@ -81518,17 +81524,28 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "No-proof HNF worklist, implication/conjunction extraction, singleton disjunction splitting, fresh predicate construction, disjunctive definition memoization, universal-prefix reconstruction, and reset-local result collection (hnf.cpp:71-138,223-292,347-421,481-511)",
+          "status": "partial",
+          "go_target": "pkg/muz/base/hnf.go",
+          "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"]
+        }
+      ],
+      "ownership": [
+        "HornNormalization owns independent references to every output formula and introduced declaration; worklist intermediates are locally pinned and released after normalization, while RuleSet retains rules created by RuleManager.AddFormula."
+      ],
+      "deviations": [
+        "Proof-producing normalization, general quantifier hoisting, and quantified antecedent definition elimination remain unported; this entry therefore remains partial."
+      ]
     },
     {
       "path": "src/muz/base/hnf.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/base/hnf.go"],
+      "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"],
       "conditionals": [
         {
           "line": 25,
@@ -81541,9 +81558,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "hnf no-proof construction, invocation, fresh-predicate result access, and reset-local lifecycle surface (hnf.h:29-50)",
+          "status": "partial",
+          "go_target": "pkg/muz/base/hnf.go",
+          "tests": ["TestHornNormalizerKeepsVariableAntecedent", "TestHornNormalizerSplitsSingletonDisjunction", "TestHornNormalizerIntroducesAndMemoizesFreshPredicate"]
+        }
+      ],
+      "ownership": [
+        "HornNormalizer borrows its AST manager; each HornNormalization return is an explicit owner and Close is idempotent."
+      ],
+      "deviations": [
+        "The Go surface returns owned formulas and fresh declarations directly; proof vectors and proof-producing invocation remain unported."
+      ]
     },
     {
       "path": "src/muz/base/rule_properties.cpp",
