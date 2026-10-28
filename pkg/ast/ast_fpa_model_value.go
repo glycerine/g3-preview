@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/smt/theory_fpa.cpp:128-192,203-232. The concrete bridge keeps
 // source numerical operations on the AST plugin's actual MPF/MPZ owners.
-package ast
 
 import (
 	"errors"

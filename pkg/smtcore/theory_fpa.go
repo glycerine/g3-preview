@@ -38,10 +38,23 @@ func (p *smtFPAValueProcedure) MakeValue(generator *SMTModelGenerator, values []
 	if p == nil || p.manager == nil || generator == nil || len(values) != len(p.dependencies) {
 		return ast.ASTHandle{}, ast.ErrASTDomain
 	}
-	if p.rounding {
-		return p.manager.MkFPARoundingModeModelValue(values)
+	if err := p.traceInputs(generator, values); err != nil {
+		return ast.ASTHandle{}, err
 	}
-	return p.manager.MkFPAModelValue(p.ebits, p.sbits, values)
+	var value ast.ASTHandle
+	var err error
+	if p.rounding {
+		value, err = p.manager.MkFPARoundingModeModelValue(values)
+	} else {
+		value, err = p.manager.MkFPAModelValue(p.ebits, p.sbits, values)
+	}
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = p.traceResult(generator, values, value); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return value, nil
 }
 
 // SMTFloatingPointTheory preserves FP and rounding-mode terms in the e-graph
