@@ -149863,7 +149863,7 @@
       "path": "src/smt/theory_seq_empty.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_seq_empty.go",
         "pkg/smtcore/proto_model/sequence_factory.go",
@@ -149896,15 +149896,16 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "sequence, string and regular-expression canonical values, distinct values, collision-free fresh strings and registered-value delimiter avoidance",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/proto_model/sequence_factory.go",
           "tests": [
-            "TestSequenceFactoryCanonicalFreshAndGenericValues"
+            "TestSequenceFactoryCanonicalFreshAndGenericValues",
+            "TestSequenceFactorySourceUnsignedWrapAndCharacterValue"
           ]
         },
         {
@@ -149944,8 +149945,8 @@
         "SMTEmptySequenceTheory owns its scoped used-state and borrows the SMT context through SMTTheoryBase."
       ],
       "deviations": [
-        "The source's unused per-sort unique-sequence prefix map has no retained consumer. Standalone character literals are not exposed by the retained AST surface; character values remain represented through string constants.",
-        "Earlier whole-unit audited claims are withdrawn. The concrete SomeValues caller-output protocol, same-reference element delegation and unsupported-sort NOT_IMPLEMENTED_YET path now follow source. Complete seq_factory methods and ownership remain unproven: Go next is uint64 while source m_next is unsigned; source trail and unique-sequence ownership and remaining dispatch/prefix methods require audit. No complete sequence factory or empty-theory closure is claimed."
+        "The source's set_prefix overloads and per-sort unique-sequence prefix map have no retained caller; no universal adapter is introduced for that dead interface state. The live character branch returns source character 'a' as the concrete retained 8-bit bit-vector numeral.",
+        "Completed the whole-unit method and ownership audit. The fresh-string counter is source-width uint32 and wraps before collision retry; registered delimiter collisions grow the delimiter exactly as source. Sequence, string, regex and character canonical/fresh dispatch, caller-owned SomeValues replacement, unsupported-sort diagnostics and closed-owner guards are concrete. SequenceFactory borrows the proto-model and manager, owns only Go string/delimiter/counter state, and returns manager-owned AST handles."
       ]
     },
     {

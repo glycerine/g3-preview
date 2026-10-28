@@ -1,5 +1,6 @@
-// Source: src/smt/theory_seq_empty.h seq_factory.
 package protomodel
+
+// Source: src/smt/theory_seq_empty.h seq_factory.
 
 import (
 	"strconv"
@@ -16,7 +17,7 @@ type SequenceFactory struct {
 	family    ast.FamilyID
 	model     *ProtoModel
 	strings   map[string]struct{}
-	next      uint64
+	next      uint32
 	delimiter string
 }
 
@@ -128,7 +129,7 @@ func (f *SequenceFactory) SomeValues(sort ast.ASTHandle, first, second ast.ASTRe
 
 func (f *SequenceFactory) freshString() (ast.ASTHandle, error) {
 	for {
-		text := f.delimiter + strconv.FormatUint(f.next, 16) + f.delimiter
+		text := f.delimiter + strconv.FormatUint(uint64(f.next), 16) + f.delimiter
 		f.next++
 		if _, found := f.strings[text]; found {
 			continue
@@ -139,6 +140,9 @@ func (f *SequenceFactory) freshString() (ast.ASTHandle, error) {
 }
 
 func (f *SequenceFactory) FreshValue(sort ast.ASTHandle) (ast.ASTHandle, error) {
+	if f == nil || f.manager == nil || f.model == nil {
+		return ast.ASTHandle{}, ast.ErrASTHandle
+	}
 	stringSort, err := f.manager.IsStringSort(sort)
 	if err != nil {
 		return ast.ASTHandle{}, err
@@ -165,10 +169,11 @@ func (f *SequenceFactory) FreshValue(sort ast.ASTHandle) (ast.ASTHandle, error) 
 		return f.manager.MkSequenceUnit(value)
 	}
 	character, err := f.manager.IsCharacterSort(sort)
-	if err != nil || character {
-		// The retained AST surface has no standalone character literal
-		// constructor. Character values are reached through string constants.
+	if err != nil {
 		return ast.ASTHandle{}, err
+	}
+	if character {
+		return f.manager.BitVectorNumeralUnsigned('a', 8)
 	}
 	return ast.ASTHandle{}, ast.ErrASTDomain
 }
