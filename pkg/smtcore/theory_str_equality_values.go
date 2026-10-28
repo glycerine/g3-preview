@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp can_concat_eq_str,
 // can_concat_eq_concat, can_two_nodes_eq and private EQC traversal.
-package smtcore
 
 import (
 	"strings"
@@ -151,7 +152,7 @@ func (t *SMTStringTheory) stringClass(expression ast.ASTHandle) []ast.ASTHandle 
 }
 
 // The value/length pair loop from new_eq_check runs while the two private
-// classes are still separate. The rest of handle_equality remains pending.
+// classes are still separate; handle_equality performs the later stages.
 func (t *SMTStringTheory) checkNewEqualityValuesAndLengths(left, right ast.ASTHandle) (bool, error) {
 	m := t.state.manager
 	for _, l := range t.stringClass(left) {

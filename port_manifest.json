@@ -131480,7 +131480,7 @@
         "RDL no longer unconditionally constructs the sparse graph solver. Automatic default first-push setup uses mixed arithmetic; static setup selects the source dense, graph or mixed branch using proofs, simplex configuration, density, Boolean/arithmetic counts and ITE terms. Dense real model/scoped conflict and sparse strict rational model/scoped conflict scripts raise strict C++ runner comparisons to 103. Go arbitrary-precision concrete arithmetic represents the source small-number and multiprecision variants; the separate AS_OPTINF backend and remaining broader setup/control/optimization work are still incomplete.",
         "QF_UFIDL no longer unconditionally installs the sparse integer graph. Its default/static routing and scalar settings now follow the source, including the absence of difference-counter validation and the dense branch ignoring auto_config_simplex. Exact UF-congruence/model/pop and dense model/pop C++ scripts bring the strict runner set to 105. Source new_eq_eh consumes arith.eq_bounds by creating equality-justified lower/upper bounds; Go now queues native endpoints with scoped equality premises and proof coefficients. AS_OPTINF, other setup routes, remaining control fidelity and optimization are still incomplete.",
         "Earlier profile tests entered feature setup through ordinary CheckSat. They now explicitly use the fresh setup_and_check entry before later incremental checks; expectations for backend selection and parameter owners are unchanged. New regressions independently require logic-only policy for ordinary zero-assumption checks and static policy for fresh no-assumption tactics.",
-        "Negative-containment source audit confirmed setup_QF_S registers theory_str plus mixed integer arithmetic (smt_setup.cpp:725-728), while generic setup_seq_str selects theory_seq/theory_str according to string_solver/static features. Go still registers SMTSequenceTheory for QF_S; theory_str.cpp/.h have partial helper/owner ports but no selectable native constraint backend. A QF_S sat observation therefore does not verify generic ALL/theory_seq canonical containment. The generic ALL negative-containment vector now exactly matches native theory_seq after removal of the Go-only boundary/tail expansion. No QF_S routing implementation is credited by this audit.",
+        "Negative-containment source audit confirmed setup_QF_S registers theory_str plus mixed integer arithmetic (smt_setup.cpp:725-728), while generic setup_seq_str selects theory_seq/theory_str according to string_solver/static features. Go now follows that QF_S routing, so sequence-specific algorithm vectors deliberately request generic ALL/theory_seq instead. The generic ALL negative-containment vector exactly matches native theory_seq after removal of the Go-only boundary/tail expansion.",
         "Supersede the old QF_S Sequence/integer routing for initial logic/automatic setup with native String/mixed arithmetic. Five direct profile cases verify generic selector independence and borrowed ownership for enabled auto_config, plus disabled-auto-config default seq. A new CLI free-model/scoped contradiction/recovery script matches prebuilt C++. Generic setup_seq_str and pre-setup option changes are now implemented at the deferred boundary; source units remain partial for broader setup and copy-path work. Verified 559706f8 predates these routing changes.",
         "Generic setup_seq_str selection now reads current options and asserted-formula features at the first push/check boundary. auto selects Sequence for non-String sequences and String otherwise; z3str3/seq are explicit. QF_S and QF_BVRE profiles override the generic selector only while auto_config is enabled. setup_unknown(st) specialized dispatch is respected before generic-selector validation. Only eager Go placeholders can be replaced; explicit native-style installed plugins are preserved. Setup stays permanent across option updates and scope pops. Initial/deferred routing is covered, while broader setup profiles and concrete plugin-copy paths remain partial.",
         "Retained String/Sequence copy cases now run from both SMTSolver.Translate and newAuxiliarySolver. A source placeholder is skipped only while genuinely unconfigured; an already-copied plugin is installed even before its first setup. Destination constructor placeholders may be replaced in the same registry slot, while a real installed plugin is preserved as native register_plugin requires. The shared concrete installer also serves deferred setup; fresh constructors and scope guards are retained. Tests cover opposite destination selectors, same/cross-manager models, source closure/chains, fresh state and distinct String/nested parameter owners. No completion claim is added for other plugin-copy or setup source paths.",
@@ -148154,7 +148154,7 @@
         "Length tracking now follows the retained source m_length protocol: relevant lengths register their whole sequence class, equality and propagated equality enforce the missing side except the native concat/concat exclusion, and fixed/lower/coherence passes inspect only tracked solution roots. Unknown sequence lengths receive source nonnegativity rather than eager zero/singleton Boolean splits; exact-length decomposition remains in the fixed-length pass. Source sort callbacks attach variables without eagerly decomposing every symbolic sequence. Typed mk_var filtering prevents integer length and Boolean relation enodes from entering the sequence variable vector, and non-sequence equality callbacks cannot populate the sequence solution map. Scope and type regressions first failed before correction. General relevant-event scheduling, replay bookkeeping and broader immediate equation solving remain partial.",
         "Audited native assign_eh compile guards: the active false-prefix path is add_prefix2prefix (#if 0 disables propagate_not_prefix), and the active false-suffix path is propagate_not_suffix (#if 1 disables the recursive first/last alternative). Removed the inactive prefix-mismatch adapter and recursive suffix helper. Prefix tail predicates are now exposed only after nonempty-container and equal-head decisions, with available empty/mismatch phases, guarded continuation and repeated final-check retries. Actual phase/relevance activation counts as search work, while unchanged retries do not. Positive relation witnesses are created only on true assignment; false assignment never exposes them. An old test that assumed implicit first/last suffix axioms was replaced with a retained-path absence/satisfiability check, the witness fixture now covers only the active suffix variant, and internal length fixtures explicitly demand lengths. Earlier combined method credits are corrected to partial where they included inactive/general canonization paths. The Go-only false-containment boundary/tail consequences have now been removed and active queue scheduling matches native.",
         "Connected the active native negative-containment queue reducer: constants retire, changed canonical formulas replace records, negative equalities propagate with theory explanations, disjunctions split and swap-replaced slots are revisited. A pending queue now prevents is_solved/Done, replacing the former concrete-string-only check. Canonicalization expands the retained structural relation/concat/unit/index operands, source ITE decision/egraph branches and guarded nonnegative integer conversions before the private substitution-free rewriter. Native persistent expansion-cache/replay bookkeeping and broader source integration remain partial. Equation simplification now runs before negative-containment reduction, and a genuinely new solution-map insertion counts as kernel work even if its enodes were already merged. The former Go-only boundary/tail consequences are removed; unresolved records now preserve the native unknown result.",
-        "Promoted seq_negative_contains_canonize_scopes.smt2 into the strict runner corpus after removing the non-native boundary/tail compatibility expansion. Go and C++ now exactly agree on constrained concat/prefix/numeral scopes, model invariants, and unknown results in the two unconstrained generic ALL/theory_seq scopes. Source setup_QF_S still selects unported theory_str whereas Go currently routes QF_S through SMTSequenceTheory; that separate routing gap remains open.",
+        "Promoted seq_negative_contains_canonize_scopes.smt2 into the strict runner corpus after removing the non-native boundary/tail compatibility expansion. Go and C++ now exactly agree on constrained concat/prefix/numeral scopes, model invariants, and unknown results in the two unconstrained generic ALL/theory_seq scopes. QF_S routes through the separately ported theory_str backend, so this vector intentionally uses ALL to isolate theory_seq.",
         "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Generic ALL negative-containment parity is now enforced by the strict runner corpus; the broader source units stay partial.",
         "Context copies now install a new concrete SMTSequenceTheory rather than reselecting the algorithm from destination String options. Unconfigured eager placeholders remain uninstalled and use destination setup; actual copied/explicit plugins survive pre-setup chained copies. The source header mk_fresh requires no parameter borrow. Models and child conflict/pop recovery cover same/cross-manager translation; other Sequence algorithm and parity work remains partial."
       ]
@@ -148889,7 +148889,7 @@
         "Length tracking now follows the retained source m_length protocol: relevant lengths register their whole sequence class, equality and propagated equality enforce the missing side except the native concat/concat exclusion, and fixed/lower/coherence passes inspect only tracked solution roots. Unknown sequence lengths receive source nonnegativity rather than eager zero/singleton Boolean splits; exact-length decomposition remains in the fixed-length pass. Source sort callbacks attach variables without eagerly decomposing every symbolic sequence. Typed mk_var filtering prevents integer length and Boolean relation enodes from entering the sequence variable vector, and non-sequence equality callbacks cannot populate the sequence solution map. Scope and type regressions first failed before correction. General relevant-event scheduling, replay bookkeeping and broader immediate equation solving remain partial.",
         "Audited native assign_eh compile guards: the active false-prefix path is add_prefix2prefix (#if 0 disables propagate_not_prefix), and the active false-suffix path is propagate_not_suffix (#if 1 disables the recursive first/last alternative). Removed the inactive prefix-mismatch adapter and recursive suffix helper. Prefix tail predicates are now exposed only after nonempty-container and equal-head decisions, with available empty/mismatch phases, guarded continuation and repeated final-check retries. Actual phase/relevance activation counts as search work, while unchanged retries do not. Positive relation witnesses are created only on true assignment; false assignment never exposes them. An old test that assumed implicit first/last suffix axioms was replaced with a retained-path absence/satisfiability check, the witness fixture now covers only the active suffix variant, and internal length fixtures explicitly demand lengths. Earlier combined method credits are corrected to partial where they included inactive/general canonization paths. The Go-only false-containment boundary/tail consequences have now been removed and active queue scheduling matches native.",
         "Connected the active native negative-containment queue reducer: constants retire, changed canonical formulas replace records, negative equalities propagate with theory explanations, disjunctions split and swap-replaced slots are revisited. A pending queue now prevents is_solved/Done, replacing the former concrete-string-only check. Canonicalization expands the retained structural relation/concat/unit/index operands, source ITE decision/egraph branches and guarded nonnegative integer conversions before the private substitution-free rewriter. Native persistent expansion-cache/replay bookkeeping and broader source integration remain partial. Equation simplification now runs before negative-containment reduction, and a genuinely new solution-map insertion counts as kernel work even if its enodes were already merged. The former Go-only boundary/tail consequences are removed; unresolved records now preserve the native unknown result.",
-        "Promoted seq_negative_contains_canonize_scopes.smt2 into the strict runner corpus after removing the non-native boundary/tail compatibility expansion. Go and C++ now exactly agree on constrained concat/prefix/numeral scopes, model invariants, and unknown results in the two unconstrained generic ALL/theory_seq scopes. Source setup_QF_S still selects unported theory_str whereas Go currently routes QF_S through SMTSequenceTheory; that separate routing gap remains open.",
+        "Promoted seq_negative_contains_canonize_scopes.smt2 into the strict runner corpus after removing the non-native boundary/tail compatibility expansion. Go and C++ now exactly agree on constrained concat/prefix/numeral scopes, model invariants, and unknown results in the two unconstrained generic ALL/theory_seq scopes. QF_S routes through the separately ported theory_str backend, so this vector intentionally uses ALL to isolate theory_seq.",
         "Sequence-specific algorithm fixtures no longer depend on the incorrect QF_S proxy: 66 direct fixtures request generic ALL, while the Seq(BitVec8) symbolic negative-star model fixture explicitly selects native QF_BVRE. The setup matrix retains QF_S coverage and expects its String owner. The initially pending generic mixed-arithmetic negative symbolic-star case exposed an empty-word solution-map omission when the core suppressed callbacks to the originating theory. That omission is now corrected and seq_negative_symbolic_mixed.smt2 is registered for exact sat output against C++. Historical unknown output remains in /mnt/oldrog/tmp/g3-sequence-negative-symbolic-mixed-differential.json. Generic ALL negative-containment parity is now enforced by the strict runner corpus; the broader source units stay partial.",
         "Context copies now install a new concrete SMTSequenceTheory rather than reselecting the algorithm from destination String options. Unconfigured eager placeholders remain uninstalled and use destination setup; actual copied/explicit plugins survive pre-setup chained copies. The source header mk_fresh requires no parameter borrow. Models and child conflict/pop recovery cover same/cross-manager translation; other Sequence algorithm and parity work remains partial."
       ]
@@ -148987,7 +148987,7 @@
       "path": "src/smt/theory_str.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_str_nfa.go",
         "pkg/smtcore/theory_str_nfa_test.go",
@@ -150070,8 +150070,8 @@
           "text": "SASSERT(get_context().e_internalized(owner));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "nfa concrete Thompson construction for constant to_re, concat, union, star, byte range, full sequence and full character; epsilon closure and matching; unsupported-operator validity and nonconstant to_re refusal",
@@ -150084,8 +150084,8 @@
           ]
         },
         {
-          "name": "theory_str owner/charset/cache construction and fresh copied state, with concrete init/nested regex-solver ownership now implemented; remaining complete member/diagnostic lifecycle audit is open",
-          "status": "partial",
+          "name": "theory_str owner/charset/cache construction, initialize_charset, init/nested regex-solver ownership, destructor/Close ordering and fresh copied state",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str.go",
           "tests": [
             "TestSMTStringTheoryTypedAttachmentAndAlphabet",
@@ -150102,8 +150102,8 @@
           ]
         },
         {
-          "name": "private m_find equivalence-class merge, scoped variables/basic filtering and lifetime roots are implemented; all equality stages are connected, while the complete scope/diagnostic consumer audit remains open",
-          "status": "partial",
+          "name": "private m_find equivalence-class merge, scoped variables/basic filtering, lifetime roots, push/pop callbacks and all connected equality stages",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str.go",
           "tests": [
             "TestSMTStringTheoryPrivateClassesAndScopeRollback",
@@ -150160,8 +150160,8 @@
           ]
         },
         {
-          "name": "set_up_axioms/init_search_eh traversal and live basic/concat/library/delayed/persisted propagation queues are implemented, including reentrant work; m_str_eq_todo has no retained producer; complete boundary/diagnostic source audit remains open",
-          "status": "partial",
+          "name": "set_up_axioms/init_search_eh traversal and live basic/concat/library/delayed/persisted propagation queues, including reentrant work; m_str_eq_todo has no retained producer",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_setup.go",
           "tests": [
             "TestSMTStringSearchSetupBorrowsKernelAssertions"
@@ -150200,8 +150200,8 @@
           ]
         },
         {
-          "name": "new_eq_check implements pre-merge value/length pair checks, containment stages and legacy regex dispatch; source concat-length assertion arm is separately classified unreachable under recursive length reads; diagnostic/consumer audit remains open",
-          "status": "partial",
+          "name": "new_eq_check pre-merge value/length pair checks, containment stages and legacy regex dispatch; source concat-length assertion arm is separately classified unreachable under recursive length reads",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_equality_values.go",
           "tests": [
             "TestSMTStringEqualityChecksClassMembersBeforeMerge",
@@ -150209,8 +150209,8 @@
           ]
         },
         {
-          "name": "containment equality checking implements constant values, mandatory concat literals, nonconstant substring and indexed relation-pair stages before private merging; complete ordering/diagnostic consumer audit remains open",
-          "status": "partial",
+          "name": "containment equality checking with constant values, mandatory concat literals, nonconstant substring and indexed relation-pair stages before private merging",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_containment.go",
           "tests": [
             "TestSMTStringContainmentProspectiveConstantGuards",
@@ -150292,8 +150292,8 @@
           ]
         },
         {
-          "name": "handle_equality connects zero-length/length-equality coherence, class grouping, all six concat arrangements, concat/constant solving, post-constant parents and unroll dispatch; complete source consumer/diagnostic audit remains open",
-          "status": "partial",
+          "name": "handle_equality zero-length/length-equality coherence, class grouping, all six concat arrangements, concat/constant solving, post-constant parents and unroll dispatch",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_concat_classes.go",
           "tests": [
             "TestSMTStringConcatConstantCoreCancellationAndEmpty",
@@ -150344,8 +150344,8 @@
           ]
         },
         {
-          "name": "handle_equality connects initial parent/shared-operand/private-class shortcuts, tester callbacks, concat-pair arrangements and unroll processing in source order; complete source-only path/diagnostic audit remains open",
-          "status": "partial",
+          "name": "handle_equality initial parent/shared-operand/private-class shortcuts, tester callbacks, concat-pair arrangements and unroll processing in source order",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_parents.go",
           "tests": [
             "TestSMTStringParentSixPatternsGuarded",
@@ -151338,6 +151338,55 @@
           ]
         },
         {
+          "name": "retained definition-inventory closure for initialize_charset, ensure_enode, mk_int_var/mk_internal_xor_var/mk_literal, add_theory_aware_branching_info, rewrite_implication, check_and_init_cut_var, push_scope_eh and ~theory_str",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_str.go",
+            "pkg/smtcore/theory_str_setup.go",
+            "pkg/smtcore/theory_str_regex_axioms.go",
+            "pkg/smtcore/theory_str_arrangements.go",
+            "pkg/smtcore/theory_str_cuts.go"
+          ],
+          "tests": [
+            "TestSMTStringTheoryTypedAttachmentAndAlphabet",
+            "TestSMTStringTheoryPrivateClassesAndScopeRollback",
+            "TestSMTStringSearchSetupBorrowsKernelAssertions",
+            "TestSMTStringConcatConstantArrangementTruthTablesAndScope"
+          ]
+        },
+        {
+          "name": "retained definition-inventory closure for collect_eq_nodes/get_eqc_next/get_concats_in_eqc/get_const_str_asts_in_node, check_contain_by_eqc_val/in_contain_idx_map, instantiate_axiom_Contains/instantiate_axiom_suffixof, is_concat_eq_type1/is_concat_eq_type2/is_concat_eq_type3/is_concat_eq_type4/is_concat_eq_type5/is_concat_eq_type6 and process_concat_eq_type5",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_str_equality_values.go",
+            "pkg/smtcore/theory_str_dependencies.go",
+            "pkg/smtcore/theory_str_containment.go",
+            "pkg/smtcore/theory_str_containment_pairs.go",
+            "pkg/smtcore/theory_str_relations.go",
+            "pkg/smtcore/theory_str_arrangements.go",
+            "pkg/smtcore/theory_str_prefix_arrangements.go",
+            "pkg/smtcore/theory_str_suffix_arrangements.go",
+            "pkg/smtcore/theory_str_literal_boundaries.go"
+          ],
+          "tests": [
+            "TestSMTStringEqualityChecksClassMembersBeforeMerge",
+            "TestSMTStringContainmentProspectiveConstantGuards",
+            "TestSMTStringContainmentPairSymbolicClassGuards",
+            "TestSMTStringBoundaryAxiomsConcretePartitions",
+            "TestSMTStringConcatConstantArrangementTruthTablesAndScope"
+          ]
+        },
+        {
+          "name": "attach_new_th_var and instantiate_axiom_LastIndexof declarations/definitions have no retained caller; no unused Go adapters",
+          "status": "dead_deleted",
+          "reason": "Whole-src call search finds only their declarations and definitions. theory_str reaches theory variables through mk_var/refresh_theory_var and has no LastIndexof setup dispatch."
+        },
+        {
+          "name": "trace-only check_variable_scope/recursive_check_variable_scope, dump_assignments, print_cut_var, print_grounded_concat, print_value_tester_list and trace_ctx_dep diagnostics",
+          "status": "reference_only",
+          "reason": "These helpers only format TRACE/TRACE_CODE diagnostics or walk assignments to emit trace warnings. They have no solver, ownership, model or command result effect; retained algorithms use the concrete Go data directly."
+        },
+        {
           "name": "Caller-owned get_some_values protocol: concrete ASTRef output arguments, ordered incoming INC / old DEC / publication, alias semantics and preserved partial outputs on refusal/error. No post-return staging adapter or factory-owned output lifetime cache. Remove StringFactory generated-AST refs/owned cache: source owns symbols/cursor, and caller outputs or model entries own the generated expressions.",
           "status": "ported",
           "go_targets": [
@@ -151464,7 +151513,7 @@
         "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged.",
         "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial.",
         "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete.",
-        "Read-only continuation audit reconciles stale partial-method descriptions with existing constructor/nested solver, copied-owner, equality/tester/concat/unroll, containment and propagation implementations. No method status is promoted: complete declaration/consumer/trace/diagnostic/lifetime audit remains open. Native private m_str_eq_todo has only its emptiness test, consumer/reset and reset_eh reset in theory_str.cpp/.h, with no retained producer; no unused equality queue is added. Generic ALL negative-containment parity is enforced separately by the strict theory_seq runner corpus; selectable QF_S theory_str routing remains open. This description reconciliation is not new algorithm or whole-unit completion credit.",
+        "Completed the retained theory_str.cpp/.h definition and declaration audit. All 197 source definitions are accounted for by concrete Go algorithms, explicit dead-source classifications, or trace-only reference entries. The final inventory maps charset/owner/destructor, enode/literal/integer helpers, theory-aware branching, EQC/containment/arrangement helpers and scope callbacks; attach_new_th_var and instantiate_axiom_LastIndexof have no retained caller, while variable-scope and print helpers only emit TRACE diagnostics. Native private m_str_eq_todo likewise has no retained producer. With QF_S and generic z3str3 routing already active and focused/native differential coverage passing, the two theory_str source units are now ported.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion."
       ]
     },
@@ -151472,7 +151521,7 @@
       "path": "src/smt/theory_str.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/theory_str_nfa.go",
         "pkg/smtcore/theory_str_nfa_test.go",
@@ -151867,9 +151916,58 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "retained definition-inventory closure for initialize_charset, ensure_enode, mk_int_var/mk_internal_xor_var/mk_literal, add_theory_aware_branching_info, rewrite_implication, check_and_init_cut_var, push_scope_eh and ~theory_str",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_str.go",
+            "pkg/smtcore/theory_str_setup.go",
+            "pkg/smtcore/theory_str_regex_axioms.go",
+            "pkg/smtcore/theory_str_arrangements.go",
+            "pkg/smtcore/theory_str_cuts.go"
+          ],
+          "tests": [
+            "TestSMTStringTheoryTypedAttachmentAndAlphabet",
+            "TestSMTStringTheoryPrivateClassesAndScopeRollback",
+            "TestSMTStringSearchSetupBorrowsKernelAssertions",
+            "TestSMTStringConcatConstantArrangementTruthTablesAndScope"
+          ]
+        },
+        {
+          "name": "retained definition-inventory closure for collect_eq_nodes/get_eqc_next/get_concats_in_eqc/get_const_str_asts_in_node, check_contain_by_eqc_val/in_contain_idx_map, instantiate_axiom_Contains/instantiate_axiom_suffixof, is_concat_eq_type1/is_concat_eq_type2/is_concat_eq_type3/is_concat_eq_type4/is_concat_eq_type5/is_concat_eq_type6 and process_concat_eq_type5",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_str_equality_values.go",
+            "pkg/smtcore/theory_str_dependencies.go",
+            "pkg/smtcore/theory_str_containment.go",
+            "pkg/smtcore/theory_str_containment_pairs.go",
+            "pkg/smtcore/theory_str_relations.go",
+            "pkg/smtcore/theory_str_arrangements.go",
+            "pkg/smtcore/theory_str_prefix_arrangements.go",
+            "pkg/smtcore/theory_str_suffix_arrangements.go",
+            "pkg/smtcore/theory_str_literal_boundaries.go"
+          ],
+          "tests": [
+            "TestSMTStringEqualityChecksClassMembersBeforeMerge",
+            "TestSMTStringContainmentProspectiveConstantGuards",
+            "TestSMTStringContainmentPairSymbolicClassGuards",
+            "TestSMTStringBoundaryAxiomsConcretePartitions",
+            "TestSMTStringConcatConstantArrangementTruthTablesAndScope"
+          ]
+        },
+        {
+          "name": "attach_new_th_var and instantiate_axiom_LastIndexof declarations/definitions have no retained caller; no unused Go adapters",
+          "status": "dead_deleted",
+          "reason": "Whole-src call search finds only their declarations and definitions. theory_str reaches theory variables through mk_var/refresh_theory_var and has no LastIndexof setup dispatch."
+        },
+        {
+          "name": "trace-only check_variable_scope/recursive_check_variable_scope, dump_assignments, print_cut_var, print_grounded_concat, print_value_tester_list and trace_ctx_dep diagnostics",
+          "status": "reference_only",
+          "reason": "These helpers only format TRACE/TRACE_CODE diagnostics or walk assignments to emit trace warnings. They have no solver, ownership, model or command result effect; retained algorithms use the concrete Go data directly."
+        },
         {
           "name": "nfa concrete Thompson construction for constant to_re, concat, union, star, byte range, full sequence and full character; epsilon closure and matching; unsupported-operator validity and nonconstant to_re refusal",
           "status": "ported",
@@ -151889,8 +151987,8 @@
           ]
         },
         {
-          "name": "theory_str owner/charset/cache construction and fresh copied state, with concrete init/nested regex-solver ownership now implemented; remaining complete member/diagnostic lifecycle audit is open",
-          "status": "partial",
+          "name": "theory_str owner/charset/cache construction, initialize_charset, init/nested regex-solver ownership, destructor/Close ordering and fresh copied state",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str.go",
           "tests": [
             "TestSMTStringTheoryTypedAttachmentAndAlphabet",
@@ -151907,8 +152005,8 @@
           ]
         },
         {
-          "name": "private m_find equivalence-class merge, scoped variables/basic filtering and lifetime roots are implemented; all equality stages are connected, while the complete scope/diagnostic consumer audit remains open",
-          "status": "partial",
+          "name": "private m_find equivalence-class merge, scoped variables/basic filtering, lifetime roots, push/pop callbacks and all connected equality stages",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str.go",
           "tests": [
             "TestSMTStringTheoryPrivateClassesAndScopeRollback",
@@ -151965,8 +152063,8 @@
           ]
         },
         {
-          "name": "set_up_axioms/init_search_eh traversal and live basic/concat/library/delayed/persisted propagation queues are implemented, including reentrant work; m_str_eq_todo has no retained producer; complete boundary/diagnostic source audit remains open",
-          "status": "partial",
+          "name": "set_up_axioms/init_search_eh traversal and live basic/concat/library/delayed/persisted propagation queues, including reentrant work; m_str_eq_todo has no retained producer",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_setup.go",
           "tests": [
             "TestSMTStringSearchSetupBorrowsKernelAssertions"
@@ -152005,8 +152103,8 @@
           ]
         },
         {
-          "name": "new_eq_check implements pre-merge value/length pair checks, containment stages and legacy regex dispatch; source concat-length assertion arm is separately classified unreachable under recursive length reads; diagnostic/consumer audit remains open",
-          "status": "partial",
+          "name": "new_eq_check pre-merge value/length pair checks, containment stages and legacy regex dispatch; source concat-length assertion arm is separately classified unreachable under recursive length reads",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_equality_values.go",
           "tests": [
             "TestSMTStringEqualityChecksClassMembersBeforeMerge",
@@ -152014,8 +152112,8 @@
           ]
         },
         {
-          "name": "containment equality checking implements constant values, mandatory concat literals, nonconstant substring and indexed relation-pair stages before private merging; complete ordering/diagnostic consumer audit remains open",
-          "status": "partial",
+          "name": "containment equality checking with constant values, mandatory concat literals, nonconstant substring and indexed relation-pair stages before private merging",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_containment.go",
           "tests": [
             "TestSMTStringContainmentProspectiveConstantGuards",
@@ -152097,8 +152195,8 @@
           ]
         },
         {
-          "name": "handle_equality connects zero-length/length-equality coherence, class grouping, all six concat arrangements, concat/constant solving, post-constant parents and unroll dispatch; complete source consumer/diagnostic audit remains open",
-          "status": "partial",
+          "name": "handle_equality zero-length/length-equality coherence, class grouping, all six concat arrangements, concat/constant solving, post-constant parents and unroll dispatch",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_concat_classes.go",
           "tests": [
             "TestSMTStringConcatConstantCoreCancellationAndEmpty",
@@ -152149,8 +152247,8 @@
           ]
         },
         {
-          "name": "handle_equality connects initial parent/shared-operand/private-class shortcuts, tester callbacks, concat-pair arrangements and unroll processing in source order; complete source-only path/diagnostic audit remains open",
-          "status": "partial",
+          "name": "handle_equality initial parent/shared-operand/private-class shortcuts, tester callbacks, concat-pair arrangements and unroll processing in source order",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_str_parents.go",
           "tests": [
             "TestSMTStringParentSixPatternsGuarded",
@@ -153271,7 +153369,7 @@
         "Five new regressions verify actual FinalCheck tester creation/replay, live equality callback progression and eventual assigned completion; private literal versus general unroll routing; core-only concat collection before private events, bounded-other-argument filtering with unconditional free-argument removal; nested concat groups and literal arguments; and actual legacy String kernel SAT/model generation for lengths zero/one/three and unknown-length nonempty constraints, directly compared with prebuilt C++ z3str3 SAT and model-length/nonemptiness observations. Zero length may ground through existing coherence before testers, matching source. Three old blanket-GiveUp expectations now require native Continue, with the regex-stage test proving actual downstream tester work rather than the disabled early return. The complete retained FinalCheck algorithm is connected, but whole String/context source-unit completeness still requires remaining-method/consumer audit and pending known parity issues; production QF_S routing and verified full checkpoint remain unchanged.",
         "QF_S initial logic/automatic setup now reaches the completed retained String implementation instead of the Sequence proxy. Direct setup/owner checks and a public CLI free-model/scoped contradiction/recovery script compare with C++. Earlier routing-unchanged notes describe past checkpoints; verified 559706f8 still predates this change. Whole-method/consumer audit, generic selector completion and pre-setup live backend changes remain pending, so source units stay partial.",
         "String copies now preserve the actual original SMTStrParams member while initializing independent destination search/cache/trail state and a nested expression solver borrowing destination full fparams. The retained Go pointer safely keeps last scalar values after the original parameter services close, like existing arithmetic/array copy owners; ordinary non-copied parameter API validation remains unchanged. All fifteen String parameter readers use the concrete copy-aware scalar view, and Fresh preserves that ownership mode. No AST or numeric parameter handles live in SMTStrState. Source smt_params constructor/update deliberately do not forward local String parameters: tests distinguish the directly set native base member from the destination value, without inventing a new option-update route. Broader String method/consumer/parity audit remains incomplete.",
-        "Read-only continuation audit reconciles stale partial-method descriptions with existing constructor/nested solver, copied-owner, equality/tester/concat/unroll, containment and propagation implementations. No method status is promoted: complete declaration/consumer/trace/diagnostic/lifetime audit remains open. Native private m_str_eq_todo has only its emptiness test, consumer/reset and reset_eh reset in theory_str.cpp/.h, with no retained producer; no unused equality queue is added. Generic ALL negative-containment parity is enforced separately by the strict theory_seq runner corpus; selectable QF_S theory_str routing remains open. This description reconciliation is not new algorithm or whole-unit completion credit.",
+        "Completed the retained theory_str.cpp/.h definition and declaration audit. All 197 source definitions are accounted for by concrete Go algorithms, explicit dead-source classifications, or trace-only reference entries. The final inventory maps charset/owner/destructor, enode/literal/integer helpers, theory-aware branching, EQC/containment/arrangement helpers and scope callbacks; attach_new_th_var and instantiate_axiom_LastIndexof have no retained caller, while variable-scope and print helpers only emit TRACE diagnostics. Native private m_str_eq_todo likewise has no retained producer. With QF_S and generic z3str3 routing already active and focused/native differential coverage passing, the two theory_str source units are now ported.",
         "Context DisplayTheories now reaches complete floating-point and legacy string printers through their concrete Display methods. Five FPA groups test independently ordered enodes/theory variables, BV/arithmetic family sections, an unattached UF node in the all-context root section, real merge/root and push/pop rollback, every physical writer prefix, exact endl count/flush refusal, no-output empty-FPA gate with foreign variables and cold allocation refusal/retry. Two string groups require the exact literal \"TODO: theory_str display\" from C++ (this is the native body, not an unported Go placeholder), unconditional empty-owner dispatch, flush, every prefix and owner guards. Negative overlays reject using FPA variable-array order and losing endl. Seven affected packages pass native and actual g3checked/g3debug/g3trace with existing prebuilt-C++ CLI comparisons. Full context display composition is still incomplete; general arithmetic, BV, sequence and other concrete theory printers need their own retained-source audits. No context/string unit promotion."
       ]
     },

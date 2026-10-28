@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/theory_str.cpp retained theory ownership, internalization,
 // mk_var, string cache and scoped union-find lifecycle.
-package smtcore
 
 import (
 	"errors"
@@ -10,8 +11,8 @@ import (
 	"github.com/glycerine/g3/pkg/util/backtrack"
 )
 
-// SMTStringTheory is the distinct theory_str owner. Its remaining constraint
-// callbacks/final check must be ported before setup selects it for QF_S.
+// SMTStringTheory is the distinct theory_str owner selected by native QF_S
+// setup and by the generic z3str3 backend.
 type SMTStringTheory struct {
 	regexExpressionSolver *smtStringExpressionSolver
 	regexStage            smtStringRegexStageState
