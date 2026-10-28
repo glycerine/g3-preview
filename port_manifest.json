@@ -132387,7 +132387,7 @@
       "path": "src/smt/smt_solver.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_bv_lifecycle.go",
         "pkg/smtcore/smt_bv_lifecycle_test.go",
@@ -267783,6 +267783,20 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_native_checkpoint": "17ecadb7"
+  },
+  "latest_smt_solver_whole_audit": {
+    "source_units": [
+      "src/smt/smt_solver.cpp"
+    ],
+    "scope": "Whole retained smt_solver.cpp audit: the concrete Go solver wraps the kernel for construction, parameter updates and descriptors, assertions and named assertions, scopes, checks and assumptions, models/proofs/cores/labels/reasons, consequences, mutexes, progress callbacks, statistics, display, translation and factory creation. Translation preserves every installed retained theory plugin and independently owns translated assertions, tracked-name mappings, parameters, kernel state and results. Pattern-distance and nonlocal-pattern core extension follow the live source controls. The MUS branch is reference-only: m_minimizing_core starts false and its only writer to true is the scoped helper constructed inside the branch guarded by m_minimizing_core, so no retained call can enter it. Go result and manager owners replace C++ ref-count wrappers without changing publication or teardown order. Full native pkg/smtcore, pkg/portcheck and both C++-differential SMT-LIB runner groups pass on the promoted code.",
+    "focused_tests": [
+      "go test ./pkg/smtcore",
+      "go test ./pkg/portcheck",
+      "go test ./pkg/cmd/g3 -run TestSMTLibRunner(Scripts|CPPReference)$"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 2,
+    "full_suite_qualification": "The whole repository suite was not rerun for this manifest-only promotion; the complete smtcore package and retained end-to-end runner groups passed."
   },
   "latest_bv_whole_audit": {
     "source_units": [
