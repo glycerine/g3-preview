@@ -1,6 +1,6 @@
 package nlsat
 
-// Source: src/nlsat/nlsat_solver.cpp:1426-1733.
+// Source: src/nlsat/nlsat_solver.cpp:1426-1800.
 
 import (
 	"errors"
@@ -210,6 +210,71 @@ func (q *searchResolution) analyze(conflict *Clause, explanation *explanationAss
 	}
 	q.numMarks = 0
 	return foundDecision, nil
+}
+
+// resolveConflict publishes analyzed lemmas and repeats when a learned clause
+// immediately exposes another conflict. False means the empty lemma was derived.
+func (q *searchResolution) resolveConflict(conflict *Clause, explanation *explanationAssumptions) (bool, error) {
+	if q == nil || q.search == nil || conflict == nil {
+		return false, ErrSearchOwner
+	}
+	for {
+		foundDecision, err := q.analyze(conflict, explanation)
+		if err != nil {
+			return false, err
+		}
+		if len(q.lemma.result) == 0 {
+			return false, nil
+		}
+
+		if !foundDecision {
+			stage, err := q.search.store.maxVar(q.lemma.result)
+			if err != nil {
+				return false, err
+			}
+			if err = q.search.undoUntilStage(stage); err != nil {
+				return false, err
+			}
+			if q.search.xk != stage {
+				return false, arena.ErrConfig
+			}
+		} else {
+			if q.search.level == 0 {
+				return false, arena.ErrConfig
+			}
+			boolean, err := q.isBooleanLemma(q.lemma.result)
+			if err != nil {
+				return false, err
+			}
+			if boolean {
+				last := q.lemma.result[len(q.lemma.result)-1].Variable()
+				if err = q.search.undoUntilUnassigned(last); err != nil {
+					return false, err
+				}
+			} else {
+				level, err := q.findNewArithmeticLevel(q.lemma.result)
+				if err != nil {
+					return false, err
+				}
+				if err = q.search.undoUntilLevel(level); err != nil {
+					return false, err
+				}
+			}
+		}
+
+		learned, err := q.search.store.mkClause(q.lemma.result, true, nil)
+		if err != nil {
+			return false, err
+		}
+		solved, err := q.search.processClause(learned, true)
+		if err != nil {
+			return false, err
+		}
+		if solved {
+			return true, nil
+		}
+		conflict = learned
+	}
 }
 
 func (q *searchResolution) marked(b sat.BoolVar) bool {

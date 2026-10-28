@@ -5,6 +5,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/sat"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func TestSearchResolutionAntecedentStagesMarksAndDeduplication(t *testing.T) {
@@ -174,4 +175,66 @@ func TestSearchResolutionRejectsUnjoinedAssumptionsBeforeMutation(t *testing.T) 
 	if len(q.lemma.result) != 0 || q.numMarks != 0 {
 		t.Fatal("rejected conflict mutated analysis scratch", q.lemma.result, q.numMarks)
 	}
+}
+
+func TestSearchResolutionPublishesBooleanLemmaAndDetectsEmptyLemma(t *testing.T) {
+	t.Run("learned", func(t *testing.T) {
+		_, r := searchStateFixture(t)
+		q, err := newSearchResolution(r)
+		assignmentMust(t, err)
+		t.Cleanup(func() { assignmentMust(t, q.close()) })
+		decision, err := r.store.atoms.mkBoolVar()
+		assignmentMust(t, err)
+		derived, err := r.store.atoms.mkBoolVar()
+		assignmentMust(t, err)
+		a := sat.MakeLiteral(decision, false)
+		b := sat.MakeLiteral(derived, false)
+		assignmentMust(t, r.decide(a))
+		reason := searchClause(t, r, a.Negated(), b)
+		justification, err := NewClauseJustification(reason)
+		assignmentMust(t, err)
+		assignmentMust(t, r.assign(b, justification))
+		conflict := searchClause(t, r, b.Negated())
+
+		solved, err := q.resolveConflict(conflict, nil)
+		assignmentMust(t, err)
+		if !solved || len(r.store.learned) != 1 {
+			t.Fatal("conflict did not publish one learned clause", solved, len(r.store.learned))
+		}
+		learned := r.store.learned[0]
+		if len(learned.Literals()) != 1 || learned.Literals()[0] != a.Negated() {
+			t.Fatal("learned decision-flipping lemma", learned.Literals())
+		}
+		value, err := r.assignedValue(a.Negated())
+		assignmentMust(t, err)
+		if value != lbool.True {
+			t.Fatal("learned unit was not asserted after backjump", value)
+		}
+		justification = r.store.atoms.bools.justifications[decision]
+		if !justification.IsClause() || justification.clause != learned {
+			t.Fatal("learned assertion did not retain its clause reason")
+		}
+	})
+
+	t.Run("empty", func(t *testing.T) {
+		_, r := searchStateFixture(t)
+		q, err := newSearchResolution(r)
+		assignmentMust(t, err)
+		t.Cleanup(func() { assignmentMust(t, q.close()) })
+		b, err := r.store.atoms.mkBoolVar()
+		assignmentMust(t, err)
+		literal := sat.MakeLiteral(b, false)
+		reason := searchClause(t, r, literal)
+		ok, err := r.processClause(reason, false)
+		assignmentMust(t, err)
+		if !ok {
+			t.Fatal("unit reason unexpectedly conflicted")
+		}
+		conflict := searchClause(t, r, literal.Negated())
+		solved, err := q.resolveConflict(conflict, nil)
+		assignmentMust(t, err)
+		if solved || len(q.lemma.result) != 0 || len(r.store.learned) != 0 {
+			t.Fatal("empty lemma did not report unsatisfiable", solved, q.lemma.result, len(r.store.learned))
+		}
+	})
 }
