@@ -145102,7 +145102,7 @@
           ]
         },
         {
-          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy, final check, model initialization/value selection and all dependency branches (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647,717,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
+          "name": "Retained FPA TRACE sites for atom/term conversion, conversion entry/cache/publication, combined side conditions, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy and wrapper/unwrapper relations, final check, model initialization/value selection and all dependency branches (theory_fpa.cpp:297,316,354,358,372,404,410,422,426,452,494,625,647,679,717,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_fpa.go",
@@ -145367,7 +145367,7 @@
           ]
         },
         {
-          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy, final check, model initialization/value selection and all dependency branches (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647,717,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
+          "name": "Retained FPA TRACE sites for atom/term conversion, conversion entry/cache/publication, combined side conditions, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy and wrapper/unwrapper relations, final check, model initialization/value selection and all dependency branches (theory_fpa.cpp:297,316,354,358,372,404,410,422,426,452,494,625,647,679,717,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_fpa.go",

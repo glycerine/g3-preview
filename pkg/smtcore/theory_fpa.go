@@ -352,6 +352,19 @@ func (t *SMTFloatingPointTheory) convert(expression ast.ASTHandle) (ast.ASTHandl
 		}
 		return ast.ASTHandle{}, ast.ErrASTHandle
 	}
+	inputSort, err := state.manager.GetSort(expression)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	booleanSort, err := state.manager.MkBoolSort()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if inputSort == booleanSort {
+		if err = t.traceFPAConvertAtom(expression); err != nil {
+			return ast.ASTHandle{}, err
+		}
+	}
 	// fpa2bv already represents this constructor by its three BV components.
 	// Keeping it unchanged is also the fixed point that prevents translated
 	// FP equalities from recursively generating fresh translated equalities.
@@ -387,16 +400,6 @@ func (t *SMTFloatingPointTheory) convert(expression ast.ASTHandle) (ast.ASTHandl
 		_ = state.manager.DelRef(&output)
 		return ast.ASTHandle{}, err
 	}
-	inputSort, err := state.manager.GetSort(expression)
-	if err != nil {
-		_ = state.manager.DelRef(&output)
-		return ast.ASTHandle{}, err
-	}
-	booleanSort, err := state.manager.MkBoolSort()
-	if err != nil {
-		_ = state.manager.DelRef(&output)
-		return ast.ASTHandle{}, err
-	}
 	if inputSort == booleanSort {
 		if err = fpaSourceAssert(302, "is_app(res)", func() (bool, error) {
 			kind, e := state.manager.GetKind(value)
@@ -417,6 +420,10 @@ func (t *SMTFloatingPointTheory) convert(expression ast.ASTHandle) (ast.ASTHandl
 			rounding, err = state.manager.IsRoundingModeSort(inputSort)
 		}
 		if err == nil && (floating || rounding) {
+			if err = t.traceFPAConvertTerm(expression, value); err != nil {
+				_ = state.manager.DelRef(&output)
+				return ast.ASTHandle{}, err
+			}
 			err = fpaSourceAssertBool(308, "m_fpa_util.is_rm(e) || m_fpa_util.is_float(e)", true)
 			if err == nil {
 				resultOp, resultOwn, operationErr := t.operation(value)
@@ -483,6 +490,26 @@ func (t *SMTFloatingPointTheory) flushSideConstraints() (result error) {
 	if stateErr != nil {
 		result = stateErr
 	} else {
+		condition, conditionErr := state.manager.MkAndArgs(assertions)
+		var simplified ast.ASTRef
+		if conditionErr == nil {
+			simplified, conditionErr = state.manager.NewRef(ast.ASTHandle{})
+		}
+		if conditionErr == nil {
+			conditionErr = state.theoryRewriter.Rewrite(condition, simplified)
+		}
+		if conditionErr == nil {
+			condition, conditionErr = state.manager.RefGet(simplified)
+		}
+		if conditionErr == nil {
+			conditionErr = t.traceFPASideCondition(condition)
+		}
+		if simplified != (ast.ASTRef{}) {
+			conditionErr = errors.Join(conditionErr, state.manager.DelRef(&simplified))
+		}
+		if conditionErr != nil {
+			result = conditionErr
+		}
 		for _, assertion := range assertions {
 			if result == nil {
 				result = t.assertConstraint(assertion)
@@ -962,6 +989,9 @@ func (t *SMTFloatingPointTheory) Relevant(expression ast.ASTHandle) error {
 			}
 			linked, err = state.manager.MkEq(linked, expression)
 			if err != nil {
+				return err
+			}
+			if err = t.traceFPAWrapUnwrap(linked); err != nil {
 				return err
 			}
 			if err = t.assertConstraint(linked); err != nil {

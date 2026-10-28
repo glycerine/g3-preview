@@ -137,6 +137,50 @@ func TestSMTFPAConversionCacheSourceTrace(t *testing.T) {
 	}
 }
 
+func TestSMTFPAConversionAndSideConditionDetailSourceTrace(t *testing.T) {
+	var output bytes.Buffer
+	m, theory, family, sort, tags := smtFPAInternalizeTraceFixture(t, &output)
+	tags.Enable("t_fpa")
+	tags.Enable("t_fpa_detail")
+	zero, err := m.MkFPAZeroOfSort(sort, false)
+	astTestMust(t, err)
+	atom, err := m.MkFamilyApp(family, ast.FPAOpEq, nil, []ast.ASTHandle{zero, zero})
+	astTestMust(t, err)
+	_, err = theory.convert(atom)
+	astTestMust(t, err)
+	_, err = theory.convert(zero)
+	astTestMust(t, err)
+
+	// The standalone converter path records the same symbolic-RM range side
+	// condition consumed by theory_fpa::mk_side_conditions.
+	astTestMust(t, theory.converter.SetConstantFactories(nil, nil))
+	roundingSort, err := m.RoundingModeSort()
+	astTestMust(t, err)
+	rounding, err := m.MkConst(astTestSymbol(t, m, "fpa-trace-rounding"), roundingSort)
+	astTestMust(t, err)
+	_, err = theory.convert(rounding)
+	astTestMust(t, err)
+	if len(theory.converter.ExtraAssertions()) != 1 {
+		t.Fatal("symbolic rounding conversion did not record its source side condition")
+	}
+	astTestMust(t, theory.flushSideConstraints())
+	if tags.ShouldTrace("t_fpa_detail") {
+		trace := output.String()
+		for _, want := range []string{
+			"-------- [t_fpa_detail] convert_atom src/smt/theory_fpa.cpp:297 ---------\nconverting atom: ",
+			"-------- [t_fpa_detail] convert_term src/smt/theory_fpa.cpp:316 ---------\nterm: ",
+			"\nconverted term: ",
+			"-------- [t_fpa] mk_side_conditions src/smt/theory_fpa.cpp:404 ---------\nside condition: ",
+		} {
+			if !strings.Contains(trace, want) {
+				t.Fatalf("missing FPA conversion detail trace %q in %q", want, trace)
+			}
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("compiled-out FPA conversion detail trace executed", output.String())
+	}
+}
+
 func TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace(t *testing.T) {
 	var output bytes.Buffer
 	m, theory, _, sort, tags := smtFPAInternalizeTraceFixture(t, &output)
@@ -166,6 +210,7 @@ func TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace(t *testing.T) {
 			"-------- [t_fpa] apply_sort_cnstr src/smt/theory_fpa.cpp:494 ---------\napply sort cnstr for: fpa-trace-variable\n",
 			"-------- [t_fpa] attach_new_th_var src/smt/theory_fpa.cpp:422 ---------\nnew theory var: fpa-trace-variable := 0\n",
 			"-------- [t_fpa] relevant_eh src/smt/theory_fpa.cpp:647 ---------\nrelevant_eh for: fpa-trace-variable\n",
+			"-------- [t_fpa] relevant_eh src/smt/theory_fpa.cpp:679 ---------\nw/u eq: \n",
 			"-------- [t_fpa_detail] assert_cnstr src/smt/theory_fpa.cpp:410 ---------\nasserting false\n",
 			"-------- [t_fpa] pop_scope_eh src/smt/theory_fpa.cpp:625 ---------\npop 1; now 0\n",
 		} {

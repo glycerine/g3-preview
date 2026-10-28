@@ -108,6 +108,58 @@ func (t *SMTFloatingPointTheory) traceFPAConversion(line int, heading string, in
 	})
 }
 
+func (t *SMTFloatingPointTheory) traceFPAConvertAtom(expression ast.ASTHandle) error {
+	return t.traceFPAExpression("t_fpa_detail", "convert_atom", 297, "converting atom: ", expression)
+}
+
+func (t *SMTFloatingPointTheory) traceFPAConvertTerm(input, output ast.ASTHandle) error {
+	return t.emitFPATrace("t_fpa_detail", "convert_term", 316, nil, func(out io.Writer) error {
+		if _, err := io.WriteString(out, "term: "); err != nil {
+			return err
+		}
+		if err := t.displayFPATraceExpression(out, input); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(out, "\nconverted term: "); err != nil {
+			return err
+		}
+		if err := t.displayFPATraceExpression(out, output); err != nil {
+			return err
+		}
+		return diagnostic.WriteTraceEndl(out)
+	})
+}
+
+func (t *SMTFloatingPointTheory) traceFPASideCondition(expression ast.ASTHandle) error {
+	state, err := t.State()
+	if err != nil {
+		return err
+	}
+	return t.emitFPATrace("t_fpa", "mk_side_conditions", 404, func() bool {
+		return !state.manager.IsTrue(expression)
+	}, func(out io.Writer) error {
+		if _, err = io.WriteString(out, "side condition: "); err != nil {
+			return err
+		}
+		if err = t.displayFPATraceExpression(out, expression); err != nil {
+			return err
+		}
+		return diagnostic.WriteTraceEndl(out)
+	})
+}
+
+func (t *SMTFloatingPointTheory) traceFPAWrapUnwrap(expression ast.ASTHandle) error {
+	return t.emitFPATrace("t_fpa", "relevant_eh", 679, nil, func(out io.Writer) error {
+		if _, err := io.WriteString(out, "w/u eq: \n"); err != nil {
+			return err
+		}
+		if err := t.displayFPATraceExpression(out, expression); err != nil {
+			return err
+		}
+		return diagnostic.WriteTraceEndl(out)
+	})
+}
+
 func (t *SMTFloatingPointTheory) createFPAVariable(node *SMTEnode) (SMTTheoryVar, error) {
 	variable, err := t.CreateVariable(node)
 	if err != nil {
