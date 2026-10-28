@@ -117342,7 +117342,7 @@
       "path": "src/smt/proto_model/value_factory.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/proto_model/factory.go",
         "pkg/smtcore/proto_model/proto_model_test.go",
@@ -117429,8 +117429,8 @@
           "text": "SASSERT(result != 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "typed ValueFactory interface plus concrete basic, scalar numeral, and user-sort factory algorithms",
@@ -117551,7 +117551,8 @@
         "Go slices and a membership map replace C++ unordered-table layout. SomeValue/SomeValues select existing values in stable insertion order; no STL hash-table implementation is ported. Checked Go errors represent invalid physical owners and the finite-domain numeral bounds exception. No billions-of-iterations uint32 wrap campaign or complete whole-unit factory/lifecycle closure is claimed.",
         "This increment records concrete algorithm/source-dispatch corrections and verification, not new whole-template closure. Stable insertion-order value selection replaces unspecified C++ hash iteration. Unsigned overflow is represented by the uint32 type; no billion-call wrap campaign is claimed. The new three-element user-sort/scoped SMT-LIB vector is compared with the prebuilt C++ executable without rebuilding it.",
         "The normal within-vector release ordering gap is corrected. This bounded check does not close constructor/map-publication or interrupted-destructor failure-prefix fidelity; whole value_factory.h and theory_dl.cpp remain partial. No C++ container implementation, generic adapter, or additional native full-suite checkpoint is introduced.",
-        "The reproduced Go owning-retry defect is fixed: previously Close revisited zero ASTRef tokens and permanently returned invalid-owner errors. The physical regression runs under g3checked && g3debug, both with and without g3trace; other profiles cover ordinary teardown. Constructor/map-publication and complete native source failure-prefix fidelity remain open. Source-unit statuses/audit flags remain unchanged; no C++ rebuild or extra full native suite is claimed."
+        "The reproduced Go owning-retry defect is fixed: previously Close revisited zero ASTRef tokens and permanently returned invalid-owner errors. The physical regression runs under g3checked && g3debug, both with and without g3trace; other profiles cover ordinary teardown. Constructor/map-publication and complete native source failure-prefix fidelity remain open. Source-unit statuses/audit flags remain unchanged; no C++ rebuild or extra full native suite is claimed.",
+        "Final retained-header audit closes the common simple_factory publication gap. TestSimpleFactoriesPublishSetBeforeSortReference drives real AST-reference page refusal independently through the concrete user-sort, arithmetic, bit-vector, and datalog implementations: each publishes its typed set/map before the sort-vector acquisition and a warm lookup does not retry that source push. Together with cursor/refusal, output, forward destruction, consumed NUM-release retry, assertion, frozen-universe, and C++ differential tests, this covers all retained unsigned and rational instantiations without a generic or STL adapter."
       ]
     },
     {

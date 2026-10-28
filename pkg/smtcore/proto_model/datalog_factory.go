@@ -60,12 +60,14 @@ func (f *DatalogFactory) valueSet(sort ast.ASTHandle) (*datalogValueSet, error) 
 	}
 	set := f.sets[sort]
 	if set == nil {
+		// Preserve simple_factory::get_value_set publication order: the set and
+		// map entry precede the owning sort-vector push.
+		set = &datalogValueSet{seen: make(map[ast.ASTHandle]struct{})}
+		f.sets[sort] = set
 		ref, err := f.manager.NewRef(sort)
 		if err != nil {
 			return nil, err
 		}
-		set = &datalogValueSet{seen: make(map[ast.ASTHandle]struct{})}
-		f.sets[sort] = set
 		f.sorts = append(f.sorts, ref)
 	}
 	if err := simpleFactoryAssert(105, "set != 0", func() bool { return set != nil }); err != nil {

@@ -49,12 +49,15 @@ func (f *userSortFactory) valueSet(sort ast.ASTHandle) (*userSortValueSet, error
 
 	set := f.sets[sort]
 	if set == nil {
+		// simple_factory::get_value_set publishes the allocated set/map before
+		// m_sorts.push_back acquires the sort. A failed acquisition therefore
+		// leaves a warm empty set and is not retried by a later lookup.
+		set = &userSortValueSet{seen: make(map[ast.ASTHandle]struct{})}
+		f.sets[sort] = set
 		ref, err := f.manager.NewRef(sort)
 		if err != nil {
 			return nil, err
 		}
-		set = &userSortValueSet{seen: make(map[ast.ASTHandle]struct{})}
-		f.sets[sort] = set
 		f.sorts = append(f.sorts, ref)
 	}
 	if err := simpleFactoryAssert(105, "set != 0", func() bool { return set != nil }); err != nil {

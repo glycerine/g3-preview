@@ -443,3 +443,120 @@ func TestScalarFactorySourceWarmSelectionAndClosedAssertionOwner(t *testing.T) {
 		})
 	}
 }
+
+func scalarFactoryReferenceFrontier(t *testing.T, m *ast.ASTManager) []ast.ASTRef {
+	t.Helper()
+	var occupied []ast.ASTRef
+	m.Budget().FailAfter(0)
+	for len(occupied) < 4096 {
+		ref, err := m.NewRef(ast.ASTHandle{})
+		if errors.Is(err, arena.ErrInjectedFailure) {
+			return occupied
+		}
+		protoMust(t, err)
+		occupied = append(occupied, ref)
+	}
+	t.Fatal("reference page frontier not reached")
+	return nil
+}
+
+func scalarFactoryReleaseFrontier(t *testing.T, m *ast.ASTManager, occupied []ast.ASTRef) {
+	t.Helper()
+	m.Budget().FailAfter(-1)
+	for i := range occupied {
+		protoMust(t, m.DelRef(&occupied[i]))
+	}
+}
+
+func TestSimpleFactoriesPublishSetBeforeSortReference(t *testing.T) {
+	t.Run("user", func(t *testing.T) {
+		m, _ := protoFixture(t)
+		f := newUserSortFactory(m)
+		t.Cleanup(func() { protoMust(t, f.Close()) })
+		sort, err := m.MkUninterpretedSort(protoSymbol(t, m, "published-user-sort"), nil)
+		protoMust(t, err)
+		protoPin(t, m, sort)
+		occupied := scalarFactoryReferenceFrontier(t, m)
+		t.Cleanup(func() { scalarFactoryReleaseFrontier(t, m, occupied) })
+		set, err := f.valueSet(sort)
+		if !errors.Is(err, arena.ErrInjectedFailure) || set != nil || f.sets[sort] == nil || len(f.sorts) != 0 {
+			t.Fatal("user-sort publication prefix", set, err, len(f.sorts))
+		}
+		published := f.sets[sort]
+		m.Budget().FailAfter(-1)
+		set, err = f.valueSet(sort)
+		protoMust(t, err)
+		if set != published || len(f.sorts) != 0 {
+			t.Fatal("user-sort warm lookup retried sort acquisition")
+		}
+	})
+
+	t.Run("arithmetic", func(t *testing.T) {
+		m, _ := protoFixture(t)
+		f, err := NewArithmeticFactory(m)
+		protoMust(t, err)
+		t.Cleanup(func() { protoMust(t, f.Close()) })
+		sort, err := m.MkFamilySort(f.FamilyID(), 0, nil)
+		protoMust(t, err)
+		protoPin(t, m, sort)
+		occupied := scalarFactoryReferenceFrontier(t, m)
+		t.Cleanup(func() { scalarFactoryReleaseFrontier(t, m, occupied) })
+		set, err := f.valueSet(sort)
+		if !errors.Is(err, arena.ErrInjectedFailure) || set != nil || f.sets[sort] == nil || len(f.sorts) != 0 {
+			t.Fatal("arithmetic publication prefix", set, err, len(f.sorts))
+		}
+		published := f.sets[sort]
+		m.Budget().FailAfter(-1)
+		set, err = f.valueSet(sort)
+		protoMust(t, err)
+		if set != published || len(f.sorts) != 0 {
+			t.Fatal("arithmetic warm lookup retried sort acquisition")
+		}
+	})
+
+	t.Run("bit-vector", func(t *testing.T) {
+		m, _ := protoFixture(t)
+		f, err := NewBitVectorFactory(m)
+		protoMust(t, err)
+		t.Cleanup(func() { protoMust(t, f.Close()) })
+		sort, err := m.BitVectorSort(8)
+		protoMust(t, err)
+		protoPin(t, m, sort)
+		occupied := scalarFactoryReferenceFrontier(t, m)
+		t.Cleanup(func() { scalarFactoryReleaseFrontier(t, m, occupied) })
+		set, err := f.valueSet(sort)
+		if !errors.Is(err, arena.ErrInjectedFailure) || set != nil || f.sets[sort] == nil || len(f.sorts) != 0 {
+			t.Fatal("bit-vector publication prefix", set, err, len(f.sorts))
+		}
+		published := f.sets[sort]
+		m.Budget().FailAfter(-1)
+		set, err = f.valueSet(sort)
+		protoMust(t, err)
+		if set != published || len(f.sorts) != 0 {
+			t.Fatal("bit-vector warm lookup retried sort acquisition")
+		}
+	})
+
+	t.Run("datalog", func(t *testing.T) {
+		m, _ := protoFixture(t)
+		f, err := NewDatalogFactory(m)
+		protoMust(t, err)
+		t.Cleanup(func() { protoMust(t, f.Close()) })
+		sort, err := m.MkDatalogFiniteSort(protoSymbol(t, m, "published-datalog-sort"), 8)
+		protoMust(t, err)
+		protoPin(t, m, sort)
+		occupied := scalarFactoryReferenceFrontier(t, m)
+		t.Cleanup(func() { scalarFactoryReleaseFrontier(t, m, occupied) })
+		set, err := f.valueSet(sort)
+		if !errors.Is(err, arena.ErrInjectedFailure) || set != nil || f.sets[sort] == nil || len(f.sorts) != 0 {
+			t.Fatal("datalog publication prefix", set, err, len(f.sorts))
+		}
+		published := f.sets[sort]
+		m.Budget().FailAfter(-1)
+		set, err = f.valueSet(sort)
+		protoMust(t, err)
+		if set != published || len(f.sorts) != 0 {
+			t.Fatal("datalog warm lookup retried sort acquisition")
+		}
+	})
+}
