@@ -1,5 +1,6 @@
-// Source: src/test/sorting_network.cpp:150-181.
 package ast
+
+// Source: src/test/sorting_network.cpp:150-181.
 
 import (
 	"testing"

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/sparse_matrix.h:220-237,372-374,412-429;
 // src/util/lp/sparse_matrix.hpp:737-743. Retained mpq LU consumers.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

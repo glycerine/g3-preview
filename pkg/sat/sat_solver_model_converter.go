@@ -1,5 +1,6 @@
-// Translation of src/sat/sat_model_converter.h/.cpp, Leonardo de Moura.
 package sat
+
+// Translation of src/sat/sat_model_converter.h/.cpp, Leonardo de Moura.
 
 import (
 	"errors"

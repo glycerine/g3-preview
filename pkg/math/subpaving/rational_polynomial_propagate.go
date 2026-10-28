@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1408-1496, concrete config_mpq
 // polynomial forward/reverse propagation over live node-bound intervals.
-package subpaving
 
 import (
 	"errors"

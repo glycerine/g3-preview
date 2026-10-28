@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/bv_decl_plugin.cpp:636-669;
 // src/ast/rewriter/bool_rewriter.cpp:650-659.
-package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

@@ -1,5 +1,6 @@
-// Source: src/tactic/goal_shared_occs.cpp; src/tactic/goal_shared_occs.h.
 package tactic
+
+// Source: src/tactic/goal_shared_occs.cpp; src/tactic/goal_shared_occs.h.
 
 import (
 	"errors"

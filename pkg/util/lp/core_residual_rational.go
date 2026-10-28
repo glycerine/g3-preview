@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.hpp:225-240,473-477; scalar mpq/mpq.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.hpp:225-240,473-477; scalar mpq/mpq.
 
 import (
 	"fmt"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/stacked_value.h; actual scalar instantiations in lar_solver.h and lar_core_solver.h.
 package lp
+
+// Source: src/util/lp/stacked_value.h; actual scalar instantiations in lar_solver.h and lar_core_solver.h.
 
 // StackedUint32 adds scoped restoration to the concrete uint32 value.
 // Value is directly mutable, matching the source's T& conversion.

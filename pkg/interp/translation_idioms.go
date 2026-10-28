@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3translate.cpp retained proof idiom
 // recognition before the ordinary rule dispatcher.
-package interp
 
 import (
 	"math"

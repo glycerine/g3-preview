@@ -1,5 +1,6 @@
-// Source: src/util/debug.cpp:37-42; src/util/debug.h:58-65.
 package diagnostic
+
+// Source: src/util/debug.cpp:37-42; src/util/debug.h:58-65.
 
 import (
 	"errors"

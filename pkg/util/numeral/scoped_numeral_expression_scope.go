@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/scoped_numeral.h:160-183. An expression temporary's
 // destructor runs after the arithmetic body, including its failure path.
-package numeral
 
 import "errors"
 

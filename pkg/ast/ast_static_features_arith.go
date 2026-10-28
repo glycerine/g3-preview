@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/static_features.cpp:103-152,211-216,246-272,282-296,313-325,346-361;
 // src/ast/static_features.h:116-127,132-141.
-package ast
 
 func (f *StaticFeatures) isArithmeticExpr(h ASTHandle) (bool, error) {
 	kind, err := f.manager.GetKind(h)

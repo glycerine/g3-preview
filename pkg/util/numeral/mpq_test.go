@@ -1,6 +1,7 @@
+package numeral
+
 // Source assertions: src/test/mpq.cpp tst0, bug1, bug2. Remaining source
 // coverage and lifecycle obligations: ../PORT_PROGRESS.md#audit-mpnum-port-status-md.
-package numeral
 
 import (
 	"errors"

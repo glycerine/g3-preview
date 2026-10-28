@@ -1,5 +1,6 @@
-// Source: src/util/mpff.cpp:1226-1321; independent decimal digit model.
 package numeral
+
+// Source: src/util/mpff.cpp:1226-1321; independent decimal digit model.
 
 import (
 	"math/big"

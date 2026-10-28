@@ -1,5 +1,6 @@
-// Source: src/util/gparams.cpp:555,633-644; generated mem_initialize/finalize.
 package params
+
+// Source: src/util/gparams.cpp:555,633-644; generated mem_initialize/finalize.
 
 // The source gparams namespace has one process-wide current service. Generated
 // initialization publishes the concrete Go owner here after gparams::init;

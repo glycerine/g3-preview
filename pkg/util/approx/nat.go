@@ -1,5 +1,6 @@
-// Source: src/util/approx_nat.h:26-43; src/util/approx_nat.cpp:22-61.
 package approx
+
+// Source: src/util/approx_nat.h:26-43; src/util/approx_nat.cpp:22-61.
 
 import "strconv"
 

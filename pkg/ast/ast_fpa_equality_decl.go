@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp:292-311,724-730.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp:292-311,724-730.
 
 import "github.com/glycerine/g3/pkg/util/z3exception"
 

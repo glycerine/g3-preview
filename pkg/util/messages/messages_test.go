@@ -1,5 +1,6 @@
-// Source: src/util/common_msgs.cpp:21-27.
 package messages
+
+// Source: src/util/common_msgs.cpp:21-27.
 
 import "testing"
 

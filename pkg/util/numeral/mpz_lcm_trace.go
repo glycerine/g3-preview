@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:983-1013.
 package numeral
+
+// Source: src/util/mpz.cpp:983-1013.
 
 import (
 	"io"

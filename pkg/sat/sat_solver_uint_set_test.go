@@ -1,5 +1,6 @@
-// Source: src/sat/sat_types.h:153-204; src/sat/sat_model_converter.cpp.
 package sat
+
+// Source: src/sat/sat_types.h:153-204; src/sat/sat_model_converter.cpp.
 
 import (
 	"errors"

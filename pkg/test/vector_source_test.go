@@ -1,5 +1,6 @@
-// Source: src/test/vector.cpp.
 package test
+
+// Source: src/test/vector.cpp.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

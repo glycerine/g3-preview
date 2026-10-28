@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp decision and GC member ownership; independent named physical census.
 package sat
+
+// Source: src/sat/sat_solver.cpp decision and GC member ownership; independent named physical census.
 
 import (
 	"errors"

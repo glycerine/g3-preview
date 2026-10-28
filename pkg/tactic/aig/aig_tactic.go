@@ -1,5 +1,6 @@
-// Source: src/tactic/aig/aig_tactic.cpp:65-113.
 package aig
+
+// Source: src/tactic/aig/aig_tactic.cpp:65-113.
 
 import (
 	"errors"

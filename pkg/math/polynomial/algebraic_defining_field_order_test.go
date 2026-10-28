@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: algebraic_numbers.cpp:1905-1924. Raw source views establish readable
 // fields only; they own no polynomial/numeral members and claim no constructor.
-package polynomial
 
 import (
 	"errors"

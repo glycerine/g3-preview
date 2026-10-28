@@ -1,5 +1,6 @@
-// Source: src/util/lp/permutation_matrix.h/.hpp, shared unsigned index algorithms.
 package lp
+
+// Source: src/util/lp/permutation_matrix.h/.hpp, shared unsigned index algorithms.
 
 // Permutation stores the exact source row-to-column mapping and reverse mapping.
 // Set updates one entry and its reverse only; construction may temporarily have

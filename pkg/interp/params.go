@@ -1,5 +1,6 @@
-// Source: src/interp/interp_params.hpp; src/interp/interp_params.pyg.
 package interp
+
+// Source: src/interp/interp_params.hpp; src/interp/interp_params.pyg.
 
 import uparams "github.com/glycerine/g3/pkg/util/params"
 

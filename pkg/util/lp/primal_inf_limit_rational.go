@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver.h:546-607; precise scalar mpq/mpq branches.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver.h:546-607; precise scalar mpq/mpq branches.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

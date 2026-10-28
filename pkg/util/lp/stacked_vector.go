@@ -1,5 +1,6 @@
-// Source: src/util/lp/stacked_vector.h. Concrete retained instantiations only.
 package lp
+
+// Source: src/util/lp/stacked_vector.h. Concrete retained instantiations only.
 
 import "errors"
 

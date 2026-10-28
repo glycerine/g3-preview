@@ -1,5 +1,6 @@
-// Selected registered algebraic.cpp inputs, through actual resource services.
 package polynomial
+
+// Selected registered algebraic.cpp inputs, through actual resource services.
 
 import (
 	"testing"

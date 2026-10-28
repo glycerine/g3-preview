@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/test/polynomial.cpp:341-451;
 // src/math/polynomial/polynomial.cpp:5473-5500.
-package polynomial
 
 import (
 	"encoding/json"

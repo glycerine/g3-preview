@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lar_constraints.h. Retained variable/term bounds and
 // the owning coefficient constraint consumed by quick_xplain.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

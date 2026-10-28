@@ -1,5 +1,6 @@
-// Source: src/sat/sat_cleaner.cpp:158-179; src/sat/sat_types.h:31.
 package sat
+
+// Source: src/sat/sat_cleaner.cpp:158-179; src/sat/sat_types.h:31.
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"

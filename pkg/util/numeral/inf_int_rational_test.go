@@ -1,5 +1,6 @@
-// Source: src/util/inf_int_rational.h, src/util/inf_int_rational.cpp.
 package numeral
+
+// Source: src/util/inf_int_rational.h, src/util/inf_int_rational.cpp.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:3252–3636; src/test/cnf_backbones.cpp:248–268.
 package sat
+
+// Source: src/sat/sat_solver.cpp:3252–3636; src/test/cnf_backbones.cpp:248–268.
 
 import (
 	"fmt"

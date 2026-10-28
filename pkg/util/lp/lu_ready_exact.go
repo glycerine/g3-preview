@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:175-229, retained precise prepared solves.
 package lp
+
+// Source: src/util/lp/lu.hpp:175-229, retained precise prepared solves.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/tactic/bv/max_bv_sharing_tactic.cpp:29-226.
 package bv
+
+// Source: src/tactic/bv/max_bv_sharing_tactic.cpp:29-226.
 
 import (
 	"fmt"

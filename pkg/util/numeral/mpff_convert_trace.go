@@ -1,5 +1,6 @@
-// Source: src/util/mpff.cpp:328-372.
 package numeral
+
+// Source: src/util/mpff.cpp:328-372.
 
 import (
 	"io"

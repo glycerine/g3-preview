@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1393-1399; src/util/buffer.h:175-221.
 package numeral
+
+// Source: src/util/mpz.cpp:1393-1399; src/util/buffer.h:175-221.
 
 import (
 	"errors"

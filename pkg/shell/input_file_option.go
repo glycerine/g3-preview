@@ -1,5 +1,6 @@
-// Source: src/shell/main.cpp:119-136,204-206,275-286, concrete input-file branches.
 package shell
+
+// Source: src/shell/main.cpp:119-136,204-206,275-286, concrete input-file branches.
 
 import (
 	"strings"

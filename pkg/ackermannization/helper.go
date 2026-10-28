@@ -1,5 +1,6 @@
-// Source: src/ackermannization/ackr_helper.cpp/.h.
 package ackermannization
+
+// Source: src/ackermannization/ackr_helper.cpp/.h.
 
 import (
 	"math"

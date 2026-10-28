@@ -1,5 +1,6 @@
-// Source: src/util/lp/int_set.h.
 package lp
+
+// Source: src/util/lp/int_set.h.
 
 import (
 	"errors"

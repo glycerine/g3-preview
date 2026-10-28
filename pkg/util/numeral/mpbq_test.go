@@ -1,5 +1,6 @@
-// Source: src/test/mpbq.cpp.
 package numeral
+
+// Source: src/test/mpbq.cpp.
 
 import (
 	"testing"

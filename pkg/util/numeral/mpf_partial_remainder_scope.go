@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1272-1436 (actual reached scoped integer lifetimes).
 package numeral
+
+// Source: src/util/mpf.cpp:1272-1436 (actual reached scoped integer lifetimes).
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

@@ -1,5 +1,6 @@
-// Source: src/util/lp/square_dense_submatrix.h/.hpp, double/double LU instance.
 package lp
+
+// Source: src/util/lp/square_dense_submatrix.h/.hpp, double/double LU instance.
 
 import "math"
 

@@ -1,5 +1,6 @@
-// Source: src/ast/datatype_decl_plugin.cpp:410-477.
 package ast
+
+// Source: src/ast/datatype_decl_plugin.cpp:410-477.
 
 func (m *ASTManager) datatypeValue(root astNodeRef) (bool, error) {
 	stack := []astNodeRef{root}

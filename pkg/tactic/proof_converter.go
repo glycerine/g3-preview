@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/tactic/proof_converter.h; src/tactic/proof_converter.cpp;
 // src/tactic/converter.h.
-package tactic
 
 import (
 	"errors"

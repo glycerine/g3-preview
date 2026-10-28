@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h:678-687; src/util/mpz.cpp:560-817.
 package numeral
+
+// Source: src/util/mpq.h:678-687; src/util/mpz.cpp:560-817.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

@@ -1,5 +1,6 @@
-// Source: src/test/polynomial.cpp:1712-1739; src/math/polynomial/linear_eq_solver.h.
 package polynomial
+
+// Source: src/test/polynomial.cpp:1712-1739; src/math/polynomial/linear_eq_solver.h.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/tactic/bv/bv_size_reduction_tactic.cpp/.h.
 package bv
+
+// Source: src/tactic/bv/bv_size_reduction_tactic.cpp/.h.
 
 import (
 	"errors"

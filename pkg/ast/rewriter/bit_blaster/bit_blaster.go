@@ -1,6 +1,7 @@
+package bit_blaster
+
 // Source: src/ast/rewriter/bit_blaster/bit_blaster.h:52-61;
 // src/ast/rewriter/bit_blaster/bit_blaster.cpp:118-128.
-package bit_blaster
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

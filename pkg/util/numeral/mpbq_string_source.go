@@ -1,5 +1,6 @@
-// Source: src/util/mpbq.cpp:384-392; src/util/mpz.cpp:1432-1436.
 package numeral
+
+// Source: src/util/mpbq.cpp:384-392; src/util/mpz.cpp:1432-1436.
 
 import (
 	"strconv"

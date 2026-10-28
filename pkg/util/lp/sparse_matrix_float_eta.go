@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:1119-1167.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:1119-1167.
 
 // FillEtaMatrix constructs the eta for logical column j. A unit column returns
 // nil,true; a small diagonal returns nil,false. On an index error after creation,

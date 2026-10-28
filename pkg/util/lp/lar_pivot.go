@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.hpp:177-195 and lar_solver.h:250-270,398-400.
 package lp
+
+// Source: src/util/lp/lar_core_solver.hpp:177-195 and lar_solver.h:250-270,398-400.
 
 // CalculatePivotRow sizes the actual precise scratch before calculating the
 // inverse basis row and its nonbasic coefficients. It requires the source's

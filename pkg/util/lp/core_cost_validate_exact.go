@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.h:210-243,568-598,689-697;
 // lp_core_solver_base.hpp:981-1044; retained mpq/impq diagnostics.
-package lp
 
 import (
 	"fmt"

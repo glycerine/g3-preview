@@ -1,5 +1,6 @@
-// Source: src/model/model.cpp:38,139; src/util/memory_manager.cpp:202-211.
 package model
+
+// Source: src/model/model.cpp:38,139; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

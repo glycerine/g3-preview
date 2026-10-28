@@ -1,5 +1,6 @@
-// Source: src/util/luby.cpp:21-31; src/util/luby.h:22-29.
 package luby
+
+// Source: src/util/luby.cpp:21-31; src/util/luby.h:22-29.
 
 import "testing"
 

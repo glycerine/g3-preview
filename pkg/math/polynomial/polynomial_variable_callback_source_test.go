@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:2538-2544;
 // src/util/memory_manager.cpp:274-285.
-package polynomial
 
 import (
 	"testing"

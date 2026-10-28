@@ -1,5 +1,6 @@
-// Source: src/test/symbol.cpp, with finite ownership and byte-policy extensions.
 package symbol
+
+// Source: src/test/symbol.cpp, with finite ownership and byte-policy extensions.
 
 import (
 	"errors"

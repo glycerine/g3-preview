@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/fpa_rewriter.cpp:764-792;
 // src/util/scoped_numeral.h:24-55.
-package ast
 
 import (
 	"errors"

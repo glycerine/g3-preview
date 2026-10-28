@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:503-543, direct params_ref ostream displays.
 package params
+
+// Source: src/util/params.cpp:503-543, direct params_ref ostream displays.
 
 import (
 	"errors"

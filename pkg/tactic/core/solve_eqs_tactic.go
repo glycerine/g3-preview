@@ -1,7 +1,8 @@
+package core
+
 // Source: src/tactic/core/solve_eqs_tactic.cpp/.h, retained simplifying-replacer
 // factory. The disabled nonlinear solver and unused external-replacer overload
 // are not instantiated by retained source consumers.
-package core
 
 import (
 	"errors"

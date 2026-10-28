@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/add_bounds_tactic.cpp is_unbounded and its probe.
 package arith
+
+// Source: src/tactic/arith/add_bounds_tactic.cpp is_unbounded and its probe.
 
 import (
 	"errors"

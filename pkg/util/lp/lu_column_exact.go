@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:193-229,260-276,503-523; exact T columns.
 package lp
+
+// Source: src/util/lp/lu.hpp:193-229,260-276,503-523; exact T columns.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

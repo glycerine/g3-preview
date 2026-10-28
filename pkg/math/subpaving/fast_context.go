@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:408-514,528-589,
 // concrete config_mpff bound context.
-package subpaving
 
 import (
 	"errors"

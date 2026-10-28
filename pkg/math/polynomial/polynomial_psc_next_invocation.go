@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:5694-5749.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:5694-5749.
 
 type polynomialPSCNextInvocationReceipt struct {
 	manager    *MultivariatePolynomialCore

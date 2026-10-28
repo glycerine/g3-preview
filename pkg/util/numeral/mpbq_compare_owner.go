@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpbq.cpp::lt; basic_interval.h:118-130. Concrete owner
 // views for the retained algebraic arithmetic-plugin translation consumer.
-package numeral
 
 import (
 	"errors"

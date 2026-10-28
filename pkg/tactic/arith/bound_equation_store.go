@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/bound_propagator.cpp:70-106,140-199.
 package arith
+
+// Source: src/tactic/arith/bound_propagator.cpp:70-106,140-199.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/interp/iz3exception.h.
 package interp
+
+// Source: src/interp/iz3exception.h.
 
 import "github.com/glycerine/g3/pkg/util/z3exception"
 

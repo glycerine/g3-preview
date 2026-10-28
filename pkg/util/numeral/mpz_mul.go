@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.h::mul, src/util/mpz.cpp::big_mul,
 // src/util/mpn.cpp::mul
-package numeral
 
 import (
 	"math"

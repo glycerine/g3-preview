@@ -1,5 +1,6 @@
-// Source: src/sat/sat_probing.cpp:61-62,112-113,199; src/util/debug.h.
 package sat
+
+// Source: src/sat/sat_probing.cpp:61-62,112-113,199; src/util/debug.h.
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"

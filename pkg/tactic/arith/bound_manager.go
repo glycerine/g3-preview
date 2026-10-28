@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/bound_manager.cpp/.h.
 package arith
+
+// Source: src/tactic/arith/bound_manager.cpp/.h.
 
 import (
 	"math/big"

@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1462-1481 (ST0/ST1 and actual descendant lifetimes).
 package numeral
+
+// Source: src/util/mpf.cpp:1462-1481 (ST0/ST1 and actual descendant lifetimes).
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lu.h and lu.hpp:125-160,491-571,619-639,717-779.
 // Retained double/double initial sparse/dense LU factorization.
-package lp
 
 type FloatLU struct {
 	Dim             uint32

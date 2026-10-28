@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/util/rational.h:54,67; src/util/mpq.h:186-189;
 // src/math/polynomial/polynomial.cpp:2530-2536,2696-2698.
-package polynomial
 
 import (
 	"errors"

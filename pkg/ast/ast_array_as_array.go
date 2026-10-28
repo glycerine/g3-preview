@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/array_decl_plugin.cpp:434-444,498-512,561-564;
 // src/ast/array_decl_plugin.h:192-195; src/util/vector.h.
-package ast
 
 import "errors"
 

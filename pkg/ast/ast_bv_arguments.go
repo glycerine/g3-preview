@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/bv_decl_plugin.cpp:571-630; src/ast/bv_decl_plugin.h:406;
 // src/ast/ast.cpp:1863-1881,2064-2211.
-package ast
 
 // MkBitVectorOrArguments borrows the actual operand storage through the
 // original cached declaration and application factories, without a clone.

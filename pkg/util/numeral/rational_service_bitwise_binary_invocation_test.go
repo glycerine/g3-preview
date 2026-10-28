@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1018-1148; src/util/rational.h bitwise forwards.
 package numeral
+
+// Source: src/util/mpz.cpp:1018-1148; src/util/rational.h bitwise forwards.
 
 import (
 	"errors"

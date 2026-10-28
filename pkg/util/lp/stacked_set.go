@@ -1,5 +1,6 @@
-// Source: src/util/lp/stacked_unordered_set.h; src/test/lp.cpp:2029-2050.
 package lp
+
+// Source: src/util/lp/stacked_unordered_set.h; src/test/lp.cpp:2029-2050.
 
 type stackedInt32SetDelta struct {
 	inserted, erased, debugCopy map[int32]struct{}

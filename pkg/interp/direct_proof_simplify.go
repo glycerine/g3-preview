@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3proof_itp.cpp generic simplify_rec cases.
 package interp
+
+// Source checkpoint: src/interp/iz3proof_itp.cpp generic simplify_rec cases.
 
 import (
 	"errors"

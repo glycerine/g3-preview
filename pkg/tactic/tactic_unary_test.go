@@ -1,5 +1,6 @@
-// Source: src/tactic/tactical.cpp:1077-1128.
 package tactic
+
+// Source: src/tactic/tactical.cpp:1077-1128.
 
 import "testing"
 

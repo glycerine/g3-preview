@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpzzp.h.
 // Concrete source util/mpzzp.h manager; borrows one actual IntegerManager.
-package numeral
 
 import (
 	"errors"

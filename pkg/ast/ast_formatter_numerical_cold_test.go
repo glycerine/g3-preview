@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:165-291; src/util/rational.cpp:64-83.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:165-291; src/util/rational.cpp:64-83.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

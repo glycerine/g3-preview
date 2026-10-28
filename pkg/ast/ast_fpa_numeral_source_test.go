@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp:64-95; src/ast/ast.cpp:76-85.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp:64-95; src/ast/ast.cpp:76-85.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

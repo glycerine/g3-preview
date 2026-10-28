@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp kernel.
 package qe
+
+// Source: src/qe/qsat.cpp kernel.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver/inc_sat_solver.cpp assertion/check/result paths.
 package sat_solver
+
+// Source: src/sat/sat_solver/inc_sat_solver.cpp assertion/check/result paths.
 
 import (
 	"errors"

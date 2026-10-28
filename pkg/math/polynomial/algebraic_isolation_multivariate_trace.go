@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:2288-2443 multivariate isolation TRACE sites.
 package polynomial
+
+// Source: algebraic_numbers.cpp:2288-2443 multivariate isolation TRACE sites.
 
 import (
 	"io"

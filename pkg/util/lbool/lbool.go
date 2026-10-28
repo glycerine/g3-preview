@@ -1,5 +1,6 @@
-// Source: src/util/lbool.h; src/util/lbool.cpp.
 package lbool
+
+// Source: src/util/lbool.h; src/util/lbool.cpp.
 
 // LBool preserves false, undefined, and true as distinct source values.
 type LBool int32

@@ -1,5 +1,6 @@
-// Source: MPBQ display methods.
 package numeral
+
+// Source: MPBQ display methods.
 
 func (m *BinaryRationalManager) appendUnsigned(offset, n uint32) (uint32, error) {
 	end, e := checkedTextEnd(offset, 10)

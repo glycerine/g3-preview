@@ -1,5 +1,6 @@
-// Source: src/util/lp/ul_pair.h, retained LAR bound evidence indices.
 package lp
+
+// Source: src/util/lp/ul_pair.h, retained LAR bound evidence indices.
 
 import "io"
 

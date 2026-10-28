@@ -1,5 +1,6 @@
-// Source: src/math/interval/interval_def.h:175-380, concrete config_hwf.
 package interval
+
+// Source: src/math/interval/interval_def.h:175-380, concrete config_hwf.
 
 import (
 	"github.com/glycerine/g3/pkg/util/control"

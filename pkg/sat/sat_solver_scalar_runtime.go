@@ -1,5 +1,6 @@
-// Concrete native unsigned work columns for retained SAT consumers.
 package sat
+
+// Concrete native unsigned work columns for retained SAT consumers.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

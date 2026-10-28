@@ -1,5 +1,6 @@
-// Source: src/qe/qe_arith.cpp imp::operator() and live-row reconstruction.
 package qe
+
+// Source: src/qe/qe_arith.cpp imp::operator() and live-row reconstruction.
 
 import (
 	"fmt"

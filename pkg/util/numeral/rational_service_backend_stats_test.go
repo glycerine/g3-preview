@@ -1,5 +1,6 @@
-// Source: src/util/rational.cpp, src/util/mpz.h.
 package numeral
+
+// Source: src/util/rational.cpp, src/util/mpz.h.
 
 import (
 	"errors"

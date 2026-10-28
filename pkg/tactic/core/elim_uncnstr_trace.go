@@ -1,5 +1,6 @@
-// Source: src/tactic/core/elim_uncnstr_tactic.cpp live diagnostic sites.
 package core
+
+// Source: src/tactic/core/elim_uncnstr_tactic.cpp live diagnostic sites.
 
 import (
 	"errors"

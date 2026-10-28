@@ -1,5 +1,6 @@
-// Source: src/ast/ast_translation.cpp; src/ast/ast_translation.h.
 package ast
+
+// Source: src/ast/ast_translation.cpp; src/ast/ast_translation.h.
 
 import (
 	"bytes"

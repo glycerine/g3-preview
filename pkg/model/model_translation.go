@@ -1,5 +1,6 @@
-// Source: src/model/func_interp.cpp:328-341; src/model/model.cpp:152-182.
 package model
+
+// Source: src/model/func_interp.cpp:328-341; src/model/model.cpp:152-182.
 
 import (
 	"errors"

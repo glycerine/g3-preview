@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.h:96-108; src/ast/fpa_decl_plugin.cpp:51-62.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.h:96-108; src/ast/fpa_decl_plugin.cpp:51-62.
 
 import (
 	"testing"

@@ -1,5 +1,6 @@
-// Source: src/ast/justified_expr.h.
 package ast
+
+// Source: src/ast/justified_expr.h.
 
 import "errors"
 

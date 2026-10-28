@@ -1,5 +1,6 @@
-// Tests-first source routes from src/test/upolynomial.cpp.
 package polynomial
+
+// Tests-first source routes from src/test/upolynomial.cpp.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

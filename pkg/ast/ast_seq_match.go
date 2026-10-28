@@ -1,5 +1,6 @@
-// Source: src/ast/seq_decl_plugin.cpp:358-498.
 package ast
+
+// Source: src/ast/seq_decl_plugin.cpp:358-498.
 
 func (m *ASTManager) sequenceSortParameterIndex(sort astNodeRef) (uint32, bool, error) {
 	if m.nodeAt(sort.slot).kind != ASTSort {

@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp; src/util/mpz.h (root/is_perfect_square and copy wrapper).
 package numeral
+
+// Source: src/util/mpz.cpp; src/util/mpz.h (root/is_perfect_square and copy wrapper).
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1100-1170 (scoped_mpf and scoped_mpz lifetimes).
 package numeral
+
+// Source: src/util/mpf.cpp:1100-1170 (scoped_mpf and scoped_mpz lifetimes).
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

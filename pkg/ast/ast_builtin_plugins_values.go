@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:909-915,1127-1141,1246-1254,1589-1632,2556-2592; src/ast/ast.h:991-1020.
 package ast
+
+// Source: src/ast/ast.cpp:909-915,1127-1141,1246-1254,1589-1632,2556-2592; src/ast/ast.h:991-1020.
 
 func (m *ASTManager) pluginValue(fid FamilyID, r astNodeRef) (bool, error) {
 	if m.nodeAt(r.slot).kind != ASTApp {

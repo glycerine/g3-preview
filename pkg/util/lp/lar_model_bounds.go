@@ -1,5 +1,6 @@
-// Source: src/util/lp/init_lar_solver.h:169-229; concrete registered LAR bounds.
 package lp
+
+// Source: src/util/lp/init_lar_solver.h:169-229; concrete registered LAR bounds.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

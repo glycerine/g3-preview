@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3interp.cpp/.h public proof, tree, and
 // solver orchestration entry points.
-package interp
 
 import (
 	"errors"

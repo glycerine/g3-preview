@@ -1,5 +1,6 @@
-// Native literal slices for retained solver model/simplifier consumers.
 package sat
+
+// Native literal slices for retained solver model/simplifier consumers.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

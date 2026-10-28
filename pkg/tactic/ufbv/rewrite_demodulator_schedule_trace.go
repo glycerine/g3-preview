@@ -1,5 +1,6 @@
-// Source: src/tactic/ufbv/ufbv_rewriter.cpp:637; src/util/trace.h:40-46.
 package ufbv
+
+// Source: src/tactic/ufbv/ufbv_rewriter.cpp:637; src/util/trace.h:40-46.
 
 import (
 	"io"

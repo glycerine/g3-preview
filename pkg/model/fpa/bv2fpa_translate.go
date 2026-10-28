@@ -1,5 +1,6 @@
-// Source: src/ast/fpa/bv2fpa_converter.cpp:505-542.
 package fpa
+
+// Source: src/ast/fpa/bv2fpa_converter.cpp:505-542.
 
 import (
 	"errors"

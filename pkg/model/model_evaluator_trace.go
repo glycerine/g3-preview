@@ -1,5 +1,6 @@
-// Source: src/model/model_evaluator.cpp:187,200,223,228,247,435-497,566; src/util/trace.h.
 package model
+
+// Source: src/model/model_evaluator.cpp:187,200,223,228,247,435-497,566; src/util/trace.h.
 
 import (
 	"errors"

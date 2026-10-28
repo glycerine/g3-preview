@@ -1,5 +1,6 @@
-// Factorization subset degrees use native boolean slices.
 package polynomial
+
+// Factorization subset degrees use native boolean slices.
 
 import (
 	"math"

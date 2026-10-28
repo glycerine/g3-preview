@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_bounds.cpp; src/ast/rewriter/bv_bounds.h.
 package rewriter
+
+// Source: src/ast/rewriter/bv_bounds.cpp; src/ast/rewriter/bv_bounds.h.
 
 import (
 	"errors"

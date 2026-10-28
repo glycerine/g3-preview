@@ -1,5 +1,6 @@
-// Source: src/tactic/core/solve_eqs_tactic.cpp sort_vars.
 package core
+
+// Source: src/tactic/core/solve_eqs_tactic.cpp sort_vars.
 
 import (
 	"errors"

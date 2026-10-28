@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:461-467.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:461-467.
 
 import (
 	"github.com/glycerine/g3/pkg/util/control"

@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:2759-2967, retained --bp scenarios.
 package lp
+
+// Source: src/test/lp.cpp:2759-2967, retained --bp scenarios.
 
 import (
 	"io"

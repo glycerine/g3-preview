@@ -1,5 +1,6 @@
-// Source: src/ast/fpa/fpa2bv_converter.cpp:973-1166.
 package fpa
+
+// Source: src/ast/fpa/fpa2bv_converter.cpp:973-1166.
 
 import (
 	"fmt"

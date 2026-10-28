@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:3001,3028; mpbq.cpp to_mpq numerical call.
 package polynomial
+
+// Source: algebraic_numbers.cpp:3001,3028; mpbq.cpp to_mpq numerical call.
 
 import (
 	"errors"

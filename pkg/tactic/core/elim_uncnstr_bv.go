@@ -1,5 +1,6 @@
-// Source: src/tactic/core/elim_uncnstr_tactic.cpp bit-vector reductions.
 package core
+
+// Source: src/tactic/core/elim_uncnstr_tactic.cpp bit-vector reductions.
 
 import (
 	"errors"

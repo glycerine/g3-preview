@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.cpp:36-130; src/ast/ast.h:156-242.
 // Source parameter constructors, copy/move, destruction, equality and hash.
-package ast
 
 import (
 	"math"

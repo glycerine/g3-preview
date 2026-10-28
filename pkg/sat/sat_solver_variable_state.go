@@ -1,5 +1,6 @@
-// Actual solver member owners and complete sat_solver.cpp:135-160 mk_var body.
 package sat
+
+// Actual solver member owners and complete sat_solver.cpp:135-160 mk_var body.
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

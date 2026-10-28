@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1151-1277,2219-2227. Retained MPS driver consumers.
 package lp
+
+// Source: src/test/lp.cpp:1151-1277,2219-2227. Retained MPS driver consumers.
 
 import (
 	"io"

@@ -1,5 +1,6 @@
-// Source: src/ackermannization/ackr_bound_probe.cpp/.h.
 package ackermannization
+
+// Source: src/ackermannization/ackr_bound_probe.cpp/.h.
 
 import (
 	"fmt"

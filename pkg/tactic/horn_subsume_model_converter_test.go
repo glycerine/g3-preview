@@ -1,5 +1,6 @@
-// Source: src/test/horn_subsume_model_converter.cpp.
 package tactic
+
+// Source: src/test/horn_subsume_model_converter.cpp.
 
 import (
 	"bytes"

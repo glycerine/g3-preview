@@ -1,5 +1,6 @@
-// Marked storage adaptation of util/region.h/.cpp; domain trail rules separate.
 package arena
+
+// Marked storage adaptation of util/region.h/.cpp; domain trail rules separate.
 
 import (
 	"errors"

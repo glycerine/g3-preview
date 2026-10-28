@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp actual four imp SOM members.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp actual four imp SOM members.
 
 import (
 	"testing"

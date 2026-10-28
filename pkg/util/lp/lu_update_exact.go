@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:581-587,775-934; retained mpq coefficients.
 package lp
+
+// Source: src/util/lp/lu.hpp:581-587,775-934; retained mpq coefficients.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/tactic/core/symmetry_reduce_tactic.cpp live TRACE sites.
 package core
+
+// Source: src/tactic/core/symmetry_reduce_tactic.cpp live TRACE sites.
 
 import (
 	"errors"

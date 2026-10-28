@@ -1,6 +1,7 @@
+package polynomial
+
 // Concrete retained projection/normalization consumers of
 // src/util/ref_vector.h:90-94,128-132. Storage remains a native Go slice.
-package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

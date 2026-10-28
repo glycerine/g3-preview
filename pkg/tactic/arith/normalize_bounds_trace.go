@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/normalize_bounds_tactic.cpp live traces.
 package arith
+
+// Source: src/tactic/arith/normalize_bounds_tactic.cpp live traces.
 
 import (
 	"fmt"

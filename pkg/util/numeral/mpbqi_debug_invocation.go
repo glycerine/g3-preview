@@ -1,6 +1,7 @@
+package numeral
+
 // Source: basic_interval arithmetic's actual MPBQ_DEBUG children, retained by
 // algebraic_numbers.cpp:1034 and its saved-interval destructors.
-package numeral
 
 type BinaryIntervalDebugInvocationReceipt struct {
 	owner      *BinaryIntervalManager

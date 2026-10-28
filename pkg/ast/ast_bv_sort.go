@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:169-178.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:169-178.
 
 func (m *ASTManager) bitVectorSort(ps []ASTParameter) (astNodeRef, error) {
 	if len(ps) != 1 {

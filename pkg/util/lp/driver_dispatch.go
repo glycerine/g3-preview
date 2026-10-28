@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:3080-3240. Retained test_lp_local preparation.
 package lp
+
+// Source: src/test/lp.cpp:3080-3240. Retained test_lp_local preparation.
 
 import "io"
 

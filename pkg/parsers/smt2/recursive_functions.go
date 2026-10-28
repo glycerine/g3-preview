@@ -1,6 +1,7 @@
+package smt2
+
 // Source: src/parsers/smt2/smt2parser.cpp parse_define_fun_rec,
 // parse_define_funs_rec and parse_rec_fun_decl/body.
-package smt2
 
 import (
 	"errors"

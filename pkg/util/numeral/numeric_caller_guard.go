@@ -1,5 +1,6 @@
-// Source: src/util numeric manager caller/reentry boundary.
 package numeral
+
+// Source: src/util numeric manager caller/reentry boundary.
 
 // NumericCallerGuard is borrowed from an enclosing source invocation. Bindings
 // are caller-owned embedded values; the primitive manager retains only the

@@ -1,5 +1,6 @@
-// Source: src/util/mpn.h manager scratch and util/buffer.h growth policy.
 package numeral
+
+// Source: src/util/mpn.h manager scratch and util/buffer.h growth policy.
 
 import (
 	"reflect"

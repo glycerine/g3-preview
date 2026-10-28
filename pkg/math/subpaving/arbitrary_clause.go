@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:773-869, concrete config_mpf
 // inequality references, ordinary watched clauses and axiom units.
-package subpaving
 
 import (
 	"math"

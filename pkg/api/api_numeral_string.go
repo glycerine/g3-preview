@@ -1,5 +1,6 @@
-// Source: src/api/api_numeral.cpp:187-228.
 package api
+
+// Source: src/api/api_numeral.cpp:187-228.
 
 import (
 	"errors"

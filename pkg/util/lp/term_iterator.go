@@ -1,5 +1,6 @@
-// Source: src/util/lp/iterator_on_term_with_basis_var.h, retained mpq instance.
 package lp
+
+// Source: src/util/lp/iterator_on_term_with_basis_var.h, retained mpq instance.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

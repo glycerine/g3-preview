@@ -1,5 +1,6 @@
-// Source: polynomial.cpp:3344-3359. Integer content has no PSC/Lazard child.
 package polynomial
+
+// Source: polynomial.cpp:3344-3359. Integer content has no PSC/Lazard child.
 
 import (
 	"errors"

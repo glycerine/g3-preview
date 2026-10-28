@@ -1,8 +1,9 @@
+package memory
+
 // Source: src/util/small_object_allocator.cpp:72-96; src/util/memory_manager.cpp.
 // Small-allocator
 // Source revision: Leonardo de Moura (leonardo) 2011-04-27; rewrote/simplified allocator.
 // Explicit Go cleanup authority for completed source deallocation prefixes.
-package memory
 
 import (
 	"math"

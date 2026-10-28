@@ -1,5 +1,6 @@
-// Source: src/util/mpf.h m_powers2, consumed by theory_fpa.cpp:158,161.
 package numeral
+
+// Source: src/util/mpf.h m_powers2, consumed by theory_fpa.cpp:158,161.
 
 // BorrowPowerOfTwo returns a read-only NUM view owned by this manager's real
 // power cache. The caller must not delete or mutate it, or retain it after the

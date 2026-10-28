@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:3384-3428; src/util/mpz.cpp array gcd.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:3384-3428; src/util/mpz.cpp array gcd.
 
 import (
 	"errors"

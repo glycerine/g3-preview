@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:1397-1479; src/ast/ast.h:1454-1490.
 package ast
+
+// Source: src/ast/ast.cpp:1397-1479; src/ast/ast.h:1454-1490.
 
 func (m *ASTManager) SourceFinalize() error {
 	if m == nil || m.Self != m {

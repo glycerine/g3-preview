@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h:920-924; src/ast/ast.cpp:1714-1780.
 package ast
+
+// Source: src/ast/ast.h:920-924; src/ast/ast.cpp:1714-1780.
 
 import "github.com/glycerine/insdict"
 

@@ -1,6 +1,7 @@
+package params
+
 // Source: src/util/params.cpp:559-565,598-613. In a shared self-copy,
 // init's clone stops before old->dec_ref when copying an entry fails.
-package params
 
 import (
 	"errors"

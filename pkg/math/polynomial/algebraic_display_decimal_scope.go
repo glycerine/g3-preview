@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:2736-2746; scoped l,u and reached get_interval.
 package polynomial
+
+// Source: algebraic_numbers.cpp:2736-2746; scoped l,u and reached get_interval.
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:436-584.
 package rewriter
+
+// Source: src/ast/rewriter/bv_rewriter.cpp:436-584.
 
 import (
 	"fmt"

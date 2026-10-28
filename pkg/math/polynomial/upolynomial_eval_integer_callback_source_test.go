@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1801-1820;
 // src/util/memory_manager.cpp:274-285. Returning-transport lifecycle fixture.
-package polynomial
 
 import (
 	"math"

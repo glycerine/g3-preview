@@ -1,5 +1,6 @@
-// Source: src/math/realclosure/mpz_matrix.cpp:92-303.
 package realclosure
+
+// Source: src/math/realclosure/mpz_matrix.cpp:92-303.
 
 import (
 	"math/big"

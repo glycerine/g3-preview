@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.cpp:allocate/deallocate.
 package memory
+
+// Source: src/util/small_object_allocator.cpp:allocate/deallocate.
 
 // Embedded in the charged caller frame. This owns only a failed raw allocation
 // that was never joined to an allocator object or chunk.

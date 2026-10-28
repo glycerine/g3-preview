@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/seq_decl_plugin.cpp:692-717,925-931;
 // src/ast/seq_decl_plugin.h:319-320.
-package ast
 
 import (
 	"math"

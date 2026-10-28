@@ -1,5 +1,6 @@
-// Source: src/util/ref_vector.h:67-71,96-100,128-132.
 package polynomial
+
+// Source: src/util/ref_vector.h:67-71,96-100,128-132.
 
 import "testing"
 

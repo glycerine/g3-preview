@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/poly_rewriter_def.h:855-858.
 package rewriter
+
+// Source: src/ast/rewriter/poly_rewriter_def.h:855-858.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

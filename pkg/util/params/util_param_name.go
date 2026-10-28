@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp norm_param_name overloads.
 package params
+
+// Source: src/util/params.cpp norm_param_name overloads.
 
 import (
 	"strings"

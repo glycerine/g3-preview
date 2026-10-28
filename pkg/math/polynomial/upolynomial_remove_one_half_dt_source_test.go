@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Qualified signed-host TLS source numeral destruction fixture.
-package polynomial
 
 import (
 	"errors"

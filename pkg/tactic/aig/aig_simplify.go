@@ -1,5 +1,6 @@
-// Source: src/tactic/aig/aig.cpp:207-416 (USE_TWO_LEVEL_RULES enabled).
 package aig
+
+// Source: src/tactic/aig/aig.cpp:207-416 (USE_TWO_LEVEL_RULES enabled).
 
 import (
 	"errors"

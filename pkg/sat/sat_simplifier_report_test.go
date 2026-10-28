@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:785-806,1058-1077,1438-1458.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:785-806,1058-1077,1438-1458.
 
 import (
 	"regexp"

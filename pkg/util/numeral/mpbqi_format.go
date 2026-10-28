@@ -1,5 +1,6 @@
-// Source basic_interval display.
 package numeral
+
+// Source basic_interval display.
 
 import (
 	"io"

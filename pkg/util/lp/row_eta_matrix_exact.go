@@ -1,5 +1,6 @@
-// Source: src/util/lp/row_eta_matrix.h/.hpp, retained precise instances.
 package lp
+
+// Source: src/util/lp/row_eta_matrix.h/.hpp, retained precise instances.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

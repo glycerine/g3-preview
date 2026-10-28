@@ -1,5 +1,6 @@
-// Source: src/shell/main.cpp:294-296,301-337; src/util/file_path.h:23-34.
 package shell
+
+// Source: src/shell/main.cpp:294-296,301-337; src/util/file_path.h:23-34.
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"

@@ -1,5 +1,6 @@
-// Source: src/ast/used_vars.cpp:21-96; concrete UFBV quantifier-cleanup use.
 package rewriter
+
+// Source: src/ast/used_vars.cpp:21-96; concrete UFBV quantifier-cleanup use.
 
 import "github.com/glycerine/g3/pkg/ast"
 

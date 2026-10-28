@@ -1,5 +1,6 @@
-// Source: src/ackermannization/ackr_info.h.
 package ackermannization
+
+// Source: src/ackermannization/ackr_info.h.
 
 import (
 	"errors"

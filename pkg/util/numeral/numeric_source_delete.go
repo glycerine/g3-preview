@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/linear_eq_solver.h:38-49; src/util/mpz.cpp.
 package numeral
+
+// Source: src/math/polynomial/linear_eq_solver.h:38-49; src/util/mpz.cpp.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

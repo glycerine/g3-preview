@@ -1,5 +1,6 @@
-// Source: src/ast/fpa/fpa2bv_converter.cpp:2796-3070.
 package fpa
+
+// Source: src/ast/fpa/fpa2bv_converter.cpp:2796-3070.
 
 import (
 	"math/bits"

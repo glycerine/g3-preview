@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/pb2bv_tactic.cpp is_pb_probe/mk_is_pb_probe.
 package arith
+
+// Source: src/tactic/arith/pb2bv_tactic.cpp is_pb_probe/mk_is_pb_probe.
 
 import (
 	"reflect"

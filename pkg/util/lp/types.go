@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_settings.h:32-86; lp_settings.hpp:25-70.
 package lp
+
+// Source: src/util/lp/lp_settings.h:32-86; lp_settings.hpp:25-70.
 
 import "errors"
 

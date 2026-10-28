@@ -1,5 +1,6 @@
-// Source: src/util/lp/square_dense_submatrix.hpp:123-173; indexed_value.h:55.
 package lp
+
+// Source: src/util/lp/square_dense_submatrix.hpp:123-173; indexed_value.h:55.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:897-929; binary/unary selection and signing.
 package polynomial
+
+// Source: algebraic_numbers.cpp:897-929; binary/unary selection and signing.
 
 func (m *AlgebraicRootCore) beginSavedInterval(saved *algebraicSavedInterval, target *Algebraic) error {
 	if e := m.check(); e != nil {

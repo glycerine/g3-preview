@@ -1,5 +1,6 @@
-// Source: linear_eq_solver.h:90,124.
 package polynomial
+
+// Source: linear_eq_solver.h:90,124.
 
 import (
 	"io"

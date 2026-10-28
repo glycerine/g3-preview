@@ -1,5 +1,6 @@
-// Source: src/interp/iz3scopes.cpp; src/interp/iz3scopes.h.
 package interp
+
+// Source: src/interp/iz3scopes.cpp; src/interp/iz3scopes.h.
 
 import "fmt"
 

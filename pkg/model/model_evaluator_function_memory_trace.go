@@ -1,6 +1,7 @@
+package model
+
 // Source: src/model/model_evaluator.cpp:250; src/model/model_core.cpp:29,81,105;
 // src/util/memory_manager.cpp:202-211.
-package model
 
 import (
 	"fmt"

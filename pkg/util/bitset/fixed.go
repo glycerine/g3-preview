@@ -1,5 +1,6 @@
-// Translation of src/util/fixed_bit_vector.h and fixed_bit_vector.cpp.
 package bitset
+
+// Translation of src/util/fixed_bit_vector.h and fixed_bit_vector.cpp.
 
 import (
 	"reflect"

@@ -1,5 +1,6 @@
-// Source: sat_solver.cpp:367–465. Independent finite clause/watch oracles.
 package sat
+
+// Source: sat_solver.cpp:367–465. Independent finite clause/watch oracles.
 
 import (
 	"errors"

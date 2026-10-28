@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:461-467; interval_def.h.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:461-467; interval_def.h.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

@@ -1,5 +1,6 @@
-// Source: src/model/func_interp.cpp:71-326; src/model/func_interp.h:70-117.
 package model
+
+// Source: src/model/func_interp.cpp:71-326; src/model/func_interp.h:70-117.
 
 import (
 	"reflect"

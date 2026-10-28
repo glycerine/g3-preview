@@ -1,5 +1,6 @@
-// Source: src/tactic/tactical.cpp:462-884; src/tactic/tactical.h:55-61.
 package tactic
+
+// Source: src/tactic/tactical.cpp:462-884; src/tactic/tactical.h:55-61.
 
 // NewParTactic selects the source _NO_OMP_ implementation for this
 // single-goroutine port. It has the same ordered fallback behavior as or_else.

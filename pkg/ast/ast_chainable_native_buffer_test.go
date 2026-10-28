@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:2194-2201; src/util/buffer.h.
 package ast
+
+// Source: src/ast/ast.cpp:2194-2201; src/util/buffer.h.
 
 import (
 	"fmt"

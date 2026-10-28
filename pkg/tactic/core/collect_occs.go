@@ -1,6 +1,7 @@
+package core
+
 // Source: src/tactic/core/collect_occs.cpp/.h. The retained consumer creates a
 // fresh collector and an empty result for each elim-uncnstr round.
-package core
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

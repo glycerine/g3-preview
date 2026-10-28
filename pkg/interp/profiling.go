@@ -1,5 +1,6 @@
-// Source: src/interp/iz3profiling.cpp; src/interp/iz3profiling.h.
 package interp
+
+// Source: src/interp/iz3profiling.cpp; src/interp/iz3profiling.h.
 
 import (
 	"fmt"

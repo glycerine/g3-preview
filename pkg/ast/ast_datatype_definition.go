@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/datatype_decl_plugin.cpp:27-147,346-429,675-736,753-872,
 // 980-1024; src/ast/datatype_decl_plugin.h:50-104,192-220.
-package ast
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/memory_manager.cpp:49-72; src/util/memory_manager.h:49-71.
 package text
+
+// Source: src/util/memory_manager.cpp:49-72; src/util/memory_manager.h:49-71.
 
 import (
 	"errors"

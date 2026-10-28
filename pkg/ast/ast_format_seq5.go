@@ -1,5 +1,6 @@
-// Source: src/ast/format.h:164-195. Concrete format-pointer specialization.
 package ast
+
+// Source: src/ast/format.h:164-195. Concrete format-pointer specialization.
 
 // FormatSeq5 builds the grouped parenthesized sequence used by SMT2 function
 // signatures. Its source mk_seq tail skips nil documents but keeps the first.

@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:6727-6735.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:6727-6735.
 
 // The source degree-greater-than-two helper currently preserves p as one
 // factor. Its source TODO is retained; no alternative factorization is used.

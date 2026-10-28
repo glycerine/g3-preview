@@ -1,5 +1,6 @@
-// Source: src/test/escaped.cpp:21-35; src/util/util.cpp:122-152.
 package escaped
+
+// Source: src/test/escaped.cpp:21-35; src/util/util.cpp:122-152.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.hpp:213-235,339-350,433-533.
 // Concrete retained mpq/mpq basis advancement, snapping and recovery.
-package lp
 
 import (
 	"fmt"

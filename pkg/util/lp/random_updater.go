@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/random_updater.hpp:28-35,130-151,166-225;
 // random_updater.h; lar_solver.h:1363-1381.
-package lp
 
 import (
 	"sort"

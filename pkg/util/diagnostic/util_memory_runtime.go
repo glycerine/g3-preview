@@ -1,7 +1,8 @@
+package diagnostic
+
 // Source: src/util/memory_manager.cpp:33-72; src/util/memory_manager.h:49-71.
 // Source: src/util/error_codes.h; src/util/z3_exception.h.
 // Source exception policy for the concrete memory owner.
-package diagnostic
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.h:387-432; mpq/impq.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.h:387-432; mpq/impq.
 
 // MakeColumnFeasible clamps a nonbasic value and returns its exact delta.
 // No change leaves delta untouched. The caller owns delta, including a partial

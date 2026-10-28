@@ -1,5 +1,6 @@
-// Source: src/util/rational.h:449-482; concrete lp_solver<mpq,mpq> expressions.
 package lp
+
+// Source: src/util/rational.h:449-482; concrete lp_solver<mpq,mpq> expressions.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

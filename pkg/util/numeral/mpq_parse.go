@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp set(mpq &, char const *), all source branches.
 package numeral
+
+// Source: src/util/mpq.cpp set(mpq &, char const *), all source branches.
 
 import (
 	"errors"

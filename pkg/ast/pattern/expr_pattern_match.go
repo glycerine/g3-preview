@@ -1,6 +1,7 @@
+package pattern
+
 // Source: src/ast/pattern/expr_pattern_match.cpp:40-381;
 // src/ast/pattern/expr_pattern_match.h:24-145.
-package pattern
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/api/dll/mem_initializer.cpp and generated mem_initialize/finalize.
 package engine
+
+// Source: src/api/dll/mem_initializer.cpp and generated mem_initialize/finalize.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:449-505,4631-4655.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:449-505,4631-4655.
 
 // queryPositions is the ONE concrete source m_m2pos member, not a private map.
 func (m *MultivariatePolynomialCore) queryPositionsReady() {

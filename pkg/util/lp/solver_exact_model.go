@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_solver.h:45-140 and lp_solver.hpp:25-91.
 // Concrete common model of the retained lp_solver<mpq,mpq> instantiation.
-package lp
 
 import (
 	"strconv"

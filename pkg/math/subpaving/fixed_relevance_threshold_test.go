@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:1233-1309; config_mpfx.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:1233-1309; config_mpfx.
 
 import (
 	"strconv"

@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.h:62-69; src/util/vector.h.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.h:62-69; src/util/vector.h.
 
 import (
 	"reflect"

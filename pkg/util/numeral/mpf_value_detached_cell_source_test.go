@@ -1,5 +1,6 @@
-// Source: src/util/mpz.h:156-164; src/util/small_object_allocator.cpp:allocate/deallocate.
 package numeral
+
+// Source: src/util/mpz.h:156-164; src/util/small_object_allocator.cpp:allocate/deallocate.
 
 import (
 	"errors"

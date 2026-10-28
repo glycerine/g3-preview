@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/card2bv_tactic.cpp TRACE sites.
 package arith
+
+// Source: src/tactic/arith/card2bv_tactic.cpp TRACE sites.
 
 import (
 	"errors"

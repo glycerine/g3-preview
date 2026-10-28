@@ -1,5 +1,6 @@
-// Source: src/util/mpbq.cpp:394-410; retained realclosure endpoint output.
 package numeral
+
+// Source: src/util/mpbq.cpp:394-410; retained realclosure endpoint output.
 
 import (
 	"io"

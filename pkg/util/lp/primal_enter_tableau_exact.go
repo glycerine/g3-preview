@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver_tableau.h:23-41.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver_tableau.h:23-41.
 
 // AdvanceOnEnteringTableau constructs its step before scanning the stored
 // entering column. The local remains alive through every stopped child borrow.

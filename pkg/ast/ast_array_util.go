@@ -1,5 +1,6 @@
-// Source: src/ast/array_decl_plugin.cpp:566-569.
 package ast
+
+// Source: src/ast/array_decl_plugin.cpp:566-569.
 
 // ArrayFamilyID follows array_util construction: register the family name,
 // independently of registering its declaration plugin.

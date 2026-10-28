@@ -1,5 +1,6 @@
-// Source: src/util/lp/static_matrix.h/.hpp, exact scopes/transposition/diagnostics.
 package lp
+
+// Source: src/util/lp/static_matrix.h/.hpp, exact scopes/transposition/diagnostics.
 
 import (
 	"fmt"

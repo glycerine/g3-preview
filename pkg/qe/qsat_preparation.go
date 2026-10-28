@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp qsat::hoist/filter_vars/initialize_levels/get_vars.
 package qe
+
+// Source: src/qe/qsat.cpp qsat::hoist/filter_vars/initialize_levels/get_vars.
 
 import (
 	"errors"

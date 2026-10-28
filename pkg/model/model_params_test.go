@@ -1,5 +1,6 @@
-// Source: src/model/model_params.hpp; src/model/model_evaluator_params.hpp.
 package model_test
+
+// Source: src/model/model_params.hpp; src/model/model_evaluator_params.hpp.
 
 import (
 	"testing"

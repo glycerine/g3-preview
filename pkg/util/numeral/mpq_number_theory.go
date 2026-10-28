@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h/.cpp number-theory overloads.
 package numeral
+
+// Source: src/util/mpq.h/.cpp number-theory overloads.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

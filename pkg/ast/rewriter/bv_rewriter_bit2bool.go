@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:2205-2277.
 package rewriter
+
+// Source: src/ast/rewriter/bv_rewriter.cpp:2205-2277.
 
 import (
 	"reflect"

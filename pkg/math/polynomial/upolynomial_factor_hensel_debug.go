@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization.cpp:513-568,677-700,805-871.
 // Source runtime CASSERT tag helpers, independent of g3debug build selection.
-package polynomial
 
 import (
 	"errors"

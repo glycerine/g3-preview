@@ -1,5 +1,6 @@
-// Source: src/util/timeit.cpp:25-58.
 package stopwatch
+
+// Source: src/util/timeit.cpp:25-58.
 
 import (
 	"bytes"

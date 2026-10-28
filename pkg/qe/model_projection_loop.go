@@ -1,5 +1,6 @@
-// Source: src/qe/qe_mbp.cpp mbp::impl::operator()/validate_model.
 package qe
+
+// Source: src/qe/qe_mbp.cpp mbp::impl::operator()/validate_model.
 
 import (
 	"io"

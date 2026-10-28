@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.cpp:2114-2128,2259-2261,2368-2373;
 // src/util/symbol.h:97-110.
-package ast
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

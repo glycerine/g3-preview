@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_dual_core_solver.hpp:264-295,599-660.
 package lp
+
+// Source: src/util/lp/lp_dual_core_solver.hpp:264-295,599-660.
 
 import (
 	"fmt"

@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/fpa_rewriter.cpp:106-119,166-175.
 package ast
+
+// Source: src/ast/rewriter/fpa_rewriter.cpp:106-119,166-175.
 
 // RewriteFPAToFPFormatNumeral implements the rounding-mode plus FP overload
 // of to_fp. The outer MPF exists before the rounding-mode/numeral guards; the

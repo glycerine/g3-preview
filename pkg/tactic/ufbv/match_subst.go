@@ -1,5 +1,6 @@
-// Source: src/tactic/ufbv/ufbv_rewriter.cpp:759-902,919-927.
 package ufbv
+
+// Source: src/tactic/ufbv/ufbv_rewriter.cpp:759-902,919-927.
 
 import "github.com/glycerine/g3/pkg/ast"
 

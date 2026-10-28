@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/rewriter_params.hpp:5-37.
 package rewriter
+
+// Source: src/ast/rewriter/rewriter_params.hpp:5-37.
 
 import uparams "github.com/glycerine/g3/pkg/util/params"
 

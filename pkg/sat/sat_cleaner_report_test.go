@@ -1,5 +1,6 @@
-// Source: src/sat/sat_cleaner.cpp:158-179.
 package sat
+
+// Source: src/sat/sat_cleaner.cpp:158-179.
 
 import (
 	"regexp"

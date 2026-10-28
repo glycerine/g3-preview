@@ -1,5 +1,6 @@
-// Source: src/util numeric primitive caller boundaries.
 package numeral
+
+// Source: src/util numeric primitive caller boundaries.
 
 // NumericCallerPolicy borrows an existing caller-owned value. Interface
 // dispatch avoids allocating function closures for warmed source invocations.

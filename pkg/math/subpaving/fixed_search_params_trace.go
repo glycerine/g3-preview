@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:516-523,1809-1810;
 // concrete config_mpfx search parameter display and TRACE caller.
-package subpaving
 
 import (
 	"io"

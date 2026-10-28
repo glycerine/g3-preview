@@ -1,6 +1,7 @@
+package bit_blaster
+
 // Source: src/ast/rewriter/bit_blaster/bit_blaster_tpl.h:78-130;
 // src/ast/rewriter/bit_blaster/bit_blaster_tpl_def.h:511-539,826-907,1122-1178.
-package bit_blaster
 
 import (
 	"errors"

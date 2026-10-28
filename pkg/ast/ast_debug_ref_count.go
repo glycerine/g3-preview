@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h:1507-1508,1600; src/ast/ast.cpp:1798-1844.
 package ast
+
+// Source: src/ast/ast.h:1507-1508,1600; src/ast/ast.cpp:1798-1844.
 
 // EnableDebugRefCount performs the actual source one-way flag publication.
 // Node deletion consults this member at each real recycle/info/free-ID action.

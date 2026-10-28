@@ -1,5 +1,6 @@
-// Source: polynomial.cpp:6237-6279, retained scalar integer substitution.
 package polynomial
+
+// Source: polynomial.cpp:6237-6279, retained scalar integer substitution.
 
 import (
 	"errors"

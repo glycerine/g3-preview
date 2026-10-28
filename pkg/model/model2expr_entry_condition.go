@@ -1,5 +1,6 @@
-// Source: src/model/model2expr.cpp:65-77; src/util/ref_vector.h:43-56,96-100.
 package model
+
+// Source: src/model/model2expr.cpp:65-77; src/util/ref_vector.h:43-56,96-100.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.hpp:543-600,741-755,916-918;
 // lp_core_solver_base.h:509-514. Retained scalar mpq/mpq specialization.
-package lp
 
 import (
 	"fmt"

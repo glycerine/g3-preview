@@ -1,7 +1,8 @@
+package interval
+
 // Source: src/math/interval/interval.h:78-104 and
 // src/math/interval/interval_def.h:710-725,776-823,834-850,928-1019,
 // 1219-1268,1494-1515,1593-1664.
-package interval
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

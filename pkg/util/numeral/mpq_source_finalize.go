@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:28-34 destructor body followed by mpz_manager base destruction.
 package numeral
+
+// Source: src/util/mpq.cpp:28-34 destructor body followed by mpz_manager base destruction.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

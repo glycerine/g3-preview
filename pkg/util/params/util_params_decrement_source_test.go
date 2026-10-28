@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:325-339,510-513; src/util/memory_manager.cpp.
 package params
+
+// Source: src/util/params.cpp:325-339,510-513; src/util/memory_manager.cpp.
 
 import (
 	"errors"

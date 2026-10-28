@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:206–318.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:206–318.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

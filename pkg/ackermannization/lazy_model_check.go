@@ -1,5 +1,6 @@
-// Source: src/ackermannization/lackr_model_constructor.cpp/.h, retained check path.
 package ackermannization
+
+// Source: src/ackermannization/lackr_model_constructor.cpp/.h, retained check path.
 
 import (
 	"errors"

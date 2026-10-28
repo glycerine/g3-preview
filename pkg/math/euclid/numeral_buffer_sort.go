@@ -1,6 +1,7 @@
+package euclid
+
 // Source: src/math/euclid/euclidean_solver.cpp:135-166;
 // src/util/numeral_buffer.h:29-89.
-package euclid
 
 import (
 	"sort"

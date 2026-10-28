@@ -1,7 +1,8 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.h:37,153-155;
 // lp_core_solver_base.hpp:350-377,449-458,516-524; lu.h:49-55,256-258;
 // lp_settings.h:336-341. Concrete mpq/impq specialization.
-package lp
 
 import (
 	"fmt"

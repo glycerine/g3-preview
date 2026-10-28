@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:461-467,1806-1843.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:461-467,1806-1843.
 
 import (
 	"bytes"

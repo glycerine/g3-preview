@@ -1,5 +1,6 @@
-// Source: mpq.cpp:156-185, retained by algebraic decimal display.
 package numeral
+
+// Source: mpq.cpp:156-185, retained by algebraic decimal display.
 
 type RationalDecimalInvocationReceipt struct {
 	owner      *RationalManager

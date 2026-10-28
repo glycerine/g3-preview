@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/seq_decl_plugin.cpp:350-352,530-572;
 // src/util/memory_manager.cpp:202-211.
-package ast
 
 import (
 	"fmt"

@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/basic_interval.h:159-163; src/util/mpbqi.h.
 // Concrete executable basic_interval<mpbq,false> and mpbqi.h specialization.
-package numeral
 
 import (
 	"reflect"

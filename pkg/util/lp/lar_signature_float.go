@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.h:717-734.
 package lp
+
+// Source: src/util/lp/lar_core_solver.h:717-734.
 
 // FindSolutionSignatureWithDoubles runs the actual floating feasibility search.
 // The returned trace is a value copy, independent of the presolver's storage.

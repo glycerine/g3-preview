@@ -1,5 +1,6 @@
-// Source: src/sat/sat_asymm_branch.cpp:35-52,54-70.
 package sat
+
+// Source: src/sat/sat_asymm_branch.cpp:35-52,54-70.
 
 import (
 	"errors"

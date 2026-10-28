@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:194-231,233-300; signed-host TLS source release.
 package numeral
+
+// Source: src/util/mpf.cpp:194-231,233-300; signed-host TLS source release.
 
 import (
 	"errors"

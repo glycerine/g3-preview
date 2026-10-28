@@ -1,5 +1,6 @@
-// Source: src/test/prime_generator.cpp:22-35.
 package numeral
+
+// Source: src/test/prime_generator.cpp:22-35.
 
 import (
 	"testing"

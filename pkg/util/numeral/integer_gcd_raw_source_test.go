@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:730-817 (LEHMER_GCD), src/util/mpz.h:393-407.
 package numeral
+
+// Source: src/util/mpz.cpp:730-817 (LEHMER_GCD), src/util/mpz.h:393-407.
 
 import (
 	"errors"

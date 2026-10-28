@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/quant_hoist.cpp; src/ast/rewriter/quant_hoist.h.
 package rewriter
+
+// Source: src/ast/rewriter/quant_hoist.cpp; src/ast/rewriter/quant_hoist.h.
 
 import (
 	"errors"

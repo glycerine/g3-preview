@@ -1,5 +1,6 @@
-// Source binding: src/math/polynomial/polynomial.h:561-577,670-676.
 package polynomial
+
+// Source binding: src/math/polynomial/polynomial.h:561-577,670-676.
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/solver/solver2tactic.cpp; src/solver/solver2tactic.h.
 package solver
+
+// Source: src/solver/solver2tactic.cpp; src/solver/solver2tactic.h.
 
 import (
 	"errors"

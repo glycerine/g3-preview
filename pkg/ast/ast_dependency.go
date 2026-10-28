@@ -1,5 +1,6 @@
-// Concrete AST-valued specialization of util/dependency.h.
 package ast
+
+// Concrete AST-valued specialization of util/dependency.h.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

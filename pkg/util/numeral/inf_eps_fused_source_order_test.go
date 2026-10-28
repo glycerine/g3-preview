@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_eps_rational.h:322-333. The outer infinity term is
 // updated before the nested finite and epsilon terms.
-package numeral
 
 import "testing"
 

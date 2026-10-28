@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:668-685,741-769,
 // concrete config_mpq polynomial definitions and watches.
-package subpaving
 
 import (
 	"math"

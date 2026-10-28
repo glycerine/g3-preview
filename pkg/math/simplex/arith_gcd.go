@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_int.h gcd_test(row) and ext_gcd_test.
 package simplex
+
+// Source: src/smt/theory_arith_int.h gcd_test(row) and ext_gcd_test.
 
 import "math/big"
 

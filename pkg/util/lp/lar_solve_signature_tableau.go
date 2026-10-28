@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.h:487-515.
 package lp
+
+// Source: src/util/lp/lar_core_solver.h:487-515.
 
 // SolveOnSignatureTableau applies the floating basis/signature to the exact
 // tableau. A singular suggestion reverses its last exchange, uses the remaining

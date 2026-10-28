@@ -1,6 +1,7 @@
+package numeral
+
 // Added action-prefix/profile tests for mpz.cpp bitwise and mpq.h forwards.
 // Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
-package numeral
 
 import (
 	"errors"

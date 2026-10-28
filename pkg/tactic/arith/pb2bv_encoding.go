@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/pb2bv_tactic.cpp bitblast_pbc/mk_pbc/split.
 package arith
+
+// Source: src/tactic/arith/pb2bv_tactic.cpp bitblast_pbc/mk_pbc/split.
 
 import (
 	"errors"

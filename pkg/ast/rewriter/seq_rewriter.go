@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/seq_rewriter.cpp:483-519.
 package rewriter
+
+// Source: src/ast/rewriter/seq_rewriter.cpp:483-519.
 
 import (
 	"errors"

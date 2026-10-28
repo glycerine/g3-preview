@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp:980-1037.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp:980-1037.
 
 // ContainsFloatingPoint reports whether an AST contains a FloatingPoint or
 // RoundingMode sort. It follows fpa_util::contains_floats through expression

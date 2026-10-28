@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization.cpp:1030-1050,1153-1175,1238-1292;
 // src/math/polynomial/upolynomial_factorization.h:85-89.
 // Actual explicit Go service binding and reflected enclosing cold storage.
-package polynomial
 
 import (
 	"reflect"

@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1385-1410; src/util/mpn.cpp:371-399.
 package numeral
+
+// Source: src/util/mpz.cpp:1385-1410; src/util/mpn.cpp:371-399.
 
 import (
 	"bytes"

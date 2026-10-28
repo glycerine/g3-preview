@@ -1,5 +1,6 @@
-// Concrete scoped_interval.
 package numeral
+
+// Concrete scoped_interval.
 
 import (
 	"reflect"

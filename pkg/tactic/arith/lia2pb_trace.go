@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/lia2pb_tactic.cpp live TRACE sites.
 package arith
+
+// Source: src/tactic/arith/lia2pb_tactic.cpp live TRACE sites.
 
 import (
 	"fmt"

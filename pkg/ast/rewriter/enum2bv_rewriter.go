@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/enum2bv_rewriter.cpp;
 // src/ast/rewriter/enum2bv_rewriter.h.
-package rewriter
 
 import (
 	"errors"

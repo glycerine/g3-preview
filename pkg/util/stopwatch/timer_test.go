@@ -1,5 +1,6 @@
-// Source: src/util/timer.h:27-36; src/util/timer.cpp:24-39.
 package stopwatch
+
+// Source: src/util/timer.h:27-36; src/util/timer.cpp:24-39.
 
 import (
 	"errors"

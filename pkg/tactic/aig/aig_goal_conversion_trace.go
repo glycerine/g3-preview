@@ -1,6 +1,7 @@
+package aig
+
 // Source: src/tactic/aig/aig.cpp:770,863,881,931;
 // src/util/trace.h:40-46.
-package aig
 
 import "io"
 

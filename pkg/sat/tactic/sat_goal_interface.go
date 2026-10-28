@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/sat/tactic/atom2bool_var.cpp:45-126;
 // src/ast/for_each_expr.h:26-103,134-136.
-package tactic
 
 import "github.com/glycerine/g3/pkg/ast"
 

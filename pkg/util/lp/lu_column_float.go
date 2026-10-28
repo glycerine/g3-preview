@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:193-229,260-276,503-523.
 package lp
+
+// Source: src/util/lp/lu.hpp:193-229,260-276,503-523.
 
 // PrepareEntering builds Q^-1*L_k*...*L_0*A[:,entering], the column
 // consumed by the source's triangular solve and Suhl update algorithms.

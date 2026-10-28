@@ -1,5 +1,6 @@
-// Source: src/api/api_context.cpp:284-307; src/util/warning.cpp:141-168.
 package api
+
+// Source: src/api/api_context.cpp:284-307; src/util/warning.cpp:141-168.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp, mpzzp.h and mpn.cpp.
 package numeral
+
+// Source: src/util/mpz.cpp, mpzzp.h and mpn.cpp.
 
 // These opaque receipts identify actual primitive invocations. Their ownership
 // and generation remain private; caller packages can retain and finish them.

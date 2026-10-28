@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/poly_rewriter.h:28-41,95-164;
 // src/ast/rewriter/bv_rewriter.h:35-43.
-package rewriter
 
 import (
 	"reflect"

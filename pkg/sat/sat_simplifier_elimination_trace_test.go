@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:1296,1302,1315.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:1296,1302,1315.
 
 import (
 	"bytes"

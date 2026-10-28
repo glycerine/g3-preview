@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:657-664,690-724,
 // concrete config_mpq monomial definitions and watches.
-package subpaving
 
 import (
 	"math"

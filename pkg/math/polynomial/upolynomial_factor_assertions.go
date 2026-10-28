@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial_factorization_int.h SASSERT sites.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial_factorization_int.h SASSERT sites.
 
 import (
 	"errors"

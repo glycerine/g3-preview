@@ -1,6 +1,7 @@
+package memory
+
 // Source: src/util/small_object_allocator.h:48; src/util/small_object_allocator.cpp:147-171.
 // Source revision: Leonardo de Moura (leonardo) 2011-04-27; rewrote/simplified allocator.
-package memory
 
 import (
 	"errors"

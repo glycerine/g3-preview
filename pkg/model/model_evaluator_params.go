@@ -1,6 +1,7 @@
+package model
+
 // Source: src/model/model_evaluator_params.hpp;
 // src/model/model_evaluator_params.pyg.
-package model
 
 import uparams "github.com/glycerine/g3/pkg/util/params"
 

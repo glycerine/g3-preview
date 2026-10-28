@@ -1,5 +1,6 @@
-// Source: src/util/sorting_network.h:120-1046; src/test/sorting_network.cpp:184-325.
 package ast
+
+// Source: src/util/sorting_network.h:120-1046; src/test/sorting_network.cpp:184-325.
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

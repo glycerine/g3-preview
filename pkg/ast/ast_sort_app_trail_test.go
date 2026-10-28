@@ -1,5 +1,6 @@
-// Source: src/ast/ast_trail.h.
 package ast
+
+// Source: src/ast/ast_trail.h.
 
 import (
 	"errors"

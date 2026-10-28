@@ -1,5 +1,6 @@
-// Source: src/ast/scoped_proof.h.
 package ast
+
+// Source: src/ast/scoped_proof.h.
 
 // ScopedProofMode temporarily selects a manager proof-generation mode and
 // restores the previous mode when closed. It owns no AST references.

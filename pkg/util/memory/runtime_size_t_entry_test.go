@@ -1,6 +1,7 @@
+package memory
+
 // Source: src/util/memory_manager.cpp:124-149,274-305,326-377;
 // src/util/memory_manager.h:49-71.
-package memory
 
 import (
 	"errors"

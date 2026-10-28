@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/sat/tactic/goal2sat.cpp:110-423;
 // src/sat/tactic/sat_tactic.cpp:80-110.
-package tactic
 
 import (
 	"bytes"

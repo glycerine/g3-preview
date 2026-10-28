@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_rational.h:313-333. Noninteger FIRST skips epsilon;
 // integer FIRST needs only epsilon's sign.
-package numeral
 
 import "testing"
 

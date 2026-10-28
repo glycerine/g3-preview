@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/array_rewriter.cpp:340-388;
 // src/ast/rewriter/rewriter_types.h:38-45.
-package rewriter
 
 import "github.com/glycerine/g3/pkg/ast"
 

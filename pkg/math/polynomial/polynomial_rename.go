@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:1464-1475,6070-6097,7356-7357.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:1464-1475,6070-6097,7356-7357.
 
 func (m *MultivariatePolynomialCore) makeFirstMaximal(p Polynomial) error {
 	n, e := m.readWord(p, 8)

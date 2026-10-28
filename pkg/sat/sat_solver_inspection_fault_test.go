@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:2859-3017; src/util/sstream.h.
 package sat
+
+// Source: src/sat/sat_solver.cpp:2859-3017; src/util/sstream.h.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:907-975.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:907-975.
 
 func (m *RationalSparseMatrix) removeRowFromActivePivotsAndShortenColumns(row uint32) (bool, error) {
 	arow, err := m.AdjustRow(row)

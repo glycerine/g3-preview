@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:2641-2649; src/util/trace.h:40-46.
 package ast
+
+// Source: src/ast/ast.cpp:2641-2649; src/util/trace.h:40-46.
 
 import (
 	"errors"

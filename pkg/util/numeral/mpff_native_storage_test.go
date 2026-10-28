@@ -1,5 +1,6 @@
-// Source: src/util/mpff.cpp:36-109; src/util/mpff.h.
 package numeral
+
+// Source: src/util/mpff.cpp:36-109; src/util/mpff.h.
 
 import (
 	"errors"

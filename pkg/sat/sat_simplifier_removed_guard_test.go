@@ -1,5 +1,6 @@
-// Source: src/sat/sat_clause_use_list.cpp:36-54; sat_simplifier.cpp:388-402.
 package sat
+
+// Source: src/sat/sat_clause_use_list.cpp:36-54; sat_simplifier.cpp:388-402.
 
 import (
 	"testing"

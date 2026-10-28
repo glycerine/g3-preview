@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h; src/util/rational.h (ownership audit adaptation).
 package numeral
+
+// Source: src/util/mpq.h; src/util/rational.h (ownership audit adaptation).
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package euclid
+
 // Source: src/math/euclid/euclidean_solver.cpp:784,788,799-800;
 // src/util/memory_manager.cpp:202-211.
-package euclid
 
 import (
 	"fmt"

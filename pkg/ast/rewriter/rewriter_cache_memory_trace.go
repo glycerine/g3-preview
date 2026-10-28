@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/rewriter.cpp:25,29,99,101;
 // src/util/util.h:169-173; src/util/memory_manager.cpp:202-211.
-package rewriter
 
 import (
 	"fmt"

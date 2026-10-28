@@ -1,5 +1,6 @@
-// Source: src/model/func_interp.cpp:108-149,287-326.
 package model
+
+// Source: src/model/func_interp.cpp:108-149,287-326.
 
 import "github.com/glycerine/g3/pkg/ast"
 

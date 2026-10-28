@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:672-743.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:672-743.
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

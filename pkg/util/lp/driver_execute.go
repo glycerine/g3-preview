@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:3080-3266, retained test_lp_local/tst_lp execution.
 package lp
+
+// Source: src/test/lp.cpp:3080-3266, retained test_lp_local/tst_lp execution.
 
 import (
 	"github.com/glycerine/g3/pkg/util/numeral"

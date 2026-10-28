@@ -1,6 +1,7 @@
+package params
+
 // Source: src/util/params.cpp:639-648,902-930; src/util/symbol.h:96;
 // scripts/mk_genfile_common.py:895-939.
-package params
 
 import (
 	"math"

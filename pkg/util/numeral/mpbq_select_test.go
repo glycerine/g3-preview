@@ -1,5 +1,6 @@
-// Added independent MPBQ tests.
 package numeral
+
+// Added independent MPBQ tests.
 
 import (
 	"errors"

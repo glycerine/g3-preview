@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.hpp:841-853,1050-1060;
 // lp_primal_core_solver.h:524-527. Precise specialization.
-package lp
 
 func (m *PairPrimalCoreSolver) NumberOfNonBasicColumnsToTryForEnter() (uint32, error) {
 	if err := m.ready(); err != nil {

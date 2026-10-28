@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:290,302,310;
 // src/util/mpz.cpp:1432-1435, mpbq.cpp:384-392. Strings use Go buffers.
-package polynomial
 
 import (
 	"bytes"

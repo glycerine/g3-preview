@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3proof_itp.cpp mixed contradiction
 // recognition and resolvent collection.
-package interp
 
 import "github.com/glycerine/g3/pkg/ast"
 

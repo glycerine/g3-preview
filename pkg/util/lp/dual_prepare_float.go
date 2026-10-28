@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_simplex.h:32-75;
 // lp_dual_simplex.hpp:44-103,136-142,186-336. Floating dual model preparation.
-package lp
 
 import (
 	"fmt"

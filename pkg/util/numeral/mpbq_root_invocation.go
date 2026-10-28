@@ -1,5 +1,6 @@
-// Source: mpbq.h root_lower/root_upper SET then mpbq.cpp:261-303.
 package numeral
+
+// Source: mpbq.h root_lower/root_upper SET then mpbq.cpp:261-303.
 
 // BinaryRootInvocation retains the actual numerator copy and integer root.
 // It neither owns the output nor authorizes cleanup of a replacement call.

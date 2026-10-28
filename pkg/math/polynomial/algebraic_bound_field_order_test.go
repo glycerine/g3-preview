@@ -1,6 +1,7 @@
+package polynomial
+
 // Raw root views establish readable fields, never source construction/ownership.
 // Source: algebraic_numbers.cpp:2987-3023; mpbq.h SET.
-package polynomial
 
 import (
 	"errors"

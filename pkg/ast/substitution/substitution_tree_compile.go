@@ -1,6 +1,7 @@
+package substitution
+
 // Source: src/ast/substitution/substitution_tree.cpp:22-571;
 // src/ast/substitution/substitution_tree.h.
-package substitution
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/binary_heap_priority_queue.h/.hpp, concrete index storage.
 package lp
+
+// Source: src/util/lp/binary_heap_priority_queue.h/.hpp, concrete index storage.
 
 // priorityHeap contains only the shared unsigned/signed index operations. Each
 // actual priority type implements its own comparisons; no algebra callback or

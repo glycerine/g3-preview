@@ -1,5 +1,6 @@
-// Source: src/test/polynomial.cpp:741-821; src/math/polynomial/polynomial.cpp:5896-5901.
 package polynomial
+
+// Source: src/test/polynomial.cpp:741-821; src/math/polynomial/polynomial.cpp:5896-5901.
 
 var polynomialPSCOriginalCases = []struct {
 	p, q          string

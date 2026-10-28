@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:786-799; config_mpf.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:786-799; config_mpf.
 
 import (
 	"fmt"

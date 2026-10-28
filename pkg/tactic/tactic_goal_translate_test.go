@@ -1,5 +1,6 @@
-// Source: src/tactic/goal.cpp:635-655; src/tactic/goal.h:145.
 package tactic
+
+// Source: src/tactic/goal.cpp:635-655; src/tactic/goal.h:145.
 
 import (
 	"testing"

@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:730-817; Go returning-transport owner boundary.
 package numeral
+
+// Source: src/util/mpz.cpp:730-817; Go returning-transport owner boundary.
 
 import (
 	"errors"

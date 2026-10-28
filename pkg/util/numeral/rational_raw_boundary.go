@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h/.cpp: caller observations of actual RAW invocations.
 package numeral
+
+// Source: src/util/mpq.h/.cpp: caller observations of actual RAW invocations.
 
 type RationalRawInvocationState struct {
 	Active      [3]bool

@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/tactic/expr2subpaving.cpp:84-286, 332-363; concrete MPFF instantiation.
 package tactic
+
+// Source: src/math/subpaving/tactic/expr2subpaving.cpp:84-286, 332-363; concrete MPFF instantiation.
 
 import (
 	"errors"

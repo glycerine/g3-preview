@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast_ll_pp.cpp:168-184,217-236,292-297;
 // src/ast/for_each_ast.h:40-125.
-package ast
 
 import (
 	"errors"

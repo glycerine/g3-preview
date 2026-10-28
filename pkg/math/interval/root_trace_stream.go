@@ -1,5 +1,6 @@
-// Source: src/util/trace.h:40-46, concrete scalar-root trace operands.
 package interval
+
+// Source: src/util/trace.h:40-46, concrete scalar-root trace operands.
 
 import (
 	"errors"

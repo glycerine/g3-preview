@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:810-851.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:810-851.
 
 import "testing"
 

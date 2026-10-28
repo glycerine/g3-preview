@@ -1,5 +1,6 @@
-// Source: remaining src/util/rational.h wrappers; concrete owner-local facade.
 package numeral
+
+// Source: remaining src/util/rational.h wrappers; concrete owner-local facade.
 
 import (
 	"errors"

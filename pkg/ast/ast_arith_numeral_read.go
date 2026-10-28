@@ -1,5 +1,6 @@
-// Source: src/ast/arith_decl_plugin.cpp:632-639.
 package ast
+
+// Source: src/ast/arith_decl_plugin.cpp:632-639.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

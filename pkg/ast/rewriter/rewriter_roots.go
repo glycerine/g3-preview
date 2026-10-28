@@ -1,5 +1,6 @@
-// Native AST reference ownership for retained rewriter result/pattern stacks.
 package rewriter
+
+// Native AST reference ownership for retained rewriter result/pattern stacks.
 
 import "github.com/glycerine/g3/pkg/ast"
 

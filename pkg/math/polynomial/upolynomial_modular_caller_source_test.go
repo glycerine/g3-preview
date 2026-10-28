@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1108-1225,1734-1820,1906-1951,2029-2074;
 // src/math/polynomial/algebraic_numbers.cpp:1565-1577;
 // src/util/mpzzp.h:97-105. Actual returning-transport owner guard fixture.
-package polynomial
 
 import (
 	"math"

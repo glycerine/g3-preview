@@ -1,5 +1,6 @@
-// Source: src/util/env_params.cpp:25-33; src/util/util.h:391-399.
 package params
+
+// Source: src/util/env_params.cpp:25-33; src/util/util.h:391-399.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

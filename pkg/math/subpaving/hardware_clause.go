@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:802-875,1349-1405,
 // concrete config_hwf clauses, inequality truth and unit propagation.
-package subpaving
 
 import (
 	"sort"

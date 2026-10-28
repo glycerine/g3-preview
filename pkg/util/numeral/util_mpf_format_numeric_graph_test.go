@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpf.cpp:61-67,1519-1569; src/util/mpq.h:25-49; src/util/small_object_allocator.cpp:28-53.
 // Test-only graph projection from actual named numeric owners, without AST construction.
-package numeral
 
 import (
 	"reflect"

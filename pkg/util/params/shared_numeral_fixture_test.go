@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h; src/util/rational.h (ownership audit adaptation).
 package params
+
+// Source: src/util/mpq.h; src/util/rational.h (ownership audit adaptation).
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp qsat tactic/factories.
 package qe
+
+// Source: src/qe/qsat.cpp qsat tactic/factories.
 
 import (
 	"errors"

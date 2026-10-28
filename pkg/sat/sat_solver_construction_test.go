@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.h:74–136; src/sat/sat_solver.cpp:34–58; src/sat/sat_var_queue.h:35.
 package sat
+
+// Source: src/sat/sat_solver.h:74–136; src/sat/sat_solver.cpp:34–58; src/sat/sat_var_queue.h:35.
 
 import (
 	"errors"

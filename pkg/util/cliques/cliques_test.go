@@ -1,5 +1,6 @@
-// Source: src/util/max_cliques.h:26-137.
 package cliques
+
+// Source: src/util/max_cliques.h:26-137.
 
 import (
 	"errors"

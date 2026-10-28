@@ -1,6 +1,7 @@
+package smt2
+
 // Source: src/parsers/smt2/smt2parser.cpp consume_attributes,
 // push_pattern_frame, process_last_symbol and pop_quant_frame.
-package smt2
 
 import (
 	"bytes"

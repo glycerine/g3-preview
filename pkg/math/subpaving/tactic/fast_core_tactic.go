@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/math/subpaving/tactic/subpaving_tactic.cpp:193-263;
 // concrete MPFF core tactic, excluding the public simplify composition.
-package tactic
 
 import (
 	"errors"

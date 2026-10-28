@@ -1,5 +1,6 @@
-// Source: src/tactic/probe.cpp:211-527.
 package tactic
+
+// Source: src/tactic/probe.cpp:211-527.
 
 import (
 	"testing"

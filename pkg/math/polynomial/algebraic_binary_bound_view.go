@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:2987-3017; mpbq.h::set.
 package polynomial
+
+// Source: algebraic_numbers.cpp:2987-3017; mpbq.h::set.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

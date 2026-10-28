@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.hpp:224-241.
 package lp
+
+// Source: src/util/lp/lar_core_solver.hpp:224-241.
 
 // PrefixD prepares the existing floating presolver. Ordinary vectors retain
 // values; indexed scratch, column norms and infeasibility membership are reset.

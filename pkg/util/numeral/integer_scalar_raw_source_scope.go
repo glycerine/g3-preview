@@ -1,5 +1,6 @@
-// Source: src/util/mpz.h:468-485; src/util/mpz.cpp:915-988.
 package numeral
+
+// Source: src/util/mpz.h:468-485; src/util/mpz.cpp:915-988.
 
 type integerScalarRawScope struct {
 	self                                         *integerScalarRawScope

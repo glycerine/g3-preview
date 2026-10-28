@@ -1,5 +1,6 @@
-// Source: src/util/mpz.h:393-426. Literal RAW tmp, Mul then Add/Sub, end-only DEL.
 package numeral
+
+// Source: src/util/mpz.h:393-426. Literal RAW tmp, Mul then Add/Sub, end-only DEL.
 
 import (
 	"errors"

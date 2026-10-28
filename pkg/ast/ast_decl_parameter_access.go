@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.h func_decl_info parameter access;
 // src/ast/ast.cpp family_manager::get_family_id.
-package ast
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

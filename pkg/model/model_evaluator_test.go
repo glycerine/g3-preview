@@ -1,5 +1,6 @@
-// Source: src/model/model_evaluator.cpp:93-203,233-253,282-290,545-579.
 package model_test
+
+// Source: src/model/model_evaluator.cpp:93-203,233-253,282-290,545-579.
 
 import (
 	"testing"

@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:194-231; src/api/api_numeral.cpp:50-88.
 package numeral
+
+// Source: src/util/mpf.cpp:194-231; src/api/api_numeral.cpp:50-88.
 
 import (
 	"errors"

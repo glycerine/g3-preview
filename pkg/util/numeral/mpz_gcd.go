@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.cpp:49-84,560-817 (_MP_INTERNAL / LEHMER_GCD);
 // src/util/mpz.h:393-426 addmul/submul.
-package numeral
 
 import (
 	"math"

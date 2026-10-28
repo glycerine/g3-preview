@@ -1,6 +1,7 @@
+package numeral
+
 // Source assertions/scenarios: src/test/mpz.cpp tst1, tst2, tst2b.
 // Additional finite expectations use independent integer arithmetic.
-package numeral
 
 import (
 	"errors"

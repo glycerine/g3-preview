@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:756-835, retained mpq coefficients.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:756-835, retained mpq coefficients.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

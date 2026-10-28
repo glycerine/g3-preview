@@ -1,5 +1,6 @@
-// Source: src/ast/format.cpp:147-152; native caller buffers.
 package ast
+
+// Source: src/ast/format.cpp:147-152; native caller buffers.
 
 import (
 	"bytes"

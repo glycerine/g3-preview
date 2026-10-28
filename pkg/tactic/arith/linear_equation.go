@@ -1,6 +1,7 @@
+package arith
+
 // Source: src/tactic/arith/linear_equation.h:29-79;
 // src/tactic/arith/linear_equation.cpp:25-58,90-205,273-280.
-package arith
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/ast/reg_decl_plugins.cpp:30-55.
 package ast
+
+// Source: src/ast/reg_decl_plugins.cpp:30-55.
 
 import (
 	"errors"

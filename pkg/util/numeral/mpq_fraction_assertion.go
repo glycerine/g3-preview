@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h:679,690.
 package numeral
+
+// Source: src/util/mpq.h:679,690.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

@@ -1,5 +1,6 @@
-// Source: src/util/lp/mps_reader.h:41-798 (floating primal/dual consumers).
 package lp
+
+// Source: src/util/lp/mps_reader.h:41-798 (floating primal/dual consumers).
 
 import (
 	"bufio"

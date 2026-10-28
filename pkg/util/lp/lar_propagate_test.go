@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lar_solver.h:363-365,402-427;
 // retained caller src/smt/theory_lra.cpp:1303-1314.
-package lp
 
 import (
 	"fmt"

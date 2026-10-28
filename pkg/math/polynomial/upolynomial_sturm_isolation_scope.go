@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:2392-2483; actual internal isolation stack locals.
 package polynomial
+
+// Source: upolynomial.cpp:2392-2483; actual internal isolation stack locals.
 
 import (
 	"errors"

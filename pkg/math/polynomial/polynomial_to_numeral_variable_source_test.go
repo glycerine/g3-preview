@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.h:426-450.
 // Independent output assertions: registered UP drivers use the other overload.
-package polynomial
 
 import (
 	"strconv"

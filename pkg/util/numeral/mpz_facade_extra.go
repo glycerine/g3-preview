@@ -1,5 +1,6 @@
-// Concrete public-method closure of src/util/mpz.h, internal 32-bit digits.
 package numeral
+
+// Concrete public-method closure of src/util/mpz.h, internal 32-bit digits.
 
 // Sign is the source m_val: full inline int32, or -1/+1 for a big numeral.
 func (m *IntegerManager) Sign(a *Int) (int32, error) {

@@ -1,5 +1,6 @@
-// Formatting expectations project src/util/mpn.cpp to_string and mpz/mpq display.
 package numeral
+
+// Formatting expectations project src/util/mpn.cpp to_string and mpz/mpq display.
 
 import (
 	"bytes"

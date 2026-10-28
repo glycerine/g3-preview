@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/sat/tactic/goal2sat.cpp:425-485;
 // src/sat/tactic/atom2bool_var.cpp:88-111.
-package tactic
 
 import (
 	"fmt"

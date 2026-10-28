@@ -1,5 +1,6 @@
-// Source: src/util/lp/breakpoint.h; lp_primal_core_solver.hpp:1245-1248.
 package lp
+
+// Source: src/util/lp/breakpoint.h; lp_primal_core_solver.hpp:1245-1248.
 
 import (
 	"fmt"

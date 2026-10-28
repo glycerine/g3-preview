@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1297-1298 (actual quotient allocation transport).
 package numeral
+
+// Source: src/util/mpf.cpp:1297-1298 (actual quotient allocation transport).
 
 import (
 	"errors"

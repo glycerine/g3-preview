@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:2054-2069; src/util/scoped_numeral.h:31-33.
 package numeral
+
+// Source: src/util/mpz.cpp:2054-2069; src/util/scoped_numeral.h:31-33.
 
 // The actual Integer method owns its scoped tmp NUM, including the zero
 // branch. Shared division buffers remain manager-owned; checked arithmetic

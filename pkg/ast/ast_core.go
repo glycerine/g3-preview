@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.cpp:1297-1479; src/ast/ast.h:1454-1490.
 // Owner-confined ast_manager default no-trace normal and format constructors.
-package ast
 
 import (
 	"errors"

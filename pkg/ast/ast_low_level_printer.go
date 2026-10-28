@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast_ll_pp.cpp:21-324; src/ast/for_each_ast.h:27-125;
 // src/ast/for_each_ast.cpp:37-48. Native Go traversal collections.
-package ast
 
 import (
 	"errors"

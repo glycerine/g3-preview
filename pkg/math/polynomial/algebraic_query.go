@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/algebraic_numbers.cpp:217-240,350-356,2807-2828.
 package polynomial
+
+// Source: src/math/polynomial/algebraic_numbers.cpp:217-240,350-356,2807-2828.
 
 // The pointer-tag dispatch establishes each reached accessor assertion. Its
 // predicate cannot fail here, but the source still evaluates the runtime switch.

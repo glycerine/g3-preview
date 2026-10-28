@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp:856-870; src/util/mpf.h.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp:856-870; src/util/mpf.h.
 
 // floatingPointSomeValue follows the source get_some_value sequence: read the
 // format, construct one MPF NaN, register its numeral, then delete that MPF.

@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_types.h:30-31 and the concrete
 // wrapper and context throws in subpaving.cpp and subpaving_t_def.h.
-package subpaving
 
 import (
 	"errors"

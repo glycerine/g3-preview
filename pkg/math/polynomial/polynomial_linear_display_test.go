@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/linear_eq_solver.h:140-150.
 package polynomial
+
+// Source: src/math/polynomial/linear_eq_solver.h:140-150.
 
 import (
 	"errors"

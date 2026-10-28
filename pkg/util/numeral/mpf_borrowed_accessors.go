@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpf.h:152-153,161,193-194; concrete mpf_manager
 // accessors reached by src/api/api_fpa.cpp:933,978-995,1011-1028,1049-1062.
-package numeral
 
 // BorrowSignificand returns the source sig() reference. The returned numeral
 // belongs to the float value and must not be deleted or retained after that

@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/fpa_rewriter.cpp:417-431;
 // src/util/scoped_numeral.h:24-33.
-package ast
 
 // RewriteFPAFMANumerals evaluates the source fused operation after recognizing
 // a rounding constant. Three operand values are constructed before probing;

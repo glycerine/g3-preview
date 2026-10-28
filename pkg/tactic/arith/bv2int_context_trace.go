@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/bv2int_rewriter.cpp:86.
 package arith
+
+// Source: src/tactic/arith/bv2int_rewriter.cpp:86.
 
 import (
 	"errors"

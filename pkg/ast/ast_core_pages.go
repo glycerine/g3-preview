@@ -1,5 +1,6 @@
-// Concrete typed page growth; each actual old/new directory overlap is charged.
 package ast
+
+// Concrete typed page growth; each actual old/new directory overlap is charged.
 
 import (
 	"reflect"

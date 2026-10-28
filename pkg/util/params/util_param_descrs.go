@@ -1,6 +1,7 @@
+package params
+
 // Source: src/util/params.cpp:59-86; src/util/params.h.
 // Concrete translation of util/params.cpp param_descrs and dictionary<info>.
-package params
 
 import (
 	"bytes"

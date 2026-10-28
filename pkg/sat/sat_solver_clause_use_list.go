@@ -1,5 +1,6 @@
-// Translation of selected LAZY_USE_LIST in src/sat/sat_clause_use_list.h/.cpp.
 package sat
+
+// Translation of selected LAZY_USE_LIST in src/sat/sat_clause_use_list.h/.cpp.
 
 import (
 	"reflect"

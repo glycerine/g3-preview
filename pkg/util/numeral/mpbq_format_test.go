@@ -1,5 +1,6 @@
-// Added exact format expectations.
 package numeral
+
+// Added exact format expectations.
 
 import (
 	"errors"

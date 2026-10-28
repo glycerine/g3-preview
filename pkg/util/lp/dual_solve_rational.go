@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.hpp:162-204,731-761.
 // Concrete retained mpq/mpq pricing, iteration and prepared dual core Solve.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

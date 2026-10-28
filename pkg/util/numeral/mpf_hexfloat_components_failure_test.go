@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1608-1619; actual scoped-value and child prefixes.
 package numeral
+
+// Source: src/util/mpf.cpp:1608-1619; actual scoped-value and child prefixes.
 
 import (
 	"errors"

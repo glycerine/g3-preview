@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/bv_rewriter.cpp:1960-1963;
 // src/util/rational.h:43,306-308.
-package ast
 
 // BitVectorNumeralOneWithInvocation passes borrowed rational::one() to the
 // original numeral factory. Its parameter copy is the only caller value;

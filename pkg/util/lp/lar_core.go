@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.h/.hpp, retained LAR constructor/state.
 package lp
+
+// Source: src/util/lp/lar_core_solver.h/.hpp, retained LAR constructor/state.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

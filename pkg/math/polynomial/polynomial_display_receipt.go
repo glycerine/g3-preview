@@ -1,5 +1,6 @@
-// Source: polynomial.cpp display, reached by algebraic_numbers.cpp:668 TRACE.
 package polynomial
+
+// Source: polynomial.cpp display, reached by algebraic_numbers.cpp:668 TRACE.
 
 type polynomialDisplayInvocationReceipt struct {
 	frame      *polynomialDisplayFrame

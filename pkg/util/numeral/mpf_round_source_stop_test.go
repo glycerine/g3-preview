@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:2016-2027,1963-2098; real signed-host TLS guard profile.
 package numeral
+
+// Source: src/util/mpf.cpp:2016-2027,1963-2098; real signed-host TLS guard profile.
 
 import (
 	"errors"

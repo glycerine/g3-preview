@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/pb2bv_tactic.cpp adjust/convert/is_eq_vector.
 package arith
+
+// Source: src/tactic/arith/pb2bv_tactic.cpp adjust/convert/is_eq_vector.
 
 import (
 	"errors"

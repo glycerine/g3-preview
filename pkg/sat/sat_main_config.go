@@ -1,5 +1,6 @@
-// Translation of src/sat/sat_config.h/.cpp, Leonardo de Moura, 2011-05-21.
 package sat
+
+// Translation of src/sat/sat_config.h/.cpp, Leonardo de Moura, 2011-05-21.
 
 import (
 	"errors"

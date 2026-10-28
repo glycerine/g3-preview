@@ -1,5 +1,6 @@
-// Source: src/ast/pp_params.hpp:5-51.
 package ast
+
+// Source: src/ast/pp_params.hpp:5-51.
 
 import uparams "github.com/glycerine/g3/pkg/util/params"
 

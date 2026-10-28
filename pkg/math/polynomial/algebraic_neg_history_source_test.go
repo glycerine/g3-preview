@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577;
 // src/util/mpz.cpp:2032-2041. Allocation-only Go diagnostic history.
-package polynomial
 
 import (
 	"errors"

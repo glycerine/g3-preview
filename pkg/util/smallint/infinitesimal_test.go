@@ -1,5 +1,6 @@
-// Source: src/util/inf_s_integer.h:25-347; src/util/inf_s_integer.cpp:22-24.
 package smallint
+
+// Source: src/util/inf_s_integer.h:25-347; src/util/inf_s_integer.cpp:22-24.
 
 import (
 	"errors"

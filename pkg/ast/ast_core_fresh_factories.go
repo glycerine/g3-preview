@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:1354,2213-2238; src/ast/ast.h:1811-1825.
 package ast
+
+// Source: src/ast/ast.cpp:1354,2213-2238; src/ast/ast.h:1811-1825.
 
 import (
 	"bytes"

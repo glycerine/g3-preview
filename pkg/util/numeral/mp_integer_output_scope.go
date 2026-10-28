@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1385-1410; src/util/buffer.h:84-95.
 package numeral
+
+// Source: src/util/mpz.cpp:1385-1410; src/util/buffer.h:84-95.
 
 import (
 	"math"

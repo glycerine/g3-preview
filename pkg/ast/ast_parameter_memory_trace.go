@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.h:124; src/ast/ast.cpp:38,53,60;
 // src/util/memory_manager.cpp:202-211.
-package ast
 
 import (
 	"fmt"

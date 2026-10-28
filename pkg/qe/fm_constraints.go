@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::constraint and fm::fm retained constraint paths.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::constraint and fm::fm retained constraint paths.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/math/euclid/euclidean_solver.cpp:735-783.
 package euclid
+
+// Source: src/math/euclid/euclidean_solver.cpp:735-783.
 
 import (
 	"errors"

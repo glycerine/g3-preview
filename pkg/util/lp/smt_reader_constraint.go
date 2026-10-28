@@ -1,5 +1,6 @@
-// Source: src/test/smt_reader.h:71-81,178-292.
 package lp
+
+// Source: src/test/smt_reader.h:71-81,178-292.
 
 import (
 	"strconv"

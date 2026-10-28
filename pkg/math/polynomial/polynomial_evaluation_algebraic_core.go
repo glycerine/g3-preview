@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:6436-6506. Concrete algebraic instantiation.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:6436-6506. Concrete algebraic instantiation.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/init_lar_solver.h and lar_solver.h: retained term/model
 // registration and direct basic-value reconstruction.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

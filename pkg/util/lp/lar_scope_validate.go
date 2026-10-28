@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:752-767; lp_core_solver_base.hpp:526-541.
 package lp
+
+// Source: src/util/lp/lar_solver.h:752-767; lp_core_solver_base.hpp:526-541.
 
 import (
 	"fmt"

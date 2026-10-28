@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial.h:426-450.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial.h:426-450.
 
 // ToNumeralVectorInto converts a univariate polynomial into the concrete dense
 // owner used by the caller. The two owners must share the actual integer

@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp qe_lite_tactic and mk_qe_lite_tactic.
 package qe
+
+// Source: src/qe/qe_lite.cpp qe_lite_tactic and mk_qe_lite_tactic.
 
 import (
 	"errors"

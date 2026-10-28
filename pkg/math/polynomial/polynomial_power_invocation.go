@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:4600-4614; src/util/obj_ref.h.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:4600-4614; src/util/obj_ref.h.
 
 type polynomialPowerInvocationReceipt struct {
 	manager    *MultivariatePolynomialCore

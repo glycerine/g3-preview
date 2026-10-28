@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3proof_itp.cpp local arithmetic rule cases.
 package interp
+
+// Source checkpoint: src/interp/iz3proof_itp.cpp local arithmetic rule cases.
 
 import "github.com/glycerine/g3/pkg/ast"
 

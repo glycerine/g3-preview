@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/fpa_decl_plugin.cpp:136-139;
 // src/ast/fpa_decl_plugin.h:257-267; src/util/scoped_numeral.h:24-33.
-package ast
 
 import (
 	"errors"

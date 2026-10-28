@@ -1,5 +1,6 @@
-// Source: src/model/model.h; src/model/model_core.h.
 package model
+
+// Source: src/model/model.h; src/model/model_core.h.
 
 import (
 	"errors"

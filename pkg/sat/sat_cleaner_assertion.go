@@ -1,5 +1,6 @@
-// Source: src/sat/sat_cleaner.cpp:184,200; src/util/debug.h:64.
 package sat
+
+// Source: src/sat/sat_cleaner.cpp:184,200; src/util/debug.h:64.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

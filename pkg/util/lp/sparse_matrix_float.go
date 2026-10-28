@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.h/.hpp, retained double/double basis storage.
 package lp
+
+// Source: src/util/lp/sparse_matrix.h/.hpp, retained double/double basis storage.
 
 // FloatIndexedValue owns a coefficient; Index names the opposite dimension and
 // Other is the reciprocal offset. Sparse matrices own values in BOTH directions,

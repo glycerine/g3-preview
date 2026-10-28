@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp bitwise_or/and/xor/not, _MP_INTERNAL branch.
 package numeral
+
+// Source: src/util/mpz.cpp bitwise_or/and/xor/not, _MP_INTERNAL branch.
 
 import (
 	"errors"

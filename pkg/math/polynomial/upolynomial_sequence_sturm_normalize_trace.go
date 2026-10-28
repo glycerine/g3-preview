@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:391-392; public Sturm normalization diagnostics.
 package polynomial
+
+// Source: upolynomial.cpp:391-392; public Sturm normalization diagnostics.
 
 import (
 	"bytes"

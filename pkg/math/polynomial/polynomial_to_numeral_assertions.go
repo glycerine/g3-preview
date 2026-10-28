@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial.h:404,415.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial.h:404,415.
 
 import (
 	"errors"

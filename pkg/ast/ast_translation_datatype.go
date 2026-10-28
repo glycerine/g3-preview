@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/datatype_decl_plugin.cpp:170-191; translation methods at
 // lines 54-112.
-package ast
 
 import (
 	"sort"

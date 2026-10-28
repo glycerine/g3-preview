@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::fm candidate ordering and bound analysis.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::fm candidate ordering and bound analysis.
 
 import (
 	"io"

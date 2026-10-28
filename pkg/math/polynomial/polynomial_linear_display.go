@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/linear_eq_solver.h:140-150;
 // src/util/mpq.cpp display; src/util/mpzzp.h display.
-package polynomial
 
 import (
 	"errors"

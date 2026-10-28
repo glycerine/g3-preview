@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/fpa_rewriter.cpp:369-415;
 // src/util/scoped_numeral.h:24-33.
-package ast
 
 // RewriteFPAExtremumNumerals evaluates the numeric branch after the rewriter's
 // NaN guards. Opposite signed zeros deliberately remain unreduced.

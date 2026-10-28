@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/tactic/model_converter.cpp:167,173; src/tactic/converter.h:36;
 // src/util/memory_manager.cpp:202-211.
-package tactic
 
 import (
 	"fmt"

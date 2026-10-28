@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.h:585-601.
 package lp
+
+// Source: src/util/lp/lar_core_solver.h:585-601.
 
 // RBasisIsOK is the retained debug-only tableau basis validator.
 func (c *LARCoreSolver) RBasisIsOK() (bool, error) {

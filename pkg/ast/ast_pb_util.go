@@ -1,5 +1,6 @@
-// Source: src/ast/pb_decl_plugin.cpp:103-181,200-217.
 package ast
+
+// Source: src/ast/pb_decl_plugin.cpp:103-181,200-217.
 
 import (
 	"errors"

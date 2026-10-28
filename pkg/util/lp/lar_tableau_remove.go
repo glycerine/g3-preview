@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:1393-1510; exact tableau scope removal.
 package lp
+
+// Source: src/util/lp/lar_solver.h:1393-1510; exact tableau scope removal.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

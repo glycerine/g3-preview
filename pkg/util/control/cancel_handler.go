@@ -1,5 +1,6 @@
-// Concrete reslimit specialization of src/util/event_handler.h/cancel_eh.h.
 package control
+
+// Concrete reslimit specialization of src/util/event_handler.h/cancel_eh.h.
 
 type EventCaller uint32
 

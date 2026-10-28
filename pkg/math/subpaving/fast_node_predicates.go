@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:1321-1343, concrete config_mpff.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:1321-1343, concrete config_mpff.
 
 func (n *FastNode) IsUnbounded(variable uint32) (bool, error) {
 	lower, err := n.bound(variable, true)

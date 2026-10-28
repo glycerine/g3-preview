@@ -1,5 +1,6 @@
-// Source: src/ast/seq_decl_plugin.cpp:620-825.
 package ast
+
+// Source: src/ast/seq_decl_plugin.cpp:620-825.
 
 func canonicalSequenceKind(kind int32) int32 {
 	switch kind {

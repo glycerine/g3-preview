@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization.cpp:703-801,845-933;
 // src/util/mpz.h:124-149; src/util/mpzzp.h:46-56,154,230-233.
-package polynomial
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

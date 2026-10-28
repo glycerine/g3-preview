@@ -1,5 +1,6 @@
-// Source: src/ast/fpa/fpa2bv_rewriter.cpp/.h.
 package rewriter
+
+// Source: src/ast/fpa/fpa2bv_rewriter.cpp/.h.
 
 import (
 	"math"

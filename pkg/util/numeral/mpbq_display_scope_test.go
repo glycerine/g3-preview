@@ -1,5 +1,6 @@
-// Source mpbq.cpp:426–515 raw mpz locals.
 package numeral
+
+// Source mpbq.cpp:426–515 raw mpz locals.
 
 import (
 	"errors"

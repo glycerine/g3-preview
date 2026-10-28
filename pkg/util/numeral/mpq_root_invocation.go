@@ -1,5 +1,6 @@
-// Source: mpq.cpp root's two direct mpz root calls, each SET then root.
 package numeral
+
+// Source: mpq.cpp root's two direct mpz root calls, each SET then root.
 
 type RationalRootInvocation struct {
 	manager *RationalManager

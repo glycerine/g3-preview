@@ -1,6 +1,7 @@
+package numeral
+
 // Added source-action regressions for mpz.cpp/mpq.cpp Power and mpz.h shifts.
 // Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
-package numeral
 
 import (
 	"errors"

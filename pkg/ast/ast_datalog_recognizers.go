@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/dl_decl_plugin.cpp:683-725;
 // src/ast/dl_decl_plugin.h:131-134,176-190.
-package ast
 
 func (m *ASTManager) datalogArithmeticSort(h ASTHandle) (integer, matched bool, err error) {
 	if err = m.lock(); err != nil {

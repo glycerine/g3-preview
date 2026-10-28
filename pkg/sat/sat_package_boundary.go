@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.h public solver inspection; src/sat/sat_types.h.
 package sat
+
+// Source: src/sat/sat_solver.h public solver inspection; src/sat/sat_types.h.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

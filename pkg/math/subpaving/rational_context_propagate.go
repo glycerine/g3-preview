@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:575-587,1741-1752,
 // concrete config_mpq bound queue and insertion-order watched dispatch.
-package subpaving
 
 import (
 	"math"

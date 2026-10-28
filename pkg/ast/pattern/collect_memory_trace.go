@@ -1,6 +1,7 @@
+package pattern
+
 // Source: src/ast/pattern/pattern_inference.cpp:186,188,205,238,263-267;
 // src/util/util.h:171; src/util/memory_manager.cpp:202-211.
-package pattern
 
 import (
 	"fmt"

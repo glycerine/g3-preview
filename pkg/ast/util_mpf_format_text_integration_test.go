@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp (utility MPF formatting integration).
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp (utility MPF formatting integration).
 
 import (
 	"errors"

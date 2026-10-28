@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/mk_extract_proc.cpp:19-52;
 // src/ast/rewriter/mk_extract_proc.h:22-35.
-package rewriter
 
 import (
 	"reflect"

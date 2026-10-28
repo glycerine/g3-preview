@@ -1,5 +1,6 @@
-// Concrete cmd_context_types.h exception values; no command runtime scaffold.
 package cmdexception
+
+// Concrete cmd_context_types.h exception values; no command runtime scaffold.
 
 import (
 	"strconv"

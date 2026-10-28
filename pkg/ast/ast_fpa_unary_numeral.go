@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/fpa_rewriter.cpp:308-370;
 // src/util/scoped_numeral.h:24-33.
-package ast
 
 // RewriteFPAUnaryNumeral owns one caller-local scoped_mpf through the source
 // neg/abs numeric branch. The result becomes visible only after destruction.

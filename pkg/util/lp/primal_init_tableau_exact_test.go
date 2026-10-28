@@ -1,5 +1,6 @@
-// Source: lp_primal_core_solver_tableau.h:323-346 and its called assertions.
 package lp
+
+// Source: lp_primal_core_solver_tableau.h:323-346 and its called assertions.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/math/euclid/euclidean_solver.cpp:708-730.
 package euclid
+
+// Source: src/math/euclid/euclidean_solver.cpp:708-730.
 
 // solve follows the source pivot loop. A contradiction from either an earlier
 // assertion or a substitution returns false while retaining the explaining

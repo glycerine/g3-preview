@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/rational.h; src/util/scoped_numeral.h;
 // src/util/memory_manager.cpp:274-285.
-package numeral
 
 import (
 	"errors"

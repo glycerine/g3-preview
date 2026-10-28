@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:5356-5480.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:5356-5480.
 
 func (m *MultivariatePolynomialManager) resultantLeadingCoefficient(s *polynomialGCDFunctionScope, p Polynomial, x uint32) (Polynomial, error) {
 	c := m.core

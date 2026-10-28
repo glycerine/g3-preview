@@ -1,5 +1,6 @@
-// Source: src/model/model.cpp:69-81; src/model/model.h:44-45.
 package model
+
+// Source: src/model/model.cpp:69-81; src/model/model.h:44-45.
 
 import (
 	"errors"

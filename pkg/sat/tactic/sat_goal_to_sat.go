@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/sat/tactic/goal2sat.cpp:41-423,488-500;
 // src/ast/expr2var.cpp:25-54.
-package tactic
 
 import (
 	"errors"

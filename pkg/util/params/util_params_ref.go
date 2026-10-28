@@ -1,5 +1,6 @@
-// Source: src/util/params.h; src/util/params.cpp.
 package params
+
+// Source: src/util/params.h; src/util/params.cpp.
 
 import (
 	"errors"

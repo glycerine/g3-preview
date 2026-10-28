@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1933-2058, retained --smap scenario.
 package lp
+
+// Source: src/test/lp.cpp:1933-2058, retained --smap scenario.
 
 import (
 	"io"

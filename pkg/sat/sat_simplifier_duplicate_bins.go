@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:736–784.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:736–784.
 
 import "sort"
 

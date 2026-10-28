@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_dual_core_solver.h/.hpp; concrete mpq/mpq.
 package lp
+
+// Source: src/util/lp/lp_dual_core_solver.h/.hpp; concrete mpq/mpq.
 
 import (
 	"fmt"

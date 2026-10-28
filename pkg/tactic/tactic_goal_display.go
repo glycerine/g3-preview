@@ -1,5 +1,6 @@
-// Source: src/tactic/goal.cpp:402-410.
 package tactic
+
+// Source: src/tactic/goal.cpp:402-410.
 
 import (
 	"errors"

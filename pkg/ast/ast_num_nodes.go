@@ -1,5 +1,6 @@
-// Source: src/ast/for_each_ast.cpp:20-33; src/ast/for_each_ast.h:42-134.
 package ast
+
+// Source: src/ast/for_each_ast.cpp:20-33; src/ast/for_each_ast.h:42-134.
 
 type astNodeCountFrame struct {
 	node     astNodeRef

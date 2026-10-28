@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:1038,1075; src/util/trace.h.
 package rewriter
+
+// Source: src/ast/rewriter/bv_rewriter.cpp:1038,1075; src/util/trace.h.
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"

@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:666-687,741-780,
 // concrete config_hwf variable, polynomial, and inequality construction.
-package subpaving
 
 import (
 	"math"

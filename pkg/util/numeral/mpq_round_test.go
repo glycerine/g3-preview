@@ -1,5 +1,6 @@
-// Source assertions: src/test/mpq.cpp tst_prev_power_2 and src/test/mpz.cpp tst_log2.
 package numeral
+
+// Source assertions: src/test/mpq.cpp tst_prev_power_2 and src/test/mpz.cpp tst_log2.
 
 import (
 	"errors"

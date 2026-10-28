@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/expr_map.cpp:24-94; src/ast/expr_map.h:32-60;
 // src/util/dec_ref_util.h:24-64.
-package ast
 
 // ASTExprMap is the concrete expression-to-expression/proof map used by
 // retained AST, API and Spacer consumers. The map owns one key and value

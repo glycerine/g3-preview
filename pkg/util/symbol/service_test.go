@@ -1,5 +1,6 @@
-// Source: src/util/symbol.cpp:70-83.
 package symbol
+
+// Source: src/util/symbol.cpp:70-83.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3interp.cpp and src/interp/iz3interp.h
 // orchestration helpers independent of proof translation.
-package interp
 
 import (
 	"errors"

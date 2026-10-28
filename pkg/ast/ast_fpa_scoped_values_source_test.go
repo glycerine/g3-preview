@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/util/scoped_numeral_vector.h:25-72; src/util/vector.h:59-100,423-435;
 // src/ast/fpa_decl_plugin.cpp:51-65.
-package ast
 
 import (
 	"reflect"

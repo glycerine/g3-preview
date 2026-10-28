@@ -1,5 +1,6 @@
-// Source: src/model/model_implicant.cpp; src/model/model_implicant.h.
 package model
+
+// Source: src/model/model_implicant.cpp; src/model/model_implicant.h.
 
 import (
 	"errors"

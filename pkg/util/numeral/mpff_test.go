@@ -1,5 +1,6 @@
-// Source src/test/mpff.cpp.
 package numeral
+
+// Source src/test/mpff.cpp.
 
 import (
 	"testing"

@@ -1,6 +1,7 @@
+package model_test
+
 // Source: src/ast/bv_decl_plugin.cpp:746-751;
 // src/model/model.cpp:93-109; src/model/model_evaluator.cpp:233-253.
-package model_test
 
 import (
 	"testing"

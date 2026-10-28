@@ -1,5 +1,6 @@
-// Source: src/solver/check_sat_result.h; src/solver/check_sat_result.cpp.
 package solver
+
+// Source: src/solver/check_sat_result.h; src/solver/check_sat_result.cpp.
 
 import (
 	"errors"

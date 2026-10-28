@@ -1,5 +1,6 @@
-// Source: src/sat/sat_mus.cpp:149–174; independent checked lifetime fixtures.
 package sat
+
+// Source: src/sat/sat_mus.cpp:149–174; independent checked lifetime fixtures.
 
 import (
 	"errors"

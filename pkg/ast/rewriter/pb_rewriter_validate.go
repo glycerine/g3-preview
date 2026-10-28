@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/pb_rewriter.cpp:77-196,280-288.
 package rewriter
+
+// Source: src/ast/rewriter/pb_rewriter.cpp:77-196,280-288.
 
 import (
 	"errors"

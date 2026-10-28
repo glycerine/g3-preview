@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:1392-1423,2481-2495.
 // Explicit owning abort for retained incomplete placement; not a C++ destructor
 // of an object whose constructor did not complete.
-package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

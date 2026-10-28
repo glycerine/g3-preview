@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t.h:146-316, concrete config_mpq bounds.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t.h:146-316, concrete config_mpq bounds.
 
 import (
 	"errors"

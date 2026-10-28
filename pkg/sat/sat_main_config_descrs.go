@@ -1,5 +1,6 @@
-// Source: src/sat/sat_params.pyg; src/sat/sat_config.cpp.
 package sat
+
+// Source: src/sat/sat_params.pyg; src/sat/sat_config.cpp.
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

@@ -1,5 +1,6 @@
-// Source: src/util/mpff.cpp:989-1054.
 package numeral
+
+// Source: src/util/mpff.cpp:989-1054.
 
 import (
 	"fmt"

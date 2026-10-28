@@ -1,5 +1,6 @@
-// Source ast.cpp same_patterns/same_no_patterns and six update overloads.
 package ast
+
+// Source ast.cpp same_patterns/same_no_patterns and six update overloads.
 
 import (
 	"math"

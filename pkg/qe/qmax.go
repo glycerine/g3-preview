@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp/.h qmax, retained by opt_context::maximize_quantified.
 package qe
+
+// Source: src/qe/qsat.cpp/.h qmax, retained by opt_context::maximize_quantified.
 
 import (
 	"errors"

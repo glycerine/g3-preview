@@ -1,5 +1,6 @@
-// Source: src/util/mpbq.cpp, src/util/mpbq.h.
 package numeral
+
+// Source: src/util/mpbq.cpp, src/util/mpbq.h.
 
 import (
 	"math"

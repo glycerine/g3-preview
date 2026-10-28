@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:532,535,551; retained root-ID/public Sturm traces.
 package polynomial
+
+// Source: upolynomial.cpp:532,535,551; retained root-ID/public Sturm traces.
 
 import (
 	"bytes"

@@ -1,5 +1,6 @@
-// Source: src/util/memory_manager.cpp:202-211; src/util/small_object_allocator.cpp:44,60,132,221.
 package diagnostic
+
+// Source: src/util/memory_manager.cpp:202-211; src/util/small_object_allocator.cpp:44,60,132,221.
 
 import (
 	"io"

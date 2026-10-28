@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:2578-2598; accepted display and lexical vars.
 package polynomial
+
+// Source: algebraic_numbers.cpp:2578-2598; accepted display and lexical vars.
 
 import (
 	"errors"

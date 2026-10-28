@@ -1,5 +1,6 @@
-// Source: src/ast/normal_forms/pull_quant.cpp:109,131.
 package normal_forms
+
+// Source: src/ast/normal_forms/pull_quant.cpp:109,131.
 
 import (
 	"errors"

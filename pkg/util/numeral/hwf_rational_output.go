@@ -1,5 +1,6 @@
-// Source: src/util/hwf.cpp:409-427.
 package numeral
+
+// Source: src/util/hwf.cpp:409-427.
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

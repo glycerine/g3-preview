@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:2828-2916, including trace sites2830 and2841.
 package polynomial
+
+// Source: upolynomial.cpp:2828-2916, including trace sites2830 and2841.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/ast/macros/macro_util.cpp:36-353,748-829.
 package macros
+
+// Source: src/ast/macros/macro_util.cpp:36-353,748-829.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

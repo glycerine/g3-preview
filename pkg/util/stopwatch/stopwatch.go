@@ -1,6 +1,7 @@
+package stopwatch
+
 // Source: src/util/stopwatch.h.
 // Translation of src/util/stopwatch.h's POSIX control flow.
-package stopwatch
 
 import "errors"
 

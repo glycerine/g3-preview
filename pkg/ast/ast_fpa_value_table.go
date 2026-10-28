@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.h:96-116; src/ast/fpa_decl_plugin.cpp:52-69.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.h:96-116; src/ast/fpa_decl_plugin.cpp:52-69.
 
 // Hash buckets contain borrowed IDs into the owning numeral slice. A hash
 // collision still uses MPF equality, including sign and format. Native map/slice

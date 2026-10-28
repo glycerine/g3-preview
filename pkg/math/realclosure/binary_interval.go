@@ -1,6 +1,7 @@
+package realclosure
+
 // Source: src/math/realclosure/realclosure.cpp:54-135 and selected
 // src/math/interval/interval.h/interval_def.h mpbq_config instantiation.
-package realclosure
 
 import (
 	"errors"

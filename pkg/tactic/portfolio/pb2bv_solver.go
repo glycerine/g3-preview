@@ -1,5 +1,6 @@
-// Source: src/tactic/portfolio/pb2bv_solver.cpp/.h.
 package portfolio
+
+// Source: src/tactic/portfolio/pb2bv_solver.cpp/.h.
 
 import (
 	"errors"

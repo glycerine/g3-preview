@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/card2bv_tactic.cpp/.h, retained tactic wrapper.
 package arith
+
+// Source: src/tactic/arith/card2bv_tactic.cpp/.h, retained tactic wrapper.
 
 import (
 	"errors"

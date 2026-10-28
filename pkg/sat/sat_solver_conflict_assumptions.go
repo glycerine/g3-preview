@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:898–926,1141–1167,1822–1883,1999–2087,2545–2549.
 package sat
+
+// Source: src/sat/sat_solver.cpp:898–926,1141–1167,1822–1883,1999–2087,2545–2549.
 
 func (s *satSolverConflictResolution) trackingAssumptions() (bool, error) {
 	n, e := s.assumptions.Size()

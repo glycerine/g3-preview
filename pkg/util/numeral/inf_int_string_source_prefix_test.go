@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_int_rational.cpp:25-34. For nonzero epsilon the
 // opening parenthesis is written before FIRST is formatted.
-package numeral
 
 import "testing"
 

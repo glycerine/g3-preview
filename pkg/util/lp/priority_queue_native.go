@@ -1,5 +1,6 @@
-// Source: src/util/lp/binary_heap_priority_queue.h/.hpp, retained int/unsigned/double instances.
 package lp
+
+// Source: src/util/lp/binary_heap_priority_queue.h/.hpp, retained int/unsigned/double instances.
 
 // IntPriorityQueue dequeues the smallest priority first. Construct with NewIntPriorityQueue;
 // priorities remain stored after removal/clear, as in the source. Equal priorities

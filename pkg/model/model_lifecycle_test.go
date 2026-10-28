@@ -1,6 +1,7 @@
+package model_test
+
 // Source: src/model/model.cpp:28-40,60-66,111-150;
 // src/model/model_core.h:31-45,70-76; src/tactic/model_converter.cpp:176-181.
-package model_test
 
 import (
 	"errors"

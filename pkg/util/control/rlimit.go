@@ -1,5 +1,6 @@
-// Source: src/util/rlimit.h; src/util/rlimit.cpp.
 package control
+
+// Source: src/util/rlimit.h; src/util/rlimit.cpp.
 
 import (
 	"reflect"

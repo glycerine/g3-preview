@@ -1,5 +1,6 @@
-// Source: src/tactic/extension_model_converter.cpp:29-49,59,71; src/util/trace.h:51.
 package tactic
+
+// Source: src/tactic/extension_model_converter.cpp:29-49,59,71; src/util/trace.h:51.
 
 import (
 	"errors"

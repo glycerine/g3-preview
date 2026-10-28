@@ -1,5 +1,6 @@
-// Source: src/util/heap.h:27-28; src/util/vector.h:102-129,191-202.
 package heap
+
+// Source: src/util/heap.h:27-28; src/util/vector.h:102-129,191-202.
 
 import (
 	"errors"

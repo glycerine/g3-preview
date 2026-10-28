@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.hpp:237-337,558-708;
 // lp_core_solver_base.hpp:894-917. Retained floating dual ratio test.
-package lp
 
 import (
 	"math"

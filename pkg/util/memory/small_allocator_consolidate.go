@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.cpp:172–242; src/util/debug.h:63.
 package memory
+
+// Source: src/util/small_object_allocator.cpp:172–242; src/util/debug.h:63.
 
 import (
 	"math"

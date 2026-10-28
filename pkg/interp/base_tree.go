@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3base.cpp interpolation-tree conversion.
 package interp
+
+// Source checkpoint: src/interp/iz3base.cpp interpolation-tree conversion.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

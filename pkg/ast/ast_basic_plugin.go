@@ -1,5 +1,6 @@
-// Actual basic_decl_plugin constructor, lazy declaration caches, and dispatch.
 package ast
+
+// Actual basic_decl_plugin constructor, lazy declaration caches, and dispatch.
 
 import (
 	"math"

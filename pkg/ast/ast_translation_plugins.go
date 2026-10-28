@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:1520-1561.
 package ast
+
+// Source: src/ast/ast.cpp:1520-1561.
 
 import (
 	"github.com/glycerine/g3/pkg/util/symbol"

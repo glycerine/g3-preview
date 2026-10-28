@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3proof_itp.cpp final simplification and
 // universal closure for proofs without pending localization variables.
-package interp
 
 import (
 	"errors"

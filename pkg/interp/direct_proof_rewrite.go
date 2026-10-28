@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3proof_itp.cpp local rewrite construction
 // and trivial mixed-rule interpolation.
-package interp
 
 import (
 	"strconv"

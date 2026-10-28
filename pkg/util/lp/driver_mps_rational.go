@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1229-1254. Concrete retained mpq/mpq MPS driver.
 package lp
+
+// Source: src/test/lp.cpp:1229-1254. Concrete retained mpq/mpq MPS driver.
 
 import (
 	"fmt"

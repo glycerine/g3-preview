@@ -1,5 +1,6 @@
-// Source: src/sat/sat_cleaner.cpp:87–166.
 package sat
+
+// Source: src/sat/sat_cleaner.cpp:87–166.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

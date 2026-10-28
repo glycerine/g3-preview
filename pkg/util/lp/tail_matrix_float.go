@@ -1,5 +1,6 @@
-// Source: src/util/lp/tail_matrix.h, actual double,double virtual operations.
 package lp
+
+// Source: src/util/lp/tail_matrix.h, actual double,double virtual operations.
 
 // FloatTailMatrix is the actual polymorphic tail used by floating LU. Dense
 // left applications omit the source's unused settings parameter. Sparse left

@@ -1,5 +1,6 @@
-// Actual registered print routes.
 package numeral
+
+// Actual registered print routes.
 
 import (
 	"math/big"

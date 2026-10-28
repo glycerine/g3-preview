@@ -1,5 +1,6 @@
-// Added source-action/profile tests for selected internal32 GCD methods.
 package numeral
+
+// Added source-action/profile tests for selected internal32 GCD methods.
 
 import (
 	"errors"

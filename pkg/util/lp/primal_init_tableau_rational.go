@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver_tableau.h:323-346;
 // lp_primal_core_solver.h:864-874,894-899; retained precise specialization.
-package lp
 
 func (m *RationalPrimalCoreSolver) BasisColumnIsSetCorrectly(j uint32) (bool, error) {
 	if err := m.ready(); err != nil {

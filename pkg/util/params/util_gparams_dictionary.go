@@ -1,5 +1,6 @@
-// Source: src/util/gparams.cpp; src/util/dictionary.h; src/util/map.h.
 package params
+
+// Source: src/util/gparams.cpp; src/util/dictionary.h; src/util/map.h.
 
 import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"

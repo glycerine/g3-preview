@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/interval/interval_def.h:1427,1459,1470;
 // concrete config_mpfx instantiation, src/util/trace.h.
-package subpaving
 
 import (
 	"io"

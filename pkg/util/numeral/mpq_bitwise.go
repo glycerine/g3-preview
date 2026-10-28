@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpq.h bitwise forwards, preserving numerator action before
 // output-denominator reset. Arithmetic remains the concrete integer algorithm.
-package numeral
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

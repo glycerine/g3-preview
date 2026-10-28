@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/arith_rewriter.cpp:367-454,561-583,685-733.
 package rewriter
+
+// Source: src/ast/rewriter/arith_rewriter.cpp:367-454,561-583,685-733.
 
 import (
 	"errors"

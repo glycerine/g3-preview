@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:2116-2130,2265-2309.
 package lp
+
+// Source: src/test/lp.cpp:2116-2130,2265-2309.
 
 import (
 	"errors"

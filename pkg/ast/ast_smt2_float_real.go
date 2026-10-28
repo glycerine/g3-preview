@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:235-268.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:235-268.
 
 import (
 	"bytes"

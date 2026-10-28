@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3proof_itp.cpp rewrite-chain arithmetic
 // normalization and coefficient recovery.
-package interp
 
 import (
 	"errors"

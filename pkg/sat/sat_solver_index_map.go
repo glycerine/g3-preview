@@ -1,5 +1,6 @@
-// Native antecedent map with independently copied ordered index sets.
 package sat
+
+// Native antecedent map with independently copied ordered index sets.
 
 import "github.com/glycerine/g3/pkg/arena"
 

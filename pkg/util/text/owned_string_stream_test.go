@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1432-1435.
 package text
+
+// Source: src/util/mpz.cpp:1432-1435.
 
 import (
 	"errors"

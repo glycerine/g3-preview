@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:756-835.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:756-835.
 
 import "math"
 

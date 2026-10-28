@@ -1,5 +1,6 @@
-// Translation of literal/model parts of src/sat/sat_types.h, Leonardo de Moura.
 package sat
+
+// Translation of literal/model parts of src/sat/sat_types.h, Leonardo de Moura.
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

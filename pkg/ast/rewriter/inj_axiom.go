@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/inj_axiom.cpp; src/ast/rewriter/inj_axiom.h.
 package rewriter
+
+// Source: src/ast/rewriter/inj_axiom.cpp; src/ast/rewriter/inj_axiom.h.
 
 import (
 	"errors"

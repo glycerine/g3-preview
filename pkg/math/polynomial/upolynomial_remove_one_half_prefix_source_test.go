@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Literal pseudo-division and independent exact scaled quotient cases.
-package polynomial
 
 import (
 	"fmt"

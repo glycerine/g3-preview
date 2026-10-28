@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization.cpp:979-1017;
 // src/util/mpz.h; src/util/mpz.cpp; src/util/mpq.h.
-package polynomial
 
 import (
 	"testing"

@@ -1,5 +1,6 @@
-// Source: src/util/max_cliques.h; src/sat/sat_solver.cpp:3113-3150.
 package sat
+
+// Source: src/util/max_cliques.h; src/sat/sat_solver.cpp:3113-3150.
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

@@ -1,5 +1,6 @@
-// Source: src/util/rational.cpp:64-83; src/util/memory_manager.cpp:202-211.
 package numeral
+
+// Source: src/util/rational.cpp:64-83; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

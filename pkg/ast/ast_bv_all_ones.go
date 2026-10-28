@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.h:387; src/ast/fpa/fpa2bv_converter.cpp:424-432.
 package ast
+
+// Source: src/ast/bv_decl_plugin.h:387; src/ast/fpa/fpa2bv_converter.cpp:424-432.
 
 // BitVectorNumeralAllOnes constructs the width-bit numeral 2^width-1.
 func (m *ASTManager) BitVectorNumeralAllOnes(width uint32) (result ASTHandle, resultErr error) {

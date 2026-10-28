@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:1441-1484; config_mpq.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:1441-1484; config_mpq.
 
 import (
 	"io"

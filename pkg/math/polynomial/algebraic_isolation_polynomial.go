@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/algebraic_numbers.cpp:635-643.
 package polynomial
+
+// Source: src/math/polynomial/algebraic_numbers.cpp:635-643.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

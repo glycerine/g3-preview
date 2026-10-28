@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:753-765.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:753-765.
 
 import (
 	"errors"

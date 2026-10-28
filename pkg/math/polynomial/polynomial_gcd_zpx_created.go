@@ -1,5 +1,6 @@
-// Source: polynomial.cpp:4018-4051, reached monomial constructor branches.
 package polynomial
+
+// Source: polynomial.cpp:4018-4051, reached monomial constructor branches.
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

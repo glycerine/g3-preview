@@ -1,5 +1,6 @@
-// Explicit little-endian word views over the sole initialized-byte backing.
 package memory
+
+// Explicit little-endian word views over the sole initialized-byte backing.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

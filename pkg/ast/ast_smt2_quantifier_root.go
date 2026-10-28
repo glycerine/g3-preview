@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast_smt2_pp.cpp:872-902,904-917,922-989;
 // src/ast/format.h:133-157.
-package ast
 
 import (
 	"strconv"

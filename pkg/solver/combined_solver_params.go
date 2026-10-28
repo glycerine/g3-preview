@@ -1,6 +1,7 @@
+package solver
+
 // Source: src/solver/combined_solver_params.hpp;
 // src/solver/combined_solver_params.pyg.
-package solver
 
 import uparams "github.com/glycerine/g3/pkg/util/params"
 

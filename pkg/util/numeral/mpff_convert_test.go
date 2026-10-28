@@ -1,5 +1,6 @@
-// Source MPFF conversion fixtures.
 package numeral
+
+// Source MPFF conversion fixtures.
 
 import (
 	"errors"

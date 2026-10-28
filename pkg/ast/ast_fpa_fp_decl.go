@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp:591-606.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp:591-606.
 
 // FPAOpFP constructs a floating-point value from separate sign, exponent,
 // and significand bit-vectors. Its format follows the latter two widths.

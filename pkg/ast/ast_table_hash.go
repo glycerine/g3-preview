@@ -1,5 +1,6 @@
-// Exact source AST array hash and compare_nodes/get_node_hash branches.
 package ast
+
+// Exact source AST array hash and compare_nodes/get_node_hash branches.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

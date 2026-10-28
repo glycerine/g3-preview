@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/var_subst.cpp:26-40;
 // src/ast/rewriter/var_subst.h:35-53; src/test/var_subst.cpp:60-106.
-package rewriter
 
 import (
 	"errors"

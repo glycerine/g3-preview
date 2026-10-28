@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/arith_rewriter.cpp;
 // src/ast/rewriter/arith_rewriter.h.
-package rewriter
 
 import (
 	"errors"

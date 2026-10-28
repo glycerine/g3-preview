@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_rational.h:459-463; src/util/inf_int_rational.h:374-378;
 // src/util/inf_eps_rational.h:431-435.
-package numeral
 
 import utext "github.com/glycerine/g3/pkg/util/text"
 

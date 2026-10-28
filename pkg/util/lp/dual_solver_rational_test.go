@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_dual_simplex.hpp. Concrete exact stage consumers.
 package lp
+
+// Source: src/util/lp/lp_dual_simplex.hpp. Concrete exact stage consumers.
 
 import (
 	"fmt"

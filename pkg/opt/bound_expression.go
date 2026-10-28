@@ -1,5 +1,6 @@
-// Source: src/opt/opt_context.cpp:1352-1381, context::to_expr.
 package opt
+
+// Source: src/opt/opt_context.cpp:1352-1381, context::to_expr.
 
 import (
 	"errors"

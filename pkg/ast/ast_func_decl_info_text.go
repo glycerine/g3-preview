@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.cpp:115-130,219-226,283-294. The extension-model
 // debug trace prints attached func_decl_info after each model declaration.
-package ast
 
 import (
 	"strconv"

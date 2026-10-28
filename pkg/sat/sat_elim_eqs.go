@@ -1,5 +1,6 @@
-// Source: src/sat/sat_elim_eqs.cpp; src/sat/sat_elim_eqs.h.
 package sat
+
+// Source: src/sat/sat_elim_eqs.cpp; src/sat/sat_elim_eqs.h.
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

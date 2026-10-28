@@ -1,5 +1,6 @@
-// Source: mps_reader.h:796-800; retained exact consumers in src/test/lp.cpp.
 package lp
+
+// Source: mps_reader.h:796-800; retained exact consumers in src/test/lp.cpp.
 
 import (
 	"bytes"

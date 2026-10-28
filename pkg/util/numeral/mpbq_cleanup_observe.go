@@ -1,6 +1,7 @@
+package numeral
+
 // Source saved-interval destructors read magnitude and swap old bounds after
 // completed debug locals, even when an unjoined RAW allocation remains.
-package numeral
 
 func (m *BinaryRationalManager) IsNonNegForCleanup(a *BinaryRational) (bool, error) {
 	if e := m.checkCleanup(a); e != nil {

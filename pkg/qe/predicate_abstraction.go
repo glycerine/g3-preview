@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.h max_level/pred_abs; src/qe/qsat.cpp pred_abs.
 package qe
+
+// Source: src/qe/qsat.h max_level/pred_abs; src/qe/qsat.cpp pred_abs.
 
 import (
 	"errors"

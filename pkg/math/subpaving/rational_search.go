@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1665-1682,1806-1843,
 // concrete config_mpq recent-bound propagation and breadth-first search.
-package subpaving
 
 import (
 	"math"

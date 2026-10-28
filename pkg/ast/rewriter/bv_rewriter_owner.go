@@ -1,7 +1,8 @@
+package rewriter
+
 // Source: src/ast/rewriter/bv_rewriter.h:158-170;
 // src/ast/rewriter/bv_rewriter.cpp:26-51,2076-2079,2170-2205;
 // src/ast/rewriter/bv_trailing.cpp:26-48,365-388.
-package rewriter
 
 import (
 	"reflect"

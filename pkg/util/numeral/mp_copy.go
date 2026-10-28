@@ -1,6 +1,7 @@
+package numeral
+
 // Source set/copy semantics, adapted to the explicit numerical owner boundary
 // required by GO_PORT_PLAN.md B12. C++ rational uses one global manager instead.
-package numeral
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

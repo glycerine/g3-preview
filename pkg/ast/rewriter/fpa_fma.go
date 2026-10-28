@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/fpa_rewriter.cpp:417-431.
 package rewriter
+
+// Source: src/ast/rewriter/fpa_rewriter.cpp:417-431.
 
 import "github.com/glycerine/g3/pkg/ast"
 

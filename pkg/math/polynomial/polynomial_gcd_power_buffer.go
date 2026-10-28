@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:3207-3256,4352-4506.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:3207-3256,4352-4506.
 
 import (
 	"sort"

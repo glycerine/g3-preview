@@ -1,5 +1,6 @@
-// Source: src/math/interval/interval_def.h:1019-1218, concrete mpbq interval.
 package realclosure
+
+// Source: src/math/interval/interval_def.h:1019-1218, concrete mpbq interval.
 
 import (
 	"errors"

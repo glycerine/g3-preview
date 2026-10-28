@@ -1,6 +1,7 @@
+package polynomial
+
 // Source action fixtures for algebraic_numbers.cpp:360–539. These are additional
 // branch tests, not claims of registered src/test/algebraic.cpp ENSURE coverage.
-package polynomial
 
 import (
 	"errors"

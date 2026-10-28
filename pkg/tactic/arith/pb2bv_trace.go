@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/pb2bv_tactic.cpp diagnostics and live TRACE bodies.
 package arith
+
+// Source: src/tactic/arith/pb2bv_tactic.cpp diagnostics and live TRACE bodies.
 
 import (
 	"bytes"

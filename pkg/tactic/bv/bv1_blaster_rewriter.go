@@ -1,5 +1,6 @@
-// Source: src/tactic/bv/bv1_blaster_tactic.cpp rw_cfg and rw.
 package bv
+
+// Source: src/tactic/bv/bv1_blaster_tactic.cpp rw_cfg and rw.
 
 import (
 	"errors"

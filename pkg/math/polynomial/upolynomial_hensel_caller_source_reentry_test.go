@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization.cpp:583-674;
 // src/math/polynomial/upolynomial_factorization_int.h:42-52;
 // src/util/memory_manager.cpp:274-285.
-package polynomial
 
 import (
 	"testing"

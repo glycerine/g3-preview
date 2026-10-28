@@ -1,5 +1,6 @@
-// Source mpn.cpp:371 and buffer.h:84-95; independent bounded lifetime oracle.
 package numeral
+
+// Source mpn.cpp:371 and buffer.h:84-95; independent bounded lifetime oracle.
 
 import (
 	"errors"

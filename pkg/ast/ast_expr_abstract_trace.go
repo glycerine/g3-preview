@@ -1,5 +1,6 @@
-// Source: src/ast/expr_abstract.cpp:112-133; src/util/trace.h:40-46.
 package ast
+
+// Source: src/ast/expr_abstract.cpp:112-133; src/util/trace.h:40-46.
 
 import (
 	"io"

@@ -1,6 +1,7 @@
+package simplex
+
 // Package simplex implements the retained exact sparse tableau and simplex
 // engines from src/math/simplex.
-package simplex
 
 import (
 	"fmt"

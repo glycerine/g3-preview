@@ -1,6 +1,7 @@
+package substitution
+
 // Source: src/ast/substitution/substitution.cpp;
 // src/ast/substitution/substitution.h.
-package substitution
 
 import (
 	"bytes"

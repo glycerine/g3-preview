@@ -1,5 +1,6 @@
-// Source: src/util/hash.cpp:26-102; src/util/fixed_bit_vector.cpp:138-140.
 package runtimehash
+
+// Source: src/util/hash.cpp:26-102; src/util/fixed_bit_vector.cpp:138-140.
 
 import (
 	"errors"

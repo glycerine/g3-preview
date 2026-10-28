@@ -1,6 +1,7 @@
+package model
+
 // Source: src/model/model.cpp:93-109; src/model/model_core.h:65;
 // src/ast/ast.cpp:2561-2582.
-package model
 
 import "github.com/glycerine/g3/pkg/ast"
 

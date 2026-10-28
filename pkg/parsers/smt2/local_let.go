@@ -1,5 +1,6 @@
-// Source: src/parsers/smt2/smt2parser.cpp:1869-1900; src/util/symbol_table.h:142-182.
 package smt2
+
+// Source: src/parsers/smt2/smt2parser.cpp:1869-1900; src/util/symbol_table.h:142-182.
 
 import (
 	"errors"

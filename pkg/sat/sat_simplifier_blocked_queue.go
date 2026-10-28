@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:875–919.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:875–919.
 
 func newSATSimplifierBlockedQueue(s *satSimplifier) (*satVarQueue, error) {
 	if s == nil || s.self != s {

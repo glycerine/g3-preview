@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/diff_neq_tactic.cpp live display/TRACE sites.
 package arith
+
+// Source: src/tactic/arith/diff_neq_tactic.cpp live display/TRACE sites.
 
 import (
 	"errors"

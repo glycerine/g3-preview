@@ -1,5 +1,6 @@
-// Source: src/sat/sat_model_converter.cpp:108,142,152,163.
 package sat
+
+// Source: src/sat/sat_model_converter.cpp:108,142,152,163.
 
 import (
 	"bytes"

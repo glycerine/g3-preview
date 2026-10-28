@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:6179-6232,6307-6344; src/util/vector.h:101-214,530-546.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:6179-6232,6307-6344; src/util/vector.h:101-214,530-546.
 
 func (d *PolynomialMaxDegrees) SourceFinalize() error {
 	if e := d.identity(); e != nil {

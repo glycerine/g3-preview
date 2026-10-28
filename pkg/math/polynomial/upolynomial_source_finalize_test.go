@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial.cpp:138-157,1259-1265; src/util/mpzzp.h:97-105.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial.cpp:138-157,1259-1265; src/util/mpzzp.h:97-105.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package arith
+
 // Source: src/tactic/arith/propagate_ineqs_tactic.cpp:517,521,546,548;
 // src/util/memory_manager.cpp:202-211.
-package arith
 
 import (
 	"io"

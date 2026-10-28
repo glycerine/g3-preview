@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:463-474,509-539; basic_interval.h:118-130.
 package polynomial
+
+// Source: algebraic_numbers.cpp:463-474,509-539; basic_interval.h:118-130.
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/util/rational.h operator/, reached by MPBQ debug snapshots.
 package numeral
+
+// Source: src/util/rational.h operator/, reached by MPBQ debug snapshots.
 
 import (
 	"testing"

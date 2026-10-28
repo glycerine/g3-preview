@@ -1,5 +1,6 @@
-// Source: src/util/mpz.h:350-389,427-519.
 package numeral
+
+// Source: src/util/mpz.h:350-389,427-519.
 
 import (
 	"io"

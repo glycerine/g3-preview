@@ -1,5 +1,6 @@
-// Source: src/parsers/smt2/smt2parser.cpp:55-58,590-604,857-879,2098-2146,2992-3006.
 package smt2
+
+// Source: src/parsers/smt2/smt2parser.cpp:55-58,590-604,857-879,2098-2146,2992-3006.
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

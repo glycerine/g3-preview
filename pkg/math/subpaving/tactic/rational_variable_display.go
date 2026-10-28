@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/math/subpaving/tactic/subpaving_tactic.cpp:32-49,
 // concrete inverse expr2var display for MPQ arithmetic variables.
-package tactic
 
 import (
 	"io"

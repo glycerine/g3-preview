@@ -1,5 +1,6 @@
-// Source: src/util/timeit.h:25-31; src/util/timeit.cpp:25-58.
 package stopwatch
+
+// Source: src/util/timeit.h:25-31; src/util/timeit.cpp:25-58.
 
 import (
 	"errors"

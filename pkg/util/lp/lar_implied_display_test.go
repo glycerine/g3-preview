@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:141-159,1340-1345.
 package lp
+
+// Source: src/util/lp/lar_solver.h:141-159,1340-1345.
 
 import (
 	"bytes"

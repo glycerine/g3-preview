@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:243-246,254-269,636-650;
 // concrete config_mpfx child-bound display.
-package subpaving
 
 import "io"
 

@@ -1,6 +1,7 @@
+package numeral
+
 // Source destructor: mpz.cpp:142–161; member order mpz.h:108–119 and
 // mpn.h:99 (t_ab,t_ms,v,u), small_object_allocator.cpp:39–53.
-package numeral
 
 import (
 	"errors"

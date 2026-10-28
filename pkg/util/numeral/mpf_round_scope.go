@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpf.cpp:2100-2131 (shared concrete allocation/lifetime engine).
 // Source: src/util/mpf.cpp:1963-2098.
-package numeral
 
 import
 

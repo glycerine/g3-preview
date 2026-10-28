@@ -1,5 +1,6 @@
-// Source: src/util/rational.cpp infinitesimal initialization/finalization.
 package numeral
+
+// Source: src/util/rational.cpp infinitesimal initialization/finalization.
 
 import (
 	"reflect"

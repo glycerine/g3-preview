@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:672-743; src/ast/bv_decl_plugin.h:28-105.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:672-743; src/ast/bv_decl_plugin.h:28-105.
 
 import (
 	"testing"

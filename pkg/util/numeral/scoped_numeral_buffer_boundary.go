@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral_buffer.h; src/util/buffer.h.
 package numeral
+
+// Source: src/util/scoped_numeral_buffer.h; src/util/buffer.h.
 
 // ScopedIntegerModularBuffer128 is the concrete source scoped buffer. Its
 // enclosing caller owns its lifetime; its native slice stores explicitly owned

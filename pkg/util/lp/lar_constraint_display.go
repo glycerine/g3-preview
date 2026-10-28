@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lar_solver.h:1309-1337,1359-1362;
 // column_namer.h:73-97; lar_constraints.h:35-45.
-package lp
 
 import (
 	"fmt"

@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/datatype_decl_plugin.cpp:914,937-980;
 // src/ast/ast_smt2_pp.cpp:1211-1261; src/util/trace.h:40-46.
-package ast
 
 import (
 	"errors"

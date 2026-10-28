@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:1170-1175,1703-1737; config_mpfx.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:1170-1175,1703-1737; config_mpfx.
 
 import (
 	"bytes"

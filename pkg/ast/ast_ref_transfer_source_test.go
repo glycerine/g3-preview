@@ -1,5 +1,6 @@
-// Source: src/util/obj_ref.h:56-60,100-110; src/ast/ast.h:2258-2264.
 package ast
+
+// Source: src/util/obj_ref.h:56-60,100-110; src/ast/ast.h:2258-2264.
 
 import (
 	"errors"

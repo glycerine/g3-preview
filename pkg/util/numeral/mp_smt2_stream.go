@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1412-1429; src/util/mpq.cpp:142-153.
 package numeral
+
+// Source: src/util/mpz.cpp:1412-1429; src/util/mpq.cpp:142-153.
 
 import (
 

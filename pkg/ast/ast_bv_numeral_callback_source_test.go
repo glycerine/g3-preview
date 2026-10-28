@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/bv_decl_plugin.cpp:143-155; src/util/rational.cpp:32-54;
 // src/util/memory_manager.cpp:274-289.
-package ast
 
 import (
 	"context"

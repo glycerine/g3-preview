@@ -1,5 +1,6 @@
-// Source: src/ast/normal_forms/nnf_params.hpp:5-27.
 package normal_forms
+
+// Source: src/ast/normal_forms/nnf_params.hpp:5-27.
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:177-197,285-313,497-529.
 package lp
+
+// Source: src/util/lp/lu.hpp:177-197,285-313,497-529.
 
 // SolveBy solves B*y=rhs in place. The source's dense floating triangular
 // refinement and final drop pass remain distinct from the tail transformations.

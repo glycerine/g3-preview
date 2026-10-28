@@ -1,6 +1,7 @@
+package diagnostic
+
 // Source: src/util/util.cpp:22-40; src/util/util.h:176-186;
 // src/util/small_object_allocator.cpp:172-242.
-package diagnostic
 
 import (
 	"errors"

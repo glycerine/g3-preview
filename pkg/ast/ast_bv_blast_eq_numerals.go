@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/bv_rewriter.cpp:2287-2302;
 // src/util/rational.h:43,46,182-184,202-206.
-package ast
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

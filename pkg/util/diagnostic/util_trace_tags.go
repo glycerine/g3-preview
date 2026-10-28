@@ -1,5 +1,6 @@
-// Source: src/util/trace.cpp:25-55; src/util/trace.h:40-46.
 package diagnostic
+
+// Source: src/util/trace.cpp:25-55; src/util/trace.h:40-46.
 
 import (
 	"errors"

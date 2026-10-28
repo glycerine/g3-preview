@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.hpp:353-409;
 // lp_primal_core_solver.h:337-344,452-482.
-package lp
 
 // LimitTheta preserves std::min's argument order and assignment prefix. The
 // caller owns all pairs, including a partially assigned theta on failure.

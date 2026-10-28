@@ -1,5 +1,6 @@
-// Source: src/util/lp/bound_analyzer_on_row.h, retained exact row consumers.
 package lp
+
+// Source: src/util/lp/bound_analyzer_on_row.h, retained exact row consumers.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

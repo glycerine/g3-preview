@@ -1,6 +1,7 @@
+package normal_forms
+
 // Source: src/ast/normal_forms/name_exprs.cpp:24-151;
 // src/ast/normal_forms/name_exprs.h:24-62.
-package normal_forms
 
 import (
 	"errors"

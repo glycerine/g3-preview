@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization_int.h:124-417.
 // Concrete ufactorization_combination_iterator, without template dispatch.
-package polynomial
 
 import (
 	"math"

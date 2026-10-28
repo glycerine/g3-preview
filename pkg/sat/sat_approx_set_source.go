@@ -1,6 +1,7 @@
+package sat
+
 // Source: src/util/approx_set.h:43-158; src/sat/sat_types.h:115-119;
 // src/sat/sat_solver.h:419; src/smt/smt_conflict_resolution.h:34.
-package sat
 
 // All production 32-bit-word aliases use this concrete inline word. Unsigned
 // variables/levels use identity conversion; SAT literals use their full index.

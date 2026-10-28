@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver.hpp:643-663, precise branch.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver.hpp:643-663, precise branch.
 
 // InitRun resets run counters, recomputes stored infeasibility, and prepares
 // exact costs and sparse-count estimates. A feasible feasibility-only run

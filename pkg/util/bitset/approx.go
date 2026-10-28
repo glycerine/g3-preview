@@ -1,5 +1,6 @@
-// Concrete unsigned approx_set from src/util/approx_set.h and approx_set.cpp.
 package bitset
+
+// Concrete unsigned approx_set from src/util/approx_set.h and approx_set.cpp.
 
 import (
 	"math/bits"

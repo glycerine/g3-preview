@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1474,1480-1481; actual nonallocating child entries.
 package numeral
+
+// Source: src/util/mpf.cpp:1474,1480-1481; actual nonallocating child entries.
 
 import "testing"
 

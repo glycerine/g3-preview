@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:3512-3530.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:3512-3530.
 
 func (m *MultivariatePolynomialManager) iccpConcreteChildSourceCause(s *polynomialICCPScope) error {
 	c := m.core

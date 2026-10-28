@@ -1,5 +1,6 @@
-// Source: src/util/dictionary.h; src/util/map.h.
 package symbol
+
+// Source: src/util/dictionary.h; src/util/map.h.
 
 import "github.com/glycerine/g3/pkg/arena"
 

@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/tactic/subpaving_tactic.cpp:92-120, concrete MPQ branch.
 package tactic
+
+// Source: src/math/subpaving/tactic/subpaving_tactic.cpp:92-120, concrete MPQ branch.
 
 import (
 	"errors"

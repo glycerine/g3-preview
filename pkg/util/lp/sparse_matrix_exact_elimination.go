@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:171-196,241-257,278-330,420-432,799-809.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:171-196,241-257,278-330,420-432,799-809.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

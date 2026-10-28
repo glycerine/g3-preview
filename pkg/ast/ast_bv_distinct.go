@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:636-669; src/util/rational.h:131-139.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:636-669; src/util/rational.h:131-139.
 
 import "errors"
 

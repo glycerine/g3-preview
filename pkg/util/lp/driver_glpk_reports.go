@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:2132-2264. Retained GLPK report comparison.
 package lp
+
+// Source: src/test/lp.cpp:2132-2264. Retained GLPK report comparison.
 
 import (
 	"bufio"

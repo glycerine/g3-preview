@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:290,2999-3001; actual display NUM destructor.
 package polynomial
+
+// Source: algebraic_numbers.cpp:290,2999-3001; actual display NUM destructor.
 
 import (
 	"errors"

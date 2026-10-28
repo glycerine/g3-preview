@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:1321-1343, concrete config_mpq.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:1321-1343, concrete config_mpq.
 
 func (n *RationalNode) IsZero(variable uint32) (bool, error) {
 	lo, hi, err := n.Bounds(variable)

@@ -1,5 +1,6 @@
-// Source: src/util/symbol.h.
 package symbol
+
+// Source: src/util/symbol.h.
 
 import "github.com/glycerine/g3/pkg/arena"
 

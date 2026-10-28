@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpf.cpp:194-231; actual allocation callback during the
 // formatted text's rational/exponent/conversion chain.
-package numeral
 
 import (
 	"testing"

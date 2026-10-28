@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization.cpp:805-871;
 // src/util/mpz.cpp:1453-1507.
-package polynomial
 
 func (c *upolyHenselCallerScope) finishIndividualSource() error {
 	c.enterCall()

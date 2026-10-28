@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp qsat::maximize_model/maximize_core.
 package qe
+
+// Source: src/qe/qsat.cpp qsat::maximize_model/maximize_core.
 
 import (
 	"io"

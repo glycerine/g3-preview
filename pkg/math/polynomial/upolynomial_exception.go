@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: upolynomial.h:40-43; upolynomial.cpp:159;
 // upolynomial_factorization.cpp:39,44.
-package polynomial
 
 import "github.com/glycerine/g3/pkg/util/z3exception"
 

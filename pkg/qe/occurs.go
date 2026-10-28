@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp eq::occurs_var (lines 41-63).
 package qe
+
+// Source: src/qe/qe_lite.cpp eq::occurs_var (lines 41-63).
 
 import "github.com/glycerine/g3/pkg/ast"
 

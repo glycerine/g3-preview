@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:2538-2544,2481-2495.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:2538-2544,2481-2495.
 
 type polynomialVariableScope struct {
 	invocation, calleeGeneration, singletonGeneration uint64

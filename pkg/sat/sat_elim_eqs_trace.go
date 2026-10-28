@@ -1,5 +1,6 @@
-// Source: src/sat/sat_elim_eqs.cpp:81,104,138,187,205,216; retained util/trace sites.
 package sat
+
+// Source: src/sat/sat_elim_eqs.cpp:81,104,138,187,205,216; retained util/trace sites.
 
 import (
 	"io"

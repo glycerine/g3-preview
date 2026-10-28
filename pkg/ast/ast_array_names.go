@@ -1,5 +1,6 @@
-// Source: src/ast/array_decl_plugin.cpp:518-541,566-587.
 package ast
+
+// Source: src/ast/array_decl_plugin.cpp:518-541,566-587.
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

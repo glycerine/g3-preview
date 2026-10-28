@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:711–716,2845–2850,3053–3075.
 package sat
+
+// Source: src/sat/sat_solver.cpp:711–716,2845–2850,3053–3075.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

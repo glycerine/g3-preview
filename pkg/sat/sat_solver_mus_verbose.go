@@ -1,5 +1,6 @@
-// Source: src/sat/sat_mus.cpp:52-70,95-145; src/util/util.h:176-186.
 package sat
+
+// Source: src/sat/sat_mus.cpp:52-70,95-145; src/util/util.h:176-186.
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"

@@ -1,5 +1,6 @@
-// Source: src/model/model_implicant.cpp:468-616,875-917.
 package model
+
+// Source: src/model/model_implicant.cpp:468-616,875-917.
 
 import (
 	"errors"

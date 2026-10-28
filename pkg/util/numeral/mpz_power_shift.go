@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.cpp power/is_power_of_two/ensure_capacity/normalize/
 // machine_div2k/mul2k (_MP_INTERNAL 32-bit digits) and mpz.h copy wrappers.
-package numeral
 
 import (
 	"errors"

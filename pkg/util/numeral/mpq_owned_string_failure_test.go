@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:123-127; actual owned strings and integer display.
 package numeral
+
+// Source: src/util/mpq.cpp:123-127; actual owned strings and integer display.
 
 import (
 	"errors"

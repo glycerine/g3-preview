@@ -1,6 +1,7 @@
+package realclosure
+
 // Source: src/math/realclosure/realclosure.cpp:3773-3920 and 3930-4025,
 // rational-coefficient exact evaluation at finite binary-rational bounds.
-package realclosure
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/sorting_network.h:190-260,531-594,645-653,749-777.
 package ast
+
+// Source: src/util/sorting_network.h:190-260,531-594,645-653,749-777.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp and .h.
 package sat
+
+// Source: src/sat/sat_solver.cpp and .h.
 
 import (
 	"io"

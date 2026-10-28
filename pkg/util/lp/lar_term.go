@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_term.h, retained exact LAR terms.
 package lp
+
+// Source: src/util/lp/lar_term.h, retained exact LAR terms.
 
 import (
 	"errors"

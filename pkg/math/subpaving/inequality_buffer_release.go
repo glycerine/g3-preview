@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/util/ref_buffer.h:32-52,56-61;
 // src/math/subpaving/tactic/subpaving_tactic.cpp:165-178.
-package subpaving
 
 import "github.com/glycerine/g3/pkg/arena"
 

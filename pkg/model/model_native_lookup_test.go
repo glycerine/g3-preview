@@ -1,5 +1,6 @@
-// Source: src/model/model_core.cpp:21-109; src/model/model.cpp:44-75,111-150.
 package model_test
+
+// Source: src/model/model_core.cpp:21-109; src/model/model.cpp:44-75,111-150.
 
 import (
 	"fmt"

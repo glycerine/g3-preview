@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:56-63.
 // Concrete core_manager::factors, actual scoped coefficient ownership.
-package polynomial
 
 import (
 	"math"

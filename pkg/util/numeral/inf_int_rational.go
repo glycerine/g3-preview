@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_int_rational.h.
 // Concrete translation of src/util/inf_int_rational.h/.cpp.
-package numeral
 
 import (
 	"errors"

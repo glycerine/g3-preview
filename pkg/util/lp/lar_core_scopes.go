@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.h:170-264, core scope lifecycle.
 package lp
+
+// Source: src/util/lp/lar_core_solver.h:170-264, core scope lifecycle.
 
 func pushLARUintVector(dst *StackedUintVector, src []uint32) error {
 	if sourceDebugEnabled && uint64(dst.Size()) > uint64(len(src)) {

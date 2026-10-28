@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp and sat_justification.h; native value storage.
 package sat
+
+// Source: src/sat/sat_solver.cpp and sat_justification.h; native value storage.
 
 import (
 	"errors"

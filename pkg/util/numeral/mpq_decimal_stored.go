@@ -1,5 +1,6 @@
-// Source: mpq.cpp:156-185, reached by algebraic_numbers.cpp:2733.
 package numeral
+
+// Source: mpq.cpp:156-185, reached by algebraic_numbers.cpp:2733.
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

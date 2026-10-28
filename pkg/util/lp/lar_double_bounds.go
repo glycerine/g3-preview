@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.h:667-685,737-788.
 package lp
+
+// Source: src/util/lp/lar_core_solver.h:667-685,737-788.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_asymm_branch.cpp:35-52; src/sat/sat_types.h:31.
 package sat
+
+// Source: src/sat/sat_asymm_branch.cpp:35-52; src/sat/sat_types.h:31.
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"

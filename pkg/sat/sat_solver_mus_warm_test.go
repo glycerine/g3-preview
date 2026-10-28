@@ -1,5 +1,6 @@
-// Source: src/sat/sat_mus.cpp; measured owner-local warm behavior.
 package sat
+
+// Source: src/sat/sat_mus.cpp; measured owner-local warm behavior.
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

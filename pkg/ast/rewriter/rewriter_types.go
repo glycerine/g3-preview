@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/rewriter_types.h:29-49.
 package rewriter
+
+// Source: src/ast/rewriter/rewriter_types.h:29-49.
 
 import (
 	"errors"

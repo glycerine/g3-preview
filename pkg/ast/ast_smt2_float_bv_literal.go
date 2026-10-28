@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:270-291.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:270-291.
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

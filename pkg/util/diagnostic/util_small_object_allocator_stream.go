@@ -1,6 +1,7 @@
+package diagnostic
+
 // Source: src/util/small_object_allocator.cpp:172-242; src/util/util.cpp:22-40.
 // Source allocator diagnostics through an explicit borrowed ostream adapter.
-package diagnostic
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

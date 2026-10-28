@@ -1,6 +1,7 @@
+package sat
+
 // Source: src/sat/sat_simplifier.cpp; src/sat/sat_simplifier.h; src/sat/sat_simplifier_params.pyg.
 // These are independent source-branch fixtures, not registered user-scope Check coverage.
-package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

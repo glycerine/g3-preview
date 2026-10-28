@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.h/.hpp, retained precise T and scalar/pair X owners.
 package lp
+
+// Source: src/util/lp/lu.h/.hpp, retained precise T and scalar/pair X owners.
 
 // RationalLU owns an exact factorization in the source matrix's borrowed
 // manager. Close every partial constructor result, including failed results.

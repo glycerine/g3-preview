@@ -1,6 +1,7 @@
+package numeral
+
 // Added source-action/profile tests for mpq.h division/reciprocal methods.
 // Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
-package numeral
 
 import (
 	"errors"

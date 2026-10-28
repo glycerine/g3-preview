@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:2823-2827, before either scoped binary bound exists.
 package polynomial
+
+// Source: upolynomial.cpp:2823-2827, before either scoped binary bound exists.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

@@ -1,5 +1,6 @@
-// Concrete ast_manager proof construction/inspection from ast.h and ast.cpp.
 package ast
+
+// Concrete ast_manager proof construction/inspection from ast.h and ast.cpp.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

@@ -1,5 +1,6 @@
-// Source: src/util/memory_manager.cpp:173-191; src/shell/z3_log_frontend.cpp:37.
 package memory
+
+// Source: src/util/memory_manager.cpp:173-191; src/shell/z3_log_frontend.cpp:37.
 
 import (
 	"io"

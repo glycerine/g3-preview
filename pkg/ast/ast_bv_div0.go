@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.h:107-126.
 package ast
+
+// Source: src/ast/bv_decl_plugin.h:107-126.
 
 // BitVectorDivZeroKind selects the unary unspecified operation for an ordinary
 // division, remainder or modulus. Other kinds violate the native precondition.

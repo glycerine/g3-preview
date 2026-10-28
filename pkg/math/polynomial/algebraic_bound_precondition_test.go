@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:2987-3009,3014-3037; actual predicate scopes.
 package polynomial
+
+// Source: algebraic_numbers.cpp:2987-3009,3014-3037; actual predicate scopes.
 
 import (
 	"errors"

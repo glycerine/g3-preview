@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpf.cpp:1519-1569; src/util/mpq.cpp:156-185.
 // rational display
-package numeral
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

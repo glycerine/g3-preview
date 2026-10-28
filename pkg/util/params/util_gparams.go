@@ -1,6 +1,7 @@
+package params
+
 // Source: src/util/gparams.cpp:81-123,633-644; src/util/gparams.h.
 // Explicit runtime-owned gparams::imp; source catalog dispatch is borrowed.
-package params
 
 import (
 	"errors"

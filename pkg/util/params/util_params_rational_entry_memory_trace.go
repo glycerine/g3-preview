@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:753-761,992-1014; src/util/memory_manager.cpp:202-211.
 package params
+
+// Source: src/util/params.cpp:753-761,992-1014; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

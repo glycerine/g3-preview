@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:625-636; src/ast/fpa_decl_plugin.h.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:625-636; src/ast/fpa_decl_plugin.h.
 
 // The source constant dispatch probes a floating-point numeral before it
 // chooses pp_float_literal. Keep the probe on the owning plugin so special

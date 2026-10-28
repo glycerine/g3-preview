@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:big_set; src/util/mpz.h:allocate.
 package numeral
+
+// Source: src/util/mpz.cpp:big_set; src/util/mpz.h:allocate.
 
 import (
 	"errors"

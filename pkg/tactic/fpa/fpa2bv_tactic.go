@@ -1,5 +1,6 @@
-// Source: src/tactic/fpa/fpa2bv_tactic.cpp/.h.
 package fpa
+
+// Source: src/tactic/fpa/fpa2bv_tactic.cpp/.h.
 
 import (
 	"errors"

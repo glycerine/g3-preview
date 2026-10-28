@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3mgr.cpp linear_comb, sum_inequalities, and mk_idiv.
 package interp
+
+// Source checkpoint: src/interp/iz3mgr.cpp linear_comb, sum_inequalities, and mk_idiv.
 
 import (
 	"errors"

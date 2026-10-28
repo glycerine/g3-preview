@@ -1,5 +1,6 @@
-// Source-owner extraction bridge charges and nominal errors, tests first.
 package diagnostic
+
+// Source-owner extraction bridge charges and nominal errors, tests first.
 
 import (
 	"errors"

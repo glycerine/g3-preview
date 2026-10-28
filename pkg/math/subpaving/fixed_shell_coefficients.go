@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving.cpp:198-260, concrete
 // context_fpoint_wrapper<context_mpfx> coefficient and bound conversion.
-package subpaving
 
 import (
 	"errors"

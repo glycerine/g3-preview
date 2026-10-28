@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:1450-1454.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:1450-1454.
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"

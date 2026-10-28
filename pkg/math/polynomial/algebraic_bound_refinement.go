@@ -1,8 +1,9 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:2764-2778,2797-2807, reached
 // by src/math/polynomial/algebraic_numbers.cpp:730,743,773,2721-2767.
 // Width outlives each midpoint. MPBQ_DEBUG snapshots retain their separate
 // diagnostic service ownership; this policy covers the numerical body.
-package polynomial
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

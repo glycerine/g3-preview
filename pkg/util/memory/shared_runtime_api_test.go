@@ -1,5 +1,6 @@
-// Tests-first concrete shared memory owner contract; no duplicate implementation.
 package memory
+
+// Tests-first concrete shared memory owner contract; no duplicate implementation.
 
 import (
 	"errors"

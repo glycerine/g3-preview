@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.h:539-542; src/util/vector.h:290-294.
 package sat
+
+// Source: src/sat/sat_solver.h:539-542; src/util/vector.h:290-294.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

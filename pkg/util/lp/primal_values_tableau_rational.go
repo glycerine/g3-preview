@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver_tableau.h:350-383.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver_tableau.h:350-383.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3proof_itp.cpp subst_term_and_simp.
 package interp
+
+// Source checkpoint: src/interp/iz3proof_itp.cpp subst_term_and_simp.
 
 import (
 	"errors"

@@ -1,7 +1,8 @@
+package ast
+
 // Source: src/ast/seq_decl_plugin.cpp:959-967,993-1018;
 // src/ast/seq_decl_plugin.h:277-306,319-335.
 // Reached consumer: src/ast/rewriter/seq_rewriter.cpp:466-481.
-package ast
 
 import "errors"
 

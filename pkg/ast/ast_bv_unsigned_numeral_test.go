@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:48.
 package ast
+
+// Source: src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:48.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:351-363, reached through get_root_id's Sturm prefix.
 package polynomial
+
+// Source: upolynomial.cpp:351-363, reached through get_root_id's Sturm prefix.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

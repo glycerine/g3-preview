@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:528-589,1337-1343,
 // concrete config_hwf bound normalization, publication, and conflict check.
-package subpaving
 
 import (
 	"math"

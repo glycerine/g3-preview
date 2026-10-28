@@ -1,5 +1,6 @@
-// Translation of src/util/hash.h and hash.cpp
 package hash
+
+// Translation of src/util/hash.h and hash.cpp
 
 import (
 	"encoding/binary"

@@ -1,6 +1,7 @@
+package numeral
+
 // Independent test-only physical roots for the source-backed Integer owner.
 // Source: src/util/mpz.h, src/util/mpz.cpp, src/util/mpq.h.
-package numeral
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp qsat::get_core/add_assumption/project_qe/project.
 package qe
+
+// Source: src/qe/qsat.cpp qsat::get_core/add_assumption/project_qe/project.
 
 import (
 	"fmt"

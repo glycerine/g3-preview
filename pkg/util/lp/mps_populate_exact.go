@@ -1,5 +1,6 @@
-// Source: src/util/lp/mps_reader.h:680-739,796-800, retained mpq/mpq consumers.
 package lp
+
+// Source: src/util/lp/mps_reader.h:680-739,796-800, retained mpq/mpq consumers.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

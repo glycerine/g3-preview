@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp floor/ceil/prev_power_of_two and mpq.h wrappers.
 package numeral
+
+// Source: src/util/mpq.cpp floor/ceil/prev_power_of_two and mpq.h wrappers.
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

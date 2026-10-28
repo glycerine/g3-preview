@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/square_dense_submatrix.hpp:175-197,211-299,325-351;
 // square_dense_submatrix.h:182-215. Retained mpq dense/sparse applications.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

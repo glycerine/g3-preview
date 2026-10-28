@@ -1,5 +1,6 @@
-// Source: src/math/polynomial caller-owned invocation state.
 package polynomial
+
+// Source: src/math/polynomial caller-owned invocation state.
 
 type integerManagerPolynomialBindings struct {
 	knuthCaller                  *UPolynomialManager

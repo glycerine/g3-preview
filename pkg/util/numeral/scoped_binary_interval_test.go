@@ -1,6 +1,7 @@
+package numeral
+
 // Concrete lexical-owner tests.
 // Source: src/util/mpbq.cpp, src/util/scoped_numeral.h.
-package numeral
 
 import (
 	"bytes"

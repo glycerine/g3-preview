@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.h:54-120; src/util/lp/lu.hpp:110-125,926-934.
 package lp
+
+// Source: src/util/lp/lu.h:54-120; src/util/lp/lu.hpp:110-125,926-934.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

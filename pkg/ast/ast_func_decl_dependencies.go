@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/func_decl_dependencies.cpp;
 // src/ast/func_decl_dependencies.h.
-package ast
 
 // FuncDeclSet is the concrete uninterpreted-function declaration set used by
 // retained macro and model consumers. Handles are borrowed until Insert

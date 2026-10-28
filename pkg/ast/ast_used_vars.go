@@ -1,5 +1,6 @@
-// Source: src/ast/used_vars.cpp:22-113; src/ast/used_vars.h:25-56.
 package ast
+
+// Source: src/ast/used_vars.cpp:22-113; src/ast/used_vars.h:25-56.
 
 type astUsedVarFrame struct {
 	node  astNodeRef

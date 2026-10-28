@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/tactic/arith/propagate_ineqs_tactic.cpp:483;
 // src/tactic/goal.h:85; src/util/memory_manager.cpp:202-211.
-package tactic
 
 import (
 	"fmt"

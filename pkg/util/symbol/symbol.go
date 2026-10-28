@@ -1,5 +1,6 @@
-// Source: src/util/symbol.h; src/util/symbol.cpp.
 package symbol
+
+// Source: src/util/symbol.h; src/util/symbol.cpp.
 
 import (
 	"errors"

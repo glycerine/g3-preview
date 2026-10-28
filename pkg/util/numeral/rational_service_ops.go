@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/rational.h; src/util/rational.cpp.
 // Source: src/util/rational.h owner-local operator facade.
-package numeral
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/symbol.cpp:50-74.
 package symbol
+
+// Source: src/util/symbol.cpp:50-74.
 
 func (m *Manager) InternBorrowedSymbolCString(s Symbol) (Symbol, error) {
 	m.mu.Lock()

@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:437-462,528-534,545-552,585-617,713-722.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:437-462,528-534,545-552,585-617,713-722.
 
 // SolveYU solves x*U=y in place for unit upper triangular U. The source omits
 // division by the diagonal and never reads the final anchor coordinate.

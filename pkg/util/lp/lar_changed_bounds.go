@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:710-751,798-849.
 package lp
+
+// Source: src/util/lp/lar_solver.h:710-751,798-849.
 
 // DetectRowsOfBoundChangeColumnForNBasicColumn solves the actual basis column.
 // The caller prepares the row-set domain; existing marks are retained.

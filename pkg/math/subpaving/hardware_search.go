@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1806-1843, concrete
 // config_hwf default breadth-first search loop.
-package subpaving
 
 import (
 	"math"

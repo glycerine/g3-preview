@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:1191-1196,1347-1355.
 package sat
+
+// Source: src/sat/sat_solver.cpp:1191-1196,1347-1355.
 
 import (
 	"os"

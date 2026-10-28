@@ -1,5 +1,6 @@
-// Source: src/util/statistics.h; src/util/statistics.cpp.
 package statistics
+
+// Source: src/util/statistics.h; src/util/statistics.cpp.
 
 import (
 	"fmt"

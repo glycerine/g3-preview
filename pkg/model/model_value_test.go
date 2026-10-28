@@ -1,5 +1,6 @@
-// Source: src/model/model.cpp:93-109; src/ast/ast.cpp:2561-2582.
 package model_test
+
+// Source: src/model/model.cpp:93-109; src/ast/ast.cpp:2561-2582.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

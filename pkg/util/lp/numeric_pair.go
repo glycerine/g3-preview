@@ -1,5 +1,6 @@
-// Source: src/util/lp/numeric_pair.h. Concrete numeric_pair<mpq> used by LAR.
 package lp
+
+// Source: src/util/lp/numeric_pair.h. Concrete numeric_pair<mpq> used by LAR.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

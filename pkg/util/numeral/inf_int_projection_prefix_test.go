@@ -1,5 +1,6 @@
-// Source: src/util/inf_int_rational.h:144-152.
 package numeral
+
+// Source: src/util/inf_int_rational.h:144-152.
 
 import (
 	"math/big"

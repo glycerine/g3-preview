@@ -1,5 +1,6 @@
-// Source: src/tactic/core/simplify_tactic.cpp/.h.
 package core
+
+// Source: src/tactic/core/simplify_tactic.cpp/.h.
 
 import (
 	"errors"

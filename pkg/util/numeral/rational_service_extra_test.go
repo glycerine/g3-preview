@@ -1,5 +1,6 @@
-// Remaining source rational.h wrappers; tst_rational.cpp::tst8 assertions.
 package numeral
+
+// Remaining source rational.h wrappers; tst_rational.cpp::tst8 assertions.
 
 import (
 	"bytes"

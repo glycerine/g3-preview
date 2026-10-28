@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h:934-938; src/util/vector.h:59-100,349-363.
 package ast
+
+// Source: src/ast/ast.h:934-938; src/util/vector.h:59-100,349-363.
 
 import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:2818-2838,3119-3150; src/util/max_cliques.h.
 package sat
+
+// Source: src/sat/sat_solver.cpp:2818-2838,3119-3150; src/util/max_cliques.h.
 
 import (
 	"reflect"

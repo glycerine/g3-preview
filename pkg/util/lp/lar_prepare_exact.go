@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lar_core_solver.hpp:199-222;
 // lp_primal_core_solver.h:826-838.
-package lp
 
 func resizeLARCounts(values []uint32, size uint32) []uint32 {
 	if uint64(len(values)) >= uint64(size) {

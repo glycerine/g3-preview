@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_params.hpp; retained getters in
 // src/shell/lp_frontend.cpp and src/smt/theory_lra.cpp.
-package lp
 
 import (
 	"errors"

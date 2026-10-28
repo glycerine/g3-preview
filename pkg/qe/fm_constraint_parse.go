@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::fm variable/literal registration and add_constraint.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::fm variable/literal registration and add_constraint.
 
 import (
 	"io"

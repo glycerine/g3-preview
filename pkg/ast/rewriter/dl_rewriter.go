@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/dl_rewriter.cpp; src/ast/rewriter/dl_rewriter.h.
 package rewriter
+
+// Source: src/ast/rewriter/dl_rewriter.cpp; src/ast/rewriter/dl_rewriter.h.
 
 import (
 	"errors"

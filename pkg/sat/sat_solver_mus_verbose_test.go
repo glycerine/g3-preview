@@ -1,5 +1,6 @@
-// Source: src/sat/sat_mus.cpp:52-70,95-145.
 package sat
+
+// Source: src/sat/sat_mus.cpp:52-70,95-145.
 
 import (
 	"strconv"

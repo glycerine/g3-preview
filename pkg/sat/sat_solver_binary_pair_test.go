@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.h:286,445; src/sat/sat_solver.cpp:2818-2838.
 package sat
+
+// Source: src/sat/sat_solver.h:286,445; src/sat/sat_solver.cpp:2818-2838.
 
 import "testing"
 

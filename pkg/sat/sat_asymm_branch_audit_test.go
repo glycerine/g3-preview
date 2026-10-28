@@ -1,5 +1,6 @@
-// Source: src/sat/sat_asymm_branch.cpp owning source roots.
 package sat
+
+// Source: src/sat/sat_asymm_branch.cpp owning source roots.
 
 import (
 	"reflect"

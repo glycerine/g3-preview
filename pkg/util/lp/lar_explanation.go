@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:371-394, explain_implied_bound.
 package lp
+
+// Source: src/util/lp/lar_solver.h:371-394, explain_implied_bound.
 
 // explanationTermColumn preserves the source map's operator[] publication:
 // an existing but unregistered term inserts a zero-valued column mapping.

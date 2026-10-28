@@ -1,5 +1,6 @@
-// Source: src/util/hwf.cpp:222-255,586-650.
 package numeral
+
+// Source: src/util/hwf.cpp:222-255,586-650.
 
 import (
 	"math"

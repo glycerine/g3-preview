@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1594-1602,2029-2074.
 // Qualified actual returning-transport callback guard.
-package polynomial
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

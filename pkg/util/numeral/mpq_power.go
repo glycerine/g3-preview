@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp power, including its final unused square.
 package numeral
+
+// Source: src/util/mpq.cpp power, including its final unused square.
 
 // Power preserves source rational repeated squaring, including zero^zero=1.
 // Unlike integer Power it has no 0/1/2 fast paths. Nonterminating source mask

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:3753-3768; src/sat/sat_types.h:289-293.
 package sat
+
+// Source: src/sat/sat_solver.cpp:3753-3768; src/sat/sat_types.h:289-293.
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

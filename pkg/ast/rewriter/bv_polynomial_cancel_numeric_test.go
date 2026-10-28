@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/poly_rewriter_def.h:708-883.
 package rewriter
+
+// Source: src/ast/rewriter/poly_rewriter_def.h:708-883.
 
 import (
 	"fmt"

@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h; src/util/id_gen.h.
 package ast
+
+// Source: src/ast/ast.h; src/util/id_gen.h.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

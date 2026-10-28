@@ -1,5 +1,6 @@
-// Parameter collectors remain with the C++ definitions they translate.
 package model
+
+// Parameter collectors remain with the C++ definitions they translate.
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

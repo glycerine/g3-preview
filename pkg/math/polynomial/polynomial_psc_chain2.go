@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:5588-5658.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:5588-5658.
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

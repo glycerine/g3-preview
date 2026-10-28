@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:310-342,1661-1681,
 // concrete config_mpf child views and recent decision-bound replay.
-package subpaving
 
 import (
 	"math"

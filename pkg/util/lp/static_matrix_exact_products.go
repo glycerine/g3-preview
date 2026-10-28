@@ -1,5 +1,6 @@
-// Source: src/util/lp/static_matrix.h/.hpp, retained exact extraction/products.
 package lp
+
+// Source: src/util/lp/static_matrix.h/.hpp, retained exact extraction/products.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

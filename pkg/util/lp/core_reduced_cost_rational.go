@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.hpp:768-788,888-891.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.hpp:768-788,888-891.
 
 // FillReducedCostsFromYByRows initializes nonbasic costs, then subtracts each
 // stored row contribution. Y and Costs remain live references throughout.

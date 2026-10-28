@@ -1,5 +1,6 @@
-// Source: src/ast/array_decl_plugin.cpp:86-113; src/util/rational.h:67,110-181.
 package ast
+
+// Source: src/ast/array_decl_plugin.cpp:86-113; src/util/rational.h:67,110-181.
 
 import (
 	"errors"

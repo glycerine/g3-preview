@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h:77-154,273-344,458-500.
 package numeral
+
+// Source: src/util/mpq.h:77-154,273-344,458-500.
 
 import (
 	"io"

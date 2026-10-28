@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/math/subpaving/tactic/subpaving_tactic.cpp:92-120, selected
 // MPFF branch; src/math/subpaving/subpaving.cpp:260,275-276.
-package tactic
 
 import (
 	"errors"

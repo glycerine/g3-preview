@@ -1,5 +1,6 @@
-// Tests FIRST: complete registered source prime campaign, no substitute generator.
 package numeral
+
+// Tests FIRST: complete registered source prime campaign, no substitute generator.
 
 import (
 	"testing"

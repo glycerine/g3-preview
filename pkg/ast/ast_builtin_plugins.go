@@ -1,5 +1,6 @@
-// Actual label, pattern, model-value, and user-sort decl plugins in ast.cpp.
 package ast
+
+// Actual label, pattern, model-value, and user-sort decl plugins in ast.cpp.
 
 import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"

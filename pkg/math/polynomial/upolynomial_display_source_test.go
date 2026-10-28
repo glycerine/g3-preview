@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1108-1225,3120-3124;
 // src/test/upolynomial.cpp:23-65,468-490 (display driver sites).
-package polynomial
 
 import (
 	"errors"

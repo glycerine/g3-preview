@@ -1,5 +1,6 @@
-// Source: src/tactic/tactical.cpp:1225-1387; src/tactic/tactical.h:71-88.
 package tactic
+
+// Source: src/tactic/tactical.cpp:1225-1387; src/tactic/tactical.h:71-88.
 
 import (
 	"errors"

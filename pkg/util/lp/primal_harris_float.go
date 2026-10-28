@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.h:328-374,539-742;
 // lp_primal_core_solver.hpp:305-392. Retained double/double Harris path.
-package lp
 
 import "math"
 

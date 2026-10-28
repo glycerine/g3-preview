@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/tactic/goal.cpp:26-30,111-190,240-329,498-631,656-707;
 // src/tactic/goal.h:39-143.
-package tactic
 
 import (
 	"testing"

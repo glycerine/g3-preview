@@ -1,6 +1,7 @@
+package core
+
 // Source: src/tactic/core/symmetry_reduce_tactic.cpp live coloring, occurrence,
 // range-restriction and term-selection specializations of for_each_expr.
-package core
 
 import "github.com/glycerine/g3/pkg/ast"
 

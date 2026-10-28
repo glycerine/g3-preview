@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1828-1848; actual cached-numeral ownership.
 package numeral
+
+// Source: src/util/mpf.cpp:1828-1848; actual cached-numeral ownership.
 
 import (
 	"errors"

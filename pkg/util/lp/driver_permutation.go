@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1014-1072, retained --test_perm scenario.
 package lp
+
+// Source: src/test/lp.cpp:1014-1072, retained --test_perm scenario.
 
 import "io"
 

@@ -1,5 +1,6 @@
-// Native tuple lookup for src/model/model_evaluator.cpp:337-416.
 package model
+
+// Native tuple lookup for src/model/model_evaluator.cpp:337-416.
 
 import (
 	"encoding/binary"

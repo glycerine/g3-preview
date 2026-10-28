@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/bv_decl_plugin.h:403-405, 437-468;
 // src/ast/rewriter/bit_blaster/bit_blaster_rewriter.cpp:147-159, 183-187.
-package ast
 
 func (m *ASTManager) MkBitVectorBit2Bool(index uint32, arg ASTHandle) (ASTHandle, error) {
 	values := [1]astParameterRecord{{Kind: ASTParameterInt, integer: int32(index)}}

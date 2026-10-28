@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:951-1003 (lower, upper, mid, product, diff lifetimes).
 package numeral
+
+// Source: src/util/mpf.cpp:951-1003 (lower, upper, mid, product, diff lifetimes).
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

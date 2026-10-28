@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp set(char const*) caller actions and lexical scopes.
 package numeral
+
+// Source: src/util/mpq.cpp set(char const*) caller actions and lexical scopes.
 
 import (
 	"errors"

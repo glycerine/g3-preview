@@ -1,5 +1,6 @@
-// Source: src/math/polynomial numeric invocation adapters.
 package polynomial
+
+// Source: src/math/polynomial numeric invocation adapters.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

@@ -1,5 +1,6 @@
-// Translation of src/util/bit_vector.h and bit_vector.cpp.
 package bitset
+
+// Translation of src/util/bit_vector.h and bit_vector.cpp.
 
 import (
 	"strings"

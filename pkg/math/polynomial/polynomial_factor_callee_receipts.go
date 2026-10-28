@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:4507-4528,5114-5156;
 // src/util/scoped_numeral.h; src/util/obj_ref.h.
-package polynomial
 
 // Cold owning continuation identities are acquired only at the actual guarded
 // invocation. The source NUM arithmetic and persistent buffers stay unchanged.

@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/test/mpz.cpp rand_tst_gcd and tst_gcd_bug; source-only print
 // cases receive added mathematical expectations, not invented source asserts.
-package numeral
 
 import (
 	"errors"

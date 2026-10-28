@@ -1,6 +1,7 @@
+package core
+
 // Source: src/tactic/core/solve_eqs_tactic.cpp live trivial/ITE/arithmetic and
 // Boolean literal solvers. The #if 0 nonlinear path has no retained caller.
-package core
 
 import (
 	"errors"

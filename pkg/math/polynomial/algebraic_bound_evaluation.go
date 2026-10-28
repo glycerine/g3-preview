@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: algebraic_numbers.cpp:2721-2767 and the reached
 // upolynomial.cpp:1734-1764,2757-2814 eval_sign_at calls.
-package polynomial
 
 func (m *UPolynomialManager) matchesBinaryEvaluationReceipt(r *upolyBinaryEvaluationInvocationReceipt) bool {
 	if m == nil || m.self != m || r == nil {

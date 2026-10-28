@@ -1,5 +1,6 @@
-// Source: math/polynomial numerical calls; synchronous utility owner exclusion.
 package polynomial
+
+// Source: math/polynomial numerical calls; synchronous utility owner exclusion.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

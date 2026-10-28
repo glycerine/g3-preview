@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial_factorization.cpp:1058-1094.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial_factorization.cpp:1058-1094.
 
 import (
 	primegen "github.com/glycerine/g3/pkg/util/prime"

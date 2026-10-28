@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:2477-2506,2529-2545.
 package lp
+
+// Source: src/test/lp.cpp:2477-2506,2529-2545.
 
 import (
 	"os"

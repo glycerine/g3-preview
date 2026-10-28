@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:6737-6830;
 // src/test/polynomial.cpp:1017-1190 (dormant driver after return at 1825).
-package polynomial
 
 import (
 	"reflect"

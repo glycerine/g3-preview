@@ -1,5 +1,6 @@
-// Source: src/util/lp/permutation_matrix.h/.hpp, concrete double,double methods.
 package lp
+
+// Source: src/util/lp/permutation_matrix.h/.hpp, concrete double,double methods.
 
 import "math"
 

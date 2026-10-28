@@ -1,5 +1,6 @@
-// Test reflection keeps the original source field spelling while accepting exported Go names.
 package polynomial
+
+// Test reflection keeps the original source field spelling while accepting exported Go names.
 
 import "reflect"
 

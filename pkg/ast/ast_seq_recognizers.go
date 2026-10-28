@@ -1,5 +1,6 @@
-// Source: src/ast/seq_decl_plugin.h:198-225,246-288.
 package ast
+
+// Source: src/ast/seq_decl_plugin.h:198-225,246-288.
 
 func (m *ASTManager) sequenceSortParameter(sort astNodeRef, kind int32) (astNodeRef, bool, error) {
 	p := m.sequencePlugin

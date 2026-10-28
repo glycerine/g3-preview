@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.h:901-934,791-821.
 // Concrete retained scalar mpq/mpq stage-one primal core.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

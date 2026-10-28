@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:243-271;
 // upolynomial.cpp:1801-1820 and mpbq.h integer comparison.
-package polynomial
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

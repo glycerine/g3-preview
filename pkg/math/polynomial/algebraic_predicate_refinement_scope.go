@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/algebraic_numbers.cpp:291-308,897-929.
 package polynomial
+
+// Source: src/math/polynomial/algebraic_numbers.cpp:291-308,897-929.
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

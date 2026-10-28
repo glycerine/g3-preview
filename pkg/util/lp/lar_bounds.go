@@ -1,7 +1,8 @@
+package lp
+
 // Source: src/util/lp/init_lar_solver.h:308-603 and lar_solver.h witness
 // updates. This is the concrete bound state of the retained LAR solver;
 // matrix/basis construction, constraint scopes and optimization remain separate.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

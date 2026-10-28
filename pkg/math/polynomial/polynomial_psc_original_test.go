@@ -1,5 +1,6 @@
-// Source: src/test/polynomial.cpp:702-723,741-821.
 package polynomial
+
+// Source: src/test/polynomial.cpp:702-723,741-821.
 
 import (
 	"strconv"

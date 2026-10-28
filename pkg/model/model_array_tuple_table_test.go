@@ -1,5 +1,6 @@
-// Native collection checks for src/model/model_evaluator.cpp:337-416.
 package model
+
+// Native collection checks for src/model/model_evaluator.cpp:337-416.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

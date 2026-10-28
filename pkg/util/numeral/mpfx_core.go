@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpfx.h and src/util/mpfx.cpp:28-83,90-100,133-249,
 // 316-520. Concrete fixed-point numeral reached by subpaving's mpfx context.
-package numeral
 
 import (
 	"errors"

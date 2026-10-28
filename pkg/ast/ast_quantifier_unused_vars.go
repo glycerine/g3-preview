@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h quantifier::may_have_unused_vars/set_no_unused_vars.
 package ast
+
+// Source: src/ast/ast.h quantifier::may_have_unused_vars/set_no_unused_vars.
 
 func (m *ASTManager) QuantifierMayHaveUnusedVars(h ASTHandle) (bool, error) {
 	if e := m.lock(); e != nil {

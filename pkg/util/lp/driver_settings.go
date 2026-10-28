@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1080-1147,2098-2112; lp_solver.h:158-164.
 package lp
+
+// Source: src/test/lp.cpp:1080-1147,2098-2112; lp_solver.h:158-164.
 
 import (
 	"fmt"

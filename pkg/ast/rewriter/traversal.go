@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/rewriter.h:194-408;
 // src/ast/rewriter/rewriter_def.h:23-750; src/model/model_evaluator.cpp:282-289.
-package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

@@ -1,5 +1,6 @@
-// Source: src/util/mpn.cpp:360-399; src/util/buffer.h.
 package numeral
+
+// Source: src/util/mpn.cpp:360-399; src/util/buffer.h.
 
 import (
 	"strconv"

@@ -1,5 +1,6 @@
-// Selected assertions translated from src/test/rational.cpp.
 package numeral
+
+// Selected assertions translated from src/test/rational.cpp.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1898-1904; actual returning-failure transport.
 package numeral
+
+// Source: src/util/mpf.cpp:1898-1904; actual returning-failure transport.
 
 import (
 	"errors"

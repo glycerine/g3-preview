@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:464-473; src/test/lp.cpp:2456-2474.
 package lp
+
+// Source: src/util/lp/lar_solver.h:464-473; src/test/lp.cpp:2456-2474.
 
 func (s *LARSolver) TotalIterations() uint32 {
 	return s.Core.RPrimal.TotalIterations

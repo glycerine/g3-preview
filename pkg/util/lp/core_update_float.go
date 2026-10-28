@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.hpp:541-601,741-755.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.hpp:541-601,741-755.
 
 import "fmt"
 

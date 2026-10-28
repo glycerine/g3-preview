@@ -1,5 +1,6 @@
-// Source: src/util/lp/tail_matrix.h, actual precise virtual operations.
 package lp
+
+// Source: src/util/lp/tail_matrix.h, actual precise virtual operations.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp comparison, including Sturm–Tarski fallback.
 package polynomial
+
+// Source: algebraic_numbers.cpp comparison, including Sturm–Tarski fallback.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/ast/ast_util.cpp:160-252; src/ast/ast_util.h:99-140.
 package ast
+
+// Source: src/ast/ast_util.cpp:160-252; src/ast/ast_util.h:99-140.
 
 import "testing"
 

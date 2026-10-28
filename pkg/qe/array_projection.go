@@ -1,5 +1,6 @@
-// Source: src/qe/qe_arrays.cpp/.h enabled array_project_plugin paths.
 package qe
+
+// Source: src/qe/qe_arrays.cpp/.h enabled array_project_plugin paths.
 
 import (
 	"errors"

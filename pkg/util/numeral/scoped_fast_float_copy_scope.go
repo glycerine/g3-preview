@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral.h:31-33; concrete mpff_manager copy.
 package numeral
+
+// Source: src/util/scoped_numeral.h:31-33; concrete mpff_manager copy.
 
 // ScopedFastFloatCopyCleanupError retains a failed copy constructor's owner.
 type ScopedFastFloatCopyCleanupError struct {

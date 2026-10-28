@@ -1,5 +1,6 @@
-// Source: src/math/polynomial caller reentry guards.
 package polynomial
+
+// Source: src/math/polynomial caller reentry guards.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:296-368.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:296-368.
 
 import (
 	"errors"

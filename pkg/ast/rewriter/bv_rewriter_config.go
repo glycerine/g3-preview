@@ -1,7 +1,8 @@
+package rewriter
+
 // Source: src/ast/rewriter/bv_rewriter.cpp:26-51;
 // src/ast/rewriter/bv_rewriter_params.pyg:1-20;
 // scripts/mk_genfile_common.py:895-939.
-package rewriter
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

@@ -1,5 +1,6 @@
-// Source: src/util/gparams.cpp:81-123,633-644; src/util/params.cpp:59-86.
 package params
+
+// Source: src/util/gparams.cpp:81-123,633-644; src/util/params.cpp:59-86.
 
 import "github.com/glycerine/g3/pkg/arena"
 

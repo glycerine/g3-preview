@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization.cpp:1153-1175;
 // src/util/mpzzp.h:122-123.
-package polynomial
 
 // The post-loop SET uses the actual already-constructed saved-prime NUM and
 // related manager. Metadata creates no source declaration or extra Copy.

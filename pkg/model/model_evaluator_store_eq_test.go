@@ -1,6 +1,7 @@
+package model_test
+
 // Source: src/ast/rewriter/array_rewriter.cpp:381-417;
 // src/model/model_evaluator.cpp:282-290,565-569.
-package model_test
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

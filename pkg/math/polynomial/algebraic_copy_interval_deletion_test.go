@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:198-200,533-536; basic_interval.h:94-97.
 package polynomial
+
+// Source: algebraic_numbers.cpp:198-200,533-536; basic_interval.h:94-97.
 
 import (
 	"errors"

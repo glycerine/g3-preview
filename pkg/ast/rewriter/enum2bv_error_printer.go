@@ -1,5 +1,6 @@
-// Source: enum2bv_rewriter.cpp:84-88 throw_non_fd; ast_smt2_pp.cpp mk_pp.
 package rewriter
+
+// Source: enum2bv_rewriter.cpp:84-88 throw_non_fd; ast_smt2_pp.cpp mk_pp.
 
 import (
 	"errors"

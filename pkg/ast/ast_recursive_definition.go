@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.h ast_manager::is_rec_fun_def/rec_fun_qid and
 // src/ast/ast.cpp reserved recursive-definition identifier.
-package ast
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

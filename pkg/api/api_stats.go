@@ -1,5 +1,6 @@
-// Source: src/api/api_stats.cpp:133-135; src/util/memory_manager.cpp:162-171.
 package api
+
+// Source: src/api/api_stats.cpp:133-135; src/util/memory_manager.cpp:162-171.
 
 import "github.com/glycerine/g3/pkg/util/params"
 

@@ -1,5 +1,6 @@
-// Source: src/solver/smt_logics.h; src/solver/smt_logics.cpp.
 package solver
+
+// Source: src/solver/smt_logics.h; src/solver/smt_logics.cpp.
 
 func logicIn(logic string, values ...string) bool {
 	for _, value := range values {

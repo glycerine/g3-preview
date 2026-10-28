@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:738-801; src/ast/format.h:67-79.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:738-801; src/ast/format.h:67-79.
 
 // smt2FormatTail is the concrete format-pointer mk_seq loop: a line break
 // precedes each non-nil document in the supplied suffix.

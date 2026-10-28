@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_simplex.hpp:169-187,227-271,360-367;
 // lp_primal_simplex.h:86-88; lp_solver.hpp:43-48.
-package lp
 
 import "sort"
 

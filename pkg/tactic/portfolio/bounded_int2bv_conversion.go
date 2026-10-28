@@ -1,5 +1,6 @@
-// Source: src/tactic/portfolio/bounded_int2bv_solver.cpp:141-323.
 package portfolio
+
+// Source: src/tactic/portfolio/bounded_int2bv_solver.cpp:141-323.
 
 import (
 	"errors"

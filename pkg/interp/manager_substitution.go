@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3mgr.cpp substitution and variable queries.
 package interp
+
+// Source checkpoint: src/interp/iz3mgr.cpp substitution and variable queries.
 
 import "github.com/glycerine/g3/pkg/ast"
 

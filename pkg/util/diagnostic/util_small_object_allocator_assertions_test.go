@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.cpp:72-145; src/util/debug.h:63.
 package diagnostic
+
+// Source: src/util/small_object_allocator.cpp:72-145; src/util/debug.h:63.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Concrete error classification and nonformatted util/z3_exception values.
 package z3exception
+
+// Concrete error classification and nonformatted util/z3_exception values.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:629-630,674.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:629-630,674.
 
 func (m *MonomialManager) lexDistinctEndAssert(i, j int32) error {
 	enabled, e := monomialSourceAssertionsEnabled()

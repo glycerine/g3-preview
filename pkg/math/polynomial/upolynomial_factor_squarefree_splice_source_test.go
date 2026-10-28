@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial_factorization.cpp:1030-1034,1020-1299.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial_factorization.cpp:1030-1034,1020-1299.
 
 import (
 	"fmt"

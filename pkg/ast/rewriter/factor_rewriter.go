@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/factor_rewriter.cpp;
 // src/ast/rewriter/factor_rewriter.h.
-package rewriter
 
 import (
 	"errors"

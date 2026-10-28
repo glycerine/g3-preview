@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1385-1410; src/util/mpn.cpp:371-399; src/util/buffer.h.
 package numeral
+
+// Source: src/util/mpz.cpp:1385-1410; src/util/mpn.cpp:371-399; src/util/buffer.h.
 
 type IntegerMagnitudeView struct {
 	owner *IntegerManager

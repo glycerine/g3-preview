@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver_tableau.h:51-94.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver_tableau.h:51-94.
 
 // ChooseEnteringColumnTableau prices actual tableau columns. Only strict
 // sparsity improvements consume budget; ties consume RNG before rotation.

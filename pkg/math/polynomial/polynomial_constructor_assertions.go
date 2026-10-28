@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:2531,2539,2558,2560,2569,2605-2606,2626,2631.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:2531,2539,2558,2560,2569,2605-2606,2626,2631.
 
 // The concrete constructor helpers share the cell's source assertion transport;
 // each predicate remains lazy and each source statement keeps its own gate.

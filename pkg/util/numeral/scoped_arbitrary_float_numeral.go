@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/scoped_numeral.h:25-55, instantiated with
 // f2n<mpf_manager> by src/math/interval/interval_def.h:197-370.
-package numeral
 
 import "github.com/glycerine/g3/pkg/arena"
 

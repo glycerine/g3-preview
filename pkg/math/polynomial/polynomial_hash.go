@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:2464-2480,7026-7032.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:2464-2480,7026-7032.
 
 import uhash "github.com/glycerine/g3/pkg/util/hash"
 

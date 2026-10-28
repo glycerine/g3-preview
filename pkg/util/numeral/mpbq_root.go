@@ -1,5 +1,6 @@
-// Source: src/util/mpbq.h/.cpp.
 package numeral
+
+// Source: src/util/mpbq.h/.cpp.
 
 func (m *BinaryRationalManager) RootLower(a *BinaryRational, n uint32, out *BinaryRational) (bool, error) {
 	return m.RootLowerWithInvocation(a, n, out, nil)

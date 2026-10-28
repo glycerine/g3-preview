@@ -1,5 +1,6 @@
-// Source: src/ast/ast_pp_util.cpp; src/ast/ast_pp_util.h.
 package ast
+
+// Source: src/ast/ast_pp_util.cpp; src/ast/ast_pp_util.h.
 
 import "io"
 

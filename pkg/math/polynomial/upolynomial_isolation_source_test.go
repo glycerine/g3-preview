@@ -1,5 +1,6 @@
-// Tests FIRST: actual registered root-isolation inputs and assertion routes.
 package polynomial
+
+// Tests FIRST: actual registered root-isolation inputs and assertion routes.
 
 import (
 	"testing"

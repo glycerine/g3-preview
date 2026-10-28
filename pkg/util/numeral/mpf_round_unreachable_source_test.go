@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:2052,2120.
 package numeral
+
+// Source: src/util/mpf.cpp:2052,2120.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/ast/normal_forms/nnf_params.hpp:5-27.
 package normal_forms_test
+
+// Source: src/ast/normal_forms/nnf_params.hpp:5-27.
 
 import (
 	"testing"

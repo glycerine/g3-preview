@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial.cpp; caller-owned numeric lifetimes.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial.cpp; caller-owned numeric lifetimes.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

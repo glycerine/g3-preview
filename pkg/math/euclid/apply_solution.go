@@ -1,5 +1,6 @@
-// Source: src/math/euclid/euclidean_solver.cpp:422-461,615-618.
 package euclid
+
+// Source: src/math/euclid/euclidean_solver.cpp:422-461,615-618.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.cpp:allocate/deallocate.
 package memory
+
+// Source: src/util/small_object_allocator.cpp:allocate/deallocate.
 
 import (
 	"testing"

@@ -1,5 +1,6 @@
-// Source: src/sat/tactic/goal2sat.cpp:380-391; src/util/memory_manager.cpp:162-171.
 package tactic
+
+// Source: src/sat/tactic/goal2sat.cpp:380-391; src/util/memory_manager.cpp:162-171.
 
 import (
 	"errors"

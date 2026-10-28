@@ -1,5 +1,6 @@
-// Source: src/util/union_find.h:25-241.
 package backtrack
+
+// Source: src/util/union_find.h:25-241.
 
 import (
 	"bytes"

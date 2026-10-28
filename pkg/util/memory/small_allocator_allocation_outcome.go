@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.cpp:allocate.
 package memory
+
+// Source: src/util/small_object_allocator.cpp:allocate.
 
 type smallAllocatorAllocationScope struct {
 	invocation uint64

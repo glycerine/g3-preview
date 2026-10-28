@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:2054-2069; explicit returning-transport helper profile.
 package numeral
+
+// Source: src/util/mpz.cpp:2054-2069; explicit returning-transport helper profile.
 
 import (
 	"errors"

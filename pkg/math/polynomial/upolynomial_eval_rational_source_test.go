@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1767-1797.
 // Qualified returning-transport and signed-host TLS destructor guard fixture.
-package polynomial
 
 import (
 	"errors"

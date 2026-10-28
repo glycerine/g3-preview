@@ -1,5 +1,6 @@
-// Source: src/ast/expr2var.cpp:25-92; src/ast/expr2var.h:32-77.
 package ast
+
+// Source: src/ast/expr2var.cpp:25-92; src/ast/expr2var.h:32-77.
 
 import (
 	"bytes"

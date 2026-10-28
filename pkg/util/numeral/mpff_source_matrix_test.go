@@ -1,5 +1,6 @@
-// Active src/test/mpff.cpp routes.
 package numeral
+
+// Active src/test/mpff.cpp routes.
 
 import (
 	"errors"

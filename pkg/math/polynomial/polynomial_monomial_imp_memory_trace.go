@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:814,2330,2341;
 // src/util/memory_manager.cpp:202-211.
-package polynomial
 
 import (
 	"fmt"

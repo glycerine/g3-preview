@@ -1,6 +1,7 @@
+package numeral
+
 // Source: mpz.h:231-242,736-742; mpz.cpp:1262-1382; mpq.h:772-778;
 // mpq.cpp:297-303; rational.h:101-125. New bounded profile/ownership tests.
-package numeral
 
 import (
 	"errors"

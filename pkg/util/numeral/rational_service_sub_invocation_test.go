@@ -1,5 +1,6 @@
-// Source: src/util/rational.h:462-464.
 package numeral
+
+// Source: src/util/rational.h:462-464.
 
 import (
 	"testing"

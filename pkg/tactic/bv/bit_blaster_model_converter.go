@@ -1,5 +1,6 @@
-// Source: src/tactic/bv/bit_blaster_model_converter.cpp/.h.
 package bv
+
+// Source: src/tactic/bv/bit_blaster_model_converter.cpp/.h.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/hwf.h:26-44, 45-62, 126-160;
 // src/util/hwf.cpp:97-110,168-214,430-555.
-package numeral
 
 import (
 	"math"

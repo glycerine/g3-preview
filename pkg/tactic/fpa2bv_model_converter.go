@@ -1,5 +1,6 @@
-// Source: src/tactic/fpa/fpa2bv_model_converter.cpp/.h.
 package tactic
+
+// Source: src/tactic/fpa/fpa2bv_model_converter.cpp/.h.
 
 import (
 	"errors"

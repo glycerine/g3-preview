@@ -1,5 +1,6 @@
-// Source: src/util/sorting_network.h:120-1046; src/test/sorting_network.cpp:150-181.
 package ast
+
+// Source: src/util/sorting_network.h:120-1046; src/test/sorting_network.cpp:150-181.
 
 import (
 	"reflect"

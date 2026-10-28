@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:499-503,1641,
 // concrete config_mpq inverse-root precision and interval dispatch.
-package subpaving
 
 import (
 	"errors"

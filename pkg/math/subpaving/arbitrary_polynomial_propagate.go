@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1408-1496, concrete config_mpf
 // polynomial propagation over live root-bound interval views.
-package subpaving
 
 import (
 	"errors"

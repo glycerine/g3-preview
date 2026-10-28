@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:1460-1512,1518-1607.
 package sat
+
+// Source: src/sat/sat_solver.cpp:1460-1512,1518-1607.
 
 import (
 	"fmt"

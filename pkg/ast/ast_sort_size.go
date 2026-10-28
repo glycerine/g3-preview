@@ -1,5 +1,6 @@
-// Translation of src/ast/ast.h::sort_size and ast.cpp stream insertion.
 package ast
+
+// Translation of src/ast/ast.h::sort_size and ast.cpp stream insertion.
 
 import (
 	"errors"

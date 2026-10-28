@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:2874-2887.
 package ast
+
+// Source: src/ast/ast.cpp:2874-2887.
 
 // MatchProofQuantInstantiation appends borrowed expression handles. The proof
 // owns their lifetime; decoding does not acquire additional AST references.

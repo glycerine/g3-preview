@@ -1,6 +1,7 @@
+package numeral
+
 // Concrete owner/lifetime tests.
 // Source: src/util/mpbq.h, src/util/scoped_numeral_vector.h.
-package numeral
 
 import (
 	"errors"

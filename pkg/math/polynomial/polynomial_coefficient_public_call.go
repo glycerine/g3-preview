@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:3264-3277,3297-3312,7034-7040;
 // src/util/obj_ref.h. Retained nlsat_explain.cpp:335 caller assignment.
-package polynomial
 
 import "errors"
 

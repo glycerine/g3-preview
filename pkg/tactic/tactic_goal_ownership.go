@@ -1,5 +1,6 @@
-// Concrete ownership operations for goal's native slices.
 package tactic
+
+// Concrete ownership operations for goal's native slices.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/tactic/subpaving_tactic.cpp:82-118.
 package tactic
+
+// Source: src/math/subpaving/tactic/subpaving_tactic.cpp:82-118.
 
 import (
 	"github.com/glycerine/g3/pkg/math/subpaving"

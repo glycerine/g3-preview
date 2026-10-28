@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:632-634,746-751.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:632-634,746-751.
 
 func (m *ASTManager) bitVectorSomeValue(sort astNodeRef) (ASTHandle, error) {
 	// Numerical failure transport must not reenter the locked AST owner.

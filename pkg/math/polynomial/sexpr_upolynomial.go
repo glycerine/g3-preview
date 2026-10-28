@@ -1,5 +1,6 @@
-// Source math/polynomial/sexpr2upolynomial.cpp, recursive source parser.
 package polynomial
+
+// Source math/polynomial/sexpr2upolynomial.cpp, recursive source parser.
 
 import (
 	"errors"

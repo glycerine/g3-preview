@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.h:32-105;
 // lp_dual_core_solver.hpp:26-45,67-88. Retained floating dual construction.
-package lp
 
 type FloatDualCoreSolver struct {
 	*FloatCoreSolverBase

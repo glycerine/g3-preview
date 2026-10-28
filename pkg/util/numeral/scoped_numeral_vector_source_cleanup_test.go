@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral_vector.h:29-58, concrete mpz/mpq vectors.
 package numeral
+
+// Source: src/util/scoped_numeral_vector.h:29-58, concrete mpz/mpq vectors.
 
 import (
 	"errors"

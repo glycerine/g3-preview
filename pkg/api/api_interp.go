@@ -1,5 +1,6 @@
-// Source: src/api/api_interp.cpp, retained context, marker, and compute APIs.
 package api
+
+// Source: src/api/api_interp.cpp, retained context, marker, and compute APIs.
 
 import (
 	"errors"

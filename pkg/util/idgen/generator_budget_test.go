@@ -1,5 +1,6 @@
-// Source: src/util/id_gen.h; src/util/vector.h.
 package idgen
+
+// Source: src/util/id_gen.h; src/util/vector.h.
 
 import (
 	"math"

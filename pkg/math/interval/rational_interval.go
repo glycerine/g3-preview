@@ -1,6 +1,7 @@
+package interval
+
 // Source: src/math/interval/interval.h:32-67,137-190 and
 // src/math/interval/interval_def.h:597-709,795-837.
-package interval
 
 import (
 	"errors"

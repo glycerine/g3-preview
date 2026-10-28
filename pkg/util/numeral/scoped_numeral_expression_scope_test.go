@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral.h:160-183.
 package numeral
+
+// Source: src/util/scoped_numeral.h:160-183.
 
 import (
 	"errors"

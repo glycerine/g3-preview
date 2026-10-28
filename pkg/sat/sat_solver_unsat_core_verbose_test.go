@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:2071-2084.
 package sat
+
+// Source: src/sat/sat_solver.cpp:2071-2084.
 
 import (
 	"strconv"

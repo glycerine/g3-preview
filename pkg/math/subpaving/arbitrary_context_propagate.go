@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1694-1750, concrete config_mpf
 // bound queue and insertion-order watched clause dispatch.
-package subpaving
 
 import (
 	"errors"

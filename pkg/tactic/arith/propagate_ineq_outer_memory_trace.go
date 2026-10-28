@@ -1,6 +1,7 @@
+package arith
+
 // Source: src/tactic/arith/propagate_ineqs_tactic.cpp:47,61;
 // src/tactic/tactic.h:43; src/util/memory_manager.cpp:202-211.
-package arith
 
 import (
 	"fmt"

@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:967-1060, concrete config_mpq.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:967-1060, concrete config_mpq.
 
 import (
 	"math"

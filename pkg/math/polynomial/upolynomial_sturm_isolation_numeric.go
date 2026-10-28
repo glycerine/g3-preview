@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:2409-2411,2453-2454; retained binary arithmetic.
 package polynomial
+
+// Source: upolynomial.cpp:2409-2411,2453-2454; retained binary arithmetic.
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

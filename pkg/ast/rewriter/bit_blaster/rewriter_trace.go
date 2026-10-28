@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bit_blaster/bit_blaster_rewriter.cpp:350-352,519-520.
 package bit_blaster
+
+// Source: src/ast/rewriter/bit_blaster/bit_blaster_rewriter.cpp:350-352,519-520.
 
 import (
 	"errors"

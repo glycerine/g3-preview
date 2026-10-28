@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.cpp:1781-1844.
 // Source delete_node ascending pushes/LIFO pops, using a native Go worklist.
-package ast
 
 // consumed reports whether the input reference was consumed, even when
 // a destruction callback returns an error.

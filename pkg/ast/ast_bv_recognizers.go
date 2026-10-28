@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/bv_decl_plugin.cpp:793-830;
 // src/ast/bv_decl_plugin.h:307-310; src/util/rational.h:462-464.
-package ast
 
 func (m *ASTManager) bitVectorAppKind(r astNodeRef, kind int32) (bool, error) {
 	if m.nodeAt(r.slot).kind != ASTApp || m.bitVectorPlugin == nil {

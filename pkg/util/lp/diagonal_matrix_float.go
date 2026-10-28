@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.h:54-120; src/util/lp/lu.hpp:110-125,926-934.
 package lp
+
+// Source: src/util/lp/lu.h:54-120; src/util/lp/lu.hpp:110-125,926-934.
 
 // FloatDiagonalMatrix divides one coordinate by a stored diagonal coefficient.
 // It is the retained one_elem_on_diag tail used by LU column updates.

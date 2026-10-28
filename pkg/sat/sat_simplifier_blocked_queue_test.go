@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:875–919; src/util/heap.h.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:875–919; src/util/heap.h.
 
 import (
 	"testing"

@@ -1,5 +1,6 @@
-// Source: src/ast/fpa/fpa2bv_converter.cpp:2703-2794.
 package fpa
+
+// Source: src/ast/fpa/fpa2bv_converter.cpp:2703-2794.
 
 import (
 	"math/big"

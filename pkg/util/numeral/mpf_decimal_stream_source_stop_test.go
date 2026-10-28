@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1578-1582; scoped q follows the younger display DT.
 package numeral
+
+// Source: src/util/mpf.cpp:1578-1582; scoped q follows the younger display DT.
 
 import (
 	"errors"

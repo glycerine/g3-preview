@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: the retained iz3proof.cpp/iz3proof.h path used by
 // iz3translation_full::translate and iz3interp::proof_to_interpolant.
-package interp
 
 import (
 	"errors"

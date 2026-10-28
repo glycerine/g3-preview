@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:2038-2112.
 package ast
+
+// Source: src/ast/ast.cpp:2038-2112.
 
 type astAppCoercionFrame struct {
 	args        []ASTHandle

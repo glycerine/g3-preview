@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:951,967,1008,1079; retained util/trace sites.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:951,967,1008,1079; retained util/trace sites.
 
 import (
 	"io"

@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp pred_abs scoped assumptions and concretization.
 package qe
+
+// Source: src/qe/qsat.cpp pred_abs scoped assumptions and concretization.
 
 import (
 	"fmt"

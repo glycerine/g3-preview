@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:405-410,445-455,494.
 package polynomial
+
+// Source: algebraic_numbers.cpp:405-410,445-455,494.
 
 // The coefficient SET already issues its exact allocation receipt. This borrow
 // protects the enclosing placement loop only while that source call executes.

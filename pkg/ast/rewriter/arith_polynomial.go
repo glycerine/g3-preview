@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/poly_rewriter.h;
 // src/ast/rewriter/poly_rewriter_def.h.
-package rewriter
 
 import (
 	"errors"

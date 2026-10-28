@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:3119-3150; src/util/max_cliques.h all named owners.
 package sat
+
+// Source: src/sat/sat_solver.cpp:3119-3150; src/util/max_cliques.h all named owners.
 
 import (
 	"fmt"

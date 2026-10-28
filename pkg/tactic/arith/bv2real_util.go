@@ -1,6 +1,7 @@
+package arith
+
 // Source: src/tactic/arith/bv2real_rewriter.cpp:25-350;
 // src/tactic/arith/bv2real_rewriter.h:33-141.
-package arith
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:753-763,946-1014,1017-1033.
 package params
+
+// Source: src/util/params.cpp:753-763,946-1014,1017-1033.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

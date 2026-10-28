@@ -1,5 +1,6 @@
-// Native storage checks for the retained integer heap.
 package heap
+
+// Native storage checks for the retained integer heap.
 
 import (
 	"errors"

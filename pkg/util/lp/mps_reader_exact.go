@@ -1,5 +1,6 @@
-// Source: src/util/lp/mps_reader.h:41-671,741-794,800-897 (mpq/LAR consumer).
 package lp
+
+// Source: src/util/lp/mps_reader.h:41-671,741-794,800-897 (mpq/LAR consumer).
 
 import (
 	"bufio"

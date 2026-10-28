@@ -1,6 +1,7 @@
+package interval
+
 // Source: src/math/interval/interval_def.h:206-210,315-320;
 // concrete precise config_mpq instantiation, src/util/trace.h.
-package interval
 
 import (
 	"io"

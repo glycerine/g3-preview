@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:1809-1844; config_mpff.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:1809-1844; config_mpff.
 
 import (
 	"bytes"

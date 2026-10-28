@@ -1,5 +1,6 @@
-// Source: src/sat/sat_types.h:153–289; src/sat/sat_mus.cpp:132–209.
 package sat
+
+// Source: src/sat/sat_types.h:153–289; src/sat/sat_mus.cpp:132–209.
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

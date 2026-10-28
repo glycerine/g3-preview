@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp:176-180.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp:176-180.
 
 import (
 	"errors"

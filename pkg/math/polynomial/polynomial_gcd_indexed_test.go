@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:1863-1876; src/util/mpz.cpp array gcd.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:1863-1876; src/util/mpz.cpp array gcd.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

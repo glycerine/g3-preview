@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1519-1569.
 package numeral
+
+// Source: src/util/mpf.cpp:1519-1569.
 
 // ToStringInto writes the source result into its actual owned text context.
 // The returned c_str view borrows that result until the caller's result DT.

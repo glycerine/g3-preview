@@ -1,5 +1,6 @@
-// Concrete ast_ref specialization of src/util/obj_ref.h.
 package ast
+
+// Concrete ast_ref specialization of src/util/obj_ref.h.
 
 import (
 	"math"

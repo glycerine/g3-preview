@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:776-795; exact basic-value delta updates.
 package lp
+
+// Source: src/util/lp/lar_solver.h:776-795; exact basic-value delta updates.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

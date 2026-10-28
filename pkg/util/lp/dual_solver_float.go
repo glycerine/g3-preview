@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_simplex.hpp:23-43,105-135,145-184,342-384;
 // lp_dual_simplex.h:40-44,99-103; lp_solver.h:253-255.
-package lp
 
 import (
 	"fmt"

@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1151-1227. Concrete double/double MPS driver.
 package lp
+
+// Source: src/test/lp.cpp:1151-1227. Concrete double/double MPS driver.
 
 import (
 	"fmt"

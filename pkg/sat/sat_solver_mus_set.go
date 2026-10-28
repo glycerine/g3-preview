@@ -1,5 +1,6 @@
-// Source: src/sat/sat_types.h:153-289.
 package sat
+
+// Source: src/sat/sat_types.h:153-289.
 
 // MUS and consequence sets use the same concrete native literal storage as
 // probing. Set operations preserve the source insertion/compaction order.

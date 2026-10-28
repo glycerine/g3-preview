@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.hpp:353-409;
 // lp_primal_core_solver.h:337-344.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

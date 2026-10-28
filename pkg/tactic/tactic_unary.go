@@ -1,5 +1,6 @@
-// Source: src/tactic/tactical.cpp:886-927,1077-1128.
 package tactic
+
+// Source: src/tactic/tactical.cpp:886-927,1077-1128.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

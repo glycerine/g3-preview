@@ -1,5 +1,6 @@
-// Source: src/tactic/ufbv/ufbv_rewriter.cpp:217-219,231,297,307.
 package ufbv
+
+// Source: src/tactic/ufbv/ufbv_rewriter.cpp:217-219,231,297,307.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

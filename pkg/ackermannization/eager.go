@@ -1,5 +1,6 @@
-// Source: src/ackermannization/lackr.cpp eager encoding path.
 package ackermannization
+
+// Source: src/ackermannization/lackr.cpp eager encoding path.
 
 import (
 	"errors"

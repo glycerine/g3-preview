@@ -1,5 +1,6 @@
-// Source: src/util/mpzzp.h.
 package numeral
+
+// Source: src/util/mpzzp.h.
 
 func (m *IntegerModularManager) dividesWithAllocationContext(a, b *Int, c integerAllocationInvocationContext) (bool, error) {
 	f, e := m.Field()

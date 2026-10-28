@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.h; src/ast/ast.cpp:2213-2238.
 // Concrete decl_info, sort_info and func_decl_info storage/action translation.
-package ast
 
 import (
 	"math"

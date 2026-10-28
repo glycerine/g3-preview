@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.h/.hpp: floating constructor,
 // basis headings and bound feasibility; numeric_pair.h:316-326.
-package lp
 
 // ColumnNamer is the retained source column_namer interface.
 type ColumnNamer interface{ ColumnName(uint32) string }

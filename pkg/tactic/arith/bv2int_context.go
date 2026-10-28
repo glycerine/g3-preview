@@ -1,6 +1,7 @@
+package arith
+
 // Source: src/tactic/arith/bv2int_rewriter.cpp:24-93;
 // src/tactic/arith/bv2int_rewriter.h:29-51.
-package arith
 
 import (
 	"math/big"

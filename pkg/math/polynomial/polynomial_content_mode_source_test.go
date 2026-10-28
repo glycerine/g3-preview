@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:1821-1830,3344-3359,3405-3430; src/util/mpzzp.h.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:1821-1830,3344-3359,3405-3430; src/util/mpzzp.h.
 
 import (
 	"fmt"

@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp; src/math/polynomial/polynomial.h.
 // Actual standalone polynomial.cpp monomial owner. This is not polynomial::imp.
-package polynomial
 
 import (
 	"errors"

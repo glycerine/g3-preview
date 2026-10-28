@@ -1,5 +1,6 @@
-// Source: ast_smt_pp.cpp smt_printer::pp_dt and pp_sort_decl.
 package ast
+
+// Source: ast_smt_pp.cpp smt_printer::pp_dt and pp_sort_decl.
 
 import (
 	"strconv"

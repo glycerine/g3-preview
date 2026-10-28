@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3mgr.cpp solve_arith, cont_eq, apply_quant,
 // and close_universally.
-package interp
 
 import (
 	"errors"

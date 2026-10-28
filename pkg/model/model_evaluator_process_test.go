@@ -1,5 +1,6 @@
-// Source: src/model/model_evaluator.cpp:282-290; src/util/memory_manager.cpp:162-171.
 package model_test
+
+// Source: src/model/model_evaluator.cpp:282-290; src/util/memory_manager.cpp:162-171.
 
 import (
 	"errors"

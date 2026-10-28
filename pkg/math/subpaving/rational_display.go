@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:254-282,376-416,636-650,
 // 1135-1155,1848-1861; concrete config_mpq constraint and leaf display.
-package subpaving
 
 import (
 	"io"

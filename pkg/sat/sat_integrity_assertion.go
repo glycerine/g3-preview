@@ -1,5 +1,6 @@
-// Source: src/sat/sat_integrity_checker.cpp:133-189; src/util/debug.h:60-65.
 package sat
+
+// Source: src/sat/sat_integrity_checker.cpp:133-189; src/util/debug.h:60-65.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

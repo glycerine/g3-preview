@@ -1,6 +1,7 @@
+package normal_forms
+
 // Source: src/ast/normal_forms/defined_names.cpp:37-320;
 // src/ast/normal_forms/defined_names.h:26-86.
-package normal_forms
 
 import (
 	"errors"

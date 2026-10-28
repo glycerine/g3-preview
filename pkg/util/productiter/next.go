@@ -1,6 +1,7 @@
+package productiter
+
 // Package productiter implements the retained uint32 product-coordinate step
 // from src/util/util.cpp:112-119.
-package productiter
 
 // Next advances the first coordinate fastest and resets completed coordinates.
 // The caller supplies equal-length slices, as at the source call site.

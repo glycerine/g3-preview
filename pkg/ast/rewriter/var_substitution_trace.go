@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/var_subst.cpp:35-40; src/util/trace.h:40-46.
 package rewriter
+
+// Source: src/ast/rewriter/var_subst.cpp:35-40; src/util/trace.h:40-46.
 
 import (
 	"io"

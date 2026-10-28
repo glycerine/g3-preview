@@ -1,7 +1,8 @@
+package numeral
+
 // Source: src/util/buffer.h:29-75,90-96,146-151,194-210;
 // src/util/rational.h:41-43,67;
 // src/ast/rewriter/poly_rewriter_def.h:570-586.
-package numeral
 
 import "github.com/glycerine/g3/pkg/arena"
 

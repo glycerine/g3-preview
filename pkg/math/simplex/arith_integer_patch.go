@@ -1,6 +1,7 @@
+package simplex
+
 // Source: src/smt/theory_arith_int.h patch_int_infeasible_vars and
 // fix_non_base_vars. Assignment updates preserve the canonical row equations.
-package simplex
 
 import "math/big"
 

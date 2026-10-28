@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/reg_decl_plugins.cpp:32; src/ast/ast.cpp:1412;
 // src/util/memory_manager.cpp:202-211.
-package ast
 
 import (
 	"fmt"

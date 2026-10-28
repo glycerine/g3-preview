@@ -1,6 +1,7 @@
+package interval
+
 // Source: src/util/ext_numeral.h:27-344, concrete mpff specialization reached
 // by src/math/subpaving/subpaving_mpff.h.
-package interval
 
 import (
 	"io"

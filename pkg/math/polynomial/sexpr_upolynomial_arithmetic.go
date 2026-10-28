@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/sexpr2upolynomial.cpp:39-85.
 package polynomial
+
+// Source: src/math/polynomial/sexpr2upolynomial.cpp:39-85.
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

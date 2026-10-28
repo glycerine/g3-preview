@@ -1,5 +1,6 @@
-// Source: src/util/file_path.h:23-35.
 package filepath
+
+// Source: src/util/file_path.h:23-35.
 
 import (
 	"strings"

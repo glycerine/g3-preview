@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:1613-1642.
 // The reached constructor/reset SET writes the existing class NUM member.
 // Its adapter creates no source numeral or source destructor.
-package polynomial
 
 import (
 	"errors"

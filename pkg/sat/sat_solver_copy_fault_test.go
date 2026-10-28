@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:75-127. Actual destination refusal prefixes.
 package sat
+
+// Source: src/sat/sat_solver.cpp:75-127. Actual destination refusal prefixes.
 
 import (
 	"fmt"

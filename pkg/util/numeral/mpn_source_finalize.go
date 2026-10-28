@@ -1,5 +1,6 @@
-// Source mpn.h manager member destruction: t_ab,t_ms,v,u.
 package numeral
+
+// Source mpn.h manager member destruction: t_ab,t_ms,v,u.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

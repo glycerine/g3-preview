@@ -1,5 +1,6 @@
-// Source: src/test/mpz.cpp::bug4 and src/util/mpz.cpp bitwise preconditions.
 package numeral
+
+// Source: src/test/mpz.cpp::bug4 and src/util/mpz.cpp bitwise preconditions.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_mus.cpp:60–127,210–229; independent source value fixtures.
 package sat
+
+// Source: src/sat/sat_mus.cpp:60–127,210–229; independent source value fixtures.
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/fpa_rewriter.cpp:106-119,189-213.
 package ast
+
+// Source: src/ast/rewriter/fpa_rewriter.cpp:106-119,189-213.
 
 import (
 	"errors"

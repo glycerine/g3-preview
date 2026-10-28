@@ -1,5 +1,6 @@
-// Source: mpbq.cpp add/sub(mpz), retained by algebraic root_core bounds.
 package numeral
+
+// Source: mpbq.cpp add/sub(mpz), retained by algebraic root_core bounds.
 
 type BinaryIntegerDebugInvocationReceipt struct {
 	owner      *BinaryRationalManager

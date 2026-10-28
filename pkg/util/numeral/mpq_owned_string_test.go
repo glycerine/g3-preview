@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:123-127; src/util/mpz.cpp:1432-1435.
 package numeral
+
+// Source: src/util/mpq.cpp:123-127; src/util/mpz.cpp:1432-1435.
 
 import (
 	utext "github.com/glycerine/g3/pkg/util/text"

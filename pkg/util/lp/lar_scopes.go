@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:474-542; whole-model scopes.
 package lp
+
+// Source: src/util/lp/lar_solver.h:474-542; whole-model scopes.
 
 func (s *LARSolver) Push() (err error) {
 	if err = s.ready(); err != nil {

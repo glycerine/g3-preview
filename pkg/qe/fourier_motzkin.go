@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::fm retained owning entry point.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::fm retained owning entry point.
 
 import (
 	"errors"

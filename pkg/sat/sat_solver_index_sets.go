@@ -1,5 +1,6 @@
-// Concrete SAT antecedent storage. Container backing uses native Go collections.
 package sat
+
+// Concrete SAT antecedent storage. Container backing uses native Go collections.
 
 import (
 	"reflect"

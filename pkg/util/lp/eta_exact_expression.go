@@ -1,5 +1,6 @@
-// Source: src/util/rational.h:449-451,462-464,480-493; reached exact expressions.
 package lp
+
+// Source: src/util/rational.h:449-451,462-464,480-493; reached exact expressions.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

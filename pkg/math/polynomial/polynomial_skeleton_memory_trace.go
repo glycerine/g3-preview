@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:4226;
 // src/util/scoped_ptr_vector.h:38,46; src/util/util.h:171.
-package polynomial
 
 import (
 	"fmt"

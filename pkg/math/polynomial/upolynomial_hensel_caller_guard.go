@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization.cpp:703-801,873-977;
 // src/util/mpzzp.h:97-105.
-package polynomial
 
 // The synchronous chain is an entry/destructor guard, never acquisition
 // authority. Explicit concrete contexts alone stamp actual numerical leaves.

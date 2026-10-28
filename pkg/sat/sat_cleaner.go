@@ -1,5 +1,6 @@
-// Source: src/sat/sat_cleaner.h and .cpp:26–229; src/sat/sat_solver.cpp:3082–3087.
 package sat
+
+// Source: src/sat/sat_cleaner.h and .cpp:26–229; src/sat/sat_solver.cpp:3082–3087.
 
 import (
 	"reflect"

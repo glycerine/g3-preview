@@ -1,5 +1,6 @@
-// Source: src/util/nat_set.h:25-85.
 package natset
+
+// Source: src/util/nat_set.h:25-85.
 
 import "testing"
 

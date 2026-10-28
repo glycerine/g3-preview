@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.h:172-180;
 // lp_dual_core_solver.hpp:375-386,711-730,742-750.
-package lp
 
 func (m *FloatDualCoreSolver) SignedSpanOfBoxed(j uint32) (float64, error) {
 	low, err := m.dualAtBound(j, false)

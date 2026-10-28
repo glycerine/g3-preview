@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:123-127; actual denominator-display transport.
 package numeral
+
+// Source: src/util/mpq.cpp:123-127; actual denominator-display transport.
 
 import (
 	"math/big"

@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp elim_rec/elim; src/qe/qe.cpp extract_vars.
 package qe
+
+// Source: src/qe/qsat.cpp elim_rec/elim; src/qe/qe.cpp extract_vars.
 
 import (
 	"io"

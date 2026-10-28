@@ -1,7 +1,8 @@
+package rewriter
+
 // Source: src/ast/rewriter/rewriter_def.h:23-180,182-562,562-750;
 // src/ast/rewriter/rewriter.h:365-408; src/ast/rewriter/bool_rewriter.h:181-200;
 // src/test/var_subst.cpp:60-106.
-package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

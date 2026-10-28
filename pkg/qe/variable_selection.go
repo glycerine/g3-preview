@@ -1,6 +1,7 @@
+package qe
+
 // Source: src/qe/qe_vartest.h. The retained callers use only these three
 // concrete selection modes; no open-ended expression-predicate adapter is needed.
-package qe
 
 import (
 	"reflect"

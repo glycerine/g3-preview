@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/bv_rewriter.cpp:305-306;
 // src/ast/bv_decl_plugin.cpp:571-630.
-package ast
 
 import "testing"
 

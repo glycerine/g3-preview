@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/arith_decl_plugin.cpp:602-626;
 // src/ast/rewriter/bool_rewriter.cpp:650-659.
-package rewriter
 
 import (
 	"testing"

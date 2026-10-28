@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_solver.hpp:412-534, lp_solver.h:229-235 and precise
 // scale early return at lp_solver.hpp:111-116; retained mpq/mpq consumers.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

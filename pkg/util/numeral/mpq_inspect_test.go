@@ -1,6 +1,7 @@
+package numeral
+
 // Active source assertions: src/test/rational.cpp tst2 conversion block and
 // rational_tester::tst_hash. The global rational wrapper remains unported.
-package numeral
 
 import (
 	"errors"

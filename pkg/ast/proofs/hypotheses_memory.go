@@ -1,6 +1,7 @@
+package proofs
+
 // Source: src/ast/proofs/proof_utils.cpp:365,398,412,517,569;
 // src/util/util.h:223-225; src/util/memory_manager.cpp:202-211.
-package proofs
 
 import (
 	"fmt"

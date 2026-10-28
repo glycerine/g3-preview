@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1608-1619; actual first COPY allocation transport.
 package numeral
+
+// Source: src/util/mpf.cpp:1608-1619; actual first COPY allocation transport.
 
 import (
 	"errors"

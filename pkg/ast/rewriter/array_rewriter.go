@@ -1,7 +1,8 @@
+package rewriter
+
 // Source: src/ast/rewriter/array_rewriter.cpp:25-38,70-224;
 // src/ast/rewriter/array_rewriter.h:34-64;
 // src/ast/rewriter/array_rewriter_params.pyg:1-6.
-package rewriter
 
 import (
 	"errors"

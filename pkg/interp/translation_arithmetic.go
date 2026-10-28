@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3translate.cpp arithmetic normalization
 // helpers used by retained proof-rule translation.
-package interp
 
 import (
 	"errors"

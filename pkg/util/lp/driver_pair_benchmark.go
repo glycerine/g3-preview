@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/test/lp.cpp:3050-3078; numeric_pair.h:97-101,164-168,216-218;
 // indexed_vector.hpp:25-30. Retained test_rationals benchmark.
-package lp
 
 import (
 	"io"

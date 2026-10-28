@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:283-303; actual first BIG digit allocation transport.
 package numeral
+
+// Source: src/util/mpz.cpp:283-303; actual first BIG digit allocation transport.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/tactic/aig/aig.cpp:1548-1591,1739-1741.
 package aig
+
+// Source: src/tactic/aig/aig.cpp:1548-1591,1739-1741.
 
 import (
 	"bytes"

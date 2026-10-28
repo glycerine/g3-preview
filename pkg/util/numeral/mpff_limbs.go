@@ -1,5 +1,6 @@
-// Concrete indexed bit_util and source MPN Algorithms A/S/M, no borrowed slice.
 package numeral
+
+// Concrete indexed bit_util and source MPN Algorithms A/S/M, no borrowed slice.
 
 import (
 	"math/bits"

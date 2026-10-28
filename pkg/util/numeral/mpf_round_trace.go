@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1967-2097 (retained mpf_dbg TRACE sites).
 package numeral
+
+// Source: src/util/mpf.cpp:1967-2097 (retained mpf_dbg TRACE sites).
 
 import (
 	"io"

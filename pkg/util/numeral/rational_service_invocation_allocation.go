@@ -1,5 +1,6 @@
-// Source: src/util/rational.h; src/util/mpz.h:allocate.
 package numeral
+
+// Source: src/util/rational.h; src/util/mpz.h:allocate.
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

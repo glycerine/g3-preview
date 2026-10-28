@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/bv_rewriter.cpp:1532-1540;
 // src/util/rational.h:131-134,198-200.
-package ast
 
 // ExtendBitVectorNumeralSign owns the local rational and each source full
 // expression through publication. Symbolic input does not access out.

@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3translate.cpp commutativity-axiom
 // elimination helpers.
-package interp
 
 import "github.com/glycerine/g3/pkg/ast"
 

@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:274; src/util/mpq.cpp:rat_lt.
 package numeral
+
+// Source: src/util/mpf.cpp:274; src/util/mpq.cpp:rat_lt.
 
 import (
 	"testing"

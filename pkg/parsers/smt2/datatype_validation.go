@@ -1,5 +1,6 @@
-// Source: src/parsers/smt2/smt2parser.cpp:885-920,930-954,981-1001.
 package smt2
+
+// Source: src/parsers/smt2/smt2parser.cpp:885-920,930-954,981-1001.
 
 import (
 	"github.com/glycerine/g3/pkg/smtcore"

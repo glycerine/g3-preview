@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:366-401,2520-2580; public Sturm/Fourier normalization.
 package polynomial
+
+// Source: upolynomial.cpp:366-401,2520-2580; public Sturm/Fourier normalization.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:1503–1522; src/sat/sat_simplifier_params.pyg.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:1503–1522; src/sat/sat_simplifier_params.pyg.
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

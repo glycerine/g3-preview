@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpf.cpp:2100-2131 (shared concrete allocation/lifetime engine).
 // Source: src/util/mpf.cpp:1963-2098; explicit reached Integer allocation leaves.
-package numeral
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

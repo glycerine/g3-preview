@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:370-389,637-639.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:370-389,637-639.
 
 import "strconv"
 

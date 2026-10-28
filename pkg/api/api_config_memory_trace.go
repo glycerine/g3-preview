@@ -1,5 +1,6 @@
-// Source: src/api/api_config_params.cpp:73,79; src/util/memory_manager.cpp:202-211.
 package api
+
+// Source: src/api/api_config_params.cpp:73,79; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

@@ -1,6 +1,7 @@
+package model_test
+
 // Source: src/model/model_evaluator.cpp:149-174;
 // src/ast/rewriter/fpa_rewriter.cpp:547-667.
-package model_test
 
 import (
 	"testing"

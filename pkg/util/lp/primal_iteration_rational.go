@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver.hpp:1050-1060, precise specialization.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver.hpp:1050-1060, precise specialization.
 
 func (m *RationalPrimalCoreSolver) OneIteration() (err error) {
 	if err = m.ready(); err != nil {

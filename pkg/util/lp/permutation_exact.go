@@ -1,5 +1,6 @@
-// Source: src/util/lp/permutation_matrix.h/.hpp, retained mpq/mpq and mpq/impq instances.
 package lp
+
+// Source: src/util/lp/permutation_matrix.h/.hpp, retained mpq/mpq and mpq/impq instances.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

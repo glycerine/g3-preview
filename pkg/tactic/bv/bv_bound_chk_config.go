@@ -1,5 +1,6 @@
-// Source: src/tactic/bv/bv_bound_chk_tactic.cpp bv_bound_chk_rewriter_cfg.
 package bv
+
+// Source: src/tactic/bv/bv_bound_chk_tactic.cpp bv_bound_chk_rewriter_cfg.
 
 import (
 	"errors"

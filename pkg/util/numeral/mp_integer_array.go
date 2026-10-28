@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:845-922; src/util/mpzzp.h:217-220.
 package numeral
+
+// Source: src/util/mpz.cpp:845-922; src/util/mpzzp.h:217-220.
 
 import (
 	"math"

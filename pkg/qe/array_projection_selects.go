@@ -1,5 +1,6 @@
-// Source: src/qe/qe_arrays.cpp select occurrence checking/Ackermann reduction.
 package qe
+
+// Source: src/qe/qe_arrays.cpp select occurrence checking/Ackermann reduction.
 
 import "github.com/glycerine/g3/pkg/ast"
 

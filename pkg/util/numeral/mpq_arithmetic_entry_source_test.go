@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h:140-145,324-332,456-482.
 package numeral
+
+// Source: src/util/mpq.h:140-145,324-332,456-482.
 
 import (
 	"errors"

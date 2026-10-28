@@ -1,5 +1,6 @@
-// Source: src/util/mpn.cpp:296-302.
 package numeral
+
+// Source: src/util/mpn.cpp:296-302.
 
 import (
 	"io"

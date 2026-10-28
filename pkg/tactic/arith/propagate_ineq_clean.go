@@ -1,6 +1,7 @@
+package arith
+
 // Source: src/tactic/arith/propagate_ineqs_tactic.cpp:60-62;
 // src/tactic/tactical.cpp:1107-1128.
-package arith
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

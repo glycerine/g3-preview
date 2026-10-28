@@ -1,5 +1,6 @@
-// Source: src/ast/macros/macro_util.cpp/.h.
 package macros
+
+// Source: src/ast/macros/macro_util.cpp/.h.
 
 import (
 	"errors"

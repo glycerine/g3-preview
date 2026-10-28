@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:24-65,1806-1843;
 // concrete config_mpff breadth-first search loop.
-package subpaving
 
 import "github.com/glycerine/g3/pkg/arena"
 

@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp:940-948.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp:940-948.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

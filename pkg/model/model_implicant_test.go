@@ -1,5 +1,6 @@
-// Source: src/model/model_implicant.cpp:46-466,617-917.
 package model_test
+
+// Source: src/model/model_implicant.cpp:46-466,617-917.
 
 import (
 	"testing"

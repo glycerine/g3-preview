@@ -1,5 +1,6 @@
-// Source: upolynomial_factorization.cpp:1141-1145,1155-1158,1192-1196.
 package polynomial
+
+// Source: upolynomial_factorization.cpp:1141-1145,1155-1158,1192-1196.
 
 import (
 	"io"

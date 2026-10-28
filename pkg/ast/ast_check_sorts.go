@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:1958-2030; retained util/warning.cpp caller.
 package ast
+
+// Source: src/ast/ast.cpp:1958-2030; retained util/warning.cpp caller.
 
 import (
 	"errors"

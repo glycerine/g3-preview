@@ -1,7 +1,8 @@
+package memory
+
 // Source: src/util/small_object_allocator.cpp:72-96,98-145; src/util/fixed_bit_vector.cpp:78-80.
 // Source revision: Leonardo de Moura (leonardo) 2011-04-27; rewrote/simplified allocator.
 // Fixed-vector
-package memory
 
 import (
 	"errors"

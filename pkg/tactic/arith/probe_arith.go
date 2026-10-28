@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/probe_arith.cpp/.h Boolean fragment probes.
 package arith
+
+// Source: src/tactic/arith/probe_arith.cpp/.h Boolean fragment probes.
 
 import (
 	"errors"

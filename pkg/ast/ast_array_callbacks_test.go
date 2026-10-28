@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/array_decl_plugin.cpp:543-558;
 // src/ast/ast.cpp:2566-2593.
-package ast
 
 import (
 	"errors"

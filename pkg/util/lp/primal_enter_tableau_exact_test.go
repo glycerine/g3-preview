@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver_tableau.h:23-41.
 // Independent exact-rational models supplement retained source assertions.
-package lp
 
 import (
 	"errors"

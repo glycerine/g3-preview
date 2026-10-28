@@ -1,5 +1,6 @@
-// Source: src/sat/sat_mus.cpp:52–209; actual allocation-prefix ownership campaign.
 package sat
+
+// Source: src/sat/sat_mus.cpp:52–209; actual allocation-prefix ownership campaign.
 
 import (
 	"fmt"

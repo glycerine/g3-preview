@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:427-438,465-469, retained precise branches.
 package lp
+
+// Source: src/util/lp/lu.hpp:427-438,465-469, retained precise branches.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

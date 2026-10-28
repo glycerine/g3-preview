@@ -1,5 +1,6 @@
-// Source: src/util/trace.h:40-46, concrete interval-root trace operands.
 package subpaving
+
+// Source: src/util/trace.h:40-46, concrete interval-root trace operands.
 
 import (
 	"errors"

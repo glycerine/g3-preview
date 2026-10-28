@@ -1,5 +1,6 @@
-// Original source allocator tests; source actions and names preserved.
 package memory
+
+// Original source allocator tests; source actions and names preserved.
 
 import (
 	"errors"

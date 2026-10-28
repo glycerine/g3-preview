@@ -1,5 +1,6 @@
-// Source: src/tactic/core/ctx_simplify_tactic.cpp imp traversal and scoped cache.
 package core
+
+// Source: src/tactic/core/ctx_simplify_tactic.cpp imp traversal and scoped cache.
 
 import (
 	"reflect"

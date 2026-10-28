@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:6683-6725;
 // src/math/polynomial/upolynomial_factorization.cpp:845-933.
-package polynomial
 
 import (
 	"errors"

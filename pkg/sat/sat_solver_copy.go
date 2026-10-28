@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:75-127; src/sat/sat_solver.h:257.
 package sat
+
+// Source: src/sat/sat_solver.cpp:75-127; src/sat/sat_solver.h:257.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

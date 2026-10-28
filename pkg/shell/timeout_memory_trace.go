@@ -1,5 +1,6 @@
-// Source: src/util/scoped_timer.cpp:255-265; src/util/memory_manager.cpp:202-211.
 package shell
+
+// Source: src/util/scoped_timer.cpp:255-265; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

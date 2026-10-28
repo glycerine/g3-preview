@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:801; src/util/trace.h:40-46.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:801; src/util/trace.h:40-46.
 
 import (
 	"io"

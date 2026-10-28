@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/var_subst.cpp:39-158. This is the concrete
 // UFBV call with an empty params_ref, so ignore_patterns_on_ground_qbody=true.
-package rewriter
 
 import (
 	"errors"

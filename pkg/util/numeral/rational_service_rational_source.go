@@ -1,5 +1,6 @@
-// Source: src/util/rational.h:52; src/util/mpq.h set(mpq const&).
 package numeral
+
+// Source: src/util/rational.h:52; src/util/mpq.h set(mpq const&).
 
 import (
 	"sync/atomic"

@@ -1,5 +1,6 @@
-// Source: src/shell/main.cpp:207-214, the -T option branch.
 package shell
+
+// Source: src/shell/main.cpp:207-214, the -T option branch.
 
 import (
 	"errors"

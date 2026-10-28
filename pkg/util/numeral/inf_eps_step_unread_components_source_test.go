@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_eps_rational.h:225-237 and inf_rational.h:228-238.
 // Prefix increment and decrement touch only the nested finite rational.
-package numeral
 
 import "testing"
 

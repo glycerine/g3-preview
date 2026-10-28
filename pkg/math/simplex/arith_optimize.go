@@ -1,7 +1,8 @@
+package simplex
+
 // Source: src/smt/theory_arith_aux.h init_gains, update_gains,
 // pick_var_to_leave, move_to_bound and max_min. This is the concrete rational
 // tableau path retained by nonlinear arithmetic (maintain_integrality=false).
-package simplex
 
 import (
 	"errors"

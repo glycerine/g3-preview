@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp:873-933.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp:873-933.
 
 func (m *ASTManager) floatingPointValue(fid FamilyID, r astNodeRef, unique bool) (bool, error) {
 	if m.nodeAt(r.slot).kind != ASTApp {

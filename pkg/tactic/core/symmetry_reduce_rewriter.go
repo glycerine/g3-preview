@@ -1,5 +1,6 @@
-// Source: src/tactic/core/symmetry_reduce_tactic.cpp ac_rewriter and cfg.
 package core
+
+// Source: src/tactic/core/symmetry_reduce_tactic.cpp ac_rewriter and cfg.
 
 import (
 	"errors"

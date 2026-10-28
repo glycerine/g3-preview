@@ -1,6 +1,7 @@
+package normal_forms
+
 // Source: src/ast/normal_forms/pull_quant.cpp reduce_app,
 // reduce_quantifier and pull_nested_quant::imp.
-package normal_forms
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

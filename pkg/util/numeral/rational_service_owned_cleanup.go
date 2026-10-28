@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:130-141; explicit Go owning continuation.
 package numeral
+
+// Source: src/util/mpq.cpp:130-141; explicit Go owning continuation.
 
 // CleanupValue owns only this caller's actual NUM/DEN fields. Unjoined lower
 // allocations remain with their real manager scopes; none is adopted here.

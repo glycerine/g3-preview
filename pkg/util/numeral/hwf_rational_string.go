@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/hwf.cpp:387-393,409-427;
 // src/util/f2n.h:164 instantiated as f2n<hwf_manager>.
-package numeral
 
 import "math/big"
 

@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/bool_rewriter.h:81,135-140;
 // src/model/model2expr.cpp:76,153.
-package rewriter
 
 import "github.com/glycerine/g3/pkg/ast"
 

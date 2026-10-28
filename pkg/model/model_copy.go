@@ -1,6 +1,7 @@
+package model
+
 // Source: src/model/model.cpp:44-75;
 // src/tactic/filter_model_converter.cpp:42-50.
-package model
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

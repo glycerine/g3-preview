@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1302-1368,2968-2987.
 package lp
+
+// Source: src/test/lp.cpp:1302-1368,2968-2987.
 
 import (
 	"io"

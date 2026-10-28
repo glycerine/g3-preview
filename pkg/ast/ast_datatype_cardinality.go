@@ -1,5 +1,6 @@
-// Source: src/ast/datatype_decl_plugin.cpp:112-147,215-229,557-673.
 package ast
+
+// Source: src/ast/datatype_decl_plugin.cpp:112-147,215-229,557-673.
 
 import "math"
 

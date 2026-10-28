@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_trailing.cpp:213-234,311-327.
 package ast
+
+// Source: src/ast/rewriter/bv_trailing.cpp:213-234,311-327.
 
 // ASTBitVectorNumeralInvocation names the actual numerical child of a
 // structural caller. A failed call cannot be reused, even after owning cleanup.

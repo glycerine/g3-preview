@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/label_rewriter.cpp;
 // src/ast/rewriter/label_rewriter.h.
-package rewriter
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/ast/fpa/fpa2bv_converter.cpp:652-666,1168-1179,2065-2261,3349-3512.
 package fpa
+
+// Source: src/ast/fpa/fpa2bv_converter.cpp:652-666,1168-1179,2065-2261,3349-3512.
 
 import "github.com/glycerine/g3/pkg/ast"
 

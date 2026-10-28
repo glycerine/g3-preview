@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/lia2pb_tactic.cpp/.h.
 package arith
+
+// Source: src/tactic/arith/lia2pb_tactic.cpp/.h.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/datatype_decl_plugin.cpp:753-872;
 // src/ast/datatype_decl_plugin.h:290-391.
-package ast
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

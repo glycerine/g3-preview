@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:1696-1697; src/util/trace.h.
 package ast
+
+// Source: src/ast/ast.cpp:1696-1697; src/util/trace.h.
 
 import (
 	"io"

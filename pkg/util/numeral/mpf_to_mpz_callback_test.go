@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1174 (foreign Integer COPY allocation transport).
 package numeral
+
+// Source: src/util/mpf.cpp:1174 (foreign Integer COPY allocation transport).
 
 import (
 	"errors"

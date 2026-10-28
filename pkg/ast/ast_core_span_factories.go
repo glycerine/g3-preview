@@ -1,5 +1,6 @@
-// Source: src/ast/ast_util.cpp:173-180; src/ast/ast.cpp:2064-2211.
 package ast
+
+// Source: src/ast/ast_util.cpp:173-180; src/ast/ast.cpp:2064-2211.
 
 // This concrete call-local argument reader selects actual borrowed storage.
 // It never clones a pointer array or grants ownership of its elements.

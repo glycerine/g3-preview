@@ -1,5 +1,6 @@
-// Source: src/tactic/probe.cpp:29-37; src/util/memory_manager.cpp:162-171.
 package tactic
+
+// Source: src/tactic/probe.cpp:29-37; src/util/memory_manager.cpp:162-171.
 
 import (
 	"testing"

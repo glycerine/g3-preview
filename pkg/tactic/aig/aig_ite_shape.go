@@ -1,5 +1,6 @@
-// Source: src/tactic/aig/aig.cpp:647-724.
 package aig
+
+// Source: src/tactic/aig/aig.cpp:647-724.
 
 // iteShape recognizes the source's four complementary-child positions in an
 // AND node whose two children are inverted AND nodes. Returned literals are

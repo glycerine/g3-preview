@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:1863-1876.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:1863-1876.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

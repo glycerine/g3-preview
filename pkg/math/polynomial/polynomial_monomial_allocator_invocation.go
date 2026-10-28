@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:862-884;
 // src/util/small_object_allocator.cpp:104-145.
-package polynomial
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

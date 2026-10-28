@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:303-316; src/api/api_fpa.cpp:364-377.
 package numeral
+
+// Source: src/util/mpf.cpp:303-316; src/api/api_fpa.cpp:364-377.
 
 import (
 	"math"

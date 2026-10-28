@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_dual_core_solver.hpp:213-235,339-350,433-533.
 package lp
+
+// Source: src/util/lp/lp_dual_core_solver.hpp:213-235,339-350,433-533.
 
 import (
 	"bytes"

@@ -1,5 +1,6 @@
-// Source: src/util/debug.cpp:73-117; src/util/debug.h:42-56.
 package diagnostic
+
+// Source: src/util/debug.cpp:73-117; src/util/debug.h:42-56.
 
 import (
 	"context"

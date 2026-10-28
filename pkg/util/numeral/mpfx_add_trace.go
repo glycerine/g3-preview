@@ -1,5 +1,6 @@
-// Source: src/util/mpfx.cpp:368,403,408-416.
 package numeral
+
+// Source: src/util/mpfx.cpp:368,403,408-416.
 
 import (
 	"io"

@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/push_app_ite.cpp:24-91;
 // src/ast/rewriter/push_app_ite.h:24-70.
-package rewriter
 
 import (
 	"errors"

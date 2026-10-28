@@ -1,5 +1,6 @@
-// Source AST scalar/indexed readers. All public borrows remain handle values.
 package ast
+
+// Source AST scalar/indexed readers. All public borrows remain handle values.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

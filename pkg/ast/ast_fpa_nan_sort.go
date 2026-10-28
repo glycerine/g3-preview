@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/fpa_decl_plugin.cpp:950-957;
 // src/ast/rewriter/fpa_rewriter.cpp:476-481.
-package ast
 
 // MkFPANaNOfSort is the concrete fpa_util::mk_nan(sort*) call used by the
 // infinity comparison rewrites. The supplied sort selects its two widths.

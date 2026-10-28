@@ -1,5 +1,6 @@
-// Source: src/model/func_interp.cpp:234-255; src/util/obj_hashtable.h.
 package model
+
+// Source: src/model/func_interp.cpp:234-255; src/util/obj_hashtable.h.
 
 import "github.com/glycerine/g3/pkg/ast"
 

@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.cpp/mpz.h signed comparison; explicit owner views for
 // retained cross-manager algebraic interval copying.
-package numeral
 
 import "github.com/glycerine/g3/pkg/arena"
 

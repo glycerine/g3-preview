@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.h:1984,2008-2018,2031-2060; src/ast/ast_util.cpp:173-180.
 // Source: src/test/sorting_network.cpp:150-181.
-package ast
 
 import (
 	"testing"

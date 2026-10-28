@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver/inc_sat_solver.cpp init_preprocess/internalize_goal.
 package sat_solver
+
+// Source: src/sat/sat_solver/inc_sat_solver.cpp init_preprocess/internalize_goal.
 
 import (
 	"errors"

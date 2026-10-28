@@ -1,5 +1,6 @@
-// Source: polynomial.cpp:3432-3534. ICCP owns only its reached concrete children.
 package polynomial
+
+// Source: polynomial.cpp:3432-3534. ICCP owns only its reached concrete children.
 
 import (
 	"errors"

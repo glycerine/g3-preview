@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/var_subst.cpp:160-174.
 package rewriter
+
+// Source: src/ast/rewriter/var_subst.cpp:160-174.
 
 import (
 	"errors"

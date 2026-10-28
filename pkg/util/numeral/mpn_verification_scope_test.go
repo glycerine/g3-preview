@@ -1,5 +1,6 @@
-// Source: src/util/mpn.cpp:158-168,206-217.
 package numeral
+
+// Source: src/util/mpn.cpp:158-168,206-217.
 
 import (
 	"testing"

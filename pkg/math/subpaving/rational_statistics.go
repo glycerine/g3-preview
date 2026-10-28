@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:1869-1884, concrete config_mpq.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:1869-1884, concrete config_mpq.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

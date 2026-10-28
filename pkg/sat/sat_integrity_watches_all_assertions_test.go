@@ -1,5 +1,6 @@
-// Source: src/sat/sat_integrity_checker.cpp:167-189; src/util/debug.h:64.
 package sat
+
+// Source: src/sat/sat_integrity_checker.cpp:167-189; src/util/debug.h:64.
 
 import (
 	"errors"

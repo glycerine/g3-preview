@@ -1,5 +1,6 @@
-// Source: src/tactic/core/ctx_simplify_tactic.cpp retained diagnostic sites.
 package core
+
+// Source: src/tactic/core/ctx_simplify_tactic.cpp retained diagnostic sites.
 
 import (
 	"errors"

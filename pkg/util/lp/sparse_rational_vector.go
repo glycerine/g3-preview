@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_vector.h, retained mpq coefficient storage.
 package lp
+
+// Source: src/util/lp/sparse_vector.h, retained mpq coefficient storage.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

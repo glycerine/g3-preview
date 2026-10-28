@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.hpp:893-914, mpq/impq.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.hpp:893-914, mpq/impq.
 
 func (m *PairCoreSolverBase) exactAtColumnBound(j uint32, upper bool) (bool, error) {
 	bounds := m.LowBounds

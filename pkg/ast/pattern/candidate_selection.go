@@ -1,5 +1,6 @@
-// Source: src/ast/pattern/pattern_inference.cpp:396-432,559-566.
 package pattern
+
+// Source: src/ast/pattern/pattern_inference.cpp:396-432,559-566.
 
 import (
 	"sort"

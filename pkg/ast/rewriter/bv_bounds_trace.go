@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_bounds.cpp TRACE("bv_bounds") sites.
 package rewriter
+
+// Source: src/ast/rewriter/bv_bounds.cpp TRACE("bv_bounds") sites.
 
 import (
 	"io"

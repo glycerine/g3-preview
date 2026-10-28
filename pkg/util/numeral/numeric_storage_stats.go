@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp/mpn.cpp; diagnostics of actual numeric storage.
 package numeral
+
+// Source: src/util/mpz.cpp/mpn.cpp; diagnostics of actual numeric storage.
 
 type NumericStorageStats struct {
 	LiveCells, CellSlots, RetiredCells, CachedCells uint32

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.h:199-208.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.h:199-208.
 
 // NeedToPivotToBasisTableau tests singleton columns and their unit values.
 // Like the source it does not additionally require the cell row to equal i.

@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:473-494, concrete config_mpq
 // bound relevance numerals. Other context search parameters remain open.
-package subpaving
 
 // UpdateBoundPolicy sets epsilon to 1/denominator (or zero) and the maximum
 // bound to 10^maxPower in source statement order. A failed numeral operation

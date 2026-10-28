@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.hpp:261-263,334-348,758-766;
 // numeric_pair.h:141-143,164-173.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

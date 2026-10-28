@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:233-300; explicit signed-host Runtime guard profile.
 package numeral
+
+// Source: src/util/mpf.cpp:233-300; explicit signed-host Runtime guard profile.
 
 import (
 	"errors"

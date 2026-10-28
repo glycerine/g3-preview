@@ -1,5 +1,6 @@
-// Actual source diagnostic byte streams stay in main; core tests moved to memory.
 package diagnostic
+
+// Actual source diagnostic byte streams stay in main; core tests moved to memory.
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

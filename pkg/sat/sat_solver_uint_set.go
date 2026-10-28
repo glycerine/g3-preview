@@ -1,6 +1,7 @@
+package sat
+
 // Source: src/sat/sat_types.h:153-204.
 // Concrete elimination todo, model-converter and integrity-check variable sets.
-package sat
 
 import (
 	"reflect"

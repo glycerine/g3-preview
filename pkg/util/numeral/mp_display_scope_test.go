@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:156-184 raw locals do not have numeral destructors.
 package numeral
+
+// Source: src/util/mpq.cpp:156-184 raw locals do not have numeral destructors.
 
 import (
 	"errors"

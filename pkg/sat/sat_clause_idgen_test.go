@@ -1,5 +1,6 @@
-// Source: src/sat/sat_clause.h/.cpp; src/util/id_gen.h.
 package sat
+
+// Source: src/sat/sat_clause.h/.cpp; src/util/id_gen.h.
 
 import (
 	"errors"

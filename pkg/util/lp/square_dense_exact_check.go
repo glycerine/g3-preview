@@ -1,5 +1,6 @@
-// Source: src/util/lp/square_dense_submatrix.hpp:302-323.
 package lp
+
+// Source: src/util/lp/square_dense_submatrix.hpp:302-323.
 
 func (m *RationalSquareDenseSubmatrix) IsLMatrix() (bool, error) {
 	if !sourceDebugEnabled {

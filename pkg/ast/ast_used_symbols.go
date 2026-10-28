@@ -1,5 +1,6 @@
-// Source: src/ast/used_symbols.h.
 package ast
+
+// Source: src/ast/used_symbols.h.
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

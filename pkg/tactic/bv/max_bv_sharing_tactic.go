@@ -1,5 +1,6 @@
-// Source: src/tactic/bv/max_bv_sharing_tactic.cpp/.h.
 package bv
+
+// Source: src/tactic/bv/max_bv_sharing_tactic.cpp/.h.
 
 import (
 	"errors"

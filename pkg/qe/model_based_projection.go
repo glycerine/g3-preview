@@ -1,5 +1,6 @@
-// Source: src/qe/qe_mbp.cpp/.h mbp::impl and public forwarding methods.
 package qe
+
+// Source: src/qe/qe_mbp.cpp/.h mbp::impl and public forwarding methods.
 
 import (
 	"errors"

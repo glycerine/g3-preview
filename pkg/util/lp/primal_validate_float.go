@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_simplex.hpp:271-358;
 // lp_primal_simplex.h:86-88. Retained floating named-solution validators.
-package lp
 
 import (
 	"fmt"

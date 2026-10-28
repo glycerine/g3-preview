@@ -1,5 +1,6 @@
-// Source: src/util/memory_manager.cpp; src/util/vector.h (failure audit adaptation).
 package numeral
+
+// Source: src/util/memory_manager.cpp; src/util/vector.h (failure audit adaptation).
 
 import (
 	"errors"

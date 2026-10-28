@@ -1,5 +1,6 @@
-// Source: src/util/gparams.cpp:633-644; source imp:81-105.
 package params
+
+// Source: src/util/gparams.cpp:633-644; source imp:81-105.
 
 import (
 	"errors"

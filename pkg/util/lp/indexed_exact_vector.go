@@ -1,5 +1,6 @@
-// Source: src/util/lp/indexed_vector.h/.hpp, live mpq and numeric_pair<mpq> instances.
 package lp
+
+// Source: src/util/lp/indexed_vector.h/.hpp, live mpq and numeric_pair<mpq> instances.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/util/lp/eta_matrix.h/.hpp, concrete double,double instance.
 package lp
+
+// Source: src/util/lp/eta_matrix.h/.hpp, concrete double,double instance.
 
 // FloatEtaMatrix is identity with one replaced column. SetDiagonal must precede
 // numerical use; the C++ double constructor does not initialize that member.

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:644,654,660,664,670,676.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:644,654,660,664,670,676.
 
 import (
 	"io"

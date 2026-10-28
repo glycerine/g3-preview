@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_solver.hpp:95-100,528-577. Retained mpq/mpq
 // objective preparation and the original-column reconstruction accessor.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

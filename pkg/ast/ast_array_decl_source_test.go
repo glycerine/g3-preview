@@ -1,5 +1,6 @@
-// Source: src/ast/array_decl_plugin.cpp:120-137,235-306,446-465.
 package ast
+
+// Source: src/ast/array_decl_plugin.cpp:120-137,235-306,446-465.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/bv_trailing.cpp:342,376,384,388;
 // src/util/memory_manager.cpp:202-211.
-package rewriter
 
 import (
 	"fmt"

@@ -1,5 +1,6 @@
-// Source: src/util/id_gen.h:25-85; src/math/polynomial/polynomial.cpp.
 package polynomial
+
+// Source: src/util/id_gen.h:25-85; src/math/polynomial/polynomial.cpp.
 
 import (
 	"errors"

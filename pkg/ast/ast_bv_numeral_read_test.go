@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:778-790; src/ast/rewriter/bv_rewriter.h:36.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:778-790; src/ast/rewriter/bv_rewriter.h:36.
 
 import (
 	"errors"

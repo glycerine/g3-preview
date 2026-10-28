@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_simplex.h:32-88;
 // lp_primal_simplex.hpp:63-68,146-165,189-250. Retained mpq/mpq instance.
-package lp
 
 import (
 	"fmt"

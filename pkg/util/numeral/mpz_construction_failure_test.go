@@ -1,6 +1,7 @@
+package numeral
+
 // mpz.cpp:87-140 constructor; mpz.h member order; implicit failed-constructor
 // member unwind excludes the completed mpz_manager destructor body.
-package numeral
 
 import (
 	"errors"

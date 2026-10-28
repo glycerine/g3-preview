@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:391-392; mpz.cpp:1432-1435 (to_string).
 package polynomial
+
+// Source: upolynomial.cpp:391-392; mpz.cpp:1432-1435 (to_string).
 
 import (
 	"bytes"

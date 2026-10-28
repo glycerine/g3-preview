@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:1392-1423,2481-2495;
 // src/util/small_object_allocator.cpp:104-145.
-package polynomial
 
 import (
 	"errors"

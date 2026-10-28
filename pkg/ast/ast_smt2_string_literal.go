@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:370-383,628-630.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:370-383,628-630.
 
 import "strings"
 

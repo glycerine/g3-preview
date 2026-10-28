@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:2454; retained util/trace TRACE call site.
 package ast
+
+// Source: src/ast/ast.cpp:2454; retained util/trace TRACE call site.
 
 import (
 	"io"

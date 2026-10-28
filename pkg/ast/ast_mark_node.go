@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h:495-518.
 package ast
+
+// Source: src/ast/ast.h:495-518.
 
 func (m *ASTManager) nodeMark(r astNodeRef, plane uint8, owner uint64, op uint8, flag bool) (bool, error) {
 	if e := m.validNode(r); e != nil {

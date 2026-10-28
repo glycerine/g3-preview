@@ -1,5 +1,6 @@
-// Source scenarios: src/test/check_assumptions.cpp and sat_user_scope.cpp.
 package testoracle
+
+// Source scenarios: src/test/check_assumptions.cpp and sat_user_scope.cpp.
 
 import (
 	"embed"

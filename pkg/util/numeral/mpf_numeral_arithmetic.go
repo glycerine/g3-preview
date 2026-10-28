@@ -1,5 +1,6 @@
-// Source: src/util/f2n.h:96-112, instantiated as f2n<mpf_manager>.
 package numeral
+
+// Source: src/util/f2n.h:96-112, instantiated as f2n<mpf_manager>.
 
 // Inv follows the source local-one, divide, delete, final-check sequence.
 func (m *ArbitraryFloatNumeralManager) Inv(x *ArbitraryFloat) error {

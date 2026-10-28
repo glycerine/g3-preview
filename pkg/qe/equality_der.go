@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp eq::der.
 package qe
+
+// Source: src/qe/qe_lite.cpp eq::der.
 
 import (
 	"errors"

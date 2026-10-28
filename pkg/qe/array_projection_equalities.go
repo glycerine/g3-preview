@@ -1,5 +1,6 @@
-// Source: src/qe/qe_arrays.cpp indices/solve_eq/solve/compare.
 package qe
+
+// Source: src/qe/qe_arrays.cpp indices/solve_eq/solve/compare.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

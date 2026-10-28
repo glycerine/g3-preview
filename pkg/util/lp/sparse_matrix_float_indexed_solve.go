@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:467-493,679-705.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:467-493,679-705.
 
 // SolveYUIndexed solves x*U=y over the row-reachable sparse domain. Visitation
 // postorder is retained in the rebuilt index, including zero/tolerance policy.

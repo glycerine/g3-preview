@@ -1,8 +1,9 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577,2933-2935.
 // The standalone numerical core borrows services and materializes workspaces
 // on demand. AlgebraicManager supplies eager source-ordered ownership around
 // these same numerical operations.
-package polynomial
 
 import (
 	"errors"

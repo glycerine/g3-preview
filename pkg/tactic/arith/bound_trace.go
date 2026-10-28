@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357,382-411,457,473,523,691-702,735-736.
 package arith
+
+// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357,382-411,457,473,523,691-702,735-736.
 
 import (
 	"io"

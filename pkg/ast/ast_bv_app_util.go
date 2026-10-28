@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.h:397-434.
 package ast
+
+// Source: src/ast/bv_decl_plugin.h:397-434.
 
 // mkBitVectorUtilityApp uses the registered BV family's original declaration
 // dispatch and application factory. Its argument slice is borrowed.

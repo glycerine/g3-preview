@@ -1,5 +1,6 @@
-// Source: src/tactic/core/elim_uncnstr_tactic.cpp rw_cfg and rw.
 package core
+
+// Source: src/tactic/core/elim_uncnstr_tactic.cpp rw_cfg and rw.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/memory_manager.cpp:102.
 package memory
+
+// Source: src/util/memory_manager.cpp:102.
 
 import "math"
 

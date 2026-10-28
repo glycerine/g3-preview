@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving.cpp:144-206, concrete context_hwf_wrapper.
 package subpaving
+
+// Source: src/math/subpaving/subpaving.cpp:144-206, concrete context_hwf_wrapper.
 
 import (
 	"io"

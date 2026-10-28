@@ -1,5 +1,6 @@
-// Source: src/ast/expr_abstract.cpp:22-145; src/util/ref_buffer.h:38-99.
 package ast
+
+// Source: src/ast/expr_abstract.cpp:22-145; src/util/ref_buffer.h:38-99.
 
 import (
 	"math"

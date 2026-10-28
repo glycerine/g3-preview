@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_trailing.cpp:51-85,392-394.
 package rewriter
+
+// Source: src/ast/rewriter/bv_trailing.cpp:51-85,392-394.
 
 import "github.com/glycerine/g3/pkg/ast"
 

@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp ar::der (lines 829-973).
 package qe
+
+// Source: src/qe/qe_lite.cpp ar::der (lines 829-973).
 
 import (
 	"errors"

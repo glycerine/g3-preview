@@ -1,5 +1,6 @@
-// Source: src/util/lp/indexed_vector.h/.hpp numerical call ownership.
 package lp
+
+// Source: src/util/lp/indexed_vector.h/.hpp numerical call ownership.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: upolynomial_factorization_int.h:111-119; bit_vector.cpp:188-201.
 package polynomial
+
+// Source: upolynomial_factorization_int.h:111-119; bit_vector.cpp:188-201.
 
 import (
 	"io"

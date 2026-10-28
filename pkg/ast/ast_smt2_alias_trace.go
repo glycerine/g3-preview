@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:708-711; src/util/trace.h:40-46.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:708-711; src/util/trace.h:40-46.
 
 import (
 	"errors"

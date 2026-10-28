@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:827-848; src/util/rational.h:519-523.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:827-848; src/util/rational.h:519-523.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

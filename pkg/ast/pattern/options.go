@@ -1,6 +1,7 @@
+package pattern
+
 // Source: src/ast/pattern/pattern_inference_params.h:24-50 and
 // src/ast/pattern/pattern_inference_params_helper.hpp:5-34.
-package pattern
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:987-1032; src/util/rational.h:186-190.
 package ast
+
+// Source: src/ast/rewriter/bv_rewriter.cpp:987-1032; src/util/rational.h:186-190.
 
 import (
 	"fmt"

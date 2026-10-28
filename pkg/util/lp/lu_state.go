@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.h:122-155; lu.hpp:149-160,717-726.
 package lp
+
+// Source: src/util/lp/lu.h:122-155; lu.hpp:149-160,717-726.
 
 import "errors"
 

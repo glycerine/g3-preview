@@ -1,5 +1,6 @@
-// Concrete translations of util/scoped_numeral.h and scoped_numeral_vector.h.
 package numeral
+
+// Concrete translations of util/scoped_numeral.h and scoped_numeral_vector.h.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:516-522,1810-1838; config_mpf.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:516-522,1810-1838; config_mpf.
 
 import (
 	"io"

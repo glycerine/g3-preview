@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver/inc_sat_solver.cpp:89-108; src/solver/solver.cpp.
 package sat_solver
+
+// Source: src/sat/sat_solver/inc_sat_solver.cpp:89-108; src/solver/solver.cpp.
 
 import (
 	"io"

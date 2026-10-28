@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/algebraic_numbers.cpp:64-125,2772-2780.
 package polynomial
+
+// Source: src/math/polynomial/algebraic_numbers.cpp:64-125,2772-2780.
 
 // unwindConstructorSource invokes only completed declarations. A failed
 // polynomial child has already unwound its own completed declarations; its

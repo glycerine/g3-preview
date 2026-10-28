@@ -1,5 +1,6 @@
-// Native typed collection keys; only queried AST identities are dereferenced.
 package ast
+
+// Native typed collection keys; only queried AST identities are dereferenced.
 
 import "github.com/glycerine/g3/pkg/arena"
 

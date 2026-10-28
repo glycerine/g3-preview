@@ -1,5 +1,6 @@
-// Source: src/tactic/goal_num_occurs.cpp; src/tactic/goal_num_occurs.h.
 package tactic
+
+// Source: src/tactic/goal_num_occurs.cpp; src/tactic/goal_num_occurs.h.
 
 import (
 	"errors"

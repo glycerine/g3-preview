@@ -1,5 +1,6 @@
-// Source: src/util/mpff.cpp:1173-1224, retained subpaving interval display.
 package numeral
+
+// Source: src/util/mpff.cpp:1173-1224, retained subpaving interval display.
 
 import (
 	"io"

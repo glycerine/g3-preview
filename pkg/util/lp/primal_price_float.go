@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver.hpp:59-148,233-271.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver.hpp:59-148,233-271.
 
 import "sort"
 

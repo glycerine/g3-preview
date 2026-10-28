@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving.cpp:54 and
 // src/math/subpaving/subpaving_t_def.h:473-501, concrete context_hwf.
-package subpaving
 
 import (
 	"math"

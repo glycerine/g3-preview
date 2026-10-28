@@ -1,5 +1,6 @@
-// Source: src/ast/well_sorted.cpp:63-71.
 package ast
+
+// Source: src/ast/well_sorted.cpp:63-71.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.h:403-409;
 // lp_primal_core_solver.hpp:574-627,666-674,996-1046.
-package lp
 
 import "math"
 

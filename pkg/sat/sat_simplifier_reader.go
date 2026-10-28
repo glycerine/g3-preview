@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:451–458; src/sat/sat_clause.h tmp_clause.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:451–458; src/sat/sat_clause.h tmp_clause.
 
 // One concrete borrowed dummy owner is part of the actual simplifier. This
 // boundary routes only that explicit owner; it cannot discover foreign refs.

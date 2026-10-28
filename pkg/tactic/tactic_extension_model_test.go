@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/tactic/extension_model_converter.cpp:49-85;
 // src/tactic/model_converter.h:30-41.
-package tactic
 
 import (
 	"bytes"

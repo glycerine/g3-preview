@@ -1,7 +1,8 @@
+package euclid
+
 // Source: src/math/euclid/euclidean_solver.cpp:39-45,315-320,452-455;
 // src/util/heap.h:57-66,219-250. The retained specialization is local to
 // the Euclidean solver; Go's heap package maintains the typed slice order.
-package euclid
 
 import (
 	"container/heap"

@@ -1,5 +1,6 @@
-// Source: src/util/common_msgs.h:22-39; src/util/common_msgs.cpp:21-27.
 package messages
+
+// Source: src/util/common_msgs.h:22-39; src/util/common_msgs.cpp:21-27.
 
 const (
 	Canceled          = "canceled"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:456-463,1090-1139,1158-1202,1242-1275.
 package lp
+
+// Source: src/util/lp/lar_solver.h:456-463,1090-1139,1158-1202,1242-1275.
 
 import (
 	"errors"

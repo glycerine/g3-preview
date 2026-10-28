@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3base.cpp Boolean simplification.
 package interp
+
+// Source checkpoint: src/interp/iz3base.cpp Boolean simplification.
 
 import "github.com/glycerine/g3/pkg/ast"
 

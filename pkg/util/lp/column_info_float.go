@@ -1,5 +1,6 @@
-// Source: src/util/lp/column_info.h:27-273, retained floating column metadata.
 package lp
+
+// Source: src/util/lp/column_info.h:27-273, retained floating column metadata.
 
 // FloatColumnInfo is the value state used by the floating LP solver. Unset
 // scalar fields have Go's zero value; source reads require their matching flag.

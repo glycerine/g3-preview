@@ -1,5 +1,6 @@
-// Source: src/util/basic_interval.h:118-121.
 package numeral
+
+// Source: src/util/basic_interval.h:118-121.
 
 import (
 	"errors"

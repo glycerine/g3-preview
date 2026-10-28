@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.h:483-485,603-636.
 package lp
+
+// Source: src/util/lp/lar_core_solver.h:483-485,603-636.
 
 func (c *LARCoreSolver) NoRLU() bool {
 	return c.RPrimal.Factorization == nil || c.RPrimal.Factorization.GetStatus() == LUDegenerated

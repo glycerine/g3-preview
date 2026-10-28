@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:28-34; src/util/mpf.cpp:61-67.
 package numeral
+
+// Source: src/util/mpq.cpp:28-34; src/util/mpf.cpp:61-67.
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

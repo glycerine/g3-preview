@@ -1,5 +1,6 @@
-// Source: src/util/f2n.h:164, instantiated as f2n<mpf_manager>.
 package numeral
+
+// Source: src/util/f2n.h:164, instantiated as f2n<mpf_manager>.
 
 import (
 	"io"

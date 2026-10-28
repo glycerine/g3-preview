@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1857-1891,1898-1919.
 package numeral
+
+// Source: src/util/mpf.cpp:1857-1891,1898-1919.
 
 // Each bitfield assignment is a literal source action. The final sign write in
 // zero/NaN intentionally occurs after the numerical SET/decrement succeeds.

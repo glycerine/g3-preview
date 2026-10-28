@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h copy; src/util/mpz.cpp big_set allocation.
 package numeral
+
+// Source: src/util/mpq.h copy; src/util/mpz.cpp big_set allocation.
 
 import (
 	"sync/atomic"

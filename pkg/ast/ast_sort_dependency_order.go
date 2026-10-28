@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/util/top_sort.h:31-99; concrete top_sort<sort> use in
 // src/ast/decl_collector.cpp:118-124.
-package ast
 
 import udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 

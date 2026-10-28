@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1578-1582; actual scoped q and child invocations.
 package numeral
+
+// Source: src/util/mpf.cpp:1578-1582; actual scoped q and child invocations.
 
 import (
 	"errors"

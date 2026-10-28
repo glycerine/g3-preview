@@ -1,5 +1,6 @@
-// Scalar inspection from src/util/mpz.h/.cpp, internal 32-bit digit baseline.
 package numeral
+
+// Scalar inspection from src/util/mpz.h/.cpp, internal 32-bit digit baseline.
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"

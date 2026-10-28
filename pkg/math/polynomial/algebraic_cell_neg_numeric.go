@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:395-397; mpz.h:499-507 neg(INT_MIN).
 package polynomial
+
+// Source: algebraic_numbers.cpp:395-397; mpz.h:499-507 neg(INT_MIN).
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

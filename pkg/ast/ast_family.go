@@ -1,5 +1,6 @@
-// Translation of ast.h/ast.cpp::family_manager, Leonardo de Moura.
 package ast
+
+// Translation of ast.h/ast.cpp::family_manager, Leonardo de Moura.
 
 import (
 	"errors"

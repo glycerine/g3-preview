@@ -1,5 +1,6 @@
-// Source: src/util/mpn.cpp, Knuth Algorithm D.
 package numeral
+
+// Source: src/util/mpn.cpp, Knuth Algorithm D.
 
 import (
 	"math"

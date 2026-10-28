@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.cpp:349-355,2064-2135; src/ast/ast.h:665-683.
 // Scalar payload encoding. No unsafe or borrowed slice escapes.
-package ast
 
 import (
 	"math"

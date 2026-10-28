@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/rewriter.h:365-408;
 // src/ast/rewriter/bool_rewriter.h:181-200.
-package rewriter
 
 import (
 	"reflect"

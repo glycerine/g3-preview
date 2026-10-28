@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:403-651; outputs keep completed prefixes.
-package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

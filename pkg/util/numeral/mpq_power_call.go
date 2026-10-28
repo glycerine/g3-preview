@@ -1,5 +1,6 @@
-// Source: mpq.cpp power and its reached normalization/integer children.
 package numeral
+
+// Source: mpq.cpp power and its reached normalization/integer children.
 
 // RationalPowerInvocation owns only work accepted by this concrete power call.
 // A failed body does not execute the source's RAW end labels.

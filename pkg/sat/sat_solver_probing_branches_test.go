@@ -1,5 +1,6 @@
-// Source: src/sat/sat_probing.cpp; src/sat/sat_probing.h.
 package sat
+
+// Source: src/sat/sat_probing.cpp; src/sat/sat_probing.h.
 
 import (
 	"errors"

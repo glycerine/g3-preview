@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1170-1175,1664-1802,
 // concrete config_mpff definition watchers and bound queue.
-package subpaving
 
 import (
 	"errors"

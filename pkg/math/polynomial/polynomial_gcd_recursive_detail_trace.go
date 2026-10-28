@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:4100-4207; src/util/trace.h:40-46.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:4100-4207; src/util/trace.h:40-46.
 
 import (
 	"io"

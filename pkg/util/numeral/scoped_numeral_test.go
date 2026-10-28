@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral.h, src/util/scoped_numeral_vector.h.
 package numeral
+
+// Source: src/util/scoped_numeral.h, src/util/scoped_numeral_vector.h.
 
 import (
 	"errors"

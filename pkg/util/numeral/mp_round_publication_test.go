@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp floor/ceil and mpq.h output wrappers.
 package numeral
+
+// Source: src/util/mpq.cpp floor/ceil and mpq.h output wrappers.
 
 import (
 	"fmt"

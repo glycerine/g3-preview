@@ -1,6 +1,7 @@
+package interval
+
 // Source: src/math/interval/interval_def.h:206-210,315-320,344-348;
 // concrete config_hwf instantiation, src/util/trace.h.
-package interval
 
 import (
 	"io"

@@ -1,5 +1,6 @@
-// Source: src/model/func_interp.cpp:24-68; src/model/func_interp.h:38-64.
 package model
+
+// Source: src/model/func_interp.cpp:24-68; src/model/func_interp.h:38-64.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

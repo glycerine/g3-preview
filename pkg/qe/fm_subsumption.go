@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::fm registration and backward subsumption.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::fm registration and backward subsumption.
 
 import (
 	"io"

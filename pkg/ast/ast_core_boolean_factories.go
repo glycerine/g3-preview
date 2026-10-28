@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h:1984,2008-2018,2031-2060; src/ast/ast_util.cpp:173-180.
 package ast
+
+// Source: src/ast/ast.h:1984,2008-2018,2031-2060; src/ast/ast_util.cpp:173-180.
 
 func (m *ASTManager) MkFalse() (ASTHandle, error) {
 	if e := m.lock(); e != nil {

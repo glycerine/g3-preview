@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.hpp:920-935;
 // lp_settings.h:231-233,273-275. Precise rational specialization.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

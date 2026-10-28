@@ -1,6 +1,7 @@
+package api
+
 // Source: src/api/api_ast_map.cpp:27-137; src/api/api_ast_map.h:25-31;
 // src/util/dec_ref_util.h:24-36.
-package api
 
 import (
 	"errors"

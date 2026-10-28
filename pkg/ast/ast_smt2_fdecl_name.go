@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:34-73.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:34-73.
 
 import (
 	usmt2 "github.com/glycerine/g3/pkg/util/smt2"

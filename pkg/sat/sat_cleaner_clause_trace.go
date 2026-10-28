@@ -1,5 +1,6 @@
-// Source: src/sat/sat_cleaner.cpp:86-137; src/util/trace.h:40-46.
 package sat
+
+// Source: src/sat/sat_cleaner.cpp:86-137; src/util/trace.h:40-46.
 
 import (
 	"io"

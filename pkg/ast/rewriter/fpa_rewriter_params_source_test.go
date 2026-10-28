@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/fpa_rewriter_params.hpp:5-17.
 package rewriter
+
+// Source: src/ast/rewriter/fpa_rewriter_params.hpp:5-17.
 
 import "testing"
 

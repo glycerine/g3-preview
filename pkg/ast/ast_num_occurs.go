@@ -1,5 +1,6 @@
-// Source: src/ast/num_occurs.cpp; src/ast/num_occurs.h.
 package ast
+
+// Source: src/ast/num_occurs.cpp; src/ast/num_occurs.h.
 
 // NumOccurs counts incoming occurrences while traversing an expression DAG.
 // It borrows every handle and retains no AST references. Each node's children

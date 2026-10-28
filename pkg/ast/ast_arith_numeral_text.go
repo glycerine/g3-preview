@@ -1,5 +1,6 @@
-// Source: src/ast/arith_decl_plugin.cpp:632-639.
 package ast
+
+// Source: src/ast/arith_decl_plugin.cpp:632-639.
 
 // ArithmeticNumeralText reads the exact numeral value and integer flag for
 // the retained arithmetic-tactic consumer. The returned Go string is detached

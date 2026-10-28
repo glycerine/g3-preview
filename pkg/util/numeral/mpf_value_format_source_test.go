@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1519-1569; src/ast/ast_smt2_pp.cpp:262-268.
 package numeral
+
+// Source: src/util/mpf.cpp:1519-1569; src/ast/ast_smt2_pp.cpp:262-268.
 
 import (
 	"errors"

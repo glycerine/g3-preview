@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1164-1174,1869-1884;
 // concrete config_mpff counters.
-package subpaving
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

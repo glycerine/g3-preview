@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:175-229, retained double/double prepared solves.
 package lp
+
+// Source: src/util/lp/lu.hpp:175-229, retained double/double prepared solves.
 
 // SolveByWhenReadyForX consumes Q^-1*L*rhs, without applying the tails again.
 func (m *FloatLU) SolveByWhenReadyForX(y []float64) (err error) {

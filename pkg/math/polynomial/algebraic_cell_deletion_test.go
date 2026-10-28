@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:180-216; qualified signed-host TLS release.
 package polynomial
+
+// Source: algebraic_numbers.cpp:180-216; qualified signed-host TLS release.
 
 import (
 	"errors"

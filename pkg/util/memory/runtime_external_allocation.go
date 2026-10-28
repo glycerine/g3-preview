@@ -1,5 +1,6 @@
-// Source: src/util/memory_manager.cpp:33-72.
 package memory
+
+// Source: src/util/memory_manager.cpp:33-72.
 
 // RecordAllocationFailure applies the memory manager's sticky out-of-memory
 // state and configured failure transport to storage allocated by a typed Go

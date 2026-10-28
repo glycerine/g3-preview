@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:416-435,475-477,590-592.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:416-435,475-477,590-592.
 
 func (m *ASTManager) bitVectorNumeralDecl(ps []ASTParameter, arity int) (decl astNodeRef, result error) {
 	if len(ps) != 2 || arity != 0 {

@@ -1,5 +1,6 @@
-// Source: src/util/gparams.cpp:23,93; generated gparams_register_modules.cpp.
 package params
+
+// Source: src/util/gparams.cpp:23,93; generated gparams_register_modules.cpp.
 
 import (
 	"fmt"

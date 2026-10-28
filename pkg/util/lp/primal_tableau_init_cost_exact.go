@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver_tableau.h:396-425.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver_tableau.h:396-425.
 
 // InitReducedCostsTableau uses the actual stored tableau columns. Cost
 // switching completes before the ascending heading scan; basic costs and

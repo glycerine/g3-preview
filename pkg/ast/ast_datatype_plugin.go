@@ -1,9 +1,10 @@
+package ast
+
 // Source: src/ast/datatype_decl_plugin.h:237-246;
 // src/ast/datatype_decl_plugin.cpp:150-162.
 // The definition maps own the concrete datatype definition graph. Node
 // references retained by that graph are recorded in definitionRefs and are
 // released before the plugin's native Go containers are discarded.
-package ast
 
 import (
 	"reflect"

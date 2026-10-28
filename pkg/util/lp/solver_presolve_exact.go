@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_solver.hpp:168-411; lp_solver.h:187-193;
 // lp_settings.h:350-356. Concrete retained lp_solver<mpq,mpq> presolve.
-package lp
 
 import (
 	"fmt"

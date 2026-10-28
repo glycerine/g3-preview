@@ -1,5 +1,6 @@
-// Source: src/ast/arith_decl_plugin.cpp:115-332; src/ast/ast.cpp:1635-1638.
 package ast
+
+// Source: src/ast/arith_decl_plugin.cpp:115-332; src/ast/ast.cpp:1635-1638.
 
 import (
 	"errors"

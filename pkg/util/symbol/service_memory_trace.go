@@ -1,5 +1,6 @@
-// Source: src/util/symbol.cpp:65-73; src/util/memory_manager.cpp:202-211.
 package symbol
+
+// Source: src/util/symbol.cpp:65-73; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

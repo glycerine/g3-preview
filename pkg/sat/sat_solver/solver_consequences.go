@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver/inc_sat_solver.cpp:264-333,450-551.
 package sat_solver
+
+// Source: src/sat/sat_solver/inc_sat_solver.cpp:264-333,450-551.
 
 import (
 	"errors"

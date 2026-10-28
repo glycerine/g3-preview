@@ -1,5 +1,6 @@
-// Source: src/ackermannization/lackr.cpp/.h, solver-backed eager/lazy paths.
 package ackermannization
+
+// Source: src/ackermannization/lackr.cpp/.h, solver-backed eager/lazy paths.
 
 import (
 	"errors"

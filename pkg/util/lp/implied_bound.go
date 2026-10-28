@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/implied_bound.h; lar_constraints.h:flip_kind and
 // lconstraint_kind_string; ul_pair.h:lconstraint_kind.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

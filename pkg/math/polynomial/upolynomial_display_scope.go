@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1108-1225;
 // src/util/mpz.cpp:1385-1410; src/util/scoped_numeral.h.
-package polynomial
 
 import (
 	"reflect"

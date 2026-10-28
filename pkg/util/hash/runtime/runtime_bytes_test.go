@@ -1,5 +1,6 @@
-// Source: src/util/hash.cpp:26-102.
 package runtimehash
+
+// Source: src/util/hash.cpp:26-102.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: polynomial.cpp:3541-4506, concrete reached GCD child calls.
 package polynomial
+
+// Source: polynomial.cpp:3541-4506, concrete reached GCD child calls.
 
 func (m *MultivariatePolynomialManager) gcdDirectChildrenPending(s *polynomialGCDFunctionScope) bool {
 	c := m.core

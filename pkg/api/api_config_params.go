@@ -1,5 +1,6 @@
-// Source: src/api/api_config_params.cpp:69-94.
 package api
+
+// Source: src/api/api_config_params.cpp:69-94.
 
 import (
 	"errors"

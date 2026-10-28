@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:3157-3249. Independent finite fixtures.
 package sat
+
+// Source: src/sat/sat_solver.cpp:3157-3249. Independent finite fixtures.
 
 import (
 	"fmt"

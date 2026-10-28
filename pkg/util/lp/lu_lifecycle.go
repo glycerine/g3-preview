@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:936-944; explicit instances in lu_instances.cpp:39-41.
 package lp
+
+// Source: src/util/lp/lu.hpp:936-944; explicit instances in lu_instances.cpp:39-41.
 
 // InitFloatFactorization destroys the old factorization before constructing its
 // replacement. On error, the slot retains the partial new owner for Close.

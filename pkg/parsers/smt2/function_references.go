@@ -1,6 +1,7 @@
+package smt2
+
 // Source: src/parsers/smt2/smt2parser.cpp parse_indexed_identifier_core and
 // parse_func_decl_ref. Retained applications include array map and as-array.
-package smt2
 
 import (
 	"fmt"

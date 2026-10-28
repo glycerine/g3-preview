@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:463-474,509-539. Actual same-core copy callers.
 package polynomial
+
+// Source: algebraic_numbers.cpp:463-474,509-539. Actual same-core copy callers.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package smt2
+
 // Source: src/parsers/smt2/smt2parser.cpp parse_declare_datatype(s),
 // parse_datatype_dec and parse_constructor_decls: concrete declaration grammar.
-package smt2
 
 import (
 	"fmt"

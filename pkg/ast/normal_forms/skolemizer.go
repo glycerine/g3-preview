@@ -1,5 +1,6 @@
-// Source: src/ast/normal_forms/nnf.cpp:69-195.
 package normal_forms
+
+// Source: src/ast/normal_forms/nnf.cpp:69-195.
 
 import (
 	"errors"

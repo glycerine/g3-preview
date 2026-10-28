@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:351-363; public Sturm/Fourier RAW multiplier.
 package polynomial
+
+// Source: upolynomial.cpp:351-363; public Sturm/Fourier RAW multiplier.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

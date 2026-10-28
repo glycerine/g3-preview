@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_solver.h:253-255 and retained primal/dual callers.
 package lp
+
+// Source: src/util/lp/lp_solver.h:253-255 and retained primal/dual callers.
 
 import (
 	"fmt"

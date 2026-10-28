@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/bv_decl_plugin.h:399-402,416-423;
 // src/ast/bv_decl_plugin.cpp:880-885; src/ast/ast.h:113-122.
-package ast
 
 import "math"
 

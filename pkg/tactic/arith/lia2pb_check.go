@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/lia2pb_tactic.cpp is_target_core and visitor/check.
 package arith
+
+// Source: src/tactic/arith/lia2pb_tactic.cpp is_target_core and visitor/check.
 
 import (
 	"math/big"

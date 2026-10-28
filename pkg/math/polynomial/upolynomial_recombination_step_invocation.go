@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial_factorization.cpp:1238-1292;
 // src/math/polynomial/upolynomial.cpp:213-232,609-651.
 // Concrete call adapter only: this source span declares no additional numeral.
-package polynomial
 
 import (
 	"errors"

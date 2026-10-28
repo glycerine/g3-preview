@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver.hpp:274-303.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver.hpp:274-303.
 
 func (m *PairPrimalCoreSolver) copyBreakpointSlope(entering uint32) (err error) {
 	if uint64(entering) >= uint64(len(m.D.Data)) {

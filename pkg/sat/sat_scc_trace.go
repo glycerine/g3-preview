@@ -1,5 +1,6 @@
-// Source: src/sat/sat_scc.cpp:68-69,138,156,168,191,216,221; retained util/trace sites.
 package sat
+
+// Source: src/sat/sat_scc.cpp:68-69,138,156,168,191,216,221; retained util/trace sites.
 
 import (
 	"errors"

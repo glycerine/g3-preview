@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/poly_rewriter_def.h:928.
 package ast
+
+// Source: src/ast/rewriter/poly_rewriter_def.h:928.
 
 import "testing"
 

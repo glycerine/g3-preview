@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Exact source-slot replacement uses the real SET leaf; direct member access
 // is a qualified Go adapter ownership guard fixture, not another native driver.
-package polynomial
 
 import (
 	"fmt"

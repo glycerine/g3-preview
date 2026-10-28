@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_rational.h:346-357. Fused accumulation mutates FIRST
 // before EPS, so a late EPS failure retains the FIRST update.
-package numeral
 
 import "testing"
 

@@ -1,5 +1,6 @@
-// Source: src/qe/qe_datatypes.cpp recursive solving and foreign-field lifting.
 package qe
+
+// Source: src/qe/qe_datatypes.cpp recursive solving and foreign-field lifting.
 
 import (
 	"fmt"

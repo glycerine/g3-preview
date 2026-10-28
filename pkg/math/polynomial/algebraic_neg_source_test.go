@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:383-388,1565-1577,2933-2935.
 // Source caller: src/test/algebraic.cpp:376-379 (negation precedes multivariate sign evaluation).
-package polynomial
 
 import (
 	"fmt"

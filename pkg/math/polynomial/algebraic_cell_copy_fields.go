@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: algebraic_numbers.cpp:467-474,1905-1924. Copy reads source fields as their
 // consuming callees are reached, without decoding the entire source cell.
-package polynomial
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:467,474.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:467,474.
 
 func (p *MonomialPositions) resetIndexAssert(id uint32) error {
 	enabled, e := monomialSourceAssertionsEnabled()

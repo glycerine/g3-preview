@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.h:1026; src/ast/bv_decl_plugin.h:271-285;
 // src/ast/arith_decl_plugin.h:202-217.
-package ast
 
 // IsConsideredUninterpreted dispatches the declaration plugin hook. Ordinary
 // null-family functions are handled separately by consumers of this hook.

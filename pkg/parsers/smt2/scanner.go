@@ -1,5 +1,6 @@
-// Source: src/parsers/smt2/smt2scanner.cpp and smt2scanner.h.
 package smt2
+
+// Source: src/parsers/smt2/smt2scanner.cpp and smt2scanner.h.
 
 import (
 	"bufio"

@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:254-287,376-415,
 // 614-650,1067-1084,1135-1156,1848-1861; concrete config_hwf.
-package subpaving
 
 import (
 	"io"

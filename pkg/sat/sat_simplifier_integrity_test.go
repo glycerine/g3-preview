@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:148,161,169,222; sat_solver.cpp:711–716.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:148,161,169,222; sat_solver.cpp:711–716.
 
 import (
 	"testing"

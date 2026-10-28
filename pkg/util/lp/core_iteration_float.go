@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.h:77-99,475-514;
 // lp_core_solver_base.hpp:123-132,154-163,768-787,888-891,916-918.
-package lp
 
 func (m *FloatCoreSolverBase) StartTracingBasisChanges() { m.Trace = m.Trace[:0]; m.Tracing = true }
 func (m *FloatCoreSolverBase) StopTracingBasisChanges()  { m.Tracing = false }

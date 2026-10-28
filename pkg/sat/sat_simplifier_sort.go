@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:83–96; std::stable_sort invocation.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:83–96; std::stable_sort invocation.
 
 import "sort"
 

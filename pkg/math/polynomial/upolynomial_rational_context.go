@@ -1,5 +1,6 @@
-// Source: math/polynomial/sexpr2upolynomial.cpp; util scoped-numeral lifetimes.
 package polynomial
+
+// Source: math/polynomial/sexpr2upolynomial.cpp; util scoped-numeral lifetimes.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

@@ -1,5 +1,6 @@
-// Source: polynomial.cpp:3675-3767, concrete CRA reconstruction.
 package polynomial
+
+// Source: polynomial.cpp:3675-3767, concrete CRA reconstruction.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:392-417,1771-1792,1821-1847.
 package numeral
+
+// Source: src/util/mpf.cpp:392-417,1771-1792,1821-1847.
 
 // MkTopExp and MkBotExp are the reserved exponents for special values.
 // MkMinExp and MkMaxExp delimit the ordinary exponent range.

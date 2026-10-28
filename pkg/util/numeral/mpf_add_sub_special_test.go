@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:484-521 (early branches and actual callees).
 package numeral
+
+// Source: src/util/mpf.cpp:484-521 (early branches and actual callees).
 
 import (
 	"math"

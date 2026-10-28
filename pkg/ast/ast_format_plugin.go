@@ -1,5 +1,6 @@
-// Source: src/ast/format.cpp:25-117; src/ast/ast.cpp:1578-1585,1635-1638.
 package ast
+
+// Source: src/ast/format.cpp:25-117; src/ast/ast.cpp:1578-1585,1635-1638.
 
 import (
 	"math"

@@ -1,5 +1,6 @@
-// Source: src/ast/datatype_decl_plugin.h:237-246; src/ast/datatype_decl_plugin.cpp:150-162.
 package ast
+
+// Source: src/ast/datatype_decl_plugin.h:237-246; src/ast/datatype_decl_plugin.cpp:150-162.
 
 import "testing"
 

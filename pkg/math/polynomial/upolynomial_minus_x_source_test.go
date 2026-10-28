@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1594-1602.
 // Actual public returning-allocation callback and destructive-prefix fixtures.
-package polynomial
 
 import (
 	"fmt"

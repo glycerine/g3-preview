@@ -1,5 +1,6 @@
-// Source: src/ast/well_sorted.cpp:49; src/util/trace.h:40-46.
 package ast
+
+// Source: src/ast/well_sorted.cpp:49; src/util/trace.h:40-46.
 
 import (
 	"errors"

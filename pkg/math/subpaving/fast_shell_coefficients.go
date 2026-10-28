@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving.cpp:198-250, concrete context_mpff_wrapper.
 package subpaving
+
+// Source: src/math/subpaving/subpaving.cpp:198-250, concrete context_mpff_wrapper.
 
 import (
 	"errors"

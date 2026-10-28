@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::fm OCC recognition and forbidden_proc.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::fm OCC recognition and forbidden_proc.
 
 import (
 	"io"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:313-478, retained double/double refinement.
 package lp
+
+// Source: src/util/lp/lu.hpp:313-478, retained double/double refinement.
 
 func (m *FloatLU) findRowError(yc, y []float64, basis []uint32) error {
 	for i := m.Dim; i > 0; {

@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:734-745; src/util/buffer.h.
 package ast
+
+// Source: src/ast/ast.cpp:734-745; src/util/buffer.h.
 
 import "testing"
 

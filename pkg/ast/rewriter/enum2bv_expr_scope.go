@@ -1,5 +1,6 @@
-// Source: enum2bv_rewriter.cpp:54-81,132-148 concrete lexical expr_ref owners.
 package rewriter
+
+// Source: enum2bv_rewriter.cpp:54-81,132-148 concrete lexical expr_ref owners.
 
 import (
 	"errors"

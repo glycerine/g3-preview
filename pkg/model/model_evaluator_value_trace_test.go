@@ -1,5 +1,6 @@
-// Source: src/model/model_evaluator.cpp:565-577; src/solver/solver.cpp:87-94.
 package model_test
+
+// Source: src/model/model_evaluator.cpp:565-577; src/solver/solver.cpp:87-94.
 
 import (
 	"bytes"

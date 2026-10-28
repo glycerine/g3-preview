@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:2709-2714; mpq.cpp:130-139.
 package polynomial
+
+// Source: algebraic_numbers.cpp:2709-2714; mpq.cpp:130-139.
 
 import (
 	"bytes"

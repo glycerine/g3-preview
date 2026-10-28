@@ -1,5 +1,6 @@
-// Source mpq.h delegates to mpz and resets the output denominator afterward.
 package numeral
+
+// Source mpq.h delegates to mpz and resets the output denominator afterward.
 
 import (
 	"math/big"

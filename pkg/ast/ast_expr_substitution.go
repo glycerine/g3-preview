@@ -1,5 +1,6 @@
-// Concrete expr_substitution: checked scalar owners and native dictionaries.
 package ast
+
+// Concrete expr_substitution: checked scalar owners and native dictionaries.
 
 import (
 	"reflect"

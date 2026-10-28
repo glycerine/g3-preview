@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/math/subpaving/tactic/expr2subpaving.cpp:150-286,
 // concrete config_mpq arithmetic term construction.
-package tactic
 
 import (
 	"errors"

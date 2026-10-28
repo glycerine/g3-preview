@@ -1,5 +1,6 @@
-// Source: src/tactic/replace_proof_converter.cpp; src/tactic/replace_proof_converter.h.
 package tactic
+
+// Source: src/tactic/replace_proof_converter.cpp; src/tactic/replace_proof_converter.h.
 
 import (
 	"errors"

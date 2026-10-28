@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_settings.h, concrete settings/state and float predicates.
 package lp
+
+// Source: src/util/lp/lp_settings.h, concrete settings/state and float predicates.
 
 import (
 	"io"

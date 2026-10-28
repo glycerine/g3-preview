@@ -1,6 +1,7 @@
+package params
+
 // Source: scripts/mk_genfile_common.py:895-939; src/util/gparams.cpp:598-605;
 // src/util/params.cpp:325-339,639-648,902-928; src/smt/params/smt_params_helper.pyg:59-66.
-package params
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.hpp:275-319.
 package lp
+
+// Source: src/util/lp/lar_core_solver.hpp:275-319.
 
 // Solve orchestrates the coupled LAR cores and source explanation/status
 // publication. In particular, source maps every terminal status other than

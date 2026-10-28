@@ -1,5 +1,6 @@
-// Concrete finite-field square-free decomposition and Berlekamp source bodies.
 package polynomial
+
+// Concrete finite-field square-free decomposition and Berlekamp source bodies.
 
 import (
 	"errors"

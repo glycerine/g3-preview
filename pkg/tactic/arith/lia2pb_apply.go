@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/lia2pb_tactic.cpp imp::operator().
 package arith
+
+// Source: src/tactic/arith/lia2pb_tactic.cpp imp::operator().
 
 import (
 	"errors"

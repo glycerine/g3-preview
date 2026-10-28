@@ -1,5 +1,6 @@
-// Source: src/qe/qe_mbp.cpp common mbp::impl preprocessing stages.
 package qe
+
+// Source: src/qe/qe_mbp.cpp common mbp::impl preprocessing stages.
 
 import (
 	"errors"

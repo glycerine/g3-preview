@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:1425-1433,6436-6550,7409-7414;
 // src/util/scoped_numeral.h.
-package polynomial
 
 import (
 	"errors"

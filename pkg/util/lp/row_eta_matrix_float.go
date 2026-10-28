@@ -1,5 +1,6 @@
-// Source: src/util/lp/row_eta_matrix.h/.hpp, concrete double,double instance.
 package lp
+
+// Source: src/util/lp/row_eta_matrix.h/.hpp, concrete double,double instance.
 
 // FloatRowEtaMatrix is identity plus the literal sparse terms of one row.
 // The source row_start constructor argument is never read by retained bodies.

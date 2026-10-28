@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/util/scoped_ptr_vector.h;
 // src/math/polynomial/polynomial.cpp:2159-2214,2914-2952,4071.
-package polynomial
 
 import (
 	"reflect"

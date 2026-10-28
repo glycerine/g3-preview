@@ -1,5 +1,6 @@
-// Source: src/solver/mus.cpp; src/solver/mus.h.
 package solver
+
+// Source: src/solver/mus.cpp; src/solver/mus.h.
 
 import (
 	"math/big"

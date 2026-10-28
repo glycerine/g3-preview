@@ -1,6 +1,7 @@
+package numeral
+
 // Source mpz.cpp:1412 and scoped_numeral.h:31-33: DEFAULT before assignment.
 // Source: src/util/mpz.cpp, src/util/scoped_numeral.h.
-package numeral
 
 import (
 	"errors"

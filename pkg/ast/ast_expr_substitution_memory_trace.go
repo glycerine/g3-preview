@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/expr_substitution.cpp:29,31;
 // src/util/util.h:223-225; src/util/memory_manager.cpp:202-211.
-package ast
 
 import (
 	"fmt"

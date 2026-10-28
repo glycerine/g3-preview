@@ -1,5 +1,6 @@
-// Source: src/api/api_context.cpp:408-419; src/api/z3_api.h:5295-5305.
 package api
+
+// Source: src/api/api_context.cpp:408-419; src/api/z3_api.h:5295-5305.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

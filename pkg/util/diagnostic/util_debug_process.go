@@ -1,6 +1,7 @@
+package diagnostic
+
 // Source: src/util/debug.cpp:28-65. The assertion switch and debug-tag table
 // belong to the process, not to an individual heap instantiation.
-package diagnostic
 
 import "github.com/glycerine/g3/pkg/arena"
 

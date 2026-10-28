@@ -1,5 +1,6 @@
-// Source: src/util/util.h:131-139; src/ast/rewriter/bv_rewriter.cpp:684,814,863,909-921.
 package rewriter
+
+// Source: src/util/util.h:131-139; src/ast/rewriter/bv_rewriter.cpp:684,814,863,909-921.
 
 import (
 	"math/big"

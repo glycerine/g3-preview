@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:4909,4955-4962,4973,5011-5013,5072-5077.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:4909,4955-4962,4973,5011-5013,5072-5077.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

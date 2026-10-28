@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3proof_itp.cpp local resolution dispatch.
 package interp
+
+// Source checkpoint: src/interp/iz3proof_itp.cpp local resolution dispatch.
 
 import "github.com/glycerine/g3/pkg/ast"
 

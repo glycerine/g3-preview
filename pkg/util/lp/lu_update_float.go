@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.hpp:581-587,775-934, retained double/double.
 package lp
+
+// Source: src/util/lp/lu.hpp:581-587,775-934, retained double/double.
 
 import "math"
 

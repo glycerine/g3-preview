@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.h:308-366, retained mpq/pair extension (lar_solver.h:853,902-925).
 package lp
+
+// Source: src/util/lp/lu.h:308-366, retained mpq/pair extension (lar_solver.h:853,902-925).
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

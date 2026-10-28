@@ -1,5 +1,6 @@
-// Source: src/util/approx_set.h:43-158; src/sat/sat_types.h:115-119.
 package sat
+
+// Source: src/util/approx_set.h:43-158; src/sat/sat_types.h:115-119.
 
 import "testing"
 

@@ -1,6 +1,7 @@
+package smt2
+
 // Source: src/parsers/smt2/smt2parser.cpp parse_expr, parse_expr_name,
 // parse_sorted_vars and the quantifier/let frame reductions.
-package smt2
 
 import (
 	"errors"

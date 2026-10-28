@@ -1,5 +1,6 @@
-// Source: src/sat/sat_cleaner.cpp and .h; src/sat/sat_solver.cpp:3082–3087.
 package sat
+
+// Source: src/sat/sat_cleaner.cpp and .h; src/sat/sat_solver.cpp:3082–3087.
 
 import (
 	"errors"

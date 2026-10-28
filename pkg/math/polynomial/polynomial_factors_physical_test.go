@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:1613-1683;
 // src/util/vector.h; src/util/mpz.cpp.
-package polynomial
 
 import (
 	"testing"

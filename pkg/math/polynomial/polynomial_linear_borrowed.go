@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/linear_eq_solver.h:31-34,87-150.
 package polynomial
+
+// Source: src/math/polynomial/linear_eq_solver.h:31-34,87-150.
 
 func (s *RationalLinearSolver) NumericExecuting() bool { return s != nil && s.self == s && s.running }
 func (s *RationalLinearSolver) beginExecution() error {

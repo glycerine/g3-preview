@@ -1,5 +1,6 @@
-// Source: src/util/hwf.cpp:380-384; src/util/f2n.h:163,165.
 package numeral
+
+// Source: src/util/hwf.cpp:380-384; src/util/f2n.h:163,165.
 
 import (
 	"io"

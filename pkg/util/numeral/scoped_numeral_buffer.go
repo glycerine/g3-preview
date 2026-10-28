@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral_buffer.h; src/util/buffer.h:29-59,146-151,210-242.
 package numeral
+
+// Source: src/util/scoped_numeral_buffer.h; src/util/buffer.h:29-59,146-151,210-242.
 
 import "github.com/glycerine/g3/pkg/arena"
 

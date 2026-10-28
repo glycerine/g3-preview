@@ -1,5 +1,6 @@
-// Source: src/util/mpz.h:allocate; src/util/mpz.cpp scratch/publication callers.
 package numeral
+
+// Source: src/util/mpz.h:allocate; src/util/mpz.cpp scratch/publication callers.
 
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral or reservation.

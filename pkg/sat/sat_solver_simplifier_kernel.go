@@ -1,6 +1,7 @@
+package sat
+
 // Source: src/sat/sat_simplifier.cpp; src/sat/sat_simplifier.h.
 // Concrete extracted state for sat::simplifier's solver-independent algorithms.
-package sat
 
 import (
 	"reflect"

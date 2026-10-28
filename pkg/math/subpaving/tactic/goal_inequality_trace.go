@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/tactic/subpaving_tactic.cpp:158.
 package tactic
+
+// Source: src/math/subpaving/tactic/subpaving_tactic.cpp:158.
 
 import (
 	"io"

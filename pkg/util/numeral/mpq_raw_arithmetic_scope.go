@@ -1,5 +1,6 @@
-// Source: src/util/mpq.h; src/util/mpq.cpp.
 package numeral
+
+// Source: src/util/mpq.h; src/util/mpq.cpp.
 
 import (
 	"errors"

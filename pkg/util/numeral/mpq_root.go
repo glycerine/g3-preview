@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp root and mpq.h square predicates/output wrappers.
 package numeral
+
+// Source: src/util/mpq.cpp root and mpq.h square predicates/output wrappers.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

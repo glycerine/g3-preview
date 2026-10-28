@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver_tableau.h:350-383.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver_tableau.h:350-383.
 
 // Each arithmetic segment finishes its capture before delegated feasibility
 // or cost operations, whose stopped numerical receipts remain their own.

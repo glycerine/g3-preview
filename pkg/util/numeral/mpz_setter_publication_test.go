@@ -1,6 +1,7 @@
+package numeral
+
 // Source action fixtures: src/util/mpz.h allocate_if_needed/set_i64 and
 // src/util/mpz.cpp set_big_i64/set_big_ui64/ensure_capacity/normalize/power.
-package numeral
 
 import (
 	"errors"

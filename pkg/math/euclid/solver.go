@@ -1,6 +1,7 @@
+package euclid
+
 // Source: src/math/euclid/euclidean_solver.h:30-86;
 // src/math/euclid/euclidean_solver.cpp:485-501,788-845.
-package euclid
 
 import (
 	"errors"

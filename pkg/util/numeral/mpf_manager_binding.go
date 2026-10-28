@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:61-67; src/util/mpf.h:241-259.
 package numeral
+
+// Source: src/util/mpf.cpp:61-67; src/util/mpf.h:241-259.
 
 import (
 	"sync/atomic"

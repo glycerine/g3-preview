@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.h:541-548;
 // lp_primal_core_solver.hpp:1043-1048. Retained mpq/impq specialization.
-package lp
 
 import "os"
 

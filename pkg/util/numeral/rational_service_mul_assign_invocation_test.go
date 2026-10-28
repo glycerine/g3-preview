@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/rational.h:161-164; src/util/mpq.h:324-332;
 // src/ast/rewriter/poly_rewriter_def.h:217,248.
-package numeral
 
 import (
 	"errors"

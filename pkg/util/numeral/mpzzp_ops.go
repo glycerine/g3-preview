@@ -1,5 +1,6 @@
-// Source: src/util/mpzzp.h; src/util/mpzzp.cpp.
 package numeral
+
+// Source: src/util/mpzzp.h; src/util/mpzzp.cpp.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

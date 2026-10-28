@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/seq_rewriter.cpp mk_seq_automaton retained
 // byte-string consumer in src/smt/theory_str.cpp. Reuse the concrete builder.
-package rewriter
 
 import (
 	"errors"

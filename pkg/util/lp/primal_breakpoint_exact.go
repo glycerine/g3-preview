@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/breakpoint.h; lp_primal_core_solver.hpp:1069-1072,
 // 1245-1248,1306-1333; numeric_pair.h and lp_settings.h:368.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

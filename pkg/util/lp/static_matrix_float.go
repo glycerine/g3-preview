@@ -1,5 +1,6 @@
-// Source: src/util/lp/static_matrix.h/.hpp, retained double/double operations.
 package lp
+
+// Source: src/util/lp/static_matrix.h/.hpp, retained double/double operations.
 
 import (
 	"errors"

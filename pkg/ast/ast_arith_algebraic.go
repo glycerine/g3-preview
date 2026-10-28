@@ -1,5 +1,6 @@
-// Source: src/ast/arith_decl_plugin.cpp:20-72,99-112.
 package ast
+
+// Source: src/ast/arith_decl_plugin.cpp:20-72,99-112.
 
 import (
 	"math"

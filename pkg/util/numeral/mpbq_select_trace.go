@@ -1,5 +1,6 @@
-// Source: src/util/mpbq.cpp:750-754.
 package numeral
+
+// Source: src/util/mpbq.cpp:750-754.
 
 import (
 	"io"

@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Real BIG finite-field Div/Inv/PN/RAW children; no replacement division engine.
-package polynomial
 
 import (
 	"fmt"

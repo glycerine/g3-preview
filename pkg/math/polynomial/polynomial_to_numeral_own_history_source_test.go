@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial.h:426-450.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial.h:426-450.
 
 import (
 	"strconv"

@@ -1,7 +1,8 @@
+package tactic
+
 // Source: src/tactic/extension_model_converter.cpp:26-27,49-85;
 // src/tactic/extension_model_converter.h:27-50;
 // src/tactic/model_converter.h:30-41; src/util/ref_vector.h:96-100.
-package tactic
 
 import (
 	"errors"

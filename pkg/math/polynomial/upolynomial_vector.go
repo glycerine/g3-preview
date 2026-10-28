@@ -1,5 +1,6 @@
-// Concrete _scoped_numeral_vector<mpzzp_manager> scalar ownership methods.
 package polynomial
+
+// Concrete _scoped_numeral_vector<mpzzp_manager> scalar ownership methods.
 
 import (
 	"math"

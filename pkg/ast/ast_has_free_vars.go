@@ -1,5 +1,6 @@
-// Source: src/ast/has_free_vars.cpp:20-94; src/ast/has_free_vars.h:22-24.
 package ast
+
+// Source: src/ast/has_free_vars.cpp:20-94; src/ast/has_free_vars.h:22-24.
 
 import "math"
 

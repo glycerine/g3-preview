@@ -1,5 +1,6 @@
-// Source: src/qe/qe_datatypes.cpp/.h datatype_project_plugin.
 package qe
+
+// Source: src/qe/qe_datatypes.cpp/.h datatype_project_plugin.
 
 import (
 	"errors"

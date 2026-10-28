@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:183-185; explicit successful-body end-label DEL.
 package numeral
+
+// Source: src/util/mpq.cpp:183-185; explicit successful-body end-label DEL.
 
 import (
 	"errors"

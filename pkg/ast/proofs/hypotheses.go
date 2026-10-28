@@ -1,6 +1,7 @@
+package proofs
+
 // Source: src/ast/proofs/proof_utils.cpp:394-421;
 // src/util/container_util.h:48-52.
-package proofs
 
 import "github.com/glycerine/g3/pkg/ast"
 

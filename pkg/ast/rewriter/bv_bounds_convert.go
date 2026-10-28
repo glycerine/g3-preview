@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_bounds.cpp:68-238,332-450.
 package rewriter
+
+// Source: src/ast/rewriter/bv_bounds.cpp:68-238,332-450.
 
 import (
 	"math/big"

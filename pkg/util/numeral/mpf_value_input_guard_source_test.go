@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:69-181; explicit Go borrowed-context guard domain.
 package numeral
+
+// Source: src/util/mpf.cpp:69-181; explicit Go borrowed-context guard domain.
 
 import (
 	"testing"

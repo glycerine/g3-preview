@@ -1,5 +1,6 @@
-// Source: src/tactic/core/reduce_args_tactic.cpp mk_mc.
 package core
+
+// Source: src/tactic/core/reduce_args_tactic.cpp mk_mc.
 
 import (
 	"errors"

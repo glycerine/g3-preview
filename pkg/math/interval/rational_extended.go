@@ -1,6 +1,7 @@
+package interval
+
 // Source: src/util/ext_numeral.h, concrete mpq instantiation reached by
 // src/math/interval/interval.h and interval_def.h.
-package interval
 
 import (
 	"errors"

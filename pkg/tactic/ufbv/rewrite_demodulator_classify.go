@@ -1,5 +1,6 @@
-// Source: src/tactic/ufbv/ufbv_rewriter.cpp:52-210.
 package ufbv
+
+// Source: src/tactic/ufbv/ufbv_rewriter.cpp:52-210.
 
 import (
 	"errors"

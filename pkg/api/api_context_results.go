@@ -1,6 +1,7 @@
+package api
+
 // Source: src/api/api_context.cpp:35-55,109-119,215-246;
 // src/api/api_context.h:78-84; src/api/api_util.h:37-49; src/util/ref.h:79-85.
-package api
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Standalone source sort_size boundary checks; no active source ENSURE exists.
 package ast
+
+// Standalone source sort_size boundary checks; no active source ENSURE exists.
 
 import (
 	"errors"

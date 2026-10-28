@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:66-101; concrete config_mpff
 // round-robin variable selector.
-package subpaving
 
 import "github.com/glycerine/g3/pkg/arena"
 

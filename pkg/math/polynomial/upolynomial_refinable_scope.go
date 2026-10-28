@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:2599-2744; mpbq.cpp:384-392.
 package polynomial
+
+// Source: upolynomial.cpp:2599-2744; mpbq.cpp:384-392.
 
 import (
 	"errors"

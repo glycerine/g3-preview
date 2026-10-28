@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/util/ref_buffer.h:38-99; src/util/buffer.h:29-46,146-151;
 // src/math/polynomial/polynomial.cpp:5704.
-package polynomial
 
 import "github.com/glycerine/g3/pkg/arena"
 

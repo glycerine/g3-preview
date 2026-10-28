@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/propagate_ineqs_tactic.cpp:39-62,529-549.
 package arith
+
+// Source: src/tactic/arith/propagate_ineqs_tactic.cpp:39-62,529-549.
 
 import (
 	"errors"

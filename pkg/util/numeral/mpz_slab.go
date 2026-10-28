@@ -1,6 +1,7 @@
+package numeral
+
 // Concrete numeric-cell specialization of the reviewed slab storage algorithm.
 // Slot/generation/budget semantics are preserved without generic declarations.
-package numeral
 
 import (
 	"math"

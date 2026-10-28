@@ -1,5 +1,6 @@
-// Source: src/ast/arith_decl_plugin.cpp:561-577,588-594,602-630.
 package ast
+
+// Source: src/ast/arith_decl_plugin.cpp:561-577,588-594,602-630.
 
 import "github.com/glycerine/g3/pkg/math/polynomial"
 

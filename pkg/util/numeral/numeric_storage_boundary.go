@@ -1,5 +1,6 @@
-// Source: src/util/mpz.h, mpq.h and mpbq.h: numeral fields in source aggregates.
 package numeral
+
+// Source: src/util/mpz.h, mpq.h and mpbq.h: numeral fields in source aggregates.
 
 // NativeWords encodes a borrowed numeral for pointer-free source aggregate
 // storage. It transfers no ownership. The owning manager must outlive the

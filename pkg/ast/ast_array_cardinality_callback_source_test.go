@@ -1,5 +1,6 @@
-// Source: src/ast/array_decl_plugin.cpp:86-113; src/util/memory_manager.cpp:274-289.
 package ast
+
+// Source: src/ast/array_decl_plugin.cpp:86-113; src/util/memory_manager.cpp:274-289.
 
 import (
 	"context"

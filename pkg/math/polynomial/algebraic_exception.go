@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/algebraic_numbers.h:41-44.
 package polynomial
+
+// Source: src/math/polynomial/algebraic_numbers.h:41-44.
 
 import "github.com/glycerine/g3/pkg/util/z3exception"
 

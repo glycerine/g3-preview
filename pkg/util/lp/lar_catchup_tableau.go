@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_core_solver.h:533-582.
 package lp
+
+// Source: src/util/lp/lar_core_solver.h:533-582.
 
 // CatchUpInLUTableau selects the same delayed endpoints as LU catch-up, then
 // changes basis before pivoting the actual tableau. A false pivot result rolls

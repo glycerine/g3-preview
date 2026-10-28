@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:667-746; src/util/mpf.h:127.
 package numeral
+
+// Source: src/util/mpf.cpp:667-746; src/util/mpf.h:127.
 
 func (m *ArbitraryFloatManager) Div(mode ArbitraryFloatRoundingMode, x, y, out *ArbitraryFloat) (cause error) {
 	for _, v := range [...]*ArbitraryFloat{x, y, out} {

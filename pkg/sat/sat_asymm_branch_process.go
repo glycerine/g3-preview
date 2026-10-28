@@ -1,5 +1,6 @@
-// Source: src/sat/sat_asymm_branch.cpp:123–204; src/sat/sat_solver.h:199–218.
 package sat
+
+// Source: src/sat/sat_asymm_branch.cpp:123–204; src/sat/sat_solver.h:199–218.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/test/argument_parser.h; src/test/lp.cpp:1883-1929.
 // Concrete catalogue and parser reached by the retained LP test driver.
-package lp
 
 import (
 	"io"

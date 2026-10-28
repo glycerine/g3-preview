@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:3434-3442,7220-7222;
 // src/math/polynomial/polynomial.h:426. Retained NLSAT atom-factory consumer.
-package polynomial
 
 // FlipSignIfLeadingMonomialNegative returns p itself for zero or a nonnegative
 // graded-lex leading coefficient. Otherwise it returns an unreferenced negation,

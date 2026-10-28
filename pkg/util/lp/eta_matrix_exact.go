@@ -1,5 +1,6 @@
-// Source: src/util/lp/eta_matrix.h/.hpp, retained mpq/mpq and mpq/pair instances.
 package lp
+
+// Source: src/util/lp/eta_matrix.h/.hpp, retained mpq/mpq and mpq/pair instances.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

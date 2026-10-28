@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_vector.h and exact eta division applications.
 package lp
+
+// Source: src/util/lp/sparse_vector.h and exact eta division applications.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

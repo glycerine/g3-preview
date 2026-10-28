@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:5499-5572.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:5499-5572.
 
 type polynomialSubresultantChainScope struct {
 	invocation                           uint64

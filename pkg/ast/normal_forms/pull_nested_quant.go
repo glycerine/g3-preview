@@ -1,5 +1,6 @@
-// Source: src/ast/normal_forms/pull_quant.cpp pull_nested_quant::imp.
 package normal_forms
+
+// Source: src/ast/normal_forms/pull_quant.cpp pull_nested_quant::imp.
 
 import (
 	"errors"

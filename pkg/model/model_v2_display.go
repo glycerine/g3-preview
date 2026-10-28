@@ -1,6 +1,7 @@
+package model
+
 // Source: src/model/model_v2_pp.cpp:22-83. The retained extension-model trace
 // uses this concrete ordered constant/function display.
-package model
 
 import (
 	"errors"

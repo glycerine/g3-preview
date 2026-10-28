@@ -1,5 +1,6 @@
-// Raw views prove source field reads without claiming constructor ownership.
 package polynomial
+
+// Raw views prove source field reads without claiming constructor ownership.
 
 import (
 	"bytes"

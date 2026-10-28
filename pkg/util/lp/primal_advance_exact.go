@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.hpp:700-768, precise branch;
 // numeric_pair.h:141-143,191-193; util/rational.h unary minus.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_dual_core_solver.hpp:168-204,550-556,751-779.
 package lp
+
+// Source: src/util/lp/lp_dual_core_solver.hpp:168-204,550-556,751-779.
 
 import "math"
 

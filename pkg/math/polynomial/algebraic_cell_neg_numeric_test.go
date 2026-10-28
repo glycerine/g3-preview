@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:392-398; actual neg(INT_MIN) allocation.
 package polynomial
+
+// Source: algebraic_numbers.cpp:392-398; actual neg(INT_MIN) allocation.
 
 import (
 	"errors"

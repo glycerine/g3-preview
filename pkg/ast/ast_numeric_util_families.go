@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/arith_decl_plugin.cpp:641-645;
 // src/ast/bv_decl_plugin.cpp:850-855.
-package ast
 
 // ArithmeticFamilyID follows arith_util's constructor. It creates only the
 // family identity; the utility's declaration-plugin pointer is initially null.

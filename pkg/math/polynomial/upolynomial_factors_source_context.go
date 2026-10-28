@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:33-63.
 // Concrete FS class destruction shared by its actual captured callers.
-package polynomial
 
 func (fs *UPolynomialFactors) closeWithSourceContext(st *upolyPreparedFactorCursor, source bool, context integerAllocationInvocationContext) error {
 	if fs == nil || fs.self != fs || fs.manager == nil || st == nil {

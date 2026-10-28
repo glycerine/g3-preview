@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.h; src/util/mpz.cpp (_MP_INTERNAL, digit32).
 // Actual mpz.h cell allocation and object-bounded initialized-byte access.
-package numeral
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

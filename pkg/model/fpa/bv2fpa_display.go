@@ -1,5 +1,6 @@
-// Source: src/ast/fpa/bv2fpa_converter.cpp:474-503.
 package fpa
+
+// Source: src/ast/fpa/bv2fpa_converter.cpp:474-503.
 
 import (
 	"io"

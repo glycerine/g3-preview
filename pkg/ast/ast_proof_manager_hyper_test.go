@@ -1,5 +1,6 @@
-// Additional finite tests; no registered hyper-resolution source test exists.
 package ast
+
+// Additional finite tests; no registered hyper-resolution source test exists.
 
 import (
 	"errors"

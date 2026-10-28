@@ -1,5 +1,6 @@
-// Source: src/util/min_cut.cpp:35, after edge publication.
 package mincut
+
+// Source: src/util/min_cut.cpp:35, after edge publication.
 
 import (
 	"io"

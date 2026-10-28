@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_trailing.cpp:39,46,51,87,95-96,346,362,370,372; src/util/trace.h:40-46.
 package rewriter
+
+// Source: src/ast/rewriter/bv_trailing.cpp:39,46,51,87,95-96,346,362,370,372; src/util/trace.h:40-46.
 
 import (
 	"io"

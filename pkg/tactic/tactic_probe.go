@@ -1,5 +1,6 @@
-// Source: src/tactic/probe.h:30-61; src/tactic/probe.cpp:39-70,180-192.
 package tactic
+
+// Source: src/tactic/probe.h:30-61; src/tactic/probe.cpp:39-70,180-192.
 
 import (
 	"errors"

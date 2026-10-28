@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/bit2int.cpp:30-107,412-420;
 // src/ast/rewriter/bit2int.h:27-90.
-package rewriter
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/seq_decl_plugin.cpp:343-357,500-610;
 // src/ast/seq_decl_plugin.h:126-175.
-package ast
 
 import (
 	"errors"

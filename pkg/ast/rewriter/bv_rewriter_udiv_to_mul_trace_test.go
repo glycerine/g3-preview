@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:1058-1085; src/util/trace.h:40-46.
 package rewriter
+
+// Source: src/ast/rewriter/bv_rewriter.cpp:1058-1085; src/util/trace.h:40-46.
 
 import (
 	"bytes"

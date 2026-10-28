@@ -1,5 +1,6 @@
-// Source: src/util/approx_set.h:43-158,162-233; src/util/approx_set.cpp:22-51.
 package approx
+
+// Source: src/util/approx_set.h:43-158,162-233; src/util/approx_set.cpp:22-51.
 
 import (
 	"math/bits"

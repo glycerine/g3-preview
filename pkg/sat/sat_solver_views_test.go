@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.h:245-286,318-323,539-542.
 package sat
+
+// Source: src/sat/sat_solver.h:245-286,318-323,539-542.
 
 import (
 	"fmt"

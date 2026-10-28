@@ -1,5 +1,6 @@
-// Concrete port of src/util/heap.h; src/util/vector.h:102-129,191-202.
 package heap
+
+// Concrete port of src/util/heap.h; src/util/vector.h:102-129,191-202.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/datatype_rewriter.cpp:24-140.
 package rewriter
+
+// Source: src/ast/rewriter/datatype_rewriter.cpp:24-140.
 
 import (
 	"testing"

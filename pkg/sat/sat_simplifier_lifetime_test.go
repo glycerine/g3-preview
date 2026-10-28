@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp register_clauses/scoped_finalize; Go owning abort.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp register_clauses/scoped_finalize; Go owning abort.
 
 import (
 	"errors"

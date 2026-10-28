@@ -1,5 +1,6 @@
-// Source: src/util/hash.cpp; src/util/symbol.cpp:48-52.
 package symbol
+
+// Source: src/util/hash.cpp; src/util/symbol.cpp:48-52.
 
 import uhash "github.com/glycerine/g3/pkg/util/hash"
 

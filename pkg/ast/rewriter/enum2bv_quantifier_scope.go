@@ -1,5 +1,6 @@
-// Source: enum2bv_rewriter.cpp:162-195, concrete bounds/new_body_ref owners.
 package rewriter
+
+// Source: enum2bv_rewriter.cpp:162-195, concrete bounds/new_body_ref owners.
 
 import (
 	"errors"

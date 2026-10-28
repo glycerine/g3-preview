@@ -1,5 +1,6 @@
-// Source: src/ast/pp_params.hpp:5-51.
 package ast_test
+
+// Source: src/ast/pp_params.hpp:5-51.
 
 import (
 	"testing"

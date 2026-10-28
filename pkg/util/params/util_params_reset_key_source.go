@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:682-690,753-763,805-828.
 package params
+
+// Source: src/util/params.cpp:682-690,753-763,805-828.
 
 const paramsResetKey uint8 = 3
 

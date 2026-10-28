@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:4053-4068.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:4053-4068.
 
 import (
 	"github.com/glycerine/g3/pkg/clibrand"

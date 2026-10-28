@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/func_decl_dependencies.cpp;
 // src/ast/func_decl_dependencies.h.
-package ast
 
 import "testing"
 

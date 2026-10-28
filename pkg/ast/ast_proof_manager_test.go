@@ -1,5 +1,6 @@
-// Source ast_manager proof bodies; these tests do not replace proof_checker.
 package ast
+
+// Source ast_manager proof bodies; these tests do not replace proof_checker.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_integrity_checker.cpp:220-222; src/util/trace.h:40-46.
 package sat
+
+// Source: src/sat/sat_integrity_checker.cpp:220-222; src/util/trace.h:40-46.
 
 import (
 	"io"

@@ -1,5 +1,6 @@
-// Exact src/ast/ast.h basic_op_kind enumeration (including sentinel gap).
 package ast
+
+// Exact src/ast/ast.h basic_op_kind enumeration (including sentinel gap).
 
 const (
 	ASTOpTrue int32 = iota

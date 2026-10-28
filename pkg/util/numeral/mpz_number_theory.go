@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.cpp.
 // Source: src/util/mpz.cpp array gcd, extended Euclid, lcm, divides.
-package numeral
 
 import (
 	"io"

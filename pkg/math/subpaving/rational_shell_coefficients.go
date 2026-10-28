@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving.cpp:59-81, concrete context_mpq_wrapper.
 package subpaving
+
+// Source: src/math/subpaving/subpaving.cpp:59-81, concrete context_mpq_wrapper.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

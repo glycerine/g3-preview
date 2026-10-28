@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:316-333; src/util/scoped_numeral_vector.h:25-65.
 package numeral
+
+// Source: src/util/mpf.cpp:316-333; src/util/scoped_numeral_vector.h:25-65.
 
 import (
 	"reflect"

@@ -1,5 +1,6 @@
-// Source: src/util/mpn.cpp:371-399; src/util/buffer.h:84-95.
 package numeral
+
+// Source: src/util/mpn.cpp:371-399; src/util/buffer.h:84-95.
 
 import (
 	"math"

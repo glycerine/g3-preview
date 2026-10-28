@@ -1,5 +1,6 @@
-// Source: src/qe/qe_mbp.cpp project_plugin::partition_values/partition_args.
 package qe
+
+// Source: src/qe/qe_mbp.cpp project_plugin::partition_values/partition_args.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

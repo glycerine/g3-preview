@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpbq.h:116.
 // Source: src/util/mpbq.h/.cpp.
-package numeral
 
 func (m *BinaryRationalManager) Add(a, b, r *BinaryRational) error { return m.addSub(a, b, r, false) }
 func (m *BinaryRationalManager) Sub(a, b, r *BinaryRational) error { return m.addSub(a, b, r, true) }

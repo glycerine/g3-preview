@@ -1,5 +1,6 @@
-// Source: src/util/lp/binary_heap_upair_queue.h/.hpp, concrete pair bookkeeping.
 package lp
+
+// Source: src/util/lp/binary_heap_upair_queue.h/.hpp, concrete pair bookkeeping.
 
 // IndexPair identifies a matrix row/column pair. Pair priority queues distinguish
 // (i,j) from (j,i); their map has no iteration-order contract.

@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:541-542,670-742,752-754; numeric formatting inside TRACE.
 package numeral
+
+// Source: src/util/mpf.cpp:541-542,670-742,752-754; numeric formatting inside TRACE.
 
 import (
 	"bytes"

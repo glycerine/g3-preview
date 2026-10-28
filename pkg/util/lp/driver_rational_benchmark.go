@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:2990-3046, retained scalar rational benchmarks.
 package lp
+
+// Source: src/test/lp.cpp:2990-3046, retained scalar rational benchmarks.
 
 import (
 	"io"

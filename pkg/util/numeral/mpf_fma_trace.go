@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:813-818,830-831,844-845,867-874,899-940.
 package numeral
+
+// Source: src/util/mpf.cpp:813-818,830-831,844-845,867-874,899-940.
 
 import (
 	"io"

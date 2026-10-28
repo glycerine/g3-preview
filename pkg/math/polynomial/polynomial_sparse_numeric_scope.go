@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:3109-3182; src/util/mpz.cpp.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:3109-3182; src/util/mpz.cpp.
 
 import ()
 

@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/ast_counter.cpp; src/ast/rewriter/ast_counter.h.
 package rewriter
+
+// Source: src/ast/rewriter/ast_counter.cpp; src/ast/rewriter/ast_counter.h.
 
 import "github.com/glycerine/g3/pkg/ast"
 

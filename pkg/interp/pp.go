@@ -1,5 +1,6 @@
-// Source: src/interp/iz3pp.cpp; src/interp/iz3pp.h.
 package interp
+
+// Source: src/interp/iz3pp.cpp; src/interp/iz3pp.h.
 
 import (
 	"fmt"

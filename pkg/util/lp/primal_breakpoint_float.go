@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/breakpoint.h; lp_primal_core_solver.h:765-769;
 // lp_primal_core_solver.hpp:274-303,477-487,1069-1085,1245-1272,1306-1364.
-package lp
 
 import "math"
 

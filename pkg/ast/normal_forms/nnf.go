@@ -1,6 +1,7 @@
+package normal_forms
+
 // Source: src/ast/normal_forms/nnf.cpp:34-930;
 // src/ast/normal_forms/nnf.h:26-49.
-package normal_forms
 
 import (
 	"errors"

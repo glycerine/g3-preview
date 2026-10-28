@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:316-333; src/ast/fpa_decl_plugin.cpp:98-139.
 package numeral
+
+// Source: src/util/mpf.cpp:316-333; src/ast/fpa_decl_plugin.cpp:98-139.
 
 import (
 	"testing"

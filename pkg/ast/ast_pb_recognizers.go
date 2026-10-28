@@ -1,5 +1,6 @@
-// Source: src/ast/pb_decl_plugin.cpp:181-300; src/ast/pb_decl_plugin.h:81-128.
 package ast
+
+// Source: src/ast/pb_decl_plugin.cpp:181-300; src/ast/pb_decl_plugin.h:81-128.
 
 import (
 	"strconv"

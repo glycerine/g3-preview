@@ -1,5 +1,6 @@
-// Source: src/util/mpzzp.h numeric manager members, with caller-owned cursors.
 package numeral
+
+// Source: src/util/mpzzp.h numeric manager members, with caller-owned cursors.
 
 // FinalizeSourceMembers runs the literal source member destructions in order.
 // The containing caller retains its destructor cursor across transport stops.

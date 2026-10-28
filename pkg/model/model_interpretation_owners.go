@@ -1,5 +1,6 @@
-// Source: src/model/model_core.cpp:21-109.
 package model
+
+// Source: src/model/model_core.cpp:21-109.
 
 import "github.com/glycerine/g3/pkg/ast"
 

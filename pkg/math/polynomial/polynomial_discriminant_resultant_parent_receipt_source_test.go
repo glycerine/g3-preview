@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:5473-5500;
 // Go exact invoked Resultant/GCD frame boundary (invalid copied metadata).
-package polynomial
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

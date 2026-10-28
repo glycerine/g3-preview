@@ -1,8 +1,9 @@
+package proofs
+
 // Source: src/ast/proofs/proof_checker.cpp/.h.
 // Package proofs contains the retained proof validation algorithms layered on
 // top of ast_manager. It deliberately uses ASTManager's public surface so the
 // package remains a leaf of ast.
-package proofs
 
 import (
 	"errors"

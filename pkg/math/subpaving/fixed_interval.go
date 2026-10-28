@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t.h:239-316 and selected
 // src/math/interval/interval_def.h:597-837, concrete config_mpfx instance.
-package subpaving
 
 import (
 	"errors"

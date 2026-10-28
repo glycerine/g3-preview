@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513;
 // src/util/mpz.h:393-426. Qualified real unjoined RAW SubMul own TLS release.
-package polynomial
 
 import (
 	"errors"

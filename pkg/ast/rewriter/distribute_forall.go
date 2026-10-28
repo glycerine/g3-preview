@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/distribute_forall.cpp;
 // src/ast/rewriter/distribute_forall.h.
-package rewriter
 
 import (
 	"errors"

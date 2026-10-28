@@ -1,5 +1,6 @@
-// Source: src/sat/sat_probing.cpp:111.
 package sat
+
+// Source: src/sat/sat_probing.cpp:111.
 
 import (
 	"bytes"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/binary_heap_priority_queue.h/.hpp, actual mpq and numeric_pair<mpq> consumers.
 package lp
+
+// Source: src/util/lp/binary_heap_priority_queue.h/.hpp, actual mpq and numeric_pair<mpq> consumers.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

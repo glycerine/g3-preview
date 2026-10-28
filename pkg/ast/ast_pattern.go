@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:2312-2327; src/ast/ast.h:1867-1874.
 package ast
+
+// Source: src/ast/ast.cpp:2312-2327; src/ast/ast.h:1867-1874.
 
 // MkPattern constructs the concrete pattern-plugin application used by
 // quantifier triggers.

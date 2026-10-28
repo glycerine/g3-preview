@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/fix_dl_var_tactic.cpp is_target.
 package arith
+
+// Source: src/tactic/arith/fix_dl_var_tactic.cpp is_target.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/sorting_network.h:597-1046.
 package ast
+
+// Source: src/util/sorting_network.h:597-1046.
 
 import (
 	"io"

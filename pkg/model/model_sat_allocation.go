@@ -1,5 +1,6 @@
-// Source: src/sat/tactic/sat_tactic.cpp:89-112.
 package model
+
+// Source: src/sat/tactic/sat_tactic.cpp:89-112.
 
 import "github.com/glycerine/g3/pkg/ast"
 

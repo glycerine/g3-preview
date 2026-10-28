@@ -1,5 +1,6 @@
-// Source: src/ast/pattern/pattern_inference.cpp:435-482.
 package pattern
+
+// Source: src/ast/pattern/pattern_inference.cpp:435-482.
 
 import (
 	"fmt"

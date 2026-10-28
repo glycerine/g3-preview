@@ -1,5 +1,6 @@
-// Source: src/util/mpz.h:393-426 (plain RAW tmp; end-only explicit DEL).
 package numeral
+
+// Source: src/util/mpz.h:393-426 (plain RAW tmp; end-only explicit DEL).
 
 import
 

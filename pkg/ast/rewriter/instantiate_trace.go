@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/var_subst.cpp:164,168-173.
 package rewriter
+
+// Source: src/ast/rewriter/var_subst.cpp:164,168-173.
 
 import (
 	"io"

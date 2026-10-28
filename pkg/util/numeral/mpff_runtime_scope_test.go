@@ -1,5 +1,6 @@
-// Source mpff.cpp display and memory_manager.cpp TLS paths.
 package numeral
+
+// Source mpff.cpp display and memory_manager.cpp TLS paths.
 
 import (
 	"errors"

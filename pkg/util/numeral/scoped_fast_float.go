@@ -1,5 +1,6 @@
-// Concrete scoped_numeral<mpff>.
 package numeral
+
+// Concrete scoped_numeral<mpff>.
 
 import (
 	"reflect"

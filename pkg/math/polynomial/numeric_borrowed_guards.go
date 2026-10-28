@@ -1,5 +1,6 @@
-// Source: src/math/polynomial caller scopes: synchronous primitive borrows.
 package polynomial
+
+// Source: src/math/polynomial caller scopes: synchronous primitive borrows.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

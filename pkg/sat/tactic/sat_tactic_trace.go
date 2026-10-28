@@ -1,5 +1,6 @@
-// Source: src/sat/tactic/sat_tactic.cpp:51,58,68,95,99,111,198.
 package tactic
+
+// Source: src/sat/tactic/sat_tactic.cpp:51,58,68,95,99,111,198.
 
 import (
 	"errors"

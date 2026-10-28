@@ -1,5 +1,6 @@
-// Source assertions: src/test/heap.cpp, including its original finite counts.
 package heap
+
+// Source assertions: src/test/heap.cpp, including its original finite counts.
 
 import (
 	"encoding/binary"

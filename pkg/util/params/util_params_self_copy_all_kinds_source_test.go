@@ -1,6 +1,7 @@
+package params
+
 // Source: src/util/params.cpp:559-595,598-613. A self-copy first detaches a
 // shared block, then copy_core visits the newly published destination.
-package params
 
 import "testing"
 

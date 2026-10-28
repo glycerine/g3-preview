@@ -1,5 +1,6 @@
-// Source: src/util/timer.cpp:24-31; src/util/memory_manager.cpp:202-211.
 package stopwatch
+
+// Source: src/util/timer.cpp:24-31; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.h:477-503; retained inc_sat_solver consumers.
 package sat
+
+// Source: src/sat/sat_solver.h:477-503; retained inc_sat_solver consumers.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:938-944,992-1014.
 package params
+
+// Source: src/util/params.cpp:938-944,992-1014.
 
 import (
 	"reflect"

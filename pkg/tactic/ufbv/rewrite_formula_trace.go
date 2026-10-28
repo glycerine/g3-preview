@@ -1,6 +1,7 @@
+package ufbv
+
 // Source: src/tactic/ufbv/ufbv_rewriter.cpp:63,668,702,706,736,748,753;
 // src/util/trace.h:40-46.
-package ufbv
 
 import (
 	"errors"

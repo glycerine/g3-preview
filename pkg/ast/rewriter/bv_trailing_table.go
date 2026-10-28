@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_trailing.cpp:338-379.
 package rewriter
+
+// Source: src/ast/rewriter/bv_trailing.cpp:338-379.
 
 import (
 	"reflect"

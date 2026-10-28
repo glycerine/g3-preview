@@ -1,5 +1,6 @@
-// Source: src/util/lp/stacked_vector.h, numeric_pair<mpq> LAR bounds.
 package lp
+
+// Source: src/util/lp/stacked_vector.h, numeric_pair<mpq> LAR bounds.
 
 import (
 	"errors"

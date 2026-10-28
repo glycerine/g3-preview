@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.h:329,368;
 // src/util/lp/lp_settings.h:368 and numeric_pair.h:142-164,192-194,231-233.
-package lp
 
 // ZeroHarrisEps assigns the precise scalar zero without replacing its owner.
 func (m *PairPrimalCoreSolver) ZeroHarrisEps() (err error) {

@@ -1,6 +1,7 @@
+package ufbv
+
 // Source: src/util/array_map.h:29-91, and the concrete specialization in
 // src/tactic/ufbv/ufbv_rewriter.h:98-111.
-package ufbv
 
 import (
 	"errors"

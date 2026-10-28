@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/decl_collector.cpp:23-124; concrete AST sort ordering
 // through src/util/top_sort.h:31-99.
-package ast
 
 // astDeclCollector retains borrowed AST identities until its manager closes.
 // Datatype constructors and accessors contribute their reached sort edges.

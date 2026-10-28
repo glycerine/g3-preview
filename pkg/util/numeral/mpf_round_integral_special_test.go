@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1052-1095 (early branches and their real callees).
 package numeral
+
+// Source: src/util/mpf.cpp:1052-1095 (early branches and their real callees).
 
 import (
 	"testing"

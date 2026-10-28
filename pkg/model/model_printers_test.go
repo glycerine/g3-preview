@@ -1,5 +1,6 @@
-// Source: src/model/model_pp.cpp; src/model/model_smt2_pp.cpp.
 package model_test
+
+// Source: src/model/model_pp.cpp; src/model/model_smt2_pp.cpp.
 
 import (
 	"bytes"

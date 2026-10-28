@@ -1,5 +1,6 @@
-// Source: src/util/sorting_network.h:125-147,523-528,593-639,680-702,754-797,888-916,968-978,1003-1013.
 package ast
+
+// Source: src/util/sorting_network.h:125-147,523-528,593-639,680-702,754-797,888-916,968-978,1003-1013.
 
 // These are source unsigned costs, including each intermediate wrap. They
 // select actual algorithms; no host sorting or mathematical oracle is used.

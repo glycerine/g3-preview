@@ -1,7 +1,8 @@
+package rewriter
+
 // Source: src/ast/rewriter/pb_rewriter.cpp:21-64,198-293;
 // src/ast/rewriter/pb_rewriter.h:24-61;
 // src/ast/rewriter/pb_rewriter_def.h:27-292.
-package rewriter
 
 import (
 	"errors"

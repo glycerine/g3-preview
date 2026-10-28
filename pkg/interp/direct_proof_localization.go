@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3proof_itp.cpp localization-variable
 // creation and add_quants active branch.
-package interp
 
 import (
 	"fmt"

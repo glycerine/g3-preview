@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:1308,1478; src/util/memory_manager.cpp:202-211.
 package ast
+
+// Source: src/ast/ast.cpp:1308,1478; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

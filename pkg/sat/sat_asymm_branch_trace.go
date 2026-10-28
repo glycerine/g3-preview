@@ -1,5 +1,6 @@
-// Source: src/sat/sat_asymm_branch.cpp:68,118,143,162,187; retained util/trace sites.
 package sat
+
+// Source: src/sat/sat_asymm_branch.cpp:68,118,143,162,187; retained util/trace sites.
 
 import (
 	"io"

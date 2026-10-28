@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.hpp:390-444. Concrete mpq/mpq.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.hpp:390-444. Concrete mpq/mpq.
 
 import (
 	"fmt"

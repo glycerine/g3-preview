@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:677-680,753-781,799-803.
 package params
+
+// Source: src/util/params.cpp:677-680,753-781,799-803.
 
 import udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 

@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3base.cpp is_sat.
 package interp
+
+// Source checkpoint: src/interp/iz3base.cpp is_sat.
 
 import (
 	"errors"

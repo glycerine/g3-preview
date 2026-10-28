@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/bv_decl_plugin.cpp:774-776,858-864;
 // src/ast/bv_decl_plugin.h:390-394.
-package ast
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

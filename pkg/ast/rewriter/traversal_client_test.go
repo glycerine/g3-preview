@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/rewriter.h:365-388.
 package rewriter_test
+
+// Source: src/ast/rewriter/rewriter.h:365-388.
 
 import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"

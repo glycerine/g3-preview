@@ -1,7 +1,8 @@
+package substitution
+
 // Source: src/ast/substitution/expr_offset.h;
 // src/ast/substitution/expr_offset_map.h;
 // src/ast/substitution/var_offset_map.h.
-package substitution
 
 import (
 	"math"

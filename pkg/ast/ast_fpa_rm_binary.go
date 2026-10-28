@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/fpa_rewriter.cpp:256-307;
 // src/util/scoped_numeral.h:24-33.
-package ast
 
 // RewriteFPARMBinaryNumerals covers the numeric add, mul and div branches.
 // Subtraction is a structural add-of-negation rewrite in the source.

@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/bv2real_rewriter.cpp assertions and TRACE sites.
 package arith
+
+// Source: src/tactic/arith/bv2real_rewriter.cpp assertions and TRACE sites.
 
 import (
 	"errors"

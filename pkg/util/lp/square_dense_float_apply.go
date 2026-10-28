@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/square_dense_submatrix.h:182-215;
 // src/util/lp/square_dense_submatrix.hpp:175-197,211-299,325-351.
-package lp
 
 func (m *FloatSquareDenseSubmatrix) rowProduct(i uint32, w []float64) (float64, error) {
 	if i < m.IndexStart {

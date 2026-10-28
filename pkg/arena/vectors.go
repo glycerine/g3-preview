@@ -1,5 +1,6 @@
-// Scalar payload storage adaptation for util/vector.h and util/buffer.h.
 package arena
+
+// Scalar payload storage adaptation for util/vector.h and util/buffer.h.
 
 import (
 	"errors"

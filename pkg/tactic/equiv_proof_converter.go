@@ -1,5 +1,6 @@
-// Source: src/tactic/equiv_proof_converter.cpp; src/tactic/equiv_proof_converter.h.
 package tactic
+
+// Source: src/tactic/equiv_proof_converter.cpp; src/tactic/equiv_proof_converter.h.
 
 import (
 	"errors"

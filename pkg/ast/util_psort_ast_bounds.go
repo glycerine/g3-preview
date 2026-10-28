@@ -1,5 +1,6 @@
-// Source: src/util/sorting_network.h:190-260,269-494,507-520.
 package ast
+
+// Source: src/util/sorting_network.h:190-260,269-494,507-520.
 
 func (s *PsortASTNetwork) ge(full bool, k, n uint32, p psortASTPointer) (result ASTHandle, err error) {
 	if k > n {

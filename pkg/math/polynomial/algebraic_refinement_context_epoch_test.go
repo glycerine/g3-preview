@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:2797-2807; concrete retained refinement calls.
 package polynomial
+
+// Source: upolynomial.cpp:2797-2807; concrete retained refinement calls.
 
 import (
 	"errors"

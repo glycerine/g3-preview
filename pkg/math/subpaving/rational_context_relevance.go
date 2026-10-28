@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1204-1317, concrete config_mpq
 // default epsilon and maximum-bound policy for definition candidates.
-package subpaving
 
 import (
 	"math"

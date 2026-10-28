@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:48.
 package ast
+
+// Source: src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:48.
 
 func (m *ASTManager) BitVectorNumeralUnsigned(value uint32, bits uint32) (ASTHandle, error) {
 	if e := m.lock(); e != nil {

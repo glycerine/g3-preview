@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3proof_itp.cpp arithmetic normalization
 // proof vocabulary and basic chain accessors.
-package interp
 
 import "github.com/glycerine/g3/pkg/ast"
 

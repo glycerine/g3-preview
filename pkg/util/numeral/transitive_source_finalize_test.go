@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpq.cpp, src/util/rational.cpp, and infinitesimal headers.
 // Reverse member destruction and separate owning cleanup.
-package numeral
 
 import (
 	"errors"

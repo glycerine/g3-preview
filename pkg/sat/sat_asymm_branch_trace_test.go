@@ -1,5 +1,6 @@
-// Source: src/sat/sat_asymm_branch.cpp:118,143,162,187.
 package sat
+
+// Source: src/sat/sat_asymm_branch.cpp:118,143,162,187.
 
 import (
 	"bytes"

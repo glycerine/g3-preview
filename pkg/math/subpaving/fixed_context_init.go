@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1753-1808,
 // concrete config_mpfx root initialization order.
-package subpaving
 
 // InitializeRoot asserts units, propagates definitions in variable order and
 // drains the resulting queue. Each completed stage is retained so a resource

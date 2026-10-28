@@ -1,6 +1,7 @@
+package params
+
 // Source: src/util/gparams.cpp:81-105; src/util/params.cpp:55-77,210-217;
 // placement allocation: src/util/memory_manager.h:77-89.
-package params
 
 import (
 	"errors"

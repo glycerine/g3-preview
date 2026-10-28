@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_solver.h:259-264; retained floating primal caller
 // src/shell/lp_frontend.cpp:92.
-package lp
 
 import (
 	"io"

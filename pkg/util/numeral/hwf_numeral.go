@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/f2n.h:24-156, instantiated as f2n<hwf_manager> by
 // src/math/subpaving/tactic/subpaving_tactic.cpp:60.
-package numeral
 
 import (
 	"errors"

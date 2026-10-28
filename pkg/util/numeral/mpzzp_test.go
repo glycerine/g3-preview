@@ -1,5 +1,6 @@
-// Added finite source-action fixtures: no registered direct mpzzp test exists.
 package numeral
+
+// Added finite source-action fixtures: no registered direct mpzzp test exists.
 
 import (
 	"errors"

@@ -1,8 +1,9 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1324-1329,432-513.
 // Source: src/math/polynomial/upolynomial.cpp:1298-1321.
 // Source: src/math/polynomial/upolynomial.cpp:1734-1764.
 // Source: src/math/polynomial/upolynomial.h; src/math/polynomial/upolynomial.cpp.
-package polynomial
 
 import (
 	"errors"

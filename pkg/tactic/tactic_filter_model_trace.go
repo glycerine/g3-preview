@@ -1,5 +1,6 @@
-// Source: src/tactic/filter_model_converter.cpp:26,51,59-65; src/util/trace.h.
 package tactic
+
+// Source: src/tactic/filter_model_converter.cpp:26,51,59-65; src/util/trace.h.
 
 import (
 	"io"

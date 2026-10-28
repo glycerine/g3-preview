@@ -1,5 +1,6 @@
-// Source MPFF conversions, internal32.
 package numeral
+
+// Source MPFF conversions, internal32.
 
 // Selected source MPZ digit setter over a concrete ephemeral owner-indexed view.
 // Retains existing MPZ storage staging; no temporary unbudgeted limb slice.

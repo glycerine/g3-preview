@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:978-983, retained by binary/unary selection.
 package polynomial
+
+// Source: algebraic_numbers.cpp:978-983, retained by binary/unary selection.
 
 import (
 	"errors"

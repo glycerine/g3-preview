@@ -1,5 +1,6 @@
-// Source: src/api/api_context.cpp:109-117; src/util/warning.cpp.
 package api
+
+// Source: src/api/api_context.cpp:109-117; src/util/warning.cpp.
 
 import (
 	"bytes"

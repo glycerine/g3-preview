@@ -1,5 +1,6 @@
-// Source: src/ast/normal_forms/pull_quant.cpp no-proof consumer.
 package pattern
+
+// Source: src/ast/normal_forms/pull_quant.cpp no-proof consumer.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

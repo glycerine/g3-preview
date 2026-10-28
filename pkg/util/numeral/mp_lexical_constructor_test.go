@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral.h, src/util/inf_rational.h.
 package numeral
+
+// Source: src/util/scoped_numeral.h, src/util/inf_rational.h.
 
 import (
 	"errors"

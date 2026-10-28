@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:619-675.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:619-675.
 
 // processYIndex marks before descending; processColumn marks after descending.
 // The latter consumes the retained upper-triangular (acyclic) dependency graph.

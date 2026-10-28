@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/array_decl_plugin.cpp:25-114; src/ast/array_decl_plugin.h:67-130;
 // src/ast/ast.cpp:1635-1638.
-package ast
 
 import (
 	"reflect"

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.h:329,368;
 // src/util/rational.h:449-493,507-511. Concrete mpq/mpq expression.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

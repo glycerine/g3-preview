@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3mgr.cpp z3_simplify and z3_really_simplify.
 package interp
+
+// Source checkpoint: src/interp/iz3mgr.cpp z3_simplify and z3_really_simplify.
 
 import (
 	"errors"

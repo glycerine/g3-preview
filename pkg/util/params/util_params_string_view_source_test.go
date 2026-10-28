@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:639-648,902-930; src/smt/params/qi_params.cpp:23-39.
 package params
+
+// Source: src/util/params.cpp:639-648,902-930; src/smt/params/qi_params.cpp:23-39.
 
 import (
 	"errors"

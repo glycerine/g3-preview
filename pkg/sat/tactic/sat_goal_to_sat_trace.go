@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/sat/tactic/goal2sat.cpp:88-103,132,192,204,244,282,325,380-422,480;
 // src/util/trace.h:40-46.
-package tactic
 
 import (
 	"errors"

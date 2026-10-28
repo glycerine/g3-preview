@@ -1,5 +1,6 @@
-// Source: src/ast/pattern/database.h; src/ast/pattern/expr_pattern_match.cpp:383-401.
 package pattern
+
+// Source: src/ast/pattern/database.h; src/ast/pattern/expr_pattern_match.cpp:383-401.
 
 import (
 	_ "embed"

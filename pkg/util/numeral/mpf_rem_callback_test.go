@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1465-1467; source returning-failure transport profile.
 package numeral
+
+// Source: src/util/mpf.cpp:1465-1467; source returning-failure transport profile.
 
 import (
 	"errors"

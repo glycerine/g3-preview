@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/rational.h:238-240,421-423; src/util/mpq.h:572-579;
 // src/util/mpq.cpp:39-75.
-package numeral
 
 import (
 	"errors"

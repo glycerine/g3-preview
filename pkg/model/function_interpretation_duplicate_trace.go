@@ -1,5 +1,6 @@
-// Source: src/model/func_interp.cpp:200-216; src/util/trace.h:40-46.
 package model
+
+// Source: src/model/func_interp.cpp:200-216; src/util/trace.h:40-46.
 
 import (
 	"errors"

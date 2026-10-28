@@ -1,5 +1,6 @@
-// Source: src/shell/main.cpp:214-245, retained global-parameter output options.
 package shell
+
+// Source: src/shell/main.cpp:214-245, retained global-parameter output options.
 
 import (
 	"errors"

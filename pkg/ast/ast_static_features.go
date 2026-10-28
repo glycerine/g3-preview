@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/static_features.cpp:22-112,537-649;
 // src/ast/static_features.h:27-179.
-package ast
 
 import (
 	"errors"

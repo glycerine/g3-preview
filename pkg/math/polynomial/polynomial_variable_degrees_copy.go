@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.h:62-69; src/math/polynomial/polynomial.cpp:66-82; src/util/vector.h:101-116,160-210,530-546.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.h:62-69; src/math/polynomial/polynomial.cpp:66-82; src/util/vector.h:101-116,160-210,530-546.
 
 // PolynomialVariableDegreesTextSink is a borrowed output binding.
 type PolynomialVariableDegreesTextSink interface {

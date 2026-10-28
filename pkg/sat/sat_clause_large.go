@@ -1,5 +1,6 @@
-// Explicit host64 size_t storage adapter for clauses wider than SmallBytes.
 package sat
+
+// Explicit host64 size_t storage adapter for clauses wider than SmallBytes.
 
 import (
 	"reflect"

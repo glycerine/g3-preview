@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:2265-2309; src/util/buffer.h.
 package ast
+
+// Source: src/ast/ast.cpp:2265-2309; src/util/buffer.h.
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

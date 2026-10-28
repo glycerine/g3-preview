@@ -1,5 +1,6 @@
-// Storage translation of util/region.h/.cpp and util/page.h/.cpp.
 package arena
+
+// Storage translation of util/region.h/.cpp and util/page.h/.cpp.
 
 import (
 	"math"

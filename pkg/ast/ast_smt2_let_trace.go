@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:806,818,833; src/util/trace.h:40-46.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:806,818,833; src/util/trace.h:40-46.
 
 import (
 	"io"

@@ -1,6 +1,7 @@
+package numeral
+
 // Source arithmetic: src/util/mpn.cpp. Source regression projections:
 // src/test/mpz.cpp tst2 and bug1
-package numeral
 
 import (
 	"errors"

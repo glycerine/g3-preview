@@ -1,5 +1,6 @@
-// Source: src/util/lp/static_matrix.h:310-358 and init_lar_solver.h:146-148.
 package lp
+
+// Source: src/util/lp/static_matrix.h:310-358 and init_lar_solver.h:146-148.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

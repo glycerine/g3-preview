@@ -1,6 +1,7 @@
+package aig
+
 // Source: src/tactic/aig/aig_tactic.cpp:34,39;
 // src/util/memory_manager.cpp:202-211.
-package aig
 
 import (
 	"fmt"

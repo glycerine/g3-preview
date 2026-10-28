@@ -1,5 +1,6 @@
-// Source: src/ast/dl_decl_plugin.cpp:266-320,605-625,760-768.
 package ast
+
+// Source: src/ast/dl_decl_plugin.cpp:266-320,605-625,760-768.
 
 import (
 	"errors"

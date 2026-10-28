@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.cpp; src/util/memory_manager.cpp.
 package memory
+
+// Source: src/util/small_object_allocator.cpp; src/util/memory_manager.cpp.
 
 import (
 	"errors"

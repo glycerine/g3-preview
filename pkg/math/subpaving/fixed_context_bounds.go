@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:528-589,1176-1315,
 // concrete config_mpfx bound normalization and relevance.
-package subpaving
 
 import (
 	"errors"

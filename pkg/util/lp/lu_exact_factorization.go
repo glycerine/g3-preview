@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lu.h/.hpp. Shared mpq coefficient factorization for
 // the retained mpq/mpq and mpq/numeric_pair<mpq> instances.
-package lp
 
 // Both exact instances have identical coefficient algorithms. Concrete typed
 // owners below supply their distinct X permutations and tail applications.

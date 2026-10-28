@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:6754-6819.
 // Copied Go owner metadata is a guard domain, separate from source arithmetic.
-package polynomial
 
 import (
 	"errors"

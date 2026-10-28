@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1259 (real cached-power allocation transport).
 package numeral
+
+// Source: src/util/mpf.cpp:1259 (real cached-power allocation transport).
 
 import (
 	"errors"

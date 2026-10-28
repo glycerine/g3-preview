@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1255-1270.
 package numeral
+
+// Source: src/util/mpf.cpp:1255-1270.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

@@ -1,5 +1,6 @@
-// Source: src/util/util.h:324-354.
 package z3rand
+
+// Source: src/util/util.h:324-354.
 
 const Max uint32 = 0x7fff
 

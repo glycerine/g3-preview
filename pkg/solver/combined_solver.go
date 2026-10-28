@@ -1,5 +1,6 @@
-// Source: src/solver/combined_solver.cpp; src/solver/combined_solver.h.
 package solver
+
+// Source: src/solver/combined_solver.cpp; src/solver/combined_solver.h.
 
 import (
 	"errors"

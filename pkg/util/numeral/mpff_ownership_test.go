@@ -1,5 +1,6 @@
-// Owned-storage regressions for MPFF.
 package numeral
+
+// Owned-storage regressions for MPFF.
 
 import (
 	"errors"

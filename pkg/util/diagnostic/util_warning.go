@@ -1,5 +1,6 @@
-// Source: src/util/warning.h:23-53; src/util/warning.cpp:49-85,106-168.
 package diagnostic
+
+// Source: src/util/warning.h:23-53; src/util/warning.cpp:49-85,106-168.
 
 import (
 	"fmt"

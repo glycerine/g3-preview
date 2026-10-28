@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.hpp:1103-1118,1168-1225;
 // lp_primal_core_solver.h:403-408,783-789.
-package lp
 
 func (m *PairPrimalCoreSolver) NeedToSwitchCosts() bool {
 	if m.Settings.SimplexStrategy == StrategyTableauRows {

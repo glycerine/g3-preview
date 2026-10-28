@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_dual_core_solver.hpp:90-166.
 package lp
+
+// Source: src/util/lp/lp_dual_core_solver.hpp:90-166.
 
 func (m *FloatDualCoreSolver) StartWithInitialBasisAndMakeItDualFeasible() error {
 	if err := m.SetNonBasicXToCorrectBounds(); err != nil {

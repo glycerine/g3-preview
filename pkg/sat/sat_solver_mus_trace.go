@@ -1,5 +1,6 @@
-// Source: src/sat/sat_mus.cpp:40,61,71,93,120; retained util/trace sites.
 package sat
+
+// Source: src/sat/sat_mus.cpp:40,61,71,93,120; retained util/trace sites.
 
 import (
 	"io"

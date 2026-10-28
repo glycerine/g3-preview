@@ -1,5 +1,6 @@
-// Source: src/tactic/core/reduce_args_tactic.cpp candidate discovery and cfg.
 package core
+
+// Source: src/tactic/core/reduce_args_tactic.cpp candidate discovery and cfg.
 
 import (
 	"encoding/binary"

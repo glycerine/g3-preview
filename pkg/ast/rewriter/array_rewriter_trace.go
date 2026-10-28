@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/array_rewriter.cpp:38-42; src/util/trace.h:40-46.
 package rewriter
+
+// Source: src/ast/rewriter/array_rewriter.cpp:38-42; src/util/trace.h:40-46.
 
 import (
 	"errors"

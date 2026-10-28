@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:24-101,344-359,
 // concrete config_mpf breadth-first leaf and round-robin variable selectors.
-package subpaving
 
 import (
 	"math"

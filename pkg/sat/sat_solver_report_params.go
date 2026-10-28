@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:2773-2779,3652-3714; src/sat/sat_solver.h:159,164.
 package sat
+
+// Source: src/sat/sat_solver.cpp:2773-2779,3652-3714; src/sat/sat_solver.h:159,164.
 
 import (
 	uparams "github.com/glycerine/g3/pkg/util/params"

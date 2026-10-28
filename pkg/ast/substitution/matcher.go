@@ -1,6 +1,7 @@
+package substitution
+
 // Source: src/ast/substitution/matcher.cpp;
 // src/ast/substitution/matcher.h.
-package substitution
 
 import "github.com/glycerine/g3/pkg/ast"
 

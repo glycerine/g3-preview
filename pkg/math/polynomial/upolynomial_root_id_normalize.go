@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:366-401, reached through get_root_id's Sturm loop.
 package polynomial
+
+// Source: upolynomial.cpp:366-401, reached through get_root_id's Sturm loop.
 
 import (
 	"errors"

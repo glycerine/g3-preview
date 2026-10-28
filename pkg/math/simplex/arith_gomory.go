@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_int.h integer base selection and mk_gomory_cut.
 package simplex
+
+// Source: src/smt/theory_arith_int.h integer base selection and mk_gomory_cut.
 
 import (
 	"fmt"

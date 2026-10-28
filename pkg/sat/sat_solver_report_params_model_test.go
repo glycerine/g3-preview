@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:1257-1261,2763-2771; src/util/vector.h.
 package sat
+
+// Source: src/sat/sat_solver.cpp:1257-1261,2763-2771; src/util/vector.h.
 
 import (
 	"errors"

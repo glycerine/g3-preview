@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1608-1619; src/util/mpf.h:294.
 package numeral
+
+// Source: src/util/mpf.cpp:1608-1619; src/util/mpf.h:294.
 
 import (
 

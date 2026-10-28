@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lar_core_solver.h:276-352;
 // src/util/lp/lp_core_solver_base.h:685-688.
-package lp
 
 // RemoveColumnFromInfSet erases before the source feasibility assertion.
 func (m *PairCoreSolverBase) RemoveColumnFromInfSet(j uint32) (err error) {

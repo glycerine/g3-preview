@@ -1,5 +1,6 @@
-// Source: src/util/mpbq.cpp:45-57; src/util/basic_interval.h:83-86.
 package numeral
+
+// Source: src/util/mpbq.cpp:45-57; src/util/basic_interval.h:83-86.
 
 func (m *BinaryRationalManager) checkSourceDestructorAdmission() error {
 	if e := m.checkDestructorExecution(); e != nil {

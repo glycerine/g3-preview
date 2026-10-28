@@ -1,5 +1,6 @@
-// Flat polynomial sequence with native row-offset and row-size metadata.
 package polynomial
+
+// Flat polynomial sequence with native row-offset and row-size metadata.
 
 import (
 	"math"

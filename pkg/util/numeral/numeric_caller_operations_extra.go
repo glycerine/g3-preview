@@ -1,5 +1,6 @@
-// Source: src/util numeric primitive implementations.
 package numeral
+
+// Source: src/util numeric primitive implementations.
 
 type NumericRationalOperations struct {
 	manager *RationalManager

@@ -1,6 +1,7 @@
+package ast_test
+
 // Source: src/ast/ast.h:1455,1549-1550; src/util/rlimit.cpp:23-71;
 // src/sat/tactic/goal2sat.cpp:384-392.
-package ast_test
 
 import (
 	"strings"

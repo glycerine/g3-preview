@@ -1,5 +1,6 @@
-// Source assertions from src/test/rational.cpp; test helpers own every returned token.
 package numeral
+
+// Source assertions from src/test/rational.cpp; test helpers own every returned token.
 
 import (
 	"errors"

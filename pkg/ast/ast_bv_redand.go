@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/bv_rewriter.cpp:2048-2056;
 // src/ast/rewriter/bv_rewriter.h:177; src/util/rational.h:462-464.
-package ast
 
 // ReduceBitVectorAND keeps the numerical condition's source temporaries and
 // function-local rational alive through result publication. It returns false

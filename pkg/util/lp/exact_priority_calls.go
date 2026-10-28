@@ -1,5 +1,6 @@
-// Source: src/util/lp/binary_heap_priority_queue.hpp rational comparisons.
 package lp
+
+// Source: src/util/lp/binary_heap_priority_queue.hpp rational comparisons.
 
 import (
 	"errors"

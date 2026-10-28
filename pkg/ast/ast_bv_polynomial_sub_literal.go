@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/poly_rewriter_def.h:689-691;
 // src/util/rational.h:46; src/util/obj_ref.h:39-43; src/ast/ast.h:2259.
-package ast
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

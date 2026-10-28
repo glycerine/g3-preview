@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lar_core_solver.h:276-352;
 // src/util/lp/lp_core_solver_base.h:685-688.
-package lp
 
 import (
 	"fmt"

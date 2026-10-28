@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:33-54;
 // src/math/polynomial/upolynomial_factorization.cpp:1062,1120-1139,1172-1175.
-package polynomial
 
 type upolyPreparedFactorCursor struct {
 	stage       uint8

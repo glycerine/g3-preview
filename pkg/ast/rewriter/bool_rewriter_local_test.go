@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bool_rewriter.cpp:268-579.
 package rewriter
+
+// Source: src/ast/rewriter/bool_rewriter.cpp:268-579.
 
 import (
 	"fmt"

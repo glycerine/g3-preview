@@ -1,5 +1,6 @@
-// Source: src/model/model_core.cpp:21-42,68-109; src/model/model_core.h:45-64.
 package model_test
+
+// Source: src/model/model_core.cpp:21-42,68-109; src/model/model_core.h:45-64.
 
 import (
 	"errors"

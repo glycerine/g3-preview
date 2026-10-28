@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.cpp:big_set; src/util/mpz.h:allocate;
 // src/math/polynomial/polynomial.cpp:3318-3338.
-package numeral
 
 import (
 	"errors"

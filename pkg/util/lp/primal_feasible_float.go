@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.h:541-548,568-598;
 // lp_primal_core_solver.hpp:1043-1048. Retained double feasibility entry point.
-package lp
 
 import (
 	"fmt"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/column_info.h, retained column_info<mpq> LP consumers.
 package lp
+
+// Source: src/util/lp/column_info.h, retained column_info<mpq> LP consumers.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

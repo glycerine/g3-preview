@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt_pp.cpp:756-850.
 package ast
+
+// Source: src/ast/ast_smt_pp.cpp:756-850.
 
 import (
 	"io"

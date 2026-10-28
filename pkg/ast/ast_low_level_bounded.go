@@ -1,5 +1,6 @@
-// Source: src/ast/ast_ll_pp.cpp:274-328.
 package ast
+
+// Source: src/ast/ast_ll_pp.cpp:274-328.
 
 import (
 	"errors"

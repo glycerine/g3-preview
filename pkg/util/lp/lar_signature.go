@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lar_solution_signature.h;
 // lar_core_solver.h:356-405,653-662. Actual pair and double consumers.
-package lp
 
 import "sort"
 

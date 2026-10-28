@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp qe_lite::impl and qe_lite owning overloads.
 package qe
+
+// Source: src/qe/qe_lite.cpp qe_lite::impl and qe_lite owning overloads.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/tactic/smtlogics/qflra_tactic.cpp/.h, live #else factory.
 package smtlogics
+
+// Source: src/tactic/smtlogics/qflra_tactic.cpp/.h, live #else factory.
 
 import (
 	"errors"

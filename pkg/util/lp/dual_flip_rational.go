@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.h:172-182;
 // lp_dual_core_solver.hpp:375-386,695-730. Concrete retained mpq/mpq.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3mgr.cpp display helpers.
 package interp
+
+// Source checkpoint: src/interp/iz3mgr.cpp display helpers.
 
 import (
 	"io"

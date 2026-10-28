@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:2114-2134 (actual post-registration exception catch).
 package ast
+
+// Source: src/ast/ast.cpp:2114-2134 (actual post-registration exception catch).
 
 import (
 	"errors"

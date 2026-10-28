@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.cpp; src/util/memory_manager.cpp.
 package memory
+
+// Source: src/util/small_object_allocator.cpp; src/util/memory_manager.cpp.
 
 // PendingRoots exposes the actual pending allocation retained by this checked
 // owner. The two trailing zero slots preserve the receipt comparison shape used

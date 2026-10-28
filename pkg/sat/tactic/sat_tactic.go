@@ -1,5 +1,6 @@
-// Source: src/sat/tactic/sat_tactic.cpp/.h.
 package tactic
+
+// Source: src/sat/tactic/sat_tactic.cpp/.h.
 
 import (
 	"errors"

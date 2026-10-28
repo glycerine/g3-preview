@@ -1,5 +1,6 @@
-// Source: src/math/realclosure/realclosure.cpp:2879-2913, 2991-3030.
 package realclosure
+
+// Source: src/math/realclosure/realclosure.cpp:2879-2913, 2991-3030.
 
 import (
 	"errors"

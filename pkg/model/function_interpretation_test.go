@@ -1,5 +1,6 @@
-// Source: src/model/func_interp.cpp:24-330; independent Boolean graph cases.
 package model_test
+
+// Source: src/model/func_interp.cpp:24-330; independent Boolean graph cases.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/sat/tactic/goal2sat.cpp:547-559 and atom2bool_var/expr2var.
 package tactic
+
+// Source: src/sat/tactic/goal2sat.cpp:547-559 and atom2bool_var/expr2var.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

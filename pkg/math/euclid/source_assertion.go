@@ -1,5 +1,6 @@
-// Source: src/math/euclid/euclidean_solver.cpp retained SASSERT sites.
 package euclid
+
+// Source: src/math/euclid/euclidean_solver.cpp retained SASSERT sites.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

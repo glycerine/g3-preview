@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1023-1042 (a, actual Integer root and Round lifetimes).
 package numeral
+
+// Source: src/util/mpf.cpp:1023-1042 (a, actual Integer root and Round lifetimes).
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

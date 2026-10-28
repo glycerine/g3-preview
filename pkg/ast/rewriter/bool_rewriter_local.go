@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/bool_rewriter.cpp:268-579;
 // src/ast/rewriter/bool_rewriter.h:70-84.
-package rewriter
 
 import (
 	"errors"

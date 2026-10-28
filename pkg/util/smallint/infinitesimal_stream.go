@@ -1,5 +1,6 @@
-// Source: src/util/inf_s_integer.h:250-262.
 package smallint
+
+// Source: src/util/inf_s_integer.h:250-262.
 
 import utext "github.com/glycerine/g3/pkg/util/text"
 

@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t.h:239-316 and
 // src/math/interval/interval_def.h:597-709, concrete config_hwf instance.
-package subpaving
 
 import (
 	"io"

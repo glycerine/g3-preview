@@ -1,5 +1,6 @@
-// Source: src/ast/proofs/proof_utils.cpp:993-996; src/util/trace.h:40-46.
 package ast
+
+// Source: src/ast/proofs/proof_utils.cpp:993-996; src/util/trace.h:40-46.
 
 import (
 	"io"

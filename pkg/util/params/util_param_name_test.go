@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp norm_param_name; independent finite fixtures.
 package params
+
+// Source: src/util/params.cpp norm_param_name; independent finite fixtures.
 
 import (
 	"errors"

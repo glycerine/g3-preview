@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:6558-6577;
 // src/math/polynomial/polynomial.cpp:6307-6344.
-package polynomial
 
 import (
 	"strconv"

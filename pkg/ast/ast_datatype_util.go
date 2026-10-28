@@ -1,5 +1,6 @@
-// Source: datatype::util::get_non_rec_constructor and its m_asts/cache owners.
 package ast
+
+// Source: datatype::util::get_non_rec_constructor and its m_asts/cache owners.
 
 import (
 	"errors"

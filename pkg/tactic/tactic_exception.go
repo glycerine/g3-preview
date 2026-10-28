@@ -1,5 +1,6 @@
-// Source: src/tactic/tactic_exception.h:25-34.
 package tactic
+
+// Source: src/tactic/tactic_exception.h:25-34.
 
 import (
 	"github.com/glycerine/g3/pkg/util/messages"

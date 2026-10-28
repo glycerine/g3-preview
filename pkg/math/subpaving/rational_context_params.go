@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:419-438,473-513,
 // concrete config_mpq named parameter construction and update.
-package subpaving
 
 import (
 	"math"

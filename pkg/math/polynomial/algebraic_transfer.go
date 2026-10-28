@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:213-215,358-360,2803-2805,2839-2841.
 package polynomial
+
+// Source: algebraic_numbers.cpp:213-215,358-360,2803-2805,2839-2841.
 
 // Reset follows source reset, including Del's destruction order and failures.
 func (m *AlgebraicRootCore) Reset(a *Algebraic) error { return m.Del(a) }

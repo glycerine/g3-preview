@@ -1,5 +1,6 @@
-// Source: src/ast/arith_decl_plugin.cpp:342-382,392-398,451-509.
 package ast
+
+// Source: src/ast/arith_decl_plugin.cpp:342-382,392-398,451-509.
 
 import (
 	"github.com/glycerine/g3/pkg/util/z3exception"

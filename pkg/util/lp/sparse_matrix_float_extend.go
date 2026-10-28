@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/sparse_matrix.h:220-237,372-374,412-429;
 // src/util/lp/sparse_matrix.hpp:737-743. Retained LU consumers.
-package lp
 
 // NonzeroCount counts stored row entries, including explicit zeros/duplicates.
 // It is independent of the active-element counter used during factorization.

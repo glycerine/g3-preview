@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/nla2bv_tactic.cpp/.h.
 package arith
+
+// Source: src/tactic/arith/nla2bv_tactic.cpp/.h.
 
 import (
 	"errors"

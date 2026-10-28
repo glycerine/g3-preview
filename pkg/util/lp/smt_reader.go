@@ -1,5 +1,6 @@
-// Source: src/test/smt_reader.h:88-112,178-310,371-406.
 package lp
+
+// Source: src/test/smt_reader.h:88-112,178-310,371-406.
 
 import (
 	"bufio"

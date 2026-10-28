@@ -1,5 +1,6 @@
-// Source: src/util/scoped_ctrl_c.h:24-41; src/util/scoped_ctrl_c.cpp:24-66.
 package control
+
+// Source: src/util/scoped_ctrl_c.h:24-41; src/util/scoped_ctrl_c.cpp:24-66.
 
 import (
 	"errors"

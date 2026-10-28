@@ -1,5 +1,6 @@
-// Real mpn.h member sbuffers and mpn.cpp division storage action ordering.
 package numeral
+
+// Real mpn.h member sbuffers and mpn.cpp division storage action ordering.
 
 import (
 	"testing"

@@ -1,6 +1,7 @@
+package grobner
+
 // Package grobner implements the retained, unindexed Grobner basis engine from
 // src/math/grobner/grobner.{h,cpp}.
-package grobner
 
 import (
 	"errors"

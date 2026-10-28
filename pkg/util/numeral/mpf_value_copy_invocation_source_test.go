@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:316-333; src/util/mpz.cpp:big_set.
 package numeral
+
+// Source: src/util/mpf.cpp:316-333; src/util/mpz.cpp:big_set.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_simplex.hpp; independent exact outer LP models.
 package lp
+
+// Source: src/util/lp/lp_primal_simplex.hpp; independent exact outer LP models.
 
 import (
 	"fmt"

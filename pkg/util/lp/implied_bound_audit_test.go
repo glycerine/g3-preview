@@ -1,5 +1,6 @@
-// Source: src/util/lp/implied_bound.h; retained lp_bound_propagator.cpp copies.
 package lp
+
+// Source: src/util/lp/implied_bound.h; retained lp_bound_propagator.cpp copies.
 
 import (
 	"fmt"

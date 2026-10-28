@@ -1,5 +1,6 @@
-// Source: src/math/interval/interval_def.h:704-837, concrete config_hwf.
 package subpaving
+
+// Source: src/math/interval/interval_def.h:704-837, concrete config_hwf.
 
 import (
 	"github.com/glycerine/g3/pkg/math/interval"

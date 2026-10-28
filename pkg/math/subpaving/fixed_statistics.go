@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:527,888-891,1163-1167,
 // 1869-1884; concrete config_mpfx statistics.
-package subpaving
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

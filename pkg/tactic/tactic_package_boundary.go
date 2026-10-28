@@ -1,5 +1,6 @@
-// Source: src/tactic/goal.h.
 package tactic
+
+// Source: src/tactic/goal.h.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

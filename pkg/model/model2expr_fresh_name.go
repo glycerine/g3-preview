@@ -1,5 +1,6 @@
-// Source: src/model/model2expr.cpp:24-61; src/model/model2expr.h:28-39.
 package model
+
+// Source: src/model/model2expr.cpp:24-61; src/model/model2expr.h:28-39.
 
 import (
 	"strconv"

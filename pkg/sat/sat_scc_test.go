@@ -1,5 +1,6 @@
-// Source: src/sat/sat_scc.cpp and src/sat/sat_elim_eqs.cpp.
 package sat
+
+// Source: src/sat/sat_scc.cpp and src/sat/sat_elim_eqs.cpp.
 
 import (
 	"errors"

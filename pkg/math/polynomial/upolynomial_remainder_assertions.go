@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:517,519,528,568.
 package polynomial
+
+// Source: upolynomial.cpp:517,519,528,568.
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

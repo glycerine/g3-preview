@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:416-469; src/util/mpf.h:116-123.
 package numeral
+
+// Source: src/util/mpf.cpp:416-469; src/util/mpf.h:116-123.
 
 func (m *ArbitraryFloatManager) comparisonGuard(x, y *ArbitraryFloat, line int32) error {
 	if e := m.valueGuard(x); e != nil {

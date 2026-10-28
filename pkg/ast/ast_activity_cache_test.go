@@ -1,5 +1,6 @@
-// Source: src/ast/act_cache.cpp:56-225; src/ast/act_cache.h:23-53.
 package ast
+
+// Source: src/ast/act_cache.cpp:56-225; src/ast/act_cache.h:23-53.
 
 import (
 	"fmt"

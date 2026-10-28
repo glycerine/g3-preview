@@ -1,6 +1,7 @@
+package substitution
+
 // Source: src/ast/substitution/unifier.cpp;
 // src/ast/substitution/unifier.h.
-package substitution
 
 import "github.com/glycerine/g3/pkg/ast"
 

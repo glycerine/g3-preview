@@ -1,5 +1,6 @@
-// Source: src/sat/tactic/goal2sat.cpp:556-678.
 package tactic
+
+// Source: src/sat/tactic/goal2sat.cpp:556-678.
 
 import (
 	"errors"

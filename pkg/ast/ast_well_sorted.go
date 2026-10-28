@@ -1,5 +1,6 @@
-// Source: src/ast/well_sorted.cpp:27-83; src/ast/for_each_expr.h:27-97.
 package ast
+
+// Source: src/ast/well_sorted.cpp:27-83; src/ast/for_each_expr.h:27-97.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/tactic/sine_filter.cpp; src/tactic/sine_filter.h.
 package tactic
+
+// Source: src/tactic/sine_filter.cpp; src/tactic/sine_filter.h.
 
 import (
 	"testing"

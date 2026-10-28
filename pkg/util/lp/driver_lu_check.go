@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:2568-2620,2639-2668,3126-3130.
 package lp
+
+// Source: src/test/lp.cpp:2568-2620,2639-2668,3126-3130.
 
 import (
 	"bufio"

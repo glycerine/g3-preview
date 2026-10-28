@@ -1,6 +1,7 @@
+package diagnostic
+
 // Source: src/util/debug.h:63-92; src/util/heap.h:57-66,79-239,258-265.
 // Source: src/util/vector.h:303-344,389-403.
-package diagnostic
 
 import (
 	"context"

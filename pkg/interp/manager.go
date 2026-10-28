@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3mgr.cpp; src/interp/iz3mgr.h.
 package interp
+
+// Source checkpoint: src/interp/iz3mgr.cpp; src/interp/iz3mgr.h.
 
 import (
 	"errors"

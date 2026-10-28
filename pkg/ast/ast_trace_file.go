@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:1297-1334,1474-1479.
 package ast
+
+// Source: src/ast/ast.cpp:1297-1334,1474-1479.
 
 import (
 	"os"

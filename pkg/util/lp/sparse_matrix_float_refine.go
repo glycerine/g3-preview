@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:535-584.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:535-584.
 
 func (m *FloatSparseMatrix) findErrorUYIndexed(original, y *IndexedFloatVector, active []uint32) error {
 	for _, i := range active {

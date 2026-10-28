@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: algebraic_numbers.cpp:467-474. Raw source prefixes exercise reached
 // reads only; they do not establish construction or ownership of source cells.
-package polynomial
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_elim_eqs.cpp:81,104,138,187,216.
 package sat
+
+// Source: src/sat/sat_elim_eqs.cpp:81,104,138,187,216.
 
 import (
 	"bytes"

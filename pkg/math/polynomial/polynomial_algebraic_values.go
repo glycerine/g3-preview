@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: polynomial_var2value.h:28-44, concrete instantiation retained by
 // cmd_context/extra_cmds/polynomial_cmds.cpp:93.
-package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

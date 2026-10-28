@@ -1,5 +1,6 @@
-// Source: src/util/inf_rational.h; src/util/inf_int_rational.h; src/util/inf_eps_rational.h; src/util/mpq.h; src/util/rational.h.
 package numeral
+
+// Source: src/util/inf_rational.h; src/util/inf_int_rational.h; src/util/inf_eps_rational.h; src/util/mpq.h; src/util/rational.h.
 
 import (
 	"errors"

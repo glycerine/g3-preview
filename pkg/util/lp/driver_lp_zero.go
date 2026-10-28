@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:58-63,515-569, retained --test_lp_0.
 package lp
+
+// Source: src/test/lp.cpp:58-63,515-569, retained --test_lp_0.
 
 import (
 	"io"

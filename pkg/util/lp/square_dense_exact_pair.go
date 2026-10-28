@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/square_dense_submatrix.hpp:175-185,273-301;
 // numeric_pair.h:109-121,216-219. Retained mpq/numeric_pair dense-left path.
-package lp
 
 // PairSquareDenseSubmatrix shares rational coefficients and all scalar/right
 // operations. Only the concrete pair-valued dense-left application differs.

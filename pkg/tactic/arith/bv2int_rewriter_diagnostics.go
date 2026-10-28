@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/bv2int_rewriter.cpp assertions and TRACE236/251.
 package arith
+
+// Source: src/tactic/arith/bv2int_rewriter.cpp assertions and TRACE236/251.
 
 import (
 	"io"

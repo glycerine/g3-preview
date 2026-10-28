@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bit2int.cpp:185-235.
 package rewriter
+
+// Source: src/ast/rewriter/bit2int.cpp:185-235.
 
 import (
 	"math/big"

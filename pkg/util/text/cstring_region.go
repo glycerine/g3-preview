@@ -1,5 +1,6 @@
-// Borrowed source C strings shared by parameter and diagnostic consumers.
 package text
+
+// Borrowed source C strings shared by parameter and diagnostic consumers.
 
 import (
 	"errors"

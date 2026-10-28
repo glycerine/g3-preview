@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/static_features.cpp:163-365;
 // src/ast/static_features.h:128-145.
-package ast
 
 func staticFeatureIncrement(values *[]uint32, fid FamilyID) {
 	if fid < 0 {

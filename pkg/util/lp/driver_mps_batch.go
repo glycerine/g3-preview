@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1479-1724. Retained solve_some_mps orchestration.
 package lp
+
+// Source: src/test/lp.cpp:1479-1724. Retained solve_some_mps orchestration.
 
 import (
 	"io"

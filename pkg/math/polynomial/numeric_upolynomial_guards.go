@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial.cpp caller invocation ownership.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial.cpp caller invocation ownership.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

@@ -1,7 +1,8 @@
+package numeral
+
 // Source parser assertions: src/test/mpq.cpp set_str_bug, src/test/mpz.cpp
 // tst1/bug1/tst_int_min_bug. Added quirk expectations are source-derived;
 // independent mathematical expectations are test-only.
-package numeral
 
 import (
 	"errors"

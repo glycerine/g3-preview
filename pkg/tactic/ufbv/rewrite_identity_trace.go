@@ -1,6 +1,7 @@
+package ufbv
+
 // Source: src/tactic/ufbv/ufbv_rewriter.cpp:241,367. The source prints raw
 // C++ node pointers; Go nodes have stable typed origin/slot/generation handles.
-package ufbv
 
 import (
 	"io"

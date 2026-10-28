@@ -1,5 +1,6 @@
-// Source: src/tactic/bv/dt2bv_tactic.cpp/.h; src/ast/for_each_expr.h:27-139.
 package bv
+
+// Source: src/tactic/bv/dt2bv_tactic.cpp/.h; src/ast/for_each_expr.h:27-139.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/tactic/horn_subsume_model_converter.cpp;
 // src/tactic/horn_subsume_model_converter.h.
-package tactic
 
 import (
 	"errors"

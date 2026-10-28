@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_vector.h, retained double coefficient storage.
 package lp
+
+// Source: src/util/lp/sparse_vector.h, retained double coefficient storage.
 
 // FloatSparseEntry is one literal sparse-list term. Duplicates and explicit
 // zeros remain stored and are applied in insertion order.

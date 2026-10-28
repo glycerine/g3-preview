@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:2520-2546,2951-2958; scoped_upolynomial_sequence.
 package polynomial
+
+// Source: upolynomial.cpp:2520-2546,2951-2958; scoped_upolynomial_sequence.
 
 import (
 	"errors"

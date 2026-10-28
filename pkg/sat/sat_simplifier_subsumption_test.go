@@ -1,6 +1,7 @@
+package sat
+
 // Source: src/sat/sat_simplifier.cpp:421–681.
 // Independent finite branch oracles; no registered full-solver claim.
-package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

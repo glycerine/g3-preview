@@ -1,5 +1,6 @@
-// Source: src/util/f2n.h:57-69,115-149, instantiated as f2n<mpf_manager>.
 package numeral
+
+// Source: src/util/f2n.h:57-69,115-149, instantiated as f2n<mpf_manager>.
 
 func (m *ArbitraryFloatNumeralManager) IsZero(x *ArbitraryFloat) (bool, error) {
 	if e := m.guard(); e != nil {

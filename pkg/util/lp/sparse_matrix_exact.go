@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.h/.hpp and indexed_value.h, mpq storage.
 package lp
+
+// Source: src/util/lp/sparse_matrix.h/.hpp and indexed_value.h, mpq storage.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

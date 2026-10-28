@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:1117-1131.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:1117-1131.
 
 // SMT2PPDeclareFun builds smt2_printer::operator()(func_decl*)'s declaration
 // document. This entrypoint uses pp_fdecl_name, not the indexed pp_fdecl form.

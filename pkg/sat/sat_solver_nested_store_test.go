@@ -1,5 +1,6 @@
-// Concrete storage adapter checks for source nested literal vectors.
 package sat
+
+// Concrete storage adapter checks for source nested literal vectors.
 
 import (
 	"errors"

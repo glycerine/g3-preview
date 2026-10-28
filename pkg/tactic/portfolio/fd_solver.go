@@ -1,5 +1,6 @@
-// Source: src/tactic/portfolio/fd_solver.cpp:28-34; fd_solver.h:26.
 package portfolio
+
+// Source: src/tactic/portfolio/fd_solver.cpp:28-34; fd_solver.h:26.
 
 import (
 	"errors"

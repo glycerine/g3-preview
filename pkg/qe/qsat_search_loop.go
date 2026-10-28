@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp qsat::check_sat/push/pop/validation/display.
 package qe
+
+// Source: src/qe/qsat.cpp qsat::check_sat/push/pop/validation/display.
 
 import (
 	"fmt"

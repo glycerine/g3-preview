@@ -1,3 +1,5 @@
+package ast
+
 // Selected source surface and ownership adapters:
 //
 // util/obj_mark.h default expr specialization: constructor/default get_id,
@@ -45,4 +47,3 @@
 // are additional ownership, failure, ordering and independent model coverage.
 // expr_sparse_mark's identity table and other general template families remain
 // open; whole ast.h/ast.cpp completion is not claimed.
-package ast

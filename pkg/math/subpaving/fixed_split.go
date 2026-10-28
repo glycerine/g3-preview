@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:185-247, concrete
 // config_mpfx midpoint node splitter.
-package subpaving
 
 import (
 	"errors"

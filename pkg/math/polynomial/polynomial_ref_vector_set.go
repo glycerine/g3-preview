@@ -1,5 +1,6 @@
-// Source: src/util/ref_vector.h:67-71,128-132; src/util/vector.h:422-433.
 package polynomial
+
+// Source: src/util/ref_vector.h:67-71,128-132; src/util/vector.h:422-433.
 
 // This receipt names only one actual guarded caller-vector SET. It does not
 // acquire the previously published caller range or its allocation backing.

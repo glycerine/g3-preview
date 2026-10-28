@@ -1,5 +1,6 @@
-// Concrete default obj_mark<expr> and ast_mark; IDs deliberately outlive nodes.
 package ast
+
+// Concrete default obj_mark<expr> and ast_mark; IDs deliberately outlive nodes.
 
 import (
 	"reflect"

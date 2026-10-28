@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1200-1317, concrete
 // config_hwf candidate-bound relevance and arithmetic failure policy.
-package subpaving
 
 import (
 	"errors"

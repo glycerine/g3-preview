@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:75-99.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:75-99.
 
 // SMT2IsIndexedFdecl follows the SMT2 printer's source parameter walk. An
 // indexed declaration has a non-null family and at least one parameter, each

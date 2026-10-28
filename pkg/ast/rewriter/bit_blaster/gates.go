@@ -1,6 +1,7 @@
+package bit_blaster
+
 // Source: src/ast/rewriter/bit_blaster/bit_blaster.cpp:24-116;
 // src/ast/rewriter/bit_blaster/bit_blaster.h:24-50.
-package bit_blaster
 
 import (
 	"errors"

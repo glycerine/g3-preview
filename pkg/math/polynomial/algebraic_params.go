@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/algebraic_params.hpp; algebraic_numbers.cpp:150-159.
 package polynomial
+
+// Source: src/math/polynomial/algebraic_params.hpp; algebraic_numbers.cpp:150-159.
 
 import uparams "github.com/glycerine/g3/pkg/util/params"
 

@@ -1,5 +1,6 @@
-// Source: polynomial.cpp, concrete integer substitution reached by mod_gcd_rec.
 package polynomial
+
+// Source: polynomial.cpp, concrete integer substitution reached by mod_gcd_rec.
 
 type polynomialSubstitutionInvocationReceipt struct {
 	core       *MultivariatePolynomialCore

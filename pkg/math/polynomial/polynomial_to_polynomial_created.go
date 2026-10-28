@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:2582-2594,862-884.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:2582-2594,862-884.
 
 func (m *MultivariatePolynomialCore) generatedVariableToPolynomial(v, k uint32, r *polynomialToPolynomialInvocationReceipt) (Monomial, error) {
 	if r == nil || !r.manager.matchesToPolynomialInvocation(r) || r.manager.core != m || !r.frame.executing || m.callbackDepth != 0 {

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.hpp:300-330, double/double.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.hpp:300-330, double/double.
 
 func (m *FloatCoreSolverBase) CalculatePivotRowOfBInverse(row uint32) error {
 	if sourceDebugEnabled && m.Settings.UseTableau() {

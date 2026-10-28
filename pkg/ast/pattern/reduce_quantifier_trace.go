@@ -1,5 +1,6 @@
-// Source: src/ast/pattern/pattern_inference.cpp:584,695,704.
 package pattern
+
+// Source: src/ast/pattern/pattern_inference.cpp:584,695,704.
 
 import (
 	"io"

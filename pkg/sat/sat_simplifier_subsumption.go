@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:98–122,421–458,532–681.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:98–122,421–458,532–681.
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

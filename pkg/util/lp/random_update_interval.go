@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/random_updater.h:40-80;
 // random_updater.hpp:37-128,153-163; lar_core_solver.h:806-814.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

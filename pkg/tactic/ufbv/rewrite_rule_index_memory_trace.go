@@ -1,6 +1,7 @@
+package ufbv
+
 // Source: src/tactic/ufbv/ufbv_rewriter.cpp:226;
 // src/util/obj_hashtable.h:216-222; src/util/memory_manager.cpp:202-211.
-package ufbv
 
 import (
 	"fmt"

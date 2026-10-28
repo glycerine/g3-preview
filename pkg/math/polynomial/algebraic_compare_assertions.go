@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/algebraic_numbers.cpp:1710,1761-1762; algebraic_numbers.h:373.
 package polynomial
+
+// Source: src/math/polynomial/algebraic_numbers.cpp:1710,1761-1762; algebraic_numbers.h:373.
 
 func (m *AlgebraicRootCore) assertComparisonNonbasic(a *Algebraic, line int32, expression string) error {
 	_, enabled, e := algebraicAssertionSwitch()

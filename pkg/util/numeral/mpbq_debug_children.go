@@ -1,5 +1,6 @@
-// Actual accepted MPBQ debug children, shared by retained numeric callers.
 package numeral
+
+// Actual accepted MPBQ debug children, shared by retained numeric callers.
 
 type binaryDebugChildren struct {
 	owned, integer, arithmetic uint64

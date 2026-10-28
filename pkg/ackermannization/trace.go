@@ -1,5 +1,6 @@
-// Source: src/ackermannization retained diagnostics.
 package ackermannization
+
+// Source: src/ackermannization retained diagnostics.
 
 import (
 	"errors"

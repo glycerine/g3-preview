@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.hpp:207-235,331-375,411-548,731-740.
 // Floating dual pivot/beta, basis update and recovery use the actual shared LU.
-package lp
 
 import (
 	"fmt"

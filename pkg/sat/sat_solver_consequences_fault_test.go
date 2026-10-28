@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:3252–3636; actual same-Runtime publication prefixes.
 package sat
+
+// Source: src/sat/sat_solver.cpp:3252–3636; actual same-Runtime publication prefixes.
 
 import (
 	"fmt"

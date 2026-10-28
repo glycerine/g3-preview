@@ -1,5 +1,6 @@
-// Source: src/util/debug.h:63; src/util/small_object_allocator.cpp:72-145,198.
 package memory
+
+// Source: src/util/debug.h:63; src/util/small_object_allocator.cpp:72-145,198.
 
 // AllocatorAssertionControl is one cold borrowed actual assertion owner. No
 // function closure, hot-record dispatch, or mirrored assertion state is owned.

@@ -1,5 +1,6 @@
-// Source: polynomial.cpp, gcd_content and modular/recursive scalar products.
 package polynomial
+
+// Source: polynomial.cpp, gcd_content and modular/recursive scalar products.
 
 import (
 	"errors"

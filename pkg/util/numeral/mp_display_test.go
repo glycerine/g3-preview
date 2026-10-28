@@ -1,6 +1,7 @@
+package numeral
+
 // Active source outputs: src/test/mpq.cpp tst2. Other exact expectations are
 // independent finite projections of mpz/mpq printing branches, not C++ runs.
-package numeral
 
 import (
 	"bytes"

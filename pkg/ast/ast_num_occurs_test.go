@@ -1,5 +1,6 @@
-// Source: src/ast/num_occurs.cpp; src/ast/num_occurs.h.
 package ast
+
+// Source: src/ast/num_occurs.cpp; src/ast/num_occurs.h.
 
 import (
 	"errors"

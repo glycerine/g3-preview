@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/square_dense_submatrix.h/.hpp. Shared mpq coefficients
 // for retained mpq/mpq and mpq/numeric_pair LU dense blocks.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

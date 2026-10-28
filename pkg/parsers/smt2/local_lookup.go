@@ -1,5 +1,6 @@
-// Source: src/parsers/smt2/smt2parser.cpp:1699-1721,1723-1729,1735-1754.
 package smt2
+
+// Source: src/parsers/smt2/smt2parser.cpp:1699-1721,1723-1729,1735-1754.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_simplex.h:32-103;
 // lp_dual_simplex.hpp:44-103,186-336. Retained mpq/mpq model preparation.
-package lp
 
 import (
 	"fmt"

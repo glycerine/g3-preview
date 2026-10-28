@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpbq.cpp refine_upper/refine_lower, retained by
 // upolynomial.cpp:2849-2901. The raw midpoint survives a throwing body.
-package numeral
 
 type BinaryRefineInvocationReceipt struct {
 	owner      *BinaryRationalManager

@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/array_rewriter.cpp:220-323,335-338;
 // src/ast/rewriter/array_rewriter.h:44-45,59.
-package rewriter
 
 import (
 	"errors"

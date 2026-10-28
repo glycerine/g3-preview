@@ -1,5 +1,6 @@
-// Source: src/tactic/filter_model_converter.cpp:31.
 package model
+
+// Source: src/tactic/filter_model_converter.cpp:31.
 
 import "github.com/glycerine/g3/pkg/ast"
 

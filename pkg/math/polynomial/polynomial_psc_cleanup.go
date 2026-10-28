@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:5654-5810; src/util/obj_ref.h.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:5654-5810; src/util/obj_ref.h.
 
 // Generation identifies a concrete invocation of these source local scopes.
 // The subordinate continuation itself records acquisition AFTER its own

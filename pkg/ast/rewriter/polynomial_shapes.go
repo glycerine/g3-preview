@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/poly_rewriter.h:121-122;
 // src/ast/rewriter/poly_rewriter_def.h:980-1032.
-package rewriter
 
 import (
 	"math/big"

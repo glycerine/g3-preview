@@ -1,5 +1,6 @@
-// Source: src/math/interval/interval_def.h:175-380, concrete config_mpff.
 package interval
+
+// Source: src/math/interval/interval_def.h:175-380, concrete config_mpff.
 
 import (
 	"errors"

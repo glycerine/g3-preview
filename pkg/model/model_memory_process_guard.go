@@ -1,5 +1,6 @@
-// Source: src/util/memory_manager.cpp:202-211.
 package model
+
+// Source: src/util/memory_manager.cpp:202-211.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

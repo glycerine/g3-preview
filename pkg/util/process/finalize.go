@@ -1,6 +1,7 @@
+package process
+
 // Source: src/api/dll/mem_initializer.cpp, src/shell/mem_initializer.cpp,
 // src/test/mem_initializer.cpp, generated mem_finalize body.
-package process
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

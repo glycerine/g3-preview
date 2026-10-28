@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.hpp:225-295,334-348,460-477,
 // 758-766,790-798,812-851. Retained double/double value reconstruction.
-package lp
 
 import "math"
 

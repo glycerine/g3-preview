@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/diff_neq_tactic.cpp concrete int search.
 package arith
+
+// Source: src/tactic/arith/diff_neq_tactic.cpp concrete int search.
 
 import (
 	"strconv"

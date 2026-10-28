@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3proof_itp.cpp equality-to-inequality
 // proof rotation and mixed arithmetic movers.
-package interp
 
 import "github.com/glycerine/g3/pkg/ast"
 

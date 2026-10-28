@@ -1,5 +1,6 @@
-// Source: src/util/lp/lu.h:308-366, retained double/double dimension extension.
 package lp
+
+// Source: src/util/lp/lu.h:308-366, retained double/double dimension extension.
 
 func (m *FloatLU) AdjustDimensionWithMatrixA() (err error) {
 	if err = m.ready(); err != nil {

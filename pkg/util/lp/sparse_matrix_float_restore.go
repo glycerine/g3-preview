@@ -1,5 +1,6 @@
-// Source: src/util/lp/sparse_matrix.hpp:337-400.
 package lp
+
+// Source: src/util/lp/sparse_matrix.hpp:337-400.
 
 // SetRowFromWorkVectorAndCleanNotAdjusted replaces a physical row from logical
 // column coordinates. Completed mutations remain published on error.

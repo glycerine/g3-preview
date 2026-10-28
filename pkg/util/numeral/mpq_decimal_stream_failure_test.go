@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:156-185; actual RAW declarations and end-label cleanup.
 package numeral
+
+// Source: src/util/mpq.cpp:156-185; actual RAW declarations and end-label cleanup.
 
 import (
 	"errors"

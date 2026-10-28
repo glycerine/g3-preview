@@ -1,5 +1,6 @@
-// Source: src/ast/format.h:132-162.
 package ast
+
+// Source: src/ast/format.h:132-162.
 
 import (
 	"testing"

@@ -1,5 +1,6 @@
-// Source: src/tactic/smtlogics/qflia_tactic.cpp quasi_pb_probe.
 package arith
+
+// Source: src/tactic/smtlogics/qflia_tactic.cpp quasi_pb_probe.
 
 import (
 	"errors"

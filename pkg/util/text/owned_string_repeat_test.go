@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1639-1654,1673,1686.
 package text
+
+// Source: src/util/mpf.cpp:1639-1654,1673,1686.
 
 import (
 	"errors"

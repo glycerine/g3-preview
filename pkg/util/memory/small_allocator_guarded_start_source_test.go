@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.cpp:97-144.
 package memory
+
+// Source: src/util/small_object_allocator.cpp:97-144.
 
 import (
 	"testing"

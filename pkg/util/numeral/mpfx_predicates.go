@@ -1,5 +1,6 @@
-// Source: src/util/mpfx.h:160-247 and src/util/mpfx.cpp:316-417.
 package numeral
+
+// Source: src/util/mpfx.h:160-247 and src/util/mpfx.cpp:316-417.
 
 import "math/big"
 

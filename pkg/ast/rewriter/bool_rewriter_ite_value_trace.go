@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bool_rewriter.cpp:594-595,665-671; src/util/trace.h:40-46.
 package rewriter
+
+// Source: src/ast/rewriter/bool_rewriter.cpp:594-595,665-671; src/util/trace.h:40-46.
 
 import (
 	"errors"

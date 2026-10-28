@@ -1,5 +1,6 @@
-// Source: src/util/inf_rational.h:228-238. Prefix steps use m_first only.
 package numeral
+
+// Source: src/util/inf_rational.h:228-238. Prefix steps use m_first only.
 
 import "testing"
 

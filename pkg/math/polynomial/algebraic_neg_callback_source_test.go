@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577;
 // src/util/memory_manager.cpp:274-285. Returning-transport lifecycle fixture.
-package polynomial
 
 import (
 	"errors"

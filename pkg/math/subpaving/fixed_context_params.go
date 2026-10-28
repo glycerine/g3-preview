@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:416-435,476-505,
 // concrete config_mpfx.
-package subpaving
 
 import (
 	"math"

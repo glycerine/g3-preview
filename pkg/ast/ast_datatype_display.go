@@ -1,5 +1,6 @@
-// Source: src/ast/datatype_decl_plugin.cpp:1011-1070.
 package ast
+
+// Source: src/ast/datatype_decl_plugin.cpp:1011-1070.
 
 import (
 	"io"

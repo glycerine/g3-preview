@@ -1,5 +1,6 @@
-// Source: src/math/interval/interval_def.h:704-837, concrete config_mpq.
 package subpaving
+
+// Source: src/math/interval/interval_def.h:704-837, concrete config_mpq.
 
 import (
 	"errors"

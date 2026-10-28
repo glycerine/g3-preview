@@ -1,6 +1,7 @@
+package params
+
 // Test fixtures copied from the source-owned collectors. These supply upper-package
 // registrations to the utility dispatcher tests without reversing the dependency.
-package params
 
 func catalogCollectQfufbvTacticParams(d *ParamDescrs) error {
 	if e := catalogInsert(d, "sat_backend", ParamBool, "use SAT rather than SMT in qfufbv_ackr_tactic", "false", "ackermannization"); e != nil {

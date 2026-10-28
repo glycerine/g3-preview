@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3mgr.cpp and src/interp/iz3mgr.h proof readers.
 package interp
+
+// Source checkpoint: src/interp/iz3mgr.cpp and src/interp/iz3mgr.h proof readers.
 
 import (
 	"errors"

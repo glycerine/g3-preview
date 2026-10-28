@@ -1,5 +1,6 @@
-// Source: src/qe/qe_arith.cpp imp::linearize/extract_coefficients.
 package qe
+
+// Source: src/qe/qe_arith.cpp imp::linearize/extract_coefficients.
 
 import (
 	"io"

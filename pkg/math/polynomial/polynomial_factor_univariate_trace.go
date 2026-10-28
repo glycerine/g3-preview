@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:6707-6720.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:6707-6720.
 
 func (m *MultivariatePolynomialManager) emitUnivariateFactorBug(s *polynomialFactorUnivariateScope, line int, body func(*polynomialTraceSink) error) error {
 	tags := m.core.monomials.monomialTraceTags()

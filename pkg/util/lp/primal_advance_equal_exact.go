@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.hpp:675-698, precise branch;
 // numeric_pair.h:220-222; util/rational.h:480-488.
-package lp
 
 // buildAdvanceDelta evaluates sign*t through the scalar-left source overload.
 // Its returned pair survives UpdateX; scalar constructor temporaries do not.

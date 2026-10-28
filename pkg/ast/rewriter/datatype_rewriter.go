@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/datatype_rewriter.cpp:24-140;
 // src/ast/rewriter/datatype_rewriter.h:24-35.
-package rewriter
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1301,1331,1352,1410; nested formatter cleanup.
 package numeral
+
+// Source: src/util/mpf.cpp:1301,1331,1352,1410; nested formatter cleanup.
 
 import (
 	"bytes"

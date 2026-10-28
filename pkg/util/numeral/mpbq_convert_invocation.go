@@ -1,5 +1,6 @@
-// Source: src/util/mpbq.cpp set(mpq), including its reached debug snapshots.
 package numeral
+
+// Source: src/util/mpbq.cpp set(mpq), including its reached debug snapshots.
 
 type BinaryConvertInvocationReceipt struct {
 	owner      *BinaryRationalManager

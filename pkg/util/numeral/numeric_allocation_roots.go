@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp and source numeric-call ownership adapters.
 package numeral
+
+// Source: src/util/mpz.cpp and source numeric-call ownership adapters.
 
 import (
 	"errors"

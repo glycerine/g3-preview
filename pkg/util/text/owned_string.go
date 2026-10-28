@@ -1,5 +1,6 @@
-// Source: src/smt/params/qi_params.cpp:43-64; src/util/params.cpp:928-930.
 package text
+
+// Source: src/smt/params/qi_params.cpp:43-64; src/util/params.cpp:928-930.
 
 import (
 	"bytes"

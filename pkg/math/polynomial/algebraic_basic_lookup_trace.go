@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/algebraic_numbers.cpp:1953-1958.
 package polynomial
+
+// Source: src/math/polynomial/algebraic_numbers.cpp:1953-1958.
 
 import (
 	"io"

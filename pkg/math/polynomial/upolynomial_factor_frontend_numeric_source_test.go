@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:3042-3057,213-232;
 // src/util/mpz.cpp:560-843.
-package polynomial
 
 import (
 	"fmt"

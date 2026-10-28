@@ -1,5 +1,6 @@
-// Source: src/tactic/bv/bv1_blaster_tactic.cpp is_qfbv_eq_probe.
 package bv
+
+// Source: src/tactic/bv/bv1_blaster_tactic.cpp is_qfbv_eq_probe.
 
 import (
 	"errors"

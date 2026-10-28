@@ -1,5 +1,6 @@
-// Source: src/util/trace.cpp:28-33; src/util/memory_manager.cpp:202-211.
 package diagnostic
+
+// Source: src/util/trace.cpp:28-33; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

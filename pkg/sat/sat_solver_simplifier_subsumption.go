@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp; src/sat/sat_simplifier.h.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp; src/sat/sat_simplifier.h.
 
 func (k *satSimplifierKernel) occurrenceCount(l Literal) (uint32, error) {
 	v, e := k.useList.Get(l)

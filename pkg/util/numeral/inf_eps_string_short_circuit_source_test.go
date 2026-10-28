@@ -1,5 +1,6 @@
-// Source: src/util/inf_eps_rational.h:47-70, src/util/inf_rational.h:51-66.
 package numeral
+
+// Source: src/util/inf_eps_rational.h:47-70, src/util/inf_rational.h:51-66.
 
 import (
 	"errors"

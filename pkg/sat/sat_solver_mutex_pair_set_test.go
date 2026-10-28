@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:3119-3150; native literal-pair membership.
 package sat
+
+// Source: src/sat/sat_solver.cpp:3119-3150; native literal-pair membership.
 
 import (
 	"testing"

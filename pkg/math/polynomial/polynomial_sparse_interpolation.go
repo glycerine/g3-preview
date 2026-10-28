@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:3134-3182;
 // src/util/scoped_numeral_vector.h; src/math/polynomial/linear_eq_solver.h.
-package polynomial
 
 import (
 	"errors"

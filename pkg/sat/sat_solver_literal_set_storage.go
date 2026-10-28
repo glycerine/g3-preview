@@ -1,5 +1,6 @@
-// Source: src/sat/sat_types.h:153-204,229-263; src/sat/sat_probing.cpp.
 package sat
+
+// Source: src/sat/sat_types.h:153-204,229-263; src/sat/sat_probing.cpp.
 
 import "github.com/glycerine/g3/pkg/arena"
 

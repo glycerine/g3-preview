@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.h: stage-one mpq/impq constructor,
 // init_inf_set and get_column_out_of_bounds_delta_sign.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:318-334;
 // src/util/scoped_numeral.h, mpq.h::del (NUM before DEN).
-package polynomial
 
 import (
 	"errors"

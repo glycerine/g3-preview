@@ -1,5 +1,6 @@
-// Source: src/util/rational.h; src/util/mpq.cpp; src/util/memory_manager.cpp:274-285.
 package numeral
+
+// Source: src/util/rational.h; src/util/mpq.cpp; src/util/memory_manager.cpp:274-285.
 
 import (
 	"context"

@@ -1,5 +1,6 @@
-// Source: src/util/rational.h:131-134,302-304.
 package numeral
+
+// Source: src/util/rational.h:131-134,302-304.
 
 import "sync/atomic"
 

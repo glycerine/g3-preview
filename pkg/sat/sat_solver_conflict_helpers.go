@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:2091–2219.
 package sat
+
+// Source: src/sat/sat_solver.cpp:2091–2219.
 
 func (s *satSolverConflictResolution) getMaxLevel(consequent Literal, j satJustification) (uint32, error) {
 	p := s.analysis.propagation

@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/rational.cpp:75-83; src/util/rational.h:67.
 // Leonardo de Moura (2006-09-18).
-package numeral
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

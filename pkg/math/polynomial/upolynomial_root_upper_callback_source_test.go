@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1906-1951;
 // src/util/memory_manager.cpp:274-285. Qualified returning-transport guard fixture.
-package polynomial
 
 import (
 	"reflect"

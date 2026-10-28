@@ -1,5 +1,6 @@
-// Source: src/api/api_context.cpp:364-368.
 package api
+
+// Source: src/api/api_context.cpp:364-368.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

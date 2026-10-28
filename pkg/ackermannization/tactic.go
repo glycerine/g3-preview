@@ -1,5 +1,6 @@
-// Source: src/ackermannization/ackermannize_bv_tactic.cpp/.h.
 package ackermannization
+
+// Source: src/ackermannization/ackermannize_bv_tactic.cpp/.h.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/arith_rewriter_params.hpp:5-42.
 package rewriter
+
+// Source: src/ast/rewriter/arith_rewriter_params.hpp:5-42.
 
 import "testing"
 

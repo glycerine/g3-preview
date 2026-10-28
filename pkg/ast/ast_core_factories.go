@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast.cpp:2064-2211.
 // Source node construction. Results are non-owning source RC0 handles.
-package ast
 
 import (
 	"errors"

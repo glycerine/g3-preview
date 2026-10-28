@@ -1,5 +1,6 @@
-// Source: src/util/debug.cpp:45-54; src/util/memory_manager.cpp:202-211.
 package diagnostic
+
+// Source: src/util/debug.cpp:45-54; src/util/memory_manager.cpp:202-211.
 
 import (
 	"fmt"

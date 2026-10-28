@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/bv_rewriter.cpp:2040-2074;
 // src/ast/rewriter/bv_rewriter.h:133-135.
-package rewriter
 
 import "github.com/glycerine/g3/pkg/ast"
 

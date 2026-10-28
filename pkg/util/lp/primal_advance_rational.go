@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.hpp:700-768, precise branch;
 // util/rational.h scalar comparison and unary minus.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_dual_simplex.hpp:377-384; lp_dual_simplex.h:34-38,99-103; lp_solver.hpp:43-48.
 package lp
+
+// Source: src/util/lp/lp_dual_simplex.hpp:377-384; lp_dual_simplex.h:34-38,99-103; lp_solver.hpp:43-48.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

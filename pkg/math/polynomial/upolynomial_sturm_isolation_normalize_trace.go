@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:391-392; outer isolation normalization diagnostics.
 package polynomial
+
+// Source: upolynomial.cpp:391-392; outer isolation normalization diagnostics.
 
 import (
 	"bytes"

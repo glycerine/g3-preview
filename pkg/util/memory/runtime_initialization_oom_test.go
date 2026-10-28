@@ -1,5 +1,6 @@
-// Source: src/util/memory_manager.cpp:90-113, especially the reached assignment at102.
 package memory
+
+// Source: src/util/memory_manager.cpp:90-113, especially the reached assignment at102.
 
 import (
 	"errors"

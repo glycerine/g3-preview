@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_params.hpp:6-26; src/util/lp/lp_params.pyg.
 package lp
+
+// Source: src/util/lp/lp_params.hpp:6-26; src/util/lp/lp_params.pyg.
 
 import (
 	"reflect"

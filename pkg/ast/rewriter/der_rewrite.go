@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/der.cpp:100-206,317-461;
 // src/ast/rewriter/der.h:120-181.
-package rewriter
 
 import (
 	"errors"

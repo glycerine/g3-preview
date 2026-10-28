@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:657-664,690-721,1500-1663,
 // concrete config_hwf monomial construction and propagation.
-package subpaving
 
 import (
 	"errors"

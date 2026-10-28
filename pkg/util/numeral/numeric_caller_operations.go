@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp; src/util/mpzzp.h (caller lifetime adaptation).
 package numeral
+
+// Source: src/util/mpz.cpp; src/util/mpzzp.h (caller lifetime adaptation).
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

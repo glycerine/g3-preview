@@ -1,7 +1,8 @@
+package simplex
+
 // Source: src/smt/theory_arith_core.h select_lg_error_var,
 // select_var_to_fix and make_feasible. These policies are consumed by the
 // concrete SMT arithmetic theory using this shared exact tableau.
-package simplex
 
 import "sort"
 

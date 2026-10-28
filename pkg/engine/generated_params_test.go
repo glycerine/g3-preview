@@ -1,5 +1,6 @@
-// Source: generated gparams_register_modules.cpp and mem_initializer.cpp.
 package engine
+
+// Source: generated gparams_register_modules.cpp and mem_initializer.cpp.
 
 import (
 	"bytes"

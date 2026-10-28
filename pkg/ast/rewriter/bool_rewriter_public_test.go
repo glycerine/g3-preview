@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/bool_rewriter.h:86-105;
 // src/model/model_evaluator.cpp:66-93,146-169.
-package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

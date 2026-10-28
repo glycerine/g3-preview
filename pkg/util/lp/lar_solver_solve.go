@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:433-454,851-869.
 package lp
+
+// Source: src/util/lp/lar_solver.h:433-454,851-869.
 
 func (s *LARSolver) FindFeasibleSolution() (status Status, err error) {
 	if err = s.ready(); err != nil {

@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:34–74; src/sat/sat_solver.h declared members.
 package sat
+
+// Source: src/sat/sat_solver.cpp:34–74; src/sat/sat_solver.h declared members.
 
 import (
 	"fmt"

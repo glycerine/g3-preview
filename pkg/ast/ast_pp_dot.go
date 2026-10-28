@@ -1,5 +1,6 @@
-// Source: src/ast/ast_pp_dot.cpp; src/ast/ast_pp_dot.h.
 package ast
+
+// Source: src/ast/ast_pp_dot.cpp; src/ast/ast_pp_dot.h.
 
 import (
 	"errors"

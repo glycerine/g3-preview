@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/dl_decl_plugin.cpp:166-208,252-264,404-410,447-454,
 // 472-492,494-604,746-754.
-package ast
 
 import "errors"
 

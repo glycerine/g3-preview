@@ -1,5 +1,6 @@
-// Source: src/qe/qsat.cpp qsat state, reset and alternating search.
 package qe
+
+// Source: src/qe/qsat.cpp qsat state, reset and alternating search.
 
 import (
 	"errors"

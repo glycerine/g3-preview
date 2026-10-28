@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpf.cpp:194-231; src/util/mpq.cpp rational text SET;
 // src/util/mpz.cpp:283-303.
-package numeral
 
 import (
 	"strings"

@@ -1,5 +1,6 @@
-// Source: src/model/model_params.hpp; src/model/model_params.pyg.
 package model
+
+// Source: src/model/model_params.hpp; src/model/model_params.pyg.
 
 import uparams "github.com/glycerine/g3/pkg/util/params"
 

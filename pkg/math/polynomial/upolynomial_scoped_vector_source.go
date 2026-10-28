@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/util/scoped_numeral_vector.h:29-40;
 // src/math/polynomial/upolynomial_factorization.cpp:583-674.
-package polynomial
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

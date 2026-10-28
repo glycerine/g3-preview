@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp action traces; added bounded ownership expectations.
 package params
+
+// Source: src/util/params.cpp action traces; added bounded ownership expectations.
 
 import (
 	"errors"

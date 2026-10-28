@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp (caller lifetime boundary tests).
 package numeral
+
+// Source: src/util/mpz.cpp (caller lifetime boundary tests).
 
 import (
 	"errors"

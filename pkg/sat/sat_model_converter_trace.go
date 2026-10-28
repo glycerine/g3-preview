@@ -1,5 +1,6 @@
-// Source: src/sat/sat_model_converter.cpp:108,142,152,163,181; retained util/trace sites.
 package sat
+
+// Source: src/sat/sat_model_converter.cpp:108,142,152,163,181; retained util/trace sites.
 
 import (
 	"errors"

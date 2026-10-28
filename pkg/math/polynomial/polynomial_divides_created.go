@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:5177-5182;
 // src/math/polynomial/polynomial.cpp:810-851.
-package polynomial
 
 func (m *MultivariatePolynomialCore) dividesCreatedQuotient(a, b Monomial, r *polynomialDividesInvocationReceipt) (Monomial, bool, error) {
 	if !m.matchesDividesInvocation(r) || !r.frame.executing || m.callbackDepth != 0 {

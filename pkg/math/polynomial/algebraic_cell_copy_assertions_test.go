@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:235-240,427,445-446,509-539.
 package polynomial
+
+// Source: algebraic_numbers.cpp:235-240,427,445-446,509-539.
 
 import (
 	"errors"

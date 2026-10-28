@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.hpp:207-210,357-375,411-431.
 // Retained scalar mpq/mpq beta recurrence and actual LU reinitialization.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

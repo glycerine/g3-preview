@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:902-925; retained exact and floating cores.
 package lp
+
+// Source: src/util/lp/lar_solver.h:902-925; retained exact and floating cores.
 
 func (s *LARSolver) AddLastRowsToPairLU(r *PairPrimalCoreSolver) (err error) {
 	if err = s.ready(); err != nil {

@@ -1,5 +1,6 @@
-// Checked scalar replacements for borrowed ast.h field accessors.
 package ast
+
+// Checked scalar replacements for borrowed ast.h field accessors.
 
 import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"

@@ -1,5 +1,6 @@
-// Source binding: src/math/polynomial/polynomial.cpp:2303-2370,6683-6830.
 package polynomial
+
+// Source binding: src/math/polynomial/polynomial.cpp:2303-2370,6683-6830.
 
 // ArithmeticCore borrows this manager's actual arithmetic implementation for
 // Go callers constructing its inputs. This binding adds no second owner and

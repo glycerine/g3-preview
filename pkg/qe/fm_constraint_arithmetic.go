@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::fm::mk_int / normalize_coeffs.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::fm::mk_int / normalize_coeffs.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

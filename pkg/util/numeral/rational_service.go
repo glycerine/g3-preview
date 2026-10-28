@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/rational.h; src/util/rational.cpp.
 // Concrete owner-local core of src/util/rational.h/.cpp and vector.h.
-package numeral
 
 import (
 	"errors"

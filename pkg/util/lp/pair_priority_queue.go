@@ -1,5 +1,6 @@
-// Source: src/util/lp/binary_heap_upair_queue.h/.hpp, actual int/unsigned instances.
 package lp
+
+// Source: src/util/lp/binary_heap_upair_queue.h/.hpp, actual int/unsigned instances.
 
 // IntPairPriorityQueue stores ordered index pairs with native map/slice bookkeeping.
 // Slots are reused in LIFO order. Resize changes the underlying queue extent

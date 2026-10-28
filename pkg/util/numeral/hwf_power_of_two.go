@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/hwf.cpp:577-584 and the live f2n<hwf_manager>
 // previous-power lookup in src/util/f2n.h:145.
-package numeral
 
 // PrevPowerOfTwo preserves the hardware manager's source formula. The result
 // is the unsigned exponent used by the interval Newton root's rough estimate.

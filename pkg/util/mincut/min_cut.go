@@ -1,5 +1,6 @@
-// Source: src/util/min_cut.h:25-59; src/util/min_cut.cpp:21-230.
 package mincut
+
+// Source: src/util/min_cut.h:25-59; src/util/min_cut.cpp:21-230.
 
 import (
 	"errors"

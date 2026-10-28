@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/hwf.cpp:101-105,114-117; src/util/mpq.cpp:297-303;
 // src/util/mpz.cpp:1364-1380 (non-GMP branch).
-package numeral
 
 import "math"
 

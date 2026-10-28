@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver.hpp:771-790, precise specialization.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver.hpp:771-790, precise specialization.
 
 // AdvanceOnEnteringPrecise solves the actual entering column before creating
 // its local step. The local stays owned until all children finish, including

@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:185-247, concrete config_mpq
 // midpoint splitting and source decision-bound normalization.
-package subpaving
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/tactic/core/elim_uncnstr_tactic.cpp array/datatype reductions.
 package core
+
+// Source: src/tactic/core/elim_uncnstr_tactic.cpp array/datatype reductions.
 
 import "github.com/glycerine/g3/pkg/ast"
 

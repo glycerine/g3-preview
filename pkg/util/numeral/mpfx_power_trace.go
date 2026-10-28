@@ -1,5 +1,6 @@
-// Source: src/util/mpfx.cpp:647-648,745-756.
 package numeral
+
+// Source: src/util/mpfx.cpp:647-648,745-756.
 
 import (
 	"bytes"

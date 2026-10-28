@@ -1,8 +1,9 @@
+package rewriter
+
 // Source: src/ast/rewriter/poly_rewriter.h:95-123;
 // src/ast/rewriter/poly_rewriter_def.h:28-45;
 // src/ast/rewriter/poly_rewriter_params.pyg;
 // src/ast/rewriter/arith_rewriter_params.pyg.
-package rewriter
 
 import (
 	"reflect"

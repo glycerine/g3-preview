@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:634-662 (a, b, sticky_rem and Round lifetimes).
 package numeral
+
+// Source: src/util/mpf.cpp:634-662 (a, b, sticky_rem and Round lifetimes).
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

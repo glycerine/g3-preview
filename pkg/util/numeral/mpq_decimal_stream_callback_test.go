@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:157-164; actual second RAW COPY allocation transport.
 package numeral
+
+// Source: src/util/mpq.cpp:157-164; actual second RAW COPY allocation transport.
 
 import (
 	"errors"

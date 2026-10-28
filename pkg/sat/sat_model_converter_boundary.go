@@ -1,6 +1,7 @@
+package sat
+
 // Source: src/sat/tactic/goal2sat.cpp:574-576,658-661;
 // src/sat/sat_model_converter.cpp:253-262.
-package sat
 
 import "github.com/glycerine/g3/pkg/arena"
 

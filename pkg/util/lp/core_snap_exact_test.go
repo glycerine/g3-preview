@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.h:346-385; mpq/impq.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.h:346-385; mpq/impq.
 
 import (
 	"fmt"

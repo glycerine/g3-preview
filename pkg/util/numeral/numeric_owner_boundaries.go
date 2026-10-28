@@ -1,5 +1,6 @@
-// Source: src/util/mpz.h, mpq.h, mpbq.h, mpbqi.h, mpzzp.h.
 package numeral
+
+// Source: src/util/mpz.h, mpq.h, mpbq.h, mpbqi.h, mpzzp.h.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

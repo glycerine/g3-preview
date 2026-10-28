@@ -1,5 +1,6 @@
-// Source: src/util/mpz.h:468-485; src/util/mpz.cpp:730-817,915-985,1018-1183.
 package numeral
+
+// Source: src/util/mpz.h:468-485; src/util/mpz.cpp:730-817,915-985,1018-1183.
 
 // Real retained RAW declarations in the charged Integer owner. Count marks
 // reached declarations; values beyond count carry no source constructor credit.

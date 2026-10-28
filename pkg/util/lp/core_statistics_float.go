@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.h:37,153-155,689-697;
 // lp_core_solver_base.hpp:350-377,449-458; lu.h:49-55,256-258.
-package lp
 
 import (
 	"fmt"

@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:6683-6725;
 // src/util/prime_generator.cpp:99-107.
 // The Go service borrows the explicit config selecting the actual generator.
-package polynomial
 
 func (m *MultivariatePolynomialManager) factorizationService() (*UPolynomialFactorizationService, error) {
 	if e := m.ready(); e != nil {

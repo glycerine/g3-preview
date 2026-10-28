@@ -1,5 +1,6 @@
-// Source: src/tactic/model_converter.cpp:176-181.
 package tactic
+
+// Source: src/tactic/model_converter.cpp:176-181.
 
 import (
 	"errors"

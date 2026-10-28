@@ -1,9 +1,10 @@
+package ast
+
 // Source: src/ast/bv_decl_plugin.cpp:416-435,778-789,865-868.
 // Source: src/ast/rewriter/bv_rewriter.cpp:2141-2168 (zero-bit local mode).
 // Source: src/ast/rewriter/bv_rewriter.h:39 (coefficient return temporary).
 // Source: src/ast/rewriter/poly_rewriter_def.h:47-53,70-74,78-124 (factory locals).
 // Source: src/ast/rewriter/poly_rewriter_def.h:410-416 (coefficient reader).
-package ast
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package normal_forms
+
 // Source: src/ast/normal_forms/pull_quant.cpp:163-197;
 // src/ast/pattern/pattern_inference.cpp:679-698.
-package normal_forms
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

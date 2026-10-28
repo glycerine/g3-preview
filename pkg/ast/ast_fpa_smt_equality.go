@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/fpa_rewriter.cpp:648-667;
 // src/util/scoped_numeral.h:24-33.
-package ast
 
 const (
 	fpaSMTEqMode  int32 = 0

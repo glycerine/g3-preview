@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:4352-4506;
 // src/util/rlimit.h; src/util/cooperate.h.
-package polynomial
 
 import (
 	"errors"

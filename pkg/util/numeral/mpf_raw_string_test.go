@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1590-1606; src/util/mpf.h:292.
 package numeral
+
+// Source: src/util/mpf.cpp:1590-1606; src/util/mpf.h:292.
 
 import (
 	"strconv"

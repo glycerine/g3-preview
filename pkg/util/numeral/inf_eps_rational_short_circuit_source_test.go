@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_eps_rational.h:257-266. Infinity-sign comparisons
 // return before reading the finite rational or nested numeral operands.
-package numeral
 
 import (
 	"errors"

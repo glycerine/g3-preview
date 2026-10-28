@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:651-664,690-721,1499-1663,
 // concrete config_mpff monomial definitions and propagation.
-package subpaving
 
 import (
 	"errors"

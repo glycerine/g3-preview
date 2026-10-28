@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral_vector.h:25-72; src/ast/fpa_decl_plugin.cpp:51-65.
 package ast
+
+// Source: src/util/scoped_numeral_vector.h:25-72; src/ast/fpa_decl_plugin.cpp:51-65.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

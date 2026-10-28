@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/linear_equation.cpp:71,76,78,99,121.
 package arith
+
+// Source: src/tactic/arith/linear_equation.cpp:71,76,78,99,121.
 
 import (
 	"io"

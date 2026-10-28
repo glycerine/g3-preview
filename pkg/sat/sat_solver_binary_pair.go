@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.h:286,445; src/sat/sat_solver.cpp:2818-2838.
 package sat
+
+// Source: src/sat/sat_solver.h:286,445; src/sat/sat_solver.cpp:2818-2838.
 
 // BinaryLiteralPair keeps both complete literal indices. Collection order is
 // the source watch traversal order; no learned bit is packed into either value.

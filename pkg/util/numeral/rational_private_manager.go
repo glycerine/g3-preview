@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpq.h unsynch_mpq_manager construction used by
 // src/ast/arith_decl_plugin.cpp:23-31.
-package numeral
 
 import "sync/atomic"
 

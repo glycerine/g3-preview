@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/poly_rewriter_def.h:47-53,70-74,78-124,127-138.
 package ast
+
+// Source: src/ast/rewriter/poly_rewriter_def.h:47-53,70-74,78-124,127-138.
 
 import (
 	"errors"

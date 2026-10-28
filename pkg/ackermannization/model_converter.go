@@ -1,6 +1,7 @@
+package ackermannization
+
 // Source: src/ackermannization/ackr_model_converter.cpp/.h;
 // src/ackermannization/ackermannize_bv_model_converter.cpp/.h.
-package ackermannization
 
 import (
 	"errors"

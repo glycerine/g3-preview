@@ -1,5 +1,6 @@
-// Source: src/math/interval/interval_def.h:208-210,315-320,344-348; src/util/trace.h.
 package interval
+
+// Source: src/math/interval/interval_def.h:208-210,315-320,344-348; src/util/trace.h.
 
 import (
 	"io"

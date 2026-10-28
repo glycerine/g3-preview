@@ -1,5 +1,6 @@
-// Source: src/util/lp/scaler.h:32-90 and scaler.hpp:38-270.
 package lp
+
+// Source: src/util/lp/scaler.h:32-90 and scaler.hpp:38-270.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Concrete native slices used by retained SAT consumers.
 package sat
+
+// Concrete native slices used by retained SAT consumers.
 
 import (
 	"reflect"

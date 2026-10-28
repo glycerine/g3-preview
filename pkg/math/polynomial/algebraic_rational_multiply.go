@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/algebraic_numbers.cpp:1490-1563.
 package polynomial
+
+// Source: src/math/polynomial/algebraic_numbers.cpp:1490-1563.
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"

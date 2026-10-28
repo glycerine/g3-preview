@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bit_blaster/bit_blaster_params.h:22-40.
 package bit_blaster
+
+// Source: src/ast/rewriter/bit_blaster/bit_blaster_params.h:22-40.
 
 import (
 	utext "github.com/glycerine/g3/pkg/util/text"

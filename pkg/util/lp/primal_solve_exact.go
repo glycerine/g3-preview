@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.hpp:864-966;
 // lp_primal_core_solver_tableau.h:99-208; precise mpq/impq specialization.
-package lp
 
 // These conditions retain source short-circuit order. Tableau alone adds a
 // cancellation read after all these conditions and another read after exit.

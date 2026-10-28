@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/pb2bv_tactic.cpp imp::operator() and is_pb_probe.
 package arith
+
+// Source: src/tactic/arith/pb2bv_tactic.cpp imp::operator() and is_pb_probe.
 
 import (
 	"errors"

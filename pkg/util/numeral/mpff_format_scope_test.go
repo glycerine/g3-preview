@@ -1,5 +1,6 @@
-// Source mpff.cpp:1173–1378.
 package numeral
+
+// Source mpff.cpp:1173–1378.
 
 import (
 	"errors"

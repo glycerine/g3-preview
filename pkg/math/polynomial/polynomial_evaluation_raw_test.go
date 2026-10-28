@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp; src/math/polynomial/polynomial.cpp:6436-6522.
 package polynomial
+
+// Source: src/util/mpq.cpp; src/math/polynomial/polynomial.cpp:6436-6522.
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"

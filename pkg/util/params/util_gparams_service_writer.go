@@ -1,5 +1,6 @@
-// Source: src/util/gparams.cpp:446-550,612-631, direct ostream output routes.
 package params
+
+// Source: src/util/gparams.cpp:446-550,612-631, direct ostream output routes.
 
 import (
 	"errors"

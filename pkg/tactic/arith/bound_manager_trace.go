@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/bound_manager.cpp diagnostics and display.
 package arith
+
+// Source: src/tactic/arith/bound_manager.cpp diagnostics and display.
 
 import (
 	"errors"

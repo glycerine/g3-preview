@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial.h:401-423.
 package polynomial
+
+// Source: src/math/polynomial/upolynomial.h:401-423.
 
 import (
 	"testing"

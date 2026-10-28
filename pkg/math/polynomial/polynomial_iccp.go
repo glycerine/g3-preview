@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:3432-3534;
 // src/math/polynomial/polynomial.h:polynomial manager content overloads.
-package polynomial
 
 import (
 	"errors"

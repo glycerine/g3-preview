@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/diff_neq_tactic.cpp compile and bound/atom processing.
 package arith
+
+// Source: src/tactic/arith/diff_neq_tactic.cpp compile and bound/atom processing.
 
 import (
 	"math/big"

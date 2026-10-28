@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp; src/util/mpq.cpp; src/util/params.cpp (ownership audit adaptation).
 package numeral
+
+// Source: src/util/mpz.cpp; src/util/mpq.cpp; src/util/params.cpp (ownership audit adaptation).
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

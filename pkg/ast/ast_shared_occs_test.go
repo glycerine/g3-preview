@@ -1,5 +1,6 @@
-// No registered shared_occs test exists; these are additional finite source models.
 package ast
+
+// No registered shared_occs test exists; these are additional finite source models.
 
 import (
 	"errors"

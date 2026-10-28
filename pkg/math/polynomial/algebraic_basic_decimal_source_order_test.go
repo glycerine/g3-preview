@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:2733; mpq.cpp:157-161 raw declaration/getter order.
 package polynomial
+
+// Source: algebraic_numbers.cpp:2733; mpq.cpp:157-161 raw declaration/getter order.
 
 import (
 	"bytes"

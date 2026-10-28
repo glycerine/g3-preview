@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/linear_equation.cpp:179-193,93-97.
 package arith
+
+// Source: src/tactic/arith/linear_equation.cpp:179-193,93-97.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

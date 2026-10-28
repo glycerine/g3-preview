@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp; src/sat/sat_clause.h.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp; src/sat/sat_clause.h.
 
 import (
 	"errors"

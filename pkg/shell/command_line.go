@@ -1,5 +1,6 @@
-// Source: src/shell/main.cpp:113-289, concrete Linux command-line scan.
 package shell
+
+// Source: src/shell/main.cpp:113-289, concrete Linux command-line scan.
 
 import (
 	"errors"

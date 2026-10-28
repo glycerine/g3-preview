@@ -1,5 +1,6 @@
-// Concrete cold owner binding for actual cross-core coefficient ownership.
 package polynomial
+
+// Concrete cold owner binding for actual cross-core coefficient ownership.
 
 import (
 	"math"

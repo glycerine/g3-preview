@@ -1,5 +1,6 @@
-// Source: src/util/mpff.cpp:1173-1378.
 package numeral
+
+// Source: src/util/mpff.cpp:1173-1378.
 
 func (m *FastFloatManager) appendText(n uint32, s string) (uint32, error) {
 	return m.natural.appendDisplay(n, s)

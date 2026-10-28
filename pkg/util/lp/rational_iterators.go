@@ -1,5 +1,6 @@
-// Source: src/util/lp/linear_combination_iterator.h and retained exact iterators.
 package lp
+
+// Source: src/util/lp/linear_combination_iterator.h and retained exact iterators.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

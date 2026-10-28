@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver_tableau.h:210-261;
 // util/rational.h scalar multiplication and unary assignment.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

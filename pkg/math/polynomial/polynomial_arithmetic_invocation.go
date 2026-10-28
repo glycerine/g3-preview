@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:1885-2156,2217-2300,2665-2744;
 // src/util/obj_ref.h.
-package polynomial
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

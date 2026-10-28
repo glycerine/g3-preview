@@ -1,5 +1,6 @@
-// Source: src/qe/qe_mbp.cpp extract_literals/extract_bools/pick_equality.
 package qe
+
+// Source: src/qe/qe_mbp.cpp extract_literals/extract_bools/pick_equality.
 
 import (
 	"io"

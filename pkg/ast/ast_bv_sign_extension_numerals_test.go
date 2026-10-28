@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:1531-1553.
 package ast
+
+// Source: src/ast/rewriter/bv_rewriter.cpp:1531-1553.
 
 import "testing"
 

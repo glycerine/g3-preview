@@ -1,5 +1,6 @@
-// Source mpbq.cpp:426–458.
 package numeral
+
+// Source mpbq.cpp:426–458.
 
 import (
 	"errors"

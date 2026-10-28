@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bit2int.cpp:109-183.
 package rewriter
+
+// Source: src/ast/rewriter/bit2int.cpp:109-183.
 
 import "github.com/glycerine/g3/pkg/ast"
 

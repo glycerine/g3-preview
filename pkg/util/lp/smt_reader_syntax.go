@@ -1,5 +1,6 @@
-// Source: src/test/smt_reader.h:50-70,114-176.
 package lp
+
+// Source: src/test/smt_reader.h:50-70,114-176.
 
 import "strings"
 

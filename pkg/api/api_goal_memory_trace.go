@@ -1,6 +1,7 @@
+package api
+
 // Source: src/api/api_goal.cpp:35; src/api/api_context.cpp:54,116;
 // src/util/memory_manager.cpp:202-211.
-package api
 
 import (
 	"fmt"

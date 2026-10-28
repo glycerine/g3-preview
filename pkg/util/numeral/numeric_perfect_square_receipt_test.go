@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1871-1929; src/util/mpzzp.h.
 package numeral
+
+// Source: src/util/mpz.cpp:1871-1929; src/util/mpzzp.h.
 
 import "testing"
 

@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:156-184 raw decimal-display locals.
 package numeral
+
+// Source: src/util/mpq.cpp:156-184 raw decimal-display locals.
 
 import (
 	"errors"

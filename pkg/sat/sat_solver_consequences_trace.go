@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:3287,3289,3297,3307,3366,3420,3450,3516,3538,3585; retained util/trace sites.
 package sat
+
+// Source: src/sat/sat_solver.cpp:3287,3289,3297,3307,3366,3420,3450,3516,3538,3585; retained util/trace sites.
 
 import (
 	"io"

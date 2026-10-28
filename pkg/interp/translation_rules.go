@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3translate.cpp retained proof-rule
 // dispatcher and final precomputed-lemma construction.
-package interp
 
 import (
 	"errors"

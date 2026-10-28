@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/util/prime_generator.cpp:99-107;
 // src/math/polynomial/polynomial.cpp:6683-6725,6737-6830.
 // The borrowed-core accessor is explicit Go binding, not a C++ getter port.
-package polynomial
 
 import (
 	"testing"

@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h:1455,1549-1550.
 package ast
+
+// Source: src/ast/ast.h:1455,1549-1550.
 
 // Canceled increments the manager's source resource count before testing the
 // cancellation flag or step limit. Suspension permits work without hiding the

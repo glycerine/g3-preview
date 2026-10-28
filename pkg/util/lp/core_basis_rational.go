@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_core_solver_base.h:77-99,475-514,665-668;
 // src/util/lp/lp_core_solver_base.hpp:937-940; retained scalar mpq/mpq core.
-package lp
 
 func (m *RationalCoreSolverBase) StartTracingBasisChanges() { m.Trace = m.Trace[:0]; m.Tracing = true }
 func (m *RationalCoreSolverBase) StopTracingBasisChanges()  { m.Tracing = false }

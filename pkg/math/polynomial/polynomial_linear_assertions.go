@@ -1,5 +1,6 @@
-// Source: linear_eq_solver.h SASSERT/DEBUG_CODE sites.
 package polynomial
+
+// Source: linear_eq_solver.h SASSERT/DEBUG_CODE sites.
 
 import (
 	"errors"

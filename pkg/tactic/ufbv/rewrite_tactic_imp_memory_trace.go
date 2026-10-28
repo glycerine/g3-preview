@@ -1,6 +1,7 @@
+package ufbv
+
 // Source: src/tactic/ufbv/ufbv_rewriter_tactic.cpp:81,89,113-115;
 // src/util/memory_manager.cpp:202-211.
-package ufbv
 
 import (
 	"errors"

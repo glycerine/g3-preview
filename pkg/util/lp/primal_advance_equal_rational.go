@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.hpp:675-698, precise branch;
 // util/rational.h:480-493, concrete scalar mpq/mpq instantiation.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

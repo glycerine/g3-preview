@@ -1,6 +1,7 @@
+package interval
+
 // Source: src/util/ext_numeral.h, concrete mpbq instantiation reached by
 // src/math/realclosure/realclosure.cpp:54-135.
-package interval
 
 import (
 	"errors"

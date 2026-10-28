@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:802-880,1349-1405,
 // concrete config_mpfx inequalities, clauses and unit assertions.
-package subpaving
 
 import (
 	"errors"

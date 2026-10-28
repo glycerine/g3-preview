@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.cpp:636-669.
 package ast
+
+// Source: src/ast/bv_decl_plugin.cpp:636-669.
 
 import (
 	"context"

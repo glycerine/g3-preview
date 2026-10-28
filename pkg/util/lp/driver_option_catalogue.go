@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1883-1929. Retained LP driver option catalogue.
 package lp
+
+// Source: src/test/lp.cpp:1883-1929. Retained LP driver option catalogue.
 
 var lpDriverOptions = []driverOption{
 	{"-xyz_sample", "run a small interactive scenario", false},

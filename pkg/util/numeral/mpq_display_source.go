@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:130-139, raw manager display.
 package numeral
+
+// Source: src/util/mpq.cpp:130-139, raw manager display.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

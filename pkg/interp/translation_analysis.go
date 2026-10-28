@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3translate.cpp proof-DAG analysis,
 // clause extraction, and resolution helpers.
-package interp
 
 import (
 	"errors"

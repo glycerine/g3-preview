@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving.cpp:85-136, concrete context_mpf_wrapper
 // coefficient conversion. The enclosing context_mpf graph remains separate.
-package subpaving
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package ufbv
+
 // Source: src/tactic/ufbv/ufbv_rewriter.cpp:319-354;
 // src/util/ref_buffer.h:35-51 and src/util/array_map.h:62-91.
-package ufbv
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

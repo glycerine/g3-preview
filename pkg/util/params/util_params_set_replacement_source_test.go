@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:946-1014,1017-1033.
 package params
+
+// Source: src/util/params.cpp:946-1014,1017-1033.
 
 import (
 	"errors"

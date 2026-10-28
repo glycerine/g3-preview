@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.hpp:109-160,236-262,301-331,
 // 534-577. Concrete retained mpq/mpq dual pricing and leaving values.
-package lp
 
 import (
 	"math"

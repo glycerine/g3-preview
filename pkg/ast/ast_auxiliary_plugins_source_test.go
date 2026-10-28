@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/dl_decl_plugin.cpp:31-48; src/ast/pb_decl_plugin.cpp:23-29;
 // src/ast/reg_decl_plugins.cpp:30-55; src/ast/ast.cpp:1635-1638.
-package ast
 
 import (
 	"testing"

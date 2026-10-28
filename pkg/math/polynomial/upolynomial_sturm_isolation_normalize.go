@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:366-401,2469-2474; outer Sturm isolation normalization.
 package polynomial
+
+// Source: upolynomial.cpp:366-401,2469-2474; outer Sturm isolation normalization.
 
 import (
 	"errors"

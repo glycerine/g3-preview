@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving.cpp:198-260.
 package subpaving
+
+// Source: src/math/subpaving/subpaving.cpp:198-260.
 
 import (
 	"errors"

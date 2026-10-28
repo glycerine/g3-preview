@@ -1,5 +1,6 @@
-// Source: src/util/lp/indexed_value.h:34-55; actual concrete sparse-matrix helpers.
 package lp
+
+// Source: src/util/lp/indexed_value.h:34-55; actual concrete sparse-matrix helpers.
 
 import (
 	"fmt"

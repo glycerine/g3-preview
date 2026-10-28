@@ -1,6 +1,7 @@
+package simplex
+
 // Source: src/smt/theory_arith_aux.h get_freedom_interval, random_update and
 // remove_fixed_vars_from_base, specialized to the rational tableau.
-package simplex
 
 import (
 	"fmt"

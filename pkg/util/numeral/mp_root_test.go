@@ -1,6 +1,7 @@
+package numeral
+
 // Source active assertions: src/test/mpz.cpp tst_root. MPQ has no root tests;
 // its expectations below derive from mpq.h/cpp short-circuit output algorithms.
-package numeral
 
 import (
 	"errors"

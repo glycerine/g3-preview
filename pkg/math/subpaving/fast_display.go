@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:254-281,636-650,1848-1861;
 // concrete config_mpff constraint display.
-package subpaving
 
 import (
 	"io"

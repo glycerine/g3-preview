@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/pb2bv_tactic.cpp only_01_visitor/quick_pb_check.
 package arith
+
+// Source: src/tactic/arith/pb2bv_tactic.cpp only_01_visitor/quick_pb_check.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

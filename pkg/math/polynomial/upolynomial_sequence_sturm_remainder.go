@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:516-574,2520-2559; public sequence remainder locals.
 package polynomial
+
+// Source: upolynomial.cpp:516-574,2520-2559; public sequence remainder locals.
 
 import (
 	"errors"

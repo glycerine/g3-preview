@@ -1,5 +1,6 @@
-// algebraic_numbers.cpp:541–684, real univariate factor/isolation pipeline.
 package polynomial
+
+// algebraic_numbers.cpp:541–684, real univariate factor/isolation pipeline.
 
 import (
 	"errors"

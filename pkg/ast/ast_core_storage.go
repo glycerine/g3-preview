@@ -1,7 +1,8 @@
+package ast
+
 // Source: src/ast/ast.h; src/ast/ast.cpp:1354,2213-2238.
 // Concrete pointer-free storage for src/ast/ast.h. Domain destruction is
 // performed by ast_manager action translations, never by page reclamation.
-package ast
 
 import (
 	"errors"

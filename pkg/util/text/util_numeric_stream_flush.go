@@ -1,5 +1,6 @@
-// Source: src/util/debug.cpp:79-80 (formatted std::cin sentry tie()->flush()).
 package text
+
+// Source: src/util/debug.cpp:79-80 (formatted std::cin sentry tie()->flush()).
 
 // Flush is the selected direct-emission stream adapter. Every prior file byte
 // has already reached os.File.Write; the memory stream similarly has no pending

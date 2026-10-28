@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:194-231,233-300; signed-host first owning release.
 package numeral
+
+// Source: src/util/mpf.cpp:194-231,233-300; signed-host first owning release.
 
 import (
 	"errors"

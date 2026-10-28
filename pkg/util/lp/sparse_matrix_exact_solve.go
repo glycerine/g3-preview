@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/sparse_matrix.hpp:437-462,598-617; retained mpq/mpq and
 // mpq/numeric_pair dense LU consumers in lu.hpp:175-196.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

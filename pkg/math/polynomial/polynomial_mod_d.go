@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:2117-2139,6898-6927.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:2117-2139,6898-6927.
 
 // Both source loops read VAR, then the mapping, and only then a reached DEG.
 func (m *MultivariatePolynomialCore) monomialSurvivesModD(term Monomial, d *PolynomialVariableDegrees) (bool, error) {

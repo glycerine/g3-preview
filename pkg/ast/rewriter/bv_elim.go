@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/bv_elim.cpp:13-114;
 // src/ast/rewriter/bv_elim.h:24-47.
-package rewriter
 
 import (
 	"errors"

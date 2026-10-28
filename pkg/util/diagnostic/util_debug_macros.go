@@ -1,5 +1,6 @@
-// Source: src/util/debug.h:63-92; src/util/error_codes.h:29.
 package diagnostic
+
+// Source: src/util/debug.h:63-92; src/util/error_codes.h:29.
 
 import (
 	"errors"

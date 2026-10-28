@@ -1,6 +1,7 @@
+package model
+
 // Source: src/model/model_evaluator.cpp:41-203,233-302,502-579;
 // src/model/model_evaluator.h:30-64; src/model/model_evaluator_params.pyg.
-package model
 
 import (
 	"errors"

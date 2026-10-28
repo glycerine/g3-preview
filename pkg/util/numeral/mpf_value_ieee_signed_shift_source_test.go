@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1712-1737; CMakeLists.txt:224-229.
 package numeral
+
+// Source: src/util/mpf.cpp:1712-1737; CMakeLists.txt:224-229.
 
 import (
 	"math"

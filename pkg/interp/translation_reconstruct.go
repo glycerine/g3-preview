@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3translate.cpp arithmetic certificate
 // reconstruction for equality propagation and unnamed arithmetic lemmas.
-package interp
 
 import (
 	"errors"

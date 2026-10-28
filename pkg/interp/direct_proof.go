@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3proof_itp.cpp basic proof rules and term
 // classification.
-package interp
 
 import (
 	"errors"

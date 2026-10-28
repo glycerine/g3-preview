@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1906-1951.
 // Qualified returning transport / signed-host TLS destructor frontier.
-package polynomial
 
 import (
 	"errors"

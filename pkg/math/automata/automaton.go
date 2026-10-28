@@ -1,6 +1,7 @@
+package automata
+
 // Package automata implements the retained finite and symbolic automata from
 // src/math/automata with concrete uint32 condition handles.
-package automata
 
 import (
 	"fmt"

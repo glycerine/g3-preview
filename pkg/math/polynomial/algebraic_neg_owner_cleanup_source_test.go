@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577;
 // src/math/polynomial/upolynomial.cpp:1734-1764. Explicit core owning cleanup.
-package polynomial
 
 import (
 	"errors"

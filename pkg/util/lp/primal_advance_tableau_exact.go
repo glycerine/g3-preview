@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver_tableau.h:210-261;
 // numeric_pair.h:220-222 and rational scalar multiplication.
-package lp
 
 func (m *PairPrimalCoreSolver) buildTableauAdvanceDelta(t *RationalPair) (err error) {
 	before, e := m.calls.begin(m.manager)

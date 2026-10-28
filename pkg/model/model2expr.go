@@ -1,5 +1,6 @@
-// Source: src/model/model2expr.cpp:79-155.
 package model
+
+// Source: src/model/model2expr.cpp:79-155.
 
 import (
 	"errors"

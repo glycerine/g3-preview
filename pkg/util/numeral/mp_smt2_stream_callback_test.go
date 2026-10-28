@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1415-1416; actual negative temporary COPY transport.
 package numeral
+
+// Source: src/util/mpz.cpp:1415-1416; actual negative temporary COPY transport.
 
 import (
 	"errors"

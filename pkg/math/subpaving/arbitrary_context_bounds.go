@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:291-342,525-581,1337-1343,
 // 1773-1785, concrete config_mpf root unit-bound publication.
-package subpaving
 
 import (
 	"math"

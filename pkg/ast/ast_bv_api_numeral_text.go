@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/api/api_numeral.cpp:158-165,187-194;
 // src/ast/bv_decl_plugin.cpp:778-790.
-package ast
 
 import "errors"
 

@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.h; src/util/small_object_allocator.cpp; explicit scalar pointer codec.
 package memory
+
+// Source: src/util/small_object_allocator.h; src/util/small_object_allocator.cpp; explicit scalar pointer codec.
 
 import (
 	"errors"

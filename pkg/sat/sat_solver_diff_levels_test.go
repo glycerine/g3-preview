@@ -1,5 +1,6 @@
-// Source: sat_solver.cpp:2218-2238; independent finite level-set oracle.
 package sat
+
+// Source: sat_solver.cpp:2218-2238; independent finite level-set oracle.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:1845-1903; public sequence's reached binary Horner call.
 package polynomial
+
+// Source: upolynomial.cpp:1845-1903; public sequence's reached binary Horner call.
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

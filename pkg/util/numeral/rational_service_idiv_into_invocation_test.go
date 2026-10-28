@@ -1,5 +1,6 @@
-// Source: src/util/rational.h:182-184; src/util/mpq.h:523-527.
 package numeral
+
+// Source: src/util/rational.h:182-184; src/util/mpq.h:523-527.
 
 import (
 	"errors"

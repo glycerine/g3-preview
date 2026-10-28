@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/rational.h:198-200; src/util/mpq.h:549-553;
 // src/util/memory_manager.cpp:274-285.
-package numeral
 
 import (
 	"context"

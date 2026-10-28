@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1179-1317, concrete config_mpf
 // candidate normalization and bound relevance.
-package subpaving
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

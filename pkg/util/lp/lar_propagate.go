@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:363-365,402-427.
 package lp
+
+// Source: src/util/lp/lar_solver.h:363-365,402-427.
 
 // PropagateBoundsForTouchedRows preserves the source's deferred clearing:
 // cancellation leaves every touched row marked, including completed rows.

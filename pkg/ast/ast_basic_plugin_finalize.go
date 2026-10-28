@@ -1,5 +1,6 @@
-// Source: src/ast/ast.cpp:917-979.
 package ast
+
+// Source: src/ast/ast.cpp:917-979.
 
 func (m *ASTManager) finalizeBasic() error {
 	var failure error

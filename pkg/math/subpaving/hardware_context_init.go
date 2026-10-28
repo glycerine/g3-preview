@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1755-1802, concrete
 // config_hwf root creation and propagation order.
-package subpaving
 
 import "math"
 

@@ -1,5 +1,6 @@
-// Source: src/tactic/smtlogics/qfufbv_tactic.cpp ordinary strategy path.
 package smtlogics
+
+// Source: src/tactic/smtlogics/qfufbv_tactic.cpp ordinary strategy path.
 
 import (
 	"errors"

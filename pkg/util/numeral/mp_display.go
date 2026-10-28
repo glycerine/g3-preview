@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.cpp display_smt2, mpq.cpp display_smt2/display_decimal,
 // and mpq.h to_rational_string/display_pp forwarding wrappers.
-package numeral
 
 // appendDisplay copies static punctuation into the existing budgeted workspace.
 // It preserves the complete prefix if preparation grows the byte owner.

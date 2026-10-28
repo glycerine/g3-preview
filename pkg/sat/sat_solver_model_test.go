@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:1257–1345; src/sat/sat_model_converter.cpp:35–114; src/sat/sat_types.h:138; src/util/lbool.h.
 package sat
+
+// Source: src/sat/sat_solver.cpp:1257–1345; src/sat/sat_model_converter.cpp:35–114; src/sat/sat_types.h:138; src/util/lbool.h.
 
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"

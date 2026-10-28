@@ -1,5 +1,6 @@
-// Source: src/ast/expr2polynomial.cpp:25-518; src/ast/expr2polynomial.h:29-110.
 package ast
+
+// Source: src/ast/expr2polynomial.cpp:25-518; src/ast/expr2polynomial.h:29-110.
 
 import (
 	"bytes"

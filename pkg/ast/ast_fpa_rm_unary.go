@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/fpa_rewriter.cpp:433-466;
 // src/util/scoped_numeral.h:24-33.
-package ast
 
 // RewriteFPARMUnaryNumeral reads the rounding constant before constructing
 // the operand and result scoped MPF values. A symbolic argument is refused.

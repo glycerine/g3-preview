@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:193-544.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:193-544.
 
 import (
 	"errors"

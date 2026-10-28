@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_solver.h and lp_solver.hpp, floating common LP layer.
 package lp
+
+// Source: src/util/lp/lp_solver.h and lp_solver.hpp, floating common LP layer.
 
 import (
 	"strconv"

@@ -1,5 +1,6 @@
-// Source: src/util/small_object_allocator.cpp:172-242.
 package text
+
+// Source: src/util/small_object_allocator.cpp:172-242.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

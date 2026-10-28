@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1005-1045; src/util/mpf.h:131.
 package numeral
+
+// Source: src/util/mpf.cpp:1005-1045; src/util/mpf.h:131.
 
 func (m *ArbitraryFloatManager) Sqrt(mode ArbitraryFloatRoundingMode, x, out *ArbitraryFloat) (cause error) {
 	for _, v := range [...]*ArbitraryFloat{x, out} {

@@ -1,5 +1,6 @@
-// Source: src/math/euclid/euclidean_solver.cpp:734-740,751-756; src/util/trace.h.
 package euclid
+
+// Source: src/math/euclid/euclidean_solver.cpp:734-740,751-756; src/util/trace.h.
 
 import (
 	"io"

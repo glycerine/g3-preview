@@ -1,5 +1,6 @@
-// Source: src/qe/qe_arith.cpp imp::maximize/validate_model.
 package qe
+
+// Source: src/qe/qe_arith.cpp imp::maximize/validate_model.
 
 import (
 	"io"

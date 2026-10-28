@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_rational.h; src/util/inf_rational.cpp.
 // Source: src/util/inf_rational.h/.cpp; owner-local rational manager adaptation.
-package numeral
 
 import (
 	"errors"

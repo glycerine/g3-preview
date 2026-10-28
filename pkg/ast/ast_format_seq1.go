@@ -1,5 +1,6 @@
-// Source: src/ast/format.h:67-108. Concrete format-pointer specialization.
 package ast
+
+// Source: src/ast/format.h:67-108. Concrete format-pointer specialization.
 
 import "math"
 

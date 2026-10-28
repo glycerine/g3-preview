@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/expr_replacer.cpp:24-112;
 // src/ast/rewriter/expr_replacer.h:27-56.
-package rewriter
 
 import (
 	"errors"

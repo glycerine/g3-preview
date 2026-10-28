@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:470-588; src/util/mpf.h:124-125.
 package numeral
+
+// Source: src/util/mpf.cpp:470-588; src/util/mpf.h:124-125.
 
 func (m *ArbitraryFloatManager) Add(mode ArbitraryFloatRoundingMode, x, y, out *ArbitraryFloat) error {
 	return m.addSubtract(mode, x, y, out, false)

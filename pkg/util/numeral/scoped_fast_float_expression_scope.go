@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/scoped_numeral.h:160-183; concrete scoped_mpff operator
 // return-value copy followed by the source temporary's destructor.
-package numeral
 
 import "errors"
 

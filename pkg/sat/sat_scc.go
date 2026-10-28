@@ -1,5 +1,6 @@
-// Source: src/sat/sat_scc.cpp; src/sat/sat_scc.h; src/sat/sat_scc_params.pyg.
 package sat
+
+// Source: src/sat/sat_scc.cpp; src/sat/sat_scc.h; src/sat/sat_scc_params.pyg.
 
 import (
 	"errors"

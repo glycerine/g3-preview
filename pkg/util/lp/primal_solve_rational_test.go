@@ -1,5 +1,6 @@
-// Source: lp_primal_core_solver.hpp:864-966 and tableau.h:99-208.
 package lp
+
+// Source: lp_primal_core_solver.hpp:864-966 and tableau.h:99-208.
 
 import (
 	"bytes"

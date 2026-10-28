@@ -1,5 +1,6 @@
-// Source: src/ast/seq_decl_plugin.cpp:826-842.
 package ast
+
+// Source: src/ast/seq_decl_plugin.cpp:826-842.
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

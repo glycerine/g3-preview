@@ -1,5 +1,6 @@
-// Source: src/sat/sat_asymm_branch.cpp:62–119; src/sat/sat_solver.cpp:711–716.
 package sat
+
+// Source: src/sat/sat_asymm_branch.cpp:62–119; src/sat/sat_solver.cpp:711–716.
 
 import (
 	"testing"

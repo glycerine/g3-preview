@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1984-2027; Runtime signed-host guard helper profile.
 package numeral
+
+// Source: src/util/mpf.cpp:1984-2027; Runtime signed-host guard helper profile.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:487-499,1515-1555.
 package lp
+
+// Source: src/util/lp/lar_solver.h:487-499,1515-1555.
 
 // CleanLargeElementsAfterPop preserves the source snapshot and swap-pop order.
 // It removes members, retaining the old set domain.

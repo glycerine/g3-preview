@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::fm::try_eliminate / copy_remaining.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::fm::try_eliminate / copy_remaining.
 
 import (
 	"io"

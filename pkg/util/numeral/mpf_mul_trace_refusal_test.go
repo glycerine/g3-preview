@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:590,640,664; formatter exceptions in MUL TRACE.
 package numeral
+
+// Source: src/util/mpf.cpp:590,640,664; formatter exceptions in MUL TRACE.
 
 import (
 	"bytes"

@@ -1,7 +1,8 @@
+package lp
+
 // Source: src/util/lp/lar_solver.h and init_lar_solver.h: construction and
 // concrete variable registration. Whole-model scopes are in lar_scopes.go;
 // full LAR optimization remains open.
-package lp
 
 import (
 	"github.com/glycerine/g3/pkg/util/numeral"

@@ -1,5 +1,6 @@
-// Source: src/ast/macros/quasi_macros.cpp/.h.
 package macros
+
+// Source: src/ast/macros/quasi_macros.cpp/.h.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Test reflection keeps the original source field spelling while accepting exported Go names.
 package sat
+
+// Test reflection keeps the original source field spelling while accepting exported Go names.
 
 import "reflect"
 

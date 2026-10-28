@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.h:310-326.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.h:310-326.
 
 // FloatingPointSort constructs (_ FloatingPoint ebits sbits).
 func (m *ASTManager) FloatingPointSort(ebits, sbits uint32) (ASTHandle, error) {

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_simplex.hpp:23-43,105-184,342-375.
 // Concrete retained mpq/mpq two-stage outer solver.
-package lp
 
 import (
 	"fmt"

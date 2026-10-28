@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_eps_rational.h:310-317. The finite-domain assertions
 // are comments, and both roundings delegate directly to the nested numeral.
-package numeral
 
 import "testing"
 

@@ -1,5 +1,6 @@
-// Source: src/ast/arith_decl_plugin.h:81-145.
 package ast
+
+// Source: src/ast/arith_decl_plugin.h:81-145.
 
 import "errors"
 

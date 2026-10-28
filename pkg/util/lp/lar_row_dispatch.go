@@ -1,5 +1,6 @@
-// Source: src/util/lp/lar_solver.h:219-249. Exact row-analysis dispatch.
 package lp
+
+// Source: src/util/lp/lar_solver.h:219-249. Exact row-analysis dispatch.
 
 // AnalyzeNewBoundsOnRowTableau analyzes the actual tableau row. The source
 // length cutoff precedes the tableau-mode assertion and analyzer construction.

@@ -1,5 +1,6 @@
-// Source: src/ast/fpa_decl_plugin.cpp:230-253,710-724.
 package ast
+
+// Source: src/ast/fpa_decl_plugin.cpp:230-253,710-724.
 
 import (
 	"math"

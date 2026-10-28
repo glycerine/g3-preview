@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::fm::to_expr.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::fm::to_expr.
 
 import "github.com/glycerine/g3/pkg/ast"
 

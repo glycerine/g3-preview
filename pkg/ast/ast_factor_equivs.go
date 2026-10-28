@@ -1,5 +1,6 @@
-// Source: src/ast/factor_equivs.cpp; src/ast/factor_equivs.h.
 package ast
+
+// Source: src/ast/factor_equivs.cpp; src/ast/factor_equivs.h.
 
 import "github.com/glycerine/g3/pkg/util/backtrack"
 

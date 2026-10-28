@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1984-2027; actual reached scoped NUM/division leaves.
 package numeral
+
+// Source: src/util/mpf.cpp:1984-2027; actual reached scoped NUM/division leaves.
 
 import (
 	"testing"

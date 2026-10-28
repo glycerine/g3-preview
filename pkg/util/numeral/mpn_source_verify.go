@@ -1,5 +1,6 @@
-// Source: src/util/mpn.cpp:206-217 and actual Algorithm M/A bodies.
 package numeral
+
+// Source: src/util/mpn.cpp:206-217 and actual Algorithm M/A bodies.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

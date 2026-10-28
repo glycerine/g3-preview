@@ -1,6 +1,7 @@
+package arith
+
 // Source: src/tactic/arith/bound_propagator.cpp:118-137 and
 // src/tactic/arith/bound_propagator.h:183,260-262.
-package arith
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

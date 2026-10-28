@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:1905-1924,2721-2730,
 // 2748-2769,2983-3040.
-package polynomial
 
 import (
 	"errors"

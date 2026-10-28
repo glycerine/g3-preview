@@ -1,5 +1,6 @@
-// Source: src/util/lp/stacked_vector.h, live ul_pair specialization.
 package lp
+
+// Source: src/util/lp/stacked_vector.h, live ul_pair specialization.
 
 type stackedLARWitnessChange struct {
 	index uint32

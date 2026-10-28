@@ -1,5 +1,6 @@
-// Source MPFF arithmetic/control.
 package numeral
+
+// Source MPFF arithmetic/control.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

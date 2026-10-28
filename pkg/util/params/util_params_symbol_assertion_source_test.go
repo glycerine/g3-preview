@@ -1,5 +1,6 @@
-// Source: src/util/params.cpp:742-750,1017-1035; src/util/symbol.h:96.
 package params
+
+// Source: src/util/params.cpp:742-750,1017-1035; src/util/symbol.h:96.
 
 import (
 	"errors"

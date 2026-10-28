@@ -1,5 +1,6 @@
-// Source symbol interning byte-input boundary used by actual AST name buffers.
 package ast
+
+// Source symbol interning byte-input boundary used by actual AST name buffers.
 
 import (
 	"bytes"

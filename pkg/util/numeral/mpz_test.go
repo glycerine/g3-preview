@@ -1,6 +1,7 @@
+package numeral
+
 // Source assertions: src/test/mpz.cpp, especially bug3. Added bounded
 // lifecycle and exact arithmetic tests cover the Go ownership adaptation.
-package numeral
 
 import (
 	"errors"

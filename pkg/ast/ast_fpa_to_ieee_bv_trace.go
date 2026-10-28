@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/fpa_rewriter.cpp:765,769; src/util/trace.h:40-46.
 package ast
+
+// Source: src/ast/rewriter/fpa_rewriter.cpp:765,769; src/util/trace.h:40-46.
 
 import (
 	"io"

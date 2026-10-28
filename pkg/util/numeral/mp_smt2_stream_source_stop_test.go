@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp:1415-1423; literal negative scoped-numeral DT.
 package numeral
+
+// Source: src/util/mpz.cpp:1415-1423; literal negative scoped-numeral DT.
 
 import (
 	"errors"

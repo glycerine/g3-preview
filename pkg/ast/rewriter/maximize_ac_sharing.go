@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/maximize_ac_sharing.cpp:24-171;
 // src/ast/rewriter/maximize_ac_sharing.h:24-122.
-package rewriter
 
 import (
 	"errors"

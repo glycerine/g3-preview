@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:1479-1609. Literal retained catalogue order.
 package lp
+
+// Source: src/test/lp.cpp:1479-1609. Literal retained catalogue order.
 
 var driverMPSRelativeFiles = []string{
 	"/projects/lean/src/tests/util/lp/l0redund.mps",

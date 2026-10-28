@@ -1,5 +1,6 @@
-// Source: src/util/util.h:379-389; src/util/util.cpp:122-152.
 package escaped
+
+// Source: src/util/util.h:379-389; src/util/util.cpp:122-152.
 
 import (
 	"errors"

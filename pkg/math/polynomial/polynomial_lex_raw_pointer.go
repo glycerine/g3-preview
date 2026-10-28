@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:1315-1366,1401-1420;
 // src/util/permutation.h:56-91.
-package polynomial
 
 import (
 	"math"

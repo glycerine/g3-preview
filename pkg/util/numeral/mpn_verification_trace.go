@@ -1,5 +1,6 @@
-// Source: src/util/mpn.cpp:215, after the debug quotient/remainder check.
 package numeral
+
+// Source: src/util/mpn.cpp:215, after the debug quotient/remainder check.
 
 import (
 	"io"

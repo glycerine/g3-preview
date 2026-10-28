@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_solver.hpp:168-412, retained floating presolve.
 package lp
+
+// Source: src/util/lp/lp_solver.hpp:168-412, retained floating presolve.
 
 import (
 	"fmt"

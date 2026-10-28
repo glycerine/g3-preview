@@ -1,5 +1,6 @@
-// Source: src/sat/sat_clause.cpp:203,209; retained util/trace sites.
 package sat
+
+// Source: src/sat/sat_clause.cpp:203,209; retained util/trace sites.
 
 import (
 	"io"

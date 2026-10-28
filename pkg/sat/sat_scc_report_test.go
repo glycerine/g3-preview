@@ -1,5 +1,6 @@
-// Source: src/sat/sat_scc.cpp:43-58,61-65.
 package sat
+
+// Source: src/sat/sat_scc.cpp:43-58,61-65.
 
 import (
 	"regexp"

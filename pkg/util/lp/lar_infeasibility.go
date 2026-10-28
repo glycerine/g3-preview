@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lar_core_solver.hpp:240-272;
 // lp_primal_core_solver.h:156-168. Retained mpq/impq explanation consumer.
-package lp
 
 func (m *PairPrimalCoreSolver) InfSignOfColumn(j uint32) (sign int32, err error) {
 	if err = m.ready(); err != nil {

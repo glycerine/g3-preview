@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/upolynomial.cpp; src/util/mpq.h (ownership audit adaptation).
 package polynomial
+
+// Source: src/math/polynomial/upolynomial.cpp; src/util/mpq.h (ownership audit adaptation).
 
 import (
 	"fmt"

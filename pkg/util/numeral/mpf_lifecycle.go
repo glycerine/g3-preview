@@ -1,5 +1,6 @@
-// Source: src/util/mpf.h:65-73; src/util/memory_manager.cpp:274-289.
 package numeral
+
+// Source: src/util/mpf.h:65-73; src/util/memory_manager.cpp:274-289.
 
 // The backlink is borrowed, lifecycle-only cold metadata installed at the
 // actual completed MPQ/Integer member publication. It acquires no value root.

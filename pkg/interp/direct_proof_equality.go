@@ -1,6 +1,7 @@
+package interp
+
 // Source checkpoint: src/interp/iz3proof_itp.cpp local modus-ponens,
 // congruence, and transitivity rules.
-package interp
 
 import (
 	"strconv"

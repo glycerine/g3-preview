@@ -1,5 +1,6 @@
-// Source: src/tactic/smtlogics/qfbv_tactic.cpp/.h.
 package smtlogics
+
+// Source: src/tactic/smtlogics/qfbv_tactic.cpp/.h.
 
 import (
 	"errors"

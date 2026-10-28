@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:749-753,775-779;
 // src/util/scoped_numeral.h and mpq.h del: numerator before denominator.
-package polynomial
 
 import (
 	"errors"

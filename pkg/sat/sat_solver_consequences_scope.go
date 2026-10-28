@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:3252–3636; src/util/vector.h; src/util/hashtable.h.
 package sat
+
+// Source: src/sat/sat_solver.cpp:3252–3636; src/util/vector.h; src/util/hashtable.h.
 
 import (
 	"reflect"

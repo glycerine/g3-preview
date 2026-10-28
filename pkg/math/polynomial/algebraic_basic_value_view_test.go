@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: algebraic_numbers.cpp:235-240,337-341,440-444; mpq.h:666-669.
 // Raw input views establish readable fields, never source construction/ownership.
-package polynomial
 
 import (
 	"errors"

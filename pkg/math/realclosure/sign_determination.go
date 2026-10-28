@@ -1,6 +1,7 @@
+package realclosure
+
 // Source: src/math/realclosure/realclosure.cpp:254-281, 1743-1775,
 // 1967-1978, and 2018-2090.
-package realclosure
 
 // signCondition is one conjunct in the persistent sign assignment chain.
 // Several surviving columns may share an antecedent.

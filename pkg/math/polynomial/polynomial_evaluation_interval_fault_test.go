@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:6436-6550; src/util/mpbqi.h;
 // src/util/basic_interval.h.
-package polynomial
 
 import (
 	"fmt"

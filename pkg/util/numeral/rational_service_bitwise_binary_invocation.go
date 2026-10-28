@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/rational.h:370-386; src/util/mpq.h:632-655;
 // src/util/mpz.cpp:1018-1148.
-package numeral
 
 import "sync/atomic"
 

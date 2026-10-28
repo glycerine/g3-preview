@@ -1,5 +1,6 @@
-// Source MPFF predicates/getters.
 package numeral
+
+// Source MPFF predicates/getters.
 
 func (m *FastFloatManager) Sign(a *FastFloat) (bool, error) {
 	if e := m.check(a); e != nil {

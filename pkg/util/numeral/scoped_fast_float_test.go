@@ -1,5 +1,6 @@
-// Concrete owner/domain regressions.
 package numeral
+
+// Concrete owner/domain regressions.
 
 import (
 	"errors"

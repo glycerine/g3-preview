@@ -1,9 +1,10 @@
+package model
+
 // Source: src/model/model.cpp:69; src/tactic/model_converter.cpp:178;
 // src/tactic/filter_model_converter.cpp:31;
 // src/sat/tactic/sat_tactic.cpp:93;
 // src/model/model_core.h:71-75;
 // src/util/memory_manager.cpp:202-211.
-package model
 
 import (
 	"fmt"

@@ -1,5 +1,6 @@
-// Source: src/util/mpbq.cpp:394-401; scoped_numeral.h:186-189.
 package numeral
+
+// Source: src/util/mpbq.cpp:394-401; scoped_numeral.h:186-189.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

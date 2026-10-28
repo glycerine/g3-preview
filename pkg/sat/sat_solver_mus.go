@@ -1,5 +1,6 @@
-// Source: src/sat/sat_mus.cpp:28–229; src/sat/sat_mus.h; src/sat/sat_solver.cpp:1257–1261,2072–2083.
 package sat
+
+// Source: src/sat/sat_mus.cpp:28–229; src/sat/sat_mus.h; src/sat/sat_solver.cpp:1257–1261,2072–2083.
 
 import (
 	"errors"

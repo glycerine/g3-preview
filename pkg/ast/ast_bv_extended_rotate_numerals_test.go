@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/bv_rewriter.cpp:2020-2038;
 // src/util/rational.h:101,202-206.
-package ast
 
 import (
 	"errors"

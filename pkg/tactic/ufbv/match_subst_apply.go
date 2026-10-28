@@ -1,7 +1,8 @@
+package ufbv
+
 // Source: src/tactic/ufbv/ufbv_rewriter.cpp:905-917;
 // src/ast/substitution/substitution.cpp:83-213, specialized for its two
 // zero-delta offsets and UFBV's variable bindings at offset 1.
-package ufbv
 
 import (
 	"math"

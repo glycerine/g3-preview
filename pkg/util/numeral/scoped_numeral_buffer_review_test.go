@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral_buffer.h; src/util/buffer.h.
 package numeral
+
+// Source: src/util/scoped_numeral_buffer.h; src/util/buffer.h.
 
 import (
 	"errors"

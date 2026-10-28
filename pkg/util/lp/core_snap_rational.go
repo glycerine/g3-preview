@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.hpp:868-885; scalar mpq/mpq.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.hpp:868-885; scalar mpq/mpq.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/elim_bounds.cpp;
 // src/ast/rewriter/elim_bounds.h.
-package rewriter
 
 import (
 	"errors"

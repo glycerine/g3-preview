@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.h:346-385; retained mpq/impq.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.h:346-385; retained mpq/impq.
 
 // SnapColumnToBound preserves an existing endpoint; an interior boxed value
 // consumes exactly one source random value. Free and unknown types do nothing.

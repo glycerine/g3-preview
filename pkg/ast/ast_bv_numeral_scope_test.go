@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_trailing.cpp:149-171.
 package ast
+
+// Source: src/ast/rewriter/bv_trailing.cpp:149-171.
 
 import (
 	"errors"

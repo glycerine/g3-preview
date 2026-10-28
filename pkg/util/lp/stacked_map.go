@@ -1,5 +1,6 @@
-// Source: src/util/lp/stacked_map.h; src/test/lp.cpp:1933-1970.
 package lp
+
+// Source: src/util/lp/stacked_map.h; src/test/lp.cpp:1933-1970.
 
 type stackedInt32FloatDelta struct {
 	newKeys  map[int32]struct{}

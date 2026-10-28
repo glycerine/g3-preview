@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:2731-2746; manager::display selects precision10.
 package polynomial
+
+// Source: algebraic_numbers.cpp:2731-2746; manager::display selects precision10.
 
 type algebraicDecimalDisplayInvocationReceipt struct {
 	owner      *AlgebraicRootCore

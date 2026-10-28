@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/rewriter.h:365-408;
 // src/ast/rewriter/rewriter_def.h:659-750; src/model/model_evaluator.cpp:282-289.
-package rewriter
 
 import (
 	"errors"

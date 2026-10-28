@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:2711-2759, retained --term and --eti examples.
 package lp
+
+// Source: src/test/lp.cpp:2711-2759, retained --term and --eti examples.
 
 import (
 	"io"

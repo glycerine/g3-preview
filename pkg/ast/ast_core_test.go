@@ -1,5 +1,6 @@
-// Retained Boolean interning assertions from src/test/ast.cpp::tst1.
 package ast
+
+// Retained Boolean interning assertions from src/test/ast.cpp::tst1.
 
 import (
 	"testing"

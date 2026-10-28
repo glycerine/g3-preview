@@ -1,5 +1,6 @@
-// Source: src/ast/seq_decl_plugin.cpp:620-646,674-690,730-767,795-801.
 package ast
+
+// Source: src/ast/seq_decl_plugin.cpp:620-646,674-690,730-767,795-801.
 
 func (m *ASTManager) regexSortForSequence(sequenceSort astNodeRef) (astNodeRef, error) {
 	family, kind, err := m.declIdentity(sequenceSort)

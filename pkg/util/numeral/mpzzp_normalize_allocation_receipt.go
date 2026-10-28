@@ -1,5 +1,6 @@
-// Source: src/util/mpzzp.h:58-68,111-114; src/util/mpz.cpp:quot_rem_core.
 package numeral
+
+// Source: src/util/mpzzp.h:58-68,111-114; src/util/mpz.cpp:quot_rem_core.
 
 // Direct transport of actual integer-cell acquisition leaves.
 // Whole-parent and exhaustive prefix validation remain open.

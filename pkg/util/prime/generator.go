@@ -1,5 +1,6 @@
-// Source: src/util/prime_generator.h:26-52; src/util/prime_generator.cpp:23-130.
 package prime
+
+// Source: src/util/prime_generator.h:26-52; src/util/prime_generator.cpp:23-130.
 
 import (
 	"errors"

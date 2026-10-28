@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h; src/ast/rewriter/rewriter_def.h.
 package ast
+
+// Source: src/ast/ast.h; src/ast/rewriter/rewriter_def.h.
 
 func (m *ASTManager) RewriterMakeApp(d ASTHandle, args AppArguments) (ASTHandle, error) {
 	if e := m.lock(); e != nil {

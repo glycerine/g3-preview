@@ -1,5 +1,6 @@
-// Source: src/math/subpaving/subpaving_t_def.h:1170-1175; config_hwf.
 package subpaving
+
+// Source: src/math/subpaving/subpaving_t_def.h:1170-1175; config_hwf.
 
 import (
 	"io"

@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/array_decl_plugin.cpp:329-431;
 // src/ast/array_decl_plugin.h:176-185.
-package ast
 
 import "testing"
 

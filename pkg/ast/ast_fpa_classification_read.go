@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/rewriter/fpa_rewriter.cpp:547-638;
 // src/ast/fpa_decl_plugin.cpp:101-139; src/util/scoped_numeral.h:24-33.
-package ast
 
 // FPAClassificationKind is one of the seven retained unary FPA relation
 // kinds. These values match fpa_op_kind in fpa_decl_plugin.h.

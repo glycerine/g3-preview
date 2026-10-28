@@ -1,5 +1,6 @@
-// Source: src/util/symbol.cpp; src/util/params.cpp.
 package text
+
+// Source: src/util/symbol.cpp; src/util/params.cpp.
 
 import "strings"
 

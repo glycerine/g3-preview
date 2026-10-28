@@ -1,6 +1,7 @@
+package tactic
+
 // Source: src/math/subpaving/tactic/subpaving_tactic.cpp:193-263,
 // concrete MPQ core tactic with print_nodes disabled.
-package tactic
 
 import (
 	"errors"

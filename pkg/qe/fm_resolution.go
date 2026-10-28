@@ -1,5 +1,6 @@
-// Source: src/qe/qe_lite.cpp fm::fm::get_coeff / resolve.
 package qe
+
+// Source: src/qe/qe_lite.cpp fm::fm::get_coeff / resolve.
 
 import (
 	"io"

@@ -1,6 +1,7 @@
+package model
+
 // Source: src/model/model_core.cpp:21-42,68-109;
 // src/model/model_core.h:45-64.
-package model
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/scoped_numeral_buffer.h:25-71; concrete unsynch_mpz_manager
 // specialization in src/math/subpaving/tactic/expr2subpaving.cpp:221-263.
-package numeral
 
 import "github.com/glycerine/g3/pkg/arena"
 

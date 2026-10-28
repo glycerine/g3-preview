@@ -1,5 +1,6 @@
-// Native watch slices for retained SAT consumers.
 package sat
+
+// Native watch slices for retained SAT consumers.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

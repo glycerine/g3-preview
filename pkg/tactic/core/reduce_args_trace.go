@@ -1,5 +1,6 @@
-// Source: src/tactic/core/reduce_args_tactic.cpp TRACE sites.
 package core
+
+// Source: src/tactic/core/reduce_args_tactic.cpp TRACE sites.
 
 import (
 	"fmt"

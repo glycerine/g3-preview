@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:5574-5583,5897-5902.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:5574-5583,5897-5902.
 
 type polynomialPSCChain1Scope struct {
 	invocation                           uint64

@@ -1,5 +1,6 @@
-// Source: src/tactic/core/solve_eqs_tactic.cpp diagnostic sites.
 package core
+
+// Source: src/tactic/core/solve_eqs_tactic.cpp diagnostic sites.
 
 import (
 	"errors"

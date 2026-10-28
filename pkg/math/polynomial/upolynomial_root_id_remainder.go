@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:516-567,2520-2546, reached by get_root_id.
 package polynomial
+
+// Source: upolynomial.cpp:516-567,2520-2546, reached by get_root_id.
 
 import (
 	"errors"

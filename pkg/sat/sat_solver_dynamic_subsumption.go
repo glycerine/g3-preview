@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp.
 package sat
+
+// Source: src/sat/sat_solver.cpp.
 
 import (
 	"reflect"

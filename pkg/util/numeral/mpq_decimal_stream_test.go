@@ -1,5 +1,6 @@
-// Source: src/util/mpq.cpp:156-185; active display calls in src/test/mpq.cpp:111-114.
 package numeral
+
+// Source: src/util/mpq.cpp:156-185; active display calls in src/test/mpq.cpp:111-114.
 
 import (
 	utext "github.com/glycerine/g3/pkg/util/text"

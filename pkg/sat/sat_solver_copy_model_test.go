@@ -1,5 +1,6 @@
-// Source: src/sat/sat_solver.cpp:75-127. Independent finite CNF copy fixtures.
 package sat
+
+// Source: src/sat/sat_solver.cpp:75-127. Independent finite CNF copy fixtures.
 
 import (
 	"fmt"

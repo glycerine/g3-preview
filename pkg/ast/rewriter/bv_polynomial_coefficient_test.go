@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/poly_rewriter_def.h:418-426;
 // src/ast/rewriter/bv_rewriter.h:36.
-package rewriter
 
 import (
 	"testing"

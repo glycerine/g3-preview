@@ -1,6 +1,7 @@
+package params
+
 // Source: src/util/gparams.cpp:557-631; src/util/gparams.h:36-143;
 // src/util/symbol.h:96; src/util/debug.h:60-65.
-package params
 
 import (
 	"bytes"

@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:3555-4506;
 // src/util/obj_ref.h; src/util/ref_buffer.h; src/util/scoped_numeral.h.
-package polynomial
 
 // Explicit owning acknowledgement. Completed concrete local destruction is
 // separate from partial constructor/incoming-INC abort; no source cursor is

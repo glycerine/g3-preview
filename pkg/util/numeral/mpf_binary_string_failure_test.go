@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1635-1693; actual selected allocation prefixes.
 package numeral
+
+// Source: src/util/mpf.cpp:1635-1693; actual selected allocation prefixes.
 
 import (
 	"errors"

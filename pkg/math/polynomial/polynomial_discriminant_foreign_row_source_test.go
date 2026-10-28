@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:5473-5500;
 // src/util/obj_ref.h:polynomial_ref destruction.
-package polynomial
 
 import (
 	"errors"

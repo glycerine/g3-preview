@@ -1,5 +1,6 @@
-// Concrete numeric-cell storage adaptation tests.
 package numeral
+
+// Concrete numeric-cell storage adaptation tests.
 
 import (
 	"errors"

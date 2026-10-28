@@ -1,5 +1,6 @@
-// Source: src/ast/proofs/proof_utils.cpp:823-916.
 package proofs
+
+// Source: src/ast/proofs/proof_utils.cpp:823-916.
 
 import (
 	"errors"

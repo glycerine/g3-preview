@@ -1,5 +1,6 @@
-// Source: src/tactic/bv/bv_bound_chk_tactic.cpp live TRACE/CTRACE sites.
 package bv
+
+// Source: src/tactic/bv/bv_bound_chk_tactic.cpp live TRACE/CTRACE sites.
 
 import (
 	"errors"

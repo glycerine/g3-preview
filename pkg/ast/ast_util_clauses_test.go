@@ -1,5 +1,6 @@
-// Source: src/ast/ast_util.cpp:94-158; src/ast/ast_util.h:78-93.
 package ast
+
+// Source: src/ast/ast_util.cpp:94-158; src/ast/ast_util.h:78-93.
 
 import (
 	"errors"

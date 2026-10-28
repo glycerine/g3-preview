@@ -1,5 +1,6 @@
-// Source: src/sat/sat_asymm_branch.cpp:81–82,92–119.
 package sat
+
+// Source: src/sat/sat_asymm_branch.cpp:81–82,92–119.
 
 import (
 	"reflect"

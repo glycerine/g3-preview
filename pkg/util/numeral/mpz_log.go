@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.cpp log2/mlog2/bitsize (_MP_INTERNAL 32-bit limbs),
 // src/util/mpz.h prev_power_of_two and src/util/util.cpp log2(unsigned).
-package numeral
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

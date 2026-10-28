@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_primal_core_solver.h:524-527;
 // lp_primal_core_solver.hpp:841-853,864-963,1050-1060.
-package lp
 
 func (m *FloatPrimalCoreSolver) NumberOfNonBasicColumnsToTryForEnter() uint32 {
 	n := uint32(len(*m.NBasis))

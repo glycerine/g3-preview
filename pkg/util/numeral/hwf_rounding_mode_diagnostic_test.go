@@ -1,5 +1,6 @@
-// Source: src/util/hwf.cpp:586-650 (selected Linux path).
 package numeral
+
+// Source: src/util/hwf.cpp:586-650 (selected Linux path).
 
 import (
 	"math"

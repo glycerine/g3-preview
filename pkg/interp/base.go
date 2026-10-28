@@ -1,5 +1,6 @@
-// Source checkpoint: src/interp/iz3base.cpp and src/interp/iz3base.h core state.
 package interp
+
+// Source checkpoint: src/interp/iz3base.cpp and src/interp/iz3base.h core state.
 
 import (
 	"errors"

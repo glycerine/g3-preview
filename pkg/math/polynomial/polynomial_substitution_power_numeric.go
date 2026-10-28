@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:6364-6388;
 // src/util/mpzzp.h power. Actual allocation roots of the reached power leaf.
-package polynomial
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 

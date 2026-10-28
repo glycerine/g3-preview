@@ -1,5 +1,6 @@
-// Source: src/ast/arith_decl_plugin.cpp:511-559.
 package ast
+
+// Source: src/ast/arith_decl_plugin.cpp:511-559.
 
 import (
 	"testing"

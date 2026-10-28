@@ -1,5 +1,6 @@
-// Concrete counted snapshot of a numeric text stream.
 package text
+
+// Concrete counted snapshot of a numeric text stream.
 
 import (
 	"bytes"

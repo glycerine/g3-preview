@@ -1,5 +1,6 @@
-// Source: src/api/api_goal.h:25-30; src/api/api_goal.cpp:35-37.
 package api
+
+// Source: src/api/api_goal.h:25-30; src/api/api_goal.cpp:35-37.
 
 import (
 	"reflect"

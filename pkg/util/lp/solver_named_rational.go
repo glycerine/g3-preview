@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_solver.hpp:68-77; retained mpq/mpq outer consumers
 // in src/test/lp.cpp:1282-1303. Lookup dispatches to the concrete value getter.
-package lp
 
 import (
 	"fmt"

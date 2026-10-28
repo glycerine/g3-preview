@@ -1,5 +1,6 @@
-// Source: src/ast/ast.h:725-731; src/model/model_evaluator.cpp:198-202.
 package ast
+
+// Source: src/ast/ast.h:725-731; src/model/model_evaluator.cpp:198-202.
 
 import "testing"
 

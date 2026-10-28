@@ -1,5 +1,6 @@
-// Source: src/ast/for_each_expr.h:27-105; src/ast/for_each_expr.cpp:23-66.
 package ast
+
+// Source: src/ast/for_each_expr.h:27-105; src/ast/for_each_expr.cpp:23-66.
 
 import (
 	"errors"

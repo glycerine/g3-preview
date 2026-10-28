@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:101-160.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:101-160.
 
 import "math"
 

@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt_pp.cpp:24-124; src/ast/ast_smt_pp.h:24-37.
 package ast
+
+// Source: src/ast/ast_smt_pp.cpp:24-124; src/ast/ast_smt_pp.h:24-37.
 
 import (
 	"strconv"

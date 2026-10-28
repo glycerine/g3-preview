@@ -1,5 +1,6 @@
-// Source: src/ast/expr_functors.cpp; src/ast/expr_functors.h.
 package ast
+
+// Source: src/ast/expr_functors.cpp; src/ast/expr_functors.h.
 
 // ExprPredicate is the checked Go counterpart of the source i_expr_pred.
 type ExprPredicate func(ASTHandle) (bool, error)

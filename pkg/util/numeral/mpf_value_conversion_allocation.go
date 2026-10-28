@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1695-1711,1922-1945; src/util/mpz.h:133-164.
 package numeral
+
+// Source: src/util/mpf.cpp:1695-1711,1922-1945; src/util/mpz.h:133-164.
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

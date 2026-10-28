@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpz.h:836-837; src/util/mpz.cpp:1942-2012;
 // src/util/mpzzp.h:279-280.
-package numeral
 
 import (
 	"errors"

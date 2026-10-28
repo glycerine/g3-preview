@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:2308-2370,2481-2633.
 // Selected multivariate cell/SOM prerequisite owner, not manager::imp.
-package polynomial
 
 import (
 	"errors"

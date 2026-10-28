@@ -1,5 +1,6 @@
-// Source: src/util/checked_int64.h:30-219.
 package checkedint
+
+// Source: src/util/checked_int64.h:30-219.
 
 import (
 	"errors"

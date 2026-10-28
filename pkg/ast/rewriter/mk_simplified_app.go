@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/mk_simplified_app.cpp;
 // src/ast/rewriter/mk_simplified_app.h.
-package rewriter
 
 import (
 	"errors"

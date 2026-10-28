@@ -1,5 +1,6 @@
-// Source: src/util/symbol.h:97-110; src/smt/params/smt_params.cpp:138.
 package params
+
+// Source: src/util/symbol.h:97-110; src/smt/params/smt_params.cpp:138.
 
 import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"

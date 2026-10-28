@@ -1,5 +1,6 @@
-// Source: src/tactic/core/elim_uncnstr_tactic.cpp basic and arithmetic reductions.
 package core
+
+// Source: src/tactic/core/elim_uncnstr_tactic.cpp basic and arithmetic reductions.
 
 import (
 	"errors"

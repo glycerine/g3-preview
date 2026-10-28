@@ -1,5 +1,6 @@
-// Source: inc_sat_solver ownership around sat::solver's debug destructor guard.
 package sat_solver
+
+// Source: inc_sat_solver ownership around sat::solver's debug destructor guard.
 
 import "github.com/glycerine/g3/pkg/util/memory"
 

@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:5154-5194;
 // src/util/scoped_numeral.h; src/util/obj_ref.h.
-package polynomial
 
 // Names only the actual embedded source scope and its guarded invocation.
 type polynomialDividesInvocationReceipt struct {

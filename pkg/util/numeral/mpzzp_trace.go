@@ -1,5 +1,6 @@
-// Source: src/util/mpzzp.h:55,175,177,179.
 package numeral
+
+// Source: src/util/mpzzp.h:55,175,177,179.
 
 import (
 	"io"

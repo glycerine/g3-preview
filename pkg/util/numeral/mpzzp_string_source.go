@@ -1,5 +1,6 @@
-// Source: src/util/mpzzp.h:145-148; src/util/mpz.cpp:1432-1436.
 package numeral
+
+// Source: src/util/mpzzp.h:145-148; src/util/mpz.cpp:1432-1436.
 
 import (
 	"strconv"

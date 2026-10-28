@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver.h:446-449,483-511.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver.h:446-449,483-511.
 
 import (
 	"errors"

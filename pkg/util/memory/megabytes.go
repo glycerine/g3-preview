@@ -1,5 +1,6 @@
-// Source: src/util/util.h:391-398.
 package memory
+
+// Source: src/util/util.h:391-398.
 
 // MegabytesToBytes converts the source unsigned-MB parameter to native size_t
 // bytes. UINT_MAX is the source unlimited sentinel.

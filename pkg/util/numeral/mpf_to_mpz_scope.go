@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1170-1181 (no lexical NUM or RAW declarations).
 package numeral
+
+// Source: src/util/mpf.cpp:1170-1181 (no lexical NUM or RAW declarations).
 
 import
 

@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/arith_rewriter.cpp:1154-1655.
 package rewriter
+
+// Source: src/ast/rewriter/arith_rewriter.cpp:1154-1655.
 
 import (
 	"math/big"

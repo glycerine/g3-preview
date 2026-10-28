@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp:2998-3039; mpq.cpp power normal END.
 package polynomial
+
+// Source: algebraic_numbers.cpp:2998-3039; mpq.cpp power normal END.
 
 import (
 	"errors"

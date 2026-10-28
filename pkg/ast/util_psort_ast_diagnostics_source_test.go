@@ -1,5 +1,6 @@
-// Source: src/util/sorting_network.h:197-252,983-1019; src/util/debug.h:60-65.
 package ast
+
+// Source: src/util/sorting_network.h:197-252,983-1019; src/util/debug.h:60-65.
 
 import (
 	"errors"

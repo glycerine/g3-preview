@@ -1,5 +1,6 @@
-// Source: src/qe/qe_arith.cpp/.h arith_project_plugin.
 package qe
+
+// Source: src/qe/qe_arith.cpp/.h arith_project_plugin.
 
 import (
 	"errors"

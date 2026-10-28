@@ -1,6 +1,7 @@
+package realclosure
+
 // Source: src/math/realclosure/realclosure.cpp:2917-2988,
 // 3020-3043, and 3401-3420.
-package realclosure
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

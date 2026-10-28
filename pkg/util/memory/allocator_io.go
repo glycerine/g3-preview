@@ -1,6 +1,7 @@
+package memory
+
 // Source: src/util/util.h:181; src/util/small_object_allocator.cpp:172-242.
 // One borrowed cold dispatcher. Byte formatting remains in the caller package.
-package memory
 
 import (
 	"errors"

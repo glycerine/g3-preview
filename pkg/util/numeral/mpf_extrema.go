@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1487-1517; src/util/mpf.h:119,122,137-138.
 package numeral
+
+// Source: src/util/mpf.cpp:1487-1517; src/util/mpf.h:119,122,137-138.
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 

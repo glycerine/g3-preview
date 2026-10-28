@@ -1,5 +1,6 @@
-// Source: src/util/bit_vector.cpp:43-68, the two growth TRACE sites.
 package bitset
+
+// Source: src/util/bit_vector.cpp:43-68, the two growth TRACE sites.
 
 import (
 	"io"

@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/algebraic_numbers.cpp:844-889,897-1090,
 // 1440-1494,1544-1563. Concrete addition/subtraction/multiplication routes.
-package polynomial
 
 import (
 	"errors"

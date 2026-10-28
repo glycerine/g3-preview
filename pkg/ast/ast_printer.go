@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/ast_printer.cpp:20-52; src/ast/ast_printer.h:24-58;
 // src/ast/ast.cpp:115-137 parameter/declaration head display.
-package ast
 
 import (
 	"errors"

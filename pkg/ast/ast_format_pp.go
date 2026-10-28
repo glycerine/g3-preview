@@ -1,5 +1,6 @@
-// Source: src/ast/pp.cpp:22-132; src/ast/pp_params.pyg:1-23.
 package ast
+
+// Source: src/ast/pp.cpp:22-132; src/ast/pp_params.pyg:1-23.
 
 import (
 	"errors"

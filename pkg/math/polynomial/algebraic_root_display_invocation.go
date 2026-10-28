@@ -1,5 +1,6 @@
-// Source: algebraic_numbers.cpp display_root, retained by isolation TRACE.
 package polynomial
+
+// Source: algebraic_numbers.cpp display_root, retained by isolation TRACE.
 
 // This receipt names the actual display invocation, including when its owner
 // directly acknowledges it before another display is accepted.

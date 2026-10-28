@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/scoped_numeral.h:31-33. A failed copy constructor does
 // not invoke _scoped_numeral's destructor.
-package numeral
 
 // ScopedIntCopyCleanupError retains a partially constructed scoped integer.
 type ScopedIntCopyCleanupError struct {

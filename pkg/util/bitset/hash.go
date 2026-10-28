@@ -1,5 +1,6 @@
-// Source: src/util/hash.h:25-96; src/util/hash.cpp:22-63.
 package bitset
+
+// Source: src/util/hash.h:25-96; src/util/hash.cpp:22-63.
 
 func mix(a, b, c uint32) (uint32, uint32, uint32) {
 	a -= b

@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1500-1663, concrete config_mpf
 // monomial propagation over live root-bound interval views.
-package subpaving
 
 import (
 	"errors"

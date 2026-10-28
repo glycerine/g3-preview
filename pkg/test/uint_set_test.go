@@ -1,5 +1,6 @@
-// Assertion ports from src/test/uint_set.cpp, registered in src/test/main.cpp.
 package test
+
+// Assertion ports from src/test/uint_set.cpp, registered in src/test/main.cpp.
 
 import (
 	_ "embed"

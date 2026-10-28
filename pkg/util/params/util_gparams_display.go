@@ -1,5 +1,6 @@
-// Source: src/util/gparams.cpp:150-160,446-550,623-627; src/util/gparams.h.
 package params
+
+// Source: src/util/gparams.cpp:150-160,446-550,623-627; src/util/gparams.h.
 
 import (
 	"bytes"

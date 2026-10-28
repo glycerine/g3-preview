@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1753-1808, concrete config_mpf
 // root creation, unit assertion, definition sweep, then bound queue.
-package subpaving
 
 import "math"
 

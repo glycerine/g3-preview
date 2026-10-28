@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1228-1253 (finite-branch biased_exp scoped lifetime).
 package numeral
+
+// Source: src/util/mpf.cpp:1228-1253 (finite-branch biased_exp scoped lifetime).
 
 import umemory "github.com/glycerine/g3/pkg/util/memory"
 

@@ -1,5 +1,6 @@
-// Source: src/ast/bv_decl_plugin.h:307-310.
 package ast
+
+// Source: src/ast/bv_decl_plugin.h:307-310.
 
 // Each getter reads only its original declaration parameter. Callers can keep
 // the source short-circuit order without recognizing/reading all extract fields.

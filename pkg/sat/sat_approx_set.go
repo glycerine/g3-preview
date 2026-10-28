@@ -1,5 +1,6 @@
-// uint32 SAT specialization of src/util/approx_set.h; unsigned low 5 bits.
 package sat
+
+// uint32 SAT specialization of src/util/approx_set.h; unsigned low 5 bits.
 
 type satApproxSet uint32
 

@@ -1,5 +1,6 @@
-// Source: src/test/lp.cpp:2416-2477, run_lar_solver/get_solution_map.
 package lp
+
+// Source: src/test/lp.cpp:2416-2477, run_lar_solver/get_solution_map.
 
 import (
 	"fmt"

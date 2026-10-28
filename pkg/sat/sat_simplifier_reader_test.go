@@ -1,5 +1,6 @@
-// Source: src/sat/sat_simplifier.cpp:451–458; src/sat/sat_clause.cpp:105–125.
 package sat
+
+// Source: src/sat/sat_simplifier.cpp:451–458; src/sat/sat_clause.cpp:105–125.
 
 import (
 	"errors"

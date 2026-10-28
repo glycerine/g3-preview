@@ -1,5 +1,6 @@
-// Source: src/util/lp/indexed_vector.h/.hpp. Concrete live LU instantiations.
 package lp
+
+// Source: src/util/lp/indexed_vector.h/.hpp. Concrete live LU instantiations.
 
 // IndexedFloatVector has the source public dense data and ordered sparse index.
 // Matrix algorithms may edit Data and Index directly; RestoreIndex rebuilds the

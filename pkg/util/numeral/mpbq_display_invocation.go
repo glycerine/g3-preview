@@ -1,5 +1,6 @@
-// Source: mpbq.cpp:426-458; actual retained display caller cleanup identity.
 package numeral
+
+// Source: mpbq.cpp:426-458; actual retained display caller cleanup identity.
 
 type BinaryDisplayInvocationReceipt struct {
 	manager    *BinaryRationalManager

@@ -1,5 +1,6 @@
-// Source: src/util/scoped_numeral.h:170-183; scoped_mpff return copy.
 package numeral
+
+// Source: src/util/scoped_numeral.h:170-183; scoped_mpff return copy.
 
 import (
 	"errors"

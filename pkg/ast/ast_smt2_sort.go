@@ -1,5 +1,6 @@
-// Source: src/ast/ast_smt2_pp.cpp:397-448.
 package ast
+
+// Source: src/ast/ast_smt2_pp.cpp:397-448.
 
 import usymbol "github.com/glycerine/g3/pkg/util/symbol"
 

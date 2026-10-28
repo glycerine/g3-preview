@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_core_solver_base.h/.hpp, retained scalar mpq/mpq core.
 package lp
+
+// Source: src/util/lp/lp_core_solver_base.h/.hpp, retained scalar mpq/mpq core.
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

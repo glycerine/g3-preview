@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/upolynomial.cpp:1029-1105;
 // src/math/polynomial/upolynomial.h:361-364.
-package polynomial
 
 func (c *upolyHenselCallerScope) finishExtendedSource() error {
 	if c.sourceCause != nil {

@@ -1,6 +1,7 @@
+package rewriter
+
 // Source: src/ast/rewriter/var_subst.cpp:176-246;
 // src/ast/rewriter/var_subst.h:82-102.
-package rewriter
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

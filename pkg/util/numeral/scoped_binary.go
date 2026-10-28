@@ -1,5 +1,6 @@
-// Concrete MPBQ instantiation of scoped_numeral[_vector].h and MPBQ macros.
 package numeral
+
+// Concrete MPBQ instantiation of scoped_numeral[_vector].h and MPBQ macros.
 
 import (
 	"reflect"

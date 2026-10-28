@@ -1,6 +1,7 @@
+package realclosure
+
 // Source: src/math/realclosure/realclosure.cpp:3637-3702, 3930-4025,
 // and 4031-4069 for rational coefficients and unbounded intervals.
-package realclosure
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/ast/fpa/fpa2bv_rewriter_params.hpp:5-17.
 package fpa
+
+// Source: src/ast/fpa/fpa2bv_rewriter_params.hpp:5-17.
 
 import uparams "github.com/glycerine/g3/pkg/util/params"
 

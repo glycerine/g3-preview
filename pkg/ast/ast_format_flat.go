@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/format.cpp:119-145; src/ast/recurse_expr.h:28-60;
 // src/ast/recurse_expr_def.h:25-107.
-package ast
 
 import (
 	"math"

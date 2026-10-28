@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:962-981; retained algebraic factor(false) consumer.
 package polynomial
+
+// Source: upolynomial.cpp:962-981; retained algebraic factor(false) consumer.
 
 import (
 	"errors"

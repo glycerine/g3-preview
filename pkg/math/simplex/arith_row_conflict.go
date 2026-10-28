@@ -1,5 +1,6 @@
-// Source: src/smt/theory_arith_core.h sign_row_conflict and explain_bound.
 package simplex
+
+// Source: src/smt/theory_arith_core.h sign_row_conflict and explain_bound.
 
 import "math/big"
 

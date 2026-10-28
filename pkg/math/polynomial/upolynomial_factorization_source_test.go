@@ -1,5 +1,6 @@
-// Tests FIRST:37 registered numeric factor inputs; dense external-input adapter.
 package polynomial
+
+// Tests FIRST:37 registered numeric factor inputs; dense external-input adapter.
 
 import (
 	"fmt"

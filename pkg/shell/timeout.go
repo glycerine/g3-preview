@@ -1,5 +1,6 @@
-// Source: src/util/timeout.cpp:23-60; src/util/timeout.h:22-24.
 package shell
+
+// Source: src/util/timeout.cpp:23-60; src/util/timeout.h:22-24.
 
 import (
 	"io"

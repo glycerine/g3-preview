@@ -1,6 +1,7 @@
+package diagnostic
+
 // Source: src/util/small_object_allocator.h; src/util/small_object_allocator.cpp; src/util/debug.h:63.
 // Charged main adapter; all allocation algorithms live solely in memory.
-package diagnostic
 
 import (
 	"reflect"

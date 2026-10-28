@@ -1,7 +1,8 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:2757-2768;
 // src/util/mpn.cpp:206-217; src/util/scoped_numeral.h;
 // src/util/memory_manager.cpp.
-package polynomial
 
 import (
 	"errors"

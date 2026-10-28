@@ -1,5 +1,6 @@
-// Source: src/util/f2n.h:60,82; instantiated as f2n<mpf_manager>.
 package numeral
+
+// Source: src/util/f2n.h:60,82; instantiated as f2n<mpf_manager>.
 
 // The interval engine branches on this static f2n trait.
 func (*ArbitraryFloatNumeralManager) Precise() bool { return false }

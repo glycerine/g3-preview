@@ -1,5 +1,6 @@
-// Source: src/tactic/tactic.cpp:26-61; src/tactic/tactic.h:108.
 package tactic
+
+// Source: src/tactic/tactic.cpp:26-61; src/tactic/tactic.h:108.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

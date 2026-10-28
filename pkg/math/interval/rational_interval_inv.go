@@ -1,5 +1,6 @@
-// Source: src/math/interval/interval_def.h:1503-1590, concrete mpq interval.
 package interval
+
+// Source: src/math/interval/interval_def.h:1503-1590, concrete mpq interval.
 
 import (
 	"errors"

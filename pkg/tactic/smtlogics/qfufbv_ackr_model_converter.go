@@ -1,5 +1,6 @@
-// Source: src/tactic/smtlogics/qfufbv_ackr_model_converter.cpp/.h.
 package smtlogics
+
+// Source: src/tactic/smtlogics/qfufbv_ackr_model_converter.cpp/.h.
 
 import (
 	"github.com/glycerine/g3/pkg/ackermannization"

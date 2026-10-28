@@ -1,5 +1,6 @@
-// Source: src/ast/decl_collector.cpp:118-128; src/util/top_sort.h:78-80.
 package ast
+
+// Source: src/ast/decl_collector.cpp:118-128; src/util/top_sort.h:78-80.
 
 import (
 	"fmt"

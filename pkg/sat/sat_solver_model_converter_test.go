@@ -1,5 +1,6 @@
-// Source model_converter body assertions and independent finite lifetime checks.
 package sat
+
+// Source model_converter body assertions and independent finite lifetime checks.
 
 import (
 	"errors"

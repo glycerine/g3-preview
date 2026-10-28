@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:802-875,1773-1786,
 // concrete config_hwf retained unit inequalities and root assertion.
-package subpaving
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

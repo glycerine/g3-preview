@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1635-1693; actual numeric allocation transport.
 package numeral
+
+// Source: src/util/mpf.cpp:1635-1693; actual numeric allocation transport.
 
 import (
 	"errors"

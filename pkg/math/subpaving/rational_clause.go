@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:773-869,1345-1419,
 // concrete config_mpq watched clauses and exact inequality truth.
-package subpaving
 
 import (
 	"math"

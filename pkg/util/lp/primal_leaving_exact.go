@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_primal_core_solver.hpp:411-475.
 package lp
+
+// Source: src/util/lp/lp_primal_core_solver.hpp:411-475.
 
 // The full -ed*direction expression stays alive through the by-value basis
 // dispatcher call. Each numerical owner captures only its own operations.

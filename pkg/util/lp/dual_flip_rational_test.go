@@ -1,5 +1,6 @@
-// Source: src/util/lp/lp_dual_core_solver.h/.hpp; static_matrix.h:170-174.
 package lp
+
+// Source: src/util/lp/lp_dual_core_solver.h/.hpp; static_matrix.h:170-174.
 
 import (
 	"fmt"

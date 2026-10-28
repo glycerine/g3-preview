@@ -1,5 +1,6 @@
-// Concrete insertion-ordered indices for the retained SAT consequence algorithm.
 package sat
+
+// Concrete insertion-ordered indices for the retained SAT consequence algorithm.
 
 import "github.com/glycerine/g3/pkg/arena"
 

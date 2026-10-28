@@ -1,5 +1,6 @@
-// Source: old_interval.cpp tst2.
 package numeral
+
+// Source: old_interval.cpp tst2.
 
 import (
 	"errors"

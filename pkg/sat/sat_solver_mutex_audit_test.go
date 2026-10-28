@@ -1,5 +1,6 @@
-// Source: src/util/max_cliques.h concrete named owners; src/sat/sat_solver.cpp:3119-3150.
 package sat
+
+// Source: src/util/max_cliques.h concrete named owners; src/sat/sat_solver.cpp:3119-3150.
 
 import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"

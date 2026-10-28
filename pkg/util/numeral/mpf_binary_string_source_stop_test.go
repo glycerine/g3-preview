@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1660-1693; checked Runtime TLS release profile.
 package numeral
+
+// Source: src/util/mpf.cpp:1660-1693; checked Runtime TLS release profile.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/bv2int_rewriter.cpp:100-295,338-472.
 package arith
+
+// Source: src/tactic/arith/bv2int_rewriter.cpp:100-295,338-472.
 
 import (
 	"github.com/glycerine/g3/pkg/ast"

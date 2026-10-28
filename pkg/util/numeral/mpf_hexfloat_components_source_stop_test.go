@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1608-1619; younger to_string NUM destruction.
 package numeral
+
+// Source: src/util/mpf.cpp:1608-1619; younger to_string NUM destruction.
 
 import (
 	"errors"

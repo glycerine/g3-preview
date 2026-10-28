@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.h:999.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.h:999.
 
 import (
 	"errors"

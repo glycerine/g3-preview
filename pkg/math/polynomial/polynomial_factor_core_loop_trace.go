@@ -1,5 +1,6 @@
-// Source: src/math/polynomial/polynomial.cpp:6795,6807.
 package polynomial
+
+// Source: src/math/polynomial/polynomial.cpp:6795,6807.
 
 func (m *MultivariatePolynomialManager) traceFactorCoreLoop(s *polynomialFactorCoreFrame, j uint32) error {
 	return m.emitFactorTrace(s.target, "factor_core", 6795, func(out *polynomialTraceSink) error {

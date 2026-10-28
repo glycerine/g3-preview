@@ -1,6 +1,7 @@
+package substitution
+
 // Source: src/ast/substitution/substitution_tree.cpp:619-861;
 // retained STV_UNIF specialization.
-package substitution
 
 import "github.com/glycerine/g3/pkg/ast"
 

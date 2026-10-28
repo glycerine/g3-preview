@@ -1,5 +1,6 @@
-// Source: src/util/heap.h:27-28; native typed storage for the live int heap.
 package heap
+
+// Source: src/util/heap.h:27-28; native typed storage for the live int heap.
 
 import (
 	"testing"

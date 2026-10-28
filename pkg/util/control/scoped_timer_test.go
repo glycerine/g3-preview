@@ -1,5 +1,6 @@
-// Source: src/util/scoped_timer.h:24-30; src/util/scoped_timer.cpp:56-267.
 package control
+
+// Source: src/util/scoped_timer.h:24-30; src/util/scoped_timer.cpp:56-267.
 
 import (
 	"errors"

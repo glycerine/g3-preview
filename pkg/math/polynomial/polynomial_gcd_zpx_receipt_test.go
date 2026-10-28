@@ -1,5 +1,6 @@
-// Source: polynomial.cpp:4018-4051, actual leading-coefficient buffer calls.
 package polynomial
+
+// Source: polynomial.cpp:4018-4051, actual leading-coefficient buffer calls.
 
 import (
 	"testing"

@@ -1,5 +1,6 @@
-// Source: src/util/mpz.cpp, mpn.cpp, mpzzp.h: primitive invocation boundaries.
 package numeral
+
+// Source: src/util/mpz.cpp, mpn.cpp, mpzzp.h: primitive invocation boundaries.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

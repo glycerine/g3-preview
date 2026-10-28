@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:773-784,865-875,1773-1803,
 // concrete config_mpq inequality and root-unit prefix.
-package subpaving
 
 import (
 	"math"

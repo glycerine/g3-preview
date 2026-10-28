@@ -1,5 +1,6 @@
-// Source: src/tactic/probe.cpp:58-208,426-460.
 package tactic
+
+// Source: src/tactic/probe.cpp:58-208,426-460.
 
 import (
 	"math"

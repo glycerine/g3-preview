@@ -1,5 +1,6 @@
-// Source: src/ast/occurs.cpp:26-76; src/ast/occurs.h:22-33.
 package ast
+
+// Source: src/ast/occurs.cpp:26-76; src/ast/occurs.h:22-33.
 
 type astOccursFrame struct {
 	node        astNodeRef

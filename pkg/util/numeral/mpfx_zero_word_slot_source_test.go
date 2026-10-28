@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/mpfx.cpp:280-306,419-444. Nonexceptional zero-word results
 // can retain the source allocated slot and sign after directed rounding.
-package numeral
 
 import (
 	"bytes"

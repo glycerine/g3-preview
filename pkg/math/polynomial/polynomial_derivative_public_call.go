@@ -1,6 +1,7 @@
+package polynomial
+
 // Source: src/math/polynomial/polynomial.cpp:4507-4528,7228-7229;
 // src/nlsat/nlsat_explain.cpp:679. Concrete retained owning assignment.
-package polynomial
 
 import "errors"
 

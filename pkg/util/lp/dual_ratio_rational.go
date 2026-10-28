@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_dual_core_solver.hpp:575-599,660-693;
 // lp_core_solver_base.h:331-333. Concrete retained mpq/mpq ratio test.
-package lp
 
 import "github.com/glycerine/g3/pkg/util/numeral"
 

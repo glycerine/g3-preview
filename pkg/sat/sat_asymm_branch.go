@@ -1,5 +1,6 @@
-// Source: src/sat/sat_asymm_branch.cpp; src/sat/sat_asymm_branch.h; src/sat/sat_asymm_branch_params.pyg.
 package sat
+
+// Source: src/sat/sat_asymm_branch.cpp; src/sat/sat_asymm_branch.h; src/sat/sat_asymm_branch_params.pyg.
 
 import (
 	"errors"

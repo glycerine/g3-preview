@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/seq_decl_plugin.cpp:620-672,755-767;
 // src/ast/seq_decl_plugin.h:234-244.
-package ast
 
 // MkSequenceEmpty constructs the canonical empty value for a sequence sort.
 // String sorts use the source empty-string specialization.

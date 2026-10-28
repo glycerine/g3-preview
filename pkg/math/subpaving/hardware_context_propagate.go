@@ -1,6 +1,7 @@
+package subpaving
+
 // Source: src/math/subpaving/subpaving_t_def.h:1170-1175,1683-1802,
 // concrete config_hwf polynomial watchers and bound queue.
-package subpaving
 
 import (
 	"errors"

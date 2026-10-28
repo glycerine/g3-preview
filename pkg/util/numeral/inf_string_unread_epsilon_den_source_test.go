@@ -1,6 +1,7 @@
+package numeral
+
 // Source: src/util/inf_rational.h:51-66. A zero epsilon returns the finite
 // numeral's string without inspecting the epsilon denominator.
-package numeral
 
 import "testing"
 

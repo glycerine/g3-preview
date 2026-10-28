@@ -1,6 +1,7 @@
+package ast
+
 // Source: src/ast/static_features.cpp:153-163,380-536 and the Boolean,
 // quantifier, uninterpreted portions of update_core at lines 163-365.
-package ast
 
 func (f *StaticFeatures) exprID(h ASTHandle) (uint32, error) { return f.manager.GetASTID(h) }
 

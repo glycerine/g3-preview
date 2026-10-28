@@ -1,5 +1,6 @@
-// Source: src/tactic/arith/pb2bv_model_converter.cpp/.h.
 package arith
+
+// Source: src/tactic/arith/pb2bv_model_converter.cpp/.h.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: upolynomial.cpp:2401,2455-2461; retained isolation diagnostics.
 package polynomial
+
+// Source: upolynomial.cpp:2401,2455-2461; retained isolation diagnostics.
 
 import (
 	"bytes"

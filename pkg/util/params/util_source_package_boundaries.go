@@ -1,5 +1,6 @@
-// Source value and borrowed-owner boundaries used by AST and parameter consumers.
 package params
+
+// Source value and borrowed-owner boundaries used by AST and parameter consumers.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

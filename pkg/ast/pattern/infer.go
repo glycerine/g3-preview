@@ -1,5 +1,6 @@
-// Source: src/ast/pattern/pattern_inference.cpp:520-574.
 package pattern
+
+// Source: src/ast/pattern/pattern_inference.cpp:520-574.
 
 import "github.com/glycerine/g3/pkg/ast"
 

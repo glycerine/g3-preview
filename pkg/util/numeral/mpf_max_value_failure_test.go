@@ -1,5 +1,6 @@
-// Source: src/util/mpf.cpp:1898-1904.
 package numeral
+
+// Source: src/util/mpf.cpp:1898-1904.
 
 import (
 	"testing"

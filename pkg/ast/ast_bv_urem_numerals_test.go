@@ -1,5 +1,6 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:1185-1280.
 package ast
+
+// Source: src/ast/rewriter/bv_rewriter.cpp:1185-1280.
 
 import (
 	"errors"

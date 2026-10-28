@@ -1,5 +1,6 @@
-// Source: src/util/symbol.h:96; src/util/debug.h:60-65.
 package symbol
+
+// Source: src/util/symbol.h:96; src/util/debug.h:60-65.
 
 import (
 	"errors"

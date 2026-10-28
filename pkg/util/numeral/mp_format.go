@@ -1,5 +1,6 @@
-// Source: src/util/mpn.cpp to_string and src/util/mpz.cpp/src/util/mpq.cpp display.
 package numeral
+
+// Source: src/util/mpn.cpp to_string and src/util/mpz.cpp/src/util/mpq.cpp display.
 
 import (
 	"errors"

@@ -1,6 +1,7 @@
+package lp
+
 // Source: src/util/lp/lp_bound_propagator.h/.cpp and lar_solver.h's
 // adjust_column_index_to_term_index/get_term. Concrete exact LAR propagation.
-package lp
 
 import (
 	"github.com/glycerine/g3/pkg/util/numeral"
