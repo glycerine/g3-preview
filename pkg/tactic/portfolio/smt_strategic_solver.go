@@ -1,8 +1,9 @@
+package portfolio
+
 // Source: src/tactic/portfolio/smt_strategic_solver.cpp retained QF_AUFLIA and
 // QF_LRA/QF_UF/QF_IDL/QF_LIA/QF_BV/QF_AUFBV/QF_ABV/QF_UFBV and
 // UFNIA/UFLRA/AUFLIA/AUFLIRA/AUFNIRA branches and
 // smt_strategic_solver_factory::operator().
-package portfolio
 
 import (
 	"errors"
@@ -27,6 +28,44 @@ func NewQFAUFLIAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs,
 		return nil, err
 	}
 	return newStrategicSolver(m, strategy, "QF_AUFLIA", p, proofs, models, cores, config)
+}
+
+// NewALLStrategicSolver retains the default strategy's theory-neutral
+// simplification, propagation, equation solving and unconstrained-variable
+// elimination path. The direct ALL SMT solver remains the incremental backend,
+// so combined_solver owns the same nonincremental/incremental transition and
+// unknown fallback as the source factory.
+func NewALLStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (result solver.Solver, err error) {
+	strong, err := smtlogics.NewQFAUFLIATactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	if err = strong.IncRef(); err != nil {
+		return nil, err
+	}
+	defer func() { err = errors.Join(err, strong.DecRef()) }()
+	ordinary, err := smtcore.NewSMTTactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	if err = ordinary.IncRef(); err != nil {
+		return nil, err
+	}
+	defer func() { err = errors.Join(err, ordinary.DecRef()) }()
+	probe, err := newALLAsArrayProbe(m)
+	if err != nil {
+		return nil, err
+	}
+	if err = probe.IncRef(); err != nil {
+		return nil, err
+	}
+	defer func() { err = errors.Join(err, probe.DecRef()) }()
+	strategy, err := tactic.NewCondTactic(probe, strong, ordinary)
+	if err != nil {
+		return nil, err
+	}
+	result, err = newStrategicSolver(m, strategy, "ALL", p, proofs, models, cores, config)
+	return result, err
 }
 
 func NewQFLRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {

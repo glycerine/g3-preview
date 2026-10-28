@@ -19025,8 +19025,8 @@
         "TestDT2BVModelReconstructionProofsAndDependencies",
         "TestDT2BVClassificationPersistsUntilCleanupAndAppendsGoals",
         "TestDT2BVApplicationAllocationPrefixes",
-        "pkg/tactic/arith/bv2real_util_test.go",
-        "pkg/tactic/arith/nla2bv_cpp_test.go"
+        "TestBV2RealUtilContainsQuantifierMetadataAndBorrowedViews",
+        "TestNLA2BVExactGoalsPrebuiltCPP"
       ],
       "conditionals": [
         {
@@ -42514,7 +42514,8 @@
           "go_targets": [
             "pkg/tactic/portfolio/fd_solver.go",
             "pkg/cmd_context/context.go",
-            "pkg/cmd_context/fd_solver_test.go"
+            "pkg/cmd_context/fd_solver_test.go",
+            "pkg/cmd/g3/main_test.go"
           ],
           "tests": [
             "TestCommandContextFiniteDomainSolverProofGate",
@@ -129306,7 +129307,7 @@
         },
         {
           "name": "model_generator::hide and hidden-declaration filtering state (src/smt/smt_model_generator.h:225-231)",
-          "status": "excluded"
+          "status": "dead"
         },
         {
           "name": "mk_model ordering: initialize theory factories, register all relevant existing model values, then discover value procedures and allocate fresh fallback values independently of enode insertion order",
@@ -168918,14 +168919,45 @@
       "path": "src/tactic/portfolio/default_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/portfolio/all_as_array_probe.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd/g3/combined_solver_gap_test.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2"
+      ],
+      "tests": [
+        "TestSMTLibRunnerAsArrayCombinedSolverFallback",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained ALL default-strategy integration for goals containing OP_AS_ARRAY: select the existing theory-neutral simplify/propagate/solve-eqs/eliminate/simplify pipeline before SMT and preserve the ordinary combined-solver incremental unknown fallback",
+          "status": "partial",
+          "go_targets": [
+            "pkg/tactic/portfolio/all_as_array_probe.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd/g3/combined_solver_gap_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2"
+          ],
+          "tests": [
+            "TestSMTLibRunnerAsArrayCombinedSolverFallback",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The complete nested default tactic classifier remains unported. The retained Go integration currently selects the stronger existing preprocessing only when an ALL goal contains OP_AS_ARRAY; every other ALL goal retains the direct SMT tactic path. This closes the public combined-solver fallback exercised by the strict array vector without changing native-unknown results in unrelated fragments."
+      ]
     },
     {
       "path": "src/tactic/portfolio/default_tactic.h",
@@ -169326,6 +169358,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/portfolio/all_as_array_probe.go",
         "pkg/tactic/portfolio/smt_strategic_solver.go",
         "pkg/tactic/smtlogics/qfauflia_tactic.go",
         "pkg/cmd_context/context.go",
@@ -169424,6 +169457,7 @@
         "pkg/cmd/g3/test_vectors/fd_unbounded_unknown.smt2"
       ],
       "tests": [
+        "TestSMTLibRunnerAsArrayCombinedSolverFallback",
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
         "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
         "TestSMTLibRunnerScripts",
@@ -169468,6 +169502,23 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained general ALL factory operator integration for OP_AS_ARRAY goals: tactic solver plus direct ALL incremental SMT under combined-solver scope, unknown fallback and result-provider policy",
+          "status": "partial",
+          "go_targets": [
+            "pkg/tactic/portfolio/all_as_array_probe.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd/g3/combined_solver_gap_test.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2"
+          ],
+          "tests": [
+            "TestSMTLibRunnerAsArrayCombinedSolverFallback",
+            "TestSMTLibRunnerScripts",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        },
         {
           "name": "Retained QF_AUFLIA mk_tactic_for_logic branch and factory operator(): concrete QF_AUFLIA tactic2solver plus incremental SMT solver under the existing combined-solver mode, timeout/unknown fallback, assumption routing and result-provider policy",
           "status": "ported",
@@ -169592,7 +169643,7 @@
           ]
         },
         {
-          "name": "Remaining logic dispatcher branches, default tactic, QF_BV incremental-SAT selection and general stored-logic strategic solver_factory owner/public constructor; concrete FD backend composition and QF_FD command selection are now recorded separately",
+          "name": "Remaining logic dispatcher branches, complete default tactic classifier, QF_BV incremental-SAT selection and general stored-logic strategic solver_factory owner/public constructor; concrete FD backend composition and QF_FD command selection are now recorded separately",
           "status": "unported"
         },
         {
@@ -169770,7 +169821,7 @@
         "Construction uses local counted tactic/solver references. The returned combined solver owns both child solvers; the tactic solver owns the concrete strategy. Context closes the combined owner before manager/services teardown. Evaluator/parameter services are borrowed through the same concrete configuration used by the incremental backend."
       ],
       "deviations": [
-        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL and QF_LIA branches use shared combined-solver construction. Other branches and the general default dispatcher remain unported. Output-taking QF_IDL/QF_LIA constructors borrow io.Writer; convenience factories default to os.Stdout."
+        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL and QF_LIA branches use shared combined-solver construction. The general ALL dispatcher now has a narrow OP_AS_ARRAY branch; its complete default classifier and other remaining branches are unported. Output-taking QF_IDL/QF_LIA constructors borrow io.Writer; convenience factories default to os.Stdout."
       ]
     },
     {

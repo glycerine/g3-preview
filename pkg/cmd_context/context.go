@@ -1,6 +1,7 @@
+package cmd_context
+
 // Source: src/cmd_context/cmd_context.cpp retained solver, assertion,
 // declaration and scope operations; cmd_context.h.
-package cmd_context
 
 import (
 	"errors"
@@ -387,6 +388,8 @@ func (c *Context) mkSolver(m *ast.ASTManager) error {
 		c.solver, err = portfolio.NewQFABVStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "QF_UFBV":
 		c.solver, err = portfolio.NewQFUFBVStrategicSolverWithOutput(m, &c.params, proofs, models, cores, c.config, contextRegularOutput{c})
+	case "ALL":
+		c.solver, err = portfolio.NewALLStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	default:
 		var direct *smtcore.SMTSolver
 		direct, err = smtcore.NewSMTSolver(m, &c.params, c.logic, c.config)
