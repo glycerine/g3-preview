@@ -327,6 +327,16 @@ func (s *SMTSolver) CollectStatistics(dst *statistics.Statistics) error {
 	return nil
 }
 
+// ResetStatistics follows smt::kernel::reset_statistics. The source kernel
+// currently preserves its cumulative context counters, so this is an open-state
+// check until that native operation gains additional behavior.
+func (s *SMTSolver) ResetStatistics() error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	return s.kernel.ResetStatistics()
+}
+
 func (s *SMTSolver) UnsatCore() ([]ast.ASTHandle, error) {
 	if err := s.open(); err != nil {
 		return nil, err

@@ -83365,9 +83365,16 @@
       "path": "src/muz/pdr/pdr_smt_context_manager.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/pdr/smt_context_manager.go",
+        "pkg/muz/pdr/smt_context_manager_test.go",
+        "pkg/smtcore/smt_solver.go"
+      ],
+      "tests": [
+        "TestSMTContextManagerReusesGuardedSolverWithoutCrossTalk",
+        "TestSMTContextDelayScopeRollsBackLocalAssertions"
+      ],
       "assertions": [
         {
           "line": 41,
@@ -83386,19 +83393,45 @@
           "text": "SASSERT(!has_free_vars(e));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "smt_context guarded assertion, assumptions, model, proof, unsat-core, push/pop, auxiliary-predicate, and delayed-scope operations",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/smt_context_manager.go",
+          "tests": [
+            "TestSMTContextManagerReusesGuardedSolverWithoutCrossTalk",
+            "TestSMTContextDelayScopeRollsBackLocalAssertions"
+          ]
+        },
+        {
+          "name": "smt_context_manager construction, fresh pooled contexts, statistics, reset, auxiliary-predicate tracking, and destruction",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/smt_context_manager.go",
+          "tests": ["TestSMTContextManagerReusesGuardedSolverWithoutCrossTalk"]
+        }
+      ],
+      "ownership": [
+        "SMTContextManager owns pooled SMTSolver instances and retained guard predicates; Close refuses while borrowed SMTContext owners remain active.",
+        "SMTContext borrows its pooled solver and manager, while SMTDelayScope provides deterministic push/pop rollback.",
+        "Model transfers the owning model reference returned by SMTSolver to the caller."
+      ],
       "deviations": []
     },
     {
       "path": "src/muz/pdr/pdr_smt_context_manager.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/pdr/smt_context_manager.go",
+        "pkg/muz/pdr/smt_context_manager_test.go"
+      ],
+      "tests": [
+        "TestSMTContextManagerReusesGuardedSolverWithoutCrossTalk",
+        "TestSMTContextDelayScopeRollsBackLocalAssertions"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -83409,10 +83442,22 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Concrete SMTContext, SMTDelayScope, and SMTContextManager retained interface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/smt_context_manager.go",
+          "tests": [
+            "TestSMTContextManagerReusesGuardedSolverWithoutCrossTalk",
+            "TestSMTContextDelayScopeRollsBackLocalAssertions"
+          ]
+        }
+      ],
+      "ownership": [
+        "Go uses explicit Close methods in place of the source scoped_ptr and destructor ownership boundaries."
+      ],
       "deviations": []
     },
     {
