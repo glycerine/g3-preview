@@ -23,7 +23,7 @@ func (c *Context) fixedpointContext() (*muzfp.PropositionalEngine, error) {
 	if err != nil {
 		return nil, err
 	}
-	engine, err := muzfp.NewPropositionalEngine(manager)
+	engine, err := muzfp.NewPropositionalEngineWithServices(manager, c.config.Params, c.config.Globals)
 	if err != nil {
 		return nil, err
 	}

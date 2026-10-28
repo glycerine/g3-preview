@@ -10,9 +10,11 @@ import (
 	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
+	astrewriter "github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/rel"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 var (
@@ -33,10 +35,25 @@ type PropositionalEngine struct {
 	set        *base.RuleSet
 	binder     *base.VariableBinder
 	relations  *rel.RelationManager
+	guard      *astrewriter.TheoryRewriter
 	scopes     []*base.RuleSet
 	predicates map[ast.ASTHandle]*predicateState
 	queried    bool
 	closed     bool
+}
+
+// NewPropositionalEngineWithServices adds the retained AST theory rewriter
+// used to evaluate ground interpreted guards after finite variable binding.
+func NewPropositionalEngineWithServices(manager *ast.ASTManager, context *uparams.ParamsContext, globals *uparams.GlobalParamsService) (*PropositionalEngine, error) {
+	engine, err := NewPropositionalEngine(manager)
+	if err != nil {
+		return nil, err
+	}
+	engine.guard, err = astrewriter.NewTheoryRewriter(manager, context, globals, nil)
+	if err != nil {
+		return nil, errors.Join(err, engine.Close())
+	}
+	return engine, nil
 }
 
 func NewPropositionalEngine(manager *ast.ASTManager) (*PropositionalEngine, error) {
@@ -365,7 +382,7 @@ func (e *PropositionalEngine) expandUnbound(application ast.ASTHandle, state *pr
 	return bindings, nil
 }
 
-func (e *PropositionalEngine) expandExpressionVariables(root ast.ASTHandle, bindings []variableBinding) ([]variableBinding, error) {
+func (e *PropositionalEngine) expressionVariableSorts(root ast.ASTHandle) (map[uint32]ast.ASTHandle, error) {
 	variables := make(map[uint32]ast.ASTHandle)
 	stack := []ast.ASTHandle{root}
 	for len(stack) != 0 {
@@ -403,6 +420,14 @@ func (e *PropositionalEngine) expandExpressionVariables(root ast.ASTHandle, bind
 			}
 			stack = append(stack, argument)
 		}
+	}
+	return variables, nil
+}
+
+func (e *PropositionalEngine) expandExpressionVariables(root ast.ASTHandle, bindings []variableBinding) ([]variableBinding, error) {
+	variables, err := e.expressionVariableSorts(root)
+	if err != nil {
+		return nil, err
 	}
 	indices := make([]uint32, 0, len(variables))
 	for index := range variables {
@@ -455,10 +480,83 @@ func (e *PropositionalEngine) finiteValue(expression ast.ASTHandle, binding vari
 	if err != nil {
 		return 0, err
 	}
-	return e.relations.EncodeValue(sort, expression)
+	value, err := e.relations.EncodeValue(sort, expression)
+	if err != nil {
+		return 0, ErrPropositionalHorn
+	}
+	return value, nil
+}
+
+func (e *PropositionalEngine) rewriteCondition(expression ast.ASTHandle, binding variableBinding) (value bool, result error) {
+	if e.guard == nil {
+		return false, ErrPropositionalHorn
+	}
+	variables, err := e.expressionVariableSorts(expression)
+	if err != nil {
+		return false, err
+	}
+	var maximum uint32
+	for index := range variables {
+		if index > maximum {
+			maximum = index
+		}
+	}
+	bindings := make([]ast.ASTHandle, 0)
+	if len(variables) != 0 {
+		bindings = make([]ast.ASTHandle, int(maximum)+1)
+	}
+	references := make([]ast.ASTRef, 0, len(variables)+1)
+	defer func() {
+		for i := len(references) - 1; i >= 0; i-- {
+			result = errors.Join(result, e.manager.DelRef(&references[i]))
+		}
+	}()
+	for index, sort := range variables {
+		element, found := binding[index]
+		if !found {
+			return false, ErrPropositionalHorn
+		}
+		reference, x := e.relations.DecodeValue(sort, element)
+		if x != nil {
+			return false, x
+		}
+		references = append(references, reference)
+		handle, x := e.manager.RefGet(reference)
+		if x != nil {
+			return false, x
+		}
+		bindings[len(bindings)-int(index)-1] = handle
+	}
+	out, err := e.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return false, err
+	}
+	references = append(references, out)
+	if err = e.guard.RewriteWithBindings(expression, bindings, out); err != nil {
+		return false, err
+	}
+	rewritten, err := e.manager.RefGet(out)
+	if err != nil {
+		return false, err
+	}
+	if e.manager.IsTrue(rewritten) {
+		return true, nil
+	}
+	if e.manager.IsFalse(rewritten) {
+		return false, nil
+	}
+	return false, ErrPropositionalHorn
 }
 
 func (e *PropositionalEngine) evaluateCondition(expression ast.ASTHandle, binding variableBinding) (bool, error) {
+	value, err := e.evaluateConditionDirect(expression, binding)
+	if errors.Is(err, ErrPropositionalHorn) && e.guard != nil {
+		return e.rewriteCondition(expression, binding)
+	}
+	return value, err
+}
+
+func (e *PropositionalEngine) evaluateConditionDirect(expression ast.ASTHandle, binding variableBinding) (bool, error) {
 	if e.manager.IsTrue(expression) {
 		return true, nil
 	}
@@ -978,6 +1076,10 @@ func (e *PropositionalEngine) Close() (result error) {
 		result = errors.Join(result, e.scopes[i].Close())
 	}
 	e.scopes = nil
+	if e.guard != nil {
+		result = errors.Join(result, e.guard.Close())
+		e.guard = nil
+	}
 	if e.set != nil {
 		result = errors.Join(result, e.set.Close())
 		e.set = nil
