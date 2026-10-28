@@ -132937,7 +132937,7 @@
       "path": "src/smt/smt_theory.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_equality_atom.go",
         "pkg/smtcore/smt_equality_atom_test.go",
@@ -267783,6 +267783,19 @@
     "cpu_affinity": "8-16",
     "GOMAXPROCS": 9,
     "full_native_checkpoint": "17ecadb7"
+  },
+  "latest_smt_theory_header_whole_audit": {
+    "source_units": [
+      "src/smt/smt_theory.h"
+    ],
+    "scope": "Whole retained smt_theory.h audit: SMTTheoryBase and SMTTheoryInternalizer provide typed initialization, family identity, variable/enode mapping, internalization, equality/disequality, assignment, relevancy, propagation, search lifecycle, assumptions, unsat-core validation, scopes and final checks. Concrete optional interfaces supply model initialization/finalization/value construction, direct values, function-interpretation inclusion, display, names, statistics, fresh-theory copying and conflict evidence only where retained consumers use them. Equality atom construction, sharing/assume-equality behavior and variable-definition displays are implemented by the concrete context/theory helpers. Go context teardown replaces reusable C++ reset_eh/flush_eh callbacks, and concrete Close methods release theory-owned state; no universal unused adapter is introduced. Full native pkg/smtcore and pkg/portcheck pass on the promoted header mapping.",
+    "focused_tests": [
+      "go test ./pkg/smtcore",
+      "go test ./pkg/portcheck"
+    ],
+    "cpu_affinity": "8-16",
+    "GOMAXPROCS": 2,
+    "full_suite_qualification": "The whole repository suite was not rerun for this manifest-only promotion; the complete smtcore package passed."
   },
   "latest_smt_solver_whole_audit": {
     "source_units": [
