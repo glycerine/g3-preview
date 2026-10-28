@@ -821,6 +821,7 @@ var scriptResults = map[string]string{
 	"quantified_let_capture.smt2":                  "unsat\n",
 	"indexed_bit_vector.smt2":                      "unsat\n",
 	"nary_equality.smt2":                           "unsat\n",
+	"unknown_static_classifier.smt2":               "sat\n((xr 1.0)\n (yr 2.0))\nsat\n((xi 2)\n (yi 3))\nsat\n((ur 4.0)\n ((fr ur) 7.0))\nsat\n((ui 6)\n ((fi ui) 9))\n",
 }
 
 func TestSMTLibRunnerScripts(t *testing.T) {

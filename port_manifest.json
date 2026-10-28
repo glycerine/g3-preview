@@ -131157,6 +131157,7 @@
         "pkg/smtcore/smt_setup_unknown.go",
         "pkg/smtcore/smt_setup_unknown_test.go",
         "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2",
+        "pkg/cmd/g3/test_vectors/unknown_static_classifier.smt2",
         "pkg/smtcore/theory_dense_diff_logic.go",
         "pkg/smtcore/theory_dense_diff_logic_test.go",
         "pkg/smtcore/smt_setup_rdl_test.go",
@@ -131469,7 +131470,8 @@
             "pkg/smtcore/smt_setup_unknown_test.go",
             "pkg/smtcore/smt_setup_mixed_arithmetic_test.go",
             "pkg/cmd/g3/main_test.go",
-            "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2"
+            "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2",
+            "pkg/cmd/g3/test_vectors/unknown_static_classifier.smt2"
           ],
           "tests": [
             "TestSMTUnknownLogicSetupInstallsMixedArithmetic",
@@ -131857,6 +131859,7 @@
         "pkg/smtcore/smt_setup_unknown.go",
         "pkg/smtcore/smt_setup_unknown_test.go",
         "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2",
+        "pkg/cmd/g3/test_vectors/unknown_static_classifier.smt2",
         "pkg/smtcore/theory_dense_diff_logic.go",
         "pkg/smtcore/theory_dense_diff_logic_test.go",
         "pkg/smtcore/smt_setup_rdl_test.go",
@@ -132075,7 +132078,8 @@
             "pkg/smtcore/smt_setup_unknown_test.go",
             "pkg/smtcore/smt_setup_mixed_arithmetic_test.go",
             "pkg/cmd/g3/main_test.go",
-            "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2"
+            "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2",
+            "pkg/cmd/g3/test_vectors/unknown_static_classifier.smt2"
           ],
           "tests": [
             "TestSMTUnknownLogicSetupInstallsMixedArithmetic",
