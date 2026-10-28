@@ -628,6 +628,10 @@ func TestLPExactSparseEtaConstructionOlderComparisonOwnership(t *testing.T) {
 }
 
 func TestLPExactSparseEtaConstructionUnitWithoutCopies(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := lpNewDirectSparseHarness(t)
 	m := lpNewExactSparse(t, h, 2)
 	p := h.pair(strings.Repeat("1234567890", 100)+"/7", "1")

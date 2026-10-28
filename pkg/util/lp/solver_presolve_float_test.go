@@ -27,6 +27,10 @@ func lpPresolveFixture(t *testing.T, a, low, high []float64, rel LPRelation, rhs
 }
 
 func TestLPFloatPresolveIndependentCornerOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	rng := rand.New(rand.NewSource(911749))
 	for world := 0; world < 100; world++ {
 		n := 1 + rng.Intn(6)

@@ -10,6 +10,10 @@ import (
 )
 
 func TestLPPairTableauCostIndependentLexicographicOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	h := newLPPairHarness(t)
 	f := lpNewPairCoreFixture(t, h, 1, 1)
 	m, err := NewPairPrimalCoreSolver(f.input())

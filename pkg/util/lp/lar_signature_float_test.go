@@ -190,6 +190,10 @@ func TestLARFloatingSignaturePhysicalOwnership(t *testing.T) {
 }
 
 func TestLARFloatingSignatureIndependentFeasibilityModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 180; world++ {
 		h := newLPPairHarness(t)
 		extent := 2 + world%17

@@ -89,6 +89,10 @@ func TestLPBoundPropagationActualSourceCases(t *testing.T) {
 }
 
 func TestLPBoundPropagationOutputPrefixes(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for c := BoundPropagationTotalUpper; c <= BoundPropagationTotalLower; c++ {
 		want := lpBoundPropagationReport(c)
 		for cut := 0; cut < len(want); cut++ {

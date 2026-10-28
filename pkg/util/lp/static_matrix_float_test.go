@@ -136,6 +136,10 @@ func TestLPFloatStaticMatrixIndependentMutationOracle(t *testing.T) {
 }
 
 func TestLPFloatStaticMatrixIndependentPivotOracle(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	r := rand.New(rand.NewPCG(991, 402))
 	multipleCancellations := 0
 	for world := 0; world < 2000; world++ {

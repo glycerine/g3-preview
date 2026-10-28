@@ -36,6 +36,10 @@ func lpRationalInitTableauFixture(t *testing.T, h *lpPairHarness, infeasible boo
 }
 
 func TestLPRationalInitTableauIndependentStateModels(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("lp: test too slow, run with -short for full suite.")
+	}
+
 	for world := 0; world < 240; world++ {
 		h := newLPPairHarness(t)
 		inf := world%2 == 0
