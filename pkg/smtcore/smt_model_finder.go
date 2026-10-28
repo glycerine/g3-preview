@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_finder.h; src/smt/smt_model_finder.cpp model_finder
 // registration, scope, search and candidate-model lifecycle.
-package smtcore
 
 import (
 	"errors"

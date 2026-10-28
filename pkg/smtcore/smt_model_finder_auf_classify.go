@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp quantifier_analyzer AUF classification.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp quantifier_analyzer AUF classification.
 
 import "github.com/glycerine/g3/pkg/ast"
 

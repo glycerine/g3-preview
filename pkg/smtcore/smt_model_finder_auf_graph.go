@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp auf_solver node indexes and f_var.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp auf_solver node indexes and f_var.
 
 import (
 	"errors"

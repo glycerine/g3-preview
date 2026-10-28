@@ -128002,7 +128002,7 @@
       "path": "src/smt/smt_model_finder.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_model_finder.go",
         "pkg/smtcore/smt_model_finder_test.go",
@@ -128505,8 +128505,8 @@
           "text": "SASSERT(sks.size() >= num_decls);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "quantifier macro-candidate analysis and simple_macro_solver isolated satisfying-macro publication",
@@ -128805,6 +128805,26 @@
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "complete native definition inventory: constructor/destructor, both checkpoint overloads, quantifier-info/context/registration/scope/reset/search lifecycle, relevant-quantifier collection, AUF/simple/hint/non-AUF processing, cleanup/fix_model, flat-quantifier and instantiation-set/inverse queries, Skolem restriction and restart",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder.go",
+          "go_targets": [
+            "pkg/smtcore/smt_model_finder.go",
+            "pkg/smtcore/smt_model_finder_instantiation_set.go",
+            "pkg/smtcore/smt_model_finder_auf_graph.go",
+            "pkg/smtcore/smt_model_finder_auf_extension.go",
+            "pkg/smtcore/smt_model_checker.go",
+            "pkg/smtcore/smt_model_finder_package_header_test.go"
+          ],
+          "tests": [
+            "TestSMTModelFinderRegistrationRelevanceAndScopeLifecycle",
+            "TestSMTModelFinderCancellationAndResourceCheckpoint",
+            "TestSMTModelFinderAUFProductionExtensionPreservesGroundFunction",
+            "TestSMTModelCheckerMixedUniverseRecoversFiniteInverse",
+            "TestSMTModelFinderFilesPutPackageBeforeProvenance"
+          ]
         }
       ],
       "ownership": [
@@ -128814,7 +128834,7 @@
       ],
       "deviations": [
         "Go arithmetic-witness refinement: when the chosen witness evaluates to a public numeral provably distinct from all exceptions and avoided fallbacks, the instantiation set retains the numeral rather than the reassignable auxiliary constant. This preserves its value when an instance enters the context and avoids regenerating symbolic counterexamples on every candidate. Colliding and nonnumeric witnesses retain the source symbolic-witness/deferred-constraint path. Covered by TestSMTModelFinderAUFArithmeticWitnessUsesStableNumeral and the integer MBQI solver regressions.",
-        "The production model-finder lifecycle is wired to quantifier internalization, context scopes, search initialization, MBQI candidate construction and final published-model construction. Existing AST macro analysis supplies owned conditional-macro candidates; the simple macro solver repeatedly publishes an eligible isolated satisfying definition as the function fallback and records the chosen declaration. Shared conditional macros flow through the hint solver's indexes and bounded search, and selected definitions are published into the generated model. The quantifier analyzer classifies AUF formula and term structure with separate positive/negative formula caches, and the non-AUF solver publishes unconditional or ordered conditional definitions while rejecting cyclic function dependencies. Concrete instantiation sets retain accepted terms, reject private model values, build model-value inverses and preserve source generation preference. The AUF graph merges quantified-variable and function-argument nodes for direct f_var constraints, populates sets from original relevant argument enodes and publishes shared terms into MBQI instantiation sets. Variable equality/disequality qinfo adds class merges, avoid constraints, exceptions and ground terms, including offset and difference forms. Offset arguments use separate classes, two-pass shifted term transfer and the source same-class cutoff, with arithmetic and bit-vector simplification through the existing theory rewriter. Comparison qinfo supplies monotone/signed flags, variable-class merges and polarity-dependent ground boundaries. Array-select qinfo resolves function-backed partial array values, follows relevant ground/nested array parents and links index variables to model-function argument sets. Root sets are cleaned, empty sets receive context-safe terms, uninterpreted universes are frozen and discrete monotone exceptions receive neighboring terms. Monotone projection helpers construct piecewise auxiliary functions using arithmetic or signed/unsigned bit-vector order. Simple projection helpers select generation-preferred exception-safe fallbacks, maintain shared infinite-sort witnesses and defer colliding witness disequalities to the live restart hook. Production graph fixing dispatches simple/monotone projections, constructs inverses, completes originally partial functions and preserves their old ground graphs under auxiliary declarations before composing projected arguments. Deferred witness constraints force a search restart before candidate acceptance. Nested quantifiers reuse the retained pull_quant implementation; flattened AST references are owned until scope rollback, graph indexes use flattened binders and MBQI emits only original-binder instances. Macro-satisfied quantifiers receive selected-head instantiation sets and inverses from original relevant argument enodes; hint subset solving repeats to a fixed point. The enclosing method/ownership completeness audit remains open. The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles."
+        "The production model-finder lifecycle is wired to quantifier internalization, context scopes, search initialization, MBQI candidate construction and final published-model construction. Existing AST macro analysis supplies owned conditional-macro candidates; the simple macro solver repeatedly publishes an eligible isolated satisfying definition as the function fallback and records the chosen declaration. Shared conditional macros flow through the hint solver's indexes and bounded search, and selected definitions are published into the generated model. The quantifier analyzer classifies AUF formula and term structure with separate positive/negative formula caches, and the non-AUF solver publishes unconditional or ordered conditional definitions while rejecting cyclic function dependencies. Concrete instantiation sets retain accepted terms, reject private model values, build model-value inverses and preserve source generation preference. The AUF graph merges quantified-variable and function-argument nodes for direct f_var constraints, populates sets from original relevant argument enodes and publishes shared terms into MBQI instantiation sets. Variable equality/disequality qinfo adds class merges, avoid constraints, exceptions and ground terms, including offset and difference forms. Offset arguments use separate classes, two-pass shifted term transfer and the source same-class cutoff, with arithmetic and bit-vector simplification through the existing theory rewriter. Comparison qinfo supplies monotone/signed flags, variable-class merges and polarity-dependent ground boundaries. Array-select qinfo resolves function-backed partial array values, follows relevant ground/nested array parents and links index variables to model-function argument sets. Root sets are cleaned, empty sets receive context-safe terms, uninterpreted universes are frozen and discrete monotone exceptions receive neighboring terms. Monotone projection helpers construct piecewise auxiliary functions using arithmetic or signed/unsigned bit-vector order. Simple projection helpers select generation-preferred exception-safe fallbacks, maintain shared infinite-sort witnesses and defer colliding witness disequalities to the live restart hook. Production graph fixing dispatches simple/monotone projections, constructs inverses, completes originally partial functions and preserves their old ground graphs under auxiliary declarations before composing projected arguments. Deferred witness constraints force a search restart before candidate acceptance. Nested quantifiers reuse the retained pull_quant implementation; flattened AST references are owned until scope rollback, graph indexes use flattened binders and MBQI emits only original-binder instances. Macro-satisfied quantifiers receive selected-head instantiation sets and inverses from original relevant argument enodes; hint subset solving repeats to a fixed point. The scoped quantifier sets, update_satisfied_residue transition, satisfied-set undo callback, selected-definition cycle check, iterative candidate filtering, Q_f/Q_f_def indexes and bounded greedy search are ported with borrowed AST handles. The complete source definition and ownership audit is closed."
       ]
     },
     {

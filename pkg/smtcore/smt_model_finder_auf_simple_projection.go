@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp simple projections and witness constraints.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp simple projections and witness constraints.
 
 import (
 	"errors"

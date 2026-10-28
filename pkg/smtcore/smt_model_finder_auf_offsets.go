@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp f_var_plus_offset.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp f_var_plus_offset.
 
 import (
 	"errors"

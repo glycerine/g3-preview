@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_finder.cpp get_instantiation_set_values,
 // sort_values and mk_mono_proj.
-package smtcore
 
 import (
 	"errors"

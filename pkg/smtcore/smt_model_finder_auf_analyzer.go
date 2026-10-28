@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp quantifier_analyzer formula/term visits.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp quantifier_analyzer formula/term visits.
 
 import "github.com/glycerine/g3/pkg/ast"
 

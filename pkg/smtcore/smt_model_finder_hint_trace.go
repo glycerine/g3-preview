@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp:2762-2775,2841-2843,2917-2929.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp:2762-2775,2841-2843,2917-2929.
 
 import (
 	"io"

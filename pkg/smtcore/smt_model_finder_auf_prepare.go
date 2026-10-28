@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_finder.cpp cleanup_instantiation_sets,
 // add_elem_to_empty_inst_sets, mk_sorts_finite and add_mono_exceptions.
-package smtcore
 
 import (
 	"errors"

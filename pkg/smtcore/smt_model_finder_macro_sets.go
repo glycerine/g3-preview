@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_finder.cpp f_var macro-based population and
 // quantifier_info::populate_macro_based_inst_sets.
-package smtcore
 
 import (
 	"errors"

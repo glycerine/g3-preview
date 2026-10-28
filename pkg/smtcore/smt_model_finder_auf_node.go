@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp mf::node.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp mf::node.
 
 import "github.com/glycerine/g3/pkg/ast"
 

@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp instantiation_set.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp instantiation_set.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp direct variable qinfo constraints.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp direct variable qinfo constraints.
 
 import "github.com/glycerine/g3/pkg/ast"
 

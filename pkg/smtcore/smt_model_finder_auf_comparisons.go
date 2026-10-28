@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_finder.cpp quantifier_analyzer numeric atoms;
 // x_leq_y, x_sleq_y and x_gle_t qinfo.
-package smtcore
 
 import (
 	"errors"

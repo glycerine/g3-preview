@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_model_finder.cpp collect_partial_funcs,
 // complete_partial_funcs and auf_solver::fix_model.
-package smtcore
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/smt/smt_model_finder.cpp get_auf_arrays and select_var qinfo.
 package smtcore
+
+// Source: src/smt/smt_model_finder.cpp get_auf_arrays and select_var qinfo.
 
 import (
 	"errors"
