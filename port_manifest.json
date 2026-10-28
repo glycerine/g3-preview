@@ -40844,7 +40844,9 @@
         "pkg/cmd/g3/test_vectors/labels.smt2",
         "pkg/cmd_context/info.go",
         "pkg/parsers/smt2/info_test.go",
-        "pkg/cmd/g3/test_vectors/get_info.smt2"
+        "pkg/cmd/g3/test_vectors/get_info.smt2",
+        "pkg/parsers/smt2/display_test.go",
+        "pkg/cmd/g3/test_vectors/display.smt2"
       ],
       "tests": [
         "TestSMTLibRunnerScripts",
@@ -40893,7 +40895,9 @@
         "TestSMT2LabelsCommandAndAvailability",
         "TestSMT2LabelsCommandGuards",
         "TestSMT2GetInfoBuiltinsAndPersistentStatus",
-        "TestSMT2InfoStatusValidationAndUnsupportedLocation"
+        "TestSMT2InfoStatusValidationAndUnsupportedLocation",
+        "TestSMT2DisplayUsesParsedExpressionPrinter",
+        "TestSMT2DisplayRejectsMissingAndTrailingTerms"
       ],
       "conditionals": [
         {
@@ -40990,7 +40994,14 @@
           "tests": ["TestCommandContextWritesRelevantLabelsWithSMT2Quoting", "TestSMT2LabelsCommandAndAvailability", "TestSMT2LabelsCommandGuards", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         },
         {
-          "name": "remaining help/declare-map commands, string output-channel setters, model completion policy and remaining output modes",
+          "name": "display command single-expression parsing and direct pretty-printer output (basic_cmds.cpp:289-293)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "go_targets": ["pkg/cmd_context/results.go", "pkg/parsers/smt2/display_test.go", "pkg/cmd/g3/test_vectors/display.smt2"],
+          "tests": ["TestSMT2DisplayUsesParsedExpressionPrinter", "TestSMT2DisplayRejectsMissingAndTrailingTerms", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+        },
+        {
+          "name": "remaining help/declare-map/get-proof-graph commands, string output-channel setters and model completion policy",
           "status": "reference_only",
           "go_target": null,
           "tests": []
