@@ -83537,9 +83537,15 @@
       "path": "src/muz/pdr/pdr_sym_mux.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/pdr/symbol_mux.go",
+        "pkg/muz/pdr/symbol_mux_test.go"
+      ],
+      "tests": [
+        "TestSymbolMuxTupleGrowthAndFormulaConversion",
+        "TestSymbolMuxClassificationCollectionAndFiltering"
+      ],
       "conditionals": [
         {
           "line": 570,
@@ -83616,19 +83622,57 @@
           "text": "SASSERT(!contains(e, idx));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "suffix allocation, tuple creation/growth, prefix lookup and declaration conversion (pdr_sym_mux.cpp:31-153)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/symbol_mux.go",
+          "tests": [
+            "TestSymbolMuxTupleGrowthAndFormulaConversion"
+          ]
+        },
+        {
+          "name": "formula index classification, homogeneous checks, index/variable collection and declaration rewriting/shifting (pdr_sym_mux.cpp:156-440)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/symbol_mux.go",
+          "tests": [
+            "TestSymbolMuxTupleGrowthAndFormulaConversion",
+            "TestSymbolMuxClassificationCollectionAndFiltering"
+          ]
+        },
+        {
+          "name": "index partition/filter, non-model filtering and ordered diagnostic model printing (pdr_sym_mux.cpp:443-568)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/symbol_mux.go",
+          "tests": [
+            "TestSymbolMuxClassificationCollectionAndFiltering"
+          ]
+        }
+      ],
+      "ownership": [
+        "The multiplexer owns AST references for every supplied/generated tuple declaration, each prefix and every returned rewritten formula. Tuple publication is transactional: lexical references are released in reverse order on refusal and maps are published only after all pins succeed. Close releases rewritten formulas before their declarations because references are drained in reverse acquisition order.",
+        "Native Go maps and slices replace source object maps, vectors, marks and reference holders. Traversals borrow the mux and manager, own their rewrite caches only for one call, and transfer the returned expression to a mux-owned reference before the traversal and lexical output reference close."
+      ],
+      "deviations": [
+        "Invalid source assertions return typed AST domain errors. The source is_muxed_lit index argument remains intentionally unused. Collection of primary index zero returns a domain error instead of unsigned underflow. The source-disabled #if 0 index renamer remains dead and is not ported.",
+        "Go filtering returns new slices while preserving the source swap-with-last removal order. Model diagnostics use the retained SMT expression printer and accept an io.Writer; ModelString is the owning string convenience."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_sym_mux.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/pdr/symbol_mux.go",
+        "pkg/muz/pdr/symbol_mux_test.go"
+      ],
+      "tests": [
+        "TestSymbolMuxTupleGrowthAndFormulaConversion",
+        "TestSymbolMuxClassificationCollectionAndFiltering"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -83645,11 +83689,25 @@
           "text": "SASSERT(is_muxed(sym));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "live sym_mux public tuple, lookup, conversion, classification, filtering, primary iteration and model-display surface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/symbol_mux.go",
+          "tests": [
+            "TestSymbolMuxTupleGrowthAndFormulaConversion",
+            "TestSymbolMuxClassificationCollectionAndFiltering"
+          ]
+        }
+      ],
+      "ownership": [
+        "SymbolMux is the owning Go counterpart of the source reference holder and map graph. Borrowed AST handles are valid until Close; returned slices copy container storage but borrow their handles from that owner."
+      ],
+      "deviations": [
+        "Concrete Go methods and typed errors replace nested C++ RAII helpers, raw pointer ranges and assertion-only preconditions."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_util.cpp",
