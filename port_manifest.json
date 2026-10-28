@@ -154343,7 +154343,7 @@
       "path": "src/smt/theory_utvpi.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arithmetic_lifecycle.go",
         "pkg/smtcore/theory_utvpi_lifecycle_test.go",
@@ -154392,13 +154392,14 @@
           "tests": []
         },
         {
-          "name": "Explicit retained rdl_ext instantiation now selected by basic arithmetic mode 4; remaining class-definition controls tracked in theory_utvpi_def.h",
-          "status": "partial",
+          "name": "UTVPI tester linearization and explicit retained rdl_ext instantiation selected by basic arithmetic mode 4; remaining class-definition controls tracked in theory_utvpi_def.h",
+          "status": "ported",
           "go_target": "pkg/smtcore/theory_utvpi.go",
           "tests": [
             "TestSMTUTVPIContextConflictsProofsAndScopes",
             "TestSMTUTVPIEqualityEventsAndScopedFragmentRefusal",
             "TestSMTUTVPIMixedBridgeAndSumModelRefusal",
+            "TestSMTUTVPILinearizationNormalizationAndRefusals",
             "TestSMTBasicArithmeticModesBeforeFirstBoundary",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
@@ -154415,7 +154416,8 @@
       "deviations": [
         "UTVPI now has a dedicated registered graph backend selected by arithmetic mode 4, rather than falling through to simplex. Six strict C++ model/parity/refusal/scope scripts increase the runner comparison set to 118. Remaining stronger-cycle/control/alias fidelity is explicitly incomplete.",
         "The source arithmetic factory can reject a fractional Int candidate after rational-part parity succeeds. Go checks graph model values before SAT acceptance and returns UNKNOWN before publishing an invalid numeral.",
-        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement."
+        "Go internalization requires each handled arithmetic enode to own an attached variable, so one-variable term aliases use explicit unconditional paired edges. Exact source alias/control behavior remains partial; simplex is not used as a replacement.",
+        "Completed the standalone theory_utvpi.cpp audit. The concrete linearizer preserves LIFO arithmetic traversal, numeral accumulation, coefficient cancellation, at-most-two unit terms, to_real traversal and refusal/reuse behavior. Only the retained real-difference instantiation is needed by mode 4; unused template instantiations are not reproduced. Theory state, display, reset and control obligations remain explicitly tracked in theory_utvpi.h/theory_utvpi_def.h."
       ]
     },
     {
