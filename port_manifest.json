@@ -131154,6 +131154,8 @@
         "pkg/smtcore/smt_setup_difference_test.go",
         "pkg/smtcore/smt_setup_mixed_arithmetic.go",
         "pkg/smtcore/smt_setup_mixed_arithmetic_test.go",
+        "pkg/smtcore/smt_setup_unknown.go",
+        "pkg/smtcore/smt_setup_unknown_test.go",
         "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2",
         "pkg/smtcore/theory_dense_diff_logic.go",
         "pkg/smtcore/theory_dense_diff_logic_test.go",
@@ -131224,6 +131226,7 @@
         "TestSMTMixedArithmeticScopeModel",
         "TestSMTMixedSetupSelectsInfiniteArithmetic",
         "TestSMTRDLStaticSetupKeepsDirectBackendSelection",
+        "TestSMTUnknownStaticSetupClassifiesLinearArithmetic",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTQFUFLIASetupOwnsInternalArithmeticThresholdAcrossUpdates",
@@ -131451,15 +131454,18 @@
           ]
         },
         {
-          "name": "setup_mi_arith mode dispatch for QF_RDL logic-only, LRA, AUFLIRA/AUFNIRA/UFLRA and mixed quantified routes: ordinary mixed linear arithmetic or AS_OPTINF infinite arithmetic at the first boundary; setup_unknown static no-quantifier classification remains partial",
-          "status": "partial",
-          "go_target": "pkg/smtcore/smt_setup_mixed_arithmetic.go",
+          "name": "setup_mi_arith mode dispatch and setup_unknown static classification: select retained QF_UF, difference, linear/mixed arithmetic, bit-vector, floating-point and array profiles, with generic fallback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup_unknown.go",
           "go_targets": [
             "pkg/smtcore/smt_asserted_bounds.go",
+            "pkg/smtcore/smt_setup_unknown.go",
+            "pkg/smtcore/smt_setup_mixed_arithmetic.go",
             "pkg/smtcore/theory_arith_mixed.go",
             "pkg/smtcore/smt_setup_difference.go",
             "pkg/smtcore/smt_setup_real.go",
             "pkg/smtcore/smt_setup_quantified.go",
+            "pkg/smtcore/smt_setup_unknown_test.go",
             "pkg/smtcore/smt_setup_mixed_arithmetic_test.go",
             "pkg/cmd/g3/main_test.go",
             "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2"
@@ -131469,6 +131475,7 @@
             "TestSMTMixedArithmeticScopeModel",
             "TestSMTMixedSetupSelectsInfiniteArithmetic",
             "TestSMTRDLStaticSetupKeepsDirectBackendSelection",
+            "TestSMTUnknownStaticSetupClassifiesLinearArithmetic",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference",
             "TestSMTAssertedBoundsSourceSetupAndUpdates"
@@ -131846,6 +131853,8 @@
         "pkg/smtcore/smt_setup_difference_test.go",
         "pkg/smtcore/smt_setup_mixed_arithmetic.go",
         "pkg/smtcore/smt_setup_mixed_arithmetic_test.go",
+        "pkg/smtcore/smt_setup_unknown.go",
+        "pkg/smtcore/smt_setup_unknown_test.go",
         "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2",
         "pkg/smtcore/theory_dense_diff_logic.go",
         "pkg/smtcore/theory_dense_diff_logic_test.go",
@@ -131890,6 +131899,7 @@
         "TestSMTMixedArithmeticScopeModel",
         "TestSMTMixedSetupSelectsInfiniteArithmetic",
         "TestSMTRDLStaticSetupKeepsDirectBackendSelection",
+        "TestSMTUnknownStaticSetupClassifiesLinearArithmetic",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestSMTQFLIAAutomaticSetupUsesFeaturesAtFirstBoundary",
@@ -132033,15 +132043,18 @@
           ]
         },
         {
-          "name": "setup_mi_arith mode dispatch for QF_RDL logic-only, LRA, AUFLIRA/AUFNIRA/UFLRA and mixed quantified routes: ordinary mixed linear arithmetic or AS_OPTINF infinite arithmetic at the first boundary; setup_unknown static no-quantifier classification remains partial",
-          "status": "partial",
-          "go_target": "pkg/smtcore/smt_setup_mixed_arithmetic.go",
+          "name": "setup_mi_arith mode dispatch and setup_unknown static classification: select retained QF_UF, difference, linear/mixed arithmetic, bit-vector, floating-point and array profiles, with generic fallback",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_setup_unknown.go",
           "go_targets": [
             "pkg/smtcore/smt_asserted_bounds.go",
+            "pkg/smtcore/smt_setup_unknown.go",
+            "pkg/smtcore/smt_setup_mixed_arithmetic.go",
             "pkg/smtcore/theory_arith_mixed.go",
             "pkg/smtcore/smt_setup_difference.go",
             "pkg/smtcore/smt_setup_real.go",
             "pkg/smtcore/smt_setup_quantified.go",
+            "pkg/smtcore/smt_setup_unknown_test.go",
             "pkg/smtcore/smt_setup_mixed_arithmetic_test.go",
             "pkg/cmd/g3/main_test.go",
             "pkg/cmd/g3/test_vectors/basic_infinite_qfrdl.smt2"
@@ -132051,6 +132064,7 @@
             "TestSMTMixedArithmeticScopeModel",
             "TestSMTMixedSetupSelectsInfiniteArithmetic",
             "TestSMTRDLStaticSetupKeepsDirectBackendSelection",
+            "TestSMTUnknownStaticSetupClassifiesLinearArithmetic",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference",
             "TestSMTAssertedBoundsSourceSetupAndUpdates"
