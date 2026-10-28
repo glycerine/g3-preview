@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -207,7 +208,77 @@ func (m *RuleManager) NewRule(head ast.ASTHandle, tail []ast.ASTHandle, negated 
 	r.state.positive = end
 	r.state.uninterpreted = len(uninterpreted)
 	r.state.tail = append(uninterpreted, interpreted...)
+	if err = m.normalizeVariables(r.state); err != nil {
+		return nil, err
+	}
 	return r, nil
+}
+
+func (m *RuleManager) normalizeVariables(state *ruleState) (resultErr error) {
+	used, err := ast.NewASTUsedVars(m.manager)
+	if err != nil {
+		return err
+	}
+	used.Reset()
+	if err = used.Process(state.head); err != nil {
+		return err
+	}
+	for _, entry := range state.tail {
+		if err = used.Process(entry.handle); err != nil {
+			return err
+		}
+	}
+	count := used.MaxFoundVarIndexPlusOne()
+	if used.UsesAllVars(count) {
+		return nil
+	}
+	bindings := make([]ast.ASTHandle, count)
+	var next uint32
+	for i := uint32(0); i < count; i++ {
+		sort := used.Contains(i)
+		if sort.IsNull() {
+			continue
+		}
+		bindings[i], err = m.manager.MkVar(next, sort)
+		if err != nil {
+			return err
+		}
+		next++
+	}
+	substitution, err := rewriter.NewVarSubstitution(m.manager, false)
+	if substitution != nil {
+		defer func() { resultErr = errors.Join(resultErr, substitution.Close()) }()
+	}
+	if err != nil {
+		return err
+	}
+	replace := func(handle *ast.ASTHandle, reference *ast.ASTRef) error {
+		updated, e := m.manager.NewRef(ast.ASTHandle{})
+		if e != nil {
+			return e
+		}
+		if e = substitution.Substitute(*handle, bindings, updated); e != nil {
+			return errors.Join(e, m.manager.DelRef(&updated))
+		}
+		value, e := m.manager.RefGet(updated)
+		if e != nil {
+			return errors.Join(e, m.manager.DelRef(&updated))
+		}
+		if e = m.manager.DelRef(reference); e != nil {
+			return errors.Join(e, m.manager.DelRef(&updated))
+		}
+		*handle, *reference = value, updated
+		return nil
+	}
+	if err = replace(&state.head, &state.headReference); err != nil {
+		return err
+	}
+	for i := range state.tail {
+		if err = replace(&state.tail[i].handle, &state.tail[i].reference); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *Rule) open() (*ruleState, error) {

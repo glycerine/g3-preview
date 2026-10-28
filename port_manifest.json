@@ -80866,7 +80866,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/rule.go"],
-      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion"],
       "assertions": [
         {
           "line": 64,
@@ -80913,10 +80913,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "rule_manager::mk concrete head/tail construction and native positive-predicate, negative-predicate, interpreted-tail layout; to_formula with source binder-sort reversal and collision-free names; check_valid_head; rule ownership, tail queries, negation and dependency lookup (dl_rule.cpp:467-607,833-901,939-961)",
+          "name": "rule_manager::mk concrete head/tail construction and native positive-predicate, negative-predicate, interpreted-tail layout; rule::norm_vars sparse de-Bruijn compaction; to_formula with source binder-sort reversal and collision-free names; check_valid_head; rule ownership, tail queries, negation and dependency lookup (dl_rule.cpp:467-607,833-901,939-1011)",
           "status": "partial",
           "go_target": "pkg/muz/base/rule.go",
-          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads"]
+          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion"]
         }
       ],
       "ownership": [],
@@ -80928,7 +80928,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/base/rule.go"],
-      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads"],
+      "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion"],
       "conditionals": [
         {
           "line": 20,
@@ -80965,10 +80965,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete rule and rule_manager retained representation, registered predicates, head/tail/name accessors, native tail partitions, formula conversion, and explicit shared Go ownership; normalization, substitution, proof traces, HNF/query construction, and quantifier analysis remain open",
+          "name": "Concrete rule and rule_manager retained representation, registered predicates, head/tail/name accessors, native tail partitions, variable normalization, formula conversion, and explicit shared Go ownership; general substitution, proof traces, HNF/query construction, and quantifier analysis remain open",
           "status": "partial",
           "go_target": "pkg/muz/base/rule.go",
-          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads"]
+          "tests": ["TestRuleManagerClassifiesAndOwnsNativeTailLayout", "TestRuleManagerRejectsUnregisteredAndCompoundHeads", "TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion"]
         }
       ],
       "ownership": [],

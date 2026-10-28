@@ -166,3 +166,53 @@ func TestRuleManagerRejectsUnregisteredAndCompoundHeads(t *testing.T) {
 		t.Fatal("compound predicate argument accepted in head")
 	}
 }
+
+func TestRuleManagerNormalizesSparseVariablesBeforeFormulaConversion(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	ruleMust(t, err)
+	t.Cleanup(func() { ruleMust(t, context.Close()) })
+	manager, err := context.Manager()
+	ruleMust(t, err)
+	rules, err := base.NewRuleManager(manager)
+	ruleMust(t, err)
+	t.Cleanup(func() { ruleMust(t, rules.Close()) })
+	boolean, err := manager.MkBoolSort()
+	ruleMust(t, err)
+	arithmetic, err := manager.ArithmeticFamilyID()
+	ruleMust(t, err)
+	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
+	ruleMust(t, err)
+	symbol, err := manager.Symbols.Intern("rule-normalize")
+	ruleMust(t, err)
+	declaration, err := manager.MkFuncDecl(symbol, []ast.ASTHandle{integer, integer}, boolean, ast.ASTFuncDeclInfo{})
+	ruleMust(t, err)
+	ruleMust(t, rules.RegisterPredicate(declaration))
+	high, err := manager.MkVar(2, integer)
+	ruleMust(t, err)
+	low, err := manager.MkVar(0, integer)
+	ruleMust(t, err)
+	head, err := manager.MkApp(declaration, []ast.ASTHandle{high, low})
+	ruleMust(t, err)
+	rule, err := rules.NewRule(head, nil, nil, "normalize")
+	ruleMust(t, err)
+	t.Cleanup(func() { ruleMust(t, rule.Close()) })
+	normalized, err := rule.Head()
+	ruleMust(t, err)
+	for index, want := range []uint32{1, 0} {
+		argument, e := manager.GetArg(normalized, uint32(index))
+		ruleMust(t, e)
+		got, e := manager.GetVarIndex(argument)
+		ruleMust(t, e)
+		if got != want {
+			t.Fatal("normalized variable", index, got, want)
+		}
+	}
+	formula, err := rule.ToFormula()
+	ruleMust(t, err)
+	defer func() { ruleMust(t, manager.DelRef(&formula)) }()
+	formulaHandle, err := manager.RefGet(formula)
+	ruleMust(t, err)
+	if count, err := manager.GetNumDeclarations(formulaHandle); err != nil || count != 2 {
+		t.Fatal("normalized formula binder count", count, err)
+	}
+}
