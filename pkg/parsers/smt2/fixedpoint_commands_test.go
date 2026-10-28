@@ -173,7 +173,7 @@ func TestSMT2FixedpointQueryRefusesUnavailableOutputParameters(t *testing.T) {
 	}
 }
 
-func TestSMT2FixedpointRefusesUnportedTupleAnswer(t *testing.T) {
+func TestSMT2FixedpointTupleAnswerMatchesCPP(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	if err != nil {
 		t.Fatal(err)
@@ -183,10 +183,15 @@ func TestSMT2FixedpointRefusesUnportedTupleAnswer(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
-	script := "(declare-rel P (Bool))\n(rule (P true))\n(query P :print-answer true)\n"
-	err = smt2.ParseCommands(context, strings.NewReader(script), &bytes.Buffer{})
-	if err == nil || !strings.Contains(err.Error(), "nonzero-arity fixedpoint answers are not ported") {
-		t.Fatal("unported tuple answer accepted", err)
+	context.PrintSuccess = false
+	script := "(declare-rel P (Bool))\n(rule (P true))\n(rule (P false))\n(query P :print-answer true)\n"
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	cpp := fixedpointReference(t, script)
+	if output.String() != cpp || cpp != "sat\n(or (= (:var 0) true) (= (:var 0) false))\n" {
+		t.Fatal("tuple answer differential", output.String(), cpp)
 	}
 }
 

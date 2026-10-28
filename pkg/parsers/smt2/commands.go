@@ -24,6 +24,7 @@ type commandParser struct {
 	cacheEnd           int
 	out                io.Writer
 	manager            *ast.ASTManager
+	fixedpointPrintAns bool
 	refs               []ast.ASTRef
 	env                smt2LocalEnv
 	locals             localExprStack
@@ -607,7 +608,7 @@ func (p *commandParser) command() (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		printAnswer := false
+		printAnswer := p.fixedpointPrintAns
 		for p.token != RightParenToken {
 			if p.token != KeywordToken {
 				return false, fmt.Errorf("fixedpoint query parameter expected")
@@ -626,6 +627,7 @@ func (p *commandParser) command() (bool, error) {
 			switch key {
 			case ":print-answer":
 				printAnswer = value
+				p.fixedpointPrintAns = value
 			case ":print-statistics", ":print-certificate":
 				if value {
 					return false, fmt.Errorf("unsupported fixedpoint query parameter %s", key)
@@ -638,19 +640,6 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		if !p.ignoreChecks {
-			if printAnswer {
-				manager, x := p.context.Manager()
-				if x != nil {
-					return false, x
-				}
-				arity, x := manager.GetArity(declaration)
-				if x != nil {
-					return false, x
-				}
-				if arity != 0 {
-					return false, fmt.Errorf("nonzero-arity fixedpoint answers are not ported")
-				}
-			}
 			status, x := p.context.QueryFixedpoint(declaration)
 			if x != nil {
 				return false, x
@@ -665,8 +654,23 @@ func (p *commandParser) command() (bool, error) {
 				return false, err
 			}
 			if status == lbool.True && printAnswer {
-				if _, err = fmt.Fprintln(p.out, "true"); err != nil {
-					return false, err
+				manager, y := p.context.Manager()
+				if y != nil {
+					return false, y
+				}
+				answer, y := p.context.FixedpointAnswer(declaration)
+				if y != nil {
+					return false, y
+				}
+				handle, y := manager.RefGet(answer)
+				if y == nil {
+					y = p.context.WriteExpression(p.out, handle)
+				}
+				if y == nil {
+					_, y = fmt.Fprintln(p.out)
+				}
+				if y = errors.Join(y, manager.DelRef(&answer)); y != nil {
+					return false, y
 				}
 			}
 		}

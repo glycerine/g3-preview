@@ -91,6 +91,12 @@ func TestHashTableSetCloneAndValidation(t *testing.T) {
 	signature := newSignature(t, []uint64{3, 2})
 	table := rel.NewHashTable(signature)
 	add(t, table, 1, 0)
+	add(t, table, 2, 1)
+	add(t, table, 0, 1)
+	ordered, err := table.Facts()
+	if err != nil || fmt.Sprint(ordered) != "[[1 0] [2 1] [0 1]]" {
+		t.Fatal("fact insertion order", ordered, err)
+	}
 	inserted, err := table.Add(rel.Fact{1, 0})
 	if err != nil || inserted {
 		t.Fatal("duplicate insertion", inserted, err)

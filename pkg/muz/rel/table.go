@@ -7,6 +7,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+
+	"github.com/glycerine/insdict"
 )
 
 var ErrTable = errors.New("muz/rel: invalid table operation")
@@ -92,11 +94,11 @@ func projectedSignature(source Signature, removed []int) (Signature, error) {
 // relational path. Facts are copied on insertion and observation.
 type HashTable struct {
 	signature Signature
-	rows      map[string]Fact
+	rows      *insdict.Dict[string, Fact]
 }
 
 func NewHashTable(signature Signature) *HashTable {
-	return &HashTable{signature: Signature{domains: signature.Domains()}, rows: make(map[string]Fact)}
+	return &HashTable{signature: Signature{domains: signature.Domains()}, rows: insdict.NewDict[string, Fact]()}
 }
 
 func (t *HashTable) open() error {
@@ -144,10 +146,10 @@ func (t *HashTable) Add(fact Fact) (bool, error) {
 		return false, err
 	}
 	key := factKey(fact)
-	if _, found := t.rows[key]; found {
+	if _, found := t.rows.Get2(key); found {
 		return false, nil
 	}
-	t.rows[key] = cloneFact(fact)
+	t.rows.Set(key, cloneFact(fact))
 	return true, nil
 }
 
@@ -159,10 +161,10 @@ func (t *HashTable) Remove(fact Fact) (bool, error) {
 		return false, err
 	}
 	key := factKey(fact)
-	if _, found := t.rows[key]; !found {
+	if _, found := t.rows.Get2(key); !found {
 		return false, nil
 	}
-	delete(t.rows, key)
+	t.rows.Del(key)
 	return true, nil
 }
 
@@ -173,7 +175,7 @@ func (t *HashTable) Contains(fact Fact) (bool, error) {
 	if err := t.validateFact(fact); err != nil {
 		return false, err
 	}
-	_, found := t.rows[factKey(fact)]
+	_, found := t.rows.Get2(factKey(fact))
 	return found, nil
 }
 
@@ -181,15 +183,15 @@ func (t *HashTable) Len() (int, error) {
 	if err := t.open(); err != nil {
 		return 0, err
 	}
-	return len(t.rows), nil
+	return t.rows.Len(), nil
 }
 
 func (t *HashTable) Facts() ([]Fact, error) {
 	if err := t.open(); err != nil {
 		return nil, err
 	}
-	result := make([]Fact, 0, len(t.rows))
-	for _, fact := range t.rows {
+	result := make([]Fact, 0, t.rows.Len())
+	for _, fact := range t.rows.All() {
 		result = append(result, cloneFact(fact))
 	}
 	return result, nil
@@ -200,8 +202,8 @@ func (t *HashTable) Clone() (*HashTable, error) {
 		return nil, err
 	}
 	result := NewHashTable(t.signature)
-	for key, fact := range t.rows {
-		result.rows[key] = cloneFact(fact)
+	for key, fact := range t.rows.All() {
+		result.rows.Set(key, cloneFact(fact))
 	}
 	return result, nil
 }
@@ -210,7 +212,7 @@ func (t *HashTable) Reset() error {
 	if err := t.open(); err != nil {
 		return err
 	}
-	clear(t.rows)
+	t.rows.Clear()
 	return nil
 }
 
@@ -232,8 +234,8 @@ func (t *HashTable) Join(other *HashTable, leftColumns, rightColumns []int) (*Ha
 		return nil, err
 	}
 	result := NewHashTable(signature)
-	for _, left := range t.rows {
-		for _, right := range other.rows {
+	for _, left := range t.rows.All() {
+		for _, right := range other.rows.All() {
 			matches := true
 			for i := range leftColumns {
 				if left[leftColumns[i]] != right[rightColumns[i]] {
@@ -265,7 +267,7 @@ func (t *HashTable) Project(removed []int) (*HashTable, error) {
 	for _, column := range removed {
 		remove[column] = true
 	}
-	for _, source := range t.rows {
+	for _, source := range t.rows.All() {
 		fact := make(Fact, 0, signature.Len())
 		for i, value := range source {
 			if !remove[i] {
@@ -291,7 +293,7 @@ func (t *HashTable) SelectEqualAndProject(value Element, column int) (*HashTable
 		return nil, err
 	}
 	result := NewHashTable(signature)
-	for _, source := range t.rows {
+	for _, source := range t.rows.All() {
 		if source[column] != value {
 			continue
 		}
@@ -327,7 +329,7 @@ func (t *HashTable) Permute(permutation []int) (*HashTable, error) {
 		return nil, err
 	}
 	result := NewHashTable(signature)
-	for _, source := range t.rows {
+	for _, source := range t.rows.All() {
 		fact := make(Fact, len(permutation))
 		for i, column := range permutation {
 			fact[i] = source[column]
@@ -386,7 +388,7 @@ func (t *HashTable) Union(source, delta *HashTable) error {
 			return fmt.Errorf("%w: delta signature differs", ErrTable)
 		}
 	}
-	for _, fact := range source.rows {
+	for _, fact := range source.rows.All() {
 		inserted, err := t.Add(fact)
 		if err != nil {
 			return err
@@ -412,14 +414,14 @@ func (t *HashTable) FilterByNegation(negated *HashTable, targetColumns, negatedC
 		return err
 	}
 	if len(targetColumns) == 0 {
-		if len(negated.rows) != 0 {
+		if negated.rows.Len() != 0 {
 			return t.Reset()
 		}
 		return nil
 	}
-	for key, target := range t.rows {
+	for key, target := range t.rows.All() {
 		remove := false
-		for _, other := range negated.rows {
+		for _, other := range negated.rows.All() {
 			matches := true
 			for i := range targetColumns {
 				if target[targetColumns[i]] != other[negatedColumns[i]] {
@@ -433,7 +435,7 @@ func (t *HashTable) FilterByNegation(negated *HashTable, targetColumns, negatedC
 			}
 		}
 		if remove {
-			delete(t.rows, key)
+			t.rows.Del(key)
 		}
 	}
 	return nil

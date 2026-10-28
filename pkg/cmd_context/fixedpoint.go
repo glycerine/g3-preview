@@ -117,3 +117,13 @@ func (c *Context) QueryFixedpoint(declaration ast.ASTHandle) (lbool.LBool, error
 	}
 	return engine.QueryPredicate(declaration)
 }
+
+// FixedpointAnswer returns an owning formula for the most recently saturated
+// finite relation. The caller releases it through Manager.DelRef.
+func (c *Context) FixedpointAnswer(declaration ast.ASTHandle) (ast.ASTRef, error) {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	return engine.Answer(declaration)
+}
