@@ -210,7 +210,13 @@ func (t *SMTFloatingPointTheory) convertRoundingConstant(declaration ast.ASTHand
 }
 
 func (t *SMTFloatingPointTheory) convert(expression ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := t.traceFPAExpression("t_fpa", "convert", 354, "converting ", expression); err != nil {
+		return ast.ASTHandle{}, err
+	}
 	if value, found := t.converted[expression]; found {
+		if err := t.traceFPAConversion(358, "cached:", expression, value); err != nil {
+			return ast.ASTHandle{}, err
+		}
 		return value, nil
 	}
 	state, err := t.State()
@@ -226,6 +232,9 @@ func (t *SMTFloatingPointTheory) convert(expression ast.ASTHandle) (ast.ASTHandl
 	if op, own, operationErr := t.operation(expression); operationErr != nil {
 		return ast.ASTHandle{}, operationErr
 	} else if own && op == ast.FPAOpFP {
+		if err := t.traceFPAConversion(372, "converted; caching:", expression, expression); err != nil {
+			return ast.ASTHandle{}, err
+		}
 		key, keyErr := state.manager.NewRef(expression)
 		if keyErr != nil {
 			return ast.ASTHandle{}, keyErr
@@ -252,6 +261,10 @@ func (t *SMTFloatingPointTheory) convert(expression ast.ASTHandle) (ast.ASTHandl
 		_ = state.manager.DelRef(&output)
 		return ast.ASTHandle{}, err
 	}
+	if err = t.traceFPAConversion(372, "converted; caching:", expression, value); err != nil {
+		_ = state.manager.DelRef(&output)
+		return ast.ASTHandle{}, err
+	}
 	key, err := state.manager.NewRef(expression)
 	if err != nil {
 		_ = state.manager.DelRef(&output)
@@ -265,6 +278,9 @@ func (t *SMTFloatingPointTheory) convert(expression ast.ASTHandle) (ast.ASTHandl
 func (t *SMTFloatingPointTheory) assertConstraint(expression ast.ASTHandle) error {
 	state, err := t.State()
 	if err != nil || state.manager.IsTrue(expression) {
+		return err
+	}
+	if err = t.traceFPAExpression("t_fpa_detail", "assert_cnstr", 410, "asserting ", expression); err != nil {
 		return err
 	}
 	if err = state.Internalize(expression, false); err != nil {
@@ -400,6 +416,9 @@ func (t *SMTFloatingPointTheory) encoded(expression ast.ASTHandle) (ast.ASTHandl
 }
 
 func (t *SMTFloatingPointTheory) InternalizeAtom(expression ast.ASTHandle, _ bool) (bool, error) {
+	if err := t.traceFPAExpression("t_fpa_internalize", "internalize_atom", 426, "internalizing atom: ", expression); err != nil {
+		return false, err
+	}
 	_, own, err := t.operation(expression)
 	if err != nil || !own {
 		return false, err
@@ -468,11 +487,14 @@ func (t *SMTFloatingPointTheory) ensureVariable(expression ast.ASTHandle) (bool,
 	if t.IsAttachedToVariable(node) {
 		return false, nil
 	}
-	_, err = t.CreateVariable(node)
+	_, err = t.createFPAVariable(node)
 	return err == nil, err
 }
 
 func (t *SMTFloatingPointTheory) InternalizeTerm(expression ast.ASTHandle) (bool, error) {
+	if err := t.traceFPAExpression("t_fpa_internalize", "internalize_term", 452, "internalizing term: ", expression); err != nil {
+		return false, err
+	}
 	op, own, err := t.operation(expression)
 	if err != nil || !own {
 		return false, err
@@ -588,6 +610,9 @@ func (t *SMTFloatingPointTheory) ApplySortConstraint(node *SMTEnode, sort ast.AS
 	if err != nil {
 		return err
 	}
+	if err = t.traceFPAExpression("t_fpa", "apply_sort_cnstr", 494, "apply sort cnstr for: ", node.Owner()); err != nil {
+		return err
+	}
 	_, _, floating, err := state.manager.FloatingPointSortShape(sort)
 	if err != nil {
 		return err
@@ -596,7 +621,7 @@ func (t *SMTFloatingPointTheory) ApplySortConstraint(node *SMTEnode, sort ast.AS
 	if err != nil || (!floating && !rounding) || t.IsAttachedToVariable(node) {
 		return err
 	}
-	if _, err = t.CreateVariable(node); err != nil {
+	if _, err = t.createFPAVariable(node); err != nil {
 		return err
 	}
 	if rounding {
@@ -634,6 +659,9 @@ func (*SMTFloatingPointTheory) Assign(int32, bool) error { return nil }
 func (t *SMTFloatingPointTheory) Relevant(expression ast.ASTHandle) error {
 	state, err := t.State()
 	if err != nil {
+		return err
+	}
+	if err = t.traceFPAExpression("t_fpa", "relevant_eh", 647, "relevant_eh for: ", expression); err != nil {
 		return err
 	}
 	sort, err := state.manager.GetSort(expression)
@@ -713,6 +741,9 @@ func (t *SMTFloatingPointTheory) PopScopes(count uint32) (result error) {
 	}
 	t.conversion = t.conversion[:limit]
 	t.scopes = t.scopes[:level]
+	if traceErr := t.traceFPAPop(count, len(t.scopes)); traceErr != nil {
+		result = errors.Join(result, traceErr)
+	}
 	if baseErr := t.SMTTheoryBase.PopScopes(count); baseErr != nil {
 		result = errors.Join(result, fmt.Errorf("floating-point base scope pop: %w", baseErr))
 	}
