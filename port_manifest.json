@@ -114811,12 +114811,23 @@
       "path": "src/smt/params/smt_params_helper.hpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/smtcore/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/util/params/util_module_params_source.go",
+        "pkg/smtcore/util_smt_dyn_ack_params.go",
+        "pkg/smtcore/util_smt_array_params.go",
+        "pkg/smtcore/util_smt_bv_params.go",
+        "pkg/smtcore/util_smt_arith_params.go",
+        "pkg/smtcore/util_smt_qi_params.go",
+        "pkg/smtcore/util_smt_pb_params.go",
+        "pkg/smtcore/util_smt_str_params.go",
+        "pkg/smtcore/util_smt_preprocessor_params.go",
+        "pkg/smtcore/util_smt_params.go",
+        "pkg/smtcore/smt_solver_core.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -114835,11 +114846,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete 88-entry descriptor collection with exact source keys, kinds, defaults, descriptions, module registration and publication order",
           "status": "ported",
           "go_target": "pkg/smtcore/gparams_catalog_collectors.go",
           "tests": [
@@ -114852,18 +114863,50 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "all retained typed local/module/literal accessors used by smt_params, concrete theory parameter owners and SMT unsat-core pattern extension",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/params/util_module_params_source.go",
+            "pkg/smtcore/util_smt_dyn_ack_params.go",
+            "pkg/smtcore/util_smt_array_params.go",
+            "pkg/smtcore/util_smt_bv_params.go",
+            "pkg/smtcore/util_smt_arith_params.go",
+            "pkg/smtcore/util_smt_qi_params.go",
+            "pkg/smtcore/util_smt_pb_params.go",
+            "pkg/smtcore/util_smt_str_params.go",
+            "pkg/smtcore/util_smt_preprocessor_params.go",
+            "pkg/smtcore/util_smt_params.go",
+            "pkg/smtcore/smt_solver_core.go"
+          ],
+          "tests": [
+            "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
+            "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
+            "TestSMTBVSevenDefaultsThenActualUpdate",
+            "TestSMTArithSixteenGettersIndependentLocalModuleLiteralPaths",
+            "TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields",
+            "TestSMTPBFourGettersIndependentLocalModuleWrongKindLiteral",
+            "TestSMTStrAllSeventeenGettersIndependentFallbackAndWholeState",
+            "TestSMTPreprocessorAllNineteenDefaultsAndFiveLocalGetters",
+            "TestSMTParamsAllLocalGetterPublicationsFallbackAndDirectHiddenReads",
+            "TestSMTSolverExtendsUnsatCoreThroughQuantifierPatterns",
+            "TestSMTSolverExtendsUnsatCoreWithNonlocalPatterns"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes preserve source cleanup and publication. Typed helper frames borrow the caller's local ParamsRef, acquire the smt module ParamsRef, and release it before return; containing parameter owners retain only their published scalar/string/symbol snapshots."
       ],
-      "deviations": []
+      "deviations": [
+        "The generated core_minimize accessor is excluded because smt_solver.cpp guards its only call with m_minimizing_core before the sole scope that can set that flag, so it is unreachable in retained source. The generated lemma_gc_strategy accessor has no source caller; smt_params keeps its constructor-fixed LGC_FIXED value. No dead universal helper adapter is added."
+      ]
     },
     {
       "path": "src/smt/params/smt_params_helper.pyg",
       "component": "smt",
       "role": "generated_input",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/util_smt_dyn_ack_params.go",
         "pkg/smtcore/util_smt_dyn_ack_params_source_test.go",
@@ -114958,12 +115001,12 @@
         "TestSMTParamsEveryUnwarmedSharedSymbolModuleAndClassReservation",
         "TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Six concrete dack generated accessors with local/module/literal precedence and actual module acquisition (src/smt/params/smt_params_helper.pyg:61-66; scripts/mk_genfile_common.py:895-939)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_dyn_ack_params.go",
           "tests": [
             "TestSMTDynAckConstructorLiteralDefaultsAndFallbackOrder",
@@ -114977,7 +115020,7 @@
         },
         {
           "name": "Two array accessor definitions sharing exact borrowed-local/module/literal engine (src/smt/params/smt_params_helper.pyg:59-60; scripts/mk_genfile_common.py:895-939)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_array_params.go",
           "tests": [
             "TestSMTArrayConstructorElevenDefaultsDoesNotUpdate",
@@ -114990,7 +115033,7 @@
         },
         {
           "name": "Two actual BV SMT getters with borrowed local/module/default precedence (src/smt/params/smt_params_helper.pyg:38-39)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_bv_params.go",
           "tests": [
             "TestSMTBVSimultaneousHelperOlderReadAndReverseDestruction",
@@ -115007,7 +115050,7 @@
         },
         {
           "name": "Fifteen arithmetic SMT helper accessor definitions and literal defaults (src/smt/params/smt_params_helper.pyg:7,40-53)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_arith_params.go",
           "tests": [
             "TestSMTArithAllFortySixLiteralDefaults",
@@ -115021,7 +115064,7 @@
         },
         {
           "name": "Fourteen concrete QI generated local/module/literal accessors (src/smt/params/smt_params_helper.pyg:24-37)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_qi_params.go",
           "tests": [
             "TestSMTQILiteralDefaultsUninitializedEMatchingAndGoText",
@@ -115037,7 +115080,7 @@
         },
         {
           "name": "Four concrete PB generated local/module/literal getter definitions (src/smt/params/smt_params_helper.pyg:55-58)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_pb_params.go",
           "tests": [
             "TestSMTPBConstructorDoesNotUpdateAndLiteralDefaults",
@@ -115050,7 +115093,7 @@
         },
         {
           "name": "Seventeen concrete string-theory generated local/module/literal defaults (src/smt/params/smt_params_helper.pyg:70-87)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_str_params.go",
           "tests": [
             "TestSMTStrSeventeenLiteralDefaultsAndMandatoryConstructorUpdate",
@@ -115062,7 +115105,7 @@
         },
         {
           "name": "Concrete preprocessor bases, local update and thirty-one display chains (src/smt/params/smt_params_helper.pyg:9-11,19-20)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_preprocessor_params.go",
           "tests": [
             "TestSMTPreprocessorImplicitPatternBaseGetsEmptyInsteadOfParentArgument",
@@ -115077,7 +115120,7 @@
         },
         {
           "name": "Reached SMT parent local-module-literal helper getters (src/smt/params/smt_params_helper.pyg:5-23,67-69)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/smtcore/util_smt_params.go",
           "tests": [
             "TestSMTParamsImplicitBasesDefaultEmptyAndConstructorLocalOnly",
@@ -115108,15 +115151,9 @@
         "Nine implicit default-empty bases use their existing same constructor engines with embedded headers charged only by the actual parent header. Seventy preceding local initializer publications, final symbol(auto) member acquisition, and local-only constructor body retain their exact initialized frontier. Local smt/model helper declarations and nested array update use real borrowed reference acquisitions; younger source stops protect older helper/base lifetimes, while explicit owning Close drains exact retained leaves before embedded base owners and the parent header."
       ],
       "deviations": [
-        "The registered SMT kernel now owns the complete smt_params embedding, installs dynamic-Ack scalar state during construction, and applies later updates without discarding occurrence or clause state. Native global/locale/boolalpha profiles remain open. Go invalid local/closed/null owner guards and standalone incomplete-constructor owning continuation are explicit adapter domains. Strategy outside source enumerators is only selected fixed-width Go representation evidence. Generated helper credit is limited to six dack accessor definitions; full helper/generator remain partial.",
-        "No complete SMT context, generated-helper/generator, native global/locale/boolalpha or registered SMT driver completion credit. The standalone facade and lexical-frame reflected cold charges are explicit Go ownership representation rather than native scalar/stack allocations. Disabled array registration is erased; Array constructor never reads params or performs update.",
-        "No registered SMT context/kernel driver or whole generated helper/generator/global/locale/boolalpha completion credit. The seven literal defaults are followed by mandatory update, including source constructor false hi_div0 replaced by generated rewriter true. Invalid/cross-owner or incomplete-object, signed TLS overflow and native global-null lifetime conditions are explicitly guarded Go domains, not valid native OOM/undefined-behavior equivalence. Numeric test collector callbacks are unreachable configuration anchors, not injected source failure leaves.",
-        "No complete smt_params/context/kernel, registered SMT driver, whole generated helper/generator or native global/locale/boolalpha completion credit. Incomplete constructors return an explicitly diagnostic owner; Display/Update refuse before output/body while State can inspect actual initialized/published prefix. Cross-owner/null-global/closed/copy guards are precise Go domain evidence, not native null dereference equivalence. Source enum casts use fixed-width representation and signed ostream insertion; valid-enumerator oracle cases are distinct from out-of-domain conversion profiles.",
-        "No complete quantifier/context/SMT driver, native global locale/boolalpha or whole std::string/class generated copy credit. m_qi_ematching is literally uninitialized: no assignment occurs anywhere in this source fork; explicit public-field assignment is required for a valid display read. Diagnostic State exposes initialization metadata and failed-constructor prefix; Display/Update refuse incomplete constructors. Existing Params text codec virtual NUL retains actual provider generation/lifetime guard, without claiming a native NUL-word ABI. Go immutable literal/string spans and direct file flush are selected adapters. Null cost dereference, stale provider, copied owner and destroyed word reads are guarded domains, not defined native continuation.",
-        "No complete SMT/context/solver or registered source driver credit; native global/locale/boolalpha profiles remain open. The actual scalar constructor reads no unused ParamsRef and does not update; standalone Go wrapper/header lifetime and wrong-owner/closed/global-null guards are explicit representation domains. Source lexical helper reverse DT and immutable source-stop cause use the accepted same-engine concrete helper, with actual returned module reference acquisition rather than reference-count/census authority.",
-        "No complete SMT/context/solver or registered driver credit; native global/std-helper/compiler-generated class copy profiles remain open. This source class has no Display method and no owned or borrowed string fields; no invented formatter/string ownership API. Diagnostic State inspects failed constructor scalar prefix, while Update rejects an incomplete constructor. Reflected standalone header and precise null/copied/closed-owner guards are Go representation domains. smt_params.cpp parent update does not call theory_str_params::updt_params in this source; that source omission is preserved as a future parent obligation.",
-        "Source scalar State inspection after incomplete construction is diagnostic; ordinary Update and Display reject it. Guarded TLS destruction fixture reaches the real smt helper and public SourceReset, without a source callback claim. Compiler-generated parent copies, real SMT context/driver, native ABI, global ostream locale/boolalpha and full process binding remain open.",
-        "Completed selected constructor/update/context/display bodies only; compiler-generated copies, real SMT context/driver, remaining generated parameter tables, global process/ABI profiles and arbitrary ostream locale/boolalpha remain open. QI m_qi_ematching is separately source-uninitialized until a real caller assignment; default parent Display reaches its actual label then typed initialization guard. State after failed construction is diagnostic, with explicit preceding scalar/string-solver/dump frontier flags. Guarded TLS fixture reaches actual younger model destructor and proves older helper protection without a native callback claim."
+        "Only generated definitions reached by retained consumers are ported. The generated core.minimize getter is unreachable behind smt_solver.cpp's self-guard, and lemma_gc_strategy has no getter caller; no dead universal accessor facade is introduced.",
+        "Go scalar fields and strings replace generated C++ accessor return representations. Concrete typed parameter owners share one local/module/literal lookup engine; no generated C++ class, process ABI, locale state, or standard-library implementation is ported.",
+        "The source omission of theory_str_params::updt_params from smt_params::updt_params is preserved. QI m_qi_ematching remains source-uninitialized until an actual caller assigns it."
       ]
     },
     {
