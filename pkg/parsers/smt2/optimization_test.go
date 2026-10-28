@@ -69,3 +69,89 @@ func TestSMT2OptimizationObjectivesFollowScopes(t *testing.T) {
 		t.Fatal("popped objective survived", got)
 	}
 }
+
+func TestSMT2WeightedSoftOptimizationEndToEnd(t *testing.T) {
+	tests := []struct {
+		name, script, want string
+	}{
+		{
+			"default-group",
+			`(set-option :produce-models true)
+(set-logic QF_FD)
+(declare-const a Bool)(declare-const b Bool)
+(assert (not (and a b)))
+(assert-soft a)(assert-soft b :weight 2)
+(check-sat)(get-objectives)(get-value (a b))`,
+			"sat (objectives ( 1) ) ((a false) (b true))",
+		},
+		{
+			"rational-groups",
+			`(set-option :produce-models true)
+(set-logic QF_FD)
+(declare-const a Bool)(declare-const b Bool)
+(assert (not (and a b)))
+(assert-soft a :weight 1.5 :id x)
+(assert-soft b :weight 2.25 :id y)
+(check-sat)(get-objectives)(get-value (a b))`,
+			"sat (objectives (x 0) (y (/ 9.0 4.0)) ) ((a true) (b false))",
+		},
+		{
+			"negative-weight",
+			`(set-option :produce-models true)
+(set-logic QF_FD)(declare-const a Bool)
+(assert-soft a :weight -2)
+(check-sat)(get-objectives)(get-value (a))`,
+			"sat (objectives ( (- 2)) ) ((a false))",
+		},
+		{
+			"existing-group-scope",
+			`(set-option :produce-models true)
+(set-logic QF_FD)(declare-const a Bool)
+(assert-soft a :id x)
+(push)(assert-soft (not a) :weight 3 :id x)(pop)
+(check-sat)(get-objectives)(get-value (a))`,
+			"sat (objectives (x 0) ) ((a true))",
+		},
+		{
+			"mixed-lexicographic-order",
+			`(set-option :produce-models true)
+(set-logic QF_LIA)
+(declare-const a Bool)(declare-const x Int)
+(assert (and (>= x 0) (<= x 1)))
+(assert-soft a :id s)(maximize x)
+(assert-soft (not a) :weight 2 :id t)
+(check-sat)(get-objectives)(get-value (a x))`,
+			"sat (objectives (s 0) (x 1) (t 2) ) ((a true) (x 1))",
+		},
+		{
+			"retained-command-parameters",
+			`(set-logic QF_FD)
+(declare-const a Bool)(declare-const b Bool)
+(assert (not (and a b)))
+(assert-soft a :weight 3 :id first)
+(assert-soft b)
+(check-sat)(get-objectives)`,
+			"sat (objectives (first 3) )",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				if err := context.Close(); err != nil {
+					t.Error(err)
+				}
+			})
+			var output bytes.Buffer
+			if err = ParseCommands(context, strings.NewReader(tc.script), &output); err != nil {
+				t.Fatal(err, output.String())
+			}
+			if got := strings.Join(strings.Fields(output.String()), " "); got != tc.want {
+				t.Fatal("soft optimization output", got, "want", tc.want)
+			}
+		})
+	}
+}

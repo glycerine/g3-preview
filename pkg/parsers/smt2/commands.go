@@ -34,6 +34,8 @@ type commandParser struct {
 	ignoreUserPatterns bool
 	ignoreBadPatterns  bool
 	ignoreChecks       bool
+	softWeight         big.Rat
+	softID             string
 }
 
 // ParseCommands executes the retained SMT-LIB command grammar against Context.
@@ -78,6 +80,7 @@ func parseCommands(context *cmd_context.Context, input io.Reader, out io.Writer,
 		return err
 	}
 	p := &commandParser{context: context, scanner: scanner, out: out, ignoreChecks: ignoreChecks}
+	p.softWeight.SetInt64(1)
 	defer func() {
 		result = errors.Join(result, p.clearCommand())
 		if p.shifter != nil {
@@ -140,6 +143,13 @@ func (p *commandParser) unsigned() (uint32, error) {
 		return 0, fmt.Errorf("unsigned numeral is out of range")
 	}
 	value := uint32(n.Num().Uint64())
+	return value, p.advance()
+}
+func (p *commandParser) rational() (*big.Rat, error) {
+	if p.token != IntegerToken && p.token != DecimalToken {
+		return nil, fmt.Errorf("rational numeral expected")
+	}
+	value := p.scanner.Number()
 	return value, p.advance()
 }
 func (p *commandParser) astManager() (*ast.ASTManager, error) {
@@ -356,6 +366,42 @@ func (p *commandParser) command() (bool, error) {
 			return false, err
 		}
 		if err = p.context.Assert(expression, named); err != nil {
+			return false, err
+		}
+	case "assert-soft":
+		expression, _, err := p.expression()
+		if err != nil {
+			return false, err
+		}
+		weight := new(big.Rat).Set(&p.softWeight)
+		id := p.softID
+		for p.token != RightParenToken {
+			if p.token != KeywordToken {
+				return false, fmt.Errorf("assert-soft option keyword expected")
+			}
+			key := p.scanner.ID()
+			if err = p.advance(); err != nil {
+				return false, err
+			}
+			switch key {
+			case ":weight":
+				weight, err = p.rational()
+				if err == nil {
+					p.softWeight.Set(weight)
+				}
+			case ":id":
+				id, err = p.symbol()
+				if err == nil {
+					p.softID = id
+				}
+			default:
+				return false, fmt.Errorf("unsupported assert-soft option %s", key)
+			}
+			if err != nil {
+				return false, err
+			}
+		}
+		if err = p.context.AddSoftConstraint(expression, weight, id); err != nil {
 			return false, err
 		}
 	case "maximize", "minimize":

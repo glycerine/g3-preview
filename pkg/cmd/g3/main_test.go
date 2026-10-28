@@ -832,6 +832,7 @@ var scriptResults = map[string]string{
 	"nary_equality.smt2":                           "unsat\n",
 	"unknown_static_classifier.smt2":               "sat\n((xr 1.0)\n (yr 2.0))\nsat\n((xi 2)\n (yi 3))\nsat\n((ur 4.0)\n ((fr ur) 7.0))\nsat\n((ui 6)\n ((fi ui) 9))\n",
 	"unbounded_real_optimization.smt2":             "sat\n(objectives\n (x oo)\n)\n((x 0.0))\nsat\n(objectives\n (x (* (- 1) oo))\n)\n((x 0.0))\n",
+	"weighted_soft_optimization.smt2":              "sat\n(objectives\n ( 1)\n)\n((a false)\n (b true))\nsat\n(objectives\n (first 0)\n (second (/ 9.0 4.0))\n)\n((a true)\n (b false))\nsat\n(objectives\n (second (- 2))\n)\n((a false))\nsat\n(objectives\n (soft-first (- 2))\n (x 1)\n (soft-last 0)\n)\n((a false)\n (x 1))\nsat\n(objectives\n (duplicate 2)\n)\n((a true))\nsat\n(objectives\n (zero 0)\n)\n",
 }
 
 func TestSMTLibRunnerScripts(t *testing.T) {

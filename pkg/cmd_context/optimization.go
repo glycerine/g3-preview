@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/opt"
@@ -56,10 +57,79 @@ func (c *Context) AddObjective(expression ast.ASTHandle, maximize bool) error {
 	return nil
 }
 
-func (c *Context) restoreObjectives(size int) error {
+// AddSoftConstraint groups constraints by identifier at the position of the
+// group's first occurrence. Terms appended inside a scope are trailed
+// separately because the group itself may predate that scope.
+func (c *Context) AddSoftConstraint(expression ast.ASTHandle, weight *big.Rat, id string) error {
+	if weight == nil {
+		return ast.ErrASTHandle
+	}
+	m, err := c.Manager()
+	if err != nil {
+		return err
+	}
+	sort, err := m.GetSort(expression)
+	if err != nil {
+		return err
+	}
+	boolean, err := m.MkBoolSort()
+	if err != nil {
+		return err
+	}
+	if sort != boolean {
+		return fmt.Errorf("invalid type for expression: expected Boolean type")
+	}
+	if err = c.logicChecker.CheckExpression(expression); err != nil {
+		return err
+	}
+	c.checked = false
+	if err = c.clearCheckSatResult(); err != nil {
+		return err
+	}
+	index, found := c.softObjectiveIndex[id]
+	if !found {
+		index = len(c.objectives)
+		c.objectives = append(c.objectives, optimizationObjective{soft: true, id: id})
+		c.softObjectiveIndex[id] = index
+	}
+	if weight.Sign() == 0 {
+		return nil
+	}
+	ref, err := m.NewRef(expression)
+	if err != nil {
+		return err
+	}
+	term := optimizationSoftTerm{expression: expression, ref: ref}
+	term.weight.Set(weight)
+	c.objectives[index].softTerms = append(c.objectives[index].softTerms, term)
+	c.softObjectiveTrail = append(c.softObjectiveTrail, index)
+	return nil
+}
+
+func (c *Context) restoreObjectives(size, softTerms int) error {
+	for len(c.softObjectiveTrail) > softTerms {
+		last := len(c.softObjectiveTrail) - 1
+		index := c.softObjectiveTrail[last]
+		if index < 0 || index >= len(c.objectives) || !c.objectives[index].soft || len(c.objectives[index].softTerms) == 0 {
+			return ast.ErrASTDomain
+		}
+		objective := &c.objectives[index]
+		termIndex := len(objective.softTerms) - 1
+		if err := c.manager.DelRef(&objective.softTerms[termIndex].ref); err != nil {
+			return err
+		}
+		objective.softTerms = objective.softTerms[:termIndex]
+		c.softObjectiveTrail = c.softObjectiveTrail[:last]
+	}
 	for len(c.objectives) > size {
 		last := len(c.objectives) - 1
-		if err := c.manager.DelRef(&c.objectives[last].ref); err != nil {
+		objective := &c.objectives[last]
+		if objective.soft {
+			delete(c.softObjectiveIndex, objective.id)
+			if len(objective.softTerms) != 0 {
+				return ast.ErrASTDomain
+			}
+		} else if err := c.manager.DelRef(&objective.ref); err != nil {
 			return err
 		}
 		c.objectives = c.objectives[:last]
@@ -84,7 +154,18 @@ func (c *Context) checkOptimize(assumptions []ast.ASTHandle) (status lbool.LBool
 		}
 	}
 	for _, objective := range c.objectives {
-		if err = optimizer.AddObjective(objective.expression, objective.maximize); err != nil {
+		if objective.soft {
+			terms := make([]ast.ASTHandle, len(objective.softTerms))
+			weights := make([]*big.Rat, len(objective.softTerms))
+			for i := range objective.softTerms {
+				terms[i] = objective.softTerms[i].expression
+				weights[i] = &objective.softTerms[i].weight
+			}
+			err = optimizer.AddSoftObjective(terms, weights)
+		} else {
+			err = optimizer.AddObjective(objective.expression, objective.maximize)
+		}
+		if err != nil {
 			return lbool.Undef, err
 		}
 	}
@@ -116,7 +197,11 @@ func (c *Context) checkOptimize(assumptions []ast.ASTHandle) (status lbool.LBool
 	}
 	if optimized.Status == lbool.True && len(c.objectives) == len(optimized.Values) {
 		for i := range c.objectives {
-			c.objectives[i].value = optimized.Values[i]
+			if c.objectives[i].soft {
+				c.objectives[i].softValue.Set(&optimized.Values[i].SoftCost)
+			} else {
+				c.objectives[i].value = optimized.Values[i].Arithmetic
+			}
 			c.objectives[i].valueReady = optimized.Optimal
 		}
 	}
@@ -140,14 +225,26 @@ func (c *Context) WriteObjectives(out io.Writer) error {
 		if _, err := io.WriteString(out, " ("); err != nil {
 			return err
 		}
-		if err := c.WriteExpression(out, objective.expression); err != nil {
-			return err
+		if objective.soft {
+			if _, err := io.WriteString(out, objective.id); err != nil {
+				return err
+			}
+		} else {
+			if err := c.WriteExpression(out, objective.expression); err != nil {
+				return err
+			}
 		}
 		if _, err := io.WriteString(out, " "); err != nil {
 			return err
 		}
-		if err := c.writeObjectiveValue(out, &objective); err != nil {
-			return err
+		if objective.soft {
+			if err := c.writeSoftObjectiveValue(out, &objective.softValue); err != nil {
+				return err
+			}
+		} else {
+			if err := c.writeObjectiveValue(out, &objective); err != nil {
+				return err
+			}
 		}
 		if _, err := io.WriteString(out, ")\n"); err != nil {
 			return err
@@ -155,6 +252,35 @@ func (c *Context) WriteObjectives(out io.Writer) error {
 	}
 	_, err := io.WriteString(out, ")\n")
 	return err
+}
+
+func (c *Context) writeSoftObjectiveValue(out io.Writer, value *big.Rat) (resultErr error) {
+	service := c.manager.NumeralService()
+	if service == nil || value == nil {
+		return ast.ErrASTHandle
+	}
+	numeral, err := service.NewValue()
+	if err != nil {
+		return err
+	}
+	defer func() { resultErr = errors.Join(resultErr, service.Del(&numeral)) }()
+	if err = service.SetString(&numeral, value.RatString()); err != nil {
+		return err
+	}
+	expression, err := c.manager.ArithmeticNumeral(&numeral, value.IsInt())
+	if err != nil {
+		return err
+	}
+	ref, err := c.manager.NewRef(expression)
+	if err != nil {
+		return err
+	}
+	defer func() { resultErr = errors.Join(resultErr, c.manager.DelRef(&ref)) }()
+	expression, err = c.manager.RefGet(ref)
+	if err != nil {
+		return err
+	}
+	return c.WriteExpression(out, expression)
 }
 
 func (c *Context) writeObjectiveValue(out io.Writer, objective *optimizationObjective) error {

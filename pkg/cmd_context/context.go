@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/big"
 	"os"
 	"strconv"
 	"strings"
@@ -35,10 +36,19 @@ type optimizationObjective struct {
 	expression ast.ASTHandle
 	ref        ast.ASTRef
 	value      smtcore.SMTArithmeticObjectiveValue
+	softTerms  []optimizationSoftTerm
+	softValue  big.Rat
+	id         string
 	maximize   bool
+	soft       bool
 	valueReady bool
 }
-type scope struct{ functions, sorts, assertions, objectives, macros, sortConstructors int }
+type optimizationSoftTerm struct {
+	expression ast.ASTHandle
+	ref        ast.ASTRef
+	weight     big.Rat
+}
+type scope struct{ functions, sorts, assertions, objectives, softTerms, macros, sortConstructors int }
 type builtin struct {
 	family ast.FamilyID
 	kind   int32
@@ -69,6 +79,8 @@ type Context struct {
 	macroTrail                       []string
 	assertions                       []assertion
 	objectives                       []optimizationObjective
+	softObjectiveIndex               map[string]int
+	softObjectiveTrail               []int
 	scopes                           []scope
 	PrintSuccess, GlobalDeclarations bool
 	checked                          bool
@@ -85,7 +97,7 @@ func NewContext(config smtcore.SMTSolverConfig) (*Context, error) {
 	if config.Params == nil || config.Globals == nil {
 		return nil, uparams.ErrParamsOwner
 	}
-	c := &Context{config: config, functions: make(map[string][]ast.ASTHandle), sorts: make(map[string]ast.ASTHandle), sortArities: make(map[string]uint32), sortConstructors: make(map[string]sortConstructorDeclaration), builtins: make(map[string][]builtin), macros: make(map[string][]macroDeclaration), status: lbool.Undef}
+	c := &Context{config: config, functions: make(map[string][]ast.ASTHandle), sorts: make(map[string]ast.ASTHandle), sortArities: make(map[string]uint32), sortConstructors: make(map[string]sortConstructorDeclaration), builtins: make(map[string][]builtin), macros: make(map[string][]macroDeclaration), softObjectiveIndex: make(map[string]int), status: lbool.Undef}
 	var err error
 	c.params, err = config.Params.NewValue()
 	if err != nil {
@@ -589,7 +601,7 @@ func (c *Context) Push(count uint32) error {
 		if err := c.solver.Push(); err != nil {
 			return err
 		}
-		c.scopes = append(c.scopes, scope{len(c.functionTrail), len(c.sortTrail), len(c.assertions), len(c.objectives), len(c.macroTrail), len(c.sortConstructorTrail)})
+		c.scopes = append(c.scopes, scope{len(c.functionTrail), len(c.sortTrail), len(c.assertions), len(c.objectives), len(c.softObjectiveTrail), len(c.macroTrail), len(c.sortConstructorTrail)})
 	}
 	c.checked = false
 	return nil
@@ -629,7 +641,7 @@ func (c *Context) Pop(count uint32) error {
 	if err := c.restoreAssertions(s.assertions); err != nil {
 		return err
 	}
-	if err := c.restoreObjectives(s.objectives); err != nil {
+	if err := c.restoreObjectives(s.objectives, s.softTerms); err != nil {
 		return err
 	}
 	c.scopes = c.scopes[:level]
@@ -787,12 +799,13 @@ func (c *Context) ResetAssertions() error {
 	if err := c.restoreAssertions(0); err != nil {
 		return err
 	}
-	if err := c.restoreObjectives(0); err != nil {
+	if err := c.restoreObjectives(0, 0); err != nil {
 		return err
 	}
 	for i := range c.scopes {
 		c.scopes[i].assertions = 0
 		c.scopes[i].objectives = 0
+		c.scopes[i].softTerms = 0
 		if c.solver != nil {
 			if err := c.solver.Push(); err != nil {
 				c.initializationError = err
@@ -837,7 +850,7 @@ func (c *Context) resetManagerState() error {
 		if err := c.restoreAssertions(0); err != nil {
 			return err
 		}
-		if err := c.restoreObjectives(0); err != nil {
+		if err := c.restoreObjectives(0, 0); err != nil {
 			return err
 		}
 		if err := c.restoreDeclarations(0, 0); err != nil {
@@ -855,6 +868,8 @@ func (c *Context) resetManagerState() error {
 	clear(c.builtins)
 	clear(c.sortArities)
 	clear(c.sortConstructors)
+	clear(c.softObjectiveIndex)
+	c.softObjectiveTrail = nil
 	c.sortConstructorTrail = nil
 	c.logicChecker.Reset()
 	c.logic = ""

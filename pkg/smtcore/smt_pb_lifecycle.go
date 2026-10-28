@@ -4,6 +4,30 @@ package smtcore
 
 import "github.com/glycerine/g3/pkg/ast"
 
+// EnsurePseudoBooleanTheory installs the retained PB theory before the first
+// solver scope or internalization. Optimization uses weighted PB bounds under
+// arithmetic logics even when the input language did not contain PB terms.
+func (s *SMTSolver) EnsurePseudoBooleanTheory() error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	family, err := s.manager.RegisterPseudoBooleanPlugin()
+	if err != nil {
+		return err
+	}
+	if current := s.kernel.internalizer.theories[family]; current != nil {
+		if _, ok := current.(*SMTPseudoBooleanTheory); !ok {
+			return ast.ErrASTDomain
+		}
+		return nil
+	}
+	theory, err := NewSMTPseudoBooleanTheory(family)
+	if err != nil {
+		return err
+	}
+	return s.kernel.RegisterTheory(theory)
+}
+
 func (t *SMTPseudoBooleanTheory) Setup() error {
 	if _, err := t.State(); err != nil {
 		return err

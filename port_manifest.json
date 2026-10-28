@@ -92800,9 +92800,9 @@
       "path": "src/opt/maxsmt.cpp",
       "component": "opt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/opt/arithmetic_solver.go", "pkg/cmd_context/optimization.go", "pkg/parsers/smt2/optimization_test.go", "pkg/cmd/g3/test_vectors/weighted_soft_optimization.smt2"],
+      "tests": ["TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
       "assertions": [
         {
           "line": 44,
@@ -92823,9 +92823,18 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "retained weighted soft-objective initialization, exact model cost, improving pseudo-Boolean bounds and lexicographic assignment commitment (maxsmt.cpp:36-95,225-279,330-367)",
+          "status": "partial",
+          "go_target": "pkg/opt/arithmetic_solver.go",
+          "tests": ["TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "This integration slice uses exact monotone weighted pseudo-Boolean improvement bounds and source-style lexicographic assignment commitment. The source-selectable MaxRes, primal-dual MaxRes, WMax and SortMax engines, mutex preprocessing, statistics and engine parameterization remain unported; the unit therefore stays partial."
+      ]
     },
     {
       "path": "src/opt/maxsmt.h",
@@ -92856,7 +92865,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/parsers/smt2/commands.go", "pkg/cmd_context/optimization.go"],
-      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"],
+      "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
       "assertions": [
         {
           "line": 86,
@@ -92871,6 +92880,12 @@
           "status": "partial",
           "go_target": "pkg/parsers/smt2/commands.go",
           "tests": ["TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"]
+        },
+        {
+          "name": "assert-soft Boolean expression, persistent parametric weight/id lifecycle, grouped objective registration and exact assignment display (opt_cmds.cpp:46-107)",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": ["TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": [],
@@ -92905,7 +92920,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go", "pkg/opt/bound_expression.go", "pkg/opt/bound_expression_test.go", "pkg/opt/arithmetic_value_expression.go", "pkg/cmd_context/optimization.go", "pkg/parsers/smt2/optimization_test.go"],
-      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult", "TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes"],
+      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult", "TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2OptimizationObjectivesFollowScopes", "TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMTLibRunnerCPPReference"],
       "conditionals": [
         {
           "line": 271,
@@ -92984,6 +92999,12 @@
           "status": "partial",
           "go_target": "pkg/opt/arithmetic_value_expression.go",
           "tests": ["TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
+        },
+        {
+          "name": "scoped_state grouped soft terms, negative-weight normalization, MaxSMT objective order, scoped rollback, model publication and exact rational assignment display (opt_context.cpp:49-107,156-180,227-230,800-925,1264-1283)",
+          "status": "partial",
+          "go_target": "pkg/cmd_context/optimization.go",
+          "tests": ["TestSMT2WeightedSoftOptimizationEndToEnd", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": [],
@@ -93208,8 +93229,8 @@
       "component": "opt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/opt/arithmetic_solver.go", "pkg/smtcore/smt_solver_objective.go", "pkg/smtcore/smt_solver_objective_test.go"],
-      "tests": ["TestSMTSolverArithmeticObjectiveFacade", "TestSMT2BoundedIntegerOptimizationEndToEnd"],
+      "go_targets": ["pkg/opt/arithmetic_solver.go", "pkg/smtcore/smt_solver_objective.go", "pkg/smtcore/smt_solver_objective_test.go", "pkg/smtcore/smt_pb_lifecycle.go"],
+      "tests": ["TestSMTSolverArithmeticObjectiveFacade", "TestSMT2BoundedIntegerOptimizationEndToEnd", "TestSMT2WeightedSoftOptimizationEndToEnd"],
       "assertions": [
         {
           "line": 119,
