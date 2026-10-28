@@ -14,6 +14,7 @@ import (
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func (c *Context) AddObjective(expression ast.ASTHandle, maximize bool) error {
@@ -208,41 +209,141 @@ func (c *Context) addBitVectorObjective(optimizer *opt.ArithmeticSolver, objecti
 	return optimizer.AddSoftObjective(terms, weights)
 }
 
-func (c *Context) checkOptimize(assumptions []ast.ASTHandle) (status lbool.LBool, resultErr error) {
+func (c *Context) optimizationPriority() (priority string, resultErr error) {
+	module, err := c.config.Globals.SourceGetModuleName("opt")
+	if err != nil {
+		return "", err
+	}
+	defer func() { resultErr = errors.Join(resultErr, c.config.Params.Del(&module)) }()
+	key := "priority"
+	value, err := c.config.Params.GetSymbolName(&module, &key, usymbol.Symbol{})
+	if err != nil {
+		return "", err
+	}
+	priority, _, err = c.config.Params.SymbolsField.BareString(value)
+	return priority, err
+}
+
+func (c *Context) newOptimizer(assumptions []ast.ASTHandle) (optimizer *opt.ArithmeticSolver, resultErr error) {
 	optimizer, err := opt.NewArithmeticSolver(c.manager, &c.params, c.logic, c.config)
 	if err != nil {
-		return lbool.Undef, err
+		return nil, err
 	}
-	defer func() { resultErr = errors.Join(resultErr, optimizer.Close()) }()
+	published := false
+	defer func() {
+		if !published {
+			resultErr = errors.Join(resultErr, optimizer.Close())
+		}
+	}()
 	for _, assertion := range c.assertions {
 		if err = optimizer.Assert(assertion.expression); err != nil {
-			return lbool.Undef, err
+			return nil, err
 		}
 	}
 	for _, assumption := range assumptions {
 		if err = optimizer.Assert(assumption); err != nil {
-			return lbool.Undef, err
+			return nil, err
 		}
 	}
-	for _, objective := range c.objectives {
-		if objective.soft {
-			terms := make([]ast.ASTHandle, len(objective.softTerms))
-			weights := make([]*big.Rat, len(objective.softTerms))
-			for i := range objective.softTerms {
-				terms[i] = objective.softTerms[i].expression
-				weights[i] = &objective.softTerms[i].weight
-			}
-			err = optimizer.AddSoftObjective(terms, weights)
-		} else if objective.bitVector {
-			err = c.addBitVectorObjective(optimizer, &objective)
-		} else {
-			err = optimizer.AddObjective(objective.expression, objective.maximize)
+	published = true
+	return optimizer, nil
+}
+
+func (c *Context) addOptimizerObjective(optimizer *opt.ArithmeticSolver, index int) error {
+	if optimizer == nil || index < 0 || index >= len(c.objectives) {
+		return ast.ErrASTHandle
+	}
+	objective := &c.objectives[index]
+	if objective.soft {
+		terms := make([]ast.ASTHandle, len(objective.softTerms))
+		weights := make([]*big.Rat, len(objective.softTerms))
+		for i := range objective.softTerms {
+			terms[i] = objective.softTerms[i].expression
+			weights[i] = &objective.softTerms[i].weight
 		}
+		return optimizer.AddSoftObjective(terms, weights)
+	}
+	if objective.bitVector {
+		return c.addBitVectorObjective(optimizer, objective)
+	}
+	return optimizer.AddObjective(objective.expression, objective.maximize)
+}
+
+func (c *Context) checkOptimizeLex(assumptions []ast.ASTHandle) (optimized *opt.ArithmeticResult, resultErr error) {
+	optimizer, err := c.newOptimizer(assumptions)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, optimizer.Close()) }()
+	for i := range c.objectives {
+		if err = c.addOptimizerObjective(optimizer, i); err != nil {
+			return nil, err
+		}
+	}
+	return optimizer.Check()
+}
+
+func (c *Context) checkOptimizeBox(assumptions []ast.ASTHandle, continuation bool) (optimized *opt.ArithmeticResult, resultErr error) {
+	if !continuation || !c.optimizationBoxActive {
+		c.optimizationBoxNext = 0
+	}
+	c.optimizationBoxActive = true
+	if c.optimizationBoxNext >= len(c.objectives) {
+		c.optimizationBoxActive = false
+		return &opt.ArithmeticResult{Status: lbool.False, Values: make([]opt.ObjectiveValue, len(c.objectives)), Optimal: true}, nil
+	}
+	selected := c.optimizationBoxNext
+	c.optimizationBoxNext++
+	combined := &opt.ArithmeticResult{Status: lbool.True, Values: make([]opt.ObjectiveValue, len(c.objectives)), Optimal: true}
+	defer func() {
+		if resultErr != nil {
+			resultErr = errors.Join(resultErr, combined.Close())
+		}
+	}()
+	for i := range c.objectives {
+		optimizer, err := c.newOptimizer(assumptions)
 		if err != nil {
-			return lbool.Undef, err
+			return nil, err
+		}
+		if err = c.addOptimizerObjective(optimizer, i); err != nil {
+			return nil, errors.Join(err, optimizer.Close())
+		}
+		one, err := optimizer.Check()
+		err = errors.Join(err, optimizer.Close())
+		if err != nil {
+			if one != nil {
+				err = errors.Join(err, one.Close())
+			}
+			return nil, err
+		}
+		if one.Status != lbool.True || !one.Optimal || len(one.Values) != 1 {
+			combined.Status, combined.Optimal = one.Status, one.Optimal
+			return combined, one.Close()
+		}
+		combined.Values[i] = one.Values[0]
+		if i == selected {
+			combined.Model = one.Model
+			one.Model = nil
+		}
+		if err = one.Close(); err != nil {
+			return nil, err
 		}
 	}
-	optimized, err := optimizer.Check()
+	return combined, nil
+}
+
+func (c *Context) checkOptimize(assumptions []ast.ASTHandle, continuation bool) (status lbool.LBool, resultErr error) {
+	priority, err := c.optimizationPriority()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	var optimized *opt.ArithmeticResult
+	if priority == "box" {
+		optimized, err = c.checkOptimizeBox(assumptions, continuation)
+	} else {
+		c.optimizationBoxActive = false
+		optimized, err = c.checkOptimizeLex(assumptions)
+	}
 	if err != nil {
 		return lbool.Undef, err
 	}

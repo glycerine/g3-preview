@@ -86,6 +86,8 @@ type Context struct {
 	objectives                       []optimizationObjective
 	softObjectiveIndex               map[string]int
 	softObjectiveTrail               []int
+	optimizationBoxNext              int
+	optimizationBoxActive            bool
 	scopes                           []scope
 	PrintSuccess, GlobalDeclarations bool
 	checked                          bool
@@ -707,12 +709,13 @@ func (c *Context) CheckSat(assumptions []ast.ASTHandle) (status lbool.LBool, err
 		return lbool.Undef, err
 	}
 	defer func() { err = errors.Join(err, watch.Close()) }()
+	optimizationContinuation := c.checked
 	c.checked = false
 	if err := c.clearCheckSatResult(); err != nil {
 		return lbool.Undef, err
 	}
 	if len(c.objectives) != 0 {
-		return c.checkOptimize(assumptions)
+		return c.checkOptimize(assumptions, optimizationContinuation)
 	}
 	status, err = c.solver.CheckSat(assumptions)
 	if err != nil {

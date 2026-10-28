@@ -254,3 +254,29 @@ func TestSMT2UnboundedLexicographicIntervalEndToEnd(t *testing.T) {
 		t.Fatal("unbounded lexicographic interval output", got, "want", want)
 	}
 }
+
+func TestSMT2BoxOptimizationEndToEnd(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	const script = `(set-option :produce-models true)(set-option :opt.priority box)
+(set-logic QF_LIA)(declare-const x Int)(declare-const y Int)
+(assert (and (>= x 0) (>= y 0) (= (+ x y) 5)))
+(maximize x)(maximize y)
+(check-sat)(get-objectives)(get-value (x y))
+(check-sat)(get-objectives)(get-value (x y))(check-sat)`
+	var output bytes.Buffer
+	if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	want := "sat (objectives (x 5) (y 5) ) ((x 5) (y 0)) sat (objectives (x 5) (y 5) ) ((x 0) (y 5)) unsat"
+	if got := strings.Join(strings.Fields(output.String()), " "); got != want {
+		t.Fatal("box optimization output", got, "want", want)
+	}
+}
