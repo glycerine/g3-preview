@@ -1,9 +1,10 @@
+package smtcore
+
 // Source: retained linear rational fragment of src/smt/theory_arith.h,
 // src/smt/theory_arith_core.h, src/smt/theory_arith_core_def.h, and the
 // retained fragments of src/smt/theory_arith_int.h and
 // src/smt/theory_arith_eq.h and src/smt/theory_arith_nl.h, plus statistics
 // from src/smt/theory_arith_pp.h.
-package smtcore
 
 import (
 	"math/big"
@@ -2011,10 +2012,10 @@ func (t *SMTLinearArithmeticTheory) NewEquality(left, right SMTTheoryVar) error 
 	if t.equalityBoundsEnabled {
 		return t.queueCongruenceEqualityBounds(left, right)
 	}
-	return t.equalityAdapter.MkAxioms(left, right)
+	return t.equalityAdapter.NewEquality(left, right)
 }
 func (t *SMTLinearArithmeticTheory) NewDisequality(left, right SMTTheoryVar) error {
-	return t.equalityAdapter.MkAxioms(left, right)
+	return t.equalityAdapter.NewDisequality(left, right)
 }
 func (*SMTLinearArithmeticTheory) Name() string { return "arithmetic" }
 

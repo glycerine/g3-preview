@@ -168,6 +168,7 @@ func NewSMTKernel(manager *ast.ASTManager, quantifiers *SMTQuantifierRegistry) (
 		},
 	}
 	internalizer.assertedHasQuantifiers = &kernel.assertedHasQuantifiers
+	internalizer.assertedInconsistent = &kernel.assertedInconsistent
 	internalizer.assertedFormulas = &kernel.assertions
 	kernel.assertedSubstitution, err = manager.NewExprSubstitution()
 	if err != nil {

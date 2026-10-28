@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context_pp.cpp:89-91,135-148,264-284;
 // src/smt/asserted_formulas.cpp display_ll.
-package smtcore
 
 import (
 	"errors"

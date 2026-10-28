@@ -388,10 +388,10 @@ func (t *SMTUTVPITheory) InternalizeEquality(expression ast.ASTHandle, variable 
 
 func (t *SMTUTVPITheory) NewEquality(left, right SMTTheoryVar) error {
 	t.statistics.coreEqualities++
-	return t.adapter.MkAxioms(left, right)
+	return t.adapter.NewEquality(left, right)
 }
 func (t *SMTUTVPITheory) NewDisequality(left, right SMTTheoryVar) error {
-	return t.adapter.MkAxioms(left, right)
+	return t.adapter.NewDisequality(left, right)
 }
 func (t *SMTUTVPITheory) InitializeSearch() error { return t.adapter.InitializeSearch() }
 func (t *SMTUTVPITheory) Restart() error          { return t.adapter.Restart() }

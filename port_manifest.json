@@ -110257,13 +110257,16 @@
       "path": "src/smt/arith_eq_adapter.cpp",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arith_eq_adapter.go",
         "pkg/smtcore/smt_arith_eq_adapter_test.go",
         "pkg/smtcore/theory_lra_bound_axioms.go",
         "pkg/smtcore/theory_lra_eq_adapter.go",
-        "pkg/smtcore/smt_arith_eq_adapter_display_test.go"
+        "pkg/smtcore/smt_arith_eq_adapter_display_test.go",
+        "pkg/smtcore/smt_arith_eq_adapter_diagnostics.go",
+        "pkg/smtcore/smt_arith_eq_adapter_diagnostics_test.go",
+        "pkg/smtcore/smt_context_display_full.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
@@ -110284,7 +110287,10 @@
         "TestSMTArithmeticAdapterDisplayProcessedPairsAndScopes",
         "TestSMTArithmeticAdapterDisplayEveryWriterPrefixAndGuards",
         "TestSMTArithmeticAdapterFinalCheckTracePrecedesPropagation",
-        "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases"
+        "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases",
+        "TestSMTArithmeticEqualityAdapterRetainedDiagnostics",
+        "TestSMTArithmeticEqualityAdapterTraceBadbitAndAssertionGate",
+        "TestSMTContextDisplayFullCompositionAndRefusal"
       ],
       "assertions": [
         {
@@ -110366,7 +110372,16 @@
         },
         {
           "name": "Remaining retained equality-adapter TRACE/SASSERT diagnostics, including mk_axioms context::display operands (arith_eq_adapter.cpp:84-236)",
-          "status": "unported"
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_arith_eq_adapter_diagnostics.go",
+            "pkg/smtcore/smt_context_display_full.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityAdapterRetainedDiagnostics",
+            "TestSMTArithmeticEqualityAdapterTraceBadbitAndAssertionGate",
+            "TestSMTContextDisplayFullCompositionAndRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -110377,20 +110392,24 @@
       "deviations": [
         "The adapter installs pair dependencies in the shared SMT relevancy propagator instead of allocating a polymorphic C++ relevancy callback.",
         "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags.",
-        "Corrected historical dead/no-caller classification: theory_arith_core.h:1475 calls display_already_processed. Pair canonicalization now compares actual owner IDs instead of Go handle slots. Native hash iteration order is unspecified, so multi-pair checks assert membership rather than STL iteration order. Direct writer prefix/short-write tests and actual final-check propagation/stream refusal/native erasure checks pass. Adapter units remain partial pending other retained diagnostics, notably full context display operands; this does not complete smtcore."
+        "Corrected historical dead/no-caller classification: theory_arith_core.h:1475 calls display_already_processed. Pair canonicalization now compares actual owner IDs instead of Go handle slots. Native hash iteration order is unspecified, so multi-pair checks assert membership rather than STL iteration order. Direct writer prefix/short-write tests and actual final-check propagation/stream refusal/native erasure checks pass.",
+        "Retained adapter TRACE/CTRACE and SASSERT sites now cover both the generic difference/linear adapter and concrete LRA adapter. context::display composes the actual retained context sections and queue profile in source order, borrows kernel asserted-formula inconsistency state, and preserves non-throwing trace-stream badbit while propagating operand failures."
       ]
     },
     {
       "path": "src/smt/arith_eq_adapter.h",
       "component": "smt",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/smtcore/smt_arith_eq_adapter.go",
         "pkg/smtcore/smt_arith_eq_adapter_test.go",
         "pkg/smtcore/theory_lra_bound_axioms.go",
         "pkg/smtcore/theory_lra_eq_adapter.go",
-        "pkg/smtcore/smt_arith_eq_adapter_display_test.go"
+        "pkg/smtcore/smt_arith_eq_adapter_display_test.go",
+        "pkg/smtcore/smt_arith_eq_adapter_diagnostics.go",
+        "pkg/smtcore/smt_arith_eq_adapter_diagnostics_test.go",
+        "pkg/smtcore/smt_context_display_full.go"
       ],
       "tests": [
         "TestSMTArithmeticEqualityAdapterEventsAndScopes",
@@ -110410,7 +110429,10 @@
         "TestSMTArithmeticAdapterDisplayProcessedPairsAndScopes",
         "TestSMTArithmeticAdapterDisplayEveryWriterPrefixAndGuards",
         "TestSMTArithmeticAdapterFinalCheckTracePrecedesPropagation",
-        "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases"
+        "TestSMTArithmeticAdapterTraceBadbitContinuesOperandsAndNativeErases",
+        "TestSMTArithmeticEqualityAdapterRetainedDiagnostics",
+        "TestSMTArithmeticEqualityAdapterTraceBadbitAndAssertionGate",
+        "TestSMTContextDisplayFullCompositionAndRefusal"
       ],
       "conditionals": [
         {
@@ -110475,7 +110497,16 @@
         },
         {
           "name": "Remaining retained equality-adapter TRACE/SASSERT diagnostics, including mk_axioms context::display operands (arith_eq_adapter.cpp:84-236)",
-          "status": "unported"
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/smt_arith_eq_adapter_diagnostics.go",
+            "pkg/smtcore/smt_context_display_full.go"
+          ],
+          "tests": [
+            "TestSMTArithmeticEqualityAdapterRetainedDiagnostics",
+            "TestSMTArithmeticEqualityAdapterTraceBadbitAndAssertionGate",
+            "TestSMTContextDisplayFullCompositionAndRefusal"
+          ]
         }
       ],
       "ownership": [
@@ -110486,7 +110517,8 @@
       "deviations": [
         "A concrete non-template adapter serves the retained integer and real difference theories.",
         "The new concrete LRA consumer implements the active eager equality-adapter path. m_arith_lazy_adapter defaults false with no retained writer; the only m_arith_add_binary_bounds writer is QF_RDL setup selecting a difference-logic backend, not LRA. ConfigureArithmetic rejects those out-of-profile LRA settings; existing generic adapters for other backends are unchanged. Go standard stable sorting resolves equal bound thresholds without porting STL sorting internals. Full LRA cheap/LP propagation, underspecified axioms, model combination/publication, parameter forwarding, statistics/copy/reset and objective callbacks remain open. Setup still does not select SMTLRATheory and FinalCheck remains GiveUp. This increment neither completes LRA nor changes existing source-unit completion flags.",
-        "Corrected historical dead/no-caller classification: theory_arith_core.h:1475 calls display_already_processed. Pair canonicalization now compares actual owner IDs instead of Go handle slots. Native hash iteration order is unspecified, so multi-pair checks assert membership rather than STL iteration order. Direct writer prefix/short-write tests and actual final-check propagation/stream refusal/native erasure checks pass. Adapter units remain partial pending other retained diagnostics, notably full context display operands; this does not complete smtcore."
+        "Corrected historical dead/no-caller classification: theory_arith_core.h:1475 calls display_already_processed. Pair canonicalization now compares actual owner IDs instead of Go handle slots. Native hash iteration order is unspecified, so multi-pair checks assert membership rather than STL iteration order. Direct writer prefix/short-write tests and actual final-check propagation/stream refusal/native erasure checks pass.",
+        "Retained adapter TRACE/CTRACE and SASSERT sites now cover both the generic difference/linear adapter and concrete LRA adapter. context::display composes the actual retained context sections and queue profile in source order, borrows kernel asserted-formula inconsistency state, and preserves non-throwing trace-stream badbit while propagating operand failures."
       ]
     },
     {
@@ -124428,6 +124460,8 @@
         "pkg/smtcore/smt_context_display_sections_test.go",
         "pkg/smtcore/smt_context_display_definitions.go",
         "pkg/smtcore/smt_context_display_definitions_test.go",
+        "pkg/smtcore/smt_context_display_full.go",
+        "pkg/smtcore/smt_arith_eq_adapter_diagnostics_test.go",
         "pkg/smtcore/theory_fpa_display.go",
         "pkg/smtcore/theory_fpa_display_test.go",
         "pkg/smtcore/theory_str_display.go",
@@ -124460,6 +124494,7 @@
         "TestSMTContextDisplayHotVariablesThresholdDecayAndWidths",
         "TestSMTContextDisplayDefinitionsAndActivityWriterPrefixes",
         "TestSMTContextDisplayDefinitionsAllocationRefusalRetainsInputs",
+        "TestSMTContextDisplayFullCompositionAndRefusal",
         "TestSMTFPADisplayUsesContextOrderAndActualFamilyVariables",
         "TestSMTFPADisplayWriterPrefixesFlushAndOwnerStability",
         "TestSMTFPADisplayMergeRootAndScopeRollback",
@@ -124582,7 +124617,12 @@
         },
         {
           "name": "Complete retained context::display composition (smt_context_pp.cpp:296-326), including remaining source-profile case-split queue display and actual kernel/search ownership integration",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_context_display_full.go",
+          "tests": [
+            "TestSMTContextDisplayFullCompositionAndRefusal",
+            "TestSMTArithmeticEqualityAdapterRetainedDiagnostics"
+          ]
         },
         {
           "name": "SMT2 mk_pp operands for retained AST-aware literal and equivalence-class display; numeric symbol spelling, inline single-use arithmetic terms and short writer errors",

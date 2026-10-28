@@ -1,5 +1,6 @@
-// Source: src/smt/smt_case_split_queue.cpp live TRACE and AST trace-stream records.
 package smtcore
+
+// Source: src/smt/smt_case_split_queue.cpp live TRACE and AST trace-stream records.
 
 import (
 	"fmt"
@@ -49,12 +50,19 @@ func (s *SMTInternalizerState) traceRandomSplit(line int, variable int32, value 
 
 func (s *SMTInternalizerState) displayCaseSplitQueue(out io.Writer, strategy uint32) error {
 	switch strategy {
+	case 0, 1, 2:
+		return s.DisplayBasicActivityQueue(out)
 	case 3:
 		return s.DisplayRelevanceCaseSplitQueue(out)
 	case 4:
 		return s.DisplayRelevanceActivityQueue(out)
 	case 5:
 		return s.DisplayRelevanceGoalQueue(out)
+	case 6:
+		if s.theoryAwareBranching == nil {
+			return nil
+		}
+		return s.theoryAwareBranching.display(out)
 	}
 	return nil
 }

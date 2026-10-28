@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_context_pp.cpp:162-196,286-288,307-314,526-539;
 // src/smt/smt_relevancy.cpp:519-527.
-package smtcore
 
 import (
 	"fmt"

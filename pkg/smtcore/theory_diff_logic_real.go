@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: retained real fragment of src/smt/theory_diff_logic.h and
 // src/smt/theory_diff_logic_def.h.
-package smtcore
 
 import (
 	"math/big"
@@ -648,10 +649,10 @@ func (t *SMTRealDiffTheory) InternalizeEquality(expression ast.ASTHandle, variab
 }
 
 func (t *SMTRealDiffTheory) NewEquality(left, right SMTTheoryVar) error {
-	return t.equalityAdapter.MkAxioms(left, right)
+	return t.equalityAdapter.NewEquality(left, right)
 }
 func (t *SMTRealDiffTheory) NewDisequality(left, right SMTTheoryVar) error {
-	return t.equalityAdapter.MkAxioms(left, right)
+	return t.equalityAdapter.NewDisequality(left, right)
 }
 
 func (t *SMTRealDiffTheory) Graph() *SMTInfRationalDiffGraph {

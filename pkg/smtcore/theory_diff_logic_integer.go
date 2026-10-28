@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: retained integer fragment of src/smt/theory_diff_logic.h and
 // src/smt/theory_diff_logic_def.h.
-package smtcore
 
 import (
 	"math/big"
@@ -49,6 +50,7 @@ func (t *SMTIntegerDiffTheory) ConfigureArithmetic(config SMTArithState) error {
 		return ast.ErrASTHandle
 	}
 	t.addBinaryBounds = config.AddBinaryBounds
+	t.equalityAdapter.binary = config.AddBinaryBounds
 	t.equalityAdapter.lazy = config.LazyAdapter
 	return nil
 }
@@ -773,10 +775,10 @@ func (t *SMTIntegerDiffTheory) InternalizeEquality(expression ast.ASTHandle, var
 	return t.equalityAdapter.AddRelevancy(left, right, expression, lower, upper)
 }
 func (t *SMTIntegerDiffTheory) NewEquality(left, right SMTTheoryVar) error {
-	return t.equalityAdapter.MkAxioms(left, right)
+	return t.equalityAdapter.NewEquality(left, right)
 }
 func (t *SMTIntegerDiffTheory) NewDisequality(left, right SMTTheoryVar) error {
-	return t.equalityAdapter.MkAxioms(left, right)
+	return t.equalityAdapter.NewDisequality(left, right)
 }
 
 func (t *SMTIntegerDiffTheory) Graph() *SMTRationalDiffGraph {

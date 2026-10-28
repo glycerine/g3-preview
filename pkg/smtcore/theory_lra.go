@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: retained immediate-registration path in src/smt/theory_lra.cpp.
 // The constructor-only m_delay_constraints flag has no retained writer.
-package smtcore
 
 import (
 	"errors"
@@ -654,7 +655,7 @@ func (t *SMTLRATheory) NewEquality(left, right SMTTheoryVar) error {
 	if _, err := t.State(); err != nil {
 		return err
 	}
-	return t.equalityAdapter.MkAxioms(left, right)
+	return t.equalityAdapter.NewEquality(left, right)
 }
 func (t *SMTLRATheory) NewDisequality(left, right SMTTheoryVar) error {
 	if _, err := t.State(); err != nil {
@@ -666,7 +667,7 @@ func (t *SMTLRATheory) NewDisequality(left, right SMTTheoryVar) error {
 		return err
 	}
 	t.statistics.disequalities++
-	return t.equalityAdapter.MkAxioms(left, right)
+	return t.equalityAdapter.NewDisequality(left, right)
 }
 func (t *SMTLRATheory) InitializeSearch() error {
 	if _, err := t.State(); err != nil {

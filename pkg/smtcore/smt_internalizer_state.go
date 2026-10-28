@@ -1,6 +1,7 @@
+package smtcore
+
 // Source: src/smt/smt_internalizer.cpp Boolean-variable, enode, and literal
 // registration methods.
-package smtcore
 
 import (
 	"errors"
@@ -130,6 +131,7 @@ type SMTInternalizerState struct {
 	quantifiers                *SMTQuantifierRegistry
 	quantifierManager          *SMTQuantifierManager
 	assertedHasQuantifiers     *bool                 // borrowed context::has_quantifiers state
+	assertedInconsistent       *bool                 // borrowed asserted-formula inconsistency state
 	assertedFormulas           *[]SMTKernelAssertion // borrowed context asserted-formula owner
 	relevancy                  *SMTRelevancyPropagator
 	theories                   map[ast.FamilyID]SMTTheoryInternalizer

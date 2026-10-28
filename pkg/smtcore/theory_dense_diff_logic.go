@@ -1,5 +1,6 @@
-// Source: src/smt/theory_dense_diff_logic.h and theory_dense_diff_logic_def.h.
 package smtcore
+
+// Source: src/smt/theory_dense_diff_logic.h and theory_dense_diff_logic_def.h.
 
 import (
 	"errors"
@@ -369,10 +370,10 @@ func (t *SMTDenseDiffTheory) InternalizeEquality(expression ast.ASTHandle, varia
 	return real.InternalizeEquality(expression, variable)
 }
 func (t *SMTDenseDiffTheory) NewEquality(left, right SMTTheoryVar) error {
-	return t.adapter.MkAxioms(left, right)
+	return t.adapter.NewEquality(left, right)
 }
 func (t *SMTDenseDiffTheory) NewDisequality(left, right SMTTheoryVar) error {
-	return t.adapter.MkAxioms(left, right)
+	return t.adapter.NewDisequality(left, right)
 }
 func (t *SMTDenseDiffTheory) InitializeSearch() error { return t.adapter.InitializeSearch() }
 func (t *SMTDenseDiffTheory) Restart() error          { return t.adapter.Restart() }
