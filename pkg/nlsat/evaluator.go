@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_evaluator.cpp/.h.
 package nlsat
+
+// Source: src/nlsat/nlsat_evaluator.cpp/.h.
 
 import (
 	"reflect"

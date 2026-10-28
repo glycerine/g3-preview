@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_solver.cpp:727-1001,1034-1054,1165-1187.
 package nlsat
+
+// Source: src/nlsat/nlsat_solver.cpp:727-1001,1034-1054,1165-1187.
 
 import (
 	"errors"

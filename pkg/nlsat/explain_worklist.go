@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_explain.cpp:49-118.
 package nlsat
+
+// Source: src/nlsat/nlsat_explain.cpp:49-118.
 
 import (
 	"reflect"

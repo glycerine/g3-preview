@@ -1,6 +1,7 @@
+package nlsat
+
 // Source: src/nlsat/nlsat_explain.cpp:1370-1437;
 // src/nlsat/nlsat_scoped_literal_vector.h:35-47,66-69.
-package nlsat
 
 import (
 	"reflect"

@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_explain.cpp:953-991.
 package nlsat
+
+// Source: src/nlsat/nlsat_explain.cpp:953-991.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

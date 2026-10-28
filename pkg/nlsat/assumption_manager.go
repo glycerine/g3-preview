@@ -1,6 +1,7 @@
+package nlsat
+
 // Concrete non-value-refcounting dependency_manager<solver::imp::dconfig>.
 // Source: src/util/dependency.h:28-221; src/nlsat/nlsat_solver.cpp:56-64.
-package nlsat
 
 import (
 	"errors"

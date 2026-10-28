@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_assignment.h:31-101.
 package nlsat
+
+// Source: src/nlsat/nlsat_assignment.h:31-101.
 
 import (
 	"errors"

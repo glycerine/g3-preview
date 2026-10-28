@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_solver.cpp:99-107,411-425.
 package nlsat
+
+// Source: src/nlsat/nlsat_solver.cpp:99-107,411-425.
 
 import "github.com/glycerine/g3/pkg/arena"
 

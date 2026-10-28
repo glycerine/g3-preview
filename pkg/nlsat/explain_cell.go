@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_explain.cpp:704-725,864-949.
 package nlsat
+
+// Source: src/nlsat/nlsat_explain.cpp:704-725,864-949.
 
 import (
 	"errors"

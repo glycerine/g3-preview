@@ -1,6 +1,7 @@
+package nlsat
+
 // Concrete retained interval_set_ref ownership for evaluator locals.
 // Source: src/util/obj_ref.h:79-103; src/nlsat/nlsat_evaluator.cpp.
-package nlsat
 
 import "github.com/glycerine/g3/pkg/math/polynomial"
 

@@ -1,6 +1,7 @@
+package nlsat
+
 // Univariate conjunction specialization of the retained evaluator/domain/witness
 // path in nlsat_solver.cpp. This is not the multivariate search constructor.
-package nlsat
 
 import (
 	"github.com/glycerine/g3/pkg/math/polynomial"

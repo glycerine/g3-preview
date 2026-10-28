@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_clause.cpp/.h.
 package nlsat
+
+// Source: src/nlsat/nlsat_clause.cpp/.h.
 
 import (
 	"reflect"

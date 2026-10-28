@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_interval_set.cpp:168-643,675-744.
 package nlsat
+
+// Source: src/nlsat/nlsat_interval_set.cpp:168-643,675-744.
 
 import (
 	"errors"

@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_justification.h.
 package nlsat
+
+// Source: src/nlsat/nlsat_justification.h.
 
 import (
 	"reflect"

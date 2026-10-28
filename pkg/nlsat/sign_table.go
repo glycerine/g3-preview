@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_evaluator.cpp:41-366 (evaluator::imp::sign_table).
 package nlsat
+
+// Source: src/nlsat/nlsat_evaluator.cpp:41-366 (evaluator::imp::sign_table).
 
 import (
 	"errors"

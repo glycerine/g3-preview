@@ -1,6 +1,7 @@
+package nlsat
+
 // Source: src/nlsat/nlsat_types.h:36-37; nlsat_solver.cpp:56-64,1354-1416;
 // src/nlsat/tactic/goal2nlsat.cpp:251; nlsat_tactic.cpp:178-184.
-package nlsat
 
 import "github.com/glycerine/g3/pkg/sat"
 

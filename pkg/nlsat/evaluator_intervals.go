@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_evaluator.cpp:452-662.
 package nlsat
+
+// Source: src/nlsat/nlsat_evaluator.cpp:452-662.
 
 import (
 	"github.com/glycerine/g3/pkg/arena"

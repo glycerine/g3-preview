@@ -1,6 +1,7 @@
+package nlsat
+
 // Source: src/nlsat/nlsat_evaluator.cpp:387,425,467,605. Each numerical call
 // constructs a real polynomial_ref temporary for the full call expression.
-package nlsat
 
 import "github.com/glycerine/g3/pkg/math/polynomial"
 

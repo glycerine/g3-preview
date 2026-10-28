@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_interval_set.cpp/.h.
 package nlsat
+
+// Source: src/nlsat/nlsat_interval_set.cpp/.h.
 
 import (
 	"errors"

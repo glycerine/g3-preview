@@ -1,6 +1,7 @@
+package nlsat
+
 // Source: src/nlsat/nlsat_solver.cpp:454-458,510-545. This is the actual
 // canonical inequality table/factory subobject, not a solver implementation.
-package nlsat
 
 import (
 	"errors"

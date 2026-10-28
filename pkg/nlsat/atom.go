@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_types.h/.cpp.
 package nlsat
+
+// Source: src/nlsat/nlsat_types.h/.cpp.
 
 import (
 	"strconv"

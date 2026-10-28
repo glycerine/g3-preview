@@ -1,5 +1,6 @@
-// Source: src/nlsat/nlsat_solver.cpp:272-298,454-499,548-599.
 package nlsat
+
+// Source: src/nlsat/nlsat_solver.cpp:272-298,454-499,548-599.
 
 import (
 	"reflect"

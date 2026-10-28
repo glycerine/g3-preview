@@ -1,6 +1,7 @@
+package nlsat
+
 // Source: src/nlsat/nlsat_scoped_literal_vector.h:27-75.
 // Concrete retained solver literal ownership; storage is a native Go slice.
-package nlsat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
