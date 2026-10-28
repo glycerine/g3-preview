@@ -793,6 +793,9 @@ func (t *SMTFloatingPointTheory) InitializeModel(generator *SMTModelGenerator) e
 		}
 		return ast.ErrASTDomain
 	}
+	if err = t.traceFPAInitializeModel(generator); err != nil {
+		return err
+	}
 	factory, err := protomodel.NewFloatingPointFactory(generator.manager, t.FamilyID())
 	if err != nil {
 		return err
@@ -820,14 +823,17 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 		return nil, ast.ErrASTDomain
 	}
 	owner := node.Owner()
+	sort, err := state.manager.GetSort(owner)
+	if err != nil {
+		return nil, err
+	}
+	if err = t.traceFPAModelValue(generator, owner, sort); err != nil {
+		return nil, err
+	}
 	if value, valueErr := state.manager.IsValue(owner); valueErr != nil {
 		return nil, valueErr
 	} else if value {
 		return NewSMTExpressionValueProcedure(owner)
-	}
-	sort, err := state.manager.GetSort(owner)
-	if err != nil {
-		return nil, err
 	}
 	ebits, sbits, floating, err := state.manager.FloatingPointSortShape(sort)
 	if err != nil {
@@ -847,6 +853,7 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 	procedure := &smtFPAValueProcedure{manager: state.manager, ebits: ebits, sbits: sbits, rounding: rounding}
 	if own && op == ast.FPAOpFP {
 		procedure.dependencies = make([]SMTModelValueDependency, 3)
+		nodes := make([]*SMTEnode, 3)
 		for i := range procedure.dependencies {
 			argument, argumentErr := state.manager.GetArg(owner, uint32(i))
 			if argumentErr != nil {
@@ -856,10 +863,14 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 			if argumentNode == nil {
 				return nil, ast.ErrASTDomain
 			}
+			nodes[i] = argumentNode
 			procedure.dependencies[i], argumentErr = NewSMTEnodeValueDependency(argumentNode)
 			if argumentErr != nil {
 				return nil, argumentErr
 			}
+		}
+		if err = t.traceFPADependencies(generator, 770, nodes...); err != nil {
+			return nil, err
 		}
 		return procedure, nil
 	}
@@ -873,6 +884,9 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 			return nil, ast.ErrASTDomain
 		}
 		procedure.dependencies, err = smtFPAEnodeDependency(argumentNode)
+		if err == nil {
+			err = t.traceFPADependencies(generator, 782, argumentNode)
+		}
 		return procedure, err
 	}
 	wrapped, err := t.wrap(owner)
@@ -881,7 +895,13 @@ func (t *SMTFloatingPointTheory) ModelValue(node *SMTEnode, generator *SMTModelG
 	}
 	if wrappedNode := state.context.enodes[wrapped]; wrappedNode != nil {
 		procedure.dependencies, err = smtFPAEnodeDependency(wrappedNode)
+		if err == nil {
+			err = t.traceFPADependencies(generator, 798, wrappedNode)
+		}
 		return procedure, err
+	}
+	if err = t.traceFPAMissingDependency(generator, wrapped, state.context.enodes[owner] != nil); err != nil {
+		return nil, err
 	}
 	if rounding {
 		fallback, fallbackErr := state.manager.MkFamilyApp(t.FamilyID(), ast.FPAOpRMTowardZero, nil, nil)

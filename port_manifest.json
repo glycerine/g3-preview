@@ -144394,6 +144394,7 @@
         "pkg/smtcore/theory_fpa.go",
         "pkg/smtcore/theory_fpa_trace.go",
         "pkg/smtcore/theory_fpa_internalize_trace_test.go",
+        "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go",
         "pkg/smtcore/smt_fpa_lifecycle.go",
         "pkg/smtcore/smt_fpa_lifecycle_test.go",
         "pkg/smtcore/proto_model/fpa_factory.go",
@@ -144424,6 +144425,8 @@
         "TestSMTFPAInternalizeTraceStreamRefusalDoesNotStop",
         "TestSMTFPAConversionCacheSourceTrace",
         "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace",
+        "TestSMTFPAModelLifecycleAndDependencySourceTrace",
+        "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop",
         "TestSMTFloatingPointIEEEAndStructuralEqualities",
         "TestSMTFloatingPointWrappedConstantAndScopes",
         "TestSMTFloatingPointConversionTermsAndArithmetic",
@@ -144727,27 +144730,36 @@
           ]
         },
         {
-          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop and relevancy (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647), including lazy tag gates and sticky ostream refusal",
+          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy, model initialization/value selection and all dependency branches (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_fpa.go",
             "pkg/smtcore/theory_fpa_trace.go",
-            "pkg/smtcore/theory_fpa_internalize_trace_test.go"
+            "pkg/smtcore/theory_fpa_internalize_trace_test.go",
+            "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go"
           ],
           "tests": [
             "TestSMTFPAInternalizeAtomAndTermSourceTrace",
             "TestSMTFPAInternalizeTraceStreamRefusalDoesNotStop",
             "TestSMTFPAConversionCacheSourceTrace",
-            "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace"
+            "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace",
+            "TestSMTFPAModelLifecycleAndDependencySourceTrace",
+            "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop"
           ]
         },
         {
-          "name": "canonical value factory, FP and rounding-mode model value procedures, and converted-function model finalization",
-          "status": "partial",
-          "go_target": "pkg/smtcore/theory_fpa.go",
+          "name": "canonical value factory, FP and rounding-mode model value procedures across direct, wrapped and fallback dependencies, source model lifecycle diagnostics, and converted-function model finalization",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_fpa.go",
+            "pkg/smtcore/theory_fpa_trace.go",
+            "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go"
+          ],
           "tests": [
             "TestSMTFloatingPointModelReconstructsWrappedConstants",
-            "TestSMTFloatingPointModelFinalizesConvertedFunction"
+            "TestSMTFloatingPointModelFinalizesConvertedFunction",
+            "TestSMTFPAModelLifecycleAndDependencySourceTrace",
+            "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop"
           ]
         },
         {
@@ -144858,6 +144870,7 @@
         "pkg/smtcore/theory_fpa.go",
         "pkg/smtcore/theory_fpa_trace.go",
         "pkg/smtcore/theory_fpa_internalize_trace_test.go",
+        "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go",
         "pkg/smtcore/smt_fpa_lifecycle.go",
         "pkg/smtcore/smt_fpa_lifecycle_test.go",
         "pkg/smtcore/proto_model/fpa_factory.go",
@@ -144885,6 +144898,8 @@
         "TestSMTFPAInternalizeTraceStreamRefusalDoesNotStop",
         "TestSMTFPAConversionCacheSourceTrace",
         "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace",
+        "TestSMTFPAModelLifecycleAndDependencySourceTrace",
+        "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop",
         "TestSMTFloatingPointModelReconstructsWrappedConstants",
         "TestSMTFloatingPointModelFinalizesConvertedFunction",
         "TestFPA2BVRewriterConstructorAllocationFrontiers",
@@ -144956,27 +144971,36 @@
           ]
         },
         {
-          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop and relevancy (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647), including lazy tag gates and sticky ostream refusal",
+          "name": "Retained FPA TRACE sites for conversion entry/cache/publication, asserted constraints, theory-variable attachment, atom/term internalization, sort constraints, scope pop, relevancy, model initialization/value selection and all dependency branches (theory_fpa.cpp:354,358,372,410,422,426,452,494,625,647,723,730,752,770,782,798), including lazy tag gates and sticky ostream refusal",
           "status": "ported",
           "go_targets": [
             "pkg/smtcore/theory_fpa.go",
             "pkg/smtcore/theory_fpa_trace.go",
-            "pkg/smtcore/theory_fpa_internalize_trace_test.go"
+            "pkg/smtcore/theory_fpa_internalize_trace_test.go",
+            "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go"
           ],
           "tests": [
             "TestSMTFPAInternalizeAtomAndTermSourceTrace",
             "TestSMTFPAInternalizeTraceStreamRefusalDoesNotStop",
             "TestSMTFPAConversionCacheSourceTrace",
-            "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace"
+            "TestSMTFPAVariableConstraintRelevantAndScopeSourceTrace",
+            "TestSMTFPAModelLifecycleAndDependencySourceTrace",
+            "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop"
           ]
         },
         {
-          "name": "floating-point value factory, model value dependency procedures and SMT theory interface",
-          "status": "partial",
-          "go_target": "pkg/smtcore/theory_fpa.go",
+          "name": "floating-point value factory and model-value dependency procedure interface across direct, wrapped and fallback dependencies, including source model lifecycle diagnostics",
+          "status": "ported",
+          "go_targets": [
+            "pkg/smtcore/theory_fpa.go",
+            "pkg/smtcore/theory_fpa_trace.go",
+            "pkg/smtcore/theory_fpa_model_lifecycle_trace_test.go"
+          ],
           "tests": [
             "TestSMTFloatingPointModelReconstructsWrappedConstants",
-            "TestSMTFloatingPointModelFinalizesConvertedFunction"
+            "TestSMTFloatingPointModelFinalizesConvertedFunction",
+            "TestSMTFPAModelLifecycleAndDependencySourceTrace",
+            "TestSMTFPAModelLifecycleTraceStreamRefusalDoesNotStop"
           ]
         },
         {
