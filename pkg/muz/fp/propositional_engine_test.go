@@ -186,10 +186,14 @@ func TestPDREngineMatchesCPPIntegerHornQueries(t *testing.T) {
 	if gotReachable != lbool.True || gotUnreachable != lbool.False {
 		t.Fatal("PDR integer Horn results", gotReachable, gotUnreachable)
 	}
-	if unexpected, x := engine.Answer(declarations["U"]); x == nil {
-		fpMust(t, manager.DelRef(&unexpected))
-		t.Fatal("PDR answer accepted an unsuccessful query")
+	certificate, err := engine.Answer(declarations["U"])
+	fpMust(t, err)
+	certificateHandle, err := manager.RefGet(certificate)
+	fpMust(t, err)
+	if manager.IsTrue(certificateHandle) {
+		t.Fatal("PDR unsuccessful query exposed an empty certificate")
 	}
+	fpMust(t, manager.DelRef(&certificate))
 
 	cpp := fpReference(t, `(set-option :fixedpoint.engine spacer)
 (declare-rel P (Int))

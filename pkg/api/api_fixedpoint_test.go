@@ -88,10 +88,14 @@ func TestSMTContextFixedpointPDRLifecycle(t *testing.T) {
 	if status != lbool.False {
 		t.Fatal("unreachable public fixedpoint query", status)
 	}
-	if unexpected, x := context.FixedpointAnswer(u); x == nil {
-		astTestMust(t, manager.DelRef(&unexpected))
-		t.Fatal("unsuccessful public fixedpoint query exposed an answer")
+	certificate, err := context.FixedpointAnswer(u)
+	astTestMust(t, err)
+	certificateHandle, err := manager.RefGet(certificate)
+	astTestMust(t, err)
+	if manager.IsTrue(certificateHandle) {
+		t.Fatal("unreachable public fixedpoint query returned an empty certificate")
 	}
+	astTestMust(t, manager.DelRef(&certificate))
 	stats, err := context.FixedpointStatistics()
 	astTestMust(t, err)
 	if stats.Size() == 0 {

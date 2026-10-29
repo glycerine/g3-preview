@@ -5289,7 +5289,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation query, owning successful answer, PDR frame count/cover and copied statistics surface",
+          "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation query, owning trace/inductive-certificate answer, PDR frame count/cover and copied statistics surface",
           "status": "partial",
           "go_target": "pkg/api/api_fixedpoint.go",
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
@@ -83112,6 +83112,12 @@
           ]
         },
         {
+          "name": "unsuccessful-query direct-predicate inductive property and model-to-expression certificate construction (pdr_context.cpp:1864-1877,1945-1961,1989-1995; pdr_manager.cpp:57-122)",
+          "status": "partial",
+          "go_target": "pkg/muz/pdr/answer.go",
+          "tests": ["TestContextSolveFindsInductiveUnreachablePredicate", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
           "name": "pred_transformer/context finite-level count, bound-variable cover insertion and exact finite/invariant cover-delta retrieval (pdr_context.cpp:359-412,1563-1594)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/predicate_transformer.go",
@@ -83133,7 +83139,7 @@
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
         "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth.",
         "Solve now drives the unbounded native frame/model-search loop, minimizes selected transition/state literals with model_implicant, applies the native QE-lite constant-elimination overload, and partitions projected literals among predecessor states. The optional pdr_use_model_generalizer cone mode and its post-QE disequality reduction remain explicit port obligations.",
-        "Successful retained relation-declaration queries reconstruct native-compatible empty/acyclic answers, recursive-SCC state traces, multiple-initial-rule leaf selection and nonlinear selected-rule reduction to true. Cover translation matches direct retained predicates; native model-converter/slice remapping remains unported. Remaining general linear trace unification, proof traces and unsatisfiable invariant answers remain unported."
+        "Successful retained relation-declaration queries reconstruct native-compatible empty/acyclic answers, recursive-SCC state traces, multiple-initial-rule leaf selection and nonlinear selected-rule reduction to true. Unsuccessful queries expose direct-predicate universally quantified frame definitions; native model-converter remapping and clause presentation normalization remain unported. Cover translation matches direct retained predicates; native model-converter/slice remapping remains unported. Remaining general linear trace unification and proof traces remain unported."
       ]
     },
     {
@@ -83265,6 +83271,12 @@
           ]
         },
         {
+          "name": "retained direct-predicate unsuccessful-query inductive certificate surface",
+          "status": "partial",
+          "go_target": "pkg/muz/pdr/answer.go",
+          "tests": ["TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
           "name": "retained pred_transformer/context finite-level count and direct-predicate cover surface",
           "status": "partial",
           "go_target": "pkg/muz/pdr/predicate_transformer.go",
@@ -83355,7 +83367,7 @@
           ]
         },
         {
-          "name": "successful existential relation-declaration answer, recursive-SCC trace, initial-rule model recovery and nonlinear-rule reduction forwarding (pdr_dl_interface.cpp:175-182)",
+          "name": "successful existential relation-declaration trace and unsuccessful direct-predicate inductive-certificate forwarding, including recursive-SCC trace, initial-rule model recovery and nonlinear-rule reduction (pdr_dl_interface.cpp:175-182,208-210)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": [
@@ -83387,7 +83399,7 @@
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "remaining general linear trace unification and certificate answer, model/proof, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
+          "name": "remaining general linear trace unification, model/proof, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83397,7 +83409,7 @@
         "PropositionalEngine owns the current PDR Context, reuses it while the exact normalized rules and background remain unchanged, and closes/replaces it after a tracked mutation or engine shutdown; rule and parameter services are borrowed."
       ],
       "deviations": [
-        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding is retained; slicing and model-converter remapping remain unported. Successful existential declaration queries expose empty/acyclic answers, recursive-SCC state traces, initial-rule model recovery and native nonlinear-rule reduction; remaining general linear trace unification and certificate reconstruction remain unported."
+        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding and unsuccessful-query inductive certificates are retained; slicing and model-converter remapping remain unported. Successful existential declaration queries expose empty/acyclic answers, recursive-SCC state traces, initial-rule model recovery and native nonlinear-rule reduction; remaining general linear trace unification remains unported."
       ]
     },
     {
@@ -83466,7 +83478,7 @@
           ]
         },
         {
-          "name": "successful existential relation-declaration answer, recursive-SCC trace, initial-rule model recovery and nonlinear-rule reduction surface",
+          "name": "successful existential relation-declaration trace and unsuccessful direct-predicate inductive-certificate surface, including recursive-SCC trace, initial-rule model recovery and nonlinear-rule reduction",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": [
@@ -83498,7 +83510,7 @@
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "remaining general linear trace unification and certificate answer, model, proof and parameter-update surface",
+          "name": "remaining general linear trace unification, model, proof and parameter-update surface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83716,11 +83728,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/pdr/manager.go",
-        "pkg/muz/pdr/manager_test.go"
+        "pkg/muz/pdr/manager_test.go",
+        "pkg/muz/pdr/answer.go"
       ],
       "tests": [
         "TestManagerStateCreationConversionAndAtomRecognition",
-        "TestManagerBooleanBackgroundSolverAndImplicationIntegration"
+        "TestManagerBooleanBackgroundSolverAndImplicationIntegration",
+        "TestContextSolveFindsInductiveUnreachablePredicate"
       ],
       "assertions": [
         {
@@ -83753,7 +83767,13 @@
           ]
         },
         {
-          "name": "inductive_property model conversion and rule display (pdr_manager.cpp:42-156)",
+          "name": "inductive_property direct-predicate universally quantified expression construction (pdr_manager.cpp:57-76,85-122)",
+          "status": "partial",
+          "go_target": "pkg/muz/pdr/answer.go",
+          "tests": ["TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "remaining inductive_property model-converter application, model materialization/string and rule display (pdr_manager.cpp:42-156)",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83763,7 +83783,7 @@
         "Manager owns one background AST reference, one SymbolMux and one SMTContextManager. Close rejects active proposition solvers through the context manager, then releases contexts, mux pins and the background in dependency order."
       ],
       "deviations": [
-        "Typed errors replace assertion-only zero-arity state and lookup conditions. Go returns borrowed handles and native slices instead of source pointer/reference-vector iterators."
+        "Typed errors replace assertion-only zero-arity state and lookup conditions. Go returns borrowed handles and native slices instead of source pointer/reference-vector iterators. Direct-predicate certificates construct the model-to-expression equalities without an intermediate ModelCore; source clause presentation normalization and model-converter remapping remain open."
       ]
     },
     {
@@ -83773,11 +83793,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/pdr/manager.go",
-        "pkg/muz/pdr/manager_test.go"
+        "pkg/muz/pdr/manager_test.go",
+        "pkg/muz/pdr/answer.go"
       ],
       "tests": [
         "TestManagerStateCreationConversionAndAtomRecognition",
-        "TestManagerBooleanBackgroundSolverAndImplicationIntegration"
+        "TestManagerBooleanBackgroundSolverAndImplicationIntegration",
+        "TestContextSolveFindsInductiveUnreachablePredicate"
       ],
       "conditionals": [
         {
@@ -83812,7 +83834,13 @@
           ]
         },
         {
-          "name": "inductive_property and rule-manager display surface",
+          "name": "direct-predicate inductive_property expression surface",
+          "status": "partial",
+          "go_target": "pkg/muz/pdr/answer.go",
+          "tests": ["TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "remaining inductive_property model/converter and rule-manager display surface",
           "status": "unported",
           "go_target": null,
           "tests": []

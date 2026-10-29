@@ -34,6 +34,7 @@ type Context struct {
 	ownedCoop    bool
 	lastResult   lbool.LBool
 	query        *PredicateTransformer
+	queryDecl    ast.ASTHandle
 	expanded     uint32
 	inductive    uint32
 	nodes        uint32

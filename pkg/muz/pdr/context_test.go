@@ -237,6 +237,14 @@ func TestContextSolveFindsInductiveUnreachablePredicate(t *testing.T) {
 	if last, x := context.LastResult(); x != nil || last != status {
 		t.Fatal("last result", last, x)
 	}
+	certificate, err := context.Answer(predicate)
+	pdrMust(t, err)
+	certificateHandle, err := manager.RefGet(certificate)
+	pdrMust(t, err)
+	if !manager.IsTrue(certificateHandle) {
+		t.Fatal("single-query-relation certificate is not the empty conjunction")
+	}
+	pdrMust(t, manager.DelRef(&certificate))
 
 	pdrMust(t, context.Close())
 	pdrMust(t, set.Close())

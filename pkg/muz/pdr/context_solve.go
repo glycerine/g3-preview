@@ -138,14 +138,16 @@ func (c *Context) Solve(queryDeclaration ast.ASTHandle) (lbool.LBool, error) {
 	if !c.initialized || c.search == nil {
 		return lbool.Undef, ast.ErrASTDomain
 	}
+	c.query = nil
+	c.queryDecl = queryDeclaration
+	c.lastResult = lbool.Undef
+	c.expanded, c.inductive = 0, 0
 	query := c.transformers[queryDeclaration]
 	if query == nil {
 		c.lastResult = lbool.False
 		return c.lastResult, nil
 	}
 	c.query = query
-	c.lastResult = lbool.Undef
-	c.expanded, c.inductive = 0, 0
 	for level := uint32(0); ; level++ {
 		c.expanded = level
 		reachable, err := c.checkReachability(level)

@@ -1,7 +1,9 @@
 package pdr
 
 // Source: model_search::get_trace, context::get_answer and
-// context::mk_sat_answer in src/muz/pdr/pdr_context.cpp.
+// context::mk_sat_answer and context::mk_unsat_answer in
+// src/muz/pdr/pdr_context.cpp, plus inductive_property::to_expr in
+// src/muz/pdr/pdr_manager.cpp.
 
 import (
 	"errors"
@@ -241,12 +243,106 @@ func traceHasNonlinearRule(root *ModelNode) (bool, error) {
 	return false, nil
 }
 
-// Answer reconstructs the selected satisfying rule trace for the latest
-// successful query and returns one owning reference. The caller releases it
-// through ASTManager.DelRef.
+func (c *Context) unsatAnswer(queryDeclaration ast.ASTHandle) (result ast.ASTRef, resultErr error) {
+	references := make([]ast.ASTRef, 0)
+	defer func() {
+		for index := len(references) - 1; index >= 0; index-- {
+			resultErr = errors.Join(resultErr, c.manager.DelRef(&references[index]))
+		}
+		if resultErr != nil && result != (ast.ASTRef{}) {
+			resultErr = errors.Join(resultErr, c.manager.DelRef(&result))
+			result = ast.ASTRef{}
+		}
+	}()
+	pin := func(handle ast.ASTHandle) error {
+		reference, err := c.manager.NewRef(handle)
+		if err == nil {
+			references = append(references, reference)
+		}
+		return err
+	}
+	abstractor, err := ast.NewExprAbstractor(c.manager)
+	if err != nil {
+		return result, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, abstractor.Close()) }()
+	definitions := make([]ast.ASTHandle, 0, len(c.order))
+	for _, declaration := range c.order {
+		if declaration == queryDeclaration {
+			continue
+		}
+		transformer := c.transformers[declaration]
+		body, x := transformer.Formulas(c.inductive, false)
+		if x != nil {
+			return result, x
+		}
+		if x = pin(body); x != nil {
+			return result, x
+		}
+		body, x = c.owner.FormulaNewToOld(body, 0, false)
+		if x != nil {
+			return result, x
+		}
+		if x = pin(body); x != nil {
+			return result, x
+		}
+		arguments := make([]ast.ASTHandle, len(transformer.signature))
+		for index, signature := range transformer.signature {
+			arguments[index], x = c.manager.MkApp(signature, nil)
+			if x != nil {
+				return result, x
+			}
+			if x = pin(arguments[index]); x != nil {
+				return result, x
+			}
+		}
+		application, x := c.manager.MkApp(declaration, arguments)
+		if x != nil {
+			return result, x
+		}
+		if x = pin(application); x != nil {
+			return result, x
+		}
+		equality, x := c.manager.MkEq(application, body)
+		if x != nil {
+			return result, x
+		}
+		if x = pin(equality); x != nil {
+			return result, x
+		}
+		definition, x := c.manager.NewRef(ast.ASTHandle{})
+		if x != nil {
+			return result, x
+		}
+		references = append(references, definition)
+		if x = abstractor.MkForall(arguments, equality, definition); x != nil {
+			return result, x
+		}
+		definitionHandle, x := c.manager.RefGet(definition)
+		if x != nil {
+			return result, x
+		}
+		definitions = append(definitions, definitionHandle)
+	}
+	formula, err := c.manager.MkAndArray(definitions)
+	if err != nil {
+		return result, err
+	}
+	return c.manager.NewRef(formula)
+}
+
+// Answer reconstructs the selected satisfying rule trace or the direct
+// predicate inductive certificate for the latest query and returns one owning
+// reference. The caller releases it through ASTManager.DelRef.
 func (c *Context) Answer(queryDeclaration ast.ASTHandle) (result ast.ASTRef, resultErr error) {
 	if err := c.open(); err != nil {
 		return result, err
+	}
+	if c.queryDecl != queryDeclaration {
+		return result, ast.ErrASTDomain
+	}
+	if c.lastResult == lbool.False {
+		return c.unsatAnswer(queryDeclaration)
 	}
 	if c.lastResult != lbool.True || c.query == nil || c.query.head != queryDeclaration {
 		return result, ast.ErrASTDomain
