@@ -27,6 +27,23 @@ func TestSpacerProofObligationBindingsDirtyStateAndQueue(t *testing.T) {
 	if len(skolem) != 1 || post != skolem[0] || post == x {
 		t.Fatal("proof-obligation skolem replacement", post, skolem, x)
 	}
+	notPost, err := manager.MkNot(post)
+	spacerMust(t, err)
+	added, err := transformer.AddLemma(notPost, spacer.InfinityLevel)
+	spacerMust(t, err)
+	if !added {
+		t.Fatal("blocking lemma not added")
+	}
+	blocked, usesLevel, err := transformer.IsBlocked(root)
+	spacerMust(t, err)
+	if !blocked || usesLevel != spacer.InfinityLevel {
+		t.Fatal("ground proof-obligation blocking", blocked, usesLevel)
+	}
+	qblocked, err := transformer.IsQuantifierBlocked(root)
+	spacerMust(t, err)
+	if !qblocked {
+		t.Fatal("quantifier proof-obligation blocking")
+	}
 	lemma, err := spacer.NewLemmaFromProofObligation(root, nil, 2)
 	spacerMust(t, err)
 	lemmaBody, err := lemma.Body()

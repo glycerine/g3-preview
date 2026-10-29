@@ -163,6 +163,71 @@ func (p *PredicateTransformer) IsInvariant(level uint32, formula ast.ASTHandle) 
 	return true, result.UsesLevel, nil
 }
 
+func (p *PredicateTransformer) IsBlocked(obligation *ProofObligation) (bool, uint32, error) {
+	if err := p.open(); err != nil {
+		return false, 0, err
+	}
+	if obligation == nil || obligation.valid() != nil || obligation.transformer != p {
+		return false, 0, ErrManagerOwner
+	}
+	level, err := obligation.Level()
+	if err != nil {
+		return false, 0, err
+	}
+	if err = p.EnsureLevel(level); err != nil {
+		return false, 0, err
+	}
+	post, err := obligation.Post()
+	if err != nil {
+		return false, 0, err
+	}
+	result, err := p.solver.CheckAssumptions([]ast.ASTHandle{post}, nil, PropCheckOptions{Level: &level})
+	if err != nil {
+		return false, 0, err
+	}
+	defer func() { _ = result.Close(p.manager) }()
+	if result.Status != lbool.False {
+		return false, 0, nil
+	}
+	return true, result.UsesLevel, nil
+}
+
+func (p *PredicateTransformer) IsQuantifierBlocked(obligation *ProofObligation) (_ bool, resultErr error) {
+	if err := p.open(); err != nil {
+		return false, err
+	}
+	if obligation == nil || obligation.valid() != nil || obligation.transformer != p {
+		return false, ErrManagerOwner
+	}
+	level, err := obligation.Level()
+	if err != nil {
+		return false, err
+	}
+	lemmas, err := p.frames.FrameGEQLemmas(level)
+	if err != nil {
+		return false, err
+	}
+	post, err := obligation.Post()
+	if err != nil {
+		return false, err
+	}
+	context, err := p.owner.Fresh(2)
+	if err != nil {
+		return false, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, context.Close()) }()
+	for _, lemma := range lemmas {
+		if err = context.Assert(lemma); err != nil {
+			return false, err
+		}
+	}
+	if err = context.Assert(post); err != nil {
+		return false, err
+	}
+	status, err := context.CheckSat(nil)
+	return status == lbool.False, err
+}
+
 // AddLemma transfers ownership of the new lemma to the transformer's frames.
 func (p *PredicateTransformer) AddLemma(formula ast.ASTHandle, level uint32) (bool, error) {
 	if err := p.open(); err != nil {
