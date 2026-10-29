@@ -464,8 +464,9 @@ func TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP(t *testing.T) {
 	context.PrintSuccess = false
 	script := `(set-option :fixedpoint.engine spacer)
 (declare-rel P (Int))
-(assert false)
 (rule (P 0))
+(query P :print-answer false)
+(assert false)
 (query P :print-answer false)
 `
 	var output bytes.Buffer
@@ -473,7 +474,7 @@ func TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP(t *testing.T) {
 		t.Fatal(err)
 	}
 	cpp := fixedpointReference(t, script)
-	if output.String() != cpp || cpp != "unsat\n" {
+	if output.String() != cpp || cpp != "sat\nunsat\n" {
 		t.Fatal("PDR background SMT-LIB differential", output.String(), cpp)
 	}
 }

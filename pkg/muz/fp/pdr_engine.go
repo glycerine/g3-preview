@@ -35,11 +35,15 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
 	}
+	if e.pdr != nil && e.pdrRevision == e.revision {
+		return e.pdr.Solve(declaration)
+	}
 	if e.pdr != nil {
 		if err = e.pdr.Close(); err != nil {
 			return lbool.Undef, err
 		}
 		e.pdr = nil
+		e.pdrRevision = 0
 	}
 	context, err := pdr.NewContext(e.manager, nil, 4, pdr.ReachableHashCache, smtcore.SMTSolverConfig{Params: e.params, Globals: e.globals})
 	if err != nil {
@@ -56,5 +60,6 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
 	e.pdr = context
+	e.pdrRevision = e.revision
 	return context.Solve(declaration)
 }

@@ -83254,7 +83254,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "PDR/Spacer engine selection, finalized rule-set and command-background handoff, per-query context initialization and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
+          "name": "PDR/Spacer engine selection, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [
@@ -83291,17 +83291,17 @@
           ]
         },
         {
-          "name": "cover, remaining general trace and certificate answer, model/proof, transformed-rule reuse and slice/unfold/coalesce integration",
+          "name": "cover, remaining general trace and certificate answer, model/proof, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "PropositionalEngine owns the current PDR Context and closes/replaces it before each new PDR query or engine shutdown; rule and parameter services are borrowed."
+        "PropositionalEngine owns the current PDR Context, reuses it while the exact normalized rules and background remain unchanged, and closes/replaces it after a tracked mutation or engine shutdown; rule and parameter services are borrowed."
       ],
       "deviations": [
-        "The current integration rebuilds PDR state per query instead of applying native rule-subsumption reuse. Successful existential declaration queries expose empty/acyclic answers and recursive-SCC state traces; remaining general trace and certificate reconstruction remain unported."
+        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Successful existential declaration queries expose empty/acyclic answers and recursive-SCC state traces; remaining general trace and certificate reconstruction remain unported."
       ]
     },
     {
@@ -83346,7 +83346,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "retained query and engine-selection surface",
+          "name": "retained query, engine-selection and unchanged-program context-reuse surface",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [
@@ -83393,7 +83393,7 @@
         "The fixedpoint engine owns its concrete PDR Context directly rather than through the native engine_base pointer."
       ],
       "deviations": [
-        "Query dispatch, statistics, empty/acyclic answers and recursive-SCC state traces are exposed; remaining general answer traces and diagnostic surfaces await PDR trace reconstruction."
+        "Query dispatch, revision-tracked exact-program context reuse, statistics, empty/acyclic answers and recursive-SCC state traces are exposed; native transformed-rule subsumption reuse, remaining general answer traces and diagnostic surfaces remain open."
       ]
     },
     {

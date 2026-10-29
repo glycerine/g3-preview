@@ -52,22 +52,24 @@ func (e *PropositionalEngine) predicateState(declaration ast.ASTHandle) (*predic
 // PropositionalEngine owns the retained rule, finite-relation, and optional
 // ground-guard rewriting services.
 type PropositionalEngine struct {
-	manager    *ast.ASTManager
-	rules      *base.RuleManager
-	set        *base.RuleSet
-	binder     *base.VariableBinder
-	relations  *rel.RelationManager
-	guard      *astrewriter.TheoryRewriter
-	background ast.ASTRef
-	params     *uparams.ParamsContext
-	globals    *uparams.GlobalParamsService
-	backend    string
-	pdr        *muzpdr.Context
-	scopes     []*base.RuleSet
-	predicates map[ast.ASTHandle]*predicateState
-	compiled   bool
-	queried    bool
-	closed     bool
+	manager     *ast.ASTManager
+	rules       *base.RuleManager
+	set         *base.RuleSet
+	binder      *base.VariableBinder
+	relations   *rel.RelationManager
+	guard       *astrewriter.TheoryRewriter
+	background  ast.ASTRef
+	params      *uparams.ParamsContext
+	globals     *uparams.GlobalParamsService
+	backend     string
+	pdr         *muzpdr.Context
+	scopes      []*base.RuleSet
+	predicates  map[ast.ASTHandle]*predicateState
+	compiled    bool
+	queried     bool
+	revision    uint64
+	pdrRevision uint64
+	closed      bool
 }
 
 // NewPropositionalEngineWithServices adds the retained AST theory rewriter
@@ -116,7 +118,7 @@ func NewPropositionalEngine(manager *ast.ASTManager) (*PropositionalEngine, erro
 	}
 	return &PropositionalEngine{
 		manager: manager, rules: rules, set: set, binder: binder, relations: relations,
-		background: background, predicates: make(map[ast.ASTHandle]*predicateState), backend: "datalog",
+		background: background, predicates: make(map[ast.ASTHandle]*predicateState), backend: "datalog", revision: 1,
 	}, nil
 }
 
@@ -157,6 +159,7 @@ func (e *PropositionalEngine) RegisterPredicate(declaration ast.ASTHandle) error
 		return err
 	}
 	e.predicates[declaration] = state
+	e.revision++
 	return nil
 }
 
@@ -165,7 +168,11 @@ func (e *PropositionalEngine) RegisterVariable(variable ast.ASTHandle) error {
 	if err := e.open(); err != nil {
 		return err
 	}
-	return e.binder.AddVariable(variable)
+	if err := e.binder.AddVariable(variable); err != nil {
+		return err
+	}
+	e.revision++
+	return nil
 }
 
 // SetBackground replaces the background constraint used by subsequent PDR
@@ -174,7 +181,18 @@ func (e *PropositionalEngine) SetBackground(background ast.ASTHandle) error {
 	if err := e.open(); err != nil {
 		return err
 	}
-	return e.manager.SetRef(e.background, background)
+	current, err := e.manager.RefGet(e.background)
+	if err != nil {
+		return err
+	}
+	if current == background {
+		return nil
+	}
+	if err = e.manager.SetRef(e.background, background); err != nil {
+		return err
+	}
+	e.revision++
+	return nil
 }
 
 func (e *PropositionalEngine) AddRule(formula ast.ASTHandle, name string) error {
@@ -198,7 +216,12 @@ func (e *PropositionalEngine) AddRule(formula ast.ASTHandle, name string) error 
 	if getErr == nil {
 		getErr = e.rules.AddFormula(e.set, boundFormula, name)
 	}
-	return errors.Join(getErr, e.manager.DelRef(&bound))
+	added := getErr == nil
+	getErr = errors.Join(getErr, e.manager.DelRef(&bound))
+	if added {
+		e.revision++
+	}
+	return getErr
 }
 
 // Push retains a snapshot of the current rule set. Predicate registrations are
@@ -235,6 +258,7 @@ func (e *PropositionalEngine) Pop() error {
 	if err := e.set.ReplaceRules(snapshot); err != nil {
 		return err
 	}
+	e.revision++
 	e.scopes = e.scopes[:last]
 	return snapshot.Close()
 }
@@ -296,6 +320,7 @@ func (e *PropositionalEngine) normalizeSimpleJoins() (resultErr error) {
 		}
 		e.predicates[declaration] = state
 	}
+	e.revision++
 	return nil
 }
 
@@ -1239,6 +1264,7 @@ func (e *PropositionalEngine) Close() (result error) {
 	if e.pdr != nil {
 		result = errors.Join(result, e.pdr.Close())
 		e.pdr = nil
+		e.pdrRevision = 0
 	}
 	for i := len(e.scopes) - 1; i >= 0; i-- {
 		result = errors.Join(result, e.scopes[i].Close())

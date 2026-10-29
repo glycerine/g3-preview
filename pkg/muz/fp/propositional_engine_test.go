@@ -175,9 +175,14 @@ func TestPDREngineMatchesCPPIntegerHornQueries(t *testing.T) {
 	if stats.Size() == 0 {
 		t.Fatal("PDR engine exposed no statistics after reachable query")
 	}
-	fpMust(t, engine.ResetStatistics())
 	gotUnreachable, err := engine.QueryPredicate(declarations["U"])
 	fpMust(t, err)
+	reusedStats := statistics.New()
+	fpMust(t, engine.CollectStatistics(reusedStats))
+	if reusedStats.Size() == 0 {
+		t.Fatal("PDR engine discarded cumulative statistics across an unchanged program")
+	}
+	fpMust(t, engine.ResetStatistics())
 	if gotReachable != lbool.True || gotUnreachable != lbool.False {
 		t.Fatal("PDR integer Horn results", gotReachable, gotUnreachable)
 	}
