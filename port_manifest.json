@@ -180082,11 +180082,15 @@
       "status": "ported",
       "go_targets": [
         "pkg/tactic/ufbv/ufbv_tactic.go",
-        "pkg/cmd_context/tactic_commands.go"
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/context.go"
       ],
       "tests": [
         "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
-        "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2"
+        "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2",
+        "TestSMTLibRunnerScripts/ufbv_solver.smt2",
+        "TestSMTLibRunnerCPPReference/ufbv_solver.smt2"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -180097,7 +180101,9 @@
           "go_target": "pkg/tactic/ufbv/ufbv_tactic.go",
           "tests": [
             "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
-            "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2"
+            "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2",
+            "TestSMTLibRunnerScripts/ufbv_solver.smt2",
+            "TestSMTLibRunnerCPPReference/ufbv_solver.smt2"
           ]
         }
       ],
@@ -180113,11 +180119,15 @@
       "status": "ported",
       "go_targets": [
         "pkg/tactic/ufbv/ufbv_tactic.go",
-        "pkg/cmd_context/tactic_commands.go"
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd_context/context.go"
       ],
       "tests": [
         "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
-        "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2"
+        "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2",
+        "TestSMTLibRunnerScripts/ufbv_solver.smt2",
+        "TestSMTLibRunnerCPPReference/ufbv_solver.smt2"
       ],
       "conditionals": [
         {
@@ -180138,7 +180148,9 @@
           "go_target": "pkg/tactic/ufbv/ufbv_tactic.go",
           "tests": [
             "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
-            "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2"
+            "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2",
+            "TestSMTLibRunnerScripts/ufbv_solver.smt2",
+            "TestSMTLibRunnerCPPReference/ufbv_solver.smt2"
           ]
         }
       ],

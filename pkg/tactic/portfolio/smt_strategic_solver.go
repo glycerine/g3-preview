@@ -19,6 +19,7 @@ import (
 	"github.com/glycerine/g3/pkg/tactic/arith"
 	"github.com/glycerine/g3/pkg/tactic/core"
 	"github.com/glycerine/g3/pkg/tactic/smtlogics"
+	ufbvtactic "github.com/glycerine/g3/pkg/tactic/ufbv"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
@@ -354,6 +355,14 @@ func NewQFUFBVStrategicSolverWithOutput(m *ast.ASTManager, p *uparams.ParamsRef,
 		return nil, err
 	}
 	return newStrategicSolver(m, strategy, "QF_UFBV", p, proofs, models, cores, config)
+}
+
+func NewUFBVStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := ufbvtactic.NewUFBVTactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "UFBV", p, proofs, models, cores, config)
 }
 
 func NewUFLRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {

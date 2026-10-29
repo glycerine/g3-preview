@@ -536,6 +536,8 @@ func (c *Context) mkSolver(m *ast.ASTManager) error {
 		c.solver, err = portfolio.NewQFABVStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "QF_UFBV":
 		c.solver, err = portfolio.NewQFUFBVStrategicSolverWithOutput(m, &c.params, proofs, models, cores, c.config, contextRegularOutput{c})
+	case "UFBV":
+		c.solver, err = portfolio.NewUFBVStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "HORN":
 		c.solver, err = portfolio.NewHornStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "ALL", "QF_S":
