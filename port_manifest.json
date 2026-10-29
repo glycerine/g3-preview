@@ -89011,6 +89011,12 @@
           "tests": ["TestContextConsumesWeakAbstractionPolicy", "TestPropSolverScopesWeakAbstractionParameters", "TestSMTLibRunnerScripts/fp_spacer_arith_inv.smt2"]
         },
         {
+          "name": "expand_node inconclusive candidate-model child construction and bounded weakness retry",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/predicate_expand.go",
+          "tests": ["TestPropSolverPublishesIncompleteCandidateModel", "TestSpacerContextSolvesFactAndRecursiveNoBasePrograms"]
+        },
+        {
           "name": "predicate cover insertion and exact-frame bound-variable export (spacer_context.cpp:501-532,583-605,2011-2035)",
           "status": "ported",
           "go_target": "pkg/muz/spacer/predicate_cover.go",
@@ -90115,6 +90121,7 @@
         "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
         "TestPropSolverNormalAndDeltaLevelActivation",
         "TestPropSolverPublishesFarkasCore",
+        "TestPropSolverPublishesIncompleteCandidateModel",
         "TestSMTLibRunnerCPPReference/fp_spacer_arith_inv.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_linear_inv.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_mutual_inv.smt2"

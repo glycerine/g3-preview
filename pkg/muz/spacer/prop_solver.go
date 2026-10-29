@@ -426,10 +426,21 @@ func (p *PropSolver) CheckAssumptions(hard, soft []ast.ASTHandle, options PropCh
 			resultErr = errors.Join(resultErr, result.Close(p.manager))
 		}
 	}()
-	if status == lbool.True && options.NeedModel {
-		result.Model, err = context.AcquireModel()
-		if err != nil {
-			return nil, err
+	if status != lbool.False && options.NeedModel {
+		available := status == lbool.True
+		if !available {
+			if provider, ok := context.backend.(solver.CandidateModelProvider); ok {
+				available, err = provider.PrepareCandidateModel()
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+		if available {
+			result.Model, err = context.AcquireModel()
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	if status == lbool.False {

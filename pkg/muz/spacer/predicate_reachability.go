@@ -168,7 +168,7 @@ func (p *PredicateTransformer) CheckReachability(obligation *ProofObligation) (r
 			result = nil
 		}
 	}()
-	if result.Status == lbool.True && result.Model != nil {
+	if result.Status != lbool.False && result.Model != nil {
 		selection, err := p.SelectRule(result.Model)
 		if err != nil {
 			return nil, err

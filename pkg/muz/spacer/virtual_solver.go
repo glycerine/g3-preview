@@ -224,6 +224,19 @@ func (s *VirtualSolver) AssertTracked(expression, tracking ast.ASTHandle) error 
 	return s.Assert(implication)
 }
 
+// PrepareCandidateModel forwards the optional incomplete-check model protocol
+// while preserving the active virtual-solver view.
+func (s *VirtualSolver) PrepareCandidateModel() (bool, error) {
+	if err := s.open(); err != nil {
+		return false, err
+	}
+	provider, ok := s.Solver.(solver.CandidateModelProvider)
+	if !ok {
+		return false, nil
+	}
+	return provider.PrepareCandidateModel()
+}
+
 func (s *VirtualSolver) Push() error {
 	if err := s.open(); err != nil {
 		return err

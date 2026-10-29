@@ -10,6 +10,8 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
+var ErrWeakAbstractionExhausted = errors.New("muz/spacer: weak abstraction exhausted")
+
 type ExpansionResult struct {
 	Status     lbool.LBool
 	Child      *ProofObligation
@@ -186,6 +188,30 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 		}
 		return result, nil
 	default:
-		return result, nil
+		weakness, weaknessErr := obligation.Weakness()
+		if weaknessErr != nil {
+			return ExpansionResult{}, weaknessErr
+		}
+		if weakness >= 100 {
+			return ExpansionResult{}, ErrWeakAbstractionExhausted
+		}
+		if check.Rule != nil && check.Model != nil {
+			reachPredUsed := make([]bool, len(check.ReachPredUsed))
+			child, childErr := p.CreateDerivationChild(obligation, check.Rule, check.Model, reachPredUsed, p.reverseChildren)
+			if childErr != nil {
+				return ExpansionResult{}, childErr
+			}
+			if child != nil {
+				result.Child = child
+				return result, nil
+			}
+		}
+		if err = obligation.BumpWeakness(); err != nil {
+			return ExpansionResult{}, err
+		}
+		if err = check.Close(p.manager); err != nil {
+			return ExpansionResult{}, err
+		}
+		return p.ExpandObligation(obligation)
 	}
 }

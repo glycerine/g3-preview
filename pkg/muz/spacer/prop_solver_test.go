@@ -236,6 +236,39 @@ func TestPropSolverScopesWeakAbstractionParameters(t *testing.T) {
 	fixture.close(t)
 }
 
+func TestPropSolverPublishesIncompleteCandidateModel(t *testing.T) {
+	fixture := newSpacerPropFixture(t, true)
+	globals, err := fixture.command.GlobalParameters()
+	spacerMust(t, err)
+	limited, err := globals.Context.NewValue()
+	spacerMust(t, err)
+	limitName := "max_conflicts"
+	spacerMust(t, globals.Context.SetUIntName(&limited, &limitName, 0))
+	spacerMust(t, fixture.backends[0].UpdateParams(&limited))
+	spacerMust(t, globals.Context.Del(&limited))
+	a := spacerBool(t, fixture.manager, "spacer-candidate-a")
+	b := spacerBool(t, fixture.manager, "spacer-candidate-b")
+	notA, err := fixture.manager.MkNot(a)
+	spacerMust(t, err)
+	notB, err := fixture.manager.MkNot(b)
+	spacerMust(t, err)
+	var clauses []ast.ASTHandle
+	for _, pair := range [][2]ast.ASTHandle{{a, b}, {notA, b}, {a, notB}, {notA, notB}} {
+		clause, makeErr := fixture.manager.MkOr(pair[0], pair[1])
+		spacerMust(t, makeErr)
+		clauses = append(clauses, clause)
+	}
+	formula, err := fixture.manager.MkAndArgs(clauses)
+	spacerMust(t, err)
+	result, err := fixture.solver.CheckAssumptions([]ast.ASTHandle{formula}, nil, spacer.PropCheckOptions{NeedModel: true})
+	spacerMust(t, err)
+	if result.Status != lbool.Undef || result.Model == nil {
+		t.Fatal("incomplete PropSolver candidate", result.Status, result.Model)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+	fixture.close(t)
+}
+
 func TestPropSolverNormalAndDeltaLevelActivation(t *testing.T) {
 	fixture := newSpacerPropFixture(t, true)
 	p := spacerBool(t, fixture.manager, "spacer-level-p")
