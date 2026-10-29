@@ -4,8 +4,7 @@ package fp
 
 import "fmt"
 
-// SelectEngine applies the retained factory branch. Spacer is the public alias
-// for the PDR engine in the native fixedpoint frontend.
+// SelectEngine applies the retained fixedpoint engine factory branch.
 func (e *PropositionalEngine) SelectEngine(name string) error {
 	if err := e.open(); err != nil {
 		return err
@@ -30,7 +29,7 @@ func (e *PropositionalEngine) SelectEngine(name string) error {
 		if e.params == nil || e.globals == nil {
 			return fmt.Errorf("muz/fp: fixedpoint engine %s requires parameter services", name)
 		}
-		e.backend = "pdr"
+		e.backend = name
 		return nil
 	case "bmc", "tab", "clp", "duality", "ddnf", "qpdr", "qbmc":
 		return fmt.Errorf("muz/fp: fixedpoint engine %s is not ported", name)

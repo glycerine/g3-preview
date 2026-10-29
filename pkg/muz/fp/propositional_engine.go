@@ -15,6 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/muz/base"
 	muzpdr "github.com/glycerine/g3/pkg/muz/pdr"
 	"github.com/glycerine/g3/pkg/muz/rel"
+	muzspacer "github.com/glycerine/g3/pkg/muz/spacer"
 	"github.com/glycerine/g3/pkg/muz/transforms"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
@@ -53,25 +54,28 @@ func (e *PropositionalEngine) predicateState(declaration ast.ASTHandle) (*predic
 // PropositionalEngine owns the retained rule, finite-relation, and optional
 // ground-guard rewriting services.
 type PropositionalEngine struct {
-	manager     *ast.ASTManager
-	rules       *base.RuleManager
-	set         *base.RuleSet
-	binder      *base.VariableBinder
-	relations   *rel.RelationManager
-	guard       *astrewriter.TheoryRewriter
-	background  ast.ASTRef
-	params      *uparams.ParamsContext
-	globals     *uparams.GlobalParamsService
-	backend     string
-	pdr         *muzpdr.Context
-	scopes      []*base.RuleSet
-	predicates  map[ast.ASTHandle]*predicateState
-	auxiliary   map[ast.ASTHandle]bool
-	compiled    bool
-	queried     bool
-	revision    uint64
-	pdrRevision uint64
-	closed      bool
+	manager        *ast.ASTManager
+	rules          *base.RuleManager
+	set            *base.RuleSet
+	binder         *base.VariableBinder
+	relations      *rel.RelationManager
+	guard          *astrewriter.TheoryRewriter
+	background     ast.ASTRef
+	params         *uparams.ParamsContext
+	globals        *uparams.GlobalParamsService
+	backend        string
+	pdr            *muzpdr.Context
+	spacer         *muzspacer.Context
+	scopes         []*base.RuleSet
+	predicates     map[ast.ASTHandle]*predicateState
+	predicateOrder []ast.ASTHandle
+	auxiliary      map[ast.ASTHandle]bool
+	compiled       bool
+	queried        bool
+	revision       uint64
+	pdrRevision    uint64
+	spacerRevision uint64
+	closed         bool
 }
 
 // NewPropositionalEngineWithServices adds the retained AST theory rewriter
@@ -159,6 +163,9 @@ func (e *PropositionalEngine) RegisterPredicate(declaration ast.ASTHandle) error
 	state, err := e.predicateState(declaration)
 	if err != nil {
 		return err
+	}
+	if e.predicates[declaration] == nil {
+		e.predicateOrder = append(e.predicateOrder, declaration)
 	}
 	e.predicates[declaration] = state
 	e.revision++
@@ -1147,8 +1154,11 @@ func (e *PropositionalEngine) CollectStatistics(destination *statistics.Statisti
 	if destination == nil {
 		return ErrPropositionalEngine
 	}
-	if e.pdr != nil {
+	if e.backend == "pdr" && e.pdr != nil {
 		return e.pdr.CollectStatistics(destination)
+	}
+	if e.backend == "spacer" && e.spacer != nil {
+		return e.spacer.CollectStatistics(destination)
 	}
 	return nil
 }
@@ -1157,8 +1167,11 @@ func (e *PropositionalEngine) ResetStatistics() error {
 	if err := e.open(); err != nil {
 		return err
 	}
-	if e.pdr != nil {
+	if e.backend == "pdr" && e.pdr != nil {
 		return e.pdr.ResetStatistics()
+	}
+	if e.backend == "spacer" && e.spacer != nil {
+		return e.spacer.ResetStatistics()
 	}
 	return nil
 }
@@ -1177,6 +1190,10 @@ func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.L
 	if e.backend == "pdr" {
 		e.compiled = false
 		return e.queryPDR(declaration)
+	}
+	if e.backend == "spacer" {
+		e.compiled = false
+		return e.querySpacer(declaration)
 	}
 	if state.table == nil {
 		return lbool.Undef, ErrPropositionalHorn
@@ -1228,6 +1245,9 @@ func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTR
 			return answer, ErrPropositionalEngine
 		}
 		return e.pdr.Answer(declaration)
+	}
+	if e.backend == "spacer" {
+		return answer, ErrPropositionalEngine
 	}
 	state := e.predicates[declaration]
 	if state == nil || !e.queried {
@@ -1350,6 +1370,11 @@ func (e *PropositionalEngine) Close() (result error) {
 		e.pdr = nil
 		e.pdrRevision = 0
 	}
+	if e.spacer != nil {
+		result = errors.Join(result, e.spacer.Close())
+		e.spacer = nil
+		e.spacerRevision = 0
+	}
 	for i := len(e.scopes) - 1; i >= 0; i-- {
 		result = errors.Join(result, e.scopes[i].Close())
 	}
@@ -1376,6 +1401,7 @@ func (e *PropositionalEngine) Close() (result error) {
 	}
 	result = errors.Join(result, e.manager.DelRef(&e.background))
 	e.predicates = nil
+	e.predicateOrder = nil
 	e.auxiliary = nil
 	e.params, e.globals = nil, nil
 	e.closed = true

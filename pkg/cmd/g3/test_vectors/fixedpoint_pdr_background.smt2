@@ -1,4 +1,4 @@
-(set-option :fixedpoint.engine spacer)
+(set-option :fixedpoint.engine pdr)
 (declare-rel P (Int))
 (rule (P 0))
 (query P :print-answer false)

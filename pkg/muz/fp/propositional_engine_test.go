@@ -210,6 +210,64 @@ func TestPDREngineMatchesCPPIntegerHornQueries(t *testing.T) {
 	}
 }
 
+func TestSpacerEngineRunsReachableAndInductiveHornQueries(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	globals, err := context.GlobalParameters()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngineWithServices(manager, globals.Context, globals)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	fpMust(t, engine.SelectEngine("spacer"))
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	declarations := make(map[string]ast.ASTHandle)
+	applications := make(map[string]ast.ASTHandle)
+	for _, name := range []string{"P", "Q", "U"} {
+		symbol, x := manager.Symbols.Intern("spacer-engine-" + name)
+		fpMust(t, x)
+		declarations[name], x = manager.MkFuncDecl(symbol, nil, boolean, ast.ASTFuncDeclInfo{})
+		fpMust(t, x)
+		applications[name], x = manager.MkApp(declarations[name], nil)
+		fpMust(t, x)
+		fpMust(t, engine.RegisterPredicate(declarations[name]))
+	}
+	fpMust(t, engine.AddRule(applications["P"], "spacer-fact"))
+	step, err := manager.MkImplies(applications["P"], applications["Q"])
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(step, "spacer-step"))
+	recursive, err := manager.MkImplies(applications["U"], applications["U"])
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(recursive, "spacer-unreachable"))
+	reachable, err := engine.QueryPredicate(declarations["Q"])
+	fpMust(t, err)
+	if reachable != lbool.True {
+		t.Fatal("Spacer reachable query", reachable)
+	}
+	levels, err := engine.NumLevels(declarations["Q"])
+	fpMust(t, err)
+	if levels == 0 {
+		t.Fatal("Spacer query exposed no frames")
+	}
+	if answer, x := engine.Answer(declarations["Q"]); x == nil {
+		fpMust(t, manager.DelRef(&answer))
+		t.Fatal("incomplete Spacer answer surface accepted")
+	}
+	stats := statistics.New()
+	fpMust(t, engine.CollectStatistics(stats))
+	if stats.Size() == 0 {
+		t.Fatal("Spacer engine exposed no statistics")
+	}
+	unreachable, err := engine.QueryPredicate(declarations["U"])
+	fpMust(t, err)
+	if unreachable != lbool.False {
+		t.Fatal("Spacer inductive query", unreachable)
+	}
+}
+
 func TestPDREngineReadsContextAndCacheParameters(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)

@@ -1,4 +1,4 @@
-(set-option :fixedpoint.engine spacer)
+(set-option :fixedpoint.engine pdr)
 (declare-rel P (Int))
 (declare-rel Goal ())
 (declare-rel U ())

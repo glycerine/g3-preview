@@ -6,8 +6,6 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/cmd_context"
-	_ "github.com/glycerine/g3/pkg/engine"
 )
 
 func normalizeMust(t *testing.T, err error) {
@@ -39,13 +37,8 @@ func normalizeNumeral(t *testing.T, manager *ast.ASTManager, text string) ast.AS
 }
 
 func TestNormalizeFormulaCanonicalOrderAndBounds(t *testing.T) {
-	command, err := cmd_context.NewStandaloneContext()
-	normalizeMust(t, err)
-	t.Cleanup(func() { normalizeMust(t, command.Close()) })
-	manager, err := command.Manager()
-	normalizeMust(t, err)
-	globals, err := command.GlobalParameters()
-	normalizeMust(t, err)
+	manager, globals := newSpacerTestServices(t)
+	var err error
 	boolean, err := manager.MkBoolSort()
 	normalizeMust(t, err)
 	pName, err := manager.Symbols.Intern("normalize-p")
@@ -83,13 +76,8 @@ func TestNormalizeFormulaCanonicalOrderAndBounds(t *testing.T) {
 }
 
 func TestNormalizeFormulaIntegerThresholds(t *testing.T) {
-	command, err := cmd_context.NewStandaloneContext()
-	normalizeMust(t, err)
-	t.Cleanup(func() { normalizeMust(t, command.Close()) })
-	manager, err := command.Manager()
-	normalizeMust(t, err)
-	globals, err := command.GlobalParameters()
-	normalizeMust(t, err)
+	manager, globals := newSpacerTestServices(t)
+	var err error
 	minusOne := normalizeNumeral(t, manager, "-1")
 	zero := normalizeNumeral(t, manager, "0")
 	integer, err := manager.GetSort(zero)

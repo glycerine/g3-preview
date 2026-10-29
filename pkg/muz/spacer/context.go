@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 var ErrContextOwner = errors.New("muz/spacer: invalid or closed context")
@@ -51,6 +52,18 @@ func (c *Context) open() error {
 	return nil
 }
 
+// SetBackground replaces the formula asserted by subsequently constructed
+// predicate solvers. It must be called before rules are initialized.
+func (c *Context) SetBackground(background ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	return c.owner.SetBackground(background)
+}
+
 func closeSpacerRuleBuckets(buckets map[ast.ASTHandle][]*base.Rule) (result error) {
 	for _, rules := range buckets {
 		for _, rule := range rules {
@@ -68,6 +81,12 @@ func appendSpacerDeclaration(order *[]ast.ASTHandle, seen map[ast.ASTHandle]bool
 }
 
 func (c *Context) Initialize(set *base.RuleSet) (resultErr error) {
+	return c.InitializePredicates(set, nil)
+}
+
+// InitializePredicates constructs transformers for every registered live
+// predicate, including output predicates without defining rules.
+func (c *Context) InitializePredicates(set *base.RuleSet, declarations []ast.ASTHandle) (resultErr error) {
 	if err := c.open(); err != nil {
 		return err
 	}
@@ -82,6 +101,9 @@ func (c *Context) Initialize(set *base.RuleSet) (resultErr error) {
 	seen := make(map[ast.ASTHandle]bool)
 	buckets := make(map[ast.ASTHandle][]*base.Rule)
 	defer func() { resultErr = errors.Join(resultErr, closeSpacerRuleBuckets(buckets)) }()
+	for _, declaration := range declarations {
+		appendSpacerDeclaration(&order, seen, declaration)
+	}
 	for index := 0; index < count; index++ {
 		rule, err := set.Rule(index)
 		if err != nil {
@@ -165,6 +187,17 @@ func (c *Context) Transformer(declaration ast.ASTHandle) (*PredicateTransformer,
 	return transformer, found, nil
 }
 
+func (c *Context) NumLevels(declaration ast.ASTHandle) (uint32, error) {
+	if err := c.open(); err != nil {
+		return 0, err
+	}
+	transformer := c.transformers[declaration]
+	if transformer == nil {
+		return 0, ast.ErrASTDomain
+	}
+	return transformer.NumLevels()
+}
+
 func (c *Context) propagate(maximum uint32) (bool, error) {
 	for level := uint32(0); level <= maximum; level++ {
 		all := true
@@ -242,6 +275,39 @@ func (c *Context) LastResult() (lbool.LBool, error) {
 		return lbool.Undef, err
 	}
 	return c.lastResult, nil
+}
+
+func (c *Context) CollectStatistics(destination *statistics.Statistics) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if destination == nil {
+		return ast.ErrASTHandle
+	}
+	if err := c.owner.CollectStatistics(destination); err != nil {
+		return err
+	}
+	for _, declaration := range c.order {
+		if err := c.transformers[declaration].CollectStatistics(destination); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Context) ResetStatistics() error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if err := c.owner.ResetStatistics(); err != nil {
+		return err
+	}
+	for _, declaration := range c.order {
+		if err := c.transformers[declaration].ResetStatistics(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (c *Context) Close() (result error) {

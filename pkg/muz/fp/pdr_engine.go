@@ -16,6 +16,13 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if e.params == nil || e.globals == nil {
 		return lbool.Undef, fmt.Errorf("muz/fp: PDR requires parameter and global services")
 	}
+	if e.spacer != nil {
+		if err := e.spacer.Close(); err != nil {
+			return lbool.Undef, err
+		}
+		e.spacer = nil
+		e.spacerRevision = 0
+	}
 	finalized, err := e.set.IsFinalized()
 	if err != nil {
 		return lbool.Undef, err
@@ -141,6 +148,12 @@ func (e *PropositionalEngine) pdrContext() (*pdr.Context, error) {
 
 // NumLevels returns the finite PDR frame count for a relation after a query.
 func (e *PropositionalEngine) NumLevels(declaration ast.ASTHandle) (uint32, error) {
+	if err := e.open(); err != nil {
+		return 0, err
+	}
+	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
+		return e.spacer.NumLevels(declaration)
+	}
 	context, err := e.pdrContext()
 	if err != nil {
 		return 0, err

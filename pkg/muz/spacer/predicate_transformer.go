@@ -535,6 +535,18 @@ func (p *PredicateTransformer) CollectStatistics(destination *statistics.Statist
 	return nil
 }
 
+func (p *PredicateTransformer) ResetStatistics() error {
+	if err := p.open(); err != nil {
+		return err
+	}
+	if err := p.solver.ResetStatistics(); err != nil {
+		return err
+	}
+	p.propagations = 0
+	p.invariants = 0
+	return nil
+}
+
 func (p *PredicateTransformer) Close() (result error) {
 	if p == nil {
 		return ErrManagerOwner

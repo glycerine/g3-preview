@@ -7,8 +7,6 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/cmd_context"
-	_ "github.com/glycerine/g3/pkg/engine"
 )
 
 func simplifyBoundsMust(t *testing.T, err error) {
@@ -19,12 +17,8 @@ func simplifyBoundsMust(t *testing.T, err error) {
 }
 
 func TestSimplifyBoundsRunsValuesThenInequalities(t *testing.T) {
-	command, err := cmd_context.NewStandaloneContext()
-	simplifyBoundsMust(t, err)
-	manager, err := command.Manager()
-	simplifyBoundsMust(t, err)
-	globals, err := command.GlobalParameters()
-	simplifyBoundsMust(t, err)
+	manager, globals := newSpacerTestServices(t)
+	var err error
 	boolean, err := manager.MkBoolSort()
 	simplifyBoundsMust(t, err)
 	pName, err := manager.Symbols.Intern("simplify-bounds-p")
@@ -61,5 +55,4 @@ func TestSimplifyBoundsRunsValuesThenInequalities(t *testing.T) {
 	if !foundP || !foundQ {
 		t.Fatal("propagate-values did not simplify implication", foundP, foundQ)
 	}
-	simplifyBoundsMust(t, command.Close())
 }

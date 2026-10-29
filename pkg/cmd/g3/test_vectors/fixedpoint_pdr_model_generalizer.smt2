@@ -1,4 +1,4 @@
-(set-option :fixedpoint.engine spacer)
+(set-option :fixedpoint.engine pdr)
 (set-option :fixedpoint.pdr.use_model_generalizer true)
 (declare-rel P (Int))
 (declare-rel Goal ())

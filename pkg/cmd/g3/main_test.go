@@ -350,6 +350,7 @@ var scriptResults = map[string]string{
 	"fixedpoint_pdr_variable_trace.smt2":           "sat\n(and (R 2) (Q 1 1) (P 0 1))\n",
 	"fixedpoint_pdr_repeated_disequalities.smt2":   "sat\ntrue\n",
 	"fixedpoint_pdr_model_generalizer.smt2":        "sat\ntrue\n",
+	"fixedpoint_spacer_core.smt2":                 "sat\nunsat\n",
 	"horn_tactic_finite.smt2":                      "unsat\nsat\nunsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"horn_solver_finite.smt2":                      "unsat\nsat\n",
 	"fixedpoint_finite_relations.smt2":             "sat\n(and (= (:var 0) true) (= (:var 1) false))\nsat\n(= (:var 0) #b10)\nsat\nsat\n(= (:var 0) #b01)\nsat\n(= (:var 0) #b10)\nsat\nsat\nunsat\nsat\n(= (:var 0) #b10)\nsat\nsat\nunsat\nsat\nunsat\nsat\n(= (:var 0) false)\nsat\nunsat\n",
