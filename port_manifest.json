@@ -82938,28 +82938,62 @@
       "path": "src/muz/pdr/pdr_closure.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/pdr/pdr_closure.go"],
+      "tests": [
+        "TestClosureScalerTranslatesVariablesAndScalesOnlyFreeNumerals",
+        "TestConvexClosureAndInteriorOwnExpectedEndpointRegions",
+        "TestConvexClosureRelaxesStrictAndUnsupportedAtoms",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_both.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"
+      ],
       "assertions": [
         {
           "line": 79,
           "text": "SASSERT(num_vars > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "scaler declaration translation, multiplication-depth numeral homogenization and separate recursion caches",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/pdr_closure.go",
+          "tests": ["TestClosureScalerTranslatesVariablesAndScalesOnlyFreeNumerals"]
+        },
+        {
+          "name": "closure variable/sigma construction, strict-relation closing, region relaxation and conjunction assembly",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/pdr_closure.go",
+          "tests": ["TestConvexClosureAndInteriorOwnExpectedEndpointRegions", "TestConvexClosureRelaxesStrictAndUnsupportedAtoms"]
+        },
+        {
+          "name": "scaler::undo_k",
+          "status": "dead",
+          "reason": "No retained source consumer calls undo_k; live convex generalization only invokes scaler::operator()."
+        }
+      ],
+      "ownership": [
+        "The closure owns sigma and copied-state AST references through every relaxation; each Apply result is an independent caller-owned AST reference that survives closure retirement.",
+        "The scaler owns rebuilt application roots until the independently rooted scaled result is transferred to the closure conjunction."
+      ],
+      "deviations": [
+        "Concrete Go maps and AST references replace obj_map and expr_ref_vector without exposing the unused undo_k helper."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_closure.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/pdr/pdr_closure.go"],
+      "tests": [
+        "TestClosureScalerTranslatesVariablesAndScalesOnlyFreeNumerals",
+        "TestConvexClosureAndInteriorOwnExpectedEndpointRegions",
+        "TestConvexClosureRelaxesStrictAndUnsupportedAtoms"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -82970,11 +83004,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained scaler and closure concrete surfaces",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/pdr_closure.go"
+        },
+        {
+          "name": "unused scaler undo surface",
+          "status": "dead",
+          "reason": "No retained production caller reaches scaler::undo_k."
+        }
+      ],
+      "ownership": [
+        "Go closure/scaler owners retain all fresh and rebuilt expressions explicitly and publish owning result references."
+      ],
+      "deviations": [
+        "The package-private concrete Go owners replace the C++ declarations; no universal closure adapter is introduced."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_context.cpp",
@@ -82990,6 +83039,8 @@
         "pkg/muz/pdr/context_test.go",
         "pkg/muz/pdr/context_bounded.go",
         "pkg/muz/pdr/context_solve.go",
+        "pkg/muz/pdr/generalizers.go",
+        "pkg/muz/pdr/pdr_closure.go",
         "pkg/muz/pdr/answer.go",
         "pkg/muz/pdr/answer_trace.go",
         "pkg/muz/pdr/model_projection.go",
@@ -83005,6 +83056,9 @@
         "TestContextBoundedQueryTraversesTaggedHornChain",
         "TestContextSolveFindsInductiveUnreachablePredicate",
         "TestContextSolveProjectsCoupledPredecessors",
+        "TestConvexClosureAndInteriorOwnExpectedEndpointRegions",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
         "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
@@ -83246,7 +83300,7 @@
           ]
         },
         {
-          "name": "frame reachability expansion, tagged rule selection, selectable model-implicant literal/model-cone minimization, QE-lite/model-value projection, predecessor-literal partitioning, child obligations, blocking with optional flexible-trace level raising, propagation, top-level PDR solve loop and search statistics (pdr_context.cpp:1544-1769,1893-2215,2255-2335)",
+          "name": "frame reachability expansion, tagged rule selection, selectable model-implicant literal/model-cone minimization, QE-lite/model-value projection, predecessor-literal partitioning, child obligations, ordered multi-core convex/Boolean blocking with aggregate flexible-trace level raising, propagation, top-level PDR solve loop and search statistics (pdr_context.cpp:1544-1769,1810-1860,1893-2215,2255-2335)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/context_solve.go",
           "tests": [
@@ -83257,7 +83311,9 @@
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_missing_tail.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_model_generalizer.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_missing_tail.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_missing_tail.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"
           ]
         },
         {
@@ -83326,6 +83382,8 @@
         "pkg/muz/pdr/context_test.go",
         "pkg/muz/pdr/context_bounded.go",
         "pkg/muz/pdr/context_solve.go",
+        "pkg/muz/pdr/generalizers.go",
+        "pkg/muz/pdr/pdr_closure.go",
         "pkg/muz/pdr/answer.go",
         "pkg/muz/pdr/answer_trace.go",
         "pkg/muz/pdr/model_projection.go",
@@ -83341,6 +83399,9 @@
         "TestContextBoundedQueryTraversesTaggedHornChain",
         "TestContextSolveFindsInductiveUnreachablePredicate",
         "TestContextSolveProjectsCoupledPredecessors",
+        "TestConvexClosureAndInteriorOwnExpectedEndpointRegions",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
         "TestPDREngineMatchesCPPIntegerHornQueries",
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
         "TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP",
@@ -83467,13 +83528,14 @@
           "tests": ["TestContextActivatesFarkasBeforeArithmeticSolvers", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP", "TestSMT2FixedpointPDRTraceReductionMatchesCPP"]
         },
         {
-          "name": "default Boolean inductive core generalizer initialization and blocking-loop application",
+          "name": "default Boolean and optional convex closure/interior core-generalizer initialization, source-ordered multi-core blocking application and aggregate backtracking",
           "status": "ported",
           "go_target": "pkg/muz/pdr/context_solve.go",
-          "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestContextSolveFindsInductiveUnreachablePredicate"]
+          "go_targets": ["pkg/muz/pdr/generalizers.go", "pkg/muz/pdr/pdr_closure.go"],
+          "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestContextSolveFindsInductiveUnreachablePredicate", "TestConvexClosureAndInteriorOwnExpectedEndpointRegions", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"]
         },
         {
-          "name": "remaining cover and non-simple-join model-converter remapping plus general linear model-trace unification and proof reconstruction and optional core generalizers",
+          "name": "remaining cover and non-simple-join model-converter remapping plus general linear model-trace unification, proof reconstruction and optional multi/arithmetic/induction core generalizers",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83509,7 +83571,10 @@
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_linear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_nonlinear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2",
-        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_variable_trace.smt2"
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_variable_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_both.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_closure.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_interior.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
@@ -83534,6 +83599,12 @@
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_both.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_both.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_closure.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_interior.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
         "TestSMTContextFixedpointPDRLifecycle"
       ],
       "assertions": [
@@ -83565,7 +83636,9 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"
           ]
         },
         {
@@ -83637,7 +83710,10 @@
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_linear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_nonlinear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2",
-        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_variable_trace.smt2"
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_variable_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_both.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_closure.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_interior.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
@@ -83660,6 +83736,12 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_both.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_both.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_closure.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_interior.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
         "TestSMTContextFixedpointPDRLifecycle"
       ],
       "conditionals": [
@@ -83689,7 +83771,9 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"
           ]
         },
         {
@@ -83983,15 +84067,24 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/pdr/generalizers.go",
+        "pkg/muz/pdr/pdr_closure.go",
         "pkg/muz/pdr/predicate_rules.go",
-        "pkg/muz/pdr/context_solve.go"
+        "pkg/muz/pdr/context_solve.go",
+        "pkg/muz/fp/pdr_engine.go"
       ],
       "tests": [
         "TestPredicateTransformerCheckInductiveReturnsSubsetCore",
+        "TestConvexGeneralizerRestoresPropSolverModes",
         "TestContextSolveFindsReachablePredicate",
         "TestContextSolveFindsInductiveUnreachablePredicate",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_arithmetic_invariant.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2",
+        "TestConvexClosureAndInteriorOwnExpectedEndpointRegions",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_both.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_closure.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_interior.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"
       ],
       "assertions": [
         {
@@ -84029,7 +84122,18 @@
           "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2"]
         },
         {
-          "name": "core_multi_generalizer, live convex-hull method1, arithmetic and induction generalizers",
+          "name": "core_convex_hull_generalizer live multi-core method1 for closed hulls and interiors",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/generalizers.go",
+          "go_targets": ["pkg/muz/pdr/pdr_closure.go", "pkg/muz/pdr/context_solve.go", "pkg/muz/fp/pdr_engine.go"],
+          "tests": [
+            "TestConvexClosureAndInteriorOwnExpectedEndpointRegions",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"
+          ]
+        },
+        {
+          "name": "core_multi_generalizer, arithmetic inductive generalizer and induction/reachability generalizer",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -84041,10 +84145,11 @@
         }
       ],
       "ownership": [
-        "The Boolean generalizer pins every input and intermediate subset core across successive solver checks and returns explicit owning references covering the final core until blocking-lemma installation completes."
+        "The Boolean generalizer pins every input and intermediate subset core across successive solver checks and returns explicit owning references covering the final core until blocking-lemma installation completes.",
+        "The convex multi-core pipeline pins its original core and every generated Farkas core before the next reachability check clears solver-owned results; all final cores remain owned through blocking-lemma insertion."
       ],
       "deviations": [
-        "Only the default retained Boolean inductive generalizer is integrated; optional experimental and multi-core generalizers remain explicit obligations."
+        "The default Boolean and optional live convex closure/interior generalizers are integrated in source order. Other optional experimental and source-buggy multi-core generalizers remain explicit obligations."
       ]
     },
     {
@@ -84052,8 +84157,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/pdr/generalizers.go"],
-      "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore"],
+      "go_targets": ["pkg/muz/pdr/generalizers.go", "pkg/muz/pdr/pdr_closure.go"],
+      "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestConvexClosureAndInteriorOwnExpectedEndpointRegions", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"],
       "conditionals": [
         {
           "line": 20,
@@ -84074,7 +84179,13 @@
           "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore"]
         },
         {
-          "name": "remaining live optional core generalizer declarations",
+          "name": "core_convex_hull_generalizer retained multi-core declaration and live method1 dispatch",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/generalizers.go",
+          "tests": ["TestConvexClosureAndInteriorOwnExpectedEndpointRegions"]
+        },
+        {
+          "name": "remaining live optional core_multi, arithmetic-inductive and induction generalizer declarations",
           "status": "unported",
           "go_target": null,
           "tests": []

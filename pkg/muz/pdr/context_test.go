@@ -270,6 +270,8 @@ func TestContextActivatesFarkasBeforeArithmeticSolvers(t *testing.T) {
 	pdrMust(t, context.SetBreadthFirstModelSearch(false))
 	pdrMust(t, context.SetFlexibleTrace(true))
 	pdrMust(t, context.SetUseModelGeneralizer(true))
+	pdrMust(t, context.SetUseConvexClosureGeneralizer(true))
+	pdrMust(t, context.SetUseConvexInteriorGeneralizer(true))
 	arithmetic, err := manager.RegisterArithmeticPlugin()
 	pdrMust(t, err)
 	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
@@ -311,6 +313,12 @@ func TestContextActivatesFarkasBeforeArithmeticSolvers(t *testing.T) {
 	}
 	if err = context.SetUseModelGeneralizer(false); err == nil {
 		t.Fatal("initialized context accepted a model-generalizer change")
+	}
+	if err = context.SetUseConvexClosureGeneralizer(false); err == nil {
+		t.Fatal("initialized context accepted a convex-closure generalizer change")
+	}
+	if err = context.SetUseConvexInteriorGeneralizer(false); err == nil {
+		t.Fatal("initialized context accepted a convex-interior generalizer change")
 	}
 	pdrMust(t, context.Close())
 	pdrMust(t, set.Close())

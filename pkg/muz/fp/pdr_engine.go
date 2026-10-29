@@ -97,6 +97,22 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = context.SetUseInductiveGeneralizer(useInductive); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
+	convexClosureName := "pdr.use_convex_closure_generalizer"
+	useConvexClosure, err := e.globals.Context.GetBoolName(&fixedpoint, &convexClosureName, false)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetUseConvexClosureGeneralizer(useConvexClosure); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	convexInteriorName := "pdr.use_convex_interior_generalizer"
+	useConvexInterior, err := e.globals.Context.GetBoolName(&fixedpoint, &convexInteriorName, false)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetUseConvexInteriorGeneralizer(useConvexInterior); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	modelGeneralizerName := "pdr.use_model_generalizer"
 	useModelGeneralizer, err := e.globals.Context.GetBoolName(&fixedpoint, &modelGeneralizerName, false)
 	if err != nil {

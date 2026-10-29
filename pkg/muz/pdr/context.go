@@ -22,31 +22,34 @@ var ErrContextOwner = errors.New("muz/pdr: invalid or closed context")
 // Context owns the PDR manager and the predicate transformers for one Horn
 // rule set. The conflict/search loop is layered on this initialized program.
 type Context struct {
-	manager       *ast.ASTManager
-	owner         *Manager
-	cacheMode     ReachableCacheMode
-	transformers  map[ast.ASTHandle]*PredicateTransformer
-	auxiliary     map[ast.ASTHandle]bool
-	order         []ast.ASTHandle
-	search        *ModelSearch
-	implicant     *model.ModelImplicant
-	lite          *qe.Lite
-	cooperation   *cooperate.Cooperation
-	ownedCoop     bool
-	lastResult    lbool.LBool
-	query         *PredicateTransformer
-	queryDecl     ast.ASTHandle
-	expanded      uint32
-	inductive     uint32
-	nodes         uint32
-	maxDepth      uint32
-	useFarkas     bool
-	farkasActive  bool
-	useModel      bool
-	useInductive  bool
-	flexibleTrace bool
-	initialized   bool
-	closed        bool
+	manager           *ast.ASTManager
+	owner             *Manager
+	cacheMode         ReachableCacheMode
+	transformers      map[ast.ASTHandle]*PredicateTransformer
+	auxiliary         map[ast.ASTHandle]bool
+	order             []ast.ASTHandle
+	search            *ModelSearch
+	implicant         *model.ModelImplicant
+	lite              *qe.Lite
+	cooperation       *cooperate.Cooperation
+	ownedCoop         bool
+	lastResult        lbool.LBool
+	query             *PredicateTransformer
+	queryDecl         ast.ASTHandle
+	expanded          uint32
+	inductive         uint32
+	nodes             uint32
+	maxDepth          uint32
+	useFarkas         bool
+	farkasActive      bool
+	proofActive       bool
+	useModel          bool
+	useInductive      bool
+	useConvexClosure  bool
+	useConvexInterior bool
+	flexibleTrace     bool
+	initialized       bool
+	closed            bool
 }
 
 func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumContexts uint32, cacheMode ReachableCacheMode, config smtcore.SMTSolverConfig) (*Context, error) {
@@ -136,6 +139,32 @@ func (c *Context) SetUseInductiveGeneralizer(enabled bool) error {
 	return nil
 }
 
+// SetUseConvexClosureGeneralizer selects the source closed convex-hull core
+// generalizer. It must be set before Initialize.
+func (c *Context) SetUseConvexClosureGeneralizer(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.useConvexClosure = enabled
+	return nil
+}
+
+// SetUseConvexInteriorGeneralizer selects the source open convex-hull core
+// generalizer. It must be set before Initialize.
+func (c *Context) SetUseConvexInteriorGeneralizer(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.useConvexInterior = enabled
+	return nil
+}
+
 // SetUseModelGeneralizer selects model-cone backward propagation instead of
 // literal simulation. It must be set before Initialize.
 func (c *Context) SetUseModelGeneralizer(enabled bool) error {
@@ -217,8 +246,8 @@ func (c *Context) FarkasActive() (bool, error) {
 	return c.farkasActive, nil
 }
 
-func (c *Context) enterFarkasProofMode() (func() error, error) {
-	if !c.farkasActive {
+func (c *Context) enterPDRProofMode() (func() error, error) {
+	if !c.proofActive {
 		return func() error { return nil }, nil
 	}
 	previous, err := c.manager.ProofsEnabled()
@@ -323,7 +352,8 @@ func (c *Context) Initialize(set *base.RuleSet) (resultErr error) {
 		return err
 	}
 	c.farkasActive = c.useFarkas && nonBoolean
-	restoreProofMode, err := c.enterFarkasProofMode()
+	c.proofActive = c.farkasActive || c.useConvexClosure || c.useConvexInterior
+	restoreProofMode, err := c.enterPDRProofMode()
 	if err != nil {
 		return err
 	}

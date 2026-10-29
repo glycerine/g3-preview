@@ -61,28 +61,28 @@ func (c *Context) expandNode(node *ModelNode) (resultStatus lbool.LBool, resultE
 		return lbool.True, nil
 	}
 	if check.Status == lbool.False {
-		core := check.Core
-		usesLevel := check.AssumesLevel
-		var coreReferences []ast.ASTRef
-		if c.useInductive {
-			core, coreReferences, usesLevel, err = generalizeBoolInductiveCore(node.transformer, node.level, core, usesLevel, 0)
-			if err != nil {
-				return lbool.Undef, fmt.Errorf("muz/pdr: Boolean inductive core generalization: %w", err)
-			}
-			defer func() { resultErr = errors.Join(resultErr, closeASTRefs(c.manager, coreReferences)) }()
-		}
-		lemma, x := c.owner.NotAnd(core)
+		cores, x := c.generalizeBlockingCores(node, check.Core, check.AssumesLevel)
 		if x != nil {
-			return lbool.Undef, fmt.Errorf("muz/pdr: core negation: %w", x)
+			return lbool.Undef, fmt.Errorf("muz/pdr: blocking core generalization: %w", x)
 		}
-		level := InfinityLevel
-		if usesLevel {
-			level = node.level
+		defer func() { resultErr = errors.Join(resultErr, closeGeneralizedCores(c.manager, cores)) }()
+		foundInvariant := false
+		for _, core := range cores {
+			lemma, makeErr := c.owner.NotAnd(core.literals)
+			if makeErr != nil {
+				return lbool.Undef, fmt.Errorf("muz/pdr: core negation: %w", makeErr)
+			}
+			level := InfinityLevel
+			if core.usesLevel {
+				level = node.level
+			} else {
+				foundInvariant = true
+			}
+			if _, makeErr = node.transformer.AddProperty(lemma, level); makeErr != nil {
+				return lbool.Undef, fmt.Errorf("muz/pdr: blocking property: %w", makeErr)
+			}
 		}
-		if _, x = node.transformer.AddProperty(lemma, level); x != nil {
-			return lbool.Undef, fmt.Errorf("muz/pdr: blocking property: %w", x)
-		}
-		if x = c.search.BacktrackLevel(usesLevel && c.flexibleTrace, node); x != nil {
+		if x = c.search.BacktrackLevel(!foundInvariant && c.flexibleTrace, node); x != nil {
 			return lbool.Undef, x
 		}
 		return lbool.False, nil
@@ -149,7 +149,7 @@ func (c *Context) Solve(queryDeclaration ast.ASTHandle) (result lbool.LBool, res
 	if err := c.open(); err != nil {
 		return lbool.Undef, err
 	}
-	restoreProofMode, err := c.enterFarkasProofMode()
+	restoreProofMode, err := c.enterPDRProofMode()
 	if err != nil {
 		return lbool.Undef, err
 	}
