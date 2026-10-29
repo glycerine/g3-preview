@@ -4,4 +4,4 @@
 (rule (Inv 0))
 (rule (=> (and (Inv x) (>= x 0)) (Inv (+ x 1))))
 (rule (=> (and (Inv x) (< x 0)) Bad))
-(query Bad :print-answer false)
+(query Bad :print-answer true)
