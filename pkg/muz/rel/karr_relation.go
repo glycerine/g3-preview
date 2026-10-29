@@ -51,6 +51,8 @@ func cloneKarrMatrix(source KarrMatrix) KarrMatrix {
 	return result
 }
 
+func CloneKarrMatrix(source KarrMatrix) KarrMatrix { return cloneKarrMatrix(source) }
+
 func (m *KarrMatrix) append(row []big.Rat, constant *big.Rat, equal bool) {
 	m.A = append(m.A, cloneRationals(row))
 	var value big.Rat
@@ -146,6 +148,24 @@ func (r *KarrRelation) ensureBasis() error {
 	}
 	if !r.inequalitiesValid {
 		return ErrKarrDimension
+	}
+	if r.inequalities.Len() == 0 {
+		// The affine generator for true consists of one origin and signed
+		// unit directions for every integer coordinate. The native path only
+		// reaches Hilbert with a non-empty matrix; make the same mathematical
+		// boundary explicit for the direct typed Horn interpreter.
+		r.basis = KarrMatrix{}
+		r.basis.append(make([]big.Rat, r.dimension), big.NewRat(1, 1), true)
+		for column := uint32(0); column < r.dimension; column++ {
+			positive := make([]big.Rat, r.dimension)
+			positive[column].SetInt64(1)
+			r.basis.append(positive, nil, true)
+			negative := make([]big.Rat, r.dimension)
+			negative[column].SetInt64(-1)
+			r.basis.append(negative, nil, true)
+		}
+		r.basisValid = true
+		return nil
 	}
 	basis, satisfiable := r.dualizeInequalities(r.inequalities)
 	if !satisfiable {

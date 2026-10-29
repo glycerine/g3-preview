@@ -282,6 +282,14 @@ func (p *LoopCounterPlugin) Revert(source *base.RuleSet) (*base.RuleSet, error) 
 	return p.transform(source, true)
 }
 
+func (p *LoopCounterPlugin) FreshPredicates() map[ast.ASTHandle]ast.ASTHandle {
+	result := make(map[ast.ASTHandle]ast.ASTHandle, len(p.oldToNew))
+	for original, derived := range p.oldToNew {
+		result[original] = derived
+	}
+	return result
+}
+
 func (p *LoopCounterPlugin) Close() error {
 	if p == nil || p.closed {
 		return nil

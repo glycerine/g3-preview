@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/muz/base"
+	"github.com/glycerine/g3/pkg/muz/rel"
 	"github.com/glycerine/g3/pkg/muz/spacer"
 	"github.com/glycerine/g3/pkg/muz/transforms"
 	"github.com/glycerine/g3/pkg/smtcore"
@@ -142,6 +143,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	karrName := "xform.karr"
+	karr, err := e.params.GetBoolName(&fixedpoint, &karrName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -165,10 +171,18 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	}
 	var magicTransformer *transforms.MagicSymbolicPlugin
 	var magicPredicates map[ast.ASTHandle]ast.ASTHandle
+	var karrTransformer *transforms.KarrInvariantsPlugin
+	var karrInvariants map[ast.ASTHandle]rel.KarrMatrix
 	if magic {
 		magicTransformer = transforms.NewMagicSymbolicPlugin(e.manager, e.rules, 36020)
 		if err = transformer.Register(magicTransformer); err != nil {
 			return nil, errors.Join(err, magicTransformer.Close(), transformer.Close())
+		}
+	}
+	if karr {
+		karrTransformer = transforms.NewKarrInvariantsPlugin(e.manager, e.rules, 36010)
+		if err = transformer.Register(karrTransformer); err != nil {
+			return nil, errors.Join(err, karrTransformer.Close(), transformer.Close())
 		}
 	}
 	var quantifierAbstraction *transforms.QuantifierAbstractionPlugin
@@ -329,6 +343,9 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 			e.predicates[declaration] = state
 		}
 	}
+	if err == nil && karrTransformer != nil {
+		karrInvariants = karrTransformer.ModelInvariants()
+	}
 	err = errors.Join(err, transformer.Close())
 	if err != nil {
 		return nil, fmt.Errorf("muz/fp: Spacer rule preprocessing: %w", err)
@@ -379,6 +396,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	e.spacerBitBlasted = bitBlastedPredicates
 	e.spacerScaled = scaledPredicates
 	e.spacerMagic = magicPredicates
+	e.spacerKarr = karrInvariants
 	keep = true
 	return prepared, nil
 }

@@ -82,6 +82,7 @@ type PropositionalEngine struct {
 	spacerBitBlasted   map[ast.ASTHandle]ast.ASTHandle
 	spacerScaled       map[ast.ASTHandle]ast.ASTHandle
 	spacerMagic        map[ast.ASTHandle]ast.ASTHandle
+	spacerKarr         map[ast.ASTHandle]rel.KarrMatrix
 	closed             bool
 }
 

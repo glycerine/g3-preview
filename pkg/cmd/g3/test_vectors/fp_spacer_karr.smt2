@@ -1,0 +1,8 @@
+(set-option :fixedpoint.engine spacer)
+(set-option :fixedpoint.xform.karr true)
+(set-option :fixedpoint.xform.slice false)
+(set-option :fixedpoint.xform.inline_eager false)
+(set-option :fixedpoint.xform.inline_linear false)
+(set-logic HORN)
+(declare-rel p ())
+(query p)

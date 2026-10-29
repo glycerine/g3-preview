@@ -150,7 +150,7 @@ func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore,
 }
 
 func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.Model, resultErr error) {
-	if len(e.spacerPredicates) == 0 && len(e.spacerQuantified) == 0 && len(e.spacerBitBlasted) == 0 && len(e.spacerScaled) == 0 {
+	if len(e.spacerPredicates) == 0 && len(e.spacerQuantified) == 0 && len(e.spacerBitBlasted) == 0 && len(e.spacerScaled) == 0 && len(e.spacerKarr) == 0 {
 		return source, nil
 	}
 	if source == nil {
@@ -220,6 +220,9 @@ func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.M
 		if err := e.expandSpacerQuantifiedFunction(core, original, derived); err != nil {
 			return nil, err
 		}
+	}
+	if err := e.applySpacerKarrInvariants(core); err != nil {
+		return nil, err
 	}
 	return source, nil
 }
