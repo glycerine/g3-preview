@@ -90119,9 +90119,18 @@
       "path": "src/muz/spacer/spacer_mev_array.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/model/model_evaluator_array_expansion.go",
+        "pkg/model/model_evaluator_array_equality.go",
+        "pkg/qe/legacy_array_direct_equality.go",
+        "pkg/qe/legacy_array_store_equality.go"
+      ],
+      "tests": [
+        "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+        "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
+        "TestLegacyProjectionCombinesBooleanArrayAndArithmetic"
+      ],
       "assertions": [
         {
           "line": 48,
@@ -90132,19 +90141,40 @@
           "text": "VERIFY(eval_result);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "eval_exprs, extract_array_func_interp, eval_array_eq, and canonical array evaluation",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_array_expansion.go; pkg/model/model_evaluator_array_equality.go",
+          "tests": [
+            "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+            "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback"
+          ]
+        }
+      ],
+      "ownership": [
+        "The shared ModelEvaluator array-expansion owner retains extracted store rows and defaults through explicit AST roots and drains them on every success or failure path."
+      ],
+      "deviations": [
+        "The standalone Spacer copy was based on model_evaluator and is consolidated into the complete shared Go ModelEvaluator implementation. Legacy array projection calls that evaluator directly; no duplicate evaluator facade is retained."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_mev_array.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/model/model_evaluator.go",
+        "pkg/model/model_evaluator_array_expansion.go",
+        "pkg/model/model_evaluator_array_equality.go"
+      ],
+      "tests": [
+        "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+        "TestLegacyProjectionCombinesBooleanArrayAndArithmetic"
+      ],
       "conditionals": [
         {
           "line": 18,
@@ -90155,11 +90185,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained array evaluation and best-effort extensional equality surface",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator.go; pkg/model/model_evaluator_array_expansion.go; pkg/model/model_evaluator_array_equality.go",
+          "tests": [
+            "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+            "TestLegacyProjectionCombinesBooleanArrayAndArithmetic"
+          ]
+        }
+      ],
+      "ownership": [
+        "ModelEvaluator owns its reusable array expansion/equality frames and explicitly closes all temporary AST references."
+      ],
+      "deviations": [
+        "The C++ helper class is consolidated into the shared ModelEvaluator rather than exposed as a duplicate Go type."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_notes.txt",
