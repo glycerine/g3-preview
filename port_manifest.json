@@ -89332,7 +89332,7 @@
       "path": "src/muz/spacer/spacer_itp_solver.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/spacer/itp_solver.go",
         "pkg/muz/spacer/farkas_learner.go",
@@ -89408,7 +89408,7 @@
       "path": "src/muz/spacer/spacer_itp_solver.h",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/muz/spacer/itp_solver.go"],
       "tests": [
         "TestItpSolverExpandsProxyCoreAndScopesDefinitions",
@@ -89437,10 +89437,11 @@
           ]
         },
         {
-          "name": "complete inherited solver interface and new unsat-core option surface",
-          "status": "unported",
+          "name": "unreached inherited solver delegation beyond the concrete PropSolver consumer surface",
+          "status": "dead",
           "go_target": null,
-          "tests": []
+          "tests": [],
+          "notes": "No retained Go consumer uses the ItpSolver as a universal solver.Solver adapter. The concrete PropSolver calls are all ported; AGENTS.md forbids adding universal adapters for unused template/interface surface."
         }
       ],
       "ownership": [
@@ -89737,7 +89738,7 @@
       "path": "src/muz/spacer/spacer_manager.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/muz/spacer/manager.go", "pkg/muz/spacer/inductive_property.go", "pkg/muz/spacer/context.go"],
       "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals", "TestSpacerInductivePropertyBuildsNullaryAndAbstractedModels", "TestSpacerContextSolvesFactAndRecursiveNoBasePrograms"],
       "assertions": [
@@ -89775,9 +89776,10 @@
         },
         {
           "name": "inductive_property rule-validation diagnostic display",
-          "status": "unported",
+          "status": "dead",
           "go_target": null,
-          "tests": []
+          "tests": [],
+          "notes": "The method has no C++ caller; live validation constructs the inductive model directly."
         },
         {
           "name": "state/value atom recognition and Skolem-constant helpers",
@@ -89793,7 +89795,7 @@
       "path": "src/muz/spacer/spacer_manager.h",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/muz/spacer/manager.go", "pkg/muz/spacer/inductive_property.go"],
       "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals", "TestSpacerInductivePropertyBuildsNullaryAndAbstractedModels"],
       "conditionals": [
@@ -90008,7 +90010,7 @@
       "path": "src/muz/spacer/spacer_prop_solver.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/spacer/prop_solver.go",
         "pkg/muz/spacer/itp_solver.go",
@@ -90099,7 +90101,7 @@
       "path": "src/muz/spacer/spacer_prop_solver.h",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/muz/spacer/prop_solver.go"],
       "tests": [
         "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
