@@ -81,6 +81,31 @@ func TestSpacerDerivationOwnsPremisesAndAttachesToObligation(t *testing.T) {
 	}
 	spacerMust(t, projectionModel.Close())
 	spacerMust(t, projected.Close())
+	reachFact, err := spacer.NewReachFact(manager, rule, truth, nil, true)
+	spacerMust(t, err)
+	if added, err := transformer.AddReachFact(reachFact); err != nil || !added {
+		t.Fatal("Spacer derivation reach fact", added, err)
+	}
+	spacerMust(t, reachFact.Close())
+	successive, err := spacer.NewDerivation(root, rule, truth, nil)
+	spacerMust(t, err)
+	spacerMust(t, successive.AddPremise(transformer, 0, truth, false, nil))
+	spacerMust(t, successive.AddPremise(transformer, 1, truth, false, nil))
+	successiveModel, err := model.NewModel(manager)
+	spacerMust(t, err)
+	if child, err := successive.CreateFirstChild(successiveModel.Core()); err != nil || child == nil {
+		t.Fatal("first successive Spacer derivation child", child, err)
+	}
+	spacerMust(t, successiveModel.Close())
+	secondChild, err := successive.CreateNextChild()
+	spacerMust(t, err)
+	if secondChild == nil {
+		t.Fatal("second successive Spacer derivation child")
+	}
+	if child, err := successive.CreateNextChild(); err != nil || child != nil {
+		t.Fatal("exhausted Spacer derivation produced a child", child, err)
+	}
+	spacerMust(t, successive.Close())
 	premises, err := derivation.Premises()
 	spacerMust(t, err)
 	if len(premises) != 1 || premises[0].Must() || premises[0].OldIndex() != 0 || premises[0].Transformer() != transformer {

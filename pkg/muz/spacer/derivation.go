@@ -318,7 +318,7 @@ func previousSpacerLevel(level uint32) uint32 {
 
 // CreateFirstChild uses md to skip must premises and construct the first may
 // premise's projected proof obligation.
-func (d *Derivation) CreateFirstChild(md *model.ModelCore) (_ *ProofObligation, resultErr error) {
+func (d *Derivation) CreateFirstChild(md *model.ModelCore) (*ProofObligation, error) {
 	if err := d.open(); err != nil {
 		return nil, err
 	}
@@ -329,6 +329,10 @@ func (d *Derivation) CreateFirstChild(md *model.ModelCore) (_ *ProofObligation, 
 		return nil, nil
 	}
 	d.active = 0
+	return d.createProjectedChild(md)
+}
+
+func (d *Derivation) createProjectedChild(md *model.ModelCore) (_ *ProofObligation, resultErr error) {
 	manager := d.parent.transformer.manager
 	var summaries []ast.ASTHandle
 	var variables []ast.ASTHandle
@@ -450,6 +454,145 @@ func (d *Derivation) CreateFirstChild(md *model.ModelCore) (_ *ProofObligation, 
 		return nil, err
 	}
 	return active.transformer.NewProofObligation(d.parent, previousSpacerLevel(level), depth, current, bindings)
+}
+
+func (d *Derivation) modelImplicant(md *model.ModelCore, formula ast.ASTHandle) (result ast.ASTRef, resultErr error) {
+	manager := d.parent.transformer.manager
+	defer func() {
+		if resultErr != nil && result != (ast.ASTRef{}) {
+			resultErr = errors.Join(resultErr, manager.DelRef(&result))
+		}
+	}()
+	if md == nil || md.DerivedModel() == nil {
+		return ast.ASTRef{}, ast.ErrASTHandle
+	}
+	config := d.parent.transformer.owner.contexts[0].config.ModelEvaluator
+	implicant, err := model.NewModelImplicant(manager, config)
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, implicant.Close()) }()
+	literals, err := implicant.MinimizeLiterals([]ast.ASTHandle{formula}, md.DerivedModel())
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, releaseNormalizeRefs(manager, literals)) }()
+	handles := make([]ast.ASTHandle, len(literals))
+	for i := range literals {
+		handles[i], err = manager.RefGet(literals[i])
+		if err != nil {
+			return ast.ASTRef{}, err
+		}
+	}
+	conjunction, err := manager.MkAndArray(handles)
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	result, resultErr = manager.NewRef(conjunction)
+	return
+}
+
+// CreateNextChild strengthens the active premise with a selected must fact,
+// projects its current-state variables, and advances to the next may premise.
+func (d *Derivation) CreateNextChild() (_ *ProofObligation, resultErr error) {
+	if err := d.open(); err != nil {
+		return nil, err
+	}
+	if d.active+1 >= uint32(len(d.premises)) {
+		return nil, nil
+	}
+	manager := d.parent.transformer.manager
+	active := d.premises[d.active]
+	var summaries []ast.ASTHandle
+	for index := d.active + 1; index < uint32(len(d.premises)); index++ {
+		summary, err := d.premises[index].Summary()
+		if err != nil {
+			return nil, err
+		}
+		summaries = append(summaries, summary)
+	}
+	transition, err := manager.RefGet(d.transition)
+	if err != nil {
+		return nil, err
+	}
+	activeTransitionRef, err := d.parent.transformer.owner.FormulaOldToNew(transition, active.oldIndex, false)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, manager.DelRef(&activeTransitionRef)) }()
+	activeTransition, err := manager.RefGet(activeTransitionRef)
+	if err != nil {
+		return nil, err
+	}
+	summaries = append(summaries, activeTransition)
+	state, err := manager.MkAndArray(summaries)
+	if err != nil {
+		return nil, err
+	}
+	reachable, md, err := active.transformer.IsMustReachable(state, true)
+	if err != nil || !reachable || md == nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, md.DecRef()) }()
+	fact, found, err := active.transformer.UsedReachFact(md, true)
+	if err != nil || !found {
+		if err == nil {
+			err = ast.ErrASTDomain
+		}
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, fact.Close()) }()
+	factFormula, err := fact.Fact()
+	if err != nil {
+		return nil, err
+	}
+	implicantRef, err := d.modelImplicant(md, factFormula)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, manager.DelRef(&implicantRef)) }()
+	implicant, err := manager.RefGet(implicantRef)
+	if err != nil {
+		return nil, err
+	}
+	auxiliaries, err := fact.Auxiliaries()
+	if err != nil {
+		return nil, err
+	}
+	if err = active.SetSummary(implicant, true, auxiliaries); err != nil {
+		return nil, err
+	}
+	combined, err := manager.MkAnd(implicant, activeTransition)
+	if err != nil {
+		return nil, err
+	}
+	variables := append([]ast.ASTHandle(nil), auxiliaries...)
+	signature, err := active.transformer.Signature()
+	if err != nil {
+		return nil, err
+	}
+	for _, declaration := range signature {
+		current, err := active.transformer.owner.OldToNew(declaration, 0)
+		if err != nil {
+			return nil, err
+		}
+		value, err := manager.MkApp(current, nil)
+		if err != nil {
+			return nil, err
+		}
+		variables = append(variables, value)
+	}
+	projected, remaining, err := d.project(md, variables, combined)
+	if err != nil {
+		return nil, err
+	}
+	if err = manager.DelRef(&d.transition); err != nil {
+		return nil, errors.Join(err, manager.DelRef(&projected), releaseNormalizeRefs(manager, remaining))
+	}
+	d.transition = projected
+	d.appendExistentials(remaining)
+	d.active++
+	return d.createProjectedChild(md)
 }
 
 func (d *Derivation) Close() (result error) {
