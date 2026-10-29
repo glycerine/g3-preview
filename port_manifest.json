@@ -89317,7 +89317,7 @@
         "ItpSolver borrows its backend and manager. It owns references for its reusable proxy pool, scoped implication definitions, and persistent/transient assumptions; Close restores outstanding backend scopes and releases those references. Returned interpolating-core ASTRef values transfer to the caller."
       ],
       "deviations": [
-        "The retained old-core configuration uses the shared Spacer Farkas learner and concrete Go arithmetic-bound subsumption. The optional newer unsat-core plugin family is not yet ported."
+        "The retained old-core configuration uses the shared Spacer Farkas learner and concrete Go arithmetic-bound subsumption. CoreMode must select this legacy path explicitly; unspecified/default-new configuration is rejected until the newer unsat-core plugin family is ported."
       ]
     },
     {
@@ -89842,7 +89842,7 @@
       "path": "src/muz/spacer/spacer_prop_solver.cpp",
       "component": "muz",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": [
         "pkg/muz/spacer/prop_solver.go",
         "pkg/muz/spacer/itp_solver.go"
@@ -89883,9 +89883,10 @@
       "methods": [
         {
           "name": "construction, add_level/ensure_level/level_cnt, assert_level_atoms and both assert_expr forms",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/muz/spacer/prop_solver.go",
-          "tests": ["TestPropSolverNormalAndDeltaLevelActivation"]
+          "tests": ["TestPropSolverNormalAndDeltaLevelActivation"],
+          "reason": "The PropSolver construction and algorithm are present, but source-default construction selects the still-unported new unsat-core plugin mode. Go requires an explicit legacy-core selection rather than silently substituting it."
         },
         {
           "name": "maxsmt hard proxying and iterative soft-core removal",
@@ -89920,14 +89921,14 @@
         "PropSolver owns its two ItpSolver wrappers and level-atom references while borrowing both solver backends. MaxSAT pins every hard and soft input across repeated checks. PropCheckResult owns core references and an optional model until Close."
       ],
       "deviations": [
-        "Pointer-based one-shot core/model setters and RAII level toggles become one CheckAssumptions options value and an owning result. The source's intentional solver_id == 0 ? 0 : 0 routing is preserved. Go errors replace source assertions for invalid lifetime and level nesting."
+        "Pointer-based one-shot core/model setters and RAII level toggles become one CheckAssumptions options value and an owning result. The source's intentional solver_id == 0 ? 0 : 0 routing is preserved. Go errors replace source assertions for invalid lifetime and level nesting. Construction currently requires explicit legacy Farkas-core mode because the source-default new plugin mode remains open."
       ]
     },
     {
       "path": "src/muz/spacer/spacer_prop_solver.h",
       "component": "muz",
       "role": "production",
-      "status": "ported",
+      "status": "partial",
       "go_targets": ["pkg/muz/spacer/prop_solver.go"],
       "tests": [
         "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
@@ -89955,13 +89956,14 @@
       "methods": [
         {
           "name": "level creation/count, global and guarded assertion, assumption checking, core/model controls, level reporting and statistics",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/muz/spacer/prop_solver.go",
           "tests": [
             "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
             "TestPropSolverNormalAndDeltaLevelActivation",
             "TestPropSolverPublishesFarkasCore"
-          ]
+          ],
+          "reason": "All PropSolver operations are implemented for the explicit legacy-core configuration; default-new unsat-core plugin construction remains unported."
         },
         {
           "name": "scoped_level, scoped_delta_level and scoped_subset_core state changes",

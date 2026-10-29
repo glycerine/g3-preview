@@ -57,7 +57,7 @@ func newSpacerPropFixtureWithProofs(t *testing.T, keepProxy, proofs bool) *space
 	truth, err := manager.MkTrue()
 	spacerMust(t, err)
 	fixture.solver, err = spacer.NewPropSolver(manager, generic, truth, "spacer-test", spacer.PropSolverConfig{
-		Itp:       spacer.ItpSolverConfig{Params: globals.Context, Globals: globals},
+		Itp:       spacer.ItpSolverConfig{Params: globals.Context, Globals: globals, CoreMode: spacer.ItpCoreLegacyFarkas},
 		KeepProxy: keepProxy,
 	})
 	spacerMust(t, err)

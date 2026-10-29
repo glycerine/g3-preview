@@ -18,11 +18,21 @@ import (
 )
 
 var ErrITPSolverOwner = errors.New("muz/spacer: invalid or closed interpolating solver")
+var ErrITPNewCoreUnported = errors.New("muz/spacer: new unsat-core plugin path is not ported")
+
+type ItpCoreMode uint8
+
+const (
+	ItpCoreUnspecified ItpCoreMode = iota
+	ItpCoreLegacyFarkas
+	ItpCoreNewPlugins
+)
 
 type ItpSolverConfig struct {
 	Params        *uparams.ParamsContext
 	Globals       *uparams.GlobalParamsService
 	SplitLiterals bool
+	CoreMode      ItpCoreMode
 }
 
 type itpDefinitions struct {
@@ -68,6 +78,9 @@ type ItpSolver struct {
 func NewItpSolver(backend solver.Solver, config ItpSolverConfig) (*ItpSolver, error) {
 	if backend == nil || config.Params == nil || config.Globals == nil || config.Globals.Context != config.Params {
 		return nil, ErrITPSolverOwner
+	}
+	if config.CoreMode != ItpCoreLegacyFarkas {
+		return nil, ErrITPNewCoreUnported
 	}
 	manager, err := backend.Manager()
 	if err != nil {

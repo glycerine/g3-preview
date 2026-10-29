@@ -35,7 +35,10 @@ func TestItpSolverExpandsProxyCoreAndScopesDefinitions(t *testing.T) {
 	spacerMust(t, err)
 	backend, err := smtcore.NewSMTSolver(manager, nil, "QF_UF", smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
 	spacerMust(t, err)
-	wrapped, err := spacer.NewItpSolver(backend, spacer.ItpSolverConfig{Params: globals.Context, Globals: globals})
+	if _, err = spacer.NewItpSolver(backend, spacer.ItpSolverConfig{Params: globals.Context, Globals: globals}); !errors.Is(err, spacer.ErrITPNewCoreUnported) {
+		t.Fatal("unspecified core mode silently selected the legacy algorithm", err)
+	}
+	wrapped, err := spacer.NewItpSolver(backend, spacer.ItpSolverConfig{Params: globals.Context, Globals: globals, CoreMode: spacer.ItpCoreLegacyFarkas})
 	spacerMust(t, err)
 
 	p := spacerBool(t, manager, "itp-proxy-p")
@@ -112,7 +115,7 @@ func TestItpSolverExtractsFarkasCore(t *testing.T) {
 	spacerMust(t, err)
 	backend, err := smtcore.NewSMTSolver(manager, nil, "QF_LRA", smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
 	spacerMust(t, err)
-	wrapped, err := spacer.NewItpSolver(backend, spacer.ItpSolverConfig{Params: globals.Context, Globals: globals, SplitLiterals: true})
+	wrapped, err := spacer.NewItpSolver(backend, spacer.ItpSolverConfig{Params: globals.Context, Globals: globals, SplitLiterals: true, CoreMode: spacer.ItpCoreLegacyFarkas})
 	spacerMust(t, err)
 
 	arithmetic, err := manager.RegisterArithmeticPlugin()
