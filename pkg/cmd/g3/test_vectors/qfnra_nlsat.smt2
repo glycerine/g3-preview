@@ -19,3 +19,8 @@
 (declare-const x Real)
 (assert (= (ite p (* x x) 0.0) 2.0))
 (check-sat-using qfnra)
+(reset)
+(set-logic QF_NRA)
+(declare-const x Real)
+(assert (= (* (- x 1.0) (+ x 1.0)) 0.0))
+(check-sat-using qfnra)

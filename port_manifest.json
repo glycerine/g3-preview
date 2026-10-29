@@ -162252,9 +162252,9 @@
       "path": "src/tactic/arith/factor_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "complete",
+      "go_targets": ["pkg/tactic/arith/factor_tactic.go"],
+      "tests": ["TestFactorTacticSplitsPolynomialEqualityWithProofAndCore", "TestFactorTacticStrictEvenPowerAndParameterUpdate"],
       "assertions": [
         {
           "line": 48,
@@ -162289,19 +162289,26 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "polynomial equality and comparison factor rewrites",
+          "status": "complete",
+          "go_target": "pkg/tactic/arith/factor_tactic.go",
+          "tests": ["TestFactorTacticSplitsPolynomialEqualityWithProofAndCore", "TestFactorTacticStrictEvenPowerAndParameterUpdate"]
+        }
+      ],
+      "ownership": ["Each application scopes its prime generator, polynomial manager, expression converter, factor collection, polynomial references, and traversal."],
       "deviations": []
     },
     {
       "path": "src/tactic/arith/factor_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "complete",
+      "go_targets": ["pkg/tactic/arith/factor_tactic.go"],
+      "tests": ["TestFactorTacticSplitsPolynomialEqualityWithProofAndCore", "TestFactorTacticStrictEvenPowerAndParameterUpdate"],
       "conditionals": [
         {
           "line": 19,
@@ -162312,8 +162319,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
       "deviations": []

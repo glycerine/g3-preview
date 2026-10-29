@@ -77,6 +77,7 @@ func NewQFNRATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTS
 			b.clean(b.keep(core.NewSolveEquationsTactic(m, c, g, params, config.ModelEvaluator))),
 			b.clean(b.keep(core.NewEliminateUnconstrainedTactic(m, c, g, params, config.ModelEvaluator))),
 			b.clean(b.keep(core.NewEliminateTermITETactic(m, c, g, params, config.ModelEvaluator))),
+			b.clean(b.keep(arith.NewFactorTactic(m, c, g, params, config.ModelEvaluator))),
 			b.clean(b.keep(core.NewSolveEquationsTactic(m, c, g, params, config.ModelEvaluator))),
 			simplify(params),
 			backend,
