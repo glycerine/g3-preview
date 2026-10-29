@@ -90263,8 +90263,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/qe/legacy_arithmetic_linear.go", "pkg/qe/legacy_arithmetic_bounds.go", "pkg/qe/legacy_arithmetic_compare.go", "pkg/qe/legacy_arithmetic_real.go"],
-      "tests": ["TestLegacyArithmeticProjectionClassifiesLinearLiterals", "TestLegacyArithmeticProjectionClassifiesEqualities", "TestLegacyArithmeticProjectionSelectsModelBounds", "TestLegacyArithmeticProjectionBuildsBoundComparisons", "TestLegacyArithmeticProjectionProjectsRealBounds"],
+      "go_targets": ["pkg/qe/legacy_arithmetic_linear.go", "pkg/qe/legacy_arithmetic_bounds.go", "pkg/qe/legacy_arithmetic_compare.go", "pkg/qe/legacy_arithmetic_real.go", "pkg/qe/legacy_arithmetic_integer.go"],
+      "tests": ["TestLegacyArithmeticProjectionClassifiesLinearLiterals", "TestLegacyArithmeticProjectionClassifiesEqualities", "TestLegacyArithmeticProjectionSelectsModelBounds", "TestLegacyArithmeticProjectionBuildsBoundComparisons", "TestLegacyArithmeticProjectionProjectsRealBounds", "TestLegacyArithmeticProjectionNormalizesIntegerCoefficients"],
       "assertions": [
         {
           "line": 101,
@@ -90422,6 +90422,7 @@
         {"name": "legacy arithmetic model evaluation and find_max bound selection, including false-bound filtering and strict tie breaking", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_bounds.go", "tests": ["TestLegacyArithmeticProjectionSelectsModelBounds"]},
         {"name": "legacy opposite-side, same-side and equality-at-bound comparison construction with theory rewriting", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_compare.go", "tests": ["TestLegacyArithmeticProjectionBuildsBoundComparisons"]},
         {"name": "legacy real arithmetic equality, infinity and selected-bound virtual substitution", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_real.go", "tests": ["TestLegacyArithmeticProjectionProjectsRealBounds"]},
+        {"name": "legacy integer coefficient, residual term and divisibility-modulus LCM normalization", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_integer.go", "tests": ["TestLegacyArithmeticProjectionNormalizesIntegerCoefficients"]},
         {"name": "legacy integer virtual substitution, mod factoring and formula replacement", "status": "unported", "go_target": null, "tests": []},
         {"name": "legacy array equality/select reduction and projection", "status": "unported", "go_target": null, "tests": []}
       ],
