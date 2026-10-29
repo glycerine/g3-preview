@@ -367,6 +367,7 @@ var scriptResults = map[string]string{
 	"fp_spacer_array_instantiation.smt2":           "sat\n",
 	"fp_spacer_array_blast.smt2":                   "sat\n",
 	"fp_spacer_bit_blast.smt2":                     "sat\n",
+	"fp_spacer_scale.smt2":                         "sat\n",
 	"fixedpoint_spacer_recursive_trace.smt2":       "sat\n(and (P 1) (P 0))\nunsat\n",
 	"horn_tactic_finite.smt2":                      "unsat\nsat\nunsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"horn_solver_finite.smt2":                      "unsat\nsat\n",

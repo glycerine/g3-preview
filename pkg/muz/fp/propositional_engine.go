@@ -80,6 +80,7 @@ type PropositionalEngine struct {
 	spacerQuantified   map[ast.ASTHandle]ast.ASTHandle
 	spacerInstantiated map[ast.ASTHandle]ast.ASTHandle
 	spacerBitBlasted   map[ast.ASTHandle]ast.ASTHandle
+	spacerScaled       map[ast.ASTHandle]ast.ASTHandle
 	closed             bool
 }
 
@@ -1477,6 +1478,7 @@ func (e *PropositionalEngine) Close() (result error) {
 		e.spacerQuantified = nil
 		e.spacerInstantiated = nil
 		e.spacerBitBlasted = nil
+		e.spacerScaled = nil
 	}
 	for i := len(e.scopes) - 1; i >= 0; i-- {
 		result = errors.Join(result, e.scopes[i].Close())

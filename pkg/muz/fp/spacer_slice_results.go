@@ -16,6 +16,9 @@ func (e *PropositionalEngine) spacerPredicate(declaration ast.ASTHandle) ast.AST
 	if derived, found := e.spacerQuantified[declaration]; found {
 		declaration = derived
 	}
+	if derived, found := e.spacerScaled[declaration]; found {
+		declaration = derived
+	}
 	if derived, found := e.spacerBitBlasted[declaration]; found {
 		declaration = derived
 	}
@@ -144,7 +147,7 @@ func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore,
 }
 
 func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.Model, resultErr error) {
-	if len(e.spacerPredicates) == 0 && len(e.spacerQuantified) == 0 && len(e.spacerBitBlasted) == 0 {
+	if len(e.spacerPredicates) == 0 && len(e.spacerQuantified) == 0 && len(e.spacerBitBlasted) == 0 && len(e.spacerScaled) == 0 {
 		return source, nil
 	}
 	if source == nil {
@@ -202,6 +205,11 @@ func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.M
 	}
 	for original, derived := range e.spacerBitBlasted {
 		if err := e.expandSpacerBitBlastedFunction(core, original, derived); err != nil {
+			return nil, err
+		}
+	}
+	for original, derived := range e.spacerScaled {
+		if err := e.expandSpacerScaledFunction(core, original, derived); err != nil {
 			return nil, err
 		}
 	}

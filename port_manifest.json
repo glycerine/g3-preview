@@ -93126,9 +93126,19 @@
       "path": "src/muz/transforms/dl_mk_scale.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/transforms/scale.go",
+        "pkg/muz/fp/spacer_scale_results.go",
+        "pkg/muz/fp/spacer_engine.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_scale.smt2"
+      ],
+      "tests": [
+        "TestScaleAddsHomogeneousPredicateArgumentAndGuards",
+        "TestSpacerScaleReconstructsOriginalPredicateModel",
+        "TestSMTLibRunnerScripts/fp_spacer_scale.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_scale.smt2"
+      ],
       "assertions": [
         {
           "line": 71,
@@ -93141,17 +93151,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "homogeneous predicate scaling, numeral equalities, linear constraint scaling, positivity guard, and model conversion",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/scale.go",
+          "tests": [
+            "TestScaleAddsHomogeneousPredicateArgumentAndGuards",
+            "TestSpacerScaleReconstructsOriginalPredicateModel",
+            "TestSMTLibRunnerCPPReference/fp_spacer_scale.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "Each rule-local rewritten application, equality, and positivity guard stays pinned until the replacement Rule owns the published expressions.",
+        "Model reconstruction retains the scale-one substitution until the original predicate interpretation is registered."
+      ],
       "deviations": []
     },
     {
       "path": "src/muz/transforms/dl_mk_scale.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/transforms/scale.go"],
+      "tests": ["TestScaleAddsHomogeneousPredicateArgumentAndGuards"],
       "conditionals": [
         {
           "line": 21,
