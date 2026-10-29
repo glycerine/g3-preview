@@ -82,6 +82,25 @@ func TestExpandInductiveArithmeticEquality(t *testing.T) {
 			t.Fatal("expanded equality operator", index, kind, kindErr)
 		}
 	}
+	zName, err := manager.Symbols.Intern("expand-z")
+	if err != nil {
+		t.Fatal(err)
+	}
+	z, err := manager.MkConst(zName, integer)
+	if err != nil {
+		t.Fatal(err)
+	}
+	yz, err := manager.MkEq(y, z)
+	if err != nil {
+		t.Fatal(err)
+	}
+	classes, dirty, err := transformer.expandEqualityClasses([]ast.ASTHandle{equality, yz})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !dirty || len(classes) != 3 {
+		t.Fatal("full equivalence-class expansion", dirty, len(classes))
+	}
 }
 
 func TestExpandInductiveDatatypeAndBitVectorEqualities(t *testing.T) {

@@ -110,6 +110,18 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 		if err != nil {
 			return ExpansionResult{}, err
 		}
+		if p.useEqClassGeneralizer {
+			generalized, generalizeErr := p.generalizeEqualityClasses(obligation, lemma)
+			if generalizeErr != nil {
+				return ExpansionResult{}, errors.Join(generalizeErr, lemma.Close())
+			}
+			if generalized != lemma {
+				if closeErr := lemma.Close(); closeErr != nil {
+					return ExpansionResult{}, errors.Join(closeErr, generalized.Close())
+				}
+				lemma = generalized
+			}
+		}
 		if p.useInductiveGeneralizer {
 			generalized, generalizeErr := p.generalizeInductiveLemma(obligation, lemma)
 			if generalizeErr != nil {

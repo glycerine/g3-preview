@@ -27,7 +27,7 @@ func TestContextConsumesPropSolverFarkasParameters(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if context.config.Itp.CoreMode != ItpCoreNewFarkas || !context.config.Itp.SplitLiterals || context.config.Itp.FarkasAConst || context.config.KeepProxy || !context.config.UseInductiveGeneralizer || !context.config.UseArrayEqGeneralizer {
+	if context.config.Itp.CoreMode != ItpCoreNewFarkas || !context.config.Itp.SplitLiterals || context.config.Itp.FarkasAConst || context.config.KeepProxy || !context.config.UseInductiveGeneralizer || !context.config.UseArrayEqGeneralizer || context.config.UseEqClassGeneralizer {
 		t.Fatal("prop-solver parameter policy", context.config)
 	}
 	if err = context.Close(); err != nil {
@@ -43,6 +43,9 @@ func TestContextCanDisableInductiveGeneralizer(t *testing.T) {
 	if err := globals.SourceSetName("fixedpoint.spacer.use_array_eq_generalizer", "false"); err != nil {
 		t.Fatal(err)
 	}
+	if err := globals.SourceSetName("fixedpoint.spacer.use_eqclass", "true"); err != nil {
+		t.Fatal(err)
+	}
 	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
 	if err != nil {
 		t.Fatal(err)
@@ -52,6 +55,9 @@ func TestContextCanDisableInductiveGeneralizer(t *testing.T) {
 	}
 	if context.config.UseArrayEqGeneralizer {
 		t.Fatal("disabled array equality generalizer was retained as enabled")
+	}
+	if !context.config.UseEqClassGeneralizer {
+		t.Fatal("enabled equivalence-class generalizer was retained as disabled")
 	}
 	if err = context.Close(); err != nil {
 		t.Fatal(err)

@@ -22,6 +22,7 @@ type PropSolverConfig struct {
 	KeepProxy               bool
 	UseInductiveGeneralizer bool
 	UseArrayEqGeneralizer   bool
+	UseEqClassGeneralizer   bool
 }
 
 type PropCheckOptions struct {

@@ -89274,6 +89274,7 @@
       "go_targets": [
         "pkg/muz/spacer/lemma_generalizer.go",
         "pkg/muz/spacer/lemma_array_generalizer.go",
+        "pkg/muz/spacer/lemma_eq_generalizer.go",
         "pkg/muz/spacer/predicate_expand.go",
         "pkg/muz/spacer/context.go"
       ],
@@ -89324,7 +89325,12 @@
           "go_target": "pkg/muz/spacer/lemma_array_generalizer.go"
         },
         {
-          "name": "lemma_sanity_checker, unsat_core_generalizer and optional equivalence-class generalizer",
+          "name": "optional equivalence-class generalizer",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/lemma_eq_generalizer.go"
+        },
+        {
+          "name": "lemma_sanity_checker and unsat_core_generalizer",
           "status": "unported"
         }
       ],
@@ -89332,7 +89338,7 @@
         "Generalizers construct replacement owned lemmas only after successful solver checks; temporary cores, assumptions, and the array checker have explicit scoped cleanup."
       ],
       "deviations": [
-        "Optional sanity checking, the disabled native unsat-core generalizer, and the disabled-by-default equivalence-class generalizer remain pending."
+        "Optional sanity checking and the disabled native unsat-core generalizer remain pending."
       ]
     },
     {
@@ -89342,7 +89348,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/spacer/lemma_generalizer.go",
-        "pkg/muz/spacer/lemma_array_generalizer.go"
+        "pkg/muz/spacer/lemma_array_generalizer.go",
+        "pkg/muz/spacer/lemma_eq_generalizer.go"
       ],
       "tests": [
         "TestExpandInductiveArithmeticEquality",
@@ -89363,7 +89370,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "retained Boolean-inductive and array-equality generalizer interfaces",
+          "name": "retained Boolean-inductive, array-equality, and equivalence-class generalizer interfaces",
           "status": "ported",
           "go_target": "pkg/muz/spacer/lemma_generalizer.go"
         }
