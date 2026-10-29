@@ -89305,9 +89305,9 @@
         },
         {
           "name": "new unsat_core_learner plugin path",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/itp_solver.go",
+          "tests": ["TestUnsatCoreFarkasPluginClosesArithmeticMixedStep", "TestPropSolverPublishesNewPluginCore"]
         },
         {
           "name": "refresh backend reconstruction",
@@ -89319,7 +89319,7 @@
         "ItpSolver borrows its backend and manager. It owns references for its reusable proxy pool, scoped implication definitions, and persistent/transient assumptions; Close restores outstanding backend scopes and releases those references. Returned interpolating-core ASTRef values transfer to the caller."
       ],
       "deviations": [
-        "The retained old-core configuration uses the shared Spacer Farkas learner and the exact propagate-values/propagate-inequalities simplify_bounds pipeline. CoreMode must select this legacy path explicitly; unspecified/default-new configuration is rejected until the newer unsat-core plugin family is ported."
+        "The retained old-core configuration uses the shared Spacer Farkas learner and the exact propagate-values/propagate-inequalities simplify_bounds pipeline. The zero-value CoreMode selects the source default new-core optimized-Farkas path; explicit modes retain the legacy and unoptimized variants."
       ]
     },
     {
@@ -89723,9 +89723,9 @@
       "path": "src/muz/spacer/spacer_matrix.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/spacer/matrix.go"],
+      "tests": ["TestSpacerMatrixNormalizeAndSourceEliminationOrder"],
       "assertions": [
         {
           "line": 47,
@@ -89752,19 +89752,31 @@
           "text": "SASSERT(m_matrix[i][j].is_int());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, dimensions, get/set, Gaussian elimination and rational normalization",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/matrix.go",
+          "tests": ["TestSpacerMatrixNormalizeAndSourceEliminationOrder"]
+        },
+        {
+          "name": "print_matrix verbose diagnostic",
+          "status": "dead",
+          "reason": "Its only source caller is the bounded Farkas branch behind a literal true selection of the optimized branch; no retained configuration reaches it."
+        }
+      ],
+      "ownership": ["spacerMatrix owns its big.Rat cells; get returns an independent copy and set copies its input."],
+      "deviations": ["Go slices and math/big.Rat replace native vectors and rational. The source's row-assignment and subtraction-loop order, including their unusual effects, are preserved exactly."]
     },
     {
       "path": "src/muz/spacer/spacer_matrix.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/spacer/matrix.go"],
+      "tests": ["TestSpacerMatrixNormalizeAndSourceEliminationOrder"],
       "conditionals": [
         {
           "line": 18,
@@ -89775,11 +89787,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "matrix storage and reached operation surface",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/matrix.go",
+          "tests": ["TestSpacerMatrixNormalizeAndSourceEliminationOrder"]
+        }
+      ],
+      "ownership": ["The concrete Go matrix owns all cells without external aliases."],
+      "deviations": ["Header guards and native container declarations become normal Go package compilation and slices."]
     },
     {
       "path": "src/muz/spacer/spacer_mev_array.cpp",
@@ -89885,10 +89904,9 @@
       "methods": [
         {
           "name": "construction, add_level/ensure_level/level_cnt, assert_level_atoms and both assert_expr forms",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/muz/spacer/prop_solver.go",
-          "tests": ["TestPropSolverNormalAndDeltaLevelActivation"],
-          "reason": "The PropSolver construction and algorithm are present, but source-default construction selects the still-unported new unsat-core plugin mode. Go requires an explicit legacy-core selection rather than silently substituting it."
+          "tests": ["TestPropSolverNormalAndDeltaLevelActivation", "TestPropSolverPublishesNewPluginCore"]
         },
         {
           "name": "maxsmt hard proxying and iterative soft-core removal",
@@ -89923,7 +89941,7 @@
         "PropSolver owns its two ItpSolver wrappers and level-atom references while borrowing both solver backends. MaxSAT pins every hard and soft input across repeated checks. PropCheckResult owns core references and an optional model until Close."
       ],
       "deviations": [
-        "Pointer-based one-shot core/model setters and RAII level toggles become one CheckAssumptions options value and an owning result. The source's intentional solver_id == 0 ? 0 : 0 routing is preserved. Go errors replace source assertions for invalid lifetime and level nesting. Construction currently requires explicit legacy Farkas-core mode because the source-default new plugin mode remains open."
+        "Pointer-based one-shot core/model setters and RAII level toggles become one CheckAssumptions options value and an owning result. The source's intentional solver_id == 0 ? 0 : 0 routing is preserved. Go errors replace source assertions for invalid lifetime and level nesting. Zero-value core configuration selects the source-default new optimized-Farkas plugin path."
       ]
     },
     {
@@ -89958,14 +89976,14 @@
       "methods": [
         {
           "name": "level creation/count, global and guarded assertion, assumption checking, core/model controls, level reporting and statistics",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/muz/spacer/prop_solver.go",
           "tests": [
             "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
             "TestPropSolverNormalAndDeltaLevelActivation",
-            "TestPropSolverPublishesFarkasCore"
-          ],
-          "reason": "All PropSolver operations are implemented for the explicit legacy-core configuration; default-new unsat-core plugin construction remains unported."
+            "TestPropSolverPublishesFarkasCore",
+            "TestPropSolverPublishesNewPluginCore"
+          ]
         },
         {
           "name": "scoped_level, scoped_delta_level and scoped_subset_core state changes",
@@ -90408,8 +90426,12 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/spacer/unsat_core_plugin_lemma.go"],
-      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"],
+      "go_targets": [
+        "pkg/muz/spacer/unsat_core_plugin_lemma.go",
+        "pkg/muz/spacer/unsat_core_plugin_farkas.go",
+        "pkg/muz/spacer/unsat_core_plugin_farkas_optimized.go"
+      ],
+      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit", "TestUnsatCoreFarkasPluginClosesArithmeticMixedStep"],
       "assertions": [
         {
           "line": 40,
@@ -90594,7 +90616,18 @@
           "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"]
         },
         {
-          "name": "Farkas, optimized Farkas, bounded Farkas and min-cut plugins",
+          "name": "unoptimized and Gaussian-elimination optimized Farkas plugins",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/unsat_core_plugin_farkas_optimized.go",
+          "tests": ["TestUnsatCoreFarkasPluginClosesArithmeticMixedStep"]
+        },
+        {
+          "name": "bounded Farkas plugin",
+          "status": "dead",
+          "reason": "The source selects the optimized plugin through a literal if (true), so no retained configuration reaches the bounded alternative."
+        },
+        {
+          "name": "optional min-cut plugin",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -90604,7 +90637,7 @@
         "The lemma plugin borrows its owning learner and is closed by that learner; core insertion acquires an owning learner reference."
       ],
       "deviations": [
-        "The ordinary fallback lemma plugin is complete. Arithmetic and min-cut plugin families remain open."
+        "The ordinary fallback and both retained arithmetic plugin variants are complete. The optional minimize-unsat-core min-cut plugin remains open."
       ]
     },
     {
@@ -90614,7 +90647,9 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/spacer/unsat_core_learner.go",
-        "pkg/muz/spacer/unsat_core_plugin_lemma.go"
+        "pkg/muz/spacer/unsat_core_plugin_lemma.go",
+        "pkg/muz/spacer/unsat_core_plugin_farkas.go",
+        "pkg/muz/spacer/unsat_core_plugin_farkas_optimized.go"
       ],
       "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"],
       "conditionals": [
@@ -90637,10 +90672,17 @@
           "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"]
         },
         {
-          "name": "arithmetic and min-cut plugin declarations",
-          "status": "unported",
+          "name": "unoptimized and optimized arithmetic plugin declarations",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/unsat_core_plugin_farkas_optimized.go",
+          "tests": ["TestUnsatCoreFarkasPluginClosesArithmeticMixedStep"]
+        },
+        {
+          "name": "bounded arithmetic and min-cut plugin declarations",
+          "status": "partial",
           "go_target": null,
-          "tests": []
+          "tests": [],
+          "reason": "The bounded plugin is unreachable behind the source literal optimized selection; the optional min-cut plugin remains unported."
         }
       ],
       "ownership": [

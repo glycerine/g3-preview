@@ -35,8 +35,13 @@ func TestItpSolverExpandsProxyCoreAndScopesDefinitions(t *testing.T) {
 	spacerMust(t, err)
 	backend, err := smtcore.NewSMTSolver(manager, nil, "QF_UF", smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
 	spacerMust(t, err)
-	if _, err = spacer.NewItpSolver(backend, spacer.ItpSolverConfig{Params: globals.Context, Globals: globals}); !errors.Is(err, spacer.ErrITPNewCoreUnported) {
-		t.Fatal("unspecified core mode silently selected the legacy algorithm", err)
+	defaultCore, err := spacer.NewItpSolver(backend, spacer.ItpSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal("native default optimized core mode", err)
+	}
+	spacerMust(t, defaultCore.Close())
+	if _, err = spacer.NewItpSolver(backend, spacer.ItpSolverConfig{Params: globals.Context, Globals: globals, CoreMode: spacer.ItpCoreMode(255)}); !errors.Is(err, spacer.ErrITPCoreMode) {
+		t.Fatal("unsupported core mode was not rejected", err)
 	}
 	wrapped, err := spacer.NewItpSolver(backend, spacer.ItpSolverConfig{Params: globals.Context, Globals: globals, CoreMode: spacer.ItpCoreLegacyFarkas})
 	spacerMust(t, err)

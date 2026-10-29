@@ -17,14 +17,15 @@ import (
 )
 
 var ErrITPSolverOwner = errors.New("muz/spacer: invalid or closed interpolating solver")
-var ErrITPNewCoreUnported = errors.New("muz/spacer: new unsat-core plugin path is not ported")
+var ErrITPCoreMode = errors.New("muz/spacer: unsupported interpolating-core mode")
 
 type ItpCoreMode uint8
 
 const (
 	ItpCoreUnspecified ItpCoreMode = iota
 	ItpCoreLegacyFarkas
-	ItpCoreNewPlugins
+	ItpCoreNewFarkas
+	ItpCoreNewOptimized
 )
 
 type ItpSolverConfig struct {
@@ -32,6 +33,7 @@ type ItpSolverConfig struct {
 	Globals       *uparams.GlobalParamsService
 	SplitLiterals bool
 	CoreMode      ItpCoreMode
+	FarkasAConst  bool
 }
 
 type itpDefinitions struct {
@@ -78,8 +80,11 @@ func NewItpSolver(backend solver.Solver, config ItpSolverConfig) (*ItpSolver, er
 	if backend == nil || config.Params == nil || config.Globals == nil || config.Globals.Context != config.Params {
 		return nil, ErrITPSolverOwner
 	}
-	if config.CoreMode != ItpCoreLegacyFarkas {
-		return nil, ErrITPNewCoreUnported
+	if config.CoreMode == ItpCoreUnspecified {
+		config.CoreMode = ItpCoreNewOptimized
+	}
+	if config.CoreMode != ItpCoreLegacyFarkas && config.CoreMode != ItpCoreNewFarkas && config.CoreMode != ItpCoreNewOptimized {
+		return nil, ErrITPCoreMode
 	}
 	manager, err := backend.Manager()
 	if err != nil {
@@ -525,17 +530,54 @@ func (s *ItpSolver) ItpCore() (_ []ast.ASTRef, resultErr error) {
 		}
 		bAssertions = append(bAssertions, assumption)
 	}
-	learner, err := NewFarkasLearner(s.manager, s.config.Params, s.config.Globals)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { resultErr = errors.Join(resultErr, learner.Close()) }()
-	if err = learner.SetSplitLiterals(s.config.SplitLiterals); err != nil {
-		return nil, err
-	}
-	values, err := learner.GetLemmas(proof, bAssertions)
-	if err != nil {
-		return nil, err
+	var values []ast.ASTRef
+	if s.config.CoreMode == ItpCoreLegacyFarkas {
+		learner, err := NewFarkasLearner(s.manager, s.config.Params, s.config.Globals)
+		if err != nil {
+			return nil, err
+		}
+		defer func() { resultErr = errors.Join(resultErr, learner.Close()) }()
+		if err = learner.SetSplitLiterals(s.config.SplitLiterals); err != nil {
+			return nil, err
+		}
+		values, err = learner.GetLemmas(proof, bAssertions)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		learner, err := NewUnsatCoreLearner(s.manager)
+		if err != nil {
+			return nil, err
+		}
+		defer func() { resultErr = errors.Join(resultErr, learner.Close()) }()
+		if s.config.CoreMode == ItpCoreNewOptimized {
+			farkas, err := NewUnsatCoreOptimizedFarkasPlugin(learner, s.config.Params, s.config.Globals)
+			if err != nil {
+				return nil, err
+			}
+			if err = learner.RegisterPlugin(farkas); err != nil {
+				return nil, errors.Join(err, farkas.Close())
+			}
+		} else {
+			farkas, err := NewUnsatCoreFarkasPlugin(learner, s.config.Params, s.config.Globals, s.config.SplitLiterals, s.config.FarkasAConst)
+			if err != nil {
+				return nil, err
+			}
+			if err = learner.RegisterPlugin(farkas); err != nil {
+				return nil, errors.Join(err, farkas.Close())
+			}
+		}
+		fallback, err := NewUnsatCoreLemmaPlugin(learner)
+		if err != nil {
+			return nil, err
+		}
+		if err = learner.RegisterPlugin(fallback); err != nil {
+			return nil, errors.Join(err, fallback.Close())
+		}
+		values, err = learner.ComputeUnsatCore(proof, bAssertions)
+		if err != nil {
+			return nil, err
+		}
 	}
 	values, err = s.eliminateProxies(values)
 	if err != nil {

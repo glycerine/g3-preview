@@ -30,10 +30,14 @@ type spacerPropFixture struct {
 }
 
 func newSpacerPropFixture(t *testing.T, keepProxy bool) *spacerPropFixture {
-	return newSpacerPropFixtureWithProofs(t, keepProxy, false)
+	return newSpacerPropFixtureWithMode(t, keepProxy, false, spacer.ItpCoreLegacyFarkas)
 }
 
 func newSpacerPropFixtureWithProofs(t *testing.T, keepProxy, proofs bool) *spacerPropFixture {
+	return newSpacerPropFixtureWithMode(t, keepProxy, proofs, spacer.ItpCoreLegacyFarkas)
+}
+
+func newSpacerPropFixtureWithMode(t *testing.T, keepProxy, proofs bool, mode spacer.ItpCoreMode) *spacerPropFixture {
 	t.Helper()
 	command, err := cmd_context.NewStandaloneContext()
 	spacerMust(t, err)
@@ -57,11 +61,33 @@ func newSpacerPropFixtureWithProofs(t *testing.T, keepProxy, proofs bool) *space
 	truth, err := manager.MkTrue()
 	spacerMust(t, err)
 	fixture.solver, err = spacer.NewPropSolver(manager, generic, truth, "spacer-test", spacer.PropSolverConfig{
-		Itp:       spacer.ItpSolverConfig{Params: globals.Context, Globals: globals, CoreMode: spacer.ItpCoreLegacyFarkas},
+		Itp:       spacer.ItpSolverConfig{Params: globals.Context, Globals: globals, CoreMode: mode, FarkasAConst: true},
 		KeepProxy: keepProxy,
 	})
 	spacerMust(t, err)
 	return fixture
+}
+
+func TestPropSolverPublishesNewPluginCore(t *testing.T) {
+	for _, mode := range []spacer.ItpCoreMode{spacer.ItpCoreNewFarkas, spacer.ItpCoreNewOptimized} {
+		fixture := newSpacerPropFixtureWithMode(t, true, true, mode)
+		p := spacerBool(t, fixture.manager, "spacer-new-core-p")
+		notP, err := fixture.manager.MkNot(p)
+		spacerMust(t, err)
+		spacerMust(t, fixture.solver.Assert(notP))
+		result, err := fixture.solver.CheckAssumptions([]ast.ASTHandle{p}, nil, spacer.PropCheckOptions{NeedCore: true})
+		spacerMust(t, err)
+		if result.Status != lbool.False || !result.FarkasCore || len(result.Core) != 1 {
+			t.Fatal("new plugin PropSolver core", mode, result.Status, result.FarkasCore, len(result.Core))
+		}
+		handle, err := fixture.manager.RefGet(result.Core[0])
+		spacerMust(t, err)
+		if handle != p {
+			t.Fatal("new plugin core selected wrong literal", mode, handle, p)
+		}
+		spacerMust(t, result.Close(fixture.manager))
+		fixture.close(t)
+	}
 }
 
 func TestPropSolverPublishesFarkasCore(t *testing.T) {
