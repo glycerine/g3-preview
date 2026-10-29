@@ -15,6 +15,8 @@ import (
 )
 
 func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.RuleSet, resultErr error) {
+	var slicedPredicates map[ast.ASTHandle]ast.ASTHandle
+	var slicedColumns map[ast.ASTHandle][]bool
 	prepared, err := base.NewRuleSet(e.rules)
 	if err != nil {
 		return nil, err
@@ -167,6 +169,9 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 			return nil, errors.Join(err, plugin.Close(), slicer.Close())
 		}
 		_, err = slicer.Apply(prepared)
+		if err == nil {
+			slicedPredicates, slicedColumns = plugin.PredicateSlices()
+		}
 		err = errors.Join(err, slicer.Close())
 		if err != nil {
 			return nil, fmt.Errorf("muz/fp: Spacer rule slicing: %w", err)
@@ -196,6 +201,8 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 			return nil, fmt.Errorf("muz/fp: Spacer rule unfolding round %d: %w", round+1, err)
 		}
 	}
+	e.spacerPredicates = slicedPredicates
+	e.spacerSlices = slicedColumns
 	keep = true
 	return prepared, nil
 }

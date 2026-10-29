@@ -22,6 +22,8 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 		}
 		e.spacer = nil
 		e.spacerRevision = 0
+		e.spacerPredicates = nil
+		e.spacerSlices = nil
 	}
 	finalized, err := e.set.IsFinalized()
 	if err != nil {
@@ -152,7 +154,7 @@ func (e *PropositionalEngine) NumLevels(declaration ast.ASTHandle) (uint32, erro
 		return 0, err
 	}
 	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
-		return e.spacer.NumLevels(declaration)
+		return e.spacer.NumLevels(e.spacerPredicate(declaration))
 	}
 	context, err := e.pdrContext()
 	if err != nil {
@@ -168,7 +170,11 @@ func (e *PropositionalEngine) CoverDelta(level int, declaration ast.ASTHandle) (
 		return ast.ASTRef{}, err
 	}
 	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
-		return e.spacer.CoverDelta(level, declaration)
+		cover, err := e.spacer.CoverDelta(level, e.spacerPredicate(declaration))
+		if err != nil {
+			return ast.ASTRef{}, err
+		}
+		return e.expandSpacerFormula(declaration, cover)
 	}
 	context, err := e.pdrContext()
 	if err != nil {
@@ -184,7 +190,10 @@ func (e *PropositionalEngine) AddCover(level int, declaration, property ast.ASTH
 		return err
 	}
 	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
-		return e.spacer.AddCover(level, declaration, property)
+		if err := e.rejectSlicedProperty(declaration); err != nil {
+			return err
+		}
+		return e.spacer.AddCover(level, e.spacerPredicate(declaration), property)
 	}
 	context, err := e.pdrContext()
 	if err != nil {
@@ -206,7 +215,11 @@ func (e *PropositionalEngine) Reachable(declaration ast.ASTHandle) (ast.ASTRef, 
 	if e.backend != "spacer" || e.spacer == nil || e.spacerRevision != e.revision {
 		return ast.ASTRef{}, ErrPropositionalEngine
 	}
-	return e.spacer.Reachable(declaration)
+	result, err := e.spacer.Reachable(e.spacerPredicate(declaration))
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	return e.expandSpacerFormula(declaration, result)
 }
 
 // GroundSatAnswer returns the latest successful Spacer reach-fact answer.
@@ -224,7 +237,11 @@ func (e *PropositionalEngine) GroundSatAnswer(declaration ast.ASTHandle) (ast.AS
 	if status != lbool.True {
 		return ast.ASTRef{}, ErrPropositionalEngine
 	}
-	return e.spacer.Answer(declaration)
+	answer, err := e.spacer.Answer(e.spacerPredicate(declaration))
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	return e.expandSpacerFormula(declaration, answer)
 }
 
 // RulesAlongTrace returns owning rule formulas and their names in preorder for

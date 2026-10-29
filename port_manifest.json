@@ -89151,8 +89151,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/spacer/context.go", "pkg/cmd_context/fixedpoint.go", "pkg/api/api_fixedpoint.go"],
-      "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"],
+      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/fp/spacer_slice_results.go", "pkg/muz/spacer/context.go", "pkg/cmd_context/fixedpoint.go", "pkg/api/api_fixedpoint.go"],
+      "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSpacerEngineExpandsSlicedReachableColumns", "TestSMTContextFixedpointSpacerInductiveExports", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"],
       "assertions": [
         {
           "line": 274,
@@ -89169,10 +89169,11 @@
         {"name": "direct-predicate and from-level query selection, Spacer context construction and solve routing", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]},
         {"name": "answer, ground answer, trace rules/names, inductive model, level count, cover/invariant, reachable summary, statistics and reset forwarding", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerContextSolvesFactAndRecursiveNoBasePrograms", "TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "parameter-controlled semantic slice, coalesce, and iterative unfold preprocessing with direct query predicate remapping", "status": "ported", "go_target": "pkg/muz/fp/spacer_engine.go", "tests": ["TestSMTLibRunnerCPPReference/fixedpoint_spacer_slice_columns.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_spacer_coalesce_unfold.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_spacer_unfold_rules.smt2"]},
-        {"name": "remaining transformed-rule subsumption reuse, slice proof/model/answer expansion, and proof or diagnostic certificate display", "status": "unported", "go_target": null, "tests": []}
+        {"name": "sliced-predicate forwarding and answer, cover, reachable, and ground-answer variable expansion to original columns", "status": "ported", "go_target": "pkg/muz/fp/spacer_slice_results.go", "tests": ["TestSpacerEngineExpandsSlicedReachableColumns"]},
+        {"name": "remaining transformed-rule subsumption reuse, slice proof/model interpretation expansion, and proof or diagnostic certificate display", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["PropositionalEngine owns the active Spacer Context and rebuilds it after tracked rule or parameter changes; returned answers and inductive models transfer ownership to the caller."],
-      "deviations": ["Go selects direct predicate declarations through the typed engine API and remaps sliced query predicates through RuleSet metadata. Slice/unfold/coalesce proof conversion and slice model/answer expansion remain unported."]
+      "deviations": ["Go selects direct predicate declarations through the typed engine API, remaps sliced predicates through RuleSet metadata, and expands exported formulas to original free-variable columns. Slice/unfold/coalesce proof conversion and slice model interpretation expansion remain unported."]
     },
     {
       "path": "src/muz/spacer/spacer_dl_interface.h",
@@ -92971,11 +92972,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/transforms/rule_slice.go",
-        "pkg/muz/fp/spacer_engine.go"
+        "pkg/muz/fp/spacer_engine.go",
+        "pkg/muz/fp/spacer_slice_results.go"
       ],
       "tests": [
         "TestRuleSliceRemovesUnconstrainedPredicateColumns",
         "TestRuleSliceRetainsConstantConstrainedColumn",
+        "TestSpacerEngineExpandsSlicedReachableColumns",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_slice_columns.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_slice_columns.smt2"
       ],
@@ -93035,6 +93038,14 @@
           ]
         },
         {
+          "name": "formula-result variable expansion back to original predicate columns",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/spacer_slice_results.go",
+          "tests": [
+            "TestSpacerEngineExpandsSlicedReachableColumns"
+          ]
+        },
+        {
           "name": "slice proof conversion and model interpretation expansion back to original predicate columns",
           "status": "unported"
         }
@@ -93043,7 +93054,7 @@
         "The replacement RuleSet owns sliced rules and original/derived declaration mappings; temporary source rules and rewritten rules are closed after transfer."
       ],
       "deviations": [
-        "Semantic slicing and direct query remapping are retained; proof conversion and model/answer expansion to removed columns remain unported."
+        "Semantic slicing, direct predicate remapping, and free-variable expansion for exported formulas are retained; proof conversion and model interpretation expansion to removed columns remain unported."
       ]
     },
     {

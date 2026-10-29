@@ -636,6 +636,23 @@ func (p *RuleSlicePlugin) DerivedPredicate(original ast.ASTHandle) (ast.ASTHandl
 	return derived, found
 }
 
+// PredicateSlices returns independent Go container snapshots of the
+// original-to-derived mapping and removed-column masks produced by the latest
+// successful transform. The AST handles remain borrowed from the transformed
+// rule set.
+func (p *RuleSlicePlugin) PredicateSlices() (map[ast.ASTHandle]ast.ASTHandle, map[ast.ASTHandle][]bool) {
+	if p == nil || p.closed {
+		return make(map[ast.ASTHandle]ast.ASTHandle), make(map[ast.ASTHandle][]bool)
+	}
+	predicates := make(map[ast.ASTHandle]ast.ASTHandle, len(p.predicates))
+	slices := make(map[ast.ASTHandle][]bool, len(p.predicates))
+	for original, derived := range p.predicates {
+		predicates[original] = derived
+		slices[original] = append([]bool(nil), p.sliceable[original]...)
+	}
+	return predicates, slices
+}
+
 func (p *RuleSlicePlugin) Close() error {
 	if p == nil || p.closed {
 		return base.ErrRuleTransformerOwner

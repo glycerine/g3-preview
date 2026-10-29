@@ -54,28 +54,30 @@ func (e *PropositionalEngine) predicateState(declaration ast.ASTHandle) (*predic
 // PropositionalEngine owns the retained rule, finite-relation, and optional
 // ground-guard rewriting services.
 type PropositionalEngine struct {
-	manager        *ast.ASTManager
-	rules          *base.RuleManager
-	set            *base.RuleSet
-	binder         *base.VariableBinder
-	relations      *rel.RelationManager
-	guard          *astrewriter.TheoryRewriter
-	background     ast.ASTRef
-	params         *uparams.ParamsContext
-	globals        *uparams.GlobalParamsService
-	backend        string
-	pdr            *muzpdr.Context
-	spacer         *muzspacer.Context
-	scopes         []*base.RuleSet
-	predicates     map[ast.ASTHandle]*predicateState
-	predicateOrder []ast.ASTHandle
-	auxiliary      map[ast.ASTHandle]bool
-	compiled       bool
-	queried        bool
-	revision       uint64
-	pdrRevision    uint64
-	spacerRevision uint64
-	closed         bool
+	manager          *ast.ASTManager
+	rules            *base.RuleManager
+	set              *base.RuleSet
+	binder           *base.VariableBinder
+	relations        *rel.RelationManager
+	guard            *astrewriter.TheoryRewriter
+	background       ast.ASTRef
+	params           *uparams.ParamsContext
+	globals          *uparams.GlobalParamsService
+	backend          string
+	pdr              *muzpdr.Context
+	spacer           *muzspacer.Context
+	scopes           []*base.RuleSet
+	predicates       map[ast.ASTHandle]*predicateState
+	predicateOrder   []ast.ASTHandle
+	auxiliary        map[ast.ASTHandle]bool
+	compiled         bool
+	queried          bool
+	revision         uint64
+	pdrRevision      uint64
+	spacerRevision   uint64
+	spacerPredicates map[ast.ASTHandle]ast.ASTHandle
+	spacerSlices     map[ast.ASTHandle][]bool
+	closed           bool
 }
 
 // NewPropositionalEngineWithServices adds the retained AST theory rewriter
@@ -1264,7 +1266,11 @@ func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTR
 		if e.spacer == nil || !e.queried || e.spacerRevision != e.revision {
 			return answer, ErrPropositionalEngine
 		}
-		return e.spacer.Answer(declaration)
+		answer, result = e.spacer.Answer(e.spacerPredicate(declaration))
+		if result != nil {
+			return answer, result
+		}
+		return e.expandSpacerFormula(declaration, answer)
 	}
 	state := e.predicates[declaration]
 	if state == nil || !e.queried {
@@ -1397,6 +1403,8 @@ func (e *PropositionalEngine) Close() (result error) {
 		result = errors.Join(result, e.spacer.Close())
 		e.spacer = nil
 		e.spacerRevision = 0
+		e.spacerPredicates = nil
+		e.spacerSlices = nil
 	}
 	for i := len(e.scopes) - 1; i >= 0; i-- {
 		result = errors.Join(result, e.scopes[i].Close())
