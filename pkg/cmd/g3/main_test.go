@@ -841,6 +841,7 @@ var scriptResults = map[string]string{
 	"pareto_soft_optimization.smt2":                "sat\n(objectives\n (x 0)\n (y 0)\n)\n((a true)\n (b true))\nunsat\nsat\n(objectives\n (x 0)\n (y 0)\n)\n((a true)\n (b true))\n",
 	"simplify_command.smt2":                        "(+ 5 x)\n(+ (* x x) (* 2 x y) (* y y))\ntrue\n3\n(rewrite (= (+ 1 2) 3))\n",
 	"simplify_sequence_command.smt2":               "(= c #x61)\n",
+	"pending_default_portfolio_option_error.smt2":  "unknown\n",
 	"get_assertions.smt2":                          "((and a true))\n((and a true)\n (! b :named n))\n((and a true))\n",
 	"get_assignment.smt2":                          "sat\n((|p q| true) (q false))\nsat\n((|p q| true) (q false) (r false))\nsat\n((|p q| true) (q false))\n",
 	"get_unsat_assumptions.smt2":                   "unsat\n(a)\nunsat\n(b)\nunsat\n((not b))\nunsat\n(a)\n",
