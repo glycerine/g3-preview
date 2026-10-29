@@ -226,3 +226,43 @@ func (e *PropositionalEngine) GroundSatAnswer(declaration ast.ASTHandle) (ast.AS
 	}
 	return e.spacer.Answer(declaration)
 }
+
+// RulesAlongTrace returns owning rule formulas and their names in preorder for
+// the latest successful Spacer query. The caller releases every ASTRef.
+func (e *PropositionalEngine) RulesAlongTrace() (formulas []ast.ASTRef, names []string, resultErr error) {
+	if err := e.open(); err != nil {
+		return nil, nil, err
+	}
+	if e.backend != "spacer" || e.spacer == nil || e.spacerRevision != e.revision {
+		return nil, nil, ErrPropositionalEngine
+	}
+	rules, err := e.spacer.RulesAlongTrace()
+	if err != nil {
+		return nil, nil, err
+	}
+	defer func() {
+		for index := len(rules) - 1; index >= 0; index-- {
+			resultErr = errors.Join(resultErr, rules[index].Close())
+		}
+		if resultErr != nil {
+			for index := len(formulas) - 1; index >= 0; index-- {
+				resultErr = errors.Join(resultErr, e.manager.DelRef(&formulas[index]))
+			}
+			formulas = nil
+			names = nil
+		}
+	}()
+	for _, rule := range rules {
+		formula, err := rule.ToFormula()
+		if err != nil {
+			return formulas, names, err
+		}
+		name, err := rule.Name()
+		if err != nil {
+			return formulas, names, err
+		}
+		formulas = append(formulas, formula)
+		names = append(names, name)
+	}
+	return formulas, names, resultErr
+}

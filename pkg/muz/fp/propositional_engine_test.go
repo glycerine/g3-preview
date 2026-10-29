@@ -260,6 +260,14 @@ func TestSpacerEngineRunsReachableAndInductiveHornQueries(t *testing.T) {
 		t.Fatal("Spacer fallback answer", answerHandle)
 	}
 	fpMust(t, manager.DelRef(&answer))
+	trace, names, err := engine.RulesAlongTrace()
+	fpMust(t, err)
+	if len(trace) != 1 || len(names) != 1 || names[0] != "spacer-step;spacer-fact" {
+		t.Fatal("Spacer preorder trace rules", names, len(trace))
+	}
+	for index := len(trace) - 1; index >= 0; index-- {
+		fpMust(t, manager.DelRef(&trace[index]))
+	}
 	stats := statistics.New()
 	fpMust(t, engine.CollectStatistics(stats))
 	if stats.Size() == 0 {

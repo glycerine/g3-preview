@@ -180,6 +180,16 @@ func (c *SMTContext) FixedpointGroundSatAnswer(declaration ast.ASTHandle) (ast.A
 	return c.command.FixedpointGroundSatAnswer(declaration)
 }
 
+// FixedpointRulesAlongTrace returns owning rule formulas and corresponding
+// names in preorder for the latest successful Spacer query. Release every
+// formula through Manager().DelRef.
+func (c *SMTContext) FixedpointRulesAlongTrace() ([]ast.ASTRef, []string, error) {
+	if err := c.open(); err != nil {
+		return nil, nil, err
+	}
+	return c.command.FixedpointRulesAlongTrace()
+}
+
 // FixedpointStatistics returns an owning Go copy of current engine statistics.
 func (c *SMTContext) FixedpointStatistics() (statistics.Statistics, error) {
 	if err := c.open(); err != nil {

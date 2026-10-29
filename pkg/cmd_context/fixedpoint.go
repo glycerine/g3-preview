@@ -286,6 +286,16 @@ func (c *Context) FixedpointGroundSatAnswer(declaration ast.ASTHandle) (ast.ASTR
 	return engine.GroundSatAnswer(declaration)
 }
 
+// FixedpointRulesAlongTrace returns owning rule formulas and their names in
+// preorder for the latest successful Spacer query.
+func (c *Context) FixedpointRulesAlongTrace() ([]ast.ASTRef, []string, error) {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return nil, nil, err
+	}
+	return engine.RulesAlongTrace()
+}
+
 func (c *Context) FixedpointStatistics() (statistics.Statistics, error) {
 	engine, err := c.fixedpointContext()
 	if err != nil {

@@ -288,4 +288,17 @@ func TestSMTContextFixedpointSpacerInductiveExports(t *testing.T) {
 		t.Fatal("Spacer public ground answer is empty")
 	}
 	astTestMust(t, manager.DelRef(&ground))
+	trace, names, err := context.FixedpointRulesAlongTrace()
+	astTestMust(t, err)
+	if len(trace) != 1 || len(names) != 1 || names[0] != "api-spacer-fact" {
+		t.Fatal("Spacer public trace rules", len(trace), names)
+	}
+	traceHandle, err := manager.RefGet(trace[0])
+	astTestMust(t, err)
+	if traceHandle.IsNull() {
+		t.Fatal("Spacer public trace formula is empty")
+	}
+	for index := len(trace) - 1; index >= 0; index-- {
+		astTestMust(t, manager.DelRef(&trace[index]))
+	}
 }

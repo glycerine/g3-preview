@@ -91,6 +91,21 @@ func TestSpacerContextSolvesFactAndRecursiveNoBasePrograms(t *testing.T) {
 		t.Fatal("Spacer base reach summary", reachableBaseHandle)
 	}
 	spacerMust(t, manager.DelRef(&reachableBase))
+	traceRules, err := chainContext.RulesAlongTrace()
+	spacerMust(t, err)
+	if len(traceRules) != 2 {
+		t.Fatal("Spacer preorder trace rule count", len(traceRules))
+	}
+	firstName, err := traceRules[0].Name()
+	spacerMust(t, err)
+	secondName, err := traceRules[1].Name()
+	spacerMust(t, err)
+	if firstName != "chain" || secondName != "base" {
+		t.Fatal("Spacer preorder trace rules", firstName, secondName)
+	}
+	for index := len(traceRules) - 1; index >= 0; index-- {
+		spacerMust(t, traceRules[index].Close())
+	}
 	spacerMust(t, chainContext.Close())
 	spacerMust(t, chainSet.Close())
 	spacerMust(t, chainRule.Close())
