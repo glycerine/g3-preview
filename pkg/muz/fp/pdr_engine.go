@@ -45,13 +45,27 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 		e.pdr = nil
 		e.pdrRevision = 0
 	}
-	context, err := pdr.NewContext(e.manager, nil, 4, pdr.ReachableHashCache, smtcore.SMTSolverConfig{Params: e.params, Globals: e.globals})
+	fixedpoint, err := e.globals.SourceGetModuleName("fixedpoint")
 	if err != nil {
 		return lbool.Undef, err
 	}
-	fixedpoint, err := e.globals.SourceGetModuleName("fixedpoint")
+	maximumName := "pdr.max_num_contexts"
+	maximumContexts, err := e.globals.Context.GetUIntName(&fixedpoint, &maximumName, 500)
 	if err != nil {
-		return lbool.Undef, errors.Join(err, context.Close())
+		return lbool.Undef, err
+	}
+	cacheName := "pdr.cache_mode"
+	cacheValue, err := e.globals.Context.GetUIntName(&fixedpoint, &cacheName, uint32(pdr.ReachableNoCache))
+	if err != nil {
+		return lbool.Undef, err
+	}
+	cacheMode := pdr.ReachableCacheMode(cacheValue)
+	if cacheMode > pdr.ReachableConstraintCache {
+		return lbool.Undef, fmt.Errorf("muz/fp: invalid pdr.cache_mode %d", cacheValue)
+	}
+	context, err := pdr.NewContext(e.manager, nil, maximumContexts, cacheMode, smtcore.SMTSolverConfig{Params: e.params, Globals: e.globals})
+	if err != nil {
+		return lbool.Undef, err
 	}
 	farkasName := "pdr.farkas"
 	useFarkas, err := e.globals.Context.GetBoolName(&fixedpoint, &farkasName, true)

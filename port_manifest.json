@@ -83421,7 +83421,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "PDR/Spacer engine selection, fixedpoint.pdr.farkas, pdr.use_inductive_generalizer and pdr.bfs_model_search parameter forwarding, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
+          "name": "PDR/Spacer engine selection, fixedpoint PDR Farkas/generalizer/search/cache/context-limit parameter forwarding, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [
@@ -83430,6 +83430,7 @@
             "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
             "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
             "TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP",
+            "TestPDREngineReadsContextAndCacheParameters",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2",

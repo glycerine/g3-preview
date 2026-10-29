@@ -210,6 +210,35 @@ func TestPDREngineMatchesCPPIntegerHornQueries(t *testing.T) {
 	}
 }
 
+func TestPDREngineReadsContextAndCacheParameters(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	globals, err := context.GlobalParameters()
+	fpMust(t, err)
+	fpMust(t, globals.SourceSetName("fixedpoint.pdr.max_num_contexts", "1"))
+	fpMust(t, globals.SourceSetName("fixedpoint.pdr.cache_mode", "3"))
+	engine, err := fp.NewPropositionalEngineWithServices(manager, globals.Context, globals)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	fpMust(t, engine.SelectEngine("pdr"))
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	name, err := manager.Symbols.Intern("pdr-invalid-cache")
+	fpMust(t, err)
+	declaration, err := manager.MkFuncDecl(name, nil, boolean, ast.ASTFuncDeclInfo{})
+	fpMust(t, err)
+	fpMust(t, engine.RegisterPredicate(declaration))
+	fact, err := manager.MkApp(declaration, nil)
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(fact, "invalid-cache-fact"))
+	if _, err = engine.QueryPredicate(declaration); err == nil || !strings.Contains(err.Error(), "invalid pdr.cache_mode 3") {
+		t.Fatal("PDR cache parameter was not validated", err)
+	}
+}
+
 func TestPropositionalEngineCompilesSimpleJoinNormalization(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)
