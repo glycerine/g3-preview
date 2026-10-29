@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/spacer"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
@@ -36,6 +37,22 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 	spacerMust(t, err)
 	obligation, err := transformer.NewProofObligation(nil, 2, 1, truth, nil)
 	spacerMust(t, err)
+	reachable, err := transformer.CheckReachability(obligation)
+	spacerMust(t, err)
+	if reachable.Status != lbool.True || reachable.Model == nil {
+		t.Fatal("Spacer reachable obligation", reachable.Status, reachable.Model)
+	}
+	spacerMust(t, reachable.Close(manager))
+	falsity, err := manager.MkFalse()
+	spacerMust(t, err)
+	blocked, err := transformer.NewProofObligation(nil, 0, 1, falsity, nil)
+	spacerMust(t, err)
+	unreachable, err := transformer.CheckReachability(blocked)
+	spacerMust(t, err)
+	if unreachable.Status != lbool.False {
+		t.Fatal("Spacer unreachable obligation", unreachable.Status)
+	}
+	spacerMust(t, unreachable.Close(manager))
 	md, err := model.NewModel(manager)
 	spacerMust(t, err)
 	lastReach, found, err := transformer.LastReachCaseVariable()
@@ -48,8 +65,6 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 	originReachHandle, err := manager.RefGet(originReach)
 	spacerMust(t, err)
 	originReachDeclaration, err := manager.GetDecl(originReachHandle)
-	spacerMust(t, err)
-	falsity, err := manager.MkFalse()
 	spacerMust(t, err)
 	spacerMust(t, md.Core().RegisterConstant(originReachDeclaration, falsity))
 	child, err := transformer.CreateDerivationChild(obligation, recursive, md.Core(), []bool{false}, false)
