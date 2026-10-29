@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/spacer"
 )
@@ -106,6 +107,38 @@ func TestSpacerPredicateRulesBuildTaggedInitialAndTransitionSystem(t *testing.T)
 	}
 	tag, err := transformer.RuleTag(recursiveRule)
 	spacerMust(t, err)
+	md, err := model.NewModel(manager)
+	spacerMust(t, err)
+	tagDeclaration, err := manager.GetDecl(tag)
+	spacerMust(t, err)
+	spacerMust(t, md.Core().RegisterConstant(tagDeclaration, truth))
+	lastReach, found, err := transformer.LastReachCaseVariable()
+	spacerMust(t, err)
+	if !found {
+		t.Fatal("missing Spacer reach-case variable for rule selection")
+	}
+	originReach, err := owner.FormulaNewToOld(lastReach, 0, false)
+	spacerMust(t, err)
+	originReachHandle, err := manager.RefGet(originReach)
+	spacerMust(t, err)
+	originDeclaration, err := manager.GetDecl(originReachHandle)
+	spacerMust(t, err)
+	falsity, err := manager.MkFalse()
+	spacerMust(t, err)
+	spacerMust(t, md.Core().RegisterConstant(originDeclaration, falsity))
+	selection, err := transformer.SelectRule(md.Core())
+	spacerMust(t, err)
+	if selection.Rule == nil || !selection.IsConcrete || selection.NumReuseReach != 1 || len(selection.ReachPredUsed) != 1 || !selection.ReachPredUsed[0] {
+		t.Fatal("Spacer model rule selection", selection.IsConcrete, selection.NumReuseReach, selection.ReachPredUsed)
+	}
+	selectedSame, err := selection.Rule.Same(recursiveRule)
+	spacerMust(t, err)
+	if !selectedSame {
+		t.Fatal("Spacer model selected a different rule")
+	}
+	spacerMust(t, selection.Close())
+	spacerMust(t, manager.DelRef(&originReach))
+	spacerMust(t, md.Close())
 	selected, found, err := transformer.TaggedRule(tag)
 	spacerMust(t, err)
 	if !found {

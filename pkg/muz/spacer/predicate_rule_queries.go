@@ -7,8 +7,26 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
 )
+
+type RuleSelection struct {
+	Rule          *base.Rule
+	IsConcrete    bool
+	ReachPredUsed []bool
+	NumReuseReach uint32
+}
+
+func (s *RuleSelection) Close() error {
+	if s == nil || s.Rule == nil {
+		return nil
+	}
+	err := s.Rule.Close()
+	s.Rule = nil
+	s.ReachPredUsed = nil
+	return err
+}
 
 func (p *PredicateTransformer) normalizedRule(rule *base.Rule) (*spacerNormalizedRule, error) {
 	if err := p.open(); err != nil {
@@ -81,6 +99,105 @@ func (p *PredicateTransformer) TaggedRule(tag ast.ASTHandle) (*base.Rule, bool, 
 		}
 	}
 	return nil, false, nil
+}
+
+// SelectRule finds a true rule tag in the model, preferring a rule whose every
+// predecessor uses its latest reach fact. A nil rule means the model selected
+// the extension literal instead of a rule.
+func (p *PredicateTransformer) SelectRule(md *model.ModelCore) (_ RuleSelection, resultErr error) {
+	if err := p.open(); err != nil {
+		return RuleSelection{}, err
+	}
+	if md == nil {
+		return RuleSelection{}, ast.ErrASTHandle
+	}
+	config := p.owner.contexts[0].config.ModelEvaluator
+	evaluator, err := model.NewModelEvaluator(md, config)
+	if err != nil {
+		return RuleSelection{}, err
+	}
+	selection := RuleSelection{}
+	defer func() {
+		resultErr = errors.Join(resultErr, evaluator.Close())
+		if resultErr != nil {
+			resultErr = errors.Join(resultErr, selection.Close())
+		}
+	}()
+	for _, normalized := range p.rules {
+		if normalized.tag.IsNull() {
+			continue
+		}
+		valueRef, err := evaluator.EvaluateValue(normalized.tag)
+		if err != nil {
+			return RuleSelection{}, err
+		}
+		value, err := p.manager.RefGet(valueRef)
+		isTrue := err == nil && p.manager.IsTrue(value)
+		deleteErr := p.manager.DelRef(&valueRef)
+		if err != nil || deleteErr != nil {
+			return RuleSelection{}, errors.Join(err, deleteErr)
+		}
+		if !isTrue {
+			continue
+		}
+		if selection.Rule != nil {
+			if err = selection.Rule.Close(); err != nil {
+				return RuleSelection{}, err
+			}
+		}
+		selection.Rule, err = normalized.rule.Retain()
+		if err != nil {
+			return RuleSelection{}, err
+		}
+		selection.IsConcrete = true
+		selection.NumReuseReach = 0
+		selection.ReachPredUsed = selection.ReachPredUsed[:0]
+		for index, predecessor := range normalized.predecessors {
+			used := false
+			if len(predecessor.reachFacts) == 0 {
+				selection.IsConcrete = false
+			} else {
+				latest, err := predecessor.manager.RefGet(predecessor.reachCaseVariables[len(predecessor.reachCaseVariables)-1])
+				if err != nil {
+					_ = selection.Close()
+					return RuleSelection{}, err
+				}
+				originRef, err := p.owner.FormulaNewToOld(latest, uint32(index), false)
+				if err != nil {
+					_ = selection.Close()
+					return RuleSelection{}, err
+				}
+				origin, err := p.manager.RefGet(originRef)
+				if err == nil {
+					var evaluated ast.ASTRef
+					evaluated, err = evaluator.EvaluateValue(origin)
+					if err == nil {
+						var result ast.ASTHandle
+						result, err = p.manager.RefGet(evaluated)
+						used = err == nil && p.manager.IsFalse(result)
+						err = errors.Join(err, p.manager.DelRef(&evaluated))
+					}
+				}
+				err = errors.Join(err, p.manager.DelRef(&originRef))
+				if err != nil {
+					_ = selection.Close()
+					return RuleSelection{}, err
+				}
+				selection.IsConcrete = selection.IsConcrete && used
+			}
+			selection.ReachPredUsed = append(selection.ReachPredUsed, used)
+			if used {
+				selection.NumReuseReach++
+			}
+		}
+		if selection.IsConcrete {
+			return selection, nil
+		}
+	}
+	if selection.Rule == nil {
+		selection.IsConcrete = true
+	}
+	return selection, nil
 }
 
 // RemovePredecessors removes positive or negative rule-selection literals.
