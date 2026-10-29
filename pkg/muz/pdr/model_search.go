@@ -317,8 +317,17 @@ type ModelSearch struct {
 	breadthFirst bool
 	root         *ModelNode
 	goal         *ModelNode
-	cache        []map[ast.ASTHandle][]*ModelNode
+	cache        []map[modelStateKey][]*ModelNode
 	closed       bool
+}
+
+// modelStateKey keeps obligations for distinct predicates separate even when
+// their projected state is syntactically identical. This matters especially
+// for zero-arity nonlinear Horn tails, whose state cube is true for every
+// predecessor.
+type modelStateKey struct {
+	transformer *PredicateTransformer
+	state       ast.ASTHandle
 }
 
 func NewModelSearch(breadthFirst bool) *ModelSearch {
@@ -332,12 +341,16 @@ func (s *ModelSearch) open() error {
 	return nil
 }
 
-func (s *ModelSearch) levelCache(node *ModelNode) map[ast.ASTHandle][]*ModelNode {
+func (s *ModelSearch) levelCache(node *ModelNode) map[modelStateKey][]*ModelNode {
 	level := node.original
 	for uint32(len(s.cache)) <= level {
-		s.cache = append(s.cache, make(map[ast.ASTHandle][]*ModelNode))
+		s.cache = append(s.cache, make(map[modelStateKey][]*ModelNode))
 	}
 	return s.cache[level]
+}
+
+func modelState(node *ModelNode) modelStateKey {
+	return modelStateKey{transformer: node.transformer, state: node.state}
 }
 
 func (s *ModelSearch) enqueueLeaf(node *ModelNode) error {
@@ -360,7 +373,8 @@ func (s *ModelSearch) removeGoal(node *ModelNode) error {
 
 func (s *ModelSearch) removeNode(node *ModelNode, backtrack bool) error {
 	cache := s.levelCache(node)
-	nodes := cache[node.state]
+	key := modelState(node)
+	nodes := cache[key]
 	position := -1
 	for index, candidate := range nodes {
 		if candidate == node {
@@ -391,9 +405,9 @@ func (s *ModelSearch) removeNode(node *ModelNode, backtrack bool) error {
 		nodes[0].selected = node.selected
 	}
 	if len(nodes) == 0 {
-		delete(cache, node.state)
+		delete(cache, key)
 	} else {
-		cache[node.state] = nodes
+		cache[key] = nodes
 	}
 	return nil
 }
@@ -440,10 +454,11 @@ func (s *ModelSearch) SetRoot(root *ModelNode) error {
 	}
 	s.root = root
 	cache := s.levelCache(root)
-	if len(cache[root.state]) != 0 {
+	key := modelState(root)
+	if len(cache[key]) != 0 {
 		return ast.ErrASTDomain
 	}
-	cache[root.state] = []*ModelNode{root}
+	cache[key] = []*ModelNode{root}
 	return s.setLeaf(root)
 }
 
@@ -462,14 +477,15 @@ func (s *ModelSearch) AddLeaf(node *ModelNode) error {
 		return ast.ErrASTDomain
 	}
 	cache := s.levelCache(node)
-	nodes := cache[node.state]
+	key := modelState(node)
+	nodes := cache[key]
 	for _, prior := range nodes {
 		if prior == node {
 			return nil
 		}
 	}
 	nodes = append(nodes, node)
-	cache[node.state] = nodes
+	cache[key] = nodes
 	if len(nodes) == 1 {
 		return s.setLeaf(node)
 	}
@@ -546,7 +562,7 @@ func (s *ModelSearch) WellFormed() error {
 			return fmt.Errorf("%w: open leaf is missing from frontier", ErrModelSearchOwner)
 		}
 	}
-	openStates := make(map[uint32]map[ast.ASTHandle]bool)
+	openStates := make(map[uint32]map[modelStateKey]bool)
 	if s.goal != nil {
 		for node := s.goal; ; node = node.next {
 			if !node.IsOpen() || len(node.children) != 0 {
@@ -554,13 +570,14 @@ func (s *ModelSearch) WellFormed() error {
 			}
 			states := openStates[node.level]
 			if states == nil {
-				states = make(map[ast.ASTHandle]bool)
+				states = make(map[modelStateKey]bool)
 				openStates[node.level] = states
 			}
-			if states[node.state] {
+			key := modelState(node)
+			if states[key] {
 				return fmt.Errorf("%w: duplicate open state at level", ErrModelSearchOwner)
 			}
-			states[node.state] = true
+			states[key] = true
 			if node.next == s.goal {
 				break
 			}

@@ -282,6 +282,60 @@ func TestPropositionalEngineCompilesSimpleJoinNormalization(t *testing.T) {
 	}
 }
 
+func TestPDREngineCertificateHidesSimpleJoinAuxiliaries(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	globals, err := context.GlobalParameters()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngineWithServices(manager, globals.Context, globals)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	fpMust(t, engine.SelectEngine("pdr"))
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	applications := make([]ast.ASTHandle, 4)
+	declarations := make([]ast.ASTHandle, 4)
+	for index, name := range []string{"A", "B", "C", "Goal"} {
+		symbol, x := manager.Symbols.Intern("certificate-join-" + name)
+		fpMust(t, x)
+		declarations[index], x = manager.MkFuncDecl(symbol, nil, boolean, ast.ASTFuncDeclInfo{})
+		fpMust(t, x)
+		applications[index], x = manager.MkApp(declarations[index], nil)
+		fpMust(t, x)
+		fpMust(t, engine.RegisterPredicate(declarations[index]))
+	}
+	fpMust(t, engine.AddRule(applications[0], "certificate-a"))
+	fpMust(t, engine.AddRule(applications[1], "certificate-b"))
+	left, err := manager.MkAnd(applications[0], applications[1])
+	fpMust(t, err)
+	body, err := manager.MkAnd(left, applications[2])
+	fpMust(t, err)
+	rule, err := manager.MkImplies(body, applications[3])
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(rule, "certificate-goal"))
+	status, err := engine.QueryPredicate(declarations[3])
+	fpMust(t, err)
+	if status != lbool.False {
+		t.Fatal("three-tail unreachable query", status)
+	}
+	certificate, err := engine.Answer(declarations[3])
+	fpMust(t, err)
+	handle, err := manager.RefGet(certificate)
+	fpMust(t, err)
+	printer, err := ast.NewASTPPUtil(manager)
+	fpMust(t, err)
+	var text strings.Builder
+	fpMust(t, printer.CollectAll([]ast.ASTHandle{handle}))
+	fpMust(t, printer.DisplayAssertions(&text, []ast.ASTHandle{handle}, true))
+	if strings.Contains(text.String(), "simple-join") || !strings.Contains(text.String(), "certificate-join-A") {
+		t.Fatalf("converted PDR certificate:\n%s", text.String())
+	}
+	fpMust(t, manager.DelRef(&certificate))
+}
+
 func TestPropositionalEngineExecutesStratifiedNegation(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)

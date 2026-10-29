@@ -99,6 +99,13 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = context.SetFlexibleTrace(flexible); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
+	auxiliary := make([]ast.ASTHandle, 0, len(e.auxiliary))
+	for declaration := range e.auxiliary {
+		auxiliary = append(auxiliary, declaration)
+	}
+	if err = context.SetAuxiliaryPredicates(auxiliary); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	background, err := e.manager.RefGet(e.background)
 	if err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())

@@ -26,6 +26,7 @@ type Context struct {
 	owner         *Manager
 	cacheMode     ReachableCacheMode
 	transformers  map[ast.ASTHandle]*PredicateTransformer
+	auxiliary     map[ast.ASTHandle]bool
 	order         []ast.ASTHandle
 	search        *ModelSearch
 	implicant     *model.ModelImplicant
@@ -55,7 +56,7 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, err
 	}
-	result := &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(true), lastResult: lbool.Undef, useInductive: true}
+	result := &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(true), lastResult: lbool.Undef, useInductive: true, auxiliary: make(map[ast.ASTHandle]bool)}
 	fail := func(cause error) (*Context, error) {
 		cleanup := result.Close()
 		if cleanup != nil {
@@ -168,6 +169,30 @@ func (c *Context) SetFlexibleTrace(enabled bool) error {
 		return ast.ErrASTDomain
 	}
 	c.flexibleTrace = enabled
+	return nil
+}
+
+// SetAuxiliaryPredicates records declarations introduced by retained rule
+// transformations. Their transformer state participates in solving but is
+// omitted from externally visible inductive certificates, as in the source
+// model-converter path. It must be called before Initialize.
+func (c *Context) SetAuxiliaryPredicates(declarations []ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	for _, declaration := range declarations {
+		kind, err := c.manager.GetKind(declaration)
+		if err != nil {
+			return err
+		}
+		if kind != ast.ASTFuncDecl {
+			return ast.ErrASTDomain
+		}
+		c.auxiliary[declaration] = true
+	}
 	return nil
 }
 
@@ -553,6 +578,7 @@ func (c *Context) Close() (result error) {
 		c.manager = nil
 		c.owner = nil
 		c.transformers = nil
+		c.auxiliary = nil
 		c.order = nil
 		c.search = nil
 		c.implicant = nil

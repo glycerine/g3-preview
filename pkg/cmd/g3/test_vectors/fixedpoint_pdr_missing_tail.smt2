@@ -1,0 +1,7 @@
+(set-option :fixedpoint.engine spacer)
+(declare-rel A ())
+(declare-rel C ())
+(declare-rel Goal ())
+(rule A)
+(rule (=> (and A C) Goal))
+(query Goal :print-answer false)

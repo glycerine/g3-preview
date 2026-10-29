@@ -121,3 +121,40 @@ func TestModelNodeRejectsInvalidParentLevel(t *testing.T) {
 	pdrMust(t, owner.Close())
 	pdrMust(t, command.Close())
 }
+
+func TestModelSearchKeepsIdenticalStatesForDistinctPredicates(t *testing.T) {
+	command, manager, owner := pdrManagerFixture(t, 2)
+	boolean, err := manager.MkBoolSort()
+	pdrMust(t, err)
+	transformers := make([]*pdr.PredicateTransformer, 3)
+	for index, name := range []string{"root", "left", "right"} {
+		head := pdrFunction(t, manager, "predicate_state_"+name, nil, boolean)
+		transformers[index], err = pdr.NewPredicateTransformer(owner, head, pdr.ReachableNoCache)
+		pdrMust(t, err)
+	}
+	truth, err := manager.MkTrue()
+	pdrMust(t, err)
+	root, err := pdr.NewModelNode(nil, truth, transformers[0], 1)
+	pdrMust(t, err)
+	search := pdr.NewModelSearch(true)
+	pdrMust(t, search.SetRoot(root))
+	if next, found, x := search.Next(); x != nil || !found || next != root {
+		t.Fatal("root frontier", next, found, x)
+	}
+	left, err := pdr.NewModelNode(root, truth, transformers[1], 0)
+	pdrMust(t, err)
+	right, err := pdr.NewModelNode(root, truth, transformers[2], 0)
+	pdrMust(t, err)
+	pdrMust(t, search.AddLeaf(left))
+	pdrMust(t, search.AddLeaf(right))
+	if count, x := search.GoalCount(); x != nil || count != 2 || !left.IsOpen() || !right.IsOpen() {
+		t.Fatal("distinct predicate obligations were merged", count, left.IsOpen(), right.IsOpen(), x)
+	}
+	pdrMust(t, search.WellFormed())
+	pdrMust(t, search.Close())
+	for index := len(transformers) - 1; index >= 0; index-- {
+		pdrMust(t, transformers[index].Close())
+	}
+	pdrMust(t, owner.Close())
+	pdrMust(t, command.Close())
+}

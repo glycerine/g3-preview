@@ -268,7 +268,7 @@ func (c *Context) unsatAnswer(queryDeclaration ast.ASTHandle) (result ast.ASTRef
 	defer func() { resultErr = errors.Join(resultErr, abstractor.Close()) }()
 	definitions := make([]ast.ASTHandle, 0, len(c.order))
 	for _, declaration := range c.order {
-		if declaration == queryDeclaration {
+		if declaration == queryDeclaration || c.auxiliary[declaration] {
 			continue
 		}
 		transformer := c.transformers[declaration]

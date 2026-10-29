@@ -65,6 +65,7 @@ type PropositionalEngine struct {
 	pdr         *muzpdr.Context
 	scopes      []*base.RuleSet
 	predicates  map[ast.ASTHandle]*predicateState
+	auxiliary   map[ast.ASTHandle]bool
 	compiled    bool
 	queried     bool
 	revision    uint64
@@ -118,7 +119,7 @@ func NewPropositionalEngine(manager *ast.ASTManager) (*PropositionalEngine, erro
 	}
 	return &PropositionalEngine{
 		manager: manager, rules: rules, set: set, binder: binder, relations: relations,
-		background: background, predicates: make(map[ast.ASTHandle]*predicateState), backend: "datalog", revision: 1,
+		background: background, predicates: make(map[ast.ASTHandle]*predicateState), auxiliary: make(map[ast.ASTHandle]bool), backend: "datalog", revision: 1,
 	}, nil
 }
 
@@ -378,6 +379,7 @@ func (e *PropositionalEngine) normalizeSimpleJoins() (resultErr error) {
 			return x
 		}
 		e.predicates[declaration] = state
+		e.auxiliary[declaration] = true
 	}
 	e.revision++
 	return nil
@@ -1351,6 +1353,7 @@ func (e *PropositionalEngine) Close() (result error) {
 	}
 	result = errors.Join(result, e.manager.DelRef(&e.background))
 	e.predicates = nil
+	e.auxiliary = nil
 	e.params, e.globals = nil, nil
 	e.closed = true
 	return result

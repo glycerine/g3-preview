@@ -83131,7 +83131,11 @@
           "go_target": "pkg/muz/pdr/model_search.go",
           "tests": [
             "TestModelSearchFrontierOrderingClosureAndOwnership",
-            "TestModelNodeRejectsInvalidParentLevel"
+            "TestModelNodeRejectsInvalidParentLevel",
+            "TestModelSearchKeepsIdenticalStatesForDistinctPredicates",
+            "TestPDREngineCertificateHidesSimpleJoinAuxiliaries",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_missing_tail.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_missing_tail.smt2"
           ]
         },
         {
@@ -83143,7 +83147,9 @@
             "TestContextSolveFindsInductiveUnreachablePredicate",
             "TestContextSolveProjectsCoupledPredecessors",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_arithmetic_invariant.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_missing_tail.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_missing_tail.smt2"
           ]
         },
         {
@@ -83176,7 +83182,7 @@
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "cover model-converter remapping, remaining general linear rule/model trace unification, optional model-cone generalizer mode and post-QE disequality reduction",
+          "name": "remaining cover model-converter remapping, non-simple-join model-converter application, general linear rule/model trace unification, optional model-cone generalizer mode and post-QE disequality reduction",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83191,7 +83197,7 @@
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
         "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth.",
         "Solve now drives the unbounded native frame/model-search loop, minimizes selected transition/state literals with model_implicant, applies the native QE-lite constant-elimination overload, and partitions projected literals among predecessor states. The optional pdr_use_model_generalizer cone mode and its post-QE disequality reduction remain explicit port obligations.",
-        "Successful retained relation-declaration queries reconstruct native-compatible empty/acyclic answers, recursive-SCC state traces, multiple-initial-rule leaf selection and nonlinear selected-rule reduction to true. Unsuccessful queries expose direct-predicate universally quantified frame definitions; native model-converter remapping and clause presentation normalization remain unported. Cover translation matches direct retained predicates; native model-converter/slice remapping remains unported. Remaining general linear trace unification and proof traces remain unported."
+        "Successful retained relation-declaration queries reconstruct native-compatible empty/acyclic answers, recursive-SCC state traces, multiple-initial-rule leaf selection and nonlinear selected-rule reduction to true. Unsuccessful queries expose direct-predicate universally quantified frame definitions and filter retained simple-join auxiliary predicates; other native model-converter remapping and clause presentation normalization remain unported. Cover translation matches direct retained predicates; native model-converter/slice remapping remains unported. Remaining general linear trace unification and proof traces remain unported."
       ]
     },
     {
@@ -83353,7 +83359,7 @@
           "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestContextSolveFindsInductiveUnreachablePredicate"]
         },
         {
-          "name": "remaining cover model-converter remapping plus general linear model-trace unification and proof reconstruction, optional core generalizers, optional model-cone generalizer mode and post-QE disequality reduction",
+          "name": "remaining cover and non-simple-join model-converter remapping plus general linear model-trace unification and proof reconstruction, optional core generalizers, optional model-cone generalizer mode and post-QE disequality reduction",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83361,7 +83367,7 @@
       ],
       "ownership": [
         "PredicateTransformer is the concrete Go owner for its proposition solver, reachable cache, and retained AST state.",
-        "ModelSearch owns the ModelNode tree; nodes own their state, optional model and optional rule references.",
+        "ModelSearch owns the ModelNode tree; nodes own their state, optional model and optional rule references. Cache identity is the concrete predicate transformer plus state formula, so syntactically identical zero-arity predecessor cubes remain distinct obligations.",
         "Context owns its model-implicant, QE-lite projector and any fallback cooperation service created for callers that supplied only parameter services."
       ],
       "deviations": [
@@ -83933,7 +83939,8 @@
       "tests": [
         "TestManagerStateCreationConversionAndAtomRecognition",
         "TestManagerBooleanBackgroundSolverAndImplicationIntegration",
-        "TestContextSolveFindsInductiveUnreachablePredicate"
+        "TestContextSolveFindsInductiveUnreachablePredicate",
+        "TestPDREngineCertificateHidesSimpleJoinAuxiliaries"
       ],
       "assertions": [
         {
@@ -83969,7 +83976,7 @@
           "name": "inductive_property direct-predicate universally quantified expression construction (pdr_manager.cpp:57-76,85-122)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/answer.go",
-          "tests": ["TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTContextFixedpointPDRLifecycle"]
+          "tests": ["TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTContextFixedpointPDRLifecycle", "TestPDREngineCertificateHidesSimpleJoinAuxiliaries"]
         },
         {
           "name": "remaining inductive_property model-converter application, model materialization/string and rule display (pdr_manager.cpp:42-156)",
@@ -83982,7 +83989,7 @@
         "Manager owns one background AST reference, one SymbolMux and one SMTContextManager. Close rejects active proposition solvers through the context manager, then releases contexts, mux pins and the background in dependency order."
       ],
       "deviations": [
-        "Typed errors replace assertion-only zero-arity state and lookup conditions. Go returns borrowed handles and native slices instead of source pointer/reference-vector iterators. Direct-predicate certificates construct the model-to-expression equalities without an intermediate ModelCore; source clause presentation normalization and model-converter remapping remain open."
+        "Typed errors replace assertion-only zero-arity state and lookup conditions. Go returns borrowed handles and native slices instead of source pointer/reference-vector iterators. Direct-predicate certificates construct the model-to-expression equalities without an intermediate ModelCore and apply the retained simple-join auxiliary filter; source clause presentation normalization and other model-converter remapping remain open."
       ]
     },
     {
@@ -86622,7 +86629,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/transforms/simple_joins.go", "pkg/muz/fp/propositional_engine.go"],
-      "tests": ["TestPropositionalEngineCompilesSimpleJoinNormalization", "TestSMT2FixedpointSimpleJoinNormalizationMatchesCPP"],
+      "tests": ["TestPropositionalEngineCompilesSimpleJoinNormalization", "TestSMT2FixedpointSimpleJoinNormalizationMatchesCPP", "TestPDREngineCertificateHidesSimpleJoinAuxiliaries"],
       "assertions": [
         {
           "line": 64,
@@ -86736,11 +86743,11 @@
           "name": "Rule-shape normalization to at most two positive predicate tails using fresh auxiliary predicates that retain exactly the variables live in the head or remaining body (dl_mk_simple_joins.cpp:306-573,684-728)",
           "status": "ported",
           "go_target": "pkg/muz/transforms/simple_joins.go",
-          "tests": ["TestPropositionalEngineCompilesSimpleJoinNormalization", "TestSMT2FixedpointSimpleJoinNormalizationMatchesCPP"]
+          "tests": ["TestPropositionalEngineCompilesSimpleJoinNormalization", "TestSMT2FixedpointSimpleJoinNormalizationMatchesCPP", "TestPDREngineCertificateHidesSimpleJoinAuxiliaries"]
         }
       ],
       "ownership": ["SimpleJoinsPlugin borrows the AST and rule managers, owns temporary pins for original-index auxiliary applications until transformed parent rules retain them, and registers each fresh declaration with RuleManager. Returned RuleSet owns all introduced and replacement rules."],
-      "deviations": ["The retained Go path deterministically associates joins from the left and creates per-rule auxiliaries. The source planner's relation-size costing, normalized pair cache, and cross-rule auxiliary sharing remain open performance work; transformed rule semantics and the at-most-two-positive-tail contract are preserved."]
+      "deviations": ["The retained Go path deterministically associates joins from the left, creates per-rule auxiliaries, and records those auxiliaries for PDR certificate filtering. The source planner's relation-size costing, normalized pair cache, and cross-rule auxiliary sharing remain open performance work; transformed rule semantics and the at-most-two-positive-tail contract are preserved."]
     },
     {
       "path": "src/muz/rel/dl_mk_simple_joins.h",
