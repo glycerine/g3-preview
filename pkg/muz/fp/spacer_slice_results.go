@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	astrewriter "github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/model"
 )
 
 func (e *PropositionalEngine) spacerPredicate(declaration ast.ASTHandle) ast.ASTHandle {
@@ -76,4 +77,119 @@ func (e *PropositionalEngine) rejectSlicedProperty(declaration ast.ASTHandle) er
 		return fmt.Errorf("muz/fp: covers and invariants are incompatible with sliced predicate columns")
 	}
 	return nil
+}
+
+func (e *PropositionalEngine) expandSpacerHandle(declaration, source ast.ASTHandle) (ast.ASTRef, error) {
+	reference, err := e.manager.NewRef(source)
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	return e.expandSpacerFormula(declaration, reference)
+}
+
+func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore, original, derived ast.ASTHandle) (resultErr error) {
+	source, err := destination.FunctionInterpretation(derived)
+	if err != nil {
+		return err
+	}
+	if source == nil {
+		return destination.UnregisterDeclaration(derived)
+	}
+	oldArity, err := e.manager.GetArity(original)
+	if err != nil {
+		return err
+	}
+	interpretation, err := model.NewFunctionInterpretation(e.manager, oldArity)
+	if err != nil {
+		return err
+	}
+	transferred := false
+	defer func() {
+		if !transferred {
+			resultErr = errors.Join(resultErr, interpretation.Close())
+		}
+	}()
+	compact, err := source.Interpretation()
+	if err != nil {
+		return err
+	}
+	if !compact.IsNull() {
+		expanded, expandErr := e.expandSpacerHandle(original, compact)
+		if expandErr != nil {
+			return expandErr
+		}
+		expandedHandle, expandErr := e.manager.RefGet(expanded)
+		if expandErr == nil {
+			expandErr = interpretation.SetElse(expandedHandle)
+		}
+		expandErr = errors.Join(expandErr, e.manager.DelRef(&expanded))
+		if expandErr != nil {
+			return expandErr
+		}
+	}
+	if err = destination.RegisterFunction(original, interpretation); err != nil {
+		return err
+	}
+	transferred = true
+	return destination.UnregisterDeclaration(derived)
+}
+
+func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.Model, resultErr error) {
+	if len(e.spacerPredicates) == 0 {
+		return source, nil
+	}
+	if source == nil {
+		return nil, ast.ErrASTHandle
+	}
+	defer func() {
+		if resultErr != nil {
+			resultErr = errors.Join(resultErr, source.Close())
+			source = nil
+		}
+	}()
+	core := source.Core()
+	for original, derived := range e.spacerPredicates {
+		arity, err := e.manager.GetArity(derived)
+		if err != nil {
+			return nil, err
+		}
+		if arity != 0 {
+			if err = e.expandSpacerFunction(core, original, derived); err != nil {
+				return nil, err
+			}
+			continue
+		}
+		present, err := core.HasConstantInterpretation(derived)
+		if err != nil {
+			return nil, err
+		}
+		if !present {
+			continue
+		}
+		value, err := core.ConstantInterpretation(derived)
+		if err != nil {
+			return nil, err
+		}
+		oldArity, err := e.manager.GetArity(original)
+		if err != nil {
+			return nil, err
+		}
+		interpretation, err := model.NewFunctionInterpretation(e.manager, oldArity)
+		if err != nil {
+			return nil, err
+		}
+		if !value.IsNull() {
+			err = interpretation.SetElse(value)
+		}
+		if err == nil {
+			err = core.RegisterFunction(original, interpretation)
+		}
+		if err != nil {
+			return nil, errors.Join(err, interpretation.Close())
+		}
+		if err = core.UnregisterDeclaration(derived); err != nil {
+			return nil, err
+		}
+	}
+	return source, nil
 }

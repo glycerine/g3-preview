@@ -348,6 +348,77 @@ func TestSpacerEngineExpandsSlicedReachableColumns(t *testing.T) {
 	}
 }
 
+func TestSpacerEngineExpandsSlicedModelPredicates(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	globals, err := context.GlobalParameters()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngineWithServices(manager, globals.Context, globals)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	fpMust(t, engine.SelectEngine("spacer"))
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	arithmetic, err := manager.ArithmeticFamilyID()
+	fpMust(t, err)
+	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
+	fpMust(t, err)
+	pName, err := manager.Symbols.Intern("spacer-sliced-model-P")
+	fpMust(t, err)
+	predicate, err := manager.MkFuncDecl(pName, []ast.ASTHandle{integer, integer}, boolean, ast.ASTFuncDeclInfo{})
+	fpMust(t, err)
+	uName, err := manager.Symbols.Intern("spacer-sliced-model-U")
+	fpMust(t, err)
+	unreachable, err := manager.MkFuncDecl(uName, nil, boolean, ast.ASTFuncDeclInfo{})
+	fpMust(t, err)
+	fpMust(t, engine.RegisterPredicate(predicate))
+	fpMust(t, engine.RegisterPredicate(unreachable))
+	xName, err := manager.Symbols.Intern("spacer-sliced-model-x")
+	fpMust(t, err)
+	x, err := manager.MkConst(xName, integer)
+	fpMust(t, err)
+	fpMust(t, engine.RegisterVariable(x))
+	zero, err := manager.ArithmeticIntegerNumeralText("0")
+	fpMust(t, err)
+	one, err := manager.ArithmeticIntegerNumeralText("1")
+	fpMust(t, err)
+	pXZero, err := manager.MkApp(predicate, []ast.ASTHandle{x, zero})
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(pXZero, "sliced-model-fact"))
+	pXOne, err := manager.MkApp(predicate, []ast.ASTHandle{x, one})
+	fpMust(t, err)
+	uApp, err := manager.MkApp(unreachable, nil)
+	fpMust(t, err)
+	uRule, err := manager.MkImplies(pXOne, uApp)
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(uRule, "sliced-model-query"))
+	status, err := engine.QueryPredicate(unreachable)
+	fpMust(t, err)
+	if status != lbool.False {
+		t.Fatal("Spacer sliced model query", status)
+	}
+	inductive, err := engine.Model(unreachable)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, inductive.Close()) })
+	interpretation, err := inductive.Core().FunctionInterpretation(predicate)
+	fpMust(t, err)
+	if interpretation == nil || interpretation.Arity() != 2 {
+		t.Fatal("Spacer model did not restore the original predicate declaration")
+	}
+	count := inductive.Core().NumFunctionDeclarations()
+	if count != 1 {
+		t.Fatal("Spacer model retained a sliced predicate declaration", count)
+	}
+	declaration, err := inductive.Core().Function(0)
+	fpMust(t, err)
+	if declaration != predicate {
+		t.Fatal("Spacer model exposed the sliced predicate declaration", declaration)
+	}
+}
+
 func TestPDREngineReadsContextAndCacheParameters(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)

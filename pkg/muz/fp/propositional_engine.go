@@ -1355,7 +1355,11 @@ func (e *PropositionalEngine) Model(declaration ast.ASTHandle) (*model.Model, er
 		return e.pdr.Model(declaration)
 	}
 	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
-		return e.spacer.Model(declaration)
+		result, err := e.spacer.Model(e.spacerPredicate(declaration))
+		if err != nil {
+			return nil, err
+		}
+		return e.expandSpacerModel(result)
 	}
 	return nil, ErrPropositionalEngine
 }
