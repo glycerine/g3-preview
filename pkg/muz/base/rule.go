@@ -302,6 +302,19 @@ func (r *Rule) Retain() (*Rule, error) {
 	return &Rule{state: state}, nil
 }
 
+// Same reports whether two owning references designate the same native rule.
+func (r *Rule) Same(other *Rule) (bool, error) {
+	state, err := r.open()
+	if err != nil {
+		return false, err
+	}
+	otherState, err := other.open()
+	if err != nil {
+		return false, err
+	}
+	return state == otherState, nil
+}
+
 func (r *Rule) Head() (ast.ASTHandle, error) {
 	state, err := r.open()
 	if err != nil {

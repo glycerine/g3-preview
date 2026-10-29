@@ -81,6 +81,47 @@ func TestSpacerPredicateRulesBuildTaggedInitialAndTransitionSystem(t *testing.T)
 	if added, err := transformer.AddLemma(state, 0); err != nil || !added {
 		t.Fatal("self-predecessor lemma propagation", added, err)
 	}
+	tag, err := transformer.RuleTag(recursiveRule)
+	spacerMust(t, err)
+	selected, found, err := transformer.TaggedRule(tag)
+	spacerMust(t, err)
+	if !found {
+		t.Fatal("recursive Spacer rule tag not found")
+	}
+	same, err := selected.Same(recursiveRule)
+	spacerMust(t, err)
+	if !same {
+		t.Fatal("Spacer rule tag selected a different rule")
+	}
+	spacerMust(t, selected.Close())
+	predecessors, err := transformer.RulePredecessors(recursiveRule)
+	spacerMust(t, err)
+	if len(predecessors) != 1 || predecessors[0] != transformer {
+		t.Fatal("recursive Spacer rule predecessors", len(predecessors))
+	}
+	notTag, err := manager.MkNot(tag)
+	spacerMust(t, err)
+	filtered, err := transformer.RemovePredecessors([]ast.ASTHandle{tag, state, notTag})
+	spacerMust(t, err)
+	if len(filtered) != 1 || filtered[0] != state {
+		t.Fatal("Spacer predecessor tag removal", filtered)
+	}
+	rulePremises, err := transformer.RulePremises(0, recursiveRule)
+	spacerMust(t, err)
+	if len(rulePremises) != 1 {
+		t.Fatal("recursive Spacer rule premises", len(rulePremises))
+	}
+	for i := range rulePremises {
+		spacerMust(t, manager.DelRef(&rulePremises[i]))
+	}
+	premises, err := transformer.Premises(0)
+	spacerMust(t, err)
+	if len(premises) != 3 {
+		t.Fatal("Spacer combined premises", len(premises))
+	}
+	for i := range premises {
+		spacerMust(t, manager.DelRef(&premises[i]))
+	}
 	spacerMust(t, recursiveRule.Close())
 	spacerMust(t, initialRule.Close())
 	spacerMust(t, transformer.Close())
