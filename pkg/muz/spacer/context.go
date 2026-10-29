@@ -5,7 +5,6 @@ package spacer
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/muz/base"
@@ -69,9 +68,6 @@ func spacerPropSolverConfig(config smtcore.SMTSolverConfig) (PropSolverConfig, e
 	if err != nil {
 		return PropSolverConfig{}, err
 	}
-	if minimize {
-		return PropSolverConfig{}, fmt.Errorf("muz/spacer: spacer.minimize_unsat_core is not ported")
-	}
 	optimized, err := get("spacer.farkas_optimized", true)
 	if err != nil {
 		return PropSolverConfig{}, err
@@ -98,7 +94,7 @@ func spacerPropSolverConfig(config smtcore.SMTSolverConfig) (PropSolverConfig, e
 	return PropSolverConfig{
 		Itp: ItpSolverConfig{
 			Params: config.Params, Globals: config.Globals, SplitLiterals: split,
-			CoreMode: mode, FarkasAConst: farkasAConst,
+			CoreMode: mode, FarkasAConst: farkasAConst, MinimizeUnsatCore: minimize,
 		},
 		KeepProxy: keepProxy,
 	}, nil

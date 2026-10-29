@@ -1,7 +1,6 @@
 package spacer
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/smtcore"
@@ -36,13 +35,19 @@ func TestContextConsumesPropSolverFarkasParameters(t *testing.T) {
 	}
 }
 
-func TestContextRejectsPendingMinCutCoreMode(t *testing.T) {
+func TestContextConsumesMinCutCoreMode(t *testing.T) {
 	manager, globals := newSpacerTestServices(t)
 	if err := globals.SourceSetName("fixedpoint.spacer.minimize_unsat_core", "true"); err != nil {
 		t.Fatal(err)
 	}
 	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
-	if context != nil || err == nil || !strings.Contains(err.Error(), "minimize_unsat_core is not ported") {
-		t.Fatal("pending min-cut mode accepted", context, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !context.config.Itp.MinimizeUnsatCore {
+		t.Fatal("min-cut core parameter was not retained")
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
 	}
 }

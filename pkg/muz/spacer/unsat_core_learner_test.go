@@ -69,6 +69,48 @@ func TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit(t *testing.T) {
 	spacerMust(t, command.Close())
 }
 
+func TestUnsatCoreMinCutPluginExtractsProofFrontier(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	spacerMust(t, err)
+	manager, err := command.Manager()
+	spacerMust(t, err)
+	spacerMust(t, manager.ToggleProofMode(ast.ASTProofEnabled))
+	p := spacerBool(t, manager, "min-cut-b")
+	notP, err := manager.MkNot(p)
+	spacerMust(t, err)
+	bProof, err := manager.MkProofAsserted(p)
+	spacerMust(t, err)
+	aProof, err := manager.MkProofAsserted(notP)
+	spacerMust(t, err)
+	root, err := manager.MkProofUnitResolution([]ast.ASTHandle{bProof, aProof})
+	spacerMust(t, err)
+	rootRef, err := manager.NewRef(root)
+	spacerMust(t, err)
+
+	learner, err := spacer.NewUnsatCoreLearner(manager)
+	spacerMust(t, err)
+	plugin, err := spacer.NewUnsatCoreMinCutPlugin(learner)
+	spacerMust(t, err)
+	spacerMust(t, learner.RegisterPlugin(plugin))
+	core, err := learner.ComputeUnsatCore(root, []ast.ASTHandle{p})
+	spacerMust(t, err)
+	if len(core) != 1 {
+		t.Fatal("min-cut core size", len(core))
+	}
+	handle, err := manager.RefGet(core[0])
+	spacerMust(t, err)
+	if handle != p {
+		t.Fatal("min-cut selected wrong proof frontier", handle, p)
+	}
+	spacerMust(t, manager.DelRef(&core[0]))
+	spacerMust(t, learner.Close())
+	if err = plugin.Finalize(); !errors.Is(err, spacer.ErrUnsatCoreLearnerOwner) {
+		t.Fatal("closed min-cut plugin accepted finalization", err)
+	}
+	spacerMust(t, manager.DelRef(&rootRef))
+	spacerMust(t, command.Close())
+}
+
 func TestUnsatCoreFarkasPluginClosesArithmeticMixedStep(t *testing.T) {
 	command, err := cmd_context.NewStandaloneContext()
 	spacerMust(t, err)

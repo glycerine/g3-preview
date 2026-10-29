@@ -89297,11 +89297,15 @@
       "go_targets": [
         "pkg/muz/spacer/itp_solver.go",
         "pkg/muz/spacer/farkas_learner.go",
-        "pkg/tactic/arith/arith_bounds.go"
+        "pkg/tactic/arith/arith_bounds.go",
+        "pkg/muz/spacer/unsat_core_plugin_min_cut.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_mincut_inv.smt2"
       ],
       "tests": [
         "TestItpSolverExpandsProxyCoreAndScopesDefinitions",
-        "TestItpSolverExtractsFarkasCore"
+        "TestItpSolverExtractsFarkasCore",
+        "TestUnsatCoreMinCutPluginExtractsProofFrontier",
+        "TestSMTLibRunnerCPPReference/fp_spacer_mincut_inv.smt2"
       ],
       "assertions": [
         {
@@ -90553,13 +90557,14 @@
       "path": "src/muz/spacer/spacer_unsat_core_plugin.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/spacer/unsat_core_plugin_lemma.go",
         "pkg/muz/spacer/unsat_core_plugin_farkas.go",
-        "pkg/muz/spacer/unsat_core_plugin_farkas_optimized.go"
+        "pkg/muz/spacer/unsat_core_plugin_farkas_optimized.go",
+        "pkg/muz/spacer/unsat_core_plugin_min_cut.go"
       ],
-      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit", "TestUnsatCoreFarkasPluginClosesArithmeticMixedStep"],
+      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit", "TestUnsatCoreFarkasPluginClosesArithmeticMixedStep", "TestUnsatCoreMinCutPluginExtractsProofFrontier", "TestSMTLibRunnerCPPReference/fp_spacer_mincut_inv.smt2"],
       "assertions": [
         {
           "line": 40,
@@ -90756,9 +90761,9 @@
         },
         {
           "name": "optional min-cut plugin",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/unsat_core_plugin_min_cut.go",
+          "tests": ["TestUnsatCoreMinCutPluginExtractsProofFrontier", "TestSMTLibRunnerCPPReference/fp_spacer_mincut_inv.smt2"]
         }
       ],
       "ownership": [
@@ -90772,14 +90777,15 @@
       "path": "src/muz/spacer/spacer_unsat_core_plugin.h",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/spacer/unsat_core_learner.go",
         "pkg/muz/spacer/unsat_core_plugin_lemma.go",
         "pkg/muz/spacer/unsat_core_plugin_farkas.go",
-        "pkg/muz/spacer/unsat_core_plugin_farkas_optimized.go"
+        "pkg/muz/spacer/unsat_core_plugin_farkas_optimized.go",
+        "pkg/muz/spacer/unsat_core_plugin_min_cut.go"
       ],
-      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"],
+      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit", "TestUnsatCoreMinCutPluginExtractsProofFrontier"],
       "conditionals": [
         {
           "line": 18,
@@ -90807,10 +90813,10 @@
         },
         {
           "name": "bounded arithmetic and min-cut plugin declarations",
-          "status": "partial",
-          "go_target": null,
-          "tests": [],
-          "reason": "The bounded plugin is unreachable behind the source literal optimized selection; the optional min-cut plugin remains unported."
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/unsat_core_plugin_min_cut.go",
+          "tests": ["TestUnsatCoreMinCutPluginExtractsProofFrontier"],
+          "reason": "The bounded plugin is unreachable behind the source literal optimized selection; the retained optional min-cut plugin is concrete Go."
         }
       ],
       "ownership": [

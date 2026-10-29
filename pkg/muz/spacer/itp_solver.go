@@ -29,11 +29,12 @@ const (
 )
 
 type ItpSolverConfig struct {
-	Params        *uparams.ParamsContext
-	Globals       *uparams.GlobalParamsService
-	SplitLiterals bool
-	CoreMode      ItpCoreMode
-	FarkasAConst  bool
+	Params            *uparams.ParamsContext
+	Globals           *uparams.GlobalParamsService
+	SplitLiterals     bool
+	CoreMode          ItpCoreMode
+	FarkasAConst      bool
+	MinimizeUnsatCore bool
 }
 
 type itpDefinitions struct {
@@ -567,7 +568,12 @@ func (s *ItpSolver) ItpCore() (_ []ast.ASTRef, resultErr error) {
 				return nil, errors.Join(err, farkas.Close())
 			}
 		}
-		fallback, err := NewUnsatCoreLemmaPlugin(learner)
+		var fallback UnsatCorePlugin
+		if s.config.MinimizeUnsatCore {
+			fallback, err = NewUnsatCoreMinCutPlugin(learner)
+		} else {
+			fallback, err = NewUnsatCoreLemmaPlugin(learner)
+		}
 		if err != nil {
 			return nil, err
 		}
