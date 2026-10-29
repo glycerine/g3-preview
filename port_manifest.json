@@ -83897,7 +83897,8 @@
       "tests": [
         "TestPropSolverLevelFramesCoresAndModels",
         "TestPropSolverSafeProxyCoreAndTemporaryFormulaRollback",
-        "TestPropSolverExpandsArithmeticEqualityForSubsetCore"
+        "TestPropSolverExpandsArithmeticEqualityForSubsetCore",
+        "TestPropSolverExpandsDatatypeEqualityForSubsetCore"
       ],
       "assertions": [
         {
@@ -83954,7 +83955,15 @@
           ]
         },
         {
-          "name": "datatype/bit-vector literal expansion, proof Farkas theory cores and consequences (pdr_prop_solver.cpp:120-165,380-423)",
+          "name": "datatype constructor equality literal expansion (pdr_prop_solver.cpp:120-132)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/prop_solver.go",
+          "tests": [
+            "TestPropSolverExpandsDatatypeEqualityForSubsetCore"
+          ]
+        },
+        {
+          "name": "bit-vector literal expansion, proof Farkas theory cores and consequences (pdr_prop_solver.cpp:133-165,380-423)",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83962,10 +83971,10 @@
       ],
       "ownership": [
         "PropSolver owns one guarded SMTContext plus pins for level atoms and reusable proxy applications. Close releases the context before draining AST references. Each check owns one delayed solver scope; safe proxy implications and the optional formula are rolled back even on an error.",
-        "PropCheckResult cores borrow caller expressions. Synthesized arithmetic expansion terms are retained by PropSolver until its next check or Close. Successful requested models are acquired owning ModelCore references and must be released by the caller."
+        "PropCheckResult cores borrow caller expressions. Synthesized equality-expansion terms are retained by PropSolver until its next check or Close. Successful requested models are acquired owning ModelCore references and must be released by the caller."
       ],
       "deviations": [
-        "The Go API uses CheckAtLevel instead of a mutable RAII scoped_level flag and returns status/core/model/assumes-level as one concrete result. It currently always uses the source subset-core path; proof-derived theory cores, consequence extraction, and datatype and bit-vector equality expansion remain explicit blockers to source-unit completion.",
+        "The Go API uses CheckAtLevel instead of a mutable RAII scoped_level flag and returns status/core/model/assumes-level as one concrete result. It currently always uses the source subset-core path; proof-derived theory cores, consequence extraction, and bit-vector equality expansion remain explicit blockers to source-unit completion.",
         "Typed errors replace assertion-only malformed assumption and level conditions. Native slices and maps replace source ref-vectors and object maps; duplicate complex assumptions reuse one proxy within a check."
       ]
     },

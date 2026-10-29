@@ -135,3 +135,68 @@ func TestPropSolverExpandsArithmeticEqualityForSubsetCore(t *testing.T) {
 	pdrMust(t, contexts.Close())
 	pdrMust(t, command.Close())
 }
+
+func TestPropSolverExpandsDatatypeEqualityForSubsetCore(t *testing.T) {
+	command, manager, contexts := pdrContextFixture(t, 0)
+	truth, err := manager.MkTrue()
+	pdrMust(t, err)
+	solver, err := pdr.NewPropSolver(manager, contexts, truth, "datatype-core")
+	pdrMust(t, err)
+	name, err := manager.Symbols.Intern("PDRBox")
+	pdrMust(t, err)
+	constructorName, err := manager.Symbols.Intern("pdr-box")
+	pdrMust(t, err)
+	recognizerName, err := manager.Symbols.Intern("pdr-is-box")
+	pdrMust(t, err)
+	accessorName, err := manager.Symbols.Intern("pdr-unbox")
+	pdrMust(t, err)
+	otherName, err := manager.Symbols.Intern("pdr-other")
+	pdrMust(t, err)
+	otherRecognizerName, err := manager.Symbols.Intern("pdr-is-other")
+	pdrMust(t, err)
+	boolean, err := manager.MkBoolSort()
+	pdrMust(t, err)
+	sorts, err := manager.MkDatatypes([]ast.DatatypeDefinition{{
+		Name: name,
+		Constructors: []ast.DatatypeConstructorDefinition{{
+			Name:       constructorName,
+			Recognizer: recognizerName,
+			Accessors:  []ast.DatatypeAccessorDefinition{{Name: accessorName, Range: boolean}},
+		}, {Name: otherName, Recognizer: otherRecognizerName}},
+	}})
+	pdrMust(t, err)
+	constructors, err := manager.DatatypeConstructors(sorts[0])
+	pdrMust(t, err)
+	term, err := manager.MkFreshConst("datatype-core-value", sorts[0])
+	pdrMust(t, err)
+	value, err := manager.MkApp(constructors[0], []ast.ASTHandle{truth})
+	pdrMust(t, err)
+	recognizer, err := manager.DatatypeConstructorRecognizer(constructors[0])
+	pdrMust(t, err)
+	recognized, err := manager.MkApp(recognizer, []ast.ASTHandle{term})
+	pdrMust(t, err)
+	notRecognized, err := manager.MkNot(recognized)
+	pdrMust(t, err)
+	pdrMust(t, solver.AddFormula(notRecognized))
+	equality, err := manager.MkEq(term, value)
+	pdrMust(t, err)
+
+	result, err := solver.CheckAssumptions([]ast.ASTHandle{equality}, true, false)
+	pdrMust(t, err)
+	if result.Status != lbool.False || len(result.Core) != 1 {
+		t.Fatal("expanded datatype subset core", result.Status, result.Core)
+	}
+	coreDeclaration, err := manager.GetDecl(result.Core[0])
+	pdrMust(t, err)
+	coreConstructor, matched, err := manager.DatatypeRecognizerConstructor(coreDeclaration)
+	pdrMust(t, err)
+	coreTerm, err := manager.GetArg(result.Core[0], 0)
+	pdrMust(t, err)
+	if !matched || coreConstructor != constructors[0] || coreTerm != term {
+		t.Fatal("expanded datatype recognizer", matched, coreConstructor, coreTerm)
+	}
+
+	pdrMust(t, solver.Close())
+	pdrMust(t, contexts.Close())
+	pdrMust(t, command.Close())
+}

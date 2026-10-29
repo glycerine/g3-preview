@@ -228,7 +228,7 @@ type safeAssumptions struct {
 	generated      map[ast.ASTHandle]bool
 }
 
-func (p *PropSolver) arithmeticEquality(expression ast.ASTHandle) (left, right ast.ASTHandle, matched bool, result error) {
+func (p *PropSolver) binaryEquality(expression ast.ASTHandle) (left, right ast.ASTHandle, matched bool, result error) {
 	kind, err := p.manager.GetKind(expression)
 	if err != nil || kind != ast.ASTApp {
 		return left, right, false, err
@@ -247,6 +247,14 @@ func (p *PropSolver) arithmeticEquality(expression ast.ASTHandle) (left, right a
 	}
 	right, err = p.manager.GetArg(expression, 1)
 	if err != nil {
+		return left, right, false, err
+	}
+	return left, right, true, nil
+}
+
+func (p *PropSolver) arithmeticEquality(expression ast.ASTHandle) (left, right ast.ASTHandle, matched bool, result error) {
+	left, right, matched, err := p.binaryEquality(expression)
+	if err != nil || !matched {
 		return left, right, false, err
 	}
 	sort, err := p.manager.GetSort(left)
@@ -268,8 +276,38 @@ func (p *PropSolver) arithmeticEquality(expression ast.ASTHandle) (left, right a
 	return left, right, sortKind == 0 || sortKind == 1, nil
 }
 
-func (p *PropSolver) expandArithmeticEqualities(atoms []ast.ASTHandle) (result []ast.ASTHandle, references []ast.ASTRef, generated map[ast.ASTHandle]bool, resultErr error) {
+func (p *PropSolver) datatypeEquality(expression ast.ASTHandle) (term, value, constructor ast.ASTHandle, matched bool, result error) {
+	left, right, equality, err := p.binaryEquality(expression)
+	if err != nil || !equality {
+		return term, value, constructor, false, err
+	}
+	constructor, matched, err = p.manager.DatatypeConstructorApp(right)
+	if err != nil {
+		return term, value, constructor, false, err
+	}
+	if matched {
+		return left, right, constructor, true, nil
+	}
+	constructor, matched, err = p.manager.DatatypeConstructorApp(left)
+	if err != nil || !matched {
+		return term, value, constructor, false, err
+	}
+	return right, left, constructor, true, nil
+}
+
+func (p *PropSolver) expandEqualities(atoms []ast.ASTHandle) (result []ast.ASTHandle, references []ast.ASTRef, generated map[ast.ASTHandle]bool, resultErr error) {
 	generated = make(map[ast.ASTHandle]bool)
+	pin := func(expression ast.ASTHandle, topLevel bool) error {
+		reference, err := p.manager.NewRef(expression)
+		if err != nil {
+			return err
+		}
+		references = append(references, reference)
+		if topLevel {
+			generated[expression] = true
+		}
+		return nil
+	}
 	committed := false
 	defer func() {
 		if committed {
@@ -284,38 +322,85 @@ func (p *PropSolver) expandArithmeticEqualities(atoms []ast.ASTHandle) (result [
 		if err != nil {
 			return nil, references, generated, err
 		}
+		if matched {
+			lessEqual, err := p.manager.MkArithmeticLE(left, right)
+			if err != nil {
+				return nil, references, generated, err
+			}
+			if err = pin(lessEqual, true); err != nil {
+				return nil, references, generated, err
+			}
+			greaterEqual, err := p.manager.MkArithmeticGE(left, right)
+			if err != nil {
+				return nil, references, generated, err
+			}
+			if err = pin(greaterEqual, true); err != nil {
+				return nil, references, generated, err
+			}
+			atoms[index] = lessEqual
+			if index+1 == len(atoms) {
+				atoms = append(atoms, greaterEqual)
+			} else {
+				next := atoms[index+1]
+				atoms = append(atoms, next)
+				atoms[index+1] = greaterEqual
+			}
+			index++
+			continue
+		}
+		term, value, constructor, matched, err := p.datatypeEquality(atoms[index])
+		if err != nil {
+			return nil, references, generated, err
+		}
 		if !matched {
 			continue
 		}
-		lessEqual, err := p.manager.MkArithmeticLE(left, right)
+		recognizer, err := p.manager.DatatypeConstructorRecognizer(constructor)
 		if err != nil {
 			return nil, references, generated, err
 		}
-		lessEqualRef, err := p.manager.NewRef(lessEqual)
+		recognized, err := p.manager.MkApp(recognizer, []ast.ASTHandle{term})
 		if err != nil {
 			return nil, references, generated, err
 		}
-		references = append(references, lessEqualRef)
-		generated[lessEqual] = true
-		greaterEqual, err := p.manager.MkArithmeticGE(left, right)
+		if err = pin(recognized, true); err != nil {
+			return nil, references, generated, err
+		}
+		atoms[index] = recognized
+		accessors, err := p.manager.DatatypeConstructorAccessors(constructor)
 		if err != nil {
 			return nil, references, generated, err
 		}
-		greaterEqualRef, err := p.manager.NewRef(greaterEqual)
+		termConstructor, sameConstructor, err := p.manager.DatatypeConstructorApp(term)
 		if err != nil {
 			return nil, references, generated, err
 		}
-		references = append(references, greaterEqualRef)
-		generated[greaterEqual] = true
-		atoms[index] = lessEqual
-		if index+1 == len(atoms) {
-			atoms = append(atoms, greaterEqual)
-		} else {
-			next := atoms[index+1]
-			atoms = append(atoms, next)
-			atoms[index+1] = greaterEqual
+		for fieldIndex, accessor := range accessors {
+			var selected ast.ASTHandle
+			if sameConstructor && termConstructor == constructor {
+				selected, err = p.manager.GetArg(term, uint32(fieldIndex))
+			} else {
+				selected, err = p.manager.MkApp(accessor, []ast.ASTHandle{term})
+				if err == nil {
+					err = pin(selected, false)
+				}
+			}
+			if err != nil {
+				return nil, references, generated, err
+			}
+			expected, err := p.manager.GetArg(value, uint32(fieldIndex))
+			if err != nil {
+				return nil, references, generated, err
+			}
+			fieldEquality, err := p.manager.MkEq(selected, expected)
+			if err != nil {
+				return nil, references, generated, err
+			}
+			if err = pin(fieldEquality, true); err != nil {
+				return nil, references, generated, err
+			}
+			atoms = append(atoms, fieldEquality)
 		}
-		index++
 	}
 	committed = true
 	return atoms, references, generated, nil
@@ -334,7 +419,7 @@ func (p *PropSolver) makeSafeAssumptions(input []ast.ASTHandle) (_ *safeAssumpti
 	if err != nil {
 		return nil, err
 	}
-	atoms, references, generated, err := p.expandArithmeticEqualities(atoms)
+	atoms, references, generated, err := p.expandEqualities(atoms)
 	if err != nil {
 		return nil, err
 	}
