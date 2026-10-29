@@ -98,7 +98,12 @@ func (c *factorRewriteConfig) ReduceApp(decl ast.ASTHandle, arguments ast.AppArg
 	if err != nil || !changed {
 		return rewriter.RewriteFailed, err
 	}
-	return rewriter.RewriteDone, m.SetRef(out, result)
+	defer func() { _ = m.DelRef(&result) }()
+	handle, err := m.RefGet(result)
+	if err != nil {
+		return rewriter.RewriteFailed, err
+	}
+	return rewriter.RewriteDone, m.SetRef(out, handle)
 }
 
 func (i *factorInvocation) difference(left, right ast.ASTHandle) (_ *polynomial.PolynomialRef, matched bool, err error) {
@@ -251,51 +256,51 @@ func flipFactorComparison(op int32) (int32, error) {
 	}
 }
 
-func (i *factorInvocation) factor(op int32, equality bool, left, right ast.ASTHandle) (changed bool, result ast.ASTHandle, err error) {
+func (i *factorInvocation) factor(op int32, equality bool, left, right ast.ASTHandle) (changed bool, result ast.ASTRef, err error) {
 	difference, matched, err := i.difference(left, right)
 	if err != nil || !matched {
-		return false, ast.ASTHandle{}, err
+		return false, ast.ASTRef{}, err
 	}
 	defer func() { err = errors.Join(err, difference.Close()) }()
 	p, err := difference.Get()
 	if err != nil {
-		return false, ast.ASTHandle{}, err
+		return false, ast.ASTRef{}, err
 	}
 	constant, err := i.core.IsConstant(p)
 	if err != nil || constant {
-		return false, ast.ASTHandle{}, err
+		return false, ast.ASTRef{}, err
 	}
 	factors, err := polynomial.NewPolynomialFactors(i.polynomials)
 	if err != nil {
-		return false, ast.ASTHandle{}, err
+		return false, ast.ASTRef{}, err
 	}
 	defer func() { err = errors.Join(err, factors.CloseChecked()) }()
 	if err = i.polynomials.Factor(p, factors, i.owner.factorParams); err != nil {
-		return false, ast.ASTHandle{}, err
+		return false, ast.ASTRef{}, err
 	}
 	count, err := factors.Distinct()
 	if err != nil || count == 0 {
-		return false, ast.ASTHandle{}, errors.Join(polynomial.ErrPolynomialPartial, err)
+		return false, ast.ASTRef{}, errors.Join(polynomial.ErrPolynomialPartial, err)
 	}
 	degree, err := factors.Degree(0)
 	if err != nil {
-		return false, ast.ASTHandle{}, err
+		return false, ast.ASTRef{}, err
 	}
 	if count == 1 && degree == 1 {
-		return false, ast.ASTHandle{}, nil
+		return false, ast.ASTRef{}, nil
 	}
 	constantFactor, err := factors.Constant()
 	if err != nil {
-		return false, ast.ASTHandle{}, err
+		return false, ast.ASTRef{}, err
 	}
 	negative, err := i.rationals.Integers().IsNeg(constantFactor)
 	if err != nil {
-		return false, ast.ASTHandle{}, err
+		return false, ast.ASTRef{}, err
 	}
 	if !equality && negative {
 		op, err = flipFactorComparison(op)
 		if err != nil {
-			return false, ast.ASTHandle{}, err
+			return false, ast.ASTRef{}, err
 		}
 	}
 	expressions := factorExpressions{manager: i.owner.manager}
@@ -305,26 +310,33 @@ func (i *factorInvocation) factor(op int32, equality bool, left, right ast.ASTHa
 	for j := uint32(0); j < count; j++ {
 		piece, e := factors.Factor(j)
 		if e != nil {
-			return false, ast.ASTHandle{}, e
+			return false, ast.ASTRef{}, e
 		}
 		ref, e := i.expressions.ToExpr(piece, true)
 		if e != nil {
-			return false, ast.ASTHandle{}, e
+			return false, ast.ASTRef{}, e
 		}
 		if e = expressions.add(ref); e != nil {
 			_ = i.owner.manager.DelRef(&ref)
-			return false, ast.ASTHandle{}, e
+			return false, ast.ASTRef{}, e
 		}
 		factorValues[j] = expressions.values[len(expressions.values)-1]
 		degrees[j], err = factors.Degree(j)
 		if err != nil {
-			return false, ast.ASTHandle{}, err
+			return false, ast.ASTRef{}, err
 		}
 	}
+	var rewritten ast.ASTHandle
 	if equality {
-		return i.makeEquality(factorValues, &expressions)
+		changed, rewritten, err = i.makeEquality(factorValues, &expressions)
+	} else {
+		changed, rewritten, err = i.makeComparison(op, factorValues, degrees, &expressions)
 	}
-	return i.makeComparison(op, factorValues, degrees, &expressions)
+	if err != nil || !changed {
+		return changed, ast.ASTRef{}, err
+	}
+	result, err = i.owner.manager.NewRef(rewritten)
+	return changed, result, err
 }
 
 func (i *factorInvocation) makeEquality(values []ast.ASTHandle, refs *factorExpressions) (bool, ast.ASTHandle, error) {
