@@ -88584,7 +88584,7 @@
       "path": "src/muz/spacer/spacer_antiunify.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -88641,17 +88641,26 @@
           "text": "SASSERT(v.size() > 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "anti_unifier and naive_convex_closure implementation",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: no retained source constructs anti_unifier or calls naive_convex_closure. Outside this pair, spacer_util.h only includes the header and the build lists only compile the implementation; no unused graph/substitution adapter is introduced."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_antiunify.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -88670,11 +88679,20 @@
           "text": "SASSERT(index < m_substitutions.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "anti_unifier and naive_convex_closure declarations",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: no retained source constructs anti_unifier or calls naive_convex_closure. Outside this pair, spacer_util.h only includes the header and the build lists only compile the implementation; no unused graph/substitution adapter is introduced."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_context.cpp",
@@ -89560,7 +89578,7 @@
       "path": "src/muz/spacer/spacer_legacy_frames.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -89581,24 +89599,42 @@
           "text": "SASSERT(m_pt.m_head == other.m_pt.m_head);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "pred_transformer::legacy_frames implementation",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: spacer_context.h includes this legacy type but instantiates its separate nested frames implementation instead. Recursive source search finds no legacy_frames object or method call outside this pair; live frame behavior is represented independently by pkg/muz/spacer/context_frames.go."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_legacy_frames.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "pred_transformer::legacy_frames declaration",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: spacer_context.h includes this legacy type but instantiates its separate nested frames implementation instead. Recursive source search finds no legacy_frames object or method call outside this pair; live frame behavior is represented independently by pkg/muz/spacer/context_frames.go."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_legacy_mbp.cpp",
@@ -89640,7 +89676,7 @@
       "path": "src/muz/spacer/spacer_legacy_mev.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -89801,17 +89837,26 @@
           "text": "VERIFY(m_model->eval(e, result, true));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "deprecated old::model_evaluator implementation",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: recursive search finds no old::model_evaluator construction or call. spacer_util.cpp and spacer_legacy_mbp.cpp include the header but use the current model_evaluator/model_evaluator_util paths; no deprecated evaluator cache is ported."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_legacy_mev.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -89842,11 +89887,20 @@
           "text": "void set_true(expr* x) { SASSERT(is_unknown(x)); m1.mark(x); m2.mark(x); }"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "deprecated old::model_evaluator declaration",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Dead-source audit: recursive search finds no old::model_evaluator construction or call. spacer_util.cpp and spacer_legacy_mbp.cpp include the header but use the current model_evaluator/model_evaluator_util paths; no deprecated evaluator cache is ported."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_manager.cpp",
