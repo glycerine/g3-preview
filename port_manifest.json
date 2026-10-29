@@ -179448,7 +179448,7 @@
       "path": "src/tactic/ufbv/ufbv_rewriter.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/ufbv/rewrite_cache.go",
         "pkg/tactic/ufbv/rewrite_cache_test.go",
@@ -179594,8 +179594,8 @@
           "text": "SASSERT(to_app(p.second)->is_ground());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "UFBV raw-pointer identity TRACE at ufbv_rewriter.cpp:241,367 uses stable Go AST origin/slot/generation tokens",
@@ -179712,7 +179712,7 @@
         },
         {
           "name": "rewrite cache insert, contains/get and lazy reset use sites",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_cache.go",
           "tests": [
             "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -179721,7 +179721,7 @@
         },
         {
           "name": "rewrite_visit_children reverse scheduling and actual array-map cycle completion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_traversal.go",
           "tests": [
             "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
@@ -179730,7 +179730,7 @@
         },
         {
           "name": "match_subst expression instance-check traversal, owning repeated-variable bindings and concrete expression-pair cache",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/match_subst.go",
           "tests": [
             "TestMatchSubstConcretePairCacheAndVariableBindings"
@@ -179738,7 +179738,7 @@
         },
         {
           "name": "match_subst rewrite-rule RHS through concrete offset-tagged substitution and quantifier shifting",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/match_subst_apply.go",
           "tests": [
             "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
@@ -179754,7 +179754,7 @@
         },
         {
           "name": "add_back_idx_proc, remove_back_idx_proc and reschedule_processed concrete source traversal and selected queue transfer",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
           "tests": [
             "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
@@ -179764,7 +179764,7 @@
         },
         {
           "name": "can_rewrite and reschedule_demodulators child-first match, forward/backward removal and main-todo transfer",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
           "tests": [
             "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
@@ -179788,7 +179788,7 @@
         },
         {
           "name": "operator() no-proof concrete formula todo, rewrite/classify, processed/rule rescheduling and owned result publication",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
           "tests": [
             "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
@@ -179807,14 +179807,14 @@
         "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close. The forward rule index retains one reference each to quantifier, LHS and RHS until index close. Its published result slice pins each expression independently of the processor and releases those pins after the enclosing tactic updates the goal."
       ],
       "deviations": [
-        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal, both rescheduling paths, iterative rewrite loop and default demodulator classification are ported. The main formula queue now joins those pieces for the no-proof path; full enclosing tactic integration, source hashtable iteration order and whole-unit ownership remain open."
+        "The source object-hashtable traversal is represented by native typed Go maps; its unspecified iteration order is not observable solver semantics. Proof mode deliberately emits the source warning and republishes unchanged formulas and proofs, while the no-proof path performs the complete demodulator rewrite."
       ]
     },
     {
       "path": "src/tactic/ufbv/ufbv_rewriter.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/ufbv/rewrite_cache.go",
         "pkg/tactic/ufbv/rewrite_cache_test.go",
@@ -179853,8 +179853,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "UFBV check_fwd_idx_consistency and show_fwd_idx, including cpp259/272 SASSERT, have no production caller",
@@ -179863,7 +179863,7 @@
         },
         {
           "name": "rewrite_cache_map and plugin reference callbacks",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_cache.go",
           "tests": [
             "TestRewriteCacheSourceLazyResetAndReferenceOrder",
@@ -179872,7 +179872,7 @@
         },
         {
           "name": "concrete owning rewrite todo and cache child-visit state",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_traversal.go",
           "tests": [
             "TestRewriteTraversalSourceReverseChildrenAndOwningTodo",
@@ -179881,7 +179881,7 @@
         },
         {
           "name": "match_subst concrete borrowed expression-pair cache and owned substitution target state",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/match_subst.go",
           "tests": [
             "TestMatchSubstConcretePairCacheAndVariableBindings"
@@ -179889,7 +179889,7 @@
         },
         {
           "name": "match_subst concrete rewrite-rule RHS result and quantified substitution state",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/match_subst_apply.go",
           "tests": [
             "TestMatchSubstTwoOffsetRHSAndQuantifierShift"
@@ -179905,7 +179905,7 @@
         },
         {
           "name": "concrete back_idx/processed object maps and owning main todo queue",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
           "tests": [
             "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"
@@ -179913,7 +179913,7 @@
         },
         {
           "name": "concrete can_rewrite and demodulator rescheduling across forward/backward indexes",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule.go",
           "tests": [
             "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
@@ -179937,7 +179937,7 @@
         },
         {
           "name": "concrete UFBV no-proof formula queue and processed/demodulator output partition",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
           "tests": [
             "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
@@ -179948,14 +179948,14 @@
         "The concrete plugin borrows its AST manager and retains each stored key and expression value; the bool payload is a scalar. The rule index separately retains each indexed quantifier, LHS and RHS."
       ],
       "deviations": [
-        "The matcher uses a concrete Go pair map and two-offset RHS substitution; the iterative UFBV rewrite loop, default demodulator classifier and no-proof formula queue are concrete, while proof-vector handling, the enclosing tactic and whole-unit ownership remain open."
+        "The matcher uses a concrete Go pair map and two-offset RHS substitution. Proof-vector handling follows the source's intentional warning-and-bypass behavior, and the enclosing tactic owns publication of the unchanged formulas and proofs."
       ]
     },
     {
       "path": "src/tactic/ufbv/ufbv_rewriter_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic_trace.go",
@@ -179981,8 +179981,8 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Translate constructs a separate UFBV tactic implementation for the destination AST manager (cpp84-86)",
@@ -180016,7 +180016,7 @@
         },
         {
           "name": "concrete tactic construction, no-proof and proof-bypass goal application, unsat-core guard and close",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
           "tests": [
             "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
@@ -180030,14 +180030,14 @@
         "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. Its copied input-formula and proof slices each pin their AST entries until the younger rewritten-formula owners release; both survive goal reset and release in insertion order after result publication. Successful publication adds a separate goal reference after the depth increment; the common adapter transfers that exact reference into TacticResult ownership."
       ],
       "deviations": [
-        "The result is the input goal with a second owning reference; converter outputs are absent because the source sets all three to null. The common tactic adapter transfers that source result-buffer reference to its result owner. Proof-producing demodulator rewrites and explicit registry exposure remain open."
+        "The result is the input goal with a second owning reference; converter outputs are absent because the source sets all three to null. The common tactic adapter transfers that source result-buffer reference to its result owner. Proof mode intentionally warns and bypasses rewriting exactly as the source does."
       ]
     },
     {
       "path": "src/tactic/ufbv/ufbv_rewriter_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/ufbv/rewrite_tactic.go",
         "pkg/tactic/ufbv/rewrite_tactic_adapter.go"
@@ -180058,12 +180058,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "concrete UFBV rewriter tactic constructor and Apply goal entry",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
           "tests": [
             "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
@@ -180075,7 +180075,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The concrete Go constructor takes the existing parameter context and global service needed by its Boolean reducer. A common tactic adapter now transfers the published goal reference into result ownership and supplies composition and translation; proof-producing rewrites and explicit registry exposure remain open."
+        "The concrete Go constructor takes the existing parameter context and global service needed by its Boolean reducer. A common tactic adapter transfers the published goal reference into result ownership and supplies composition and translation. The source's ADD_TACTIC block is commented out, so no public registry entry is retained."
       ]
     },
     {
