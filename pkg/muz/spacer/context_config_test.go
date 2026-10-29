@@ -221,6 +221,23 @@ func TestContextConsumesGroundCTIPolicy(t *testing.T) {
 	}
 }
 
+func TestContextConsumesNativeMBPPolicy(t *testing.T) {
+	manager, globals := newSpacerTestServices(t)
+	if err := globals.SourceSetName("fixedpoint.spacer.native_mbp", "true"); err != nil {
+		t.Fatal(err)
+	}
+	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !context.owner.useNativeMBP {
+		t.Fatal("native MBP parameter policy")
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestContextMapsSpacerSMTBackendParameters(t *testing.T) {
 	manager, globals := newSpacerTestServices(t)
 	if err := globals.SourceSetName("fixedpoint.spacer.random_seed", "17"); err != nil {

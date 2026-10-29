@@ -27,6 +27,7 @@ type Manager struct {
 	cooperation   *cooperate.Cooperation
 	paramsContext *uparams.ParamsContext
 	solverParams  uparams.ParamsRef
+	useNativeMBP  bool
 	ownsParams    bool
 	unique        uint32
 	closed        bool
@@ -56,6 +57,15 @@ func NewManager(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 		}
 	}()
 	result.solverParams, err = spacerSolverParams(params, config)
+	if err != nil {
+		return nil, err
+	}
+	fixedpoint, err := config.Globals.SourceGetModuleName("fixedpoint")
+	if err != nil {
+		return nil, err
+	}
+	nativeMBPName := "spacer.native_mbp"
+	result.useNativeMBP, err = config.Params.GetBoolName(&fixedpoint, &nativeMBPName, false)
 	if err != nil {
 		return nil, err
 	}

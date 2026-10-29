@@ -156,7 +156,32 @@ func (p *LegacyProjection) Project(md *model.ModelCore, variables []ast.ASTHandl
 		return nil, err
 	}
 	defer func() { resultErr = errors.Join(resultErr, p.manager.DelRef(&current)) }()
-	pending := append([]ast.ASTHandle(nil), variables...)
+	variableRefs := make([]ast.ASTRef, 0, len(variables))
+	defer func() { resultErr = errors.Join(resultErr, truncateLiteVector(p.manager, &variableRefs, 0)) }()
+	for _, variable := range variables {
+		variableRef, err := p.manager.NewRef(variable)
+		if err != nil {
+			return nil, err
+		}
+		variableRefs = append(variableRefs, variableRef)
+	}
+	lite, err := NewLite(p.manager, nil, false, p.config)
+	if err != nil {
+		return nil, err
+	}
+	if err = lite.EliminateConstants(&variableRefs, current); err != nil {
+		return nil, errors.Join(err, lite.Close())
+	}
+	pending := make([]ast.ASTHandle, len(variableRefs))
+	for index := range variableRefs {
+		pending[index], err = p.manager.RefGet(variableRefs[index])
+		if err != nil {
+			return nil, errors.Join(err, lite.Close())
+		}
+	}
+	if err = lite.Close(); err != nil {
+		return nil, err
+	}
 	ownedVariables := make([]ast.ASTRef, 0)
 	defer func() {
 		for index := len(ownedVariables) - 1; index >= 0; index-- {

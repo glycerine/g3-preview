@@ -275,6 +275,41 @@ func (d *Derivation) project(force bool, md *model.ModelCore, variables []ast.AS
 		}
 	}()
 	config := d.parent.transformer.owner.contexts[0].config.ModelEvaluator
+	if !d.parent.transformer.owner.useNativeMBP {
+		conjunction, err := manager.MkAndArray(forms)
+		if err != nil {
+			return ast.ASTRef{}, nil, err
+		}
+		projector, err := qe.NewLegacyProjection(manager, qe.Config{Context: config.Context, Globals: config.Globals, Cooperation: config.Cooperation, Trace: config.Trace})
+		if err != nil {
+			return ast.ASTRef{}, nil, err
+		}
+		projected, err := projector.Project(md, variables, conjunction, true, !force)
+		if err != nil {
+			return ast.ASTRef{}, nil, errors.Join(err, projector.Close())
+		}
+		projectedFormula, err := projected.Formula()
+		if err == nil {
+			result, err = manager.NewRef(projectedFormula)
+		}
+		var projectedVariables []ast.ASTHandle
+		if err == nil {
+			projectedVariables, err = projected.Variables()
+		}
+		if err == nil {
+			remaining, err = refsFromHandles(manager, projectedVariables)
+		}
+		err = errors.Join(err, projected.Close(), projector.Close())
+		if err != nil {
+			if result != (ast.ASTRef{}) {
+				err = errors.Join(err, manager.DelRef(&result))
+			}
+			err = errors.Join(err, releaseNormalizeRefs(manager, remaining))
+			remaining = nil
+			return ast.ASTRef{}, nil, err
+		}
+		return result, remaining, nil
+	}
 	projector, err := qe.NewModelBasedProjection(manager, qe.Config{Context: config.Context, Globals: config.Globals, Cooperation: config.Cooperation, Trace: config.Trace})
 	if err != nil {
 		return ast.ASTRef{}, nil, err

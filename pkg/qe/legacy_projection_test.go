@@ -59,3 +59,35 @@ func TestLegacyProjectionCombinesBooleanArrayAndArithmetic(t *testing.T) {
 		}
 	}
 }
+
+func TestLegacyProjectionRunsLiteBeforeTheoryDispatch(t *testing.T) {
+	f := newFMFixture(t)
+	m := f.r.manager
+	p, err := NewLegacyProjection(m, f.r.config)
+	fmMust(t, err)
+	defer func() { fmMust(t, p.Close()) }()
+	sortName, err := m.Symbols.Intern("legacy-lite-value")
+	fmMust(t, err)
+	valueSort := f.own(m.MkUninterpretedSort(sortName, nil))
+	x := f.constant("legacy-lite-x", valueSort)
+	value := f.constant("legacy-lite-constant", valueSort)
+	predicate := f.predicate("legacy-lite-predicate", x)
+	formula := f.own(m.MkAndArray([]ast.ASTHandle{f.own(m.MkEq(x, value)), predicate}))
+	md, err := model.NewModel(m)
+	fmMust(t, err)
+	defer func() { fmMust(t, md.Close()) }()
+	result, err := p.Project(md.Core(), []ast.ASTHandle{x}, formula, false, true)
+	fmMust(t, err)
+	defer func() { fmMust(t, result.Close()) }()
+	remaining, err := result.Variables()
+	fmMust(t, err)
+	if len(remaining) != 0 {
+		t.Fatal("qe_lite retained an equality-defined variable")
+	}
+	got, err := result.Formula()
+	fmMust(t, err)
+	want := f.predicate("legacy-lite-predicate", value)
+	if got != want {
+		t.Fatal("qe_lite preprocessing result", got, want)
+	}
+}

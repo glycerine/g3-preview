@@ -89604,7 +89604,7 @@
       "path": "src/muz/spacer/spacer_legacy_mbp.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -89621,11 +89621,20 @@
           "text": "SASSERT(M->eval(fml, bval, true) && m.is_true(bval));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "qe_project overload with expr_map explanation output",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Retained-source audit: recursive search finds no caller of the expr_map qe_project overload outside its declaration and definition. Live Spacer calls the distinct spacer_util.cpp overload, now represented by LegacyProjection and the derivation native-MBP selector; no dead explanation-map adapter is introduced."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_legacy_mev.cpp",
@@ -91052,8 +91061,18 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/spacer/simplify_bounds.go"],
-      "tests": ["TestSimplifyBoundsRunsValuesThenInequalities"],
+      "go_targets": [
+        "pkg/muz/spacer/simplify_bounds.go",
+        "pkg/muz/spacer/derivation.go",
+        "pkg/muz/spacer/manager.go",
+        "pkg/qe/legacy_projection.go"
+      ],
+      "tests": [
+        "TestSimplifyBoundsRunsValuesThenInequalities",
+        "TestContextConsumesNativeMBPPolicy",
+        "TestLegacyProjectionCombinesBooleanArrayAndArithmetic",
+        "TestLegacyProjectionRunsLiteBeforeTheoryDispatch"
+      ],
       "assertions": [
         {
           "line": 168,
@@ -91174,6 +91193,16 @@
           "tests": ["TestSimplifyBoundsRunsValuesThenInequalities"]
         },
         {
+          "name": "qe_project retained live driver: flattening, qe_lite preprocessing, Boolean/array/arithmetic projection, spacer.native_mbp selection, retained failures, and final model substitution",
+          "status": "ported",
+          "go_target": "pkg/qe/legacy_projection.go; pkg/muz/spacer/derivation.go; pkg/muz/spacer/manager.go",
+          "tests": [
+            "TestContextConsumesNativeMBPPolicy",
+            "TestLegacyProjectionCombinesBooleanArrayAndArithmetic",
+            "TestLegacyProjectionRunsLiteBeforeTheoryDispatch"
+          ]
+        },
+        {
           "name": "remaining Spacer utility algorithms",
           "status": "unported",
           "go_target": null,
@@ -91188,8 +91217,16 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/spacer/simplify_bounds.go"],
-      "tests": ["TestSimplifyBoundsRunsValuesThenInequalities"],
+      "go_targets": [
+        "pkg/muz/spacer/simplify_bounds.go",
+        "pkg/muz/spacer/derivation.go",
+        "pkg/qe/legacy_projection.go"
+      ],
+      "tests": [
+        "TestSimplifyBoundsRunsValuesThenInequalities",
+        "TestContextConsumesNativeMBPPolicy",
+        "TestLegacyProjectionCombinesBooleanArrayAndArithmetic"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -91208,6 +91245,15 @@
           "status": "ported",
           "go_target": "pkg/muz/spacer/simplify_bounds.go",
           "tests": ["TestSimplifyBoundsRunsValuesThenInequalities"]
+        },
+        {
+          "name": "retained qe_project declaration and native-MBP selection interface",
+          "status": "ported",
+          "go_target": "pkg/qe/legacy_projection.go; pkg/muz/spacer/derivation.go",
+          "tests": [
+            "TestContextConsumesNativeMBPPolicy",
+            "TestLegacyProjectionCombinesBooleanArrayAndArithmetic"
+          ]
         },
         {
           "name": "remaining Spacer utility declarations",
