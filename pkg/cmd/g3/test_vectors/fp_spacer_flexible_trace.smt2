@@ -18,6 +18,7 @@
 (set-option :fixedpoint.spacer.random_seed 17)
 (set-option :fixedpoint.spacer.mbqi false)
 (set-option :fixedpoint.spacer.eq_prop false)
+(set-option :fixedpoint.spacer.weak_abs false)
 (declare-rel Inv (Int))
 (declare-rel Bad ())
 (declare-var x Int)

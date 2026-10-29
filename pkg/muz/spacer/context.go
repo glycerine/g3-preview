@@ -46,6 +46,7 @@ type Context struct {
 	instantiate      bool
 	quantifiedLemmas bool
 	groundCTI        bool
+	weakAbstraction  bool
 	initialized      bool
 	solved           bool
 	closed           bool
@@ -148,6 +149,10 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	weakAbstraction, err := getBool("spacer.weak_abs", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
 		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
@@ -156,7 +161,8 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 		eliminateAux: eliminateAux, reachDNF: reachDNF,
 		useRestarts: useRestarts, restartInitial: restartInitial,
 		instantiate: instantiate, quantifiedLemmas: quantifiedLemmas,
-		groundCTI: groundCTI,
+		groundCTI:       groundCTI,
+		weakAbstraction: weakAbstraction,
 	}, nil
 }
 
@@ -356,6 +362,9 @@ func (c *Context) InitializePredicates(set *base.RuleSet, declarations []ast.AST
 			return err
 		}
 		if err = transformer.SetGroundCTI(c.groundCTI); err != nil {
+			return err
+		}
+		if err = transformer.SetWeakAbstraction(c.weakAbstraction); err != nil {
 			return err
 		}
 	}

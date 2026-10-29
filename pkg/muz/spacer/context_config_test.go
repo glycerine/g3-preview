@@ -223,3 +223,20 @@ func TestContextMapsSpacerSMTBackendParameters(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestContextConsumesWeakAbstractionPolicy(t *testing.T) {
+	manager, globals := newSpacerTestServices(t)
+	if err := globals.SourceSetName("fixedpoint.spacer.weak_abs", "false"); err != nil {
+		t.Fatal(err)
+	}
+	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if context.weakAbstraction {
+		t.Fatal("weak abstraction parameter policy")
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
+	}
+}

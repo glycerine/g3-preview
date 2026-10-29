@@ -141,12 +141,18 @@ func (p *PredicateTransformer) CheckReachability(obligation *ProofObligation) (r
 	if err != nil {
 		return nil, err
 	}
+	weakness, err := obligation.Weakness()
+	if err != nil {
+		return nil, err
+	}
 	check, err := p.solver.CheckAssumptions([]ast.ASTHandle{post}, soft, PropCheckOptions{
 		Background:      []ast.ASTHandle{extension},
 		NeedCore:        true,
 		NeedModel:       true,
 		SubsetBasedCore: !useFarkas,
 		Level:           &level,
+		WeakAbstraction: p.weakAbstraction,
+		Weakness:        &weakness,
 	})
 	if err != nil {
 		return nil, err

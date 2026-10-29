@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -35,6 +36,8 @@ type PropCheckOptions struct {
 	Level           *uint32
 	DeltaLevel      bool
 	SolverID        uint32
+	WeakAbstraction bool
+	Weakness        *uint32
 }
 
 type PropCheckResult struct {
@@ -301,6 +304,57 @@ func (p *PropSolver) usedLevel(core []ast.ASTHandle) uint32 {
 	return result
 }
 
+func (p *PropSolver) scopedWeakAbstraction(context *ItpSolver, enabled bool, weakness uint32) (cleanup func() error, resultErr error) {
+	if context == nil || context.backend == nil || p.contexts[0].config.Params == nil {
+		return nil, ErrPropSolverOwner
+	}
+	params := p.contexts[0].config.Params
+	current, err := context.backend.Params()
+	if err != nil || current == nil {
+		return nil, errors.Join(err, ErrPropSolverOwner)
+	}
+	copyParams := func(source *uparams.ParamsRef) (value uparams.ParamsRef, copyErr error) {
+		value = params.EmptyValue()
+		committed := false
+		defer func() {
+			if !committed {
+				copyErr = errors.Join(copyErr, params.Del(&value))
+			}
+		}()
+		ignoreName := "arith.ignore_int"
+		if copyErr = params.SetBoolName(&value, &ignoreName, false); copyErr != nil {
+			return uparams.ParamsRef{}, copyErr
+		}
+		if copyErr = params.Append(&value, source); copyErr != nil {
+			return uparams.ParamsRef{}, copyErr
+		}
+		committed = true
+		return value, nil
+	}
+	saved, err := copyParams(current)
+	if err != nil {
+		return nil, err
+	}
+	override, err := copyParams(&saved)
+	if err != nil {
+		return nil, errors.Join(err, params.Del(&saved))
+	}
+	ignoreName := "arith.ignore_int"
+	if err = params.SetBoolName(&override, &ignoreName, enabled && weakness < 1); err == nil {
+		arrayWeakName := "array.weak"
+		err = params.SetBoolName(&override, &arrayWeakName, enabled && weakness < 2)
+	}
+	if err == nil {
+		err = context.backend.UpdateParams(&override)
+	}
+	if err != nil {
+		return nil, errors.Join(err, context.backend.UpdateParams(&saved), params.Del(&override), params.Del(&saved))
+	}
+	return func() error {
+		return errors.Join(context.backend.UpdateParams(&saved), params.Del(&override), params.Del(&saved))
+	}, nil
+}
+
 func (p *PropSolver) CheckAssumptions(hard, soft []ast.ASTHandle, options PropCheckOptions) (_ *PropCheckResult, resultErr error) {
 	if err := p.open(); err != nil {
 		return nil, err
@@ -316,6 +370,13 @@ func (p *PropSolver) CheckAssumptions(hard, soft []ast.ASTHandle, options PropCh
 	}
 	// The native source currently routes both solver IDs through context zero.
 	context := p.contexts[0]
+	if options.Weakness != nil {
+		cleanup, err := p.scopedWeakAbstraction(context, options.WeakAbstraction, *options.Weakness)
+		if err != nil {
+			return nil, err
+		}
+		defer func() { resultErr = errors.Join(resultErr, cleanup()) }()
+	}
 	if err = context.SetProduceModels(options.NeedModel); err != nil {
 		return nil, err
 	}

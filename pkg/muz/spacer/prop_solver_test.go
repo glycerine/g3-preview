@@ -203,6 +203,39 @@ func TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore(t *testing.T) {
 	fixture.close(t)
 }
 
+func TestPropSolverScopesWeakAbstractionParameters(t *testing.T) {
+	fixture := newSpacerPropFixture(t, true)
+	globals, err := fixture.command.GlobalParameters()
+	spacerMust(t, err)
+	baseline, err := globals.Context.NewValue()
+	spacerMust(t, err)
+	ignoreName := "arith.ignore_int"
+	arrayWeakName := "array.weak"
+	spacerMust(t, globals.Context.SetBoolName(&baseline, &ignoreName, true))
+	spacerMust(t, globals.Context.SetBoolName(&baseline, &arrayWeakName, true))
+	spacerMust(t, fixture.backends[0].UpdateParams(&baseline))
+	spacerMust(t, globals.Context.Del(&baseline))
+	truth, err := fixture.manager.MkTrue()
+	spacerMust(t, err)
+	weakness := uint32(2)
+	result, err := fixture.solver.CheckAssumptions([]ast.ASTHandle{truth}, nil, spacer.PropCheckOptions{Weakness: &weakness})
+	spacerMust(t, err)
+	if result.Status != lbool.True {
+		t.Fatal("weak-abstraction scoped check", result.Status)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+	restored, err := fixture.backends[0].Params()
+	spacerMust(t, err)
+	ignore, err := globals.Context.GetBoolName(restored, &ignoreName, false)
+	spacerMust(t, err)
+	arrayWeak, err := globals.Context.GetBoolName(restored, &arrayWeakName, false)
+	spacerMust(t, err)
+	if !ignore || !arrayWeak {
+		t.Fatal("weak-abstraction parameters were not restored", ignore, arrayWeak)
+	}
+	fixture.close(t)
+}
+
 func TestPropSolverNormalAndDeltaLevelActivation(t *testing.T) {
 	fixture := newSpacerPropFixture(t, true)
 	p := spacerBool(t, fixture.manager, "spacer-level-p")

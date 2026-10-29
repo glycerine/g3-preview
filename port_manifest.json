@@ -88706,6 +88706,8 @@
         "TestContextConsumesQuantifiedLemmaPolicies",
         "TestContextConsumesGroundCTIPolicy",
         "TestContextMapsSpacerSMTBackendParameters",
+        "TestContextConsumesWeakAbstractionPolicy",
+        "TestPropSolverScopesWeakAbstractionParameters",
         "TestSMTContextFixedpointSpacerInductiveExports",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
         "TestSMTLibRunnerScripts/fp_spacer_flexible_trace.smt2",
@@ -89001,6 +89003,12 @@
           "status": "ported",
           "go_target": "pkg/muz/spacer/manager.go",
           "tests": ["TestContextMapsSpacerSMTBackendParameters", "TestSMTLibRunnerScripts/fp_spacer_flexible_trace.smt2"]
+        },
+        {
+          "name": "expand_node scoped weak arithmetic and array abstraction by proof-obligation weakness",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/prop_solver.go",
+          "tests": ["TestContextConsumesWeakAbstractionPolicy", "TestPropSolverScopesWeakAbstractionParameters", "TestSMTLibRunnerScripts/fp_spacer_arith_inv.smt2"]
         },
         {
           "name": "predicate cover insertion and exact-frame bound-variable export (spacer_context.cpp:501-532,583-605,2011-2035)",
