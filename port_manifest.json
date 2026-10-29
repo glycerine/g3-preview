@@ -5367,14 +5367,18 @@
       "path": "src/api/api_datalog_spacer.inc",
       "component": "api",
       "role": "reference_support",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": ["pkg/api/api_fixedpoint.go", "pkg/cmd_context/fixedpoint.go", "pkg/muz/fp/pdr_engine.go"],
+      "tests": ["TestSMTContextFixedpointSpacerInductiveExports"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "Z3_fixedpoint_add_invariant typed Go equivalent", "status": "ported", "go_target": "pkg/api/api_fixedpoint.go", "tests": ["TestSMTContextFixedpointSpacerInductiveExports"]},
+        {"name": "Z3_fixedpoint_get_reachable typed Go equivalent", "status": "ported", "go_target": "pkg/api/api_fixedpoint.go", "tests": ["TestSMTContextFixedpointSpacerInductiveExports"]},
+        {"name": "remaining query-from-level, explicit ground-answer alias and rule/name trace exports", "status": "unported", "go_target": null, "tests": []}
+      ],
+      "ownership": ["FixedpointReachable transfers one ASTRef to the caller; AddFixedpointInvariant borrows its declaration and property for the call, after which the engine retains the normalized lemma."],
+      "deviations": ["Typed Go methods replace opaque C handles and saved API trails."]
     },
     {
       "path": "src/api/api_datatype.cpp",

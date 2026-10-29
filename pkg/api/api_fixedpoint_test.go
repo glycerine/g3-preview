@@ -234,7 +234,7 @@ func TestSMTContextFixedpointSpacerInductiveExports(t *testing.T) {
 	astTestMust(t, manager.DelRef(&value))
 	falsity, err := manager.MkFalse()
 	astTestMust(t, err)
-	astTestMust(t, context.AddFixedpointCover(-1, u, falsity))
+	astTestMust(t, context.AddFixedpointInvariant(u, falsity))
 	cover, err := context.FixedpointCoverDelta(-1, u)
 	astTestMust(t, err)
 	coverHandle, err := manager.RefGet(cover)

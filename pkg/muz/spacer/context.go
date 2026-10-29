@@ -284,6 +284,11 @@ func (c *Context) AddCover(level int, declaration, property ast.ASTHandle) error
 	return transformer.AddCover(level, property)
 }
 
+// AddInvariant installs a property in the predicate's invariant frame.
+func (c *Context) AddInvariant(declaration, property ast.ASTHandle) error {
+	return c.AddCover(-1, declaration, property)
+}
+
 // Reachable returns the accumulated concrete reach summary for a predicate.
 func (c *Context) Reachable(declaration ast.ASTHandle) (ast.ASTRef, error) {
 	if err := c.open(); err != nil {

@@ -193,6 +193,11 @@ func (e *PropositionalEngine) AddCover(level int, declaration, property ast.ASTH
 	return context.AddCover(level, declaration, property)
 }
 
+// AddInvariant installs a bound-variable property in the invariant frame.
+func (e *PropositionalEngine) AddInvariant(declaration, property ast.ASTHandle) error {
+	return e.AddCover(-1, declaration, property)
+}
+
 // Reachable returns the accumulated Spacer reach summary for a predicate.
 func (e *PropositionalEngine) Reachable(declaration ast.ASTHandle) (ast.ASTRef, error) {
 	if err := e.open(); err != nil {

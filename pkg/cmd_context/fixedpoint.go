@@ -221,6 +221,16 @@ func (c *Context) AddFixedpointCover(level int, declaration, property ast.ASTHan
 	return engine.AddCover(level, declaration, property)
 }
 
+// AddFixedpointInvariant installs a bound-variable property in the invariant
+// frame of a PDR or Spacer predicate.
+func (c *Context) AddFixedpointInvariant(declaration, property ast.ASTHandle) error {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return err
+	}
+	return engine.AddInvariant(declaration, property)
+}
+
 // FixedpointReachable returns the accumulated Spacer reach summary as one
 // owning AST reference.
 func (c *Context) FixedpointReachable(declaration ast.ASTHandle) (ast.ASTRef, error) {

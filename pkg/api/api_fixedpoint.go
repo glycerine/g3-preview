@@ -143,6 +143,15 @@ func (c *SMTContext) AddFixedpointCover(level int, declaration, property ast.AST
 	return c.command.AddFixedpointCover(level, declaration, property)
 }
 
+// AddFixedpointInvariant adds a property over bound predicate arguments to the
+// invariant frame of a PDR or Spacer predicate.
+func (c *SMTContext) AddFixedpointInvariant(declaration, property ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.AddFixedpointInvariant(declaration, property)
+}
+
 // FixedpointReachable returns one owning reference to the accumulated Spacer
 // reach summary. Release it through Manager().DelRef.
 func (c *SMTContext) FixedpointReachable(declaration ast.ASTHandle) (ast.ASTRef, error) {
