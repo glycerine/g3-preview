@@ -171774,12 +171774,15 @@
       "go_targets": [
         "pkg/tactic/smtlogics/qffp_tactic.go",
         "pkg/tactic/smtlogics/qffp_probe.go",
+        "pkg/tactic/smtlogics/qffp_default_probe.go",
         "pkg/tactic/smtlogics/qffp_probe_test.go",
         "pkg/tactic/portfolio/smt_strategic_solver.go",
         "pkg/cmd_context/context.go",
         "pkg/cmd_context/tactic_commands.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qffp_default.smt2",
+        "pkg/cmd/g3/test_vectors/qffpbv_tactic.smt2",
         "pkg/cmd/g3/test_vectors/qffp_solver_models_scopes.smt2",
         "pkg/cmd/g3/test_vectors/qfnra_boolean.smt2"
       ],
@@ -171787,6 +171790,10 @@
         "TestQFFPSourceStructuralProbeOrdering",
         "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
         "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2",
+        "TestSMTLibRunnerScripts/qffp_default.smt2",
+        "TestSMTLibRunnerCPPReference/qffp_default.smt2",
+        "TestSMTLibRunnerScripts/qffpbv_tactic.smt2",
+        "TestSMTLibRunnerCPPReference/qffpbv_tactic.smt2",
         "TestSMTLibRunnerScripts/qffp_solver_models_scopes.smt2",
         "TestSMTLibRunnerCPPReference/qffp_solver_models_scopes.smt2",
         "TestSMTLibRunnerScripts/qfnra_boolean.smt2",
@@ -171796,11 +171803,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "complete QF_FP/QF_FPBV/QF_BVFP simplify, FPA-to-BV, Ackermannization, bit-blast, exact source FP/QF_NRA structural probe, SAT/QF_NRA/SMT strategy and combined-solver/explicit-tactic command dispatch",
+          "name": "complete QF_FP/QF_FPBV/QF_BVFP simplify, FPA-to-BV, Ackermannization, bit-blast, distinct exact source FP/QF_NRA and default is-qffp/is-qffpbv structural probes, SAT/QF_NRA/SMT strategy, aliases and combined-solver/explicit-tactic command dispatch",
           "status": "ported",
           "go_targets": [
             "pkg/tactic/smtlogics/qffp_tactic.go",
             "pkg/tactic/smtlogics/qffp_probe.go",
+            "pkg/tactic/smtlogics/qffp_default_probe.go",
             "pkg/tactic/portfolio/smt_strategic_solver.go",
             "pkg/cmd_context/context.go",
             "pkg/cmd_context/tactic_commands.go"
@@ -171809,6 +171817,10 @@
             "TestQFFPSourceStructuralProbeOrdering",
             "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
             "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2",
+            "TestSMTLibRunnerScripts/qffp_default.smt2",
+            "TestSMTLibRunnerCPPReference/qffp_default.smt2",
+            "TestSMTLibRunnerScripts/qffpbv_tactic.smt2",
+            "TestSMTLibRunnerCPPReference/qffpbv_tactic.smt2",
             "TestSMTLibRunnerScripts/qffp_solver_models_scopes.smt2",
             "TestSMTLibRunnerCPPReference/qffp_solver_models_scopes.smt2"
           ]
@@ -171818,7 +171830,7 @@
         "The returned parameterized tactical independently owns the composed children before construction owners are released; FPA-to-BV goal/model conversion ownership is recorded with its source unit."
       ],
       "deviations": [
-        "The source probe's ordering is preserved literally: its first family guard rejects basic-family applications before the later basic-family branch can be reached. Native Go traversal and typed family/sort accessors replace the source exception-based visitor."
+        "The source internal FP/QF_NRA probe's ordering is preserved literally: its first family guard rejects basic-family applications before the later basic-family branch can be reached. The separate default is-qffp/is-qffpbv classifier accepts basic-family applications and only real arithmetic numerals exactly as its source predicate does. Native Go traversal and typed family/sort accessors replace the source exception-based visitors."
       ]
     },
     {
@@ -171828,12 +171840,15 @@
       "status": "ported",
       "go_targets": [
         "pkg/tactic/smtlogics/qffp_tactic.go",
-        "pkg/tactic/smtlogics/qffp_probe.go"
+        "pkg/tactic/smtlogics/qffp_probe.go",
+        "pkg/tactic/smtlogics/qffp_default_probe.go"
       ],
       "tests": [
         "TestQFFPSourceStructuralProbeOrdering",
         "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
         "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2",
+        "TestSMTLibRunnerScripts/qffp_default.smt2",
+        "TestSMTLibRunnerScripts/qffpbv_tactic.smt2",
         "TestSMTLibRunnerScripts/qffp_solver_models_scopes.smt2",
         "TestSMTLibRunnerCPPReference/qffp_solver_models_scopes.smt2"
       ],
@@ -171851,11 +171866,13 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "QF_FP tactic and structural-probe factory surface used by QF_FP/QF_FPBV/QF_BVFP command routes",
+          "name": "QF_FP/QF_FPBV tactic aliases and internal/default structural-probe factory surfaces used by QF_FP/QF_FPBV/QF_BVFP command and portfolio routes",
           "status": "ported",
           "go_target": "pkg/tactic/smtlogics/qffp_tactic.go",
           "tests": [
-            "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2"
+            "TestQFFPSourceStructuralProbeOrdering",
+            "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
+            "TestSMTLibRunnerScripts/qffpbv_tactic.smt2"
           ]
         }
       ],
@@ -173079,6 +173096,11 @@
         "pkg/cmd/g3/test_vectors/default_strategy_fragments.smt2",
         "pkg/cmd/g3/test_vectors/qfnia_solver_bounded.smt2",
         "pkg/tactic/smtlogics/quant_tactics.go",
+        "pkg/tactic/smtlogics/qffp_default_probe.go",
+        "pkg/tactic/smtlogics/qffp_tactic.go",
+        "pkg/tactic/smtlogics/qffplra_tactic.go",
+        "pkg/cmd/g3/test_vectors/qffp_default.smt2",
+        "pkg/cmd/g3/test_vectors/qffplra_default.smt2",
         "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2",
         "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2"
       ],
@@ -173086,6 +173108,10 @@
         "TestSMTLibRunnerAsArrayCombinedSolverFallback",
         "TestSMTLibRunnerScripts/default_strategy_fragments.smt2",
         "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
+        "TestSMTLibRunnerScripts/qffp_default.smt2",
+        "TestSMTLibRunnerCPPReference/qffp_default.smt2",
+        "TestSMTLibRunnerScripts/qffplra_default.smt2",
+        "TestSMTLibRunnerCPPReference/qffplra_default.smt2",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference"
       ],
@@ -173093,7 +173119,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained ALL default-strategy integration for the native ordered QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA, QF_LRA and bounded QF_NIA classifiers, OP_AS_ARRAY compatibility routing, and quantifier-free mixed linear integer/real goals: simplify before selecting the source preprocessing branch and preserve ordinary combined-solver incremental fallback and exception behavior",
+          "name": "Retained ALL default-strategy integration for the native ordered QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA, QF_LRA, bounded QF_NIA, QF_FP/QF_FPBV and QF_FPLRA classifiers, OP_AS_ARRAY compatibility routing, and quantifier-free mixed linear integer/real goals: simplify before selecting the source preprocessing branch and preserve ordinary combined-solver incremental fallback and exception behavior",
           "status": "partial",
           "go_targets": [
             "pkg/tactic/portfolio/all_as_array_probe.go",
@@ -173105,6 +173131,11 @@
             "pkg/cmd/g3/test_vectors/default_strategy_fragments.smt2",
             "pkg/cmd/g3/test_vectors/qfnia_solver_bounded.smt2",
             "pkg/tactic/smtlogics/quant_tactics.go",
+            "pkg/tactic/smtlogics/qffp_default_probe.go",
+            "pkg/tactic/smtlogics/qffp_tactic.go",
+            "pkg/tactic/smtlogics/qffplra_tactic.go",
+            "pkg/cmd/g3/test_vectors/qffp_default.smt2",
+            "pkg/cmd/g3/test_vectors/qffplra_default.smt2",
             "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2",
             "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2"
           ],
@@ -173112,6 +173143,10 @@
             "TestSMTLibRunnerAsArrayCombinedSolverFallback",
             "TestSMTLibRunnerScripts/default_strategy_fragments.smt2",
             "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
+            "TestSMTLibRunnerScripts/qffp_default.smt2",
+            "TestSMTLibRunnerCPPReference/qffp_default.smt2",
+            "TestSMTLibRunnerScripts/qffplra_default.smt2",
+            "TestSMTLibRunnerCPPReference/qffplra_default.smt2",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -173119,7 +173154,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The nested default tactic classifier now retains the source simplify-first ordering and the QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA, QF_LRA, bounded QF_NIA and mixed LIRA branches. QF_NRA, NRA, QF_FP and QF_FPLRA remain unported, so those and other unmatched ALL goals retain the direct SMT tactic path. QF_NIA retains its first bounded bit-vector solver and final SMT fallback while the intervening NLSAT attempts remain pending. The OP_AS_ARRAY compatibility route remains ahead of the source classifiers. End-to-end vectors cover each retained classifier, strict array and mixed UTVPI combined-solver fallback, native model-construction exception conversion and unrelated single-sort unknown preservation."
+        "The nested default tactic classifier now retains the source simplify-first ordering and the QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA, QF_LRA, bounded QF_NIA, mixed LIRA, QF_FP/QF_FPBV and QF_FPLRA branches. QF_NRA and NRA remain pending, so those and other unmatched ALL goals retain the direct SMT tactic path. QF_NIA retains its first bounded bit-vector solver and final SMT fallback while the intervening NLSAT attempts remain pending. The OP_AS_ARRAY compatibility route remains ahead of the source classifiers. End-to-end vectors cover each retained classifier, strict array and mixed UTVPI combined-solver fallback, native model-construction exception conversion and unrelated single-sort unknown preservation."
       ]
     },
     {
@@ -173831,11 +173866,14 @@
             "pkg/cmd_context/tactic_commands.go",
             "pkg/cmd/g3/main_test.go",
             "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qffpbv_tactic.smt2",
             "pkg/cmd/g3/test_vectors/qffp_solver_models_scopes.smt2"
           ],
           "tests": [
             "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
             "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2",
+            "TestSMTLibRunnerScripts/qffpbv_tactic.smt2",
+            "TestSMTLibRunnerCPPReference/qffpbv_tactic.smt2",
             "TestSMTLibRunnerScripts/qffp_solver_models_scopes.smt2",
             "TestSMTLibRunnerCPPReference/qffp_solver_models_scopes.smt2"
           ]

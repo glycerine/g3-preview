@@ -22,6 +22,15 @@ func NewQFFPTactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSo
 	return NewQFFPTacticWithOutput(m, p, config, os.Stdout)
 }
 
+// NewQFFPBVTactic preserves mk_qffpbv_tactic's exact source alias.
+func NewQFFPBVTactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig) (tactic.Tactic, error) {
+	return NewQFFPBVTacticWithOutput(m, p, config, os.Stdout)
+}
+
+func NewQFFPBVTacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig, output io.Writer) (tactic.Tactic, error) {
+	return NewQFFPTacticWithOutput(m, p, config, output)
+}
+
 // NewQFFPTacticWithOutput retains the floating-point reduction strategy and
 // supplies the command session output to its SAT backend.
 func NewQFFPTacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig, output io.Writer) (result tactic.Tactic, err error) {

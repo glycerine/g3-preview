@@ -371,6 +371,8 @@ var scriptResults = map[string]string{
 	"fpa_canonical_model_scopes.smt2":              "sat\n(((= (fp.to_ieee_bv x) #b1011001) true)\n ((fp.isNormal x) true)\n ((= rm RNA) true))\nunsat\nsat\n(((fp.isZero x) true)\n ((fp.isNegative x) true))\nsat\n(((fp.isNaN x) true)\n ((= rm RNA) true))\n",
 	"fpa2bv_tactic.smt2":                           "sat\n",
 	"qffp_solver_models_scopes.smt2":               "sat\n(((fp.isNaN x) true))\nunsat\nsat\nsat\n",
+	"qffpbv_tactic.smt2":                           "sat\nsat\n",
+	"qffp_default.smt2":                            "sat\n",
 	"qffplra_solver.smt2":                          "sat\nsat\n",
 	"qffplra_default.smt2":                         "sat\n",
 	"qfnra_boolean.smt2":                           "sat\n",

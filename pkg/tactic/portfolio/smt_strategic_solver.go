@@ -153,7 +153,7 @@ func NewALLStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mode
 	if err != nil {
 		return nil, err
 	}
-	qfFPProbe, err := keepProbe(smtlogics.NewIsFPQFNRAProbe(m.Budget()))
+	qfFPProbe, err := keepProbe(smtlogics.NewIsQFFPProbe(m.Budget()))
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +259,13 @@ func NewQFNRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mo
 }
 
 func NewQFFPStrategicSolverWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, logic string, config smtcore.SMTSolverConfig, output io.Writer) (solver.Solver, error) {
-	strategy, err := smtlogics.NewQFFPTacticWithOutput(m, p, config, output)
+	var strategy tactic.Tactic
+	var err error
+	if logic == "QF_FPBV" || logic == "QF_BVFP" {
+		strategy, err = smtlogics.NewQFFPBVTacticWithOutput(m, p, config, output)
+	} else {
+		strategy, err = smtlogics.NewQFFPTacticWithOutput(m, p, config, output)
+	}
 	if err != nil {
 		return nil, err
 	}

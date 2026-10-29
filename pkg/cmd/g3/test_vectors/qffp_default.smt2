@@ -1,0 +1,5 @@
+(declare-const x (_ FloatingPoint 3 4))
+(declare-const b (_ BitVec 7))
+(assert (fp.isNaN x))
+(assert (= (fp.to_ieee_bv x) b))
+(check-sat)

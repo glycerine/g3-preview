@@ -37,6 +37,10 @@ func TestQFFPSourceStructuralProbeOrdering(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defaultProbe, err := newIsQFFPProbe(budget)
+	if err != nil {
+		t.Fatal(err)
+	}
 	boolean, err := manager.MkBoolSort()
 	if err != nil {
 		t.Fatal(err)
@@ -58,6 +62,9 @@ func TestQFFPSourceStructuralProbeOrdering(t *testing.T) {
 	}
 	if value, evalErr := probe.Eval(plain); evalErr != nil || value != 1 {
 		t.Fatal("uninterpreted Boolean leaf", value, evalErr)
+	}
+	if value, evalErr := defaultProbe.Eval(plain); evalErr != nil || value != 1 {
+		t.Fatal("default probe uninterpreted Boolean leaf", value, evalErr)
 	}
 	if err = plain.Close(); err != nil {
 		t.Fatal(err)
@@ -81,10 +88,16 @@ func TestQFFPSourceStructuralProbeOrdering(t *testing.T) {
 	if value, evalErr := probe.Eval(basic); evalErr != nil || value != 0 {
 		t.Fatal("source basic-family early rejection", value, evalErr)
 	}
+	if value, evalErr := defaultProbe.Eval(basic); evalErr != nil || value != 1 {
+		t.Fatal("default source probe accepts basic-family application", value, evalErr)
+	}
 	if err = basic.Close(); err != nil {
 		t.Fatal(err)
 	}
 	if err = probe.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err = defaultProbe.Close(); err != nil {
 		t.Fatal(err)
 	}
 	if err = manager.Close(); err != nil {
