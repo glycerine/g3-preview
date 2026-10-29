@@ -1347,8 +1347,38 @@ func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTR
 		if e.pdr == nil || !e.queried || e.pdrRevision != e.revision {
 			return answer, ErrPropositionalEngine
 		}
+		status, err := e.pdr.LastResult()
+		if err != nil {
+			return answer, err
+		}
+		if status == lbool.False {
+			inductive, modelErr := e.Model(declaration)
+			if modelErr != nil {
+				return answer, modelErr
+			}
+			defer func() { result = errors.Join(result, inductive.Close()) }()
+			builder, modelErr := model.NewModel2ExprBuilder(inductive.Core())
+			if modelErr != nil {
+				return answer, modelErr
+			}
+			defer func() { result = errors.Join(result, builder.Close()) }()
+			answer, modelErr = e.manager.NewRef(ast.ASTHandle{})
+			if modelErr != nil {
+				return answer, modelErr
+			}
+			defer func() {
+				if result != nil && answer != (ast.ASTRef{}) {
+					result = errors.Join(result, e.manager.DelRef(&answer))
+					answer = ast.ASTRef{}
+				}
+			}()
+			if modelErr = builder.Build(answer); modelErr != nil {
+				return answer, modelErr
+			}
+			return answer, nil
+		}
 		// Relation-query answers intentionally retain sliced predicate names,
-		// matching pdr_dl_interface's converter-free relation-query surface.
+		// matching pdr_dl_interface's converter-free reachable-trace surface.
 		return e.pdr.Answer(e.pdrPredicate(declaration))
 	}
 	if e.backend == "spacer" {

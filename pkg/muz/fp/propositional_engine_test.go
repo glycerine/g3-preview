@@ -487,6 +487,19 @@ func TestPDREngineExpandsSlicedModelsAndCovers(t *testing.T) {
 	if declaration != predicate {
 		t.Fatal("PDR model exposed the sliced predicate declaration", declaration)
 	}
+	certificate, err := engine.Answer(unreachable)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, manager.DelRef(&certificate)) })
+	certificateHandle, err := manager.RefGet(certificate)
+	fpMust(t, err)
+	printer, err := ast.NewASTPPUtil(manager)
+	fpMust(t, err)
+	var certificateText strings.Builder
+	fpMust(t, printer.CollectAll([]ast.ASTHandle{certificateHandle}))
+	fpMust(t, printer.DisplayAssertions(&certificateText, []ast.ASTHandle{certificateHandle}, true))
+	if !strings.Contains(certificateText.String(), "pdr-sliced-model-P") || strings.Contains(certificateText.String(), "!slice!") {
+		t.Fatalf("PDR certificate did not restore the original predicate:\n%s", certificateText.String())
+	}
 	cover, err := engine.CoverDelta(-1, predicate)
 	fpMust(t, err)
 	t.Cleanup(func() { fpMust(t, manager.DelRef(&cover)) })
