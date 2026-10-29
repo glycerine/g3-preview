@@ -547,6 +547,22 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 `,
 			"sat\n(and (P 0))\n",
 		},
+		{
+			"nonlinear-recursion",
+			`(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(declare-rel Q (Int))
+(declare-rel Goal ())
+(declare-var x Int)
+(rule (P 0))
+(rule (Q 0))
+(rule (Q 1))
+(rule (=> (and (P x) (Q x) (< x 2)) (P (+ x 1))))
+(rule (=> (P 2) Goal))
+(query Goal :print-answer true)
+`,
+			"sat\ntrue\n",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

@@ -175,6 +175,34 @@ func updateTraceModels(root *ModelNode) error {
 	return nil
 }
 
+// traceHasNonlinearRule identifies witnesses for which the retained native
+// fixedpoint frontend reduces the printed trace to true. The linear recursive
+// trace below must not try to recover models or select initial rules for every
+// branch of such a witness.
+func traceHasNonlinearRule(root *ModelNode) (bool, error) {
+	stack := []*ModelNode{root}
+	for len(stack) != 0 {
+		last := len(stack) - 1
+		node := stack[last]
+		stack = stack[:last]
+		if node.selected != nil {
+			uninterpreted, err := node.selected.rule.UninterpretedTailSize()
+			if err != nil {
+				return false, err
+			}
+			if uninterpreted > 1 {
+				return true, nil
+			}
+		}
+		children, err := node.Children()
+		if err != nil {
+			return false, err
+		}
+		stack = append(stack, children...)
+	}
+	return false, nil
+}
+
 // Answer reconstructs the selected satisfying rule trace for the latest
 // successful query and returns one owning reference. The caller releases it
 // through ASTManager.DelRef.
@@ -191,6 +219,17 @@ func (c *Context) Answer(queryDeclaration ast.ASTHandle) (result ast.ASTRef, res
 			return result, err
 		}
 		return result, ast.ErrASTDomain
+	}
+	nonlinear, err := traceHasNonlinearRule(root)
+	if err != nil {
+		return result, err
+	}
+	if nonlinear {
+		truth, x := c.manager.MkTrue()
+		if x != nil {
+			return result, x
+		}
+		return c.manager.NewRef(truth)
 	}
 	if err = updateTraceModels(root); err != nil {
 		return result, err
