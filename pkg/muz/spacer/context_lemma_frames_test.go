@@ -231,6 +231,44 @@ func TestSpacerRulePredicateTransformerBuildsSourceStateSignature(t *testing.T) 
 	if _, err = transformer.Formulas(0, true); err != nil {
 		t.Fatal("initialized rule predicate formulas", err)
 	}
+	first, err := manager.MkVar(0, boolean)
+	spacerMust(t, err)
+	second, err := manager.MkVar(1, boolean)
+	spacerMust(t, err)
+	notSecond, err := manager.MkNot(second)
+	spacerMust(t, err)
+	property, err := manager.MkAnd(first, notSecond)
+	spacerMust(t, err)
+	spacerMust(t, transformer.AddCover(-1, property))
+	cover, err := transformer.CoverDelta(-1)
+	spacerMust(t, err)
+	coverHandle, err := manager.RefGet(cover)
+	spacerMust(t, err)
+	parts, err := manager.FlattenAnd([]ast.ASTHandle{coverHandle})
+	spacerMust(t, err)
+	if len(parts) != 2 {
+		t.Fatal("bound-variable cover", parts)
+	}
+	seenFirst, seenSecond := false, false
+	for _, part := range parts {
+		if kind, x := manager.GetKind(part); x == nil && kind == ast.ASTVar {
+			index, x := manager.GetVarIndex(part)
+			spacerMust(t, x)
+			seenFirst = seenFirst || index == 0
+			continue
+		}
+		negated, argument, x := manager.IsNot(part)
+		spacerMust(t, x)
+		if negated {
+			index, x := manager.GetVarIndex(argument)
+			spacerMust(t, x)
+			seenSecond = seenSecond || index == 1
+		}
+	}
+	if !seenFirst || !seenSecond {
+		t.Fatal("cover signature round trip", parts)
+	}
+	spacerMust(t, manager.DelRef(&cover))
 	spacerMust(t, transformer.Close())
 	spacerMust(t, owner.Close())
 	spacerMust(t, command.Close())

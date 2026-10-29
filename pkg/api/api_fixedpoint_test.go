@@ -222,4 +222,15 @@ func TestSMTContextFixedpointSpacerInductiveExports(t *testing.T) {
 		t.Fatal("Spacer public model does not satisfy fact", valueHandle)
 	}
 	astTestMust(t, manager.DelRef(&value))
+	falsity, err := manager.MkFalse()
+	astTestMust(t, err)
+	astTestMust(t, context.AddFixedpointCover(-1, u, falsity))
+	cover, err := context.FixedpointCoverDelta(-1, u)
+	astTestMust(t, err)
+	coverHandle, err := manager.RefGet(cover)
+	astTestMust(t, err)
+	if !manager.IsFalse(coverHandle) {
+		t.Fatal("Spacer public invariant cover", coverHandle)
+	}
+	astTestMust(t, manager.DelRef(&cover))
 }

@@ -201,8 +201,8 @@ func (c *Context) FixedpointNumLevels(declaration ast.ASTHandle) (uint32, error)
 	return engine.NumLevels(declaration)
 }
 
-// FixedpointCoverDelta returns an owning formula for exactly one PDR frame;
-// level -1 selects the invariant frame.
+// FixedpointCoverDelta returns an owning formula for exactly one PDR or Spacer
+// frame; level -1 selects the invariant frame.
 func (c *Context) FixedpointCoverDelta(level int, declaration ast.ASTHandle) (ast.ASTRef, error) {
 	engine, err := c.fixedpointContext()
 	if err != nil {
@@ -211,7 +211,8 @@ func (c *Context) FixedpointCoverDelta(level int, declaration ast.ASTHandle) (as
 	return engine.CoverDelta(level, declaration)
 }
 
-// AddFixedpointCover installs a bound-variable property into one PDR frame.
+// AddFixedpointCover installs a bound-variable property into one PDR or Spacer
+// frame.
 func (c *Context) AddFixedpointCover(level int, declaration, property ast.ASTHandle) error {
 	engine, err := c.fixedpointContext()
 	if err != nil {

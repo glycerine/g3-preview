@@ -255,6 +255,35 @@ func (c *Context) NumLevels(declaration ast.ASTHandle) (uint32, error) {
 	return transformer.NumLevels()
 }
 
+// CoverDelta returns one predicate cover frame as an owning AST reference.
+// Level -1 selects the invariant frame.
+func (c *Context) CoverDelta(level int, declaration ast.ASTHandle) (ast.ASTRef, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	transformer := c.transformers[declaration]
+	if transformer == nil {
+		truth, err := c.manager.MkTrue()
+		if err != nil {
+			return ast.ASTRef{}, err
+		}
+		return c.manager.NewRef(truth)
+	}
+	return transformer.CoverDelta(level)
+}
+
+// AddCover adds a bound-variable property to one predicate frame.
+func (c *Context) AddCover(level int, declaration, property ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	transformer := c.transformers[declaration]
+	if transformer == nil {
+		return ast.ErrASTDomain
+	}
+	return transformer.AddCover(level, property)
+}
+
 func (c *Context) propagate(maximum uint32) (bool, error) {
 	for level := uint32(0); level <= maximum; level++ {
 		all := true

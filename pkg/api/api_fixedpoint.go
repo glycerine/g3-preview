@@ -124,9 +124,9 @@ func (c *SMTContext) FixedpointNumLevels(declaration ast.ASTHandle) (uint32, err
 	return c.command.FixedpointNumLevels(declaration)
 }
 
-// FixedpointCoverDelta returns an owning reference to exactly one PDR cover
-// frame. Level -1 denotes the invariant frame; release the result via
-// Manager().DelRef.
+// FixedpointCoverDelta returns an owning reference to exactly one PDR or
+// Spacer cover frame. Level -1 denotes the invariant frame; release the result
+// via Manager().DelRef.
 func (c *SMTContext) FixedpointCoverDelta(level int, declaration ast.ASTHandle) (ast.ASTRef, error) {
 	if err := c.open(); err != nil {
 		return ast.ASTRef{}, err
@@ -135,7 +135,7 @@ func (c *SMTContext) FixedpointCoverDelta(level int, declaration ast.ASTHandle) 
 }
 
 // AddFixedpointCover adds a property over bound predicate arguments to one PDR
-// frame. Level -1 denotes the invariant frame.
+// or Spacer frame. Level -1 denotes the invariant frame.
 func (c *SMTContext) AddFixedpointCover(level int, declaration, property ast.ASTHandle) error {
 	if err := c.open(); err != nil {
 		return err

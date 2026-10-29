@@ -161,8 +161,15 @@ func (e *PropositionalEngine) NumLevels(declaration ast.ASTHandle) (uint32, erro
 	return context.NumLevels(declaration)
 }
 
-// CoverDelta returns an owning reference to a PDR cover frame after a query.
+// CoverDelta returns an owning reference to a PDR or Spacer cover frame after
+// a query.
 func (e *PropositionalEngine) CoverDelta(level int, declaration ast.ASTHandle) (ast.ASTRef, error) {
+	if err := e.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
+		return e.spacer.CoverDelta(level, declaration)
+	}
 	context, err := e.pdrContext()
 	if err != nil {
 		return ast.ASTRef{}, err
@@ -170,8 +177,15 @@ func (e *PropositionalEngine) CoverDelta(level int, declaration ast.ASTHandle) (
 	return context.CoverDelta(level, declaration)
 }
 
-// AddCover installs a bound-variable property in a retained PDR frame.
+// AddCover installs a bound-variable property in a retained PDR or Spacer
+// frame.
 func (e *PropositionalEngine) AddCover(level int, declaration, property ast.ASTHandle) error {
+	if err := e.open(); err != nil {
+		return err
+	}
+	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
+		return e.spacer.AddCover(level, declaration, property)
+	}
 	context, err := e.pdrContext()
 	if err != nil {
 		return err

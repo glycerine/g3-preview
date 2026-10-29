@@ -124,6 +124,20 @@ func TestSpacerContextSolvesFactAndRecursiveNoBasePrograms(t *testing.T) {
 		t.Fatal("single-query Spacer model", declarations, err)
 	}
 	spacerMust(t, inductiveModel.Close())
+	falsity, err := manager.MkFalse()
+	spacerMust(t, err)
+	spacerMust(t, recursiveContext.AddCover(-1, recursivePredicate, falsity))
+	cover, err := recursiveContext.CoverDelta(-1, recursivePredicate)
+	spacerMust(t, err)
+	coverHandle, err := manager.RefGet(cover)
+	spacerMust(t, err)
+	if !manager.IsFalse(coverHandle) {
+		t.Fatal("Spacer invariant cover", coverHandle)
+	}
+	spacerMust(t, manager.DelRef(&cover))
+	if err = recursiveContext.AddCover(-2, recursivePredicate, falsity); err == nil {
+		t.Fatal("Spacer accepted invalid cover level")
+	}
 	spacerMust(t, recursiveContext.Close())
 	spacerMust(t, recursiveSet.Close())
 	spacerMust(t, recursiveRule.Close())
