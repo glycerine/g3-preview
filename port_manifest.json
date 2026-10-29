@@ -92619,6 +92619,7 @@
         "TestRuleInlinerRefusesMixedQuantifiedProgram",
         "TestRuleInlinerBreaksMutualCycleAtOnePredicate",
         "TestRuleInlinerForbidsSecondRuleMultiplier",
+        "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_nonlinear_inlining.smt2",
@@ -92754,7 +92755,15 @@
           ]
         },
         {
-      "name": "remaining oriented eager pass, proof/model conversion, and interpreted-tail unsatisfiability filtering during resolution",
+          "name": "bounded oriented eager rewriting with unique-unifier selection and stratum/arity/declaration ordering",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_inliner.go",
+          "tests": [
+            "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition"
+          ]
+        },
+        {
+      "name": "remaining proof/model conversion and interpreted-tail unsatisfiability filtering during resolution",
           "status": "unported"
         }
       ],
@@ -92782,7 +92791,8 @@
     "TestRuleInlinerHonorsDisabledModes",
     "TestRuleInlinerRefusesMixedQuantifiedProgram",
     "TestRuleInlinerBreaksMutualCycleAtOnePredicate",
-    "TestRuleInlinerForbidsSecondRuleMultiplier"
+    "TestRuleInlinerForbidsSecondRuleMultiplier",
+    "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition"
       ],
       "conditionals": [
         {

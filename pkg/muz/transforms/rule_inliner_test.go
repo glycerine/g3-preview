@@ -179,6 +179,70 @@ func TestRuleInlinerForbidsSecondRuleMultiplier(t *testing.T) {
 	}
 }
 
+func TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition(t *testing.T) {
+	f := newConeFixture(t)
+	boolean, err := f.manager.MkBoolSort()
+	coneMust(t, err)
+	zero, err := f.manager.ArithmeticNumeralRat(big.NewRat(0, 1), true)
+	coneMust(t, err)
+	one, err := f.manager.ArithmeticNumeralRat(big.NewRat(1, 1), true)
+	coneMust(t, err)
+	integer, err := f.manager.GetSort(zero)
+	coneMust(t, err)
+	pName, err := f.manager.Symbols.Intern("oriented-P")
+	coneMust(t, err)
+	p, err := f.manager.MkFuncDecl(pName, []ast.ASTHandle{integer}, boolean, ast.ASTFuncDeclInfo{})
+	coneMust(t, err)
+	goalName, err := f.manager.Symbols.Intern("oriented-Goal")
+	coneMust(t, err)
+	goal, err := f.manager.MkFuncDecl(goalName, nil, boolean, ast.ASTFuncDeclInfo{})
+	coneMust(t, err)
+	coneMust(t, f.rules.RegisterPredicate(p))
+	coneMust(t, f.rules.RegisterPredicate(goal))
+	pZero, err := f.manager.MkApp(p, []ast.ASTHandle{zero})
+	coneMust(t, err)
+	pOne, err := f.manager.MkApp(p, []ast.ASTHandle{one})
+	coneMust(t, err)
+	goalApp, err := f.manager.MkApp(goal, nil)
+	coneMust(t, err)
+	add := func(head ast.ASTHandle, tails []ast.ASTHandle, name string) {
+		rule, addErr := f.rules.NewRule(head, tails, nil, name)
+		coneMust(t, addErr)
+		coneMust(t, f.set.Add(rule))
+		coneMust(t, rule.Close())
+	}
+	add(pZero, nil, "p-zero")
+	add(pOne, nil, "p-one")
+	add(goalApp, []ast.ASTHandle{pZero}, "goal")
+	coneMust(t, f.set.SetOutputPredicate(goal))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("oriented eager inliner fixture rejected")
+	}
+	transformer := base.NewRuleTransformer()
+	t.Cleanup(func() { coneMust(t, transformer.Close()) })
+	coneMust(t, transformer.Register(transforms.NewRuleInlinerPluginWithModes(f.manager, f.rules, []ast.ASTHandle{p, goal}, true, false, 0)))
+	modified, err := transformer.Apply(f.set)
+	coneMust(t, err)
+	if !modified {
+		t.Fatal("oriented eager pass did not use the unique unifying definition")
+	}
+	rules, err := f.set.PredicateRules(goal)
+	coneMust(t, err)
+	defer func() {
+		for _, rule := range rules {
+			coneMust(t, rule.Close())
+		}
+	}()
+	if len(rules) != 1 {
+		t.Fatalf("oriented eager goal rules %d, want 1", len(rules))
+	}
+	if tails, tailErr := rules[0].TailSize(); tailErr != nil || tails != 0 {
+		t.Fatal("oriented eager result tail", tails, tailErr)
+	}
+}
+
 func TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput(t *testing.T) {
 	f := newConeFixture(t, "P", "Q", "Goal")
 	f.add(t, f.applications["P"], "fact-P")

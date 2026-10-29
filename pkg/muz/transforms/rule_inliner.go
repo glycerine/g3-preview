@@ -537,6 +537,220 @@ func closeRuleBuckets(buckets map[ast.ASTHandle][]*base.Rule) (result error) {
 	return result
 }
 
+func (p *RuleInlinerPlugin) rulesUnify(target *base.Rule, tailIndex int, source *base.Rule) (_ bool, resultErr error) {
+	tail, negated, err := target.Tail(tailIndex)
+	if err != nil || negated {
+		if err == nil {
+			err = ast.ErrASTDomain
+		}
+		return false, err
+	}
+	sourceHead, err := source.Head()
+	if err != nil {
+		return false, err
+	}
+	targetVariables, err := ruleVariableCount(p.manager, target)
+	if err != nil {
+		return false, err
+	}
+	sourceVariables, err := ruleVariableCount(p.manager, source)
+	if err != nil {
+		return false, err
+	}
+	variables := targetVariables
+	if sourceVariables > variables {
+		variables = sourceVariables
+	}
+	subst, err := substitution.New(p.manager)
+	if err != nil {
+		return false, err
+	}
+	unifier, err := substitution.NewUnifier(p.manager)
+	if err != nil {
+		return false, errors.Join(err, subst.Close())
+	}
+	defer func() { resultErr = errors.Join(resultErr, unifier.Close(), subst.Close()) }()
+	if err = subst.Reserve(2, variables); err != nil {
+		return false, err
+	}
+	return unifier.UnifyPair(tail, sourceHead, subst, true)
+}
+
+func (p *RuleInlinerPlugin) orientedDefinition(rule *base.Rule, rules *base.RuleSet) (bool, error) {
+	head, err := rule.HeadDeclaration()
+	if err != nil {
+		return false, err
+	}
+	headStratum, err := rules.PredicateStratum(head)
+	if err != nil {
+		return false, err
+	}
+	headArity, err := p.manager.GetArity(head)
+	if err != nil {
+		return false, err
+	}
+	headID, err := p.manager.GetASTID(head)
+	if err != nil {
+		return false, err
+	}
+	positive, err := rule.PositiveTailSize()
+	if err != nil {
+		return false, err
+	}
+	for index := 0; index < positive; index++ {
+		tail, getErr := rule.TailDeclaration(index)
+		if getErr != nil {
+			return false, getErr
+		}
+		tailStratum, getErr := rules.PredicateStratum(tail)
+		if getErr != nil {
+			return false, getErr
+		}
+		if tailStratum != headStratum {
+			continue
+		}
+		tailArity, getErr := p.manager.GetArity(tail)
+		if getErr != nil {
+			return false, getErr
+		}
+		if tailArity > headArity {
+			return false, nil
+		}
+		if tailArity == headArity {
+			tailID, idErr := p.manager.GetASTID(tail)
+			if idErr != nil {
+				return false, idErr
+			}
+			if tailID >= headID {
+				return false, nil
+			}
+		}
+	}
+	return true, nil
+}
+
+func (p *RuleInlinerPlugin) orientedEagerRule(rule *base.Rule, rules *base.RuleSet) (_ *base.Rule, changed bool, resultErr error) {
+	negated, err := rule.HasNegation()
+	if err != nil || negated {
+		return nil, false, err
+	}
+	head, err := rule.HeadDeclaration()
+	if err != nil {
+		return nil, false, err
+	}
+	positive, err := rule.PositiveTailSize()
+	if err != nil {
+		return nil, false, err
+	}
+	for tailIndex := 0; tailIndex < positive; tailIndex++ {
+		declaration, getErr := rule.TailDeclaration(tailIndex)
+		if getErr != nil {
+			return nil, false, getErr
+		}
+		if declaration == head {
+			continue
+		}
+		definitions, getErr := rules.PredicateRules(declaration)
+		if getErr != nil {
+			return nil, false, getErr
+		}
+		candidate := -1
+		if len(definitions) == 1 {
+			candidate = 0
+		} else {
+			for index, definition := range definitions {
+				unifies, unifyErr := p.rulesUnify(rule, tailIndex, definition)
+				if unifyErr != nil {
+					return nil, false, errors.Join(unifyErr, closeRules(definitions))
+				}
+				if !unifies {
+					continue
+				}
+				if candidate >= 0 {
+					candidate = -2
+					break
+				}
+				candidate = index
+			}
+		}
+		if candidate == -2 {
+			if getErr = closeRules(definitions); getErr != nil {
+				return nil, false, getErr
+			}
+			continue
+		}
+		if candidate < 0 {
+			return nil, true, closeRules(definitions)
+		}
+		oriented, orientationErr := p.orientedDefinition(definitions[candidate], rules)
+		if orientationErr != nil || !oriented {
+			getErr = errors.Join(orientationErr, closeRules(definitions))
+			if getErr != nil {
+				return nil, false, getErr
+			}
+			continue
+		}
+		resolved, resolveErr := p.resolve(rule, tailIndex, definitions[candidate])
+		resolveErr = errors.Join(resolveErr, closeRules(definitions))
+		if resolveErr != nil {
+			return nil, false, resolveErr
+		}
+		return resolved, true, nil
+	}
+	return nil, false, nil
+}
+
+func (p *RuleInlinerPlugin) orientedEager(source *base.RuleSet) (_ *base.RuleSet, changed bool, resultErr error) {
+	count, err := source.Len()
+	if err != nil {
+		return nil, false, err
+	}
+	result, err := base.NewRuleSet(p.rules)
+	if err != nil {
+		return nil, false, err
+	}
+	keep := false
+	defer func() {
+		if !keep {
+			resultErr = errors.Join(resultErr, result.Close())
+		}
+	}()
+	if err = result.InheritPredicates(source); err != nil {
+		return nil, false, err
+	}
+	for index := 0; index < count; index++ {
+		current, getErr := source.Rule(index)
+		if getErr != nil {
+			return nil, false, getErr
+		}
+		for {
+			replacement, step, stepErr := p.orientedEagerRule(current, source)
+			if stepErr != nil {
+				return nil, false, errors.Join(stepErr, current.Close())
+			}
+			if !step {
+				break
+			}
+			changed = true
+			if getErr = current.Close(); getErr != nil {
+				return nil, false, errors.Join(getErr, closeRuleIf(replacement))
+			}
+			current = replacement
+			if current == nil {
+				break
+			}
+		}
+		if current != nil {
+			getErr = errors.Join(result.Add(current), current.Close())
+			if getErr != nil {
+				return nil, false, getErr
+			}
+		}
+	}
+	keep = true
+	return result, changed, nil
+}
+
 func (p *RuleInlinerPlugin) Transform(source *base.RuleSet) (_ *base.RuleSet, resultErr error) {
 	if p == nil || p.closed || p.manager == nil || p.rules == nil {
 		return nil, base.ErrRuleTransformerOwner
@@ -661,6 +875,32 @@ func (p *RuleInlinerPlugin) Transform(source *base.RuleSet) (_ *base.RuleSet, re
 			}
 		}
 	}
+	valid, err := result.Finalize()
+	if err != nil {
+		return nil, err
+	}
+	if !valid {
+		return nil, fmt.Errorf("muz/transforms: eager inliner produced unstratified rules")
+	}
+	oriented, orientedChanged, err := p.orientedEager(result)
+	if err != nil {
+		return nil, err
+	}
+	if orientedChanged {
+		previous := result
+		result = oriented
+		if err = previous.Close(); err != nil {
+			return nil, err
+		}
+		changed = true
+	} else {
+		if err = oriented.Close(); err != nil {
+			return nil, err
+		}
+		if err = result.Reopen(); err != nil {
+			return nil, err
+		}
+	}
 	if !changed {
 		if !p.linear {
 			return nil, nil
@@ -672,10 +912,10 @@ func (p *RuleInlinerPlugin) Transform(source *base.RuleSet) (_ *base.RuleSet, re
 		if linear == nil {
 			return nil, nil
 		}
-		keep = false
 		if closeErr := result.Close(); closeErr != nil {
 			return nil, errors.Join(closeErr, linear.Close())
 		}
+		keep = true
 		return linear, nil
 	}
 	if p.linear {
