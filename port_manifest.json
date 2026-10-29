@@ -88705,6 +88705,7 @@
         "TestSearchRestartPolicyUsesStrictLubyThresholds",
         "TestContextConsumesQuantifiedLemmaPolicies",
         "TestContextConsumesGroundCTIPolicy",
+        "TestContextMapsSpacerSMTBackendParameters",
         "TestSMTContextFixedpointSpacerInductiveExports",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
         "TestSMTLibRunnerScripts/fp_spacer_flexible_trace.smt2",
@@ -88994,6 +88995,12 @@
             "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_spacer_recursive_trace.smt2"
           ]
+        },
+        {
+          "name": "init_lemma_generalizers SMT random-seed, MBQI, and disabled equality/bound-propagation backend policy",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/manager.go",
+          "tests": ["TestContextMapsSpacerSMTBackendParameters", "TestSMTLibRunnerScripts/fp_spacer_flexible_trace.smt2"]
         },
         {
           "name": "predicate cover insertion and exact-frame bound-variable export (spacer_context.cpp:501-532,583-605,2011-2035)",

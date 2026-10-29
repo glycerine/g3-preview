@@ -20,13 +20,16 @@ import (
 var ErrManagerOwner = errors.New("muz/spacer: invalid or closed manager")
 
 type Manager struct {
-	manager     *ast.ASTManager
-	mux         *SymMux
-	background  ast.ASTRef
-	contexts    [3]*SMTContextManager
-	cooperation *cooperate.Cooperation
-	unique      uint32
-	closed      bool
+	manager       *ast.ASTManager
+	mux           *SymMux
+	background    ast.ASTRef
+	contexts      [3]*SMTContextManager
+	cooperation   *cooperate.Cooperation
+	paramsContext *uparams.ParamsContext
+	solverParams  uparams.ParamsRef
+	ownsParams    bool
+	unique        uint32
+	closed        bool
 }
 
 func NewManager(manager *ast.ASTManager, params *uparams.ParamsRef, maximumContexts uint32, config smtcore.SMTSolverConfig) (_ *Manager, resultErr error) {
@@ -45,13 +48,18 @@ func NewManager(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, mux.Close())
 	}
-	result := &Manager{manager: manager, mux: mux, background: background}
+	result := &Manager{manager: manager, mux: mux, background: background, paramsContext: config.Params}
 	committed := false
 	defer func() {
 		if !committed {
 			resultErr = errors.Join(resultErr, result.Close())
 		}
 	}()
+	result.solverParams, err = spacerSolverParams(params, config)
+	if err != nil {
+		return nil, err
+	}
+	result.ownsParams = true
 	if config.ModelEvaluator.Context == nil {
 		config.ModelEvaluator.Context = config.Params
 	}
@@ -69,9 +77,69 @@ func NewManager(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 		config.ModelEvaluator.Cooperation = result.cooperation
 	}
 	for index := range result.contexts {
-		result.contexts[index], err = NewSMTContextManager(manager, params, maximumContexts, config)
+		result.contexts[index], err = NewSMTContextManager(manager, &result.solverParams, maximumContexts, config)
 		if err != nil {
 			return nil, err
+		}
+	}
+	committed = true
+	return result, nil
+}
+
+func spacerSolverParams(source *uparams.ParamsRef, config smtcore.SMTSolverConfig) (result uparams.ParamsRef, resultErr error) {
+	if config.Params == nil || config.Globals == nil {
+		return uparams.ParamsRef{}, ErrManagerOwner
+	}
+	fixedpoint, err := config.Globals.SourceGetModuleName("fixedpoint")
+	if err != nil {
+		return uparams.ParamsRef{}, err
+	}
+	seedName := "spacer.random_seed"
+	seed, err := config.Params.GetUIntName(&fixedpoint, &seedName, 0)
+	if err != nil {
+		return uparams.ParamsRef{}, err
+	}
+	mbqiName := "spacer.mbqi"
+	mbqi, err := config.Params.GetBoolName(&fixedpoint, &mbqiName, true)
+	if err != nil {
+		return uparams.ParamsRef{}, err
+	}
+	equalityName := "spacer.eq_prop"
+	equalityPropagation, err := config.Params.GetBoolName(&fixedpoint, &equalityName, true)
+	if err != nil {
+		return uparams.ParamsRef{}, err
+	}
+	result = config.Params.EmptyValue()
+	committed := false
+	defer func() {
+		if !committed {
+			resultErr = errors.Join(resultErr, config.Params.Del(&result))
+		}
+	}()
+	randomSeedName := "random_seed"
+	if err = config.Params.SetUIntName(&result, &randomSeedName, seed); err != nil {
+		return uparams.ParamsRef{}, err
+	}
+	if source != nil {
+		if err = config.Params.Append(&result, source); err != nil {
+			return uparams.ParamsRef{}, err
+		}
+	}
+	if err = config.Params.SetUIntName(&result, &randomSeedName, seed); err != nil {
+		return uparams.ParamsRef{}, err
+	}
+	smtMBQIName := "mbqi"
+	if err = config.Params.SetBoolName(&result, &smtMBQIName, mbqi); err != nil {
+		return uparams.ParamsRef{}, err
+	}
+	if !equalityPropagation {
+		propagationName := "arith.propagation_mode"
+		if err = config.Params.SetUIntName(&result, &propagationName, 0); err != nil {
+			return uparams.ParamsRef{}, err
+		}
+		propagateEqualitiesName := "arith.propagate_eqs"
+		if err = config.Params.SetBoolName(&result, &propagateEqualitiesName, false); err != nil {
+			return uparams.ParamsRef{}, err
 		}
 	}
 	committed = true
@@ -553,6 +621,13 @@ func (m *Manager) Close() (result error) {
 			result = errors.Join(result, m.contexts[index].Close())
 		}
 	}
+	if result == nil && m.ownsParams {
+		paramErr := m.paramsContext.Del(&m.solverParams)
+		result = errors.Join(result, paramErr)
+		if paramErr == nil {
+			m.ownsParams = false
+		}
+	}
 	result = errors.Join(result, m.mux.Close(), m.manager.DelRef(&m.background))
 	if m.cooperation != nil {
 		result = errors.Join(result, m.cooperation.Close())
@@ -561,6 +636,7 @@ func (m *Manager) Close() (result error) {
 		m.contexts = [3]*SMTContextManager{}
 		m.mux = nil
 		m.cooperation = nil
+		m.paramsContext = nil
 		m.manager = nil
 		m.closed = true
 	}

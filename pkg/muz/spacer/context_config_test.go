@@ -183,3 +183,43 @@ func TestContextConsumesGroundCTIPolicy(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestContextMapsSpacerSMTBackendParameters(t *testing.T) {
+	manager, globals := newSpacerTestServices(t)
+	if err := globals.SourceSetName("fixedpoint.spacer.random_seed", "17"); err != nil {
+		t.Fatal(err)
+	}
+	if err := globals.SourceSetName("fixedpoint.spacer.mbqi", "false"); err != nil {
+		t.Fatal(err)
+	}
+	if err := globals.SourceSetName("fixedpoint.spacer.eq_prop", "false"); err != nil {
+		t.Fatal(err)
+	}
+	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal(err)
+	}
+	seedName := "random_seed"
+	seed, err := globals.Context.GetUIntName(&context.owner.solverParams, &seedName, 0)
+	if err != nil || seed != 17 {
+		t.Fatal("Spacer SMT random seed", seed, err)
+	}
+	mbqiName := "mbqi"
+	mbqi, err := globals.Context.GetBoolName(&context.owner.solverParams, &mbqiName, true)
+	if err != nil || mbqi {
+		t.Fatal("Spacer SMT MBQI", mbqi, err)
+	}
+	propagationName := "arith.propagation_mode"
+	propagation, err := globals.Context.GetUIntName(&context.owner.solverParams, &propagationName, 2)
+	if err != nil || propagation != 0 {
+		t.Fatal("Spacer SMT bound propagation", propagation, err)
+	}
+	equalitiesName := "arith.propagate_eqs"
+	equalities, err := globals.Context.GetBoolName(&context.owner.solverParams, &equalitiesName, true)
+	if err != nil || equalities {
+		t.Fatal("Spacer SMT equality propagation", equalities, err)
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
