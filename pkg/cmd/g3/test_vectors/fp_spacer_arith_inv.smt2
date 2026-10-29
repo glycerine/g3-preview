@@ -1,4 +1,6 @@
 (set-option :fixedpoint.engine spacer)
+(set-option :fixedpoint.spacer.restarts true)
+(set-option :fixedpoint.spacer.restart_initial_threshold 0)
 (declare-rel Inv (Int))
 (declare-rel Bad ())
 (declare-var x Int)

@@ -19,6 +19,7 @@ type Frames struct {
 	manager     *ast.ASTManager
 	transformer FrameTransformer
 	lemmas      []*Lemma
+	additions   uint64
 	size        uint32
 	sorted      bool
 	closed      bool
@@ -58,6 +59,15 @@ func (f *Frames) LemmaSize() (int, error) {
 		return 0, err
 	}
 	return len(f.lemmas), nil
+}
+
+// LemmaAdditions returns the cumulative number of successful frame insertions
+// and promotions used by the Spacer restart schedule.
+func (f *Frames) LemmaAdditions() (uint64, error) {
+	if err := f.open(); err != nil {
+		return 0, err
+	}
+	return f.additions, nil
 }
 
 func (f *Frames) less(left, right *Lemma) (bool, error) {
@@ -153,6 +163,7 @@ func (f *Frames) AddLemma(lemma *Lemma) (added bool, resultErr error) {
 		if err = f.sort(); err != nil {
 			return false, err
 		}
+		f.additions++
 		return true, nil
 	}
 	f.lemmas = append(f.lemmas, lemma)
@@ -161,6 +172,7 @@ func (f *Frames) AddLemma(lemma *Lemma) (added bool, resultErr error) {
 		f.lemmas = f.lemmas[:len(f.lemmas)-1]
 		return false, err
 	}
+	f.additions++
 	return true, nil
 }
 

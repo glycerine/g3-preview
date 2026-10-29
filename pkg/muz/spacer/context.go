@@ -41,6 +41,8 @@ type Context struct {
 	reverseChildren bool
 	eliminateAux    bool
 	reachDNF        bool
+	useRestarts     bool
+	restartInitial  uint32
 	initialized     bool
 	solved          bool
 	closed          bool
@@ -122,12 +124,22 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	useRestarts, err := getBool("spacer.restarts", false)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	restartName := "spacer.restart_initial_threshold"
+	restartInitial, err := config.Params.GetUIntName(&fixedpoint, &restartName, 10)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
 		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
 		reusePOBs: reusePOBs, simplifyPOBs: simplifyPOBs, blastTermITE: blastTermITE, initReachFacts: initReachFacts, reachAsInitial: reachAsInitial,
 		useDerivations: useDerivations, reverseChildren: orderChildren == 1,
 		eliminateAux: eliminateAux, reachDNF: reachDNF,
+		useRestarts: useRestarts, restartInitial: restartInitial,
 	}, nil
 }
 
@@ -451,6 +463,18 @@ func (c *Context) propagate(minimum, maximum uint32) (bool, error) {
 	return false, nil
 }
 
+func (c *Context) lemmaAdditions() (uint64, error) {
+	var result uint64
+	for _, declaration := range c.order {
+		count, err := c.transformers[declaration].frames.LemmaAdditions()
+		if err != nil {
+			return 0, err
+		}
+		result += count
+	}
+	return result, nil
+}
+
 // Solve runs bounded Spacer search starting at fromLevel. maxLevels is the
 // number of search levels to attempt before returning undef.
 func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr error) {
@@ -474,7 +498,7 @@ func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr e
 	c.solved = true
 	level := fromLevel
 	for attempt := uint32(0); attempt < maxLevels; attempt++ {
-		reachable, err := c.queue.checkReachability(c.resetQueue, c.flexibleTrace, c.flexibleDepth)
+		reachable, err := c.queue.checkReachability(c.resetQueue, c.flexibleTrace, c.flexibleDepth, c.useRestarts, c.restartInitial, c.lemmaAdditions)
 		if err != nil {
 			return lbool.Undef, err
 		}
@@ -596,6 +620,7 @@ func (c *Context) CollectStatistics(destination *statistics.Statistics) error {
 			return err
 		}
 	}
+	destination.UpdateUint64("SPACER restarts", c.queue.RestartCount())
 	return nil
 }
 
@@ -611,6 +636,7 @@ func (c *Context) ResetStatistics() error {
 			return err
 		}
 	}
+	c.queue.restarts = 0
 	return nil
 }
 

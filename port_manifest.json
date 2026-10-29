@@ -88701,6 +88701,8 @@
         "TestSMT2FixedpointSpacerRecursiveTraceAnswerMatchesCPP",
         "TestSpacerRulePredicateTransformerBuildsSourceStateSignature",
         "TestContextConsumesReachFactPolicies",
+        "TestContextConsumesRestartPolicy",
+        "TestSearchRestartPolicyUsesStrictLubyThresholds",
         "TestSMTContextFixedpointSpacerInductiveExports",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
         "TestSMTLibRunnerScripts/fp_spacer_flexible_trace.smt2",
@@ -88976,13 +88978,15 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "bounded proof-obligation search, parameterized concrete reach-fact projection, and preorder ground satisfying-answer reconstruction",
+          "name": "bounded proof-obligation search with Luby lemma restarts, parameterized concrete reach-fact projection, and preorder ground satisfying-answer reconstruction",
           "status": "partial",
           "go_target": "pkg/muz/spacer/context_answer.go",
           "tests": [
             "TestSMT2FixedpointSpacerRebuildsAfterBoundedRecursiveSearch",
             "TestSMT2FixedpointSpacerRecursiveTraceAnswerMatchesCPP",
             "TestContextConsumesReachFactPolicies",
+            "TestContextConsumesRestartPolicy",
+            "TestSearchRestartPolicyUsesStrictLubyThresholds",
             "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_spacer_recursive_trace.smt2"
           ]

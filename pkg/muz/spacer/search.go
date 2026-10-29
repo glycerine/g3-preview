@@ -8,7 +8,34 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/luby"
 )
+
+type searchRestartPolicy struct {
+	enabled          bool
+	initialThreshold uint32
+	threshold        uint32
+	initialLemmas    uint64
+	lubyIndex        uint32
+}
+
+func newSearchRestartPolicy(enabled bool, initialThreshold uint32, initialLemmas uint64) searchRestartPolicy {
+	return searchRestartPolicy{enabled: enabled, initialThreshold: initialThreshold, threshold: initialThreshold, initialLemmas: initialLemmas, lubyIndex: 1}
+}
+
+func (p *searchRestartPolicy) observe(lemmas uint64) (bool, error) {
+	if !p.enabled || lemmas-p.initialLemmas <= uint64(p.threshold) {
+		return false, nil
+	}
+	p.lubyIndex++
+	value, err := luby.Value(p.lubyIndex)
+	if err != nil {
+		return false, err
+	}
+	p.threshold = value * p.initialThreshold
+	p.initialLemmas = lemmas
+	return true, nil
+}
 
 func confirmConcreteReachability(obligation *ProofObligation) (_ bool, resultErr error) {
 	if obligation == nil || obligation.valid() != nil {
@@ -78,10 +105,10 @@ func confirmConcreteReachability(obligation *ProofObligation) (_ bool, resultErr
 // queue's current maximum level. True means a concrete trace reached the root;
 // false means the root was blocked at this level.
 func (q *ProofObligationQueue) CheckReachability() (bool, error) {
-	return q.checkReachability(true, false, InfinityLevel)
+	return q.checkReachability(true, false, InfinityLevel, false, 0, nil)
 }
 
-func (q *ProofObligationQueue) checkReachability(reset, flexible bool, flexibleDepth uint32) (bool, error) {
+func (q *ProofObligationQueue) checkReachability(reset, flexible bool, flexibleDepth uint32, useRestarts bool, restartInitial uint32, lemmaCount func() (uint64, error)) (bool, error) {
 	if q == nil || q.root == nil || q.root.valid() != nil {
 		return false, ErrManagerOwner
 	}
@@ -91,6 +118,18 @@ func (q *ProofObligationQueue) checkReachability(reset, flexible bool, flexibleD
 		}
 	}
 	q.expanded = InfinityLevel
+	var initialLemmas uint64
+	if useRestarts {
+		if lemmaCount == nil {
+			return false, ErrManagerOwner
+		}
+		var err error
+		initialLemmas, err = lemmaCount()
+		if err != nil {
+			return false, err
+		}
+	}
+	restart := newSearchRestartPolicy(useRestarts, restartInitial, initialLemmas)
 	for {
 		node, err := q.Top()
 		if err != nil {
@@ -124,6 +163,23 @@ func (q *ProofObligationQueue) checkReachability(reset, flexible bool, flexibleD
 				}
 			}
 			continue
+		}
+		if useRestarts {
+			lemmas, countErr := lemmaCount()
+			if countErr != nil {
+				return false, countErr
+			}
+			restartNow, restartErr := restart.observe(lemmas)
+			if restartErr != nil {
+				return false, restartErr
+			}
+			if restartNow {
+				q.restarts++
+				if err = q.Reset(); err != nil {
+					return false, err
+				}
+				continue
+			}
 		}
 		expansion, err := node.transformer.ExpandObligation(node)
 		if err != nil {

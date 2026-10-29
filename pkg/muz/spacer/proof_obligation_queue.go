@@ -10,6 +10,7 @@ type ProofObligationQueue struct {
 	maximum      uint32
 	minimumDepth uint32
 	expanded     uint32
+	restarts     uint64
 	items        []*ProofObligation
 }
 
@@ -202,3 +203,6 @@ func (q *ProofObligationQueue) MaximumLevel() uint32  { return q.maximum }
 func (q *ProofObligationQueue) MinimumDepth() uint32  { return q.minimumDepth }
 func (q *ProofObligationQueue) ExpandedLevel() uint32 { return q.expanded }
 func (q *ProofObligationQueue) Len() int              { return len(q.items) }
+
+// RestartCount returns the number of scheduled queue restarts.
+func (q *ProofObligationQueue) RestartCount() uint64 { return q.restarts }

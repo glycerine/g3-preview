@@ -106,3 +106,43 @@ func TestContextConsumesReachFactPolicies(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestContextConsumesRestartPolicy(t *testing.T) {
+	manager, globals := newSpacerTestServices(t)
+	if err := globals.SourceSetName("fixedpoint.spacer.restarts", "true"); err != nil {
+		t.Fatal(err)
+	}
+	if err := globals.SourceSetName("fixedpoint.spacer.restart_initial_threshold", "7"); err != nil {
+		t.Fatal(err)
+	}
+	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !context.useRestarts || context.restartInitial != 7 {
+		t.Fatal("restart parameter policy", context.useRestarts, context.restartInitial)
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSearchRestartPolicyUsesStrictLubyThresholds(t *testing.T) {
+	policy := newSearchRestartPolicy(true, 1, 0)
+	for _, test := range []struct {
+		lemmas  uint64
+		restart bool
+	}{
+		{1, false},
+		{2, true},
+		{3, false},
+		{4, true},
+		{6, false},
+		{7, true},
+	} {
+		restart, err := policy.observe(test.lemmas)
+		if err != nil || restart != test.restart {
+			t.Fatal("restart policy", test.lemmas, restart, err)
+		}
+	}
+}
