@@ -48,6 +48,8 @@ type Context struct {
 	groundCTI        bool
 	weakAbstraction  bool
 	validateResult   bool
+	simplifyPre      bool
+	simplifyPost     bool
 	initialized      bool
 	solved           bool
 	closed           bool
@@ -158,6 +160,14 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	simplifyPre, err := getBool("pdr.simplify_formulas_pre", false)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	simplifyPost, err := getBool("pdr.simplify_formulas_post", false)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
 		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
@@ -169,6 +179,8 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 		groundCTI:       groundCTI,
 		weakAbstraction: weakAbstraction,
 		validateResult:  validateResult,
+		simplifyPre:     simplifyPre,
+		simplifyPost:    simplifyPost,
 	}, nil
 }
 
@@ -480,6 +492,13 @@ func (c *Context) propagate(minimum, maximum uint32) (bool, error) {
 	if minimum == InfinityLevel {
 		return false, nil
 	}
+	if c.simplifyPre {
+		for _, declaration := range c.order {
+			if err := c.transformers[declaration].frames.Simplify(c.owner); err != nil {
+				return false, err
+			}
+		}
+	}
 	for level := minimum; level <= maximum; level++ {
 		all := true
 		for _, declaration := range c.order {
@@ -496,6 +515,13 @@ func (c *Context) propagate(minimum, maximum uint32) (bool, error) {
 				}
 			}
 			return true, nil
+		}
+	}
+	if c.simplifyPost {
+		for _, declaration := range c.order {
+			if err := c.transformers[declaration].frames.Simplify(c.owner); err != nil {
+				return false, err
+			}
 		}
 	}
 	return false, nil

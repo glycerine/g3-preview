@@ -87,6 +87,26 @@ func TestContextConsumesResultValidationPolicy(t *testing.T) {
 	}
 }
 
+func TestContextConsumesFrameSimplificationPolicies(t *testing.T) {
+	manager, globals := newSpacerTestServices(t)
+	if err := globals.SourceSetName("fixedpoint.pdr.simplify_formulas_pre", "true"); err != nil {
+		t.Fatal(err)
+	}
+	if err := globals.SourceSetName("fixedpoint.pdr.simplify_formulas_post", "true"); err != nil {
+		t.Fatal(err)
+	}
+	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !context.simplifyPre || !context.simplifyPost {
+		t.Fatal("frame simplification policies were not retained")
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestContextConsumesMinCutCoreMode(t *testing.T) {
 	manager, globals := newSpacerTestServices(t)
 	if err := globals.SourceSetName("fixedpoint.spacer.minimize_unsat_core", "true"); err != nil {

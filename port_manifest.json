@@ -88685,6 +88685,7 @@
         "pkg/muz/spacer/context_answer.go",
         "pkg/muz/spacer/context_trace.go",
         "pkg/muz/spacer/context_validate.go",
+        "pkg/muz/spacer/context_frames.go",
         "pkg/muz/spacer/context.go",
         "pkg/muz/spacer/predicate_cover.go",
         "pkg/muz/spacer/predicate_reachable.go",
@@ -88709,6 +88710,8 @@
         "TestContextMapsSpacerSMTBackendParameters",
         "TestContextConsumesWeakAbstractionPolicy",
         "TestContextConsumesResultValidationPolicy",
+        "TestContextConsumesFrameSimplificationPolicies",
+        "TestSpacerFramesSimplifySameLevelLemmasByUnitPropagation",
         "TestPropSolverScopesWeakAbstractionParameters",
         "TestSMTContextFixedpointSpacerInductiveExports",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
@@ -89090,7 +89093,7 @@
       "methods_audited": false,
       "ownership_audited": true,
       "methods": [
-        {"name": "retained context/predicate-transformer lifecycle, frames, solving, result validation, answers, inductive models, levels and covers", "status": "partial", "go_target": "pkg/muz/spacer/context.go", "tests": ["TestSpacerContextSolvesFactAndRecursiveNoBasePrograms", "TestContextConsumesResultValidationPolicy", "TestSpacerRulePredicateTransformerBuildsSourceStateSignature", "TestSMTContextFixedpointSpacerInductiveExports"]},
+        {"name": "retained context/predicate-transformer lifecycle, frame unit-subsumption simplification, solving, result validation, answers, inductive models, levels and covers", "status": "partial", "go_target": "pkg/muz/spacer/context.go", "tests": ["TestSpacerContextSolvesFactAndRecursiveNoBasePrograms", "TestContextConsumesResultValidationPolicy", "TestContextConsumesFrameSimplificationPolicies", "TestSpacerFramesSimplifySameLevelLemmasByUnitPropagation", "TestSpacerRulePredicateTransformerBuildsSourceStateSignature", "TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "remaining optional generalizers, transformed-rule inheritance, proof/trace diagnostics and reachable-summary export", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["Context owns predicate transformers and the proof-obligation queue; each transformer owns solver views, frames, reach facts, rules and signature roots. Cover exports transfer one ASTRef to the caller."],
@@ -136993,9 +136996,9 @@
       "path": "src/smt/tactic/unit_subsumption_tactic.cpp",
       "component": "smt",
       "role": "production",
-      "status": "reference_only",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/unit_subsumption.go"],
+      "tests": ["TestUnitSubsumptionUsesIncrementalPropagationAndDeletionOrder", "TestSpacerFramesSimplifySameLevelLemmasByUnitPropagation"],
       "assertions": [
         {
           "line": 125,
@@ -137007,29 +137010,31 @@
       "methods": [
         {
           "name": "clause proxy creation, contextual subsumption checks and goal reconstruction",
-          "status": "reference_only",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/smtcore/unit_subsumption.go",
+          "tests": ["TestUnitSubsumptionUsesIncrementalPropagationAndDeletionOrder", "TestSpacerFramesSimplifySameLevelLemmasByUnitPropagation"]
         },
         {
-          "name": "parameter update, translation, cancellation and factory construction",
-          "status": "reference_only",
-          "tests": []
+          "name": "retained parameter snapshot, cancellation and concrete construction",
+          "status": "ported",
+          "go_target": "pkg/smtcore/unit_subsumption.go",
+          "tests": ["TestUnitSubsumptionUsesIncrementalPropagationAndDeletionOrder"]
         }
       ],
       "ownership": [
-        "The native tactic owns its SMT context, reusable clause proxies, deletion marks and parameter snapshot."
+        "UnitSubsumptionKeep owns one temporary SMT solver and borrows input formulas; fresh proxy nodes are manager-owned and the returned formula handles remain borrowed."
       ],
       "deviations": [
-        "Production consumers are the unretained native PDR/Spacer components plus native tactic registries; no retained Go consumer invokes unit-subsumption simplification."
+        "The retained Spacer consumer calls a concrete typed helper instead of allocating a generic tactic/goal wrapper; it preserves proxy definitions, nested internalization scopes, propagation-only inconsistency checks and sequential deletion order."
       ]
     },
     {
       "path": "src/smt/tactic/unit_subsumption_tactic.h",
       "component": "smt",
       "role": "production",
-      "status": "reference_only",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/smtcore/unit_subsumption.go"],
+      "tests": ["TestUnitSubsumptionUsesIncrementalPropagationAndDeletionOrder"],
       "conditionals": [
         {
           "line": 24,
@@ -137044,14 +137049,15 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "unit-subsume-simplify factory and native tactic registration",
-          "status": "reference_only",
-          "tests": []
+          "name": "retained unit-subsume-simplify construction surface",
+          "status": "ported",
+          "go_target": "pkg/smtcore/unit_subsumption.go",
+          "tests": ["TestUnitSubsumptionUsesIncrementalPropagationAndDeletionOrder"]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The retained Go tactic API does not expose the native global tactic registry, PDR or Spacer."
+        "The retained Spacer caller uses the typed UnitSubsumptionKeep entry point; the unused native global tactic registry alias is intentionally not ported."
       ]
     },
     {

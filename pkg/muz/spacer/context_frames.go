@@ -7,12 +7,82 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/smtcore"
 )
 
 type FrameTransformer interface {
 	EnsureLevel(uint32) error
 	AddLemmaCore(*Lemma) error
 	IsInvariant(level uint32, formula ast.ASTHandle) (invariant bool, solverLevel uint32, err error)
+}
+
+// Simplify removes same-level lemmas subsumed by unit propagation.
+func (f *Frames) Simplify(owner *Manager) (resultErr error) {
+	if err := f.open(); err != nil {
+		return err
+	}
+	if owner == nil || owner.open() != nil || owner.manager != f.manager || owner.contexts[0] == nil {
+		return ErrManagerOwner
+	}
+	if err := f.sort(); err != nil {
+		return err
+	}
+	deleted := make([]bool, len(f.lemmas))
+	for begin := 0; begin < len(f.lemmas); {
+		level, err := f.lemmas[begin].Level()
+		if err != nil {
+			return err
+		}
+		end := begin + 1
+		for end < len(f.lemmas) {
+			candidateLevel, err := f.lemmas[end].Level()
+			if err != nil {
+				return err
+			}
+			if candidateLevel != level {
+				break
+			}
+			end++
+		}
+		if end-begin > 1 {
+			formulas := make([]ast.ASTHandle, end-begin)
+			for index := begin; index < end; index++ {
+				formulas[index-begin], err = f.lemmas[index].Body()
+				if err != nil {
+					return err
+				}
+			}
+			config := owner.contexts[0].config
+			kept, err := smtcore.UnitSubsumptionKeep(f.manager, formulas, &owner.solverParams, config)
+			if err != nil {
+				return err
+			}
+			remaining := make(map[ast.ASTHandle]int, len(kept))
+			for _, formula := range kept {
+				remaining[formula]++
+			}
+			for index, formula := range formulas {
+				if remaining[formula] != 0 {
+					remaining[formula]--
+				} else {
+					deleted[begin+index] = true
+				}
+			}
+		}
+		begin = end
+	}
+	kept := f.lemmas[:0]
+	for index, lemma := range f.lemmas {
+		if !deleted[index] {
+			kept = append(kept, lemma)
+			continue
+		}
+		if err := lemma.Close(); err != nil {
+			resultErr = errors.Join(resultErr, err)
+		}
+	}
+	f.lemmas = kept
+	return resultErr
 }
 
 type Frames struct {

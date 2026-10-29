@@ -129,6 +129,39 @@ func TestSpacerFramesMergePromoteAndPropagate(t *testing.T) {
 	spacerMust(t, command.Close())
 }
 
+func TestSpacerFramesSimplifySameLevelLemmasByUnitPropagation(t *testing.T) {
+	command, manager, owner := lemmaOwnerFixture(t)
+	a := spacerBool(t, manager, "frames-simplify-a")
+	b := spacerBool(t, manager, "frames-simplify-b")
+	weak, err := manager.MkOr(a, b)
+	spacerMust(t, err)
+	fixture := &frameTransformerFixture{levels: make(map[ast.ASTHandle]uint32)}
+	frames, err := spacer.NewFrames(manager, fixture)
+	spacerMust(t, err)
+	weakLemma, err := spacer.NewLemma(owner, weak, 2)
+	spacerMust(t, err)
+	strongLemma, err := spacer.NewLemma(owner, a, 2)
+	spacerMust(t, err)
+	otherLevel, err := spacer.NewLemma(owner, weak, 3)
+	spacerMust(t, err)
+	_, err = frames.AddLemma(weakLemma)
+	spacerMust(t, err)
+	_, err = frames.AddLemma(strongLemma)
+	spacerMust(t, err)
+	_, err = frames.AddLemma(otherLevel)
+	spacerMust(t, err)
+	spacerMust(t, frames.Simplify(owner))
+	if got, err := frames.FrameLemmas(2); err != nil || len(got) != 1 || got[0] != a {
+		t.Fatal("simplified frame", got, err)
+	}
+	if got, err := frames.FrameLemmas(3); err != nil || len(got) != 1 || got[0] != weak {
+		t.Fatal("independent level", got, err)
+	}
+	spacerMust(t, frames.Close())
+	spacerMust(t, owner.Close())
+	spacerMust(t, command.Close())
+}
+
 func TestSpacerLemmaInstantiatesBindingsInSourceOrder(t *testing.T) {
 	command, manager, owner := lemmaOwnerFixture(t)
 	boolean, err := manager.MkBoolSort()
