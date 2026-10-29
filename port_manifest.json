@@ -179260,9 +179260,15 @@
       "path": "src/tactic/ufbv/macro_finder_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/ufbv/macro_tactics.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestMacroFinderTacticGoalProofCoreAndModelBoundary",
+        "TestSMTLibRunnerScripts/ufbv_macro_tactics.smt2"
+      ],
       "assertions": [
         {
           "line": 45,
@@ -179273,9 +179279,19 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "macro-finder goal adapter, fixed point, model reconstruction, and tactic command",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/macro_tactics.go",
+          "tests": [
+            "TestMacroFinderTacticGoalProofCoreAndModelBoundary",
+            "TestSMTLibRunnerScripts/ufbv_macro_tactics.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -179283,9 +179299,15 @@
       "path": "src/tactic/ufbv/macro_finder_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/ufbv/macro_tactics.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestMacroFinderTacticGoalProofCoreAndModelBoundary",
+        "TestSMTLibRunnerScripts/ufbv_macro_tactics.smt2"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -179296,9 +179318,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "macro-finder tactic factory and command registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/macro_tactics.go",
+          "tests": [
+            "TestMacroFinderTacticGoalProofCoreAndModelBoundary",
+            "TestSMTLibRunnerScripts/ufbv_macro_tactics.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -179306,9 +179338,15 @@
       "path": "src/tactic/ufbv/quasi_macros_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/ufbv/macro_tactics.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestQuasiMacrosTacticRunsToFixedPoint",
+        "TestSMTLibRunnerScripts/ufbv_macro_tactics.smt2"
+      ],
       "assertions": [
         {
           "line": 43,
@@ -179319,9 +179357,19 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quasi-macros fixed-point goal adapter, model reconstruction, and tactic command",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/macro_tactics.go",
+          "tests": [
+            "TestQuasiMacrosTacticRunsToFixedPoint",
+            "TestSMTLibRunnerScripts/ufbv_macro_tactics.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -179329,9 +179377,15 @@
       "path": "src/tactic/ufbv/quasi_macros_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/ufbv/macro_tactics.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestQuasiMacrosTacticRunsToFixedPoint",
+        "TestSMTLibRunnerScripts/ufbv_macro_tactics.smt2"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -179342,9 +179396,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quasi-macros tactic factory and command registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/macro_tactics.go",
+          "tests": [
+            "TestQuasiMacrosTacticRunsToFixedPoint",
+            "TestSMTLibRunnerScripts/ufbv_macro_tactics.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
