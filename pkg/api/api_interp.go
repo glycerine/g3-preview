@@ -3,6 +3,7 @@ package api
 // Source: src/api/api_interp.cpp, retained context, marker, and compute APIs.
 
 import (
+	"bytes"
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -221,6 +222,27 @@ func (c *InterpolationContext) ComputeInterpolant(pattern ast.ASTHandle) (result
 		}
 	}
 	return result, nil
+}
+
+// CheckInterpolants validates sequence or tree interpolants and their symbol
+// vocabulary. For tree interpolation, parents contains one entry per
+// constraint and its final root entry is interp.ScopeTop, matching the source
+// API. Diagnostics explains a false result.
+func (c *InterpolationContext) CheckInterpolants(constraints []ast.ASTHandle, parents []int, interpolants []ast.ASTHandle, theory []ast.ASTHandle) (valid bool, diagnostics string, resultErr error) {
+	if err := c.open(); err != nil {
+		return false, "", err
+	}
+	if len(constraints) == 0 || len(interpolants) != len(constraints)-1 || len(parents) != 0 && len(parents) != len(constraints) {
+		return false, "", ast.ErrASTDomain
+	}
+	s, err := c.factory.New(c.manager, nil, true, false, false, "AUFLIA")
+	if err != nil {
+		return false, "", err
+	}
+	defer func() { resultErr = errors.Join(resultErr, s.Close()) }()
+	var output bytes.Buffer
+	valid, err = interp.CheckInterpolants(c.terms, s, &output, constraints, parents, interpolants, theory)
+	return valid, output.String(), err
 }
 
 // Close releases results, ASTs and private services in dependency order.

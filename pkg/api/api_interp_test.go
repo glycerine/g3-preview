@@ -91,6 +91,10 @@ func (f *interpolationFixture) verify(pattern ast.ASTHandle, results []ast.ASTHa
 		if err != nil || !valid {
 			f.t.Fatalf("invalid binary vocabulary: %v: %s", err, diagnostics.String())
 		}
+		valid, message, err := f.c.CheckInterpolants(constraints, nil, results, nil)
+		if err != nil || !valid || message != "" {
+			f.t.Fatalf("public interpolation check: %v valid=%v: %s", err, valid, message)
+		}
 	}
 }
 
@@ -188,6 +192,17 @@ func TestInterpolationContextTree(t *testing.T) {
 			t.Fatalf("got %d tree interpolants", len(results))
 		}
 		f.verify(pattern, results)
+		if pattern == branching {
+			valid, message, x := f.c.CheckInterpolants(
+				[]ast.ASTHandle{p, q, root},
+				[]int{2, 2, interp.ScopeTop},
+				results,
+				nil,
+			)
+			if x != nil || !valid || message != "" {
+				t.Fatalf("public tree interpolation check: %v valid=%v: %s", x, valid, message)
+			}
+		}
 	}
 }
 
@@ -241,6 +256,9 @@ func TestInterpolationContextErrorsAndIsolation(t *testing.T) {
 	}
 	if _, err := f.c.ComputeInterpolant(x); !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal("integer pattern", err)
+	}
+	if _, _, err := f.c.CheckInterpolants([]ast.ASTHandle{x}, []int{0, 1}, nil, nil); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("invalid public interpolation parent vector", err)
 	}
 	boolean := f.pin(f.w.BoolType())
 	p := f.variable("p", boolean)
