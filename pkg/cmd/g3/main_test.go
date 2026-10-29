@@ -354,6 +354,7 @@ var scriptResults = map[string]string{
 	"fixedpoint_spacer_acyclic_inlining.smt2":      "sat\ntrue\n",
 	"fp_spacer_arith_inv.smt2":                     "unsat\n",
 	"fp_spacer_linear_inv.smt2":                    "unsat\n",
+	"fp_spacer_generalizers_inv.smt2":              "unsat\n",
 	"fp_spacer_mincut_inv.smt2":                    "unsat\n",
 	"fp_spacer_mutual_inv.smt2":                    "unsat\n",
 	"fixedpoint_spacer_nonlinear_inlining.smt2":    "sat\ntrue\n",

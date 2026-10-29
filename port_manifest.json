@@ -89276,7 +89276,8 @@
         "pkg/muz/spacer/lemma_array_generalizer.go",
         "pkg/muz/spacer/lemma_eq_generalizer.go",
         "pkg/muz/spacer/predicate_expand.go",
-        "pkg/muz/spacer/context.go"
+        "pkg/muz/spacer/context.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_generalizers_inv.smt2"
       ],
       "tests": [
         "TestExpandInductiveArithmeticEquality",
@@ -89284,7 +89285,8 @@
         "TestArrayEqualityGeneralizerStrengthensContradictoryLiteral",
         "TestContextConsumesPropSolverFarkasParameters",
         "TestContextCanDisableInductiveGeneralizer",
-        "TestSpacerPredicateCreatesAndAttachesProjectedDerivation"
+        "TestSpacerPredicateCreatesAndAttachesProjectedDerivation",
+        "TestSMTLibRunnerScripts/fp_spacer_generalizers_inv.smt2"
       ],
       "assertions": [
         {
