@@ -409,6 +409,18 @@ func (s *Solver) BooleanValue(variable sat.BoolVar) (lbool.LBool, error) {
 	return s.atoms.bools.values[variable], nil
 }
 
+// IsInterpreted reports whether a Boolean variable is backed by an arithmetic
+// atom rather than a frontend Boolean abstraction.
+func (s *Solver) IsInterpreted(variable sat.BoolVar) (bool, error) {
+	if err := s.open(); err != nil {
+		return false, err
+	}
+	if uint64(variable) >= uint64(len(s.atoms.bools.atoms)) || s.atoms.bools.dead[variable] {
+		return false, arena.ErrBounds
+	}
+	return s.atoms.bools.atoms[variable] != nil, nil
+}
+
 func (s *Solver) Core(out *[]Assumption) error {
 	if err := s.open(); err != nil {
 		return err

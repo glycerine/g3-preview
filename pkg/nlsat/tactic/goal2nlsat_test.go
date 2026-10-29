@@ -176,4 +176,97 @@ func TestGoalCompilerRationalDenominatorClearing(t *testing.T) {
 	if result != lbool.True {
 		t.Fatalf("x + 1/2 = 1: got %v", result)
 	}
+	modelValue, supported, err := fixture.compiler.Model()
+	compilerMust(t, err)
+	if !supported || modelValue == nil {
+		t.Fatal("SAT model was not published")
+	}
+	defer func() { compilerMust(t, modelValue.Close()) }()
+	declaration, err := fixture.manager.GetDecl(x)
+	compilerMust(t, err)
+	interpretation, err := modelValue.Core().ConstantInterpretation(declaration)
+	compilerMust(t, err)
+	text, integer, matched, err := fixture.manager.ArithmeticNumeralText(interpretation)
+	compilerMust(t, err)
+	if !matched || integer || text != "1/2" {
+		t.Fatalf("x model = %q, integer=%v, matched=%v", text, integer, matched)
+	}
+}
+
+func TestGoalCompilerBooleanAbstractionModel(t *testing.T) {
+	fixture := newGoalCompilerFixture(t)
+	booleanSort, err := fixture.manager.MkBoolSort()
+	compilerMust(t, err)
+	p := compilerConst(t, fixture.manager, "p", booleanSort)
+	compilerMust(t, fixture.compiler.Compile(compilerGoal(t, fixture.manager, p)))
+	result, err := fixture.solver.Check()
+	compilerMust(t, err)
+	if result != lbool.True {
+		t.Fatalf("p: got %v", result)
+	}
+	modelValue, supported, err := fixture.compiler.Model()
+	compilerMust(t, err)
+	if !supported || modelValue == nil {
+		t.Fatal("Boolean SAT model was not published")
+	}
+	defer func() { compilerMust(t, modelValue.Close()) }()
+	declaration, err := fixture.manager.GetDecl(p)
+	compilerMust(t, err)
+	interpretation, err := modelValue.Core().ConstantInterpretation(declaration)
+	compilerMust(t, err)
+	if kind, kindErr := fixture.manager.GetDeclKind(interpretation); kindErr != nil || kind != ast.ASTOpTrue {
+		t.Fatalf("p model kind = %d, err=%v", kind, kindErr)
+	}
+}
+
+func TestGoalCompilerUnsatCoreDependencies(t *testing.T) {
+	fixture := newGoalCompilerFixture(t)
+	zero, err := fixture.manager.ArithmeticRealNumeralText("0")
+	compilerMust(t, err)
+	one, err := fixture.manager.ArithmeticRealNumeralText("1")
+	compilerMust(t, err)
+	sort, err := fixture.manager.GetSort(zero)
+	compilerMust(t, err)
+	x := compilerConst(t, fixture.manager, "x", sort)
+	upper, err := fixture.manager.MkArithmeticLE(x, zero)
+	compilerMust(t, err)
+	lower, err := fixture.manager.MkArithmeticGE(x, one)
+	compilerMust(t, err)
+	booleanSort, err := fixture.manager.MkBoolSort()
+	compilerMust(t, err)
+	labels := []ast.ASTHandle{
+		compilerConst(t, fixture.manager, "upper", booleanSort),
+		compilerConst(t, fixture.manager, "lower", booleanSort),
+	}
+	goal, err := basetactic.NewGoal(fixture.manager, false, false, true)
+	compilerMust(t, err)
+	t.Cleanup(func() { compilerMust(t, goal.Close()) })
+	for i, formula := range []ast.ASTHandle{upper, lower} {
+		dependency, cause := fixture.manager.DependencyLeaf(labels[i])
+		compilerMust(t, cause)
+		compilerMust(t, goal.AssertWithProof(formula, ast.ASTHandle{}, dependency))
+	}
+	compilerMust(t, fixture.compiler.Compile(goal))
+	result, err := fixture.solver.Check()
+	compilerMust(t, err)
+	if result != lbool.False {
+		t.Fatalf("bounded contradiction: got %v", result)
+	}
+	var core basetactic.DependencyRef
+	compilerMust(t, fixture.compiler.Core(&core))
+	defer func() { compilerMust(t, core.Close()) }()
+	leaves, err := fixture.manager.DependencyLinearize(core.Get(), nil)
+	compilerMust(t, err)
+	if len(leaves) != 2 {
+		t.Fatalf("core leaves = %#v", leaves)
+	}
+	seen := make(map[ast.ASTHandle]bool, len(leaves))
+	for _, leaf := range leaves {
+		seen[leaf] = true
+	}
+	for _, label := range labels {
+		if !seen[label] {
+			t.Fatalf("core omitted label %#v", label)
+		}
+	}
 }

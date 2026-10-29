@@ -9,9 +9,11 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/nlsat"
 	"github.com/glycerine/g3/pkg/sat"
 	basetactic "github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/lbool"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -325,6 +327,210 @@ func (c *GoalCompiler) AtomMapping() *ast.Expr2Var { return c.atoms }
 func (c *GoalCompiler) TermMapping() *ast.Expr2Var { return c.terms }
 func (c *GoalCompiler) DependencyAttachments() []DependencyAttachment {
 	return append([]DependencyAttachment(nil), c.attachments...)
+}
+
+func (c *GoalCompiler) isUninterpretedConstant(expression ast.ASTHandle) (bool, error) {
+	kind, err := c.manager.GetKind(expression)
+	if err != nil || kind != ast.ASTApp {
+		return false, err
+	}
+	count, err := c.manager.GetNumArgs(expression)
+	if err != nil || count != 0 {
+		return false, err
+	}
+	declaration, err := c.manager.GetDecl(expression)
+	if err != nil {
+		return false, err
+	}
+	family, err := c.manager.GetFamilyID(declaration)
+	return family == ast.NullFamilyID, err
+}
+
+// ContainsUnsupported implements the source tactic's post-check guard. Terms
+// and abstract Boolean atoms must be uninterpreted constants unless the latter
+// Boolean variable is owned by an arithmetic atom.
+func (c *GoalCompiler) ContainsUnsupported() (bool, error) {
+	terms, err := c.terms.Entries()
+	if err != nil {
+		return false, err
+	}
+	for _, entry := range terms {
+		constant, cause := c.isUninterpretedConstant(entry.Expr)
+		if cause != nil || !constant {
+			return true, cause
+		}
+	}
+	atoms, err := c.atoms.Entries()
+	if err != nil {
+		return false, err
+	}
+	for _, entry := range atoms {
+		constant, cause := c.isUninterpretedConstant(entry.Expr)
+		if cause != nil {
+			return false, cause
+		}
+		if constant {
+			continue
+		}
+		interpreted, cause := c.solver.IsInterpreted(sat.BoolVar(entry.Variable))
+		if cause != nil || !interpreted {
+			return true, cause
+		}
+	}
+	return false, nil
+}
+
+func (c *GoalCompiler) algebraicNumeral(value *polynomial.Algebraic, integer bool) (result ast.ASTHandle, err error) {
+	algebraic, err := c.solver.AlgebraicManager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	rational, err := algebraic.IsRational(value)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if !rational {
+		if integer {
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
+		return c.manager.ArithmeticAlgebraicNumeral(value)
+	}
+	rationals, err := algebraic.RationalManager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	var q unumeral.Rational
+	defer func() { err = errors.Join(err, rationals.Del(&q)) }()
+	if err = algebraic.ToRational(value, &q); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	text, err := rationals.String(&q)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if integer {
+		return c.manager.ArithmeticIntegerNumeralText(text)
+	}
+	return c.manager.ArithmeticRealNumeralText(text)
+}
+
+// Model constructs the source constant-only model after a SAT check. A false
+// supported result leaves the goal undecided, matching nlsat_tactic.
+func (c *GoalCompiler) Model() (result *model.Model, supported bool, err error) {
+	unsupported, err := c.ContainsUnsupported()
+	if err != nil || unsupported {
+		return nil, !unsupported, err
+	}
+	result, err = model.NewModel(c.manager)
+	if err != nil {
+		return nil, false, err
+	}
+	defer func() {
+		if err != nil || !supported {
+			err = errors.Join(err, result.Close())
+			result = nil
+		}
+	}()
+	algebraic, err := c.solver.AlgebraicManager()
+	if err != nil {
+		return nil, false, err
+	}
+	terms, err := c.terms.Entries()
+	if err != nil {
+		return nil, false, err
+	}
+	for _, entry := range terms {
+		var value polynomial.Algebraic
+		if err = c.solver.Value(entry.Variable, &value); err != nil {
+			return nil, false, err
+		}
+		var numeral ast.ASTHandle
+		func() {
+			defer func() { err = errors.Join(err, algebraic.Del(&value)) }()
+			sort, cause := c.manager.GetSort(entry.Expr)
+			if cause != nil {
+				err = cause
+				return
+			}
+			kind, cause := c.manager.GetDeclKind(sort)
+			if cause != nil {
+				err = cause
+				return
+			}
+			numeral, err = c.algebraicNumeral(&value, kind == 1)
+		}()
+		if err != nil {
+			return nil, false, err
+		}
+		declaration, cause := c.manager.GetDecl(entry.Expr)
+		if cause != nil {
+			return nil, false, cause
+		}
+		if cause = result.Core().RegisterConstant(declaration, numeral); cause != nil {
+			return nil, false, cause
+		}
+	}
+	atoms, err := c.atoms.Entries()
+	if err != nil {
+		return nil, false, err
+	}
+	for _, entry := range atoms {
+		value, cause := c.solver.BooleanValue(sat.BoolVar(entry.Variable))
+		if cause != nil {
+			return nil, false, cause
+		}
+		if value == lbool.Undef {
+			continue
+		}
+		var interpretation ast.ASTHandle
+		if value == lbool.True {
+			interpretation, cause = c.manager.MkTrue()
+		} else {
+			interpretation, cause = c.manager.MkFalse()
+		}
+		if cause != nil {
+			return nil, false, cause
+		}
+		declaration, cause := c.manager.GetDecl(entry.Expr)
+		if cause != nil {
+			return nil, false, cause
+		}
+		if cause = result.Core().RegisterConstant(declaration, interpretation); cause != nil {
+			return nil, false, cause
+		}
+	}
+	return result, true, nil
+}
+
+// Core joins the goal dependencies attached to the solver's final conflict.
+func (c *GoalCompiler) Core(out *basetactic.DependencyRef) (err error) {
+	if out == nil {
+		return ast.ErrASTHandle
+	}
+	var assumptions []nlsat.Assumption
+	if err = c.solver.Core(&assumptions); err != nil {
+		return err
+	}
+	dependencies := make(map[*nlsat.AssumptionAttachment]ast.ASTDependency, len(c.attachments))
+	for _, attachment := range c.attachments {
+		dependencies[attachment.Attachment] = attachment.Dependency
+	}
+	var joined basetactic.DependencyRef
+	defer func() { err = errors.Join(err, joined.Close()) }()
+	for _, assumption := range assumptions {
+		dependency, present := dependencies[assumption.Attachment()]
+		if !present {
+			continue
+		}
+		combined, cause := c.manager.DependencyJoin(joined.Get(), dependency)
+		if cause != nil {
+			return cause
+		}
+		if cause = joined.Set(c.manager, combined); cause != nil {
+			return cause
+		}
+	}
+	return out.Set(c.manager, joined.Get())
 }
 
 func (c *GoalCompiler) Close() (err error) {
