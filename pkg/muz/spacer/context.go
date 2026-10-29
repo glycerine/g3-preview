@@ -497,7 +497,7 @@ func (c *Context) propagate(minimum, maximum uint32) (bool, error) {
 			return false, err
 		}
 	}
-	for level := minimum; level <= maximum; level++ {
+	for level := minimum; ; level++ {
 		all := true
 		for _, declaration := range c.order {
 			propagated, err := c.transformers[declaration].PropagateToNextLevel(level)
@@ -512,7 +512,10 @@ func (c *Context) propagate(minimum, maximum uint32) (bool, error) {
 					return false, err
 				}
 			}
-			return true, nil
+			return level <= maximum, nil
+		}
+		if level == InfinityLevel {
+			break
 		}
 	}
 	if c.simplifyPost {
