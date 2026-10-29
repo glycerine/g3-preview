@@ -53,6 +53,11 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 		t.Fatal("Spacer unreachable obligation", unreachable.Status)
 	}
 	spacerMust(t, unreachable.Close(manager))
+	blockedExpansion, err := transformer.ExpandObligation(blocked)
+	spacerMust(t, err)
+	if blockedExpansion.Status != lbool.False || !blockedExpansion.LemmaAdded {
+		t.Fatal("Spacer blocking expansion", blockedExpansion.Status, blockedExpansion.LemmaAdded)
+	}
 	md, err := model.NewModel(manager)
 	spacerMust(t, err)
 	lastReach, found, err := transformer.LastReachCaseVariable()
@@ -107,10 +112,55 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 		t.Fatal("duplicate projected Spacer reach fact", added, err)
 	}
 	spacerMust(t, concrete.Close())
+	spacerMust(t, transformer.SetProofObligationReuse(false))
+	concreteObligation, err := transformer.NewProofObligation(nil, 0, 2, truth, nil)
+	spacerMust(t, err)
+	concreteExpansion, err := transformer.ExpandObligation(concreteObligation)
+	spacerMust(t, err)
+	if concreteExpansion.Status != lbool.True || !concreteExpansion.Concrete || concreteExpansion.Child != nil {
+		t.Fatal("Spacer concrete expansion", concreteExpansion.Status, concreteExpansion.Concrete, concreteExpansion.Child)
+	}
 	spacerMust(t, manager.DelRef(&originReach))
 	spacerMust(t, md.Close())
 	spacerMust(t, recursive.Close())
 	spacerMust(t, initial.Close())
+	spacerMust(t, ruleManager.Close())
+	spacerMust(t, transformer.Close())
+	spacerMust(t, owner.Close())
+	spacerMust(t, command.Close())
+}
+
+func TestSpacerAbstractExpansionCreatesDerivationChild(t *testing.T) {
+	command, manager, owner := lemmaOwnerFixture(t)
+	boolean, err := manager.MkBoolSort()
+	spacerMust(t, err)
+	name, err := manager.Symbols.Intern("spacer-abstract-child-p")
+	spacerMust(t, err)
+	predicate, err := manager.MkFuncDecl(name, nil, boolean, ast.ASTFuncDeclInfo{})
+	spacerMust(t, err)
+	transformer, err := spacer.NewRulePredicateTransformer(owner, predicate, spacer.PropSolverConfig{})
+	spacerMust(t, err)
+	ruleManager, err := base.NewRuleManager(manager)
+	spacerMust(t, err)
+	spacerMust(t, ruleManager.RegisterPredicate(predicate))
+	head, err := manager.MkApp(predicate, nil)
+	spacerMust(t, err)
+	recursive, err := ruleManager.NewRule(head, []ast.ASTHandle{head}, []bool{false}, "recursive")
+	spacerMust(t, err)
+	spacerMust(t, transformer.InitializeRules(map[ast.ASTHandle]*spacer.PredicateTransformer{predicate: transformer}, []*base.Rule{recursive}))
+	truth, err := manager.MkTrue()
+	spacerMust(t, err)
+	obligation, err := transformer.NewProofObligation(nil, 1, 0, truth, nil)
+	spacerMust(t, err)
+	expansion, err := transformer.ExpandObligation(obligation)
+	spacerMust(t, err)
+	if expansion.Status != lbool.Undef || expansion.Concrete || expansion.Child == nil {
+		t.Fatal("Spacer abstract expansion", expansion.Status, expansion.Concrete, expansion.Child)
+	}
+	if _, found, err := expansion.Child.Derivation(); err != nil || !found {
+		t.Fatal("Spacer abstract child derivation", found, err)
+	}
+	spacerMust(t, recursive.Close())
 	spacerMust(t, ruleManager.Close())
 	spacerMust(t, transformer.Close())
 	spacerMust(t, owner.Close())
