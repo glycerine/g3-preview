@@ -146,3 +146,23 @@ func TestSearchRestartPolicyUsesStrictLubyThresholds(t *testing.T) {
 		}
 	}
 }
+
+func TestContextConsumesQuantifiedLemmaPolicies(t *testing.T) {
+	manager, globals := newSpacerTestServices(t)
+	if err := globals.SourceSetName("fixedpoint.spacer.instantiate", "false"); err != nil {
+		t.Fatal(err)
+	}
+	if err := globals.SourceSetName("fixedpoint.spacer.qlemmas", "false"); err != nil {
+		t.Fatal(err)
+	}
+	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if context.instantiate || context.quantifiedLemmas {
+		t.Fatal("quantified lemma parameter policy", context.instantiate, context.quantifiedLemmas)
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
+	}
+}

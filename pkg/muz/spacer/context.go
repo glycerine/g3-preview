@@ -18,34 +18,36 @@ import (
 var ErrContextOwner = errors.New("muz/spacer: invalid or closed context")
 
 type Context struct {
-	manager         *ast.ASTManager
-	owner           *Manager
-	config          PropSolverConfig
-	transformers    map[ast.ASTHandle]*PredicateTransformer
-	order           []ast.ASTHandle
-	query           *PredicateTransformer
-	queryDecl       ast.ASTHandle
-	queue           ProofObligationQueue
-	lastResult      lbool.LBool
-	inductive       uint32
-	skipPropagate   bool
-	resetQueue      bool
-	flexibleTrace   bool
-	flexibleDepth   uint32
-	reusePOBs       bool
-	simplifyPOBs    bool
-	blastTermITE    bool
-	initReachFacts  bool
-	reachAsInitial  bool
-	useDerivations  bool
-	reverseChildren bool
-	eliminateAux    bool
-	reachDNF        bool
-	useRestarts     bool
-	restartInitial  uint32
-	initialized     bool
-	solved          bool
-	closed          bool
+	manager          *ast.ASTManager
+	owner            *Manager
+	config           PropSolverConfig
+	transformers     map[ast.ASTHandle]*PredicateTransformer
+	order            []ast.ASTHandle
+	query            *PredicateTransformer
+	queryDecl        ast.ASTHandle
+	queue            ProofObligationQueue
+	lastResult       lbool.LBool
+	inductive        uint32
+	skipPropagate    bool
+	resetQueue       bool
+	flexibleTrace    bool
+	flexibleDepth    uint32
+	reusePOBs        bool
+	simplifyPOBs     bool
+	blastTermITE     bool
+	initReachFacts   bool
+	reachAsInitial   bool
+	useDerivations   bool
+	reverseChildren  bool
+	eliminateAux     bool
+	reachDNF         bool
+	useRestarts      bool
+	restartInitial   uint32
+	instantiate      bool
+	quantifiedLemmas bool
+	initialized      bool
+	solved           bool
+	closed           bool
 }
 
 func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumContexts uint32, config smtcore.SMTSolverConfig) (*Context, error) {
@@ -133,6 +135,14 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	instantiate, err := getBool("spacer.instantiate", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	quantifiedLemmas, err := getBool("spacer.qlemmas", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
 		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
@@ -140,6 +150,7 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 		useDerivations: useDerivations, reverseChildren: orderChildren == 1,
 		eliminateAux: eliminateAux, reachDNF: reachDNF,
 		useRestarts: useRestarts, restartInitial: restartInitial,
+		instantiate: instantiate, quantifiedLemmas: quantifiedLemmas,
 	}, nil
 }
 
@@ -333,6 +344,9 @@ func (c *Context) InitializePredicates(set *base.RuleSet, declarations []ast.AST
 			return err
 		}
 		if err = transformer.SetReachFactPolicy(c.eliminateAux, c.reachDNF); err != nil {
+			return err
+		}
+		if err = transformer.SetQuantifiedLemmaPolicy(c.instantiate, c.quantifiedLemmas); err != nil {
 			return err
 		}
 	}

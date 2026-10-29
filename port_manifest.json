@@ -88703,6 +88703,7 @@
         "TestContextConsumesReachFactPolicies",
         "TestContextConsumesRestartPolicy",
         "TestSearchRestartPolicyUsesStrictLubyThresholds",
+        "TestContextConsumesQuantifiedLemmaPolicies",
         "TestSMTContextFixedpointSpacerInductiveExports",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
         "TestSMTLibRunnerScripts/fp_spacer_flexible_trace.smt2",
@@ -88987,6 +88988,7 @@
             "TestContextConsumesReachFactPolicies",
             "TestContextConsumesRestartPolicy",
             "TestSearchRestartPolicyUsesStrictLubyThresholds",
+            "TestContextConsumesQuantifiedLemmaPolicies",
             "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_spacer_recursive_trace.smt2"
           ]
