@@ -102,3 +102,36 @@ func TestPropSolverSafeProxyCoreAndTemporaryFormulaRollback(t *testing.T) {
 	pdrMust(t, contexts.Close())
 	pdrMust(t, command.Close())
 }
+
+func TestPropSolverExpandsArithmeticEqualityForSubsetCore(t *testing.T) {
+	command, manager, contexts := pdrContextFixture(t, 0)
+	truth, err := manager.MkTrue()
+	pdrMust(t, err)
+	solver, err := pdr.NewPropSolver(manager, contexts, truth, "arithmetic-core")
+	pdrMust(t, err)
+	arithmetic, err := manager.RegisterArithmeticPlugin()
+	pdrMust(t, err)
+	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
+	pdrMust(t, err)
+	x, err := manager.MkFreshConst("arithmetic-core-x", integer)
+	pdrMust(t, err)
+	zero, err := manager.ArithmeticIntegerNumeralText("0")
+	pdrMust(t, err)
+	greaterEqual, err := manager.MkArithmeticGE(x, zero)
+	pdrMust(t, err)
+	less, err := manager.MkNot(greaterEqual)
+	pdrMust(t, err)
+	pdrMust(t, solver.AddFormula(less))
+	equality, err := manager.MkEq(x, zero)
+	pdrMust(t, err)
+
+	result, err := solver.CheckAssumptions([]ast.ASTHandle{equality}, true, false)
+	pdrMust(t, err)
+	if result.Status != lbool.False || len(result.Core) != 1 || result.Core[0] != greaterEqual {
+		t.Fatal("expanded arithmetic subset core", result.Status, result.Core, greaterEqual)
+	}
+
+	pdrMust(t, solver.Close())
+	pdrMust(t, contexts.Close())
+	pdrMust(t, command.Close())
+}

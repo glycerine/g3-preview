@@ -22,20 +22,22 @@ type PropCheckResult struct {
 }
 
 // PropSolver is the PDR-facing frame and safe-assumption wrapper over one
-// guarded SMTContext. Returned cores borrow their input formulas. A nonnil
-// model is an owning model reference and must be released by the caller.
+// guarded SMTContext. Returned cores borrow their input formulas; synthesized
+// expansion terms remain valid until the next check or Close. A nonnil model
+// is an owning model reference and must be released by the caller.
 type PropSolver struct {
-	manager       *ast.ASTManager
-	contexts      *SMTContextManager
-	context       *SMTContext
-	name          string
-	levelPositive []ast.ASTHandle
-	levelNegative []ast.ASTHandle
-	levelAtoms    map[ast.ASTHandle]bool
-	proxies       []ast.ASTHandle
-	auxiliary     map[ast.ASTHandle]bool
-	references    []ast.ASTRef
-	closed        bool
+	manager        *ast.ASTManager
+	contexts       *SMTContextManager
+	context        *SMTContext
+	name           string
+	levelPositive  []ast.ASTHandle
+	levelNegative  []ast.ASTHandle
+	levelAtoms     map[ast.ASTHandle]bool
+	proxies        []ast.ASTHandle
+	auxiliary      map[ast.ASTHandle]bool
+	references     []ast.ASTRef
+	coreReferences []ast.ASTRef
+	closed         bool
 }
 
 func NewPropSolver(manager *ast.ASTManager, contexts *SMTContextManager, background ast.ASTHandle, name string) (_ *PropSolver, resultErr error) {
@@ -222,10 +224,117 @@ type safeAssumptions struct {
 	atoms          []ast.ASTHandle
 	proxyToFormula map[ast.ASTHandle]ast.ASTHandle
 	formulaToProxy map[ast.ASTHandle]ast.ASTHandle
+	references     []ast.ASTRef
+	generated      map[ast.ASTHandle]bool
 }
 
-func (p *PropSolver) makeSafeAssumptions(input []ast.ASTHandle) (*safeAssumptions, error) {
+func (p *PropSolver) arithmeticEquality(expression ast.ASTHandle) (left, right ast.ASTHandle, matched bool, result error) {
+	kind, err := p.manager.GetKind(expression)
+	if err != nil || kind != ast.ASTApp {
+		return left, right, false, err
+	}
+	family, err := p.manager.GetFamilyID(expression)
+	if err != nil || family != p.manager.BasicFamilyID() {
+		return left, right, false, err
+	}
+	operation, err := p.manager.GetDeclKind(expression)
+	if err != nil || operation != ast.ASTOpEq {
+		return left, right, false, err
+	}
+	left, err = p.manager.GetArg(expression, 0)
+	if err != nil {
+		return left, right, false, err
+	}
+	right, err = p.manager.GetArg(expression, 1)
+	if err != nil {
+		return left, right, false, err
+	}
+	sort, err := p.manager.GetSort(left)
+	if err != nil {
+		return left, right, false, err
+	}
+	arithmetic, err := p.manager.ArithmeticFamilyID()
+	if err != nil {
+		return left, right, false, err
+	}
+	sortFamily, err := p.manager.GetFamilyID(sort)
+	if err != nil || sortFamily != arithmetic {
+		return left, right, false, err
+	}
+	sortKind, err := p.manager.GetDeclKind(sort)
+	if err != nil {
+		return left, right, false, err
+	}
+	return left, right, sortKind == 0 || sortKind == 1, nil
+}
+
+func (p *PropSolver) expandArithmeticEqualities(atoms []ast.ASTHandle) (result []ast.ASTHandle, references []ast.ASTRef, generated map[ast.ASTHandle]bool, resultErr error) {
+	generated = make(map[ast.ASTHandle]bool)
+	committed := false
+	defer func() {
+		if committed {
+			return
+		}
+		for index := len(references) - 1; index >= 0; index-- {
+			resultErr = errors.Join(resultErr, p.manager.DelRef(&references[index]))
+		}
+	}()
+	for index := 0; index < len(atoms); index++ {
+		left, right, matched, err := p.arithmeticEquality(atoms[index])
+		if err != nil {
+			return nil, references, generated, err
+		}
+		if !matched {
+			continue
+		}
+		lessEqual, err := p.manager.MkArithmeticLE(left, right)
+		if err != nil {
+			return nil, references, generated, err
+		}
+		lessEqualRef, err := p.manager.NewRef(lessEqual)
+		if err != nil {
+			return nil, references, generated, err
+		}
+		references = append(references, lessEqualRef)
+		generated[lessEqual] = true
+		greaterEqual, err := p.manager.MkArithmeticGE(left, right)
+		if err != nil {
+			return nil, references, generated, err
+		}
+		greaterEqualRef, err := p.manager.NewRef(greaterEqual)
+		if err != nil {
+			return nil, references, generated, err
+		}
+		references = append(references, greaterEqualRef)
+		generated[greaterEqual] = true
+		atoms[index] = lessEqual
+		if index+1 == len(atoms) {
+			atoms = append(atoms, greaterEqual)
+		} else {
+			next := atoms[index+1]
+			atoms = append(atoms, next)
+			atoms[index+1] = greaterEqual
+		}
+		index++
+	}
+	committed = true
+	return atoms, references, generated, nil
+}
+
+func (s *safeAssumptions) close(manager *ast.ASTManager) (result error) {
+	for index := len(s.references) - 1; index >= 0; index-- {
+		result = errors.Join(result, manager.DelRef(&s.references[index]))
+	}
+	s.references = nil
+	return result
+}
+
+func (p *PropSolver) makeSafeAssumptions(input []ast.ASTHandle) (_ *safeAssumptions, resultErr error) {
 	atoms, err := p.manager.FlattenAnd(append([]ast.ASTHandle(nil), input...))
+	if err != nil {
+		return nil, err
+	}
+	atoms, references, generated, err := p.expandArithmeticEqualities(atoms)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +342,15 @@ func (p *PropSolver) makeSafeAssumptions(input []ast.ASTHandle) (*safeAssumption
 		atoms:          atoms,
 		proxyToFormula: make(map[ast.ASTHandle]ast.ASTHandle),
 		formulaToProxy: make(map[ast.ASTHandle]ast.ASTHandle),
+		references:     references,
+		generated:      generated,
 	}
+	committed := false
+	defer func() {
+		if !committed {
+			resultErr = errors.Join(resultErr, safe.close(p.manager))
+		}
+	}()
 	nextProxy := uint32(0)
 	for index, atom := range safe.atoms {
 		direct, x := p.isDirectAssumption(atom)
@@ -263,6 +380,7 @@ func (p *PropSolver) makeSafeAssumptions(input []ast.ASTHandle) (*safeAssumption
 		safe.formulaToProxy[atom] = proxy
 		safe.atoms[index] = proxy
 	}
+	committed = true
 	return safe, nil
 }
 
@@ -278,8 +396,19 @@ func (p *PropSolver) levelAssumptions(level uint32) []ast.ASTHandle {
 	return result
 }
 
+func (p *PropSolver) clearCoreReferences() (result error) {
+	for index := len(p.coreReferences) - 1; index >= 0; index-- {
+		result = errors.Join(result, p.manager.DelRef(&p.coreReferences[index]))
+	}
+	p.coreReferences = nil
+	return result
+}
+
 func (p *PropSolver) check(atoms []ast.ASTHandle, formula ast.ASTHandle, level *uint32, wantCore, wantModel bool) (result PropCheckResult, resultErr error) {
 	if err := p.open(); err != nil {
+		return result, err
+	}
+	if err := p.clearCoreReferences(); err != nil {
 		return result, err
 	}
 	if level != nil {
@@ -296,6 +425,7 @@ func (p *PropSolver) check(atoms []ast.ASTHandle, formula ast.ASTHandle, level *
 	if err != nil {
 		return result, err
 	}
+	defer func() { resultErr = errors.Join(resultErr, safe.close(p.manager)) }()
 	truth, err := p.manager.MkTrue()
 	if err != nil {
 		return result, err
@@ -325,6 +455,13 @@ func (p *PropSolver) check(atoms []ast.ASTHandle, formula ast.ASTHandle, level *
 			}
 			if original, proxied := safe.proxyToFormula[item]; proxied {
 				if wantCore {
+					if safe.generated[original] {
+						reference, x := p.manager.NewRef(original)
+						if x != nil {
+							return result, x
+						}
+						p.coreReferences = append(p.coreReferences, reference)
+					}
 					result.Core = append(result.Core, original)
 				}
 				continue
@@ -386,6 +523,7 @@ func (p *PropSolver) Close() (result error) {
 	if p.context != nil {
 		result = errors.Join(result, p.context.Close())
 	}
+	result = errors.Join(result, p.clearCoreReferences())
 	for index := len(p.references) - 1; index >= 0; index-- {
 		result = errors.Join(result, p.manager.DelRef(&p.references[index]))
 	}
