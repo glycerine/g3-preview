@@ -18,8 +18,9 @@ import (
 var ErrPropSolverOwner = errors.New("muz/spacer: invalid or closed propositional solver")
 
 type PropSolverConfig struct {
-	Itp       ItpSolverConfig
-	KeepProxy bool
+	Itp                     ItpSolverConfig
+	KeepProxy               bool
+	UseInductiveGeneralizer bool
 }
 
 type PropCheckOptions struct {

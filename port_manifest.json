@@ -4,27 +4,66 @@
       "path": "CMakeLists.txt",
       "component": "CMakeLists.txt",
       "role": "reference_tool",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/spacer/lemma_generalizer.go",
+        "pkg/muz/spacer/predicate_expand.go",
+        "pkg/muz/spacer/context.go"
+      ],
+      "tests": [
+        "TestExpandInductiveArithmeticEquality",
+        "TestContextConsumesPropSolverFarkasParameters",
+        "TestContextCanDisableInductiveGeneralizer"
+      ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "lemma_bool_inductive_generalizer with inductive cube reduction and arithmetic equality literal expansion",
+          "status": "partial",
+          "go_target": "pkg/muz/spacer/lemma_generalizer.go",
+          "tests": [
+            "TestExpandInductiveArithmeticEquality"
+          ]
+        },
+        {
+          "name": "lemma_sanity_checker, unsat_core_generalizer and array equality generalizer",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Generalization constructs a replacement owning Lemma and closes the original only after successful construction; solver cores and recursive-rule assumptions retain explicit scoped AST references."
+      ],
+      "deviations": [
+        "The retained arithmetic equality branch of expand_literals is implemented. Datatype-constructor and bit-vector numeral expansion, array equality generalization, optional sanity checking, and the disabled native unsat-core generalizer remain pending."
+      ]
     },
     {
       "path": "LICENSE.txt",
       "component": "LICENSE.txt",
       "role": "reference_tool",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/spacer/lemma_generalizer.go"
+      ],
+      "tests": [
+        "TestExpandInductiveArithmeticEquality"
+      ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "lemma_bool_inductive_generalizer retained interface and default context integration",
+          "status": "partial",
+          "go_target": "pkg/muz/spacer/lemma_generalizer.go"
+        }
+      ],
+      "ownership": [
+        "Go uses concrete owned Lemma replacement instead of the native reference-counted mutable lemma_ref callback interface."
+      ],
+      "deviations": [
+        "Other optional generalizer interfaces remain unported. Header guards are represented by normal Go package compilation."
+      ]
     },
     {
       "path": "cmake/Z3Config.cmake.in",
