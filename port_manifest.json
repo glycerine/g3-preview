@@ -42285,7 +42285,16 @@
           ]
         },
         {
-          "name": "remaining command context: optimization lifecycle and retained higher-level engine hooks",
+          "name": "optimization lifecycle: scoped hard/soft objectives, lexicographic, box and Pareto continuation checks, model/result publication and objective display",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/optimization.go",
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTContextOptimizationObjectivesAndSoftConstraints"
+          ]
+        },
+        {
+          "name": "remaining command-context higher-level engine hooks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -43063,7 +43072,16 @@
           ]
         },
         {
-          "name": "remaining command context: optimization lifecycle and retained higher-level engine hooks",
+          "name": "optimization lifecycle: scoped hard/soft objectives, lexicographic, box and Pareto continuation checks, model/result publication and objective display",
+          "status": "ported",
+          "go_target": "pkg/cmd_context/optimization.go",
+          "tests": [
+            "TestSMTLibRunnerScripts",
+            "TestSMTContextOptimizationObjectivesAndSoftConstraints"
+          ]
+        },
+        {
+          "name": "remaining command-context higher-level engine hooks",
           "status": "unported",
           "go_target": null,
           "tests": []
