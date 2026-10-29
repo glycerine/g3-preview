@@ -4831,7 +4831,7 @@
       "path": "src/api/api_array.cpp",
       "component": "api",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/api/api_arrays.go",
         "pkg/api/api_arrays_test.go"
@@ -4842,8 +4842,8 @@
         "TestSMTContextArrayHelpersRejectMalformedRequests",
         "TestSMTContextArrayHelpersClosedGuards"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "array sort, multi-index select/store and constant-array public context operations (api_array.cpp:26-192)",
@@ -4864,11 +4864,23 @@
             "TestSMTContextArrayHelpersRejectMalformedRequests",
             "TestSMTContextArrayHelpersClosedGuards"
           ]
+        },
+        {
+          "name": "array extensionality, as-array construction and array sort domain/range accessors (api_array.cpp:262-316)",
+          "status": "ported",
+          "go_target": "pkg/api/api_arrays.go",
+          "tests": [
+            "TestSMTContextArrayMapDefaultAndSetHelpers",
+            "TestSMTContextArrayHelpersRejectMalformedRequests",
+            "TestSMTContextArrayHelpersClosedGuards"
+          ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The Go context and AST manager own all declaration and expression storage. Returned ASTHandle values are borrowed typed handles; callers that retain them across mutations acquire ASTRef owners instead of using the C API context trail."
+      ],
       "deviations": [
-        "The Go public API accepts complete array sorts for constant arrays, which supports native multi-index arrays directly; NestedArraySort, NestedConstantArray, NestedArraySelect and NestedArrayStore are additive typed conveniences for right-nested arrays. Typed AST handles and Go slices replace C pointer arrays and error codes. Set constants accept the element sort and construct their Boolean array sort internally. Array extensionality witnesses, as-array and duplicated public sort-accessor wrappers remain open; the AST manager already exposes the retained sort accessors directly."
+        "The Go public API accepts complete array sorts for constant arrays, which supports native multi-index arrays directly; NestedArraySort, NestedConstantArray, NestedArraySelect and NestedArrayStore are additive typed conveniences for right-nested arrays. Typed AST handles and Go slices replace C pointer arrays and error codes. Set constants accept the element sort and construct their Boolean array sort internally. ArrayArity and indexed ArrayDomain add native multi-index access beyond the source C API's first-domain accessor."
       ]
     },
     {

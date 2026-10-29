@@ -60,6 +60,30 @@ func TestSMTContextArrayMapDefaultAndSetHelpers(t *testing.T) {
 	if sort := f.pin(f.m.GetSort(defaultValue)); sort != boolean {
 		t.Fatal("array default range", sort, boolean)
 	}
+	asArray := f.pin(f.c.AsArray(not))
+	if sort := f.pin(f.m.GetSort(asArray)); sort != arraySort {
+		t.Fatal("as-array sort", sort, arraySort)
+	}
+	extensionality := f.pin(f.c.ArrayExt(emptyArray, asArray))
+	if kind, err := f.m.GetDeclKind(extensionality); err != nil || kind != ast.ASTArrayOpExt {
+		t.Fatal("array extensionality", kind, err)
+	}
+	if sort := f.pin(f.m.GetSort(extensionality)); sort != boolean {
+		t.Fatal("array extensionality range", sort, boolean)
+	}
+	multiSort := f.pin(f.c.ArraySort([]ast.ASTHandle{boolean, arraySort}, arraySort))
+	if arity, err := f.c.ArrayArity(multiSort); err != nil || arity != 2 {
+		t.Fatal("array arity", arity, err)
+	}
+	if domain := f.pin(f.c.ArrayDomain(multiSort, 0)); domain != boolean {
+		t.Fatal("first array domain", domain, boolean)
+	}
+	if domain := f.pin(f.c.ArrayDomain(multiSort, 1)); domain != arraySort {
+		t.Fatal("second array domain", domain, arraySort)
+	}
+	if rangeSort := f.pin(f.c.ArrayRange(multiSort)); rangeSort != arraySort {
+		t.Fatal("array range", rangeSort, arraySort)
+	}
 
 	setSort := f.pin(f.c.SetSort(boolean))
 	if setSort != arraySort {
@@ -138,6 +162,12 @@ func TestSMTContextArrayHelpersRejectMalformedRequests(t *testing.T) {
 	if _, err := f.c.SetComplement(value); !errors.Is(err, ast.ErrASTDomain) {
 		t.Fatal("set sort guard", err)
 	}
+	if _, err := f.c.AsArray(value); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("as-array declaration guard", err)
+	}
+	if _, err := f.c.ArrayDomain(arraySort, 1); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("array domain index guard", err)
+	}
 }
 
 func TestSMTContextArrayHelpersClosedGuards(t *testing.T) {
@@ -164,5 +194,11 @@ func TestSMTContextArrayHelpersClosedGuards(t *testing.T) {
 	}
 	if _, err = c.SetAdd(ast.ASTHandle{}, ast.ASTHandle{}); !errors.Is(err, ErrSMTContextOwner) {
 		t.Fatal("closed set add", err)
+	}
+	if _, err = c.AsArray(ast.ASTHandle{}); !errors.Is(err, ErrSMTContextOwner) {
+		t.Fatal("closed as-array", err)
+	}
+	if _, err = c.ArrayArity(ast.ASTHandle{}); !errors.Is(err, ErrSMTContextOwner) {
+		t.Fatal("closed array arity", err)
 	}
 }

@@ -87,6 +87,70 @@ func (c *SMTContext) ArrayDefault(array ast.ASTHandle) (ast.ASTHandle, error) {
 	return manager.MkFamilyApp(family, ast.ASTArrayOpDefault, nil, []ast.ASTHandle{array})
 }
 
+// ArrayExt constructs the first-index extensionality witness for two arrays.
+func (c *SMTContext) ArrayExt(left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	family, err := manager.ArrayFamilyID()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkFamilyApp(family, ast.ASTArrayOpExt, nil, []ast.ASTHandle{left, right})
+}
+
+// AsArray constructs an array whose entries are supplied by a function.
+func (c *SMTContext) AsArray(function ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkAsArray(function)
+}
+
+// ArrayArity returns the number of index sorts in an array sort.
+func (c *SMTContext) ArrayArity(arraySort ast.ASTHandle) (uint32, error) {
+	if err := c.open(); err != nil {
+		return 0, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return 0, err
+	}
+	return manager.ArrayArity(arraySort)
+}
+
+// ArrayDomain returns one index sort from an array sort.
+func (c *SMTContext) ArrayDomain(arraySort ast.ASTHandle, index uint32) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.ArrayDomain(arraySort, index)
+}
+
+// ArrayRange returns the value sort from an array sort.
+func (c *SMTContext) ArrayRange(arraySort ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.ArrayRange(arraySort)
+}
+
 // NestedConstantArray constructs a right-nested constant array whose leaf is
 // value. Index sorts are ordered outermost to innermost.
 func (c *SMTContext) NestedConstantArray(indexSorts []ast.ASTHandle, value ast.ASTHandle) (ast.ASTHandle, error) {
