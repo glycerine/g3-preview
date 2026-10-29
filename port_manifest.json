@@ -91904,22 +91904,29 @@
       "path": "src/muz/transforms/dl_mk_backwards.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/transforms/backwards.go"],
+      "tests": ["TestBackwardsBuildsOutputPredecessorAndSyntheticQuery"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "backward predecessor clauses and synthetic Boolean query output",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/backwards.go",
+          "tests": ["TestBackwardsBuildsOutputPredecessorAndSyntheticQuery"]
+        }
+      ],
+      "ownership": ["The synthetic query declaration is retained through RuleSet output ownership and every generated Rule owns its borrowed source expressions."],
       "deviations": []
     },
     {
       "path": "src/muz/transforms/dl_mk_backwards.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/transforms/backwards.go"],
+      "tests": ["TestBackwardsBuildsOutputPredecessorAndSyntheticQuery"],
       "conditionals": [
         {
           "line": 19,
@@ -92510,9 +92517,9 @@
       "path": "src/muz/transforms/dl_mk_loop_counter.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/transforms/loop_counter.go"],
+      "tests": ["TestLoopCounterAddsRecursiveSuccessorAndRevertsPredicates"],
       "assertions": [
         {
           "line": 60,
@@ -92525,17 +92532,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "counter-domain predicate expansion, recursive successor constraint, base initialization, and predicate reversion",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/loop_counter.go",
+          "tests": ["TestLoopCounterAddsRecursiveSuccessorAndRevertsPredicates"]
+        }
+      ],
+      "ownership": ["Counter applications and successor equalities remain pinned until replacement Rules own the transformed expressions."],
+      "deviations": ["The native source also leaves loop-counter model and proof conversion as explicit TODOs; the retained Karr consumer does not request either intermediate conversion."]
     },
     {
       "path": "src/muz/transforms/dl_mk_loop_counter.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/transforms/loop_counter.go"],
+      "tests": ["TestLoopCounterAddsRecursiveSuccessorAndRevertsPredicates"],
       "conditionals": [
         {
           "line": 19,
