@@ -83586,6 +83586,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/fp/pdr_engine.go",
+        "pkg/muz/fp/spacer_slice_results.go",
         "pkg/muz/fp/register_engine.go",
         "pkg/muz/pdr/answer.go",
         "pkg/muz/pdr/answer_trace.go",
@@ -83605,7 +83606,8 @@
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_both.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_closure.smt2",
-        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_interior.smt2"
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_interior.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_sliced_trace.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
@@ -83640,7 +83642,9 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_interior.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
-        "TestSMTContextFixedpointPDRLifecycle"
+        "TestSMTContextFixedpointPDRLifecycle",
+        "TestPDREngineExpandsSlicedModelsAndCovers",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2"
       ],
       "assertions": [
         {
@@ -83675,7 +83679,8 @@
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_utvpi_fragment.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_general_arithmetic_fragment.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_general_arithmetic_fragment.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2"
           ]
         },
         {
@@ -83699,6 +83704,8 @@
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2",
+            "TestPDREngineExpandsSlicedModelsAndCovers",
             "TestSMTContextFixedpointPDRLifecycle"
           ]
         },
@@ -83715,20 +83722,20 @@
           "name": "PDR finite-level count and direct-predicate cover forwarding (pdr_dl_interface.cpp:175-195)",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
-          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+          "tests": ["TestSMTContextFixedpointPDRLifecycle", "TestPDREngineExpandsSlicedModelsAndCovers"]
         },
         {
-          "name": "remaining proof traces, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
+          "name": "remaining proof traces, native transformed-rule subsumption reuse and unfold/coalesce integration",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "PropositionalEngine owns the current PDR Context, reuses it while the exact normalized rules and background remain unchanged, and closes/replaces it after a tracked mutation or engine shutdown; rule and parameter services are borrowed. Returned inductive models transfer ownership to the caller."
+        "PropositionalEngine owns the current query-specific sliced RuleSet through PDR initialization, snapshots original/derived declarations and removed-column masks while the Context retains their ASTs, closes/replaces the Context before clearing those maps, and transfers returned expanded inductive models to the caller."
       ],
       "deviations": [
-        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding and unsuccessful-query inductive certificates are retained; slicing and model-converter remapping remain unported. Successful existential declaration queries use native-style two-bank rule/head unification; when slicing and both inliners are disabled they retain the query and every reached predicate in source-tail order, while default transformed acyclic/nonlinear answers preserve the native true presentation. Proof traces remain unported."
+        "The integration reuses PDR state only for the same query and exact normalized rules/background because slicing is query-dependent; it rebuilds after another query or tracked mutation instead of applying native transformed-rule subsumption reuse. Covers and inductive models are expanded to original predicate columns, while relation-query SAT answers intentionally retain native sliced vocabulary. Until the complete native normalization chain preceding slicing is retained, compound predicate applications that violate the slicer's normalized-input precondition remain safely unsliced. Successful declaration queries use native-style two-bank rule/head unification. Go's declaration-query surface omits the native synthetic query predicate, so exact differential comparison normalizes only the resulting nonsemantic slice fresh-ID offset. Proof traces remain unported."
       ]
     },
     {
@@ -93527,6 +93534,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/transforms/rule_slice.go",
+        "pkg/muz/fp/pdr_engine.go",
         "pkg/muz/fp/spacer_engine.go",
         "pkg/muz/fp/spacer_slice_results.go"
       ],
@@ -93535,6 +93543,8 @@
         "TestRuleSliceRetainsConstantConstrainedColumn",
         "TestSpacerEngineExpandsSlicedReachableColumns",
         "TestSpacerEngineExpandsSlicedModelPredicates",
+        "TestPDREngineExpandsSlicedModelsAndCovers",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_slice_columns.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_slice_columns.smt2"
       ],
@@ -93598,7 +93608,8 @@
           "status": "ported",
           "go_target": "pkg/muz/fp/spacer_slice_results.go",
           "tests": [
-            "TestSpacerEngineExpandsSlicedReachableColumns"
+            "TestSpacerEngineExpandsSlicedReachableColumns",
+            "TestPDREngineExpandsSlicedModelsAndCovers"
           ]
         },
         {
@@ -93606,7 +93617,8 @@
           "status": "ported",
           "go_target": "pkg/muz/fp/spacer_slice_results.go",
           "tests": [
-            "TestSpacerEngineExpandsSlicedModelPredicates"
+            "TestSpacerEngineExpandsSlicedModelPredicates",
+            "TestPDREngineExpandsSlicedModelsAndCovers"
           ]
         },
         {

@@ -919,6 +919,7 @@ var scriptResults = map[string]string{
 	"fixedpoint_pdr_utvpi_fragment.smt2":                "unsat\n",
 	"fixedpoint_pdr_general_arithmetic_fragment.smt2":   "unsat\n",
 	"fixedpoint_pdr_arithmetic_inductive.smt2":          "unsat\n",
+	"fixedpoint_pdr_sliced_trace.smt2":                  "sat\n(and Goal (P!slice!0 0))\n",
 }
 
 func TestSMTLibRunnerScripts(t *testing.T) {
@@ -1015,6 +1016,12 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 }
 
 func canonicalReferenceOutput(name, output string) string {
+	if name == "fixedpoint_pdr_sliced_trace.smt2" {
+		// Native relation-query setup first allocates a synthetic query
+		// predicate, while Go's public declaration-query surface does not.
+		// The resulting slice fresh-ID offset is nonsemantic.
+		output = strings.NewReplacer("P!slice!0", "P!slice!#", "P!slice!1", "P!slice!#").Replace(output)
+	}
 	if name == "fp_spacer_array_instantiation.smt2" {
 		// dl_mk_array_instantiation.cpp writes its complete input/output rule
 		// dumps to stdout unconditionally. Compare the actual command response

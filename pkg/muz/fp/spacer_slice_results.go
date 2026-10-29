@@ -34,8 +34,8 @@ func (e *PropositionalEngine) spacerPredicate(declaration ast.ASTHandle) ast.AST
 	return declaration
 }
 
-func (e *PropositionalEngine) spacerHasRemovedColumns(declaration ast.ASTHandle) bool {
-	for _, removed := range e.spacerSlices[declaration] {
+func slicedPredicateHasRemovedColumns(slices map[ast.ASTHandle][]bool, declaration ast.ASTHandle) bool {
+	for _, removed := range slices[declaration] {
 		if removed {
 			return true
 		}
@@ -43,66 +43,66 @@ func (e *PropositionalEngine) spacerHasRemovedColumns(declaration ast.ASTHandle)
 	return false
 }
 
-func (e *PropositionalEngine) expandSpacerFormula(declaration ast.ASTHandle, source ast.ASTRef) (_ ast.ASTRef, resultErr error) {
-	removed, found := e.spacerSlices[declaration]
+func expandSlicedFormula(manager *ast.ASTManager, slices map[ast.ASTHandle][]bool, declaration ast.ASTHandle, source ast.ASTRef) (_ ast.ASTRef, resultErr error) {
+	removed, found := slices[declaration]
 	if !found {
 		return source, nil
 	}
-	formula, err := e.manager.RefGet(source)
+	formula, err := manager.RefGet(source)
 	if err != nil {
-		return ast.ASTRef{}, errors.Join(err, e.manager.DelRef(&source))
+		return ast.ASTRef{}, errors.Join(err, manager.DelRef(&source))
 	}
 	bindings := make([]ast.ASTHandle, 0, len(removed))
 	for index, sliced := range removed {
 		if sliced {
 			continue
 		}
-		sort, getErr := e.manager.GetDomain(declaration, uint32(index))
+		sort, getErr := manager.GetDomain(declaration, uint32(index))
 		if getErr != nil {
-			return ast.ASTRef{}, errors.Join(getErr, e.manager.DelRef(&source))
+			return ast.ASTRef{}, errors.Join(getErr, manager.DelRef(&source))
 		}
-		variable, getErr := e.manager.MkVar(uint32(index), sort)
+		variable, getErr := manager.MkVar(uint32(index), sort)
 		if getErr != nil {
-			return ast.ASTRef{}, errors.Join(getErr, e.manager.DelRef(&source))
+			return ast.ASTRef{}, errors.Join(getErr, manager.DelRef(&source))
 		}
 		bindings = append(bindings, variable)
 	}
-	substitute, err := astrewriter.NewVarSubstitution(e.manager, false)
+	substitute, err := astrewriter.NewVarSubstitution(manager, false)
 	if substitute != nil {
 		defer func() { resultErr = errors.Join(resultErr, substitute.Close()) }()
 	}
 	if err != nil {
-		return ast.ASTRef{}, errors.Join(err, e.manager.DelRef(&source))
+		return ast.ASTRef{}, errors.Join(err, manager.DelRef(&source))
 	}
-	result, err := e.manager.NewRef(ast.ASTHandle{})
+	result, err := manager.NewRef(ast.ASTHandle{})
 	if err != nil {
-		return ast.ASTRef{}, errors.Join(err, e.manager.DelRef(&source))
+		return ast.ASTRef{}, errors.Join(err, manager.DelRef(&source))
 	}
 	if err = substitute.Substitute(formula, bindings, result); err != nil {
-		return ast.ASTRef{}, errors.Join(err, e.manager.DelRef(&result), e.manager.DelRef(&source))
+		return ast.ASTRef{}, errors.Join(err, manager.DelRef(&result), manager.DelRef(&source))
 	}
-	if err = e.manager.DelRef(&source); err != nil {
-		return ast.ASTRef{}, errors.Join(err, e.manager.DelRef(&result))
+	if err = manager.DelRef(&source); err != nil {
+		return ast.ASTRef{}, errors.Join(err, manager.DelRef(&result))
 	}
 	return result, nil
 }
 
-func (e *PropositionalEngine) rejectSlicedProperty(declaration ast.ASTHandle) error {
-	if e.spacerHasRemovedColumns(declaration) {
+func rejectSlicedPredicateProperty(slices map[ast.ASTHandle][]bool, declaration ast.ASTHandle) error {
+	if slicedPredicateHasRemovedColumns(slices, declaration) {
 		return fmt.Errorf("muz/fp: covers and invariants are incompatible with sliced predicate columns")
 	}
 	return nil
 }
 
-func (e *PropositionalEngine) expandSpacerHandle(declaration, source ast.ASTHandle) (ast.ASTRef, error) {
-	reference, err := e.manager.NewRef(source)
+func expandSlicedHandle(manager *ast.ASTManager, slices map[ast.ASTHandle][]bool, declaration, source ast.ASTHandle) (ast.ASTRef, error) {
+	reference, err := manager.NewRef(source)
 	if err != nil {
 		return ast.ASTRef{}, err
 	}
-	return e.expandSpacerFormula(declaration, reference)
+	return expandSlicedFormula(manager, slices, declaration, reference)
 }
 
-func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore, original, derived ast.ASTHandle) (resultErr error) {
+func expandSlicedFunction(manager *ast.ASTManager, slices map[ast.ASTHandle][]bool, destination *model.ModelCore, original, derived ast.ASTHandle) (resultErr error) {
 	source, err := destination.FunctionInterpretation(derived)
 	if err != nil {
 		return err
@@ -110,11 +110,11 @@ func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore,
 	if source == nil {
 		return destination.UnregisterDeclaration(derived)
 	}
-	oldArity, err := e.manager.GetArity(original)
+	oldArity, err := manager.GetArity(original)
 	if err != nil {
 		return err
 	}
-	interpretation, err := model.NewFunctionInterpretation(e.manager, oldArity)
+	interpretation, err := model.NewFunctionInterpretation(manager, oldArity)
 	if err != nil {
 		return err
 	}
@@ -129,15 +129,15 @@ func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore,
 		return err
 	}
 	if !compact.IsNull() {
-		expanded, expandErr := e.expandSpacerHandle(original, compact)
+		expanded, expandErr := expandSlicedHandle(manager, slices, original, compact)
 		if expandErr != nil {
 			return expandErr
 		}
-		expandedHandle, expandErr := e.manager.RefGet(expanded)
+		expandedHandle, expandErr := manager.RefGet(expanded)
 		if expandErr == nil {
 			expandErr = interpretation.SetElse(expandedHandle)
 		}
-		expandErr = errors.Join(expandErr, e.manager.DelRef(&expanded))
+		expandErr = errors.Join(expandErr, manager.DelRef(&expanded))
 		if expandErr != nil {
 			return expandErr
 		}
@@ -149,8 +149,8 @@ func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore,
 	return destination.UnregisterDeclaration(derived)
 }
 
-func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.Model, resultErr error) {
-	if len(e.spacerPredicates) == 0 && len(e.spacerQuantified) == 0 && len(e.spacerBitBlasted) == 0 && len(e.spacerScaled) == 0 && len(e.spacerKarr) == 0 {
+func expandSlicedModel(manager *ast.ASTManager, predicates map[ast.ASTHandle]ast.ASTHandle, slices map[ast.ASTHandle][]bool, source *model.Model) (_ *model.Model, resultErr error) {
+	if len(predicates) == 0 {
 		return source, nil
 	}
 	if source == nil {
@@ -163,13 +163,13 @@ func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.M
 		}
 	}()
 	core := source.Core()
-	for original, derived := range e.spacerPredicates {
-		arity, err := e.manager.GetArity(derived)
+	for original, derived := range predicates {
+		arity, err := manager.GetArity(derived)
 		if err != nil {
 			return nil, err
 		}
 		if arity != 0 {
-			if err = e.expandSpacerFunction(core, original, derived); err != nil {
+			if err = expandSlicedFunction(manager, slices, core, original, derived); err != nil {
 				return nil, err
 			}
 			continue
@@ -185,11 +185,11 @@ func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.M
 		if err != nil {
 			return nil, err
 		}
-		oldArity, err := e.manager.GetArity(original)
+		oldArity, err := manager.GetArity(original)
 		if err != nil {
 			return nil, err
 		}
-		interpretation, err := model.NewFunctionInterpretation(e.manager, oldArity)
+		interpretation, err := model.NewFunctionInterpretation(manager, oldArity)
 		if err != nil {
 			return nil, err
 		}
@@ -206,6 +206,47 @@ func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.M
 			return nil, err
 		}
 	}
+	return source, nil
+}
+
+func (e *PropositionalEngine) spacerHasRemovedColumns(declaration ast.ASTHandle) bool {
+	return slicedPredicateHasRemovedColumns(e.spacerSlices, declaration)
+}
+
+func (e *PropositionalEngine) expandSpacerFormula(declaration ast.ASTHandle, source ast.ASTRef) (ast.ASTRef, error) {
+	return expandSlicedFormula(e.manager, e.spacerSlices, declaration, source)
+}
+
+func (e *PropositionalEngine) rejectSlicedProperty(declaration ast.ASTHandle) error {
+	return rejectSlicedPredicateProperty(e.spacerSlices, declaration)
+}
+
+func (e *PropositionalEngine) expandSpacerHandle(declaration, source ast.ASTHandle) (ast.ASTRef, error) {
+	return expandSlicedHandle(e.manager, e.spacerSlices, declaration, source)
+}
+
+func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore, original, derived ast.ASTHandle) error {
+	return expandSlicedFunction(e.manager, e.spacerSlices, destination, original, derived)
+}
+
+func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.Model, resultErr error) {
+	if len(e.spacerPredicates) == 0 && len(e.spacerQuantified) == 0 && len(e.spacerBitBlasted) == 0 && len(e.spacerScaled) == 0 && len(e.spacerKarr) == 0 {
+		return source, nil
+	}
+	source, err := expandSlicedModel(e.manager, e.spacerPredicates, e.spacerSlices, source)
+	if err != nil {
+		return nil, err
+	}
+	if source == nil {
+		return nil, ast.ErrASTHandle
+	}
+	defer func() {
+		if resultErr != nil {
+			resultErr = errors.Join(resultErr, source.Close())
+			source = nil
+		}
+	}()
+	core := source.Core()
 	for original, derived := range e.spacerBitBlasted {
 		if err := e.expandSpacerBitBlastedFunction(core, original, derived); err != nil {
 			return nil, err

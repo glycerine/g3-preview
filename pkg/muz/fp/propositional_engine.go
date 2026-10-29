@@ -65,6 +65,10 @@ type PropositionalEngine struct {
 	globals            *uparams.GlobalParamsService
 	backend            string
 	pdr                *muzpdr.Context
+	pdrQuery           ast.ASTHandle
+	pdrPredicates      map[ast.ASTHandle]ast.ASTHandle
+	pdrSlices          map[ast.ASTHandle][]bool
+	pdrStatistics      statistics.Statistics
 	spacer             *muzspacer.Context
 	scopes             []*base.RuleSet
 	predicates         map[ast.ASTHandle]*predicateState
@@ -1224,8 +1228,12 @@ func (e *PropositionalEngine) CollectStatistics(destination *statistics.Statisti
 	if destination == nil {
 		return ErrPropositionalEngine
 	}
-	if e.backend == "pdr" && e.pdr != nil {
-		return e.pdr.CollectStatistics(destination)
+	if e.backend == "pdr" {
+		destination.Copy(e.pdrStatistics)
+		if e.pdr != nil {
+			return e.pdr.CollectStatistics(destination)
+		}
+		return nil
 	}
 	if e.backend == "spacer" && e.spacer != nil {
 		return e.spacer.CollectStatistics(destination)
@@ -1237,8 +1245,12 @@ func (e *PropositionalEngine) ResetStatistics() error {
 	if err := e.open(); err != nil {
 		return err
 	}
-	if e.backend == "pdr" && e.pdr != nil {
-		return e.pdr.ResetStatistics()
+	if e.backend == "pdr" {
+		e.pdrStatistics.Reset()
+		if e.pdr != nil {
+			return e.pdr.ResetStatistics()
+		}
+		return nil
 	}
 	if e.backend == "spacer" && e.spacer != nil {
 		return e.spacer.ResetStatistics()
@@ -1325,10 +1337,12 @@ func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTR
 		return answer, err
 	}
 	if e.backend == "pdr" {
-		if e.pdr == nil || !e.queried {
+		if e.pdr == nil || !e.queried || e.pdrRevision != e.revision {
 			return answer, ErrPropositionalEngine
 		}
-		return e.pdr.Answer(declaration)
+		// Relation-query answers intentionally retain sliced predicate names,
+		// matching pdr_dl_interface's converter-free relation-query surface.
+		return e.pdr.Answer(e.pdrPredicate(declaration))
 	}
 	if e.backend == "spacer" {
 		if e.spacer == nil || !e.queried || e.spacerRevision != e.revision {
@@ -1420,7 +1434,11 @@ func (e *PropositionalEngine) Model(declaration ast.ASTHandle) (*model.Model, er
 		return nil, ErrPropositionalEngine
 	}
 	if e.backend == "pdr" && e.pdr != nil {
-		return e.pdr.Model(declaration)
+		result, err := e.pdr.Model(e.pdrPredicate(declaration))
+		if err != nil {
+			return nil, err
+		}
+		return expandSlicedModel(e.manager, e.pdrPredicates, e.pdrSlices, result)
 	}
 	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
 		result, err := e.spacer.Model(e.spacerPredicate(declaration))
@@ -1470,6 +1488,9 @@ func (e *PropositionalEngine) Close() (result error) {
 		result = errors.Join(result, e.pdr.Close())
 		e.pdr = nil
 		e.pdrRevision = 0
+		e.pdrQuery = ast.ASTHandle{}
+		e.pdrPredicates = nil
+		e.pdrSlices = nil
 	}
 	if e.spacer != nil {
 		result = errors.Join(result, e.spacer.Close())

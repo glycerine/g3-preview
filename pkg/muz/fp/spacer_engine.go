@@ -410,11 +410,9 @@ func (e *PropositionalEngine) querySpacerFromLevel(declaration ast.ASTHandle, fr
 		return lbool.Undef, fmt.Errorf("muz/fp: Spacer requires parameter and global services")
 	}
 	if e.pdr != nil {
-		if err := e.pdr.Close(); err != nil {
+		if err := e.closePDRForReplacement(); err != nil {
 			return lbool.Undef, err
 		}
-		e.pdr = nil
-		e.pdrRevision = 0
 	}
 	finalized, err := e.set.IsFinalized()
 	if err != nil {

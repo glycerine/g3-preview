@@ -7,12 +7,88 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/pdr"
+	"github.com/glycerine/g3/pkg/muz/transforms"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
-func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, error) {
+func (e *PropositionalEngine) closePDRForReplacement() error {
+	if e.pdr == nil {
+		return nil
+	}
+	archived := statistics.New()
+	result := e.pdr.CollectStatistics(archived)
+	e.pdrStatistics.Copy(*archived)
+	result = errors.Join(result, e.pdr.Close())
+	e.pdr = nil
+	e.pdrRevision = 0
+	e.pdrQuery = ast.ASTHandle{}
+	e.pdrPredicates = nil
+	e.pdrSlices = nil
+	return result
+}
+
+func (e *PropositionalEngine) pdrPredicate(declaration ast.ASTHandle) ast.ASTHandle {
+	if derived, found := e.pdrPredicates[declaration]; found {
+		return derived
+	}
+	return declaration
+}
+
+func (e *PropositionalEngine) preparePDRRules(query ast.ASTHandle, sliceRules bool) (_ *base.RuleSet, resultErr error) {
+	prepared, err := base.NewRuleSet(e.rules)
+	if err != nil {
+		return nil, err
+	}
+	keep := false
+	defer func() {
+		if !keep {
+			resultErr = errors.Join(resultErr, prepared.Close())
+		}
+	}()
+	if err = prepared.AddRules(e.set); err != nil {
+		return nil, err
+	}
+	if err = prepared.SetOutputPredicate(query); err != nil {
+		return nil, err
+	}
+	valid, err := prepared.Finalize()
+	if err != nil || !valid {
+		if err == nil {
+			err = fmt.Errorf("muz/fp: negation is not stratified")
+		}
+		return nil, err
+	}
+	e.pdrPredicates = nil
+	e.pdrSlices = nil
+	if sliceRules {
+		transformer := base.NewRuleTransformer()
+		plugin := transforms.NewRuleSlicePlugin(e.manager, e.rules, 1)
+		if err = transformer.Register(plugin); err != nil {
+			return nil, errors.Join(err, plugin.Close(), transformer.Close())
+		}
+		_, applyErr := transformer.Apply(prepared)
+		if applyErr == nil {
+			e.pdrPredicates, e.pdrSlices = plugin.PredicateSlices()
+		} else if errors.Is(applyErr, ast.ErrASTDomain) {
+			// The native slicer runs after rule normalization. Until that
+			// complete transform chain is retained, leave unsupported compound
+			// applications unsliced instead of rejecting a valid PDR program.
+			applyErr = nil
+		}
+		err = errors.Join(applyErr, transformer.Close())
+		if err != nil {
+			return nil, fmt.Errorf("muz/fp: PDR rule slicing: %w", err)
+		}
+	}
+	keep = true
+	return prepared, nil
+}
+
+func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (_ lbool.LBool, resultErr error) {
 	if e.params == nil || e.globals == nil {
 		return lbool.Undef, fmt.Errorf("muz/fp: PDR requires parameter and global services")
 	}
@@ -49,15 +125,13 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
 	}
-	if e.pdr != nil && e.pdrRevision == e.revision {
-		return e.pdr.Solve(declaration)
+	if e.pdr != nil && e.pdrRevision == e.revision && e.pdrQuery == declaration {
+		return e.pdr.Solve(e.pdrPredicate(declaration))
 	}
 	if e.pdr != nil {
-		if err = e.pdr.Close(); err != nil {
+		if err = e.closePDRForReplacement(); err != nil {
 			return lbool.Undef, err
 		}
-		e.pdr = nil
-		e.pdrRevision = 0
 	}
 	fixedpoint, err := e.globals.SourceGetModuleName("fixedpoint")
 	if err != nil {
@@ -168,8 +242,24 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
-	if err = context.SetFullTraceAnswer(!inlineEager && !inlineLinear && !sliceRules); err != nil {
+	if err = context.SetFullTraceAnswer(!inlineEager && !inlineLinear); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	prepared, err := e.preparePDRRules(declaration, sliceRules)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	defer func() { resultErr = errors.Join(resultErr, prepared.Close()) }()
+	installed := false
+	defer func() {
+		if !installed {
+			e.pdrPredicates = nil
+			e.pdrSlices = nil
+		}
+	}()
+	queryDeclaration, err := prepared.DerivedPredicate(declaration)
+	if err != nil {
+		return lbool.Undef, errors.Join(fmt.Errorf("muz/fp: resolve preprocessed PDR query: %w", err), context.Close())
 	}
 	auxiliary := make([]ast.ASTHandle, 0, len(e.auxiliary))
 	for declaration := range e.auxiliary {
@@ -185,12 +275,14 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = context.SetBackground(background); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
-	if err = context.Initialize(e.set); err != nil {
+	if err = context.Initialize(prepared); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
 	e.pdr = context
 	e.pdrRevision = e.revision
-	return context.Solve(declaration)
+	e.pdrQuery = declaration
+	installed = true
+	return context.Solve(queryDeclaration)
 }
 
 func (e *PropositionalEngine) pdrContext() (*pdr.Context, error) {
@@ -215,7 +307,7 @@ func (e *PropositionalEngine) NumLevels(declaration ast.ASTHandle) (uint32, erro
 	if err != nil {
 		return 0, err
 	}
-	return context.NumLevels(declaration)
+	return context.NumLevels(e.pdrPredicate(declaration))
 }
 
 // CoverDelta returns an owning reference to a PDR or Spacer cover frame after
@@ -235,7 +327,11 @@ func (e *PropositionalEngine) CoverDelta(level int, declaration ast.ASTHandle) (
 	if err != nil {
 		return ast.ASTRef{}, err
 	}
-	return context.CoverDelta(level, declaration)
+	cover, err := context.CoverDelta(level, e.pdrPredicate(declaration))
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	return expandSlicedFormula(e.manager, e.pdrSlices, declaration, cover)
 }
 
 // AddCover installs a bound-variable property in a retained PDR or Spacer
@@ -254,7 +350,10 @@ func (e *PropositionalEngine) AddCover(level int, declaration, property ast.ASTH
 	if err != nil {
 		return err
 	}
-	return context.AddCover(level, declaration, property)
+	if slicedPredicateHasRemovedColumns(e.pdrSlices, declaration) {
+		return fmt.Errorf("muz/fp: covers and invariants are incompatible with sliced predicate columns")
+	}
+	return context.AddCover(level, e.pdrPredicate(declaration), property)
 }
 
 // AddInvariant installs a bound-variable property in the invariant frame.

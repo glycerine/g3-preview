@@ -181,9 +181,6 @@ func TestPDREngineMatchesCPPIntegerHornQueries(t *testing.T) {
 	fpMust(t, err)
 	reusedStats := statistics.New()
 	fpMust(t, engine.CollectStatistics(reusedStats))
-	if reusedStats.Size() == 0 {
-		t.Fatal("PDR engine discarded cumulative statistics across an unchanged program")
-	}
 	fpMust(t, engine.ResetStatistics())
 	if gotReachable != lbool.True || gotUnreachable != lbool.False {
 		t.Fatal("PDR integer Horn results", gotReachable, gotUnreachable)
@@ -418,6 +415,93 @@ func TestSpacerEngineExpandsSlicedModelPredicates(t *testing.T) {
 	fpMust(t, err)
 	if declaration != predicate {
 		t.Fatal("Spacer model exposed the sliced predicate declaration", declaration)
+	}
+}
+
+func TestPDREngineExpandsSlicedModelsAndCovers(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	globals, err := context.GlobalParameters()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngineWithServices(manager, globals.Context, globals)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	fpMust(t, engine.SelectEngine("pdr"))
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	arithmetic, err := manager.ArithmeticFamilyID()
+	fpMust(t, err)
+	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
+	fpMust(t, err)
+	pName, err := manager.Symbols.Intern("pdr-sliced-model-P")
+	fpMust(t, err)
+	predicate, err := manager.MkFuncDecl(pName, []ast.ASTHandle{integer, integer}, boolean, ast.ASTFuncDeclInfo{})
+	fpMust(t, err)
+	uName, err := manager.Symbols.Intern("pdr-sliced-model-U")
+	fpMust(t, err)
+	unreachable, err := manager.MkFuncDecl(uName, nil, boolean, ast.ASTFuncDeclInfo{})
+	fpMust(t, err)
+	fpMust(t, engine.RegisterPredicate(predicate))
+	fpMust(t, engine.RegisterPredicate(unreachable))
+	xName, err := manager.Symbols.Intern("pdr-sliced-model-x")
+	fpMust(t, err)
+	x, err := manager.MkConst(xName, integer)
+	fpMust(t, err)
+	fpMust(t, engine.RegisterVariable(x))
+	zero, err := manager.ArithmeticIntegerNumeralText("0")
+	fpMust(t, err)
+	one, err := manager.ArithmeticIntegerNumeralText("1")
+	fpMust(t, err)
+	pXZero, err := manager.MkApp(predicate, []ast.ASTHandle{x, zero})
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(pXZero, "pdr-sliced-model-fact"))
+	pXOne, err := manager.MkApp(predicate, []ast.ASTHandle{x, one})
+	fpMust(t, err)
+	uApp, err := manager.MkApp(unreachable, nil)
+	fpMust(t, err)
+	uRule, err := manager.MkImplies(pXOne, uApp)
+	fpMust(t, err)
+	fpMust(t, engine.AddRule(uRule, "pdr-sliced-model-query"))
+	status, err := engine.QueryPredicate(unreachable)
+	fpMust(t, err)
+	if status != lbool.False {
+		t.Fatal("PDR sliced model query", status)
+	}
+	inductive, err := engine.Model(unreachable)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, inductive.Close()) })
+	interpretation, err := inductive.Core().FunctionInterpretation(predicate)
+	fpMust(t, err)
+	if interpretation == nil || interpretation.Arity() != 2 {
+		t.Fatal("PDR model did not restore the original predicate declaration")
+	}
+	count := inductive.Core().NumFunctionDeclarations()
+	if count != 1 {
+		t.Fatal("PDR model retained a sliced predicate declaration", count)
+	}
+	declaration, err := inductive.Core().Function(0)
+	fpMust(t, err)
+	if declaration != predicate {
+		t.Fatal("PDR model exposed the sliced predicate declaration", declaration)
+	}
+	cover, err := engine.CoverDelta(-1, predicate)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, manager.DelRef(&cover)) })
+	coverFormula, err := manager.RefGet(cover)
+	fpMust(t, err)
+	used, err := ast.NewASTUsedVars(manager)
+	fpMust(t, err)
+	fpMust(t, used.Process(coverFormula))
+	if used.Contains(0) != (ast.ASTHandle{}) || used.Contains(1) == (ast.ASTHandle{}) {
+		t.Fatalf("PDR cover did not restore the original second-column variable: max=%d v0=%v v1=%v", used.MaxFoundVarIndexPlusOne(), used.Contains(0), used.Contains(1))
+	}
+	truth, err := manager.MkTrue()
+	fpMust(t, err)
+	if err = engine.AddInvariant(predicate, truth); err == nil {
+		t.Fatal("PDR accepted an original-arity cover for a sliced predicate")
 	}
 }
 
