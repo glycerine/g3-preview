@@ -172,6 +172,17 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 		if x != nil {
 			return x
 		}
+		if derived := modelCore.DerivedModel(); c.implicant != nil && derived != nil {
+			reduced, y := c.reduceDisequalities(derived, 3, formula)
+			if y != nil {
+				return fmt.Errorf("muz/pdr: disequality reduction: %w", y)
+			}
+			references = append(references, reduced)
+			formula, y = c.manager.RefGet(reduced)
+			if y != nil {
+				return y
+			}
+		}
 		forms, x = c.manager.FlattenAnd([]ast.ASTHandle{formula})
 		if x != nil {
 			return x

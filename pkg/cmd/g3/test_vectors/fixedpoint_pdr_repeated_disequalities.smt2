@@ -1,0 +1,7 @@
+(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(declare-rel Goal ())
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (and (P x) (not (= x 1)) (not (= x 2)) (not (= x 3))) Goal))
+(query Goal :print-answer true)
