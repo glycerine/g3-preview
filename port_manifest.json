@@ -179959,7 +179959,8 @@
       "go_targets": [
         "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic_trace.go",
-        "pkg/tactic/ufbv/rewrite_tactic.go"
+        "pkg/tactic/ufbv/rewrite_tactic.go",
+        "pkg/tactic/ufbv/rewrite_tactic_adapter.go"
       ],
       "tests": [
         "TestUFBVRewriterTranslateOwnsDestinationImplementation",
@@ -179967,7 +179968,8 @@
         "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
-        "TestUFBVRewriterTacticPublishesIndependentGoalReference"
+        "TestUFBVRewriterTacticPublishesIndependentGoalReference",
+        "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference"
       ],
       "assertions": [
         {
@@ -180018,7 +180020,8 @@
           "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
           "tests": [
             "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
-            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
+            "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference"
           ]
         }
       ],
@@ -180026,7 +180029,7 @@
         "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. Its copied input-formula and proof slices each pin their AST entries until the younger rewritten-formula owners release; both survive goal reset and release in insertion order after result publication. Successful publication adds a separate goal reference after the depth increment; the caller releases it with DecRef."
       ],
       "deviations": [
-        "The result is the input goal with a second owning reference; converter outputs are absent because the source sets all three to null. Translation to another manager, parameter-description reporting, cleanup reconstruction and full tactic registry integration remain open."
+        "The result is the input goal with a second owning reference; converter outputs are absent because the source sets all three to null. The common tactic adapter balances that source result-buffer reference. Proof-producing demodulator rewrites and explicit registry exposure remain open."
       ]
     },
     {
@@ -180035,11 +180038,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/ufbv/rewrite_tactic.go"
+        "pkg/tactic/ufbv/rewrite_tactic.go",
+        "pkg/tactic/ufbv/rewrite_tactic_adapter.go"
       ],
       "tests": [
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
-        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
+        "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference"
       ],
       "conditionals": [
         {
@@ -180060,13 +180065,14 @@
           "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
           "tests": [
             "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
-            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
+            "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference"
           ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The concrete Go constructor takes the existing parameter context and global service needed by its Boolean reducer; full tactic registration, translate and parameter reporting remain open."
+        "The concrete Go constructor takes the existing parameter context and global service needed by its Boolean reducer. A common tactic adapter now supplies reference-balanced composition and translation; proof-producing rewrites and explicit registry exposure remain open."
       ]
     },
     {
