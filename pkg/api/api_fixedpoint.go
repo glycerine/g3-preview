@@ -26,12 +26,23 @@ func (c *SMTContext) DeclareRelation(name string, domain []ast.ASTHandle) (ast.A
 }
 
 // DeclareFixedpointVariable declares one implicit variable used by later
-// fixedpoint rules.
-func (c *SMTContext) DeclareFixedpointVariable(name string, sort ast.ASTHandle) error {
+// fixedpoint rules and returns its borrowed constant application.
+func (c *SMTContext) DeclareFixedpointVariable(name string, sort ast.ASTHandle) (ast.ASTHandle, error) {
 	if err := c.open(); err != nil {
-		return err
+		return ast.ASTHandle{}, err
 	}
-	return c.command.DeclareFixedpointVariable(name, sort)
+	if err := c.command.DeclareFixedpointVariable(name, sort); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	declaration, err := c.command.FindFunctionDeclaration(name, nil, nil, ast.ASTHandle{})
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkApp(declaration, nil)
 }
 
 // AddFixedpointRule adds a Horn rule to the current fixedpoint scope.
