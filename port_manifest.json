@@ -88565,8 +88565,8 @@
       "path": "src/muz/spacer/CMakeLists.txt",
       "component": "muz",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/muz/spacer"],
       "tests": [],
       "registrations": [
         {
@@ -88574,11 +88574,13 @@
           "text": "z3_add_component(spacer"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go package discovery and imports replace the Spacer CMake component source list and dependency registration while preserving pkg/muz/spacer as the package boundary."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_antiunify.cpp",
@@ -90209,14 +90211,16 @@
       "path": "src/muz/spacer/spacer_notes.txt",
       "component": "muz",
       "role": "reference_support",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Historical Spacer design notes only; executable algorithms, parameters, and ownership contracts are inventoried against their production source units."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_prop_solver.cpp",
