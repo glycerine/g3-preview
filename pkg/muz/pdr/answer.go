@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -346,6 +347,62 @@ func (c *Context) unsatAnswer(queryDeclaration ast.ASTHandle) (result ast.ASTRef
 		return result, err
 	}
 	return c.manager.NewRef(formula)
+}
+
+// Model materializes the inductive relation interpretations for the latest
+// unreachable query. The caller owns the returned model and closes it.
+func (c *Context) Model(queryDeclaration ast.ASTHandle) (result *model.Model, resultErr error) {
+	if err := c.open(); err != nil {
+		return nil, err
+	}
+	if c.lastResult != lbool.False || c.queryDecl != queryDeclaration {
+		return nil, ast.ErrASTDomain
+	}
+	result, err := model.NewModel(c.manager)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if resultErr != nil && result != nil {
+			resultErr = errors.Join(resultErr, result.Close())
+			result = nil
+		}
+	}()
+	for _, declaration := range c.order {
+		if declaration == queryDeclaration || c.auxiliary[declaration] {
+			continue
+		}
+		body, x := c.transformers[declaration].CoverDelta(-1)
+		if x != nil {
+			return result, x
+		}
+		bodyHandle, x := c.manager.RefGet(body)
+		if x != nil {
+			return result, errors.Join(x, c.manager.DelRef(&body))
+		}
+		arity, x := c.manager.GetArity(declaration)
+		if x == nil && arity == 0 {
+			x = result.Core().RegisterConstant(declaration, bodyHandle)
+		} else if x == nil {
+			var interpretation *model.FunctionInterpretation
+			interpretation, x = model.NewFunctionInterpretation(c.manager, arity)
+			if x == nil {
+				x = interpretation.SetElse(bodyHandle)
+			}
+			if x == nil {
+				x = result.Core().RegisterFunction(declaration, interpretation)
+				interpretation = nil
+			}
+			if interpretation != nil {
+				x = errors.Join(x, interpretation.Close())
+			}
+		}
+		x = errors.Join(x, c.manager.DelRef(&body))
+		if x != nil {
+			return result, x
+		}
+	}
+	return result, nil
 }
 
 // Answer reconstructs the selected satisfying rule trace or the direct

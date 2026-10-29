@@ -4,6 +4,7 @@ package api
 
 import (
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -93,6 +94,24 @@ func (c *SMTContext) FixedpointAnswer(declaration ast.ASTHandle) (ast.ASTRef, er
 		return ast.ASTRef{}, err
 	}
 	return c.command.FixedpointAnswer(declaration)
+}
+
+// FixedpointModel returns the inductive model from the latest unreachable PDR
+// query. The caller owns and closes the returned model.
+func (c *SMTContext) FixedpointModel(declaration ast.ASTHandle) (*model.Model, error) {
+	if err := c.open(); err != nil {
+		return nil, err
+	}
+	return c.command.FixedpointModel(declaration)
+}
+
+// EvaluateFixedpointModel evaluates an expression in the inductive model from
+// the latest unreachable PDR query and returns one owning AST reference.
+func (c *SMTContext) EvaluateFixedpointModel(declaration, expression ast.ASTHandle, completion bool) (ast.ASTRef, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	return c.command.EvaluateFixedpointModel(declaration, expression, completion)
 }
 
 // FixedpointNumLevels returns the current number of finite PDR frames for a

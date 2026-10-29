@@ -11,6 +11,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	astrewriter "github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
 	muzpdr "github.com/glycerine/g3/pkg/muz/pdr"
 	"github.com/glycerine/g3/pkg/muz/rel"
@@ -1286,6 +1287,18 @@ func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTR
 		return answer, err
 	}
 	return e.manager.NewRef(formula)
+}
+
+// Model returns the inductive PDR model for the latest unreachable query. The
+// caller owns and closes the returned model.
+func (e *PropositionalEngine) Model(declaration ast.ASTHandle) (*model.Model, error) {
+	if err := e.open(); err != nil {
+		return nil, err
+	}
+	if e.backend != "pdr" || e.pdr == nil || !e.queried {
+		return nil, ErrPropositionalEngine
+	}
+	return e.pdr.Model(declaration)
 }
 
 // Query accepts the zero-arity predicate application used by the original

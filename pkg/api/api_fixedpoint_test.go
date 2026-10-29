@@ -62,6 +62,10 @@ func TestSMTContextFixedpointPDRLifecycle(t *testing.T) {
 		t.Fatal("public fixedpoint answer is not true")
 	}
 	astTestMust(t, manager.DelRef(&answer))
+	if unexpected, x := context.FixedpointModel(q); x == nil {
+		astTestMust(t, unexpected.Close())
+		t.Fatal("reachable fixedpoint query exposed an inductive model")
+	}
 
 	levels, err := context.FixedpointNumLevels(q)
 	astTestMust(t, err)
@@ -96,6 +100,40 @@ func TestSMTContextFixedpointPDRLifecycle(t *testing.T) {
 		t.Fatal("unreachable public fixedpoint query returned an empty certificate")
 	}
 	astTestMust(t, manager.DelRef(&certificate))
+	inductiveModel, err := context.FixedpointModel(u)
+	astTestMust(t, err)
+	for _, declaration := range []ast.ASTHandle{p, q} {
+		present, x := inductiveModel.Core().HasInterpretation(declaration)
+		astTestMust(t, x)
+		if !present {
+			t.Fatal("fixedpoint model omitted retained relation", declaration)
+		}
+		interpretation, x := inductiveModel.Core().FunctionInterpretation(declaration)
+		astTestMust(t, x)
+		if interpretation == nil {
+			t.Fatal("fixedpoint model omitted relation function", declaration)
+		}
+		fallback, x := interpretation.Else()
+		astTestMust(t, x)
+		if fallback.IsNull() {
+			t.Fatal("fixedpoint model relation has no interpretation body", declaration)
+		}
+	}
+	if present, x := inductiveModel.Core().HasInterpretation(u); x != nil || present {
+		t.Fatal("fixedpoint model retained the unreachable query relation", present, x)
+	}
+	astTestMust(t, inductiveModel.Close())
+	qZero := pin(manager.MkApp(q, []ast.ASTHandle{zero}))
+	for _, application := range []ast.ASTHandle{pZero, qZero} {
+		value, x := context.EvaluateFixedpointModel(u, application, true)
+		astTestMust(t, x)
+		handle, x := manager.RefGet(value)
+		astTestMust(t, x)
+		if !manager.IsTrue(handle) {
+			t.Fatal("fixedpoint model does not satisfy reachable relation", application, handle)
+		}
+		astTestMust(t, manager.DelRef(&value))
+	}
 	stats, err := context.FixedpointStatistics()
 	astTestMust(t, err)
 	if stats.Size() == 0 {

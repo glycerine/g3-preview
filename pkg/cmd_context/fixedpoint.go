@@ -5,9 +5,11 @@ package cmd_context
 // the positive finite-domain fragment exposed by muz/fp.
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	muzfp "github.com/glycerine/g3/pkg/muz/fp"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -149,6 +151,44 @@ func (c *Context) FixedpointAnswer(declaration ast.ASTHandle) (ast.ASTRef, error
 		return ast.ASTRef{}, err
 	}
 	return engine.Answer(declaration)
+}
+
+// FixedpointModel returns the inductive model produced by the latest
+// unreachable PDR query. The caller owns and closes the returned model.
+func (c *Context) FixedpointModel(declaration ast.ASTHandle) (*model.Model, error) {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return nil, err
+	}
+	return engine.Model(declaration)
+}
+
+// EvaluateFixedpointModel evaluates an expression in the inductive model from
+// the latest unreachable PDR query and returns one owning AST reference.
+func (c *Context) EvaluateFixedpointModel(declaration, expression ast.ASTHandle, completion bool) (result ast.ASTRef, resultErr error) {
+	manager, err := c.Manager()
+	if err != nil {
+		return result, err
+	}
+	defer func() {
+		if resultErr != nil && result != (ast.ASTRef{}) {
+			resultErr = errors.Join(resultErr, manager.DelRef(&result))
+			result = ast.ASTRef{}
+		}
+	}()
+	inductiveModel, err := c.FixedpointModel(declaration)
+	if err != nil {
+		return result, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, inductiveModel.Close()) }()
+	result, err = manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return result, err
+	}
+	if err = inductiveModel.Evaluate(expression, result, completion, c.config.ModelEvaluator); err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 func (c *Context) FixedpointNumLevels(declaration ast.ASTHandle) (uint32, error) {

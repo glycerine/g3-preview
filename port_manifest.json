@@ -5289,7 +5289,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation query, owning trace/inductive-certificate answer, PDR frame count/cover and copied statistics surface",
+          "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation query, owning trace/inductive-certificate answer, inductive model and model evaluation, PDR frame count/cover and copied statistics surface",
           "status": "partial",
           "go_target": "pkg/api/api_fixedpoint.go",
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
@@ -5301,7 +5301,7 @@
           "tests": []
         }
       ],
-      "ownership": ["SMTContext owns the shared command/fixedpoint context. FixedpointAnswer and FixedpointCoverDelta each transfer one concrete ASTRef to the caller; statistics are copied Go values, and relation/rule/cover inputs are borrowed for each call then retained by the underlying context when required."],
+      "ownership": ["SMTContext owns the shared command/fixedpoint context. FixedpointAnswer, FixedpointCoverDelta and EvaluateFixedpointModel each transfer one concrete ASTRef to the caller; FixedpointModel transfers one concrete model owner; statistics are copied Go values, and relation/rule/cover inputs are borrowed for each call then retained by the underlying context when required."],
       "deviations": ["The additive public Go surface reuses SMTContext instead of exposing the native opaque reference-counted fixedpoint object or C ABI. Cover operations are available after a retained PDR/Spacer query and operate on direct predicates; native slice/model-converter remapping remains outside this path. Unlisted api_datalog operations remain unported."]
     },
     {
@@ -5325,7 +5325,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained public fixedpoint registration, rule-scope, query, answer, frame count/cover and statistics subset",
+          "name": "retained public fixedpoint registration, rule-scope, query, answer/model/evaluation, frame count/cover and statistics subset",
           "status": "partial",
           "go_target": "pkg/api/api_fixedpoint.go",
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
@@ -83172,7 +83172,7 @@
           ]
         },
         {
-          "name": "unsuccessful-query direct-predicate inductive property and model-to-expression certificate construction (pdr_context.cpp:1864-1877,1945-1961,1989-1995; pdr_manager.cpp:57-122)",
+          "name": "unsuccessful-query direct-predicate inductive model and model-to-expression certificate construction (pdr_context.cpp:1864-1877,1945-1961,1989-1995; pdr_manager.cpp:57-122)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/answer.go",
           "tests": ["TestContextSolveFindsInductiveUnreachablePredicate", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMTContextFixedpointPDRLifecycle"]
@@ -83389,6 +83389,7 @@
         "pkg/muz/fp/register_engine.go",
         "pkg/muz/pdr/answer.go",
         "pkg/cmd_context/fixedpoint.go",
+        "pkg/api/api_fixedpoint.go",
         "pkg/parsers/smt2/fixedpoint_commands_test.go",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_background.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_integer.smt2",
@@ -83416,7 +83417,8 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTContextFixedpointPDRLifecycle"
       ],
       "assertions": [
         {
@@ -83450,7 +83452,7 @@
           ]
         },
         {
-          "name": "successful existential relation-declaration trace and unsuccessful direct-predicate inductive-certificate forwarding, including acyclic linear and recursive-SCC traces, initial-rule model recovery and nonlinear-rule reduction (pdr_dl_interface.cpp:175-182,208-210)",
+          "name": "successful existential relation-declaration trace and unsuccessful direct-predicate inductive-certificate/model forwarding, including acyclic linear and recursive-SCC traces, initial-rule model recovery and nonlinear-rule reduction (pdr_dl_interface.cpp:175-182,208-227)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": [
@@ -83464,7 +83466,8 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTContextFixedpointPDRLifecycle"
           ]
         },
         {
@@ -83483,14 +83486,14 @@
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "remaining general linear trace unification, model/proof, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
+          "name": "remaining general linear trace unification, proof, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [
-        "PropositionalEngine owns the current PDR Context, reuses it while the exact normalized rules and background remain unchanged, and closes/replaces it after a tracked mutation or engine shutdown; rule and parameter services are borrowed."
+        "PropositionalEngine owns the current PDR Context, reuses it while the exact normalized rules and background remain unchanged, and closes/replaces it after a tracked mutation or engine shutdown; rule and parameter services are borrowed. Returned inductive models transfer ownership to the caller."
       ],
       "deviations": [
         "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding and unsuccessful-query inductive certificates are retained; slicing and model-converter remapping remain unported. Successful existential declaration queries expose empty answers, acyclic linear cross-predicate traces, recursive-SCC state traces, initial-rule model recovery and native nonlinear-rule reduction; remaining general rule/head unification remains unported."
@@ -83506,6 +83509,7 @@
         "pkg/muz/fp/register_engine.go",
         "pkg/muz/pdr/answer.go",
         "pkg/cmd_context/fixedpoint.go",
+        "pkg/api/api_fixedpoint.go",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_background.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_integer.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_initial_trace.smt2",
@@ -83532,7 +83536,8 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTContextFixedpointPDRLifecycle"
       ],
       "conditionals": [
         {
@@ -83597,7 +83602,7 @@
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "remaining general linear trace unification, model, proof and parameter-update surface",
+          "name": "remaining general linear trace unification, proof and parameter-update surface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83989,7 +83994,13 @@
           "tests": ["TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTContextFixedpointPDRLifecycle", "TestPDREngineCertificateHidesSimpleJoinAuxiliaries"]
         },
         {
-          "name": "remaining inductive_property model-converter application, model materialization/string and rule display (pdr_manager.cpp:42-156)",
+          "name": "inductive_property direct-predicate model materialization (pdr_manager.cpp:85-122)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/answer.go",
+          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "remaining inductive_property model-converter application, model string and rule display (pdr_manager.cpp:42-84,123-156)",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83999,7 +84010,7 @@
         "Manager owns one background AST reference, one SymbolMux and one SMTContextManager. Close rejects active proposition solvers through the context manager, then releases contexts, mux pins and the background in dependency order."
       ],
       "deviations": [
-        "Typed errors replace assertion-only zero-arity state and lookup conditions. Go returns borrowed handles and native slices instead of source pointer/reference-vector iterators. Direct-predicate certificates construct the model-to-expression equalities without an intermediate ModelCore and apply the retained simple-join auxiliary filter; source clause presentation normalization and other model-converter remapping remain open."
+        "Typed errors replace assertion-only zero-arity state and lookup conditions. Go returns borrowed handles and native slices instead of source pointer/reference-vector iterators. Direct-predicate certificates construct model-to-expression equalities and owning models while applying the retained simple-join auxiliary filter; source clause presentation normalization and other model-converter remapping remain open."
       ]
     },
     {
@@ -84056,7 +84067,13 @@
           "tests": ["TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "remaining inductive_property model/converter and rule-manager display surface",
+          "name": "direct-predicate inductive_property model surface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/answer.go",
+          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "remaining inductive_property converter and rule-manager display surface",
           "status": "unported",
           "go_target": null,
           "tests": []
