@@ -71,6 +71,9 @@ func TestSpacerPredicateRulesBuildTaggedInitialAndTransitionSystem(t *testing.T)
 	if _, found, err := transformer.LastReachCaseVariable(); err != nil || !found {
 		t.Fatal("last Spacer reach-case variable", found, err)
 	}
+	if reachable, reachModel, err := transformer.IsMustReachable(truth, false); err != nil || !reachable || reachModel != nil {
+		t.Fatal("Spacer must-reachability check", reachable, reachModel, err)
+	}
 	rules, err := transformer.Rules()
 	spacerMust(t, err)
 	if len(rules) != 2 {
@@ -117,15 +120,30 @@ func TestSpacerPredicateRulesBuildTaggedInitialAndTransitionSystem(t *testing.T)
 	if !found {
 		t.Fatal("missing Spacer reach-case variable for rule selection")
 	}
+	lastReachDeclaration, err := manager.GetDecl(lastReach)
+	spacerMust(t, err)
+	falsity, err := manager.MkFalse()
+	spacerMust(t, err)
+	spacerMust(t, md.Core().RegisterConstant(lastReachDeclaration, falsity))
 	originReach, err := owner.FormulaNewToOld(lastReach, 0, false)
 	spacerMust(t, err)
 	originReachHandle, err := manager.RefGet(originReach)
 	spacerMust(t, err)
 	originDeclaration, err := manager.GetDecl(originReachHandle)
 	spacerMust(t, err)
-	falsity, err := manager.MkFalse()
-	spacerMust(t, err)
 	spacerMust(t, md.Core().RegisterConstant(originDeclaration, falsity))
+	usedReach, found, err := transformer.UsedReachFact(md.Core(), true)
+	spacerMust(t, err)
+	if !found {
+		t.Fatal("Spacer current-state reach fact not selected")
+	}
+	spacerMust(t, usedReach.Close())
+	usedOrigin, found, err := transformer.UsedOriginReachFact(md.Core(), 0)
+	spacerMust(t, err)
+	if !found {
+		t.Fatal("Spacer origin reach fact not selected")
+	}
+	spacerMust(t, usedOrigin.Close())
 	selection, err := transformer.SelectRule(md.Core())
 	spacerMust(t, err)
 	if selection.Rule == nil || !selection.IsConcrete || selection.NumReuseReach != 1 || len(selection.ReachPredUsed) != 1 || !selection.ReachPredUsed[0] {

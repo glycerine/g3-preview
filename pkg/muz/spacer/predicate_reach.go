@@ -8,6 +8,8 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (p *PredicateTransformer) SetReachAsInitial(value bool) error {
@@ -260,4 +262,148 @@ func (p *PredicateTransformer) LastReachCaseVariable() (ast.ASTHandle, bool, err
 	}
 	value, err := p.manager.RefGet(p.reachCaseVariables[len(p.reachCaseVariables)-1])
 	return value, err == nil, err
+}
+
+// IsMustReachable checks state against the accumulated reach clauses and the
+// negation of the latest reach-case variable. The returned model is owning.
+func (p *PredicateTransformer) IsMustReachable(state ast.ASTHandle, needModel bool) (_ bool, resultModel *model.ModelCore, resultErr error) {
+	if err := p.open(); err != nil {
+		return false, nil, err
+	}
+	if len(p.reachFacts) == 0 {
+		return false, nil, nil
+	}
+	if err := p.reachSolver.SetProduceModels(needModel); err != nil {
+		return false, nil, err
+	}
+	if err := p.reachSolver.Push(); err != nil {
+		return false, nil, err
+	}
+	defer func() {
+		resultErr = errors.Join(resultErr, p.reachSolver.Pop(1))
+		if resultErr != nil && resultModel != nil {
+			resultErr = errors.Join(resultErr, resultModel.DecRef())
+			resultModel = nil
+		}
+	}()
+	if err := p.reachSolver.Assert(state); err != nil {
+		return false, nil, err
+	}
+	last, err := p.manager.RefGet(p.reachCaseVariables[len(p.reachCaseVariables)-1])
+	if err != nil {
+		return false, nil, err
+	}
+	notLast, err := p.manager.MkNot(last)
+	if err != nil {
+		return false, nil, err
+	}
+	if err = p.reachSolver.Assert(notLast); err != nil {
+		return false, nil, err
+	}
+	status, err := p.reachSolver.CheckSat(nil)
+	if err != nil || status != lbool.True {
+		return false, nil, err
+	}
+	if needModel {
+		resultModel, err = p.reachSolver.AcquireModel()
+		if err != nil {
+			return false, nil, err
+		}
+	}
+	return true, resultModel, nil
+}
+
+func (p *PredicateTransformer) usedReachFact(evaluator *model.ModelEvaluator, all bool, oldIndex *uint32) (*ReachFact, bool, error) {
+	start := uint32(0)
+	if !all {
+		start = p.initialReachFacts
+	}
+	for index := start; index < uint32(len(p.reachCaseVariables)); index++ {
+		formulaRef := p.reachCaseVariables[index]
+		owned := false
+		if oldIndex != nil {
+			formula, err := p.manager.RefGet(formulaRef)
+			if err != nil {
+				return nil, false, err
+			}
+			formulaRef, err = p.owner.FormulaNewToOld(formula, *oldIndex, false)
+			if err != nil {
+				return nil, false, err
+			}
+			owned = true
+		}
+		formula, err := p.manager.RefGet(formulaRef)
+		if err != nil {
+			if owned {
+				_ = p.manager.DelRef(&formulaRef)
+			}
+			return nil, false, err
+		}
+		valueRef, err := evaluator.EvaluateValue(formula)
+		if owned {
+			err = errors.Join(err, p.manager.DelRef(&formulaRef))
+		}
+		if err != nil {
+			return nil, false, err
+		}
+		value, err := p.manager.RefGet(valueRef)
+		used := err == nil && p.manager.IsFalse(value)
+		err = errors.Join(err, p.manager.DelRef(&valueRef))
+		if err != nil {
+			return nil, false, err
+		}
+		if used {
+			fact, err := p.reachFacts[index].Retain()
+			return fact, err == nil, err
+		}
+	}
+	return nil, false, nil
+}
+
+// UsedReachFact returns the first active current-state reach fact in md.
+func (p *PredicateTransformer) UsedReachFact(md *model.ModelCore, all bool) (result *ReachFact, found bool, resultErr error) {
+	if err := p.open(); err != nil {
+		return nil, false, err
+	}
+	if md == nil {
+		return nil, false, ast.ErrASTHandle
+	}
+	evaluator, err := model.NewModelEvaluator(md, p.owner.contexts[0].config.ModelEvaluator)
+	if err != nil {
+		return nil, false, err
+	}
+	defer func() {
+		resultErr = errors.Join(resultErr, evaluator.Close())
+		if resultErr != nil && result != nil {
+			resultErr = errors.Join(resultErr, result.Close())
+			result = nil
+			found = false
+		}
+	}()
+	result, found, resultErr = p.usedReachFact(evaluator, all, nil)
+	return
+}
+
+// UsedOriginReachFact returns the first active reach fact at an old-state index.
+func (p *PredicateTransformer) UsedOriginReachFact(md *model.ModelCore, oldIndex uint32) (result *ReachFact, found bool, resultErr error) {
+	if err := p.open(); err != nil {
+		return nil, false, err
+	}
+	if md == nil {
+		return nil, false, ast.ErrASTHandle
+	}
+	evaluator, err := model.NewModelEvaluator(md, p.owner.contexts[0].config.ModelEvaluator)
+	if err != nil {
+		return nil, false, err
+	}
+	defer func() {
+		resultErr = errors.Join(resultErr, evaluator.Close())
+		if resultErr != nil && result != nil {
+			resultErr = errors.Join(resultErr, result.Close())
+			result = nil
+			found = false
+		}
+	}()
+	result, found, resultErr = p.usedReachFact(evaluator, true, &oldIndex)
+	return
 }
