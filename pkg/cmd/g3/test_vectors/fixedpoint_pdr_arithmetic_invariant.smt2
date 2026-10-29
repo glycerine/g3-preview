@@ -1,0 +1,7 @@
+(declare-rel Inv (Int))
+(declare-rel Bad ())
+(declare-var x Int)
+(rule (Inv 0))
+(rule (=> (and (Inv x) (>= x 0)) (Inv (+ x 1))))
+(rule (=> (and (Inv x) (< x 0)) Bad))
+(query Bad :print-answer false)

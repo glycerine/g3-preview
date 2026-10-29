@@ -83141,7 +83141,9 @@
           "tests": [
             "TestContextBoundedQueryTraversesTaggedHornChain",
             "TestContextSolveFindsInductiveUnreachablePredicate",
-            "TestContextSolveProjectsCoupledPredecessors"
+            "TestContextSolveProjectsCoupledPredecessors",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_arithmetic_invariant.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2"
           ]
         },
         {
@@ -83826,7 +83828,9 @@
       "tests": [
         "TestPredicateTransformerCheckInductiveReturnsSubsetCore",
         "TestContextSolveFindsReachablePredicate",
-        "TestContextSolveFindsInductiveUnreachablePredicate"
+        "TestContextSolveFindsInductiveUnreachablePredicate",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_arithmetic_invariant.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2"
       ],
       "assertions": [
         {
@@ -83861,7 +83865,7 @@
           "name": "core_bool_inductive_generalizer literal dropping with source failure-limit and processed-literal restart behavior",
           "status": "ported",
           "go_target": "pkg/muz/pdr/generalizers.go",
-          "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestContextSolveFindsInductiveUnreachablePredicate"]
+          "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2"]
         },
         {
           "name": "core_multi_generalizer, core_farkas_generalizer lemma guessing, convex hull, arithmetic and induction generalizers",
