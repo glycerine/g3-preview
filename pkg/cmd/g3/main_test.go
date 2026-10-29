@@ -355,6 +355,7 @@ var scriptResults = map[string]string{
 	"array_as_array_combined_fallback_gap.smt2":    "sat\nunsat\nsat\n",
 	"default_strategy_fragments.smt2":              "unsat\nunsat\nunsat\nunsat\nunsat\n",
 	"qfnia_solver_bounded.smt2":                    "sat\n((x 2))\nunsat\nunsat\nunsat\n",
+	"nlsat_direct.smt2":                           "sat\n((x (/ 1.0 2.0)))\nunsat\n",
 	"utvpi_mixed_sum_model.smt2":                   "sat\n",
 	"nla2bv_bounded_scopes.smt2":                   "sat\n((x 7))\nunsat\nsat\n((x 7))\n",
 	"nla2bv_under_unknown.smt2":                    "unknown\nsat\n(((= (* x x) 4) true))\n",

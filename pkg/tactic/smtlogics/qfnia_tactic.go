@@ -1,7 +1,6 @@
 package smtlogics
 
-// Source: src/tactic/smtlogics/qfnia_tactic.cpp/.h retained preamble prefix,
-// bounded-NIA bit-vector route and final SMT fallback.
+// Source: src/tactic/smtlogics/qfnia_tactic.cpp/.h.
 
 import (
 	"errors"
@@ -9,6 +8,7 @@ import (
 	"os"
 
 	"github.com/glycerine/g3/pkg/ast"
+	nlsattactic "github.com/glycerine/g3/pkg/nlsat/tactic"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/tactic/arith"
@@ -20,9 +20,8 @@ func NewQFNIATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTS
 	return NewQFNIATacticWithOutput(m, p, config, os.Stdout)
 }
 
-// NewQFNIATacticWithOutput retains the source's first bounded-NIA solver and
-// final complete SMT fallback. The intervening timed SMT/NLSAT attempts remain
-// pending with the NLSAT tactic layer.
+// NewQFNIATacticWithOutput retains the bounded bit-vector, timed SMT, timed
+// NLSAT, and final SMT routes in source order.
 func NewQFNIATacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTSolverConfig, output io.Writer) (result tactic.Tactic, err error) {
 	c, g := config.Params, config.Globals
 	if m == nil || c == nil || g == nil || g.Context != c {
@@ -53,7 +52,7 @@ func NewQFNIATacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config sm
 		return value
 	}
 	main, pullParams, contextParams := copyParams(), copyParams(), copyParams()
-	simplifyParams, nlaParams, smtParams := copyParams(), copyParams(), copyParams()
+	simplifyParams, nlaParams, smtParams, nlsatParams := copyParams(), copyParams(), copyParams(), copyParams()
 	b.boolean(pullParams, "pull_cheap_ite", true)
 	b.boolean(pullParams, "local_ctx", true)
 	b.uint(pullParams, "local_ctx_limit", 10000000)
@@ -62,6 +61,8 @@ func NewQFNIATacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config sm
 	b.boolean(simplifyParams, "hoist_mul", true)
 	b.uint(nlaParams, "nla2bv_max_bv_size", 64)
 	b.boolean(smtParams, "som", true)
+	b.boolean(nlsatParams, "som", true)
+	b.boolean(nlsatParams, "factor", false)
 	if b.err != nil {
 		return nil, b.err
 	}
@@ -83,8 +84,14 @@ func NewQFNIATacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config sm
 		return b.then(simplify(smtParams), b.keep(smtcore.NewSMTTactic(m, nil, config)))
 	}
 	intermediate := b.timed(smtSolver(), 2000)
+	nlsatSolver := b.using(b.keep(nlsattactic.NewNLSATTactic(m, c, g, nlsatParams, config.ModelEvaluator)), nlsatParams)
+	nlsatAttempt := b.then(
+		simplify(nlsatParams),
+		b.timed(nlsatSolver, 3000),
+		b.keep(tactic.NewFailIfUndecidedTactic(), nil),
+	)
 	fallback := smtSolver()
-	body := b.then(preamble, b.otherwise(bounded, intermediate, fallback))
+	body := b.then(preamble, b.otherwise(bounded, intermediate, nlsatAttempt, fallback))
 	if b.err != nil {
 		return nil, b.err
 	}
