@@ -1,0 +1,75 @@
+package qe
+
+// Source: src/muz/spacer/spacer_qe_project.cpp
+// array_select_reducer.
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
+)
+
+func TestLegacyArrayProjectionReducesModelSelectedStore(t *testing.T) {
+	f := newFMFixture(t)
+	m := f.r.manager
+	p, err := newLegacyArrayProjection(m, f.r.config)
+	fmMust(t, err)
+	defer func() { fmMust(t, p.Close()) }()
+	arraySort := f.own(m.MkArraySort(ast.SliceArguments([]ast.ASTHandle{f.integer}), f.integer))
+	a := f.constant("legacy-reduce-array", arraySort)
+	i := f.constant("legacy-reduce-i", f.integer)
+	j := f.constant("legacy-reduce-j", f.integer)
+	one := f.own(m.ArithmeticIntegerNumeralText("1"))
+	seven := f.own(m.ArithmeticIntegerNumeralText("7"))
+	stored := f.own(m.MkFamilyApp(p.syntax.family, ast.ASTArrayOpStore, nil, []ast.ASTHandle{a, i, seven}))
+	selected := f.own(m.MkFamilyApp(p.syntax.family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{stored, j}))
+	formula := f.own(m.MkEq(selected, seven))
+	md, err := model.NewModel(m)
+	fmMust(t, err)
+	defer func() { fmMust(t, md.Close()) }()
+	for _, variable := range []ast.ASTHandle{i, j} {
+		decl, err := m.GetDecl(variable)
+		fmMust(t, err)
+		fmMust(t, md.Core().RegisterConstant(decl, one))
+	}
+	zero := f.own(m.ArithmeticIntegerNumeralText("0"))
+	base := f.own(m.MkConstArray(arraySort, zero))
+	aDecl, err := m.GetDecl(a)
+	fmMust(t, err)
+	fmMust(t, md.Core().RegisterConstant(aDecl, base))
+	result, err := p.reduceSelects(md.Core(), []ast.ASTHandle{a}, formula, false)
+	fmMust(t, err)
+	defer func() { fmMust(t, result.Close()) }()
+	handle, err := m.RefGet(result.formula)
+	fmMust(t, err)
+	seen := make(map[ast.ASTHandle]bool)
+	work := []ast.ASTHandle{handle}
+	for len(work) != 0 {
+		last := len(work) - 1
+		current := work[last]
+		work = work[:last]
+		if seen[current] {
+			continue
+		}
+		seen[current] = true
+		_, storeTerm, err := p.syntax.operation(current, p.syntax.family, ast.ASTArrayOpStore)
+		fmMust(t, err)
+		_, selectTerm, err := p.syntax.operation(current, p.syntax.family, ast.ASTArrayOpSelect)
+		fmMust(t, err)
+		if storeTerm || selectTerm {
+			t.Fatal("selected store chain remains after reduction")
+		}
+		kind, err := m.GetKind(current)
+		fmMust(t, err)
+		if kind == ast.ASTApp {
+			count, err := m.GetNumArgs(current)
+			fmMust(t, err)
+			for index := uint32(0); index < count; index++ {
+				child, err := m.GetArg(current, index)
+				fmMust(t, err)
+				work = append(work, child)
+			}
+		}
+	}
+}

@@ -7,10 +7,12 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 )
 
 type legacyArrayProjection struct {
 	syntax *ArrayProjection
+	theory *rewriter.TheoryRewriter
 }
 
 type legacyArrayEqualities struct {
@@ -27,14 +29,22 @@ func newLegacyArrayProjection(manager *ast.ASTManager, config Config) (*legacyAr
 	if err != nil {
 		return nil, err
 	}
-	return &legacyArrayProjection{syntax: syntax}, nil
+	theory, err := rewriter.NewTheoryRewriter(manager, config.Context, config.Globals, nil)
+	if err != nil {
+		return nil, errors.Join(err, syntax.Close())
+	}
+	return &legacyArrayProjection{syntax: syntax, theory: theory}, nil
 }
 
 func (p *legacyArrayProjection) Close() error {
 	if p == nil || p.syntax == nil {
 		return ast.ErrASTHandle
 	}
-	err := p.syntax.Close()
+	err := p.theory.Close()
+	if err == nil {
+		p.theory = nil
+		err = p.syntax.Close()
+	}
 	if err == nil {
 		p.syntax = nil
 	}
