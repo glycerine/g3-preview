@@ -22,6 +22,7 @@ func TestSpacerContextSolvesFactAndRecursiveNoBasePrograms(t *testing.T) {
 	spacerMust(t, err)
 	globals, err := command.GlobalParameters()
 	spacerMust(t, err)
+	spacerMust(t, globals.SourceSetName("fixedpoint.pdr.validate_result", "true"))
 	config := smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals}
 	boolean, err := manager.MkBoolSort()
 	spacerMust(t, err)

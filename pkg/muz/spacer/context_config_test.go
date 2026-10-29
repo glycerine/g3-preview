@@ -70,6 +70,23 @@ func TestContextCanDisableInductiveGeneralizer(t *testing.T) {
 	}
 }
 
+func TestContextConsumesResultValidationPolicy(t *testing.T) {
+	manager, globals := newSpacerTestServices(t)
+	if err := globals.SourceSetName("fixedpoint.pdr.validate_result", "true"); err != nil {
+		t.Fatal(err)
+	}
+	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !context.validateResult {
+		t.Fatal("result validation policy was not retained")
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestContextConsumesMinCutCoreMode(t *testing.T) {
 	manager, globals := newSpacerTestServices(t)
 	if err := globals.SourceSetName("fixedpoint.spacer.minimize_unsat_core", "true"); err != nil {

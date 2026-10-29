@@ -47,6 +47,7 @@ type Context struct {
 	quantifiedLemmas bool
 	groundCTI        bool
 	weakAbstraction  bool
+	validateResult   bool
 	initialized      bool
 	solved           bool
 	closed           bool
@@ -153,6 +154,10 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	validateResult, err := getBool("pdr.validate_result", false)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
 		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
@@ -163,6 +168,7 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 		instantiate: instantiate, quantifiedLemmas: quantifiedLemmas,
 		groundCTI:       groundCTI,
 		weakAbstraction: weakAbstraction,
+		validateResult:  validateResult,
 	}, nil
 }
 
@@ -536,7 +542,7 @@ func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr e
 		}
 		if reachable {
 			c.lastResult = lbool.True
-			return c.lastResult, nil
+			return c.lastResult, c.validate()
 		}
 		if level > 0 && !c.skipPropagate {
 			inductive, err := c.propagate(c.queue.ExpandedLevel(), level)
@@ -546,7 +552,7 @@ func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr e
 			if inductive {
 				c.inductive = level
 				c.lastResult = lbool.False
-				return c.lastResult, nil
+				return c.lastResult, c.validate()
 			}
 		}
 		if err = c.queue.IncrementLevel(); err != nil {

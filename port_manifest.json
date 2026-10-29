@@ -88684,6 +88684,7 @@
       "go_targets": [
         "pkg/muz/spacer/context_answer.go",
         "pkg/muz/spacer/context_trace.go",
+        "pkg/muz/spacer/context_validate.go",
         "pkg/muz/spacer/context.go",
         "pkg/muz/spacer/predicate_cover.go",
         "pkg/muz/spacer/predicate_reachable.go",
@@ -88707,6 +88708,7 @@
         "TestContextConsumesGroundCTIPolicy",
         "TestContextMapsSpacerSMTBackendParameters",
         "TestContextConsumesWeakAbstractionPolicy",
+        "TestContextConsumesResultValidationPolicy",
         "TestPropSolverScopesWeakAbstractionParameters",
         "TestSMTContextFixedpointSpacerInductiveExports",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
@@ -89088,7 +89090,7 @@
       "methods_audited": false,
       "ownership_audited": true,
       "methods": [
-        {"name": "retained context/predicate-transformer lifecycle, frames, solving, answers, inductive models, levels and covers", "status": "partial", "go_target": "pkg/muz/spacer/context.go", "tests": ["TestSpacerContextSolvesFactAndRecursiveNoBasePrograms", "TestSpacerRulePredicateTransformerBuildsSourceStateSignature", "TestSMTContextFixedpointSpacerInductiveExports"]},
+        {"name": "retained context/predicate-transformer lifecycle, frames, solving, result validation, answers, inductive models, levels and covers", "status": "partial", "go_target": "pkg/muz/spacer/context.go", "tests": ["TestSpacerContextSolvesFactAndRecursiveNoBasePrograms", "TestContextConsumesResultValidationPolicy", "TestSpacerRulePredicateTransformerBuildsSourceStateSignature", "TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "remaining optional generalizers, transformed-rule inheritance, proof/trace diagnostics and reachable-summary export", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["Context owns predicate transformers and the proof-obligation queue; each transformer owns solver views, frames, reach facts, rules and signature roots. Cover exports transfer one ASTRef to the caller."],
