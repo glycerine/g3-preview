@@ -171669,11 +171669,17 @@
       "status": "ported",
       "go_targets": [
         "pkg/tactic/fpa/fpa2bv_tactic.go",
+        "pkg/tactic/fpa/fpa2bv_tactic_adapter.go",
         "pkg/ast/rewriter/fpa2bv_rewriter.go",
-        "pkg/tactic/tactic_package_boundary.go"
+        "pkg/tactic/tactic_package_boundary.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/fpa2bv_tactic.smt2"
       ],
       "tests": [
-        "TestFPA2BVTacticRewritesGoalAndPublishesSingleResult"
+        "TestFPA2BVTacticRewritesGoalAndPublishesSingleResult",
+        "TestSMTLibRunnerScripts/fpa2bv_tactic.smt2",
+        "TestSMTLibRunnerCPPReference/fpa2bv_tactic.smt2"
       ],
       "assertions": [
         {
@@ -171689,16 +171695,22 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "complete FPA-to-BV goal pass with parameter updates, rewrite/proof traversal, dependency-preserving updates, auxiliary assertions, optional model converter, depth/result publication, translation, cleanup, and destruction",
+          "name": "complete FPA-to-BV goal pass and counted tactic adapter with parameter updates, rewrite/proof traversal, dependency-preserving updates, auxiliary assertions, optional model converter, depth/result publication, translation, cleanup, destruction, and check-sat-using registration",
           "status": "ported",
-          "go_target": "pkg/tactic/fpa/fpa2bv_tactic.go",
+          "go_targets": [
+            "pkg/tactic/fpa/fpa2bv_tactic.go",
+            "pkg/tactic/fpa/fpa2bv_tactic_adapter.go",
+            "pkg/cmd_context/tactic_commands.go"
+          ],
           "tests": [
-            "TestFPA2BVTacticRewritesGoalAndPublishesSingleResult"
+            "TestFPA2BVTacticRewritesGoalAndPublishesSingleResult",
+            "TestSMTLibRunnerScripts/fpa2bv_tactic.smt2",
+            "TestSMTLibRunnerCPPReference/fpa2bv_tactic.smt2"
           ]
         }
       ],
       "ownership": [
-        "Pass owns its parameter value, converter, and rewriter in source member order. Apply returns an independently retained goal and transfers any model converter to the caller. Temporary rewritten expressions and proofs use ASTRef owners through Goal.Update."
+        "Pass owns its parameter value, converter, and rewriter in source member order. Apply returns an independently retained goal and transfers any model converter to the caller. The counted tactic adapter moves that retained goal and acquires the uncounted converter into TacticResult. Temporary rewritten expressions and proofs use ASTRef owners through Goal.Update."
       ],
       "deviations": [
         "The post-rewrite OP_FPA_IS_NAN auxiliary-lemma branch is unreachable for the retained rewriter: classification applications are reduced to Boolean/BV expressions before publication. The converter's canonical NaN encoding already fixes the three fields, so no dead adapter is added."

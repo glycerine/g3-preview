@@ -22,6 +22,7 @@ import (
 	"github.com/glycerine/g3/pkg/tactic/arith"
 	"github.com/glycerine/g3/pkg/tactic/bv"
 	"github.com/glycerine/g3/pkg/tactic/core"
+	fpatactic "github.com/glycerine/g3/pkg/tactic/fpa"
 	"github.com/glycerine/g3/pkg/tactic/smtlogics"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
@@ -55,7 +56,7 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return nil, err
 	}
 	switch name {
-	case "qe-light", "qsat", "qe2", "qe_rec", "smt", "nlsat", "horn", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "elim-term-ite", "tseitin-cnf", "tseitin-cnf-core", "factor", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "dt2bv", "bv_bound_chk", "reduce-bv-size", "reduce-args", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "nla2bv", "diff-neq", "lia2pb", "card2bv", "pb2bv", "qfbv", "qfaufbv", "qfufbv", "qfufbv_ackr", "qfidl", "qflia", "qfnia", "qfnra", "qfauflia", "qflra", "qfuf", "ufnia", "uflra", "auflia", "auflira", "aufnira", "skip", "fail", "fail-if-undecided":
+	case "qe-light", "qsat", "qe2", "qe_rec", "smt", "nlsat", "horn", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "elim-term-ite", "tseitin-cnf", "tseitin-cnf-core", "factor", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "fpa2bv", "dt2bv", "bv_bound_chk", "reduce-bv-size", "reduce-args", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "nla2bv", "diff-neq", "lia2pb", "card2bv", "pb2bv", "qfbv", "qfaufbv", "qfufbv", "qfufbv_ackr", "qfidl", "qflia", "qfnia", "qfnra", "qfauflia", "qflra", "qfuf", "ufnia", "uflra", "auflia", "auflira", "aufnira", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -121,6 +122,8 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return bv.MakeBitBlasterTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator.Cooperation)
 	case "bv1-blast":
 		return bv.MakeBV1BlasterTactic(m, c.config.Params, c.config.Globals, nil, c.config.ModelEvaluator.Cooperation)
+	case "fpa2bv":
+		return fpatactic.NewFPA2BVTactic(m, c.config.Params, c.config.Globals, nil)
 	case "dt2bv":
 		return bv.NewDT2BVTactic(m, c.config.Params, nil, c.config.ModelEvaluator)
 	case "reduce-bv-size":
