@@ -15,7 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.RuleSet, resultErr error) {
+func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *hornPreprocessResult, resultErr error) {
 	var slicedPredicates map[ast.ASTHandle]ast.ASTHandle
 	var slicedColumns map[ast.ASTHandle][]bool
 	prepared, err := base.NewRuleSet(e.rules)
@@ -389,16 +389,18 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 			return nil, fmt.Errorf("muz/fp: Spacer rule unfolding round %d: %w", round+1, err)
 		}
 	}
-	e.spacerPredicates = slicedPredicates
-	e.spacerSlices = slicedColumns
-	e.spacerQuantified = quantifiedPredicates
-	e.spacerInstantiated = instantiatedPredicates
-	e.spacerBitBlasted = bitBlastedPredicates
-	e.spacerScaled = scaledPredicates
-	e.spacerMagic = magicPredicates
-	e.spacerKarr = karrInvariants
 	keep = true
-	return prepared, nil
+	return &hornPreprocessResult{
+		rules:                  prepared,
+		slicedPredicates:       slicedPredicates,
+		slicedColumns:          slicedColumns,
+		quantifiedPredicates:   quantifiedPredicates,
+		instantiatedPredicates: instantiatedPredicates,
+		bitBlastedPredicates:   bitBlastedPredicates,
+		scaledPredicates:       scaledPredicates,
+		magicPredicates:        magicPredicates,
+		karrInvariants:         karrInvariants,
+	}, nil
 }
 
 func (e *PropositionalEngine) querySpacer(declaration ast.ASTHandle) (_ lbool.LBool, resultErr error) {
@@ -433,11 +435,20 @@ func (e *PropositionalEngine) querySpacerFromLevel(declaration ast.ASTHandle, fr
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
 	}
-	prepared, err := e.preprocessHornRules(declaration)
+	preprocessed, err := e.preprocessHornRules(declaration)
 	if err != nil {
 		return lbool.Undef, err
 	}
-	defer func() { resultErr = errors.Join(resultErr, prepared.Close()) }()
+	defer func() { resultErr = errors.Join(resultErr, preprocessed.Close()) }()
+	prepared := preprocessed.rules
+	e.spacerPredicates = preprocessed.slicedPredicates
+	e.spacerSlices = preprocessed.slicedColumns
+	e.spacerQuantified = preprocessed.quantifiedPredicates
+	e.spacerInstantiated = preprocessed.instantiatedPredicates
+	e.spacerBitBlasted = preprocessed.bitBlastedPredicates
+	e.spacerScaled = preprocessed.scaledPredicates
+	e.spacerMagic = preprocessed.magicPredicates
+	e.spacerKarr = preprocessed.karrInvariants
 	queryDeclaration, deriveErr := prepared.DerivedPredicate(declaration)
 	if deriveErr != nil {
 		return lbool.Undef, fmt.Errorf("muz/fp: resolve preprocessed Spacer query: %w", deriveErr)
