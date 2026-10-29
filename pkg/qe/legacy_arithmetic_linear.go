@@ -8,10 +8,12 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 )
 
 type legacyArithmeticProjection struct {
 	syntax *ArithmeticProjection
+	theory *rewriter.TheoryRewriter
 }
 
 type legacyLinearLiteral struct {
@@ -29,14 +31,27 @@ func newLegacyArithmeticProjection(manager *ast.ASTManager, config Config) (*leg
 	if err != nil {
 		return nil, err
 	}
-	return &legacyArithmeticProjection{syntax: syntax}, nil
+	theory, err := rewriter.NewTheoryRewriter(manager, config.Context, config.Globals, nil)
+	if err != nil {
+		return nil, errors.Join(err, syntax.Close())
+	}
+	return &legacyArithmeticProjection{syntax: syntax, theory: theory}, nil
 }
 
 func (p *legacyArithmeticProjection) Close() error {
 	if p == nil || p.syntax == nil {
 		return ast.ErrASTHandle
 	}
-	err := p.syntax.Close()
+	var err error
+	if p.theory != nil {
+		err = p.theory.Close()
+	}
+	if err == nil && p.theory != nil {
+		p.theory = nil
+	}
+	if err == nil {
+		err = p.syntax.Close()
+	}
 	if err == nil {
 		p.syntax = nil
 	}
