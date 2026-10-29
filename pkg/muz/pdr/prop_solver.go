@@ -21,6 +21,7 @@ type PropCheckResult struct {
 	Model        *model.ModelCore
 	AssumesLevel bool
 	FarkasCore   bool
+	Consequences []ast.ASTHandle
 }
 
 // PropSolver is the PDR-facing frame and safe-assumption wrapper over one
@@ -623,23 +624,7 @@ func (p *PropSolver) clearCoreReferences() (result error) {
 	return result
 }
 
-func (p *PropSolver) extractTheoryCore(safe *safeAssumptions) (_ []ast.ASTHandle, resultErr error) {
-	if p.contexts.config.Params == nil || p.contexts.config.Globals == nil {
-		return nil, nil
-	}
-	proof, err := p.context.Proof()
-	if err != nil || proof.IsNull() {
-		return nil, err
-	}
-	learner, err := NewFarkasLearner(p.manager, p.contexts.config.Params, p.contexts.config.Globals)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { resultErr = errors.Join(resultErr, learner.Close()) }()
-	learned, err := learner.GetLemmas(proof, safe.atoms)
-	if err != nil {
-		return nil, err
-	}
+func (p *PropSolver) publishTheoryResults(safe *safeAssumptions, learned []ast.ASTRef) (_ []ast.ASTHandle, resultErr error) {
 	committed := false
 	defer func() {
 		if committed {
@@ -692,20 +677,49 @@ func (p *PropSolver) extractTheoryCore(safe *safeAssumptions) (_ []ast.ASTHandle
 			learned[i] = rewritten
 		}
 	}
-	core := make([]ast.ASTHandle, 0, len(learned))
+	result := make([]ast.ASTHandle, 0, len(learned))
 	for i := range learned {
 		handle, err := p.manager.RefGet(learned[i])
 		if err != nil {
 			return nil, err
 		}
-		core = append(core, handle)
+		result = append(result, handle)
 	}
 	p.coreReferences = append(p.coreReferences, learned...)
 	committed = true
-	return core, nil
+	return result, nil
 }
 
-func (p *PropSolver) check(atoms []ast.ASTHandle, formula ast.ASTHandle, level *uint32, wantCore, wantModel bool) (result PropCheckResult, resultErr error) {
+func (p *PropSolver) extractTheoryCore(safe *safeAssumptions, wantConsequences bool) (_ []ast.ASTHandle, _ []ast.ASTHandle, resultErr error) {
+	if p.contexts.config.Params == nil || p.contexts.config.Globals == nil {
+		return nil, nil, nil
+	}
+	proof, err := p.context.Proof()
+	if err != nil || proof.IsNull() {
+		return nil, nil, err
+	}
+	learner, err := NewFarkasLearner(p.manager, p.contexts.config.Params, p.contexts.config.Globals)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, learner.Close()) }()
+	learned, err := learner.GetLemmas(proof, safe.atoms)
+	if err != nil {
+		return nil, nil, err
+	}
+	core, err := p.publishTheoryResults(safe, learned)
+	if err != nil || len(core) == 0 || !wantConsequences {
+		return core, nil, err
+	}
+	learnedConsequences, err := learner.GetConsequences(proof, safe.atoms)
+	if err != nil {
+		return nil, nil, err
+	}
+	consequences, err := p.publishTheoryResults(safe, learnedConsequences)
+	return core, consequences, err
+}
+
+func (p *PropSolver) check(atoms []ast.ASTHandle, formula ast.ASTHandle, level *uint32, wantCore, wantModel, wantConsequences bool) (result PropCheckResult, resultErr error) {
 	if err := p.open(); err != nil {
 		return result, err
 	}
@@ -784,13 +798,14 @@ func (p *PropSolver) check(atoms []ast.ASTHandle, formula ast.ASTHandle, level *
 			return result, x
 		}
 		if wantCore && p.useFarkas && !p.subsetCore && proofsEnabled {
-			theoryCore, x := p.extractTheoryCore(safe)
+			theoryCore, consequences, x := p.extractTheoryCore(safe, wantConsequences)
 			if x != nil {
 				return result, x
 			}
 			if len(theoryCore) != 0 {
 				result.Core = theoryCore
 				result.FarkasCore = true
+				result.Consequences = consequences
 			}
 		}
 	} else if result.Status == lbool.True && wantModel {
@@ -810,7 +825,7 @@ func (p *PropSolver) CheckAssumptions(atoms []ast.ASTHandle, wantCore, wantModel
 	if err != nil {
 		return PropCheckResult{}, err
 	}
-	return p.check(atoms, truth, nil, wantCore, wantModel)
+	return p.check(atoms, truth, nil, wantCore, wantModel, false)
 }
 
 func (p *PropSolver) CheckAtLevel(level uint32, atoms []ast.ASTHandle, wantCore, wantModel bool) (PropCheckResult, error) {
@@ -821,11 +836,25 @@ func (p *PropSolver) CheckAtLevel(level uint32, atoms []ast.ASTHandle, wantCore,
 	if err != nil {
 		return PropCheckResult{}, err
 	}
-	return p.check(atoms, truth, &level, wantCore, wantModel)
+	return p.check(atoms, truth, &level, wantCore, wantModel, false)
 }
 
 func (p *PropSolver) CheckAssumptionsAndFormula(atoms []ast.ASTHandle, formula ast.ASTHandle, wantCore, wantModel bool) (PropCheckResult, error) {
-	return p.check(atoms, formula, nil, wantCore, wantModel)
+	return p.check(atoms, formula, nil, wantCore, wantModel, false)
+}
+
+// CheckAssumptionsWithConsequences requests the source proof-derived core and
+// its consequence-mode companion. Consequences are retained until the next
+// check or Close, like Farkas core terms.
+func (p *PropSolver) CheckAssumptionsWithConsequences(atoms []ast.ASTHandle, wantModel bool) (PropCheckResult, error) {
+	if err := p.open(); err != nil {
+		return PropCheckResult{}, err
+	}
+	truth, err := p.manager.MkTrue()
+	if err != nil {
+		return PropCheckResult{}, err
+	}
+	return p.check(atoms, truth, nil, true, wantModel, true)
 }
 
 func (p *PropSolver) Close() (result error) {

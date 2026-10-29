@@ -182,6 +182,16 @@ func TestPropSolverExtractsFarkasTheoryCore(t *testing.T) {
 			t.Fatal("Farkas core did not retain its result", err)
 		}
 	}
+	result, err = solver.CheckAssumptionsWithConsequences([]ast.ASTHandle{xNonnegative, yNonnegative}, false)
+	pdrMust(t, err)
+	if result.Status != lbool.False || !result.FarkasCore || len(result.Consequences) == 0 {
+		t.Fatal("Farkas consequence forwarding", result.Status, result.FarkasCore, result.Consequences)
+	}
+	for _, consequence := range result.Consequences {
+		if _, err = manager.GetKind(consequence); err != nil {
+			t.Fatal("Farkas consequence was not retained", err)
+		}
+	}
 	pdrMust(t, solver.SetSubsetBasedCore(true))
 	result, err = solver.CheckAssumptions([]ast.ASTHandle{xNonnegative, yNonnegative}, true, false)
 	pdrMust(t, err)
@@ -212,10 +222,13 @@ func TestPropSolverFarkasCoreRestoresSafeProxy(t *testing.T) {
 	pdrMust(t, err)
 	pdrMust(t, solver.AddFormula(notP))
 	pdrMust(t, solver.AddFormula(notQ))
-	result, err := solver.CheckAssumptions([]ast.ASTHandle{disjunction}, true, false)
+	result, err := solver.CheckAssumptionsWithConsequences([]ast.ASTHandle{disjunction}, false)
 	pdrMust(t, err)
 	if result.Status != lbool.False || !result.FarkasCore || len(result.Core) != 1 || result.Core[0] != disjunction {
 		t.Fatal("Farkas proxy restoration", result.Status, result.FarkasCore, result.Core, disjunction)
+	}
+	if len(result.Consequences) != 1 || result.Consequences[0] != disjunction {
+		t.Fatal("Farkas consequence proxy restoration", result.Consequences, disjunction)
 	}
 	pdrMust(t, solver.Close())
 	pdrMust(t, contexts.Close())
