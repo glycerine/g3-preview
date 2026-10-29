@@ -42,6 +42,36 @@ func TestSpacerManagerBuildsStateAndPropSolverServices(t *testing.T) {
 	if converted, err := owner.OldToOld(old0, 0, 1); err != nil || converted != old1 {
 		t.Fatal("old-to-old", converted, old1, err)
 	}
+	currentAtom, err := manager.MkApp(current, nil)
+	spacerMust(t, err)
+	old0Atom, err := manager.MkApp(old0, nil)
+	spacerMust(t, err)
+	old1Atom, err := manager.MkApp(old1, nil)
+	spacerMust(t, err)
+	mixedOld, err := manager.MkAnd(old0Atom, old1Atom)
+	spacerMust(t, err)
+	if isNew, err := owner.IsNewFormula(currentAtom); err != nil || !isNew {
+		t.Fatal("new formula classification", isNew, err)
+	}
+	if isOld, err := owner.IsOldFormula(old0Atom); err != nil || !isOld {
+		t.Fatal("old formula classification", isOld, err)
+	}
+	if homogeneous, err := owner.IsHomogeneousFormula(mixedOld); err != nil || homogeneous {
+		t.Fatal("mixed old formula classification", homogeneous, err)
+	}
+	indices, err := owner.CollectStateIndices(mixedOld)
+	spacerMust(t, err)
+	if len(indices) != 2 || indices[0] != 0 || indices[1] != 1 {
+		t.Fatal("manager state indices", indices)
+	}
+	if different, err := owner.HaveDifferentStateKinds(old0, old1); err != nil || !different {
+		t.Fatal("different state kinds", different, err)
+	}
+	filtered, err := owner.FilterOldAtoms([]ast.ASTHandle{currentAtom, old0Atom, old1Atom, mixedOld}, 0)
+	spacerMust(t, err)
+	if len(filtered) != 1 || filtered[0] != old0Atom {
+		t.Fatal("manager old-atom filter", filtered)
+	}
 	if first, err := owner.Unique(); err != nil || first != 0 {
 		t.Fatal("first unique", first, err)
 	}

@@ -182,6 +182,89 @@ func (m *Manager) FormulaOldToNew(formula ast.ASTHandle, oldIndex uint32, homoge
 	return m.mux.ConvertFormula(formula, oldIndex+1, 0, homogeneous)
 }
 
+func (m *Manager) IsOldFormula(formula ast.ASTHandle) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	containsNew, err := m.mux.Contains(formula, 0)
+	return !containsNew, err
+}
+
+func (m *Manager) IsOldFormulaAt(formula ast.ASTHandle, oldIndex uint32) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	return m.mux.IsHomogeneousAt(formula, oldIndex+1)
+}
+
+func (m *Manager) IsNewFormula(formula ast.ASTHandle) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	return m.mux.IsHomogeneousAt(formula, 0)
+}
+
+func (m *Manager) IsHomogeneousFormula(formula ast.ASTHandle) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	return m.mux.IsHomogeneous(formula)
+}
+
+func (m *Manager) CollectStateIndices(formula ast.ASTHandle) ([]uint32, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	return m.mux.CollectIndices(formula)
+}
+
+func (m *Manager) CollectStateVariables(formula ast.ASTHandle) ([][]ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	return m.mux.CollectVariables(formula)
+}
+
+func (m *Manager) HaveDifferentStateKinds(left, right ast.ASTHandle) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	leftIndex, leftMuxed, err := m.mux.Index(left)
+	if err != nil {
+		return false, err
+	}
+	rightIndex, rightMuxed, err := m.mux.Index(right)
+	return leftMuxed && rightMuxed && leftIndex != rightIndex, err
+}
+
+func (m *Manager) FilterOldAtoms(formulas []ast.ASTHandle, oldIndex uint32) ([]ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	return m.mux.FilterIndex(formulas, oldIndex+1)
+}
+
+func (m *Manager) FilterNewAtoms(formulas []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	return m.mux.FilterIndex(formulas, 0)
+}
+
+func (m *Manager) PartitionOldAtoms(formulas []ast.ASTHandle, oldIndex uint32) ([]ast.ASTHandle, []ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return nil, nil, err
+	}
+	return m.mux.PartitionIndex(formulas, oldIndex+1)
+}
+
+func (m *Manager) FilterNonModelAtoms(formulas []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	return m.mux.FilterNonModel(formulas)
+}
+
 func (m *Manager) SetBackground(background ast.ASTHandle) error {
 	if err := m.open(); err != nil {
 		return err

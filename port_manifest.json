@@ -89700,7 +89700,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/spacer/manager.go"],
-      "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices"],
+      "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"],
       "assertions": [
         {
           "line": 193,
@@ -89750,7 +89750,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/spacer/manager.go"],
-      "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices"],
+      "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"],
       "conditionals": [
         {
           "line": 21,
@@ -89779,13 +89779,19 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "retained manager state conversion, background, solver creation and statistics surface",
+          "name": "retained manager state conversion, homogeneity, state collection/filtering, background, solver creation and statistics surface",
           "status": "ported",
           "go_target": "pkg/muz/spacer/manager.go",
-          "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices"]
+          "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"]
         },
         {
-          "name": "model cubes, atom partition/filter helpers and inductive_property surface",
+          "name": "atom partition/filter helpers",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/manager.go",
+          "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"]
+        },
+        {
+          "name": "model cubes and inductive_property surface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -90322,7 +90328,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/spacer/sym_mux.go"],
-      "tests": ["TestSymMuxCreatesAndRewritesStateVariants"],
+      "tests": ["TestSymMuxCreatesAndRewritesStateVariants", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"],
       "conditionals": [
         {
           "line": 576,
@@ -90415,7 +90421,13 @@
           "tests": ["TestSymMuxCreatesAndRewritesStateVariants"]
         },
         {
-          "name": "homogeneity vector checks, index/variable collectors, literal filtering/partitioning, model cube extraction and model printer",
+          "name": "homogeneity vector checks, index/variable collectors and literal filtering/partitioning",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/sym_mux.go",
+          "tests": ["TestSymMuxClassifiesCollectsAndFiltersStateLiterals", "TestSpacerManagerBuildsStateAndPropSolverServices"]
+        },
+        {
+          "name": "model cube extraction and model printer",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -90435,7 +90447,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/spacer/sym_mux.go"],
-      "tests": ["TestSymMuxCreatesAndRewritesStateVariants"],
+      "tests": ["TestSymMuxCreatesAndRewritesStateVariants", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"],
       "conditionals": [
         {
           "line": 20,
@@ -90462,7 +90474,13 @@
           "tests": ["TestSymMuxCreatesAndRewritesStateVariants"]
         },
         {
-          "name": "model and literal filtering surface",
+          "name": "literal classification and filtering surface",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/sym_mux.go",
+          "tests": ["TestSymMuxClassifiesCollectsAndFiltersStateLiterals"]
+        },
+        {
+          "name": "model cube and diagnostic model surface",
           "status": "unported",
           "go_target": null,
           "tests": []

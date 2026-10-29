@@ -181,6 +181,26 @@ func (m *SymMux) IsMuxed(declaration ast.ASTHandle) (bool, error) {
 	return found, nil
 }
 
+func (m *SymMux) IsMuxedLiteral(expression ast.ASTHandle, _ uint32) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	if negated, argument, err := m.manager.IsNot(expression); err != nil {
+		return false, err
+	} else if negated {
+		expression = argument
+	}
+	kind, err := m.manager.GetKind(expression)
+	if err != nil || kind != ast.ASTApp {
+		return false, err
+	}
+	declaration, err := m.manager.GetDecl(expression)
+	if err != nil {
+		return false, err
+	}
+	return m.IsMuxed(declaration)
+}
+
 func (m *SymMux) Index(declaration ast.ASTHandle) (uint32, bool, error) {
 	if err := m.open(); err != nil {
 		return 0, false, err
@@ -368,12 +388,12 @@ func (m *SymMux) ShiftFormula(formula ast.ASTHandle, distance int) (ast.ASTRef, 
 	return m.manager.NewRef(converted)
 }
 
-func (m *SymMux) Contains(formula ast.ASTHandle, wanted uint32) (bool, error) {
+func (m *SymMux) walkApplications(root ast.ASTHandle, visit func(ast.ASTHandle, ast.ASTHandle) (bool, error)) error {
 	if err := m.open(); err != nil {
-		return false, err
+		return err
 	}
 	seen := make(map[ast.ASTHandle]bool)
-	stack := []ast.ASTHandle{formula}
+	stack := []ast.ASTHandle{root}
 	for len(stack) != 0 {
 		current := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
@@ -383,42 +403,43 @@ func (m *SymMux) Contains(formula ast.ASTHandle, wanted uint32) (bool, error) {
 		seen[current] = true
 		kind, err := m.manager.GetKind(current)
 		if err != nil {
-			return false, err
+			return err
 		}
 		if kind == ast.ASTApp {
 			declaration, err := m.manager.GetDecl(current)
 			if err != nil {
-				return false, err
+				return err
 			}
-			if index, found := m.symbolToIndex[declaration]; found && index == wanted {
-				return true, nil
+			stop, err := visit(current, declaration)
+			if err != nil || stop {
+				return err
 			}
 		}
 		if kind == ast.ASTQuantifier {
 			body, err := m.manager.GetQuantifierBody(current)
 			if err != nil {
-				return false, err
+				return err
 			}
 			stack = append(stack, body)
 			patternCount, err := m.manager.GetNumPatterns(current)
 			if err != nil {
-				return false, err
+				return err
 			}
 			for index := uint32(0); index < patternCount; index++ {
 				pattern, err := m.manager.GetPattern(current, index)
 				if err != nil {
-					return false, err
+					return err
 				}
 				stack = append(stack, pattern)
 			}
 			noPatternCount, err := m.manager.GetNumNoPatterns(current)
 			if err != nil {
-				return false, err
+				return err
 			}
 			for index := uint32(0); index < noPatternCount; index++ {
 				pattern, err := m.manager.GetNoPattern(current, index)
 				if err != nil {
-					return false, err
+					return err
 				}
 				stack = append(stack, pattern)
 			}
@@ -426,18 +447,117 @@ func (m *SymMux) Contains(formula ast.ASTHandle, wanted uint32) (bool, error) {
 		if kind == ast.ASTApp {
 			count, err := m.manager.GetNumArgs(current)
 			if err != nil {
-				return false, err
+				return err
 			}
 			for index := uint32(0); index < count; index++ {
 				argument, err := m.manager.GetArg(current, index)
 				if err != nil {
-					return false, err
+					return err
 				}
 				stack = append(stack, argument)
 			}
 		}
 	}
-	return false, nil
+	return nil
+}
+
+func (m *SymMux) Contains(formula ast.ASTHandle, wanted uint32) (bool, error) {
+	found := false
+	err := m.walkApplications(formula, func(_ ast.ASTHandle, declaration ast.ASTHandle) (bool, error) {
+		index, muxed := m.symbolToIndex[declaration]
+		found = muxed && index == wanted
+		return found, nil
+	})
+	return found, err
+}
+
+func (m *SymMux) IsHomogeneousAt(formula ast.ASTHandle, wanted uint32) (bool, error) {
+	homogeneous := true
+	err := m.walkApplications(formula, func(_ ast.ASTHandle, declaration ast.ASTHandle) (bool, error) {
+		index, muxed := m.symbolToIndex[declaration]
+		homogeneous = !muxed || index == wanted
+		return !homogeneous, nil
+	})
+	return homogeneous, err
+}
+
+func (m *SymMux) IsHomogeneous(formula ast.ASTHandle) (bool, error) {
+	var first uint32
+	found := false
+	homogeneous := true
+	err := m.walkApplications(formula, func(_ ast.ASTHandle, declaration ast.ASTHandle) (bool, error) {
+		index, muxed := m.symbolToIndex[declaration]
+		if !muxed {
+			return false, nil
+		}
+		if !found {
+			first, found = index, true
+		} else if first != index {
+			homogeneous = false
+		}
+		return !homogeneous, nil
+	})
+	return homogeneous, err
+}
+
+func (m *SymMux) IsHomogeneousAll(formulas []ast.ASTHandle, wanted uint32) (bool, error) {
+	for _, formula := range formulas {
+		homogeneous, err := m.IsHomogeneousAt(formula, wanted)
+		if err != nil || !homogeneous {
+			return false, err
+		}
+	}
+	return true, nil
+}
+
+func (m *SymMux) CollectIndices(formula ast.ASTHandle) ([]uint32, error) {
+	seen := make(map[uint32]bool)
+	maximum := uint32(0)
+	err := m.walkApplications(formula, func(_ ast.ASTHandle, declaration ast.ASTHandle) (bool, error) {
+		index, muxed := m.symbolToIndex[declaration]
+		if !muxed {
+			return false, nil
+		}
+		if index == 0 {
+			return false, ast.ErrASTDomain
+		}
+		index--
+		seen[index] = true
+		if index > maximum {
+			maximum = index
+		}
+		return false, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	result := make([]uint32, 0, len(seen))
+	for index := uint32(0); len(result) != len(seen) && index <= maximum; index++ {
+		if seen[index] {
+			result = append(result, index)
+		}
+	}
+	return result, nil
+}
+
+func (m *SymMux) CollectVariables(formula ast.ASTHandle) ([][]ast.ASTHandle, error) {
+	var result [][]ast.ASTHandle
+	err := m.walkApplications(formula, func(application, declaration ast.ASTHandle) (bool, error) {
+		index, muxed := m.symbolToIndex[declaration]
+		if !muxed {
+			return false, nil
+		}
+		if index == 0 {
+			return false, ast.ErrASTDomain
+		}
+		index--
+		for uint32(len(result)) <= index {
+			result = append(result, nil)
+		}
+		result[index] = append(result[index], application)
+		return false, nil
+	})
+	return result, err
 }
 
 func (m *SymMux) MarkNonModel(declaration ast.ASTHandle) error {
@@ -446,6 +566,88 @@ func (m *SymMux) MarkNonModel(declaration ast.ASTHandle) error {
 		m.nonModel[primary] = true
 	}
 	return err
+}
+
+func (m *SymMux) FilterIndex(formulas []ast.ASTHandle, wanted uint32) ([]ast.ASTHandle, error) {
+	result := append([]ast.ASTHandle(nil), formulas...)
+	for index := 0; index < len(result); {
+		contains, err := m.Contains(result[index], wanted)
+		if err != nil {
+			return nil, err
+		}
+		homogeneous, err := m.IsHomogeneousAt(result[index], wanted)
+		if err != nil {
+			return nil, err
+		}
+		if contains && homogeneous {
+			index++
+		} else {
+			result[index] = result[len(result)-1]
+			result = result[:len(result)-1]
+		}
+	}
+	return result, nil
+}
+
+func (m *SymMux) PartitionIndex(formulas []ast.ASTHandle, wanted uint32) (matching, other []ast.ASTHandle, resultErr error) {
+	for _, formula := range formulas {
+		contains, err := m.Contains(formula, wanted)
+		if err != nil {
+			return nil, nil, err
+		}
+		homogeneous, err := m.IsHomogeneousAt(formula, wanted)
+		if err != nil {
+			return nil, nil, err
+		}
+		if contains && homogeneous {
+			matching = append(matching, formula)
+		} else {
+			other = append(other, formula)
+		}
+	}
+	return matching, other, nil
+}
+
+func (m *SymMux) IsNonModel(declaration ast.ASTHandle) (bool, error) {
+	if err := m.open(); err != nil {
+		return false, err
+	}
+	primary, found := m.symbolToPrim[declaration]
+	return found && m.nonModel[primary], nil
+}
+
+func (m *SymMux) HasNonModelSymbol(formula ast.ASTHandle) (bool, error) {
+	found := false
+	err := m.walkApplications(formula, func(_ ast.ASTHandle, declaration ast.ASTHandle) (bool, error) {
+		primary, muxed := m.symbolToPrim[declaration]
+		found = muxed && m.nonModel[primary]
+		return found, nil
+	})
+	return found, err
+}
+
+func (m *SymMux) FilterNonModel(formulas []ast.ASTHandle) ([]ast.ASTHandle, error) {
+	result := append([]ast.ASTHandle(nil), formulas...)
+	for index := 0; index < len(result); {
+		remove, err := m.HasNonModelSymbol(result[index])
+		if err != nil {
+			return nil, err
+		}
+		if !remove {
+			index++
+		} else {
+			result[index] = result[len(result)-1]
+			result = result[:len(result)-1]
+		}
+	}
+	return result, nil
+}
+
+func (m *SymMux) PrimaryPredicates() ([]ast.ASTHandle, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	return append([]ast.ASTHandle(nil), m.primary...), nil
 }
 
 func (m *SymMux) Close() (result error) {

@@ -99,3 +99,83 @@ func TestSymMuxCreatesAndRewritesStateVariants(t *testing.T) {
 	spacerMust(t, mux.Close())
 	spacerMust(t, command.Close())
 }
+
+func TestSymMuxClassifiesCollectsAndFiltersStateLiterals(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	spacerMust(t, err)
+	manager, err := command.Manager()
+	spacerMust(t, err)
+	boolean, err := manager.MkBoolSort()
+	spacerMust(t, err)
+	name, err := manager.Symbols.Intern("ClassifiedState")
+	spacerMust(t, err)
+	prefix, err := manager.MkFuncDecl(name, nil, boolean, ast.ASTFuncDeclInfo{})
+	spacerMust(t, err)
+	mux, err := spacer.NewSymMux(manager, []string{"_n"})
+	spacerMust(t, err)
+	tuple, err := mux.CreateTuple(prefix, 2)
+	spacerMust(t, err)
+	thirdDeclaration, err := mux.ConvertDeclaration(tuple[1], 1, 2)
+	spacerMust(t, err)
+	current, err := manager.MkApp(tuple[0], nil)
+	spacerMust(t, err)
+	old, err := manager.MkApp(tuple[1], nil)
+	spacerMust(t, err)
+	third, err := manager.MkApp(thirdDeclaration, nil)
+	spacerMust(t, err)
+	mixed, err := manager.MkAnd(old, third)
+	spacerMust(t, err)
+	plain, err := manager.MkTrue()
+	spacerMust(t, err)
+	notOld, err := manager.MkNot(old)
+	spacerMust(t, err)
+	if muxed, err := mux.IsMuxedLiteral(notOld, 99); err != nil || !muxed {
+		t.Fatal("negated muxed literal classification", muxed, err)
+	}
+
+	if homogeneous, err := mux.IsHomogeneousAt(old, 1); err != nil || !homogeneous {
+		t.Fatal("old-state homogeneity", homogeneous, err)
+	}
+	if homogeneous, err := mux.IsHomogeneous(mixed); err != nil || homogeneous {
+		t.Fatal("mixed-state homogeneity", homogeneous, err)
+	}
+	if _, err = mux.CollectIndices(current); err == nil {
+		t.Fatal("current-state index collector accepted source index zero")
+	}
+	indices, err := mux.CollectIndices(mixed)
+	spacerMust(t, err)
+	if len(indices) != 2 || indices[0] != 0 || indices[1] != 1 {
+		t.Fatal("collected state indices", indices)
+	}
+	variables, err := mux.CollectVariables(mixed)
+	spacerMust(t, err)
+	if len(variables) != 2 || len(variables[0]) != 1 || variables[0][0] != old || len(variables[1]) != 1 || variables[1][0] != third {
+		t.Fatal("collected state variables", variables)
+	}
+	filtered, err := mux.FilterIndex([]ast.ASTHandle{plain, old, third, mixed}, 1)
+	spacerMust(t, err)
+	if len(filtered) != 1 || filtered[0] != old {
+		t.Fatal("state-index filter", filtered)
+	}
+	matching, other, err := mux.PartitionIndex([]ast.ASTHandle{plain, old, third, mixed}, 2)
+	spacerMust(t, err)
+	if len(matching) != 1 || matching[0] != third || len(other) != 3 {
+		t.Fatal("state-index partition", matching, other)
+	}
+	spacerMust(t, mux.MarkNonModel(tuple[1]))
+	if nonModel, err := mux.IsNonModel(thirdDeclaration); err != nil || !nonModel {
+		t.Fatal("tuple-wide non-model marker", nonModel, err)
+	}
+	kept, err := mux.FilterNonModel([]ast.ASTHandle{plain, old, third, mixed})
+	spacerMust(t, err)
+	if len(kept) != 1 || kept[0] != plain {
+		t.Fatal("non-model literal filter", kept)
+	}
+	primaries, err := mux.PrimaryPredicates()
+	spacerMust(t, err)
+	if len(primaries) != 1 || primaries[0] != tuple[0] {
+		t.Fatal("primary predicates", primaries)
+	}
+	spacerMust(t, mux.Close())
+	spacerMust(t, command.Close())
+}
