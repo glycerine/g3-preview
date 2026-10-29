@@ -57,9 +57,10 @@ func TestFarkasLearnerRecognizesArithmeticTheoryLemma(t *testing.T) {
 	pdrMust(t, err)
 	coefficientValue, err := manager.NumeralService().NewValue()
 	pdrMust(t, err)
-	pdrMust(t, manager.NumeralService().SetString(&coefficientValue, "1"))
+	pdrMust(t, manager.NumeralService().SetString(&coefficientValue, "-3/2"))
 	coefficient0, err := manager.NewParameterRational(&coefficientValue)
 	pdrMust(t, err)
+	pdrMust(t, manager.NumeralService().SetString(&coefficientValue, "5"))
 	coefficient1, err := manager.NewParameterRational(&coefficientValue)
 	pdrMust(t, err)
 	pdrMust(t, manager.NumeralService().Del(&coefficientValue))
@@ -73,6 +74,14 @@ func TestFarkasLearnerRecognizesArithmeticTheoryLemma(t *testing.T) {
 	pdrMust(t, err)
 	if !matched {
 		t.Fatal("arithmetic Farkas theory lemma was not recognized")
+	}
+	facts, coefficients, matched, err := learner.FarkasPremises(lemma)
+	pdrMust(t, err)
+	if !matched || len(facts) != 2 || facts[0] != le || facts[1] != ge {
+		t.Fatal("Farkas parent facts were not extracted in proof order", matched, facts)
+	}
+	if coefficients[0].Cmp(big.NewRat(3, 2)) != 0 || coefficients[1].Cmp(big.NewRat(5, 1)) != 0 {
+		t.Fatal("Farkas coefficients were not extracted and normalized", coefficients)
 	}
 	matched, err = learner.IsFarkasLemma(premise0)
 	pdrMust(t, err)

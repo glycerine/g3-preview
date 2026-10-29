@@ -83689,7 +83689,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "is_farkas_lemma and combine_constraints coefficient/literal modes",
+          "name": "is_farkas_lemma, ordered parent-fact/coefficient extraction and combine_constraints coefficient/literal modes",
           "status": "ported",
           "go_target": "pkg/muz/pdr/farkas_learner.go",
           "tests": [
@@ -83737,7 +83737,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "learner construction, Farkas recognition and constraint combination surface",
+          "name": "learner construction, Farkas recognition, parent-fact/coefficient extraction and constraint combination surface",
           "status": "ported",
           "go_target": "pkg/muz/pdr/farkas_learner.go",
           "tests": [

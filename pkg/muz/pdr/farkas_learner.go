@@ -111,6 +111,78 @@ func (f *FarkasLearner) IsFarkasLemma(proof ast.ASTHandle) (_ bool, resultErr er
 	return farkas, err
 }
 
+func (f *FarkasLearner) rationalParameter(parameter ast.ASTParameter) (_ *big.Rat, resultErr error) {
+	service := f.manager.NumeralService()
+	value, err := service.NewValue()
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, service.Del(&value)) }()
+	matched, err := f.manager.ParameterRationalCopy(parameter, &value)
+	if err != nil {
+		return nil, err
+	}
+	if !matched {
+		return nil, ast.ErrASTDomain
+	}
+	text, err := service.String(&value)
+	if err != nil {
+		return nil, err
+	}
+	coefficient, ok := new(big.Rat).SetString(text)
+	if !ok {
+		return nil, ast.ErrASTDomain
+	}
+	return coefficient, nil
+}
+
+// FarkasPremises returns the borrowed fact of each proof parent and its
+// coefficient. Coefficients are made nonnegative, matching the source
+// learner's workaround before it combines constraints.
+func (f *FarkasLearner) FarkasPremises(proof ast.ASTHandle) (_ []ast.ASTHandle, _ []*big.Rat, _ bool, resultErr error) {
+	matched, err := f.IsFarkasLemma(proof)
+	if err != nil || !matched {
+		return nil, nil, matched, err
+	}
+	declaration, err := f.manager.GetDecl(proof)
+	if err != nil {
+		return nil, nil, false, err
+	}
+	parameters, err := f.manager.GetDeclParametersCopy(declaration)
+	if err != nil {
+		return nil, nil, false, err
+	}
+	defer func() {
+		for i := range parameters {
+			resultErr = errors.Join(resultErr, f.manager.DelParameter(&parameters[i]))
+		}
+	}()
+	count, err := f.manager.GetProofNumParents(proof)
+	if err != nil {
+		return nil, nil, false, err
+	}
+	facts := make([]ast.ASTHandle, 0, count)
+	coefficients := make([]*big.Rat, 0, count)
+	for i := uint32(0); i < count; i++ {
+		parent, err := f.manager.GetProofParent(proof, i)
+		if err != nil {
+			return nil, nil, false, err
+		}
+		fact, err := f.manager.GetProofFact(parent)
+		if err != nil {
+			return nil, nil, false, err
+		}
+		coefficient, err := f.rationalParameter(parameters[i+2])
+		if err != nil {
+			return nil, nil, false, err
+		}
+		coefficient.Abs(coefficient)
+		facts = append(facts, fact)
+		coefficients = append(coefficients, coefficient)
+	}
+	return facts, coefficients, true, nil
+}
+
 // CombineConstraints applies the source learner's two combination modes.
 func (f *FarkasLearner) CombineConstraints(literals []ast.ASTHandle, coefficients []*big.Rat) (_ ast.ASTRef, resultErr error) {
 	if err := f.open(); err != nil {
