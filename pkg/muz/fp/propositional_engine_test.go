@@ -262,7 +262,7 @@ func TestSpacerEngineRunsReachableAndInductiveHornQueries(t *testing.T) {
 	fpMust(t, manager.DelRef(&answer))
 	trace, names, err := engine.RulesAlongTrace()
 	fpMust(t, err)
-	if len(trace) != 1 || len(names) != 1 || names[0] != "spacer-step;spacer-fact" {
+	if len(trace) != 1 || len(names) != 1 || names[0] != "spacer-step" {
 		t.Fatal("Spacer preorder trace rules", names, len(trace))
 	}
 	for index := len(trace) - 1; index >= 0; index-- {

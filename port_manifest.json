@@ -81416,28 +81416,46 @@
       "path": "src/muz/base/dl_rule_subsumption_index.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/transforms/subsumption_checker.go"
+      ],
+      "tests": [
+        "TestSubsumptionCheckerDropsTautologicalSelfRule",
+        "TestSubsumptionCheckerRemovesTotalPositiveTail"
+      ],
       "assertions": [
         {
           "line": 37,
           "text": "SASSERT(r->get_tail_size()==0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "rule_subsumption_index exact unconditional-head and retained-rule identity indexing",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/subsumption_checker.go"
+        }
+      ],
+      "ownership": [
+        "The transform pass owns all indexed Rule wrappers through its source snapshot; the index borrows them and owns only Go handle membership maps."
+      ],
       "deviations": []
     },
     {
       "path": "src/muz/base/dl_rule_subsumption_index.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/transforms/subsumption_checker.go"
+      ],
+      "tests": [
+        "TestSubsumptionCheckerDropsTautologicalSelfRule",
+        "TestSubsumptionCheckerRemovesTotalPositiveTail"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -81448,10 +81466,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "rule_subsumption_index concrete retained interface",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/subsumption_checker.go"
+        }
+      ],
+      "ownership": [
+        "The private Go index is scoped to one transformation pass and borrows its owning rule snapshot."
+      ],
       "deviations": []
     },
     {
@@ -92898,9 +92924,17 @@
       "path": "src/muz/transforms/dl_mk_subsumption_checker.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/subsumption_checker.go",
+        "pkg/muz/fp/spacer_engine.go"
+      ],
+      "tests": [
+        "TestSubsumptionCheckerDropsTautologicalSelfRule",
+        "TestSubsumptionCheckerRemovesTotalPositiveTail",
+        "TestSubsumptionCheckerDisabledReturnsNoChange",
+        "TestSMTLibRunnerCPPReference/fp_spacer_skip_propagate.smt2"
+      ],
       "assertions": [
         {
           "line": 62,
@@ -92943,19 +92977,39 @@
           "text": "SASSERT(m_new_total_relation_discovery_during_transformation || !m_have_new_total_rule);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained fixedpoint preprocessing: total-rule discovery, exact fact/rule subsumption, total-tail removal, tautological self-rule removal, output preservation, and parameter gate",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/subsumption_checker.go"
+        },
+        {
+          "name": "finite relation-table cardinality discovery and model-converter extension",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Each transform result owns newly constructed rules and inherited predicate metadata; source snapshots and retained total-rule definitions are closed on every return path."
+      ],
+      "deviations": [
+        "The live Spacer preprocessing consumer has no finite relation context or model converter, so relation-table cardinality discovery and converter extension remain outside this retained path."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_subsumption_checker.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/subsumption_checker.go"
+      ],
+      "tests": [
+        "TestSubsumptionCheckerDropsTautologicalSelfRule",
+        "TestSubsumptionCheckerRemovesTotalPositiveTail",
+        "TestSubsumptionCheckerDisabledReturnsNoChange"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -92966,11 +93020,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "owned prioritized rule-transform plugin surface and retained fixedpoint transformation state",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/subsumption_checker.go"
+        },
+        {
+          "name": "relation-context cardinality hooks and model-converter state",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Close invalidates the plugin; transformation-local source and result owners are independently finalized and released."
+      ],
+      "deviations": [
+        "Relation-context and model-converter fields are deferred with their currently unreached consumer path."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_unbound_compressor.cpp",
@@ -93100,7 +93168,9 @@
       "go_targets": [
         "pkg/muz/fp/spacer_engine.go",
         "pkg/muz/transforms/rule_inliner.go",
-        "pkg/muz/transforms/interp_tail_simplifier.go"
+        "pkg/muz/transforms/interp_tail_simplifier.go",
+        "pkg/muz/transforms/coi_plugin.go",
+        "pkg/muz/transforms/subsumption_checker.go"
       ],
       "tests": [
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
@@ -93109,7 +93179,10 @@
         "TestInterpTailSimplifierDropsFalseRule",
         "TestRuleInlinerContractsUniqueLinearGroundChain",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_nonlinear_inlining.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_nonlinear_inlining.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_nonlinear_inlining.smt2",
+        "TestSubsumptionCheckerDropsTautologicalSelfRule",
+        "TestSubsumptionCheckerRemovesTotalPositiveTail",
+        "TestSMTLibRunnerCPPReference/fp_spacer_skip_propagate.smt2"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -93120,7 +93193,7 @@
           "go_target": "pkg/muz/fp/spacer_engine.go"
         },
         {
-          "name": "live Spacer query specialization: run interpreted-tail simplification, acyclic inlining, and a second simplification/inlining pass in source order",
+          "name": "live Spacer query specialization: mark the query output, then run cone filtering, interpreted-tail simplification, retained subsumption, acyclic inlining, and a second simplification/inlining pass in source priority order",
           "status": "ported",
           "go_target": "pkg/muz/fp/spacer_engine.go"
         },
@@ -93133,7 +93206,7 @@
         "Each Spacer query owns a finalized transformed RuleSet clone until Context initialization has retained its rules; the engine's original set remains available for subsequent queries."
       ],
       "deviations": [
-        "Only the source-reached Spacer interpreted-tail and inliner stages are integrated here; the complete default transformation schedule remains pending."
+        "The source-reached Spacer cone, interpreted-tail, subsumption, and inliner stages are integrated here; array/quantifier transforms, bit blasting, scaling, magic sets, and the remaining repeated schedule stay pending until reached by retained consumers."
       ]
     },
     {

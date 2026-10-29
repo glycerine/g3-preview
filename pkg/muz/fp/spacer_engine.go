@@ -28,6 +28,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err = prepared.AddRules(e.set); err != nil {
 		return nil, err
 	}
+	// rule_manager::mk_query registers the synthetic/direct query predicate as
+	// an output before apply_default_transformation runs.
+	if err = prepared.SetOutputPredicate(query); err != nil {
+		return nil, err
+	}
 	valid, err := prepared.Finalize()
 	if err != nil || !valid {
 		if err == nil {
@@ -36,12 +41,34 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 		return nil, err
 	}
 	transformer := base.NewRuleTransformer()
+	if err = transformer.Register(transforms.NewConePlugin(0)); err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	firstSimplifier, err := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 40000)
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
 	if err = transformer.Register(firstSimplifier); err != nil {
 		return nil, errors.Join(err, firstSimplifier.Close(), transformer.Close())
+	}
+	fixedpoint, err := e.globals.SourceGetModuleName("fixedpoint")
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	subsumptionName := "datalog.subsumption"
+	useSubsumption, err := e.params.GetBoolName(&fixedpoint, &subsumptionName, true)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	checkerName := "xform.subsumption_checker"
+	useChecker, err := e.params.GetBoolName(&fixedpoint, &checkerName, true)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	if useSubsumption {
+		if err = transformer.Register(transforms.NewSubsumptionCheckerPlugin(useChecker, 35005)); err != nil {
+			return nil, errors.Join(err, transformer.Close())
+		}
 	}
 	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 35000)); err != nil {
 		return nil, errors.Join(err, transformer.Close())

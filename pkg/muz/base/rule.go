@@ -323,6 +323,15 @@ func (r *Rule) Head() (ast.ASTHandle, error) {
 	return state.head, nil
 }
 
+// ASTManager returns the borrowed manager that owns this rule's expressions.
+func (r *Rule) ASTManager() (*ast.ASTManager, error) {
+	state, err := r.open()
+	if err != nil {
+		return nil, err
+	}
+	return state.manager, nil
+}
+
 // AccountingCosts returns the accumulated concrete instruction costs owned by
 // this rule. Child accounted objects propagate their processed costs here.
 func (r *Rule) AccountingCosts() (Costs, error) {
