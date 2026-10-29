@@ -48,6 +48,10 @@ func NewQFNRATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTS
 	}
 	main := copyParams()
 	p0, p1, p2 := copyParams(), copyParams(), copyParams()
+	for _, params := range []*uparams.ParamsRef{p0, p1, p2} {
+		b.boolean(params, "elim_and", true)
+		b.boolean(params, "blast_distinct", true)
+	}
 	b.boolean(p0, "inline_vars", true)
 	b.uint(p1, "seed", 11)
 	b.boolean(p1, "factor", false)
@@ -67,7 +71,15 @@ func NewQFNRATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTS
 		if timeout != 0 {
 			backend = b.timed(backend, timeout)
 		}
-		route := b.then(simplify(params), backend)
+		route := b.then(
+			simplify(params),
+			b.keep(core.NewPropagateValuesTactic(m, c, g, nil)),
+			b.clean(b.keep(core.NewSolveEquationsTactic(m, c, g, params, config.ModelEvaluator))),
+			b.clean(b.keep(core.NewEliminateUnconstrainedTactic(m, c, g, params, config.ModelEvaluator))),
+			b.clean(b.keep(core.NewSolveEquationsTactic(m, c, g, params, config.ModelEvaluator))),
+			simplify(params),
+			backend,
+		)
 		if requireDecision {
 			route = b.then(route, b.keep(tactic.NewFailIfUndecidedTactic(), nil))
 		}
