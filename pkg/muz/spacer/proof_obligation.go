@@ -22,6 +22,7 @@ type ProofObligation struct {
 	useFarkas   bool
 	weakness    uint32
 	children    []*ProofObligation
+	derivation  *Derivation
 	released    bool
 	sequence    uint64
 }
@@ -30,7 +31,7 @@ func NewProofObligation(parent *ProofObligation, transformer *PredicateTransform
 	if transformer == nil || transformer.open() != nil {
 		return nil, ErrManagerOwner
 	}
-	if parent != nil && (parent.released || parent.transformer != transformer) {
+	if parent != nil && (parent.released || parent.transformer == nil || parent.transformer.owner != transformer.owner) {
 		return nil, ErrManagerOwner
 	}
 	sequence, err := transformer.owner.Unique()
@@ -80,6 +81,38 @@ func (p *ProofObligation) Parent() (*ProofObligation, error) {
 		return nil, err
 	}
 	return p.parent, nil
+}
+
+func (p *ProofObligation) SetDerivation(derivation *Derivation) error {
+	if err := p.valid(); err != nil {
+		return err
+	}
+	if derivation != nil && (derivation.closed || derivation.parent != p) {
+		return ErrManagerOwner
+	}
+	if p.derivation != nil && p.derivation != derivation {
+		if err := p.derivation.Close(); err != nil {
+			return err
+		}
+	}
+	p.derivation = derivation
+	return nil
+}
+
+func (p *ProofObligation) Derivation() (*Derivation, bool, error) {
+	if err := p.valid(); err != nil {
+		return nil, false, err
+	}
+	return p.derivation, p.derivation != nil, nil
+}
+
+func (p *ProofObligation) DetachDerivation() (*Derivation, error) {
+	if err := p.valid(); err != nil {
+		return nil, err
+	}
+	result := p.derivation
+	p.derivation = nil
+	return result, nil
 }
 
 func (p *ProofObligation) SetPost(post ast.ASTHandle, bindings []ast.ASTHandle) (resultErr error) {
@@ -237,6 +270,12 @@ func (p *ProofObligation) Reset() error {
 		return err
 	}
 	p.open = true
+	if p.derivation != nil {
+		if err := p.derivation.Close(); err != nil {
+			return err
+		}
+		p.derivation = nil
+	}
 	return nil
 }
 
@@ -358,6 +397,10 @@ func (p *ProofObligation) Release() (result error) {
 		return ErrManagerOwner
 	}
 	manager := p.transformer.manager
+	if p.derivation != nil {
+		result = errors.Join(result, p.derivation.Close())
+		p.derivation = nil
+	}
 	if p.newPost != (ast.ASTRef{}) {
 		result = errors.Join(result, manager.DelRef(&p.newPost))
 	}

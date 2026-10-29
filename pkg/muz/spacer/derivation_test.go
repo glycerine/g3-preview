@@ -1,0 +1,97 @@
+package spacer_test
+
+// Source: src/muz/spacer/spacer_context.cpp derivation premise ownership,
+// origin variables, summary replacement, and proof-obligation attachment.
+
+import (
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/muz/base"
+	"github.com/glycerine/g3/pkg/muz/spacer"
+)
+
+func TestSpacerDerivationOwnsPremisesAndAttachesToObligation(t *testing.T) {
+	command, manager, owner := lemmaOwnerFixture(t)
+	boolean, err := manager.MkBoolSort()
+	spacerMust(t, err)
+	predicateName, err := manager.Symbols.Intern("spacer-derivation-p")
+	spacerMust(t, err)
+	predicate, err := manager.MkFuncDecl(predicateName, []ast.ASTHandle{boolean}, boolean, ast.ASTFuncDeclInfo{})
+	spacerMust(t, err)
+	transformer, err := spacer.NewRulePredicateTransformer(owner, predicate, spacer.PropSolverConfig{})
+	spacerMust(t, err)
+	ruleManager, err := base.NewRuleManager(manager)
+	spacerMust(t, err)
+	spacerMust(t, ruleManager.RegisterPredicate(predicate))
+	truth, err := manager.MkTrue()
+	spacerMust(t, err)
+	head, err := manager.MkApp(predicate, []ast.ASTHandle{truth})
+	spacerMust(t, err)
+	rule, err := ruleManager.NewRule(head, nil, nil, "derivation")
+	spacerMust(t, err)
+	root, err := transformer.NewProofObligation(nil, 2, 1, truth, nil)
+	spacerMust(t, err)
+	auxiliaryName, err := manager.Symbols.Intern("spacer-derivation-aux")
+	spacerMust(t, err)
+	auxiliaryDeclaration, err := manager.MkFuncDecl(auxiliaryName, nil, boolean, ast.ASTFuncDeclInfo{})
+	spacerMust(t, err)
+	auxiliaryDeclaration, err = owner.NewPredicate(auxiliaryDeclaration)
+	spacerMust(t, err)
+	auxiliary, err := manager.MkApp(auxiliaryDeclaration, nil)
+	spacerMust(t, err)
+	derivation, err := spacer.NewDerivation(root, rule, truth, []ast.ASTHandle{auxiliary})
+	spacerMust(t, err)
+	spacerMust(t, derivation.AddPremise(transformer, 0, truth, false, []ast.ASTHandle{auxiliary}))
+	premises, err := derivation.Premises()
+	spacerMust(t, err)
+	if len(premises) != 1 || premises[0].Must() || premises[0].OldIndex() != 0 || premises[0].Transformer() != transformer {
+		t.Fatal("Spacer derivation premise metadata", len(premises))
+	}
+	variables, err := premises[0].Variables()
+	spacerMust(t, err)
+	if len(variables) != 2 {
+		t.Fatal("Spacer derivation origin variables", len(variables))
+	}
+	falsity, err := manager.MkFalse()
+	spacerMust(t, err)
+	spacerMust(t, premises[0].SetSummary(falsity, true, nil))
+	variables, err = premises[0].Variables()
+	spacerMust(t, err)
+	if !premises[0].Must() || len(variables) != 1 {
+		t.Fatal("Spacer derivation premise update", premises[0].Must(), len(variables))
+	}
+	spacerMust(t, root.SetDerivation(derivation))
+	attached, found, err := root.Derivation()
+	spacerMust(t, err)
+	if !found || attached != derivation {
+		t.Fatal("Spacer derivation attachment", found)
+	}
+	detached, err := root.DetachDerivation()
+	spacerMust(t, err)
+	if detached != derivation {
+		t.Fatal("Spacer derivation detachment")
+	}
+	spacerMust(t, root.SetDerivation(detached))
+	spacerMust(t, root.Reset())
+	if _, found, err = root.Derivation(); err != nil || found {
+		t.Fatal("Spacer reset retained derivation", found, err)
+	}
+	childName, err := manager.Symbols.Intern("spacer-derivation-child")
+	spacerMust(t, err)
+	childPredicate, err := manager.MkFuncDecl(childName, nil, boolean, ast.ASTFuncDeclInfo{})
+	spacerMust(t, err)
+	childTransformer, err := spacer.NewRulePredicateTransformer(owner, childPredicate, spacer.PropSolverConfig{})
+	spacerMust(t, err)
+	child, err := childTransformer.NewProofObligation(root, 1, 1, truth, nil)
+	spacerMust(t, err)
+	if parent, err := child.Parent(); err != nil || parent != root {
+		t.Fatal("cross-transformer Spacer derivation child", parent, err)
+	}
+	spacerMust(t, childTransformer.Close())
+	spacerMust(t, rule.Close())
+	spacerMust(t, ruleManager.Close())
+	spacerMust(t, transformer.Close())
+	spacerMust(t, owner.Close())
+	spacerMust(t, command.Close())
+}
