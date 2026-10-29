@@ -83126,7 +83126,7 @@
           ]
         },
         {
-          "name": "model_node ownership/closure and model_search frontier, cache, duplicate, reset, validation and level-backtracking operations (pdr_context.cpp:750-779,875-1128,1435-1454)",
+          "name": "model_node ownership/closure and configurable breadth/depth-first model_search frontier, cache, duplicate, reset, validation and level-backtracking operations (pdr_context.cpp:750-779,875-1128,1435-1454)",
           "status": "ported",
           "go_target": "pkg/muz/pdr/model_search.go",
           "tests": [
@@ -83421,7 +83421,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "PDR/Spacer engine selection, fixedpoint.pdr.farkas and pdr.use_inductive_generalizer parameter forwarding, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
+          "name": "PDR/Spacer engine selection, fixedpoint.pdr.farkas, pdr.use_inductive_generalizer and pdr.bfs_model_search parameter forwarding, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [

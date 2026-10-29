@@ -262,6 +262,12 @@ func TestContextActivatesFarkasBeforeArithmeticSolvers(t *testing.T) {
 	context, err := pdr.NewContext(manager, nil, 2, pdr.ReachableHashCache, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
 	pdrMust(t, err)
 	pdrMust(t, context.SetUseFarkas(true))
+	breadthFirst, err := context.BreadthFirstModelSearch()
+	pdrMust(t, err)
+	if !breadthFirst {
+		t.Fatal("PDR context did not default to breadth-first model search")
+	}
+	pdrMust(t, context.SetBreadthFirstModelSearch(false))
 	arithmetic, err := manager.RegisterArithmeticPlugin()
 	pdrMust(t, err)
 	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
@@ -294,6 +300,9 @@ func TestContextActivatesFarkasBeforeArithmeticSolvers(t *testing.T) {
 	}
 	if err = context.SetUseFarkas(false); err == nil {
 		t.Fatal("initialized context accepted a Farkas mode change")
+	}
+	if err = context.SetBreadthFirstModelSearch(true); err == nil {
+		t.Fatal("initialized context accepted a model-search strategy change")
 	}
 	pdrMust(t, context.Close())
 	pdrMust(t, set.Close())

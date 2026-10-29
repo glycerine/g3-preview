@@ -54,7 +54,7 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, err
 	}
-	result := &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(false), lastResult: lbool.Undef, useInductive: true}
+	result := &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(true), lastResult: lbool.Undef, useInductive: true}
 	fail := func(cause error) (*Context, error) {
 		cleanup := result.Close()
 		if cleanup != nil {
@@ -131,6 +131,29 @@ func (c *Context) SetUseInductiveGeneralizer(enabled bool) error {
 	}
 	c.useInductive = enabled
 	return nil
+}
+
+// SetBreadthFirstModelSearch selects the source PDR obligation-frontier
+// strategy. It must be set before Initialize.
+func (c *Context) SetBreadthFirstModelSearch(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized || c.search == nil {
+		return ast.ErrASTDomain
+	}
+	c.search.breadthFirst = enabled
+	return nil
+}
+
+func (c *Context) BreadthFirstModelSearch() (bool, error) {
+	if err := c.open(); err != nil {
+		return false, err
+	}
+	if c.search == nil {
+		return false, ast.ErrASTDomain
+	}
+	return c.search.breadthFirst, nil
 }
 
 func (c *Context) FarkasActive() (bool, error) {

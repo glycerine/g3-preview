@@ -69,6 +69,14 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = context.SetUseInductiveGeneralizer(useInductive); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
+	breadthFirstName := "pdr.bfs_model_search"
+	breadthFirst, err := e.globals.Context.GetBoolName(&fixedpoint, &breadthFirstName, true)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetBreadthFirstModelSearch(breadthFirst); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	background, err := e.manager.RefGet(e.background)
 	if err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
