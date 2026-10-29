@@ -34,6 +34,12 @@ func newIsFPQFNRAProbe(budget *arena.Budget) (*isFPQFNRAProbe, error) {
 	return probe, nil
 }
 
+// NewIsFPQFNRAProbe exposes the source default-portfolio probe to the
+// portfolio package while retaining its concrete ownership implementation.
+func NewIsFPQFNRAProbe(budget *arena.Budget) (tactic.ProbeEvaluator, error) {
+	return newIsFPQFNRAProbe(budget)
+}
+
 func (p *isFPQFNRAProbe) Check() error {
 	if p == nil || p.self != p || p.closed {
 		return tactic.ErrRegistryOwner

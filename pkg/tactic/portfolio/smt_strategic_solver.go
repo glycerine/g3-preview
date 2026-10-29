@@ -103,6 +103,16 @@ func NewALLStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mode
 	if err != nil {
 		return nil, err
 	}
+	qfFP, err := smtlogics.NewQFFPTactic(m, p, config)
+	qfFP, err = keepTactic(qfFP, err)
+	if err != nil {
+		return nil, err
+	}
+	qfFPLRA, err := smtlogics.NewQFFPLRATactic(m, p, config)
+	qfFPLRA, err = keepTactic(qfFPLRA, err)
+	if err != nil {
+		return nil, err
+	}
 	ordinaryValue, err := smtcore.NewSMTTactic(m, p, config)
 	ordinary, err := keepTactic(ordinaryValue, err)
 	if err != nil {
@@ -139,6 +149,14 @@ func NewALLStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mode
 		return nil, err
 	}
 	qfNRAProbe, err := keepProbe(arith.NewArithmeticFragmentProbe(m.Budget(), config.Params, config.Globals, arith.FragmentQFNRA))
+	if err != nil {
+		return nil, err
+	}
+	qfFPProbe, err := keepProbe(smtlogics.NewIsFPQFNRAProbe(m.Budget()))
+	if err != nil {
+		return nil, err
+	}
+	qfFPLRAProbe, err := keepProbe(smtlogics.NewIsQFFPLRAProbe(m.Budget()))
 	if err != nil {
 		return nil, err
 	}
@@ -183,6 +201,8 @@ func NewALLStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mode
 		probe  tactic.ProbeEvaluator
 		tactic tactic.Tactic
 	}{
+		{qfFPLRAProbe, qfFPLRA},
+		{qfFPProbe, qfFP},
 		{qfNIAProbe, qfNIA},
 		{qfNRAProbe, qfNRA},
 		{qfLRAProbe, qfLRA},

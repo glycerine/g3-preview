@@ -1,0 +1,8 @@
+(set-logic QF_FPLRA)
+(declare-const x (_ FloatingPoint 3 4))
+(declare-const r Real)
+(assert (= r 1.0))
+(assert (= x ((_ to_fp 3 4) RNE r)))
+(assert (= (fp.to_real x) r))
+(check-sat)
+(check-sat-using qffplra)

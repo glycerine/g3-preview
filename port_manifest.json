@@ -171866,22 +171866,60 @@
       "path": "src/tactic/fpa/qffplra_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qffplra_tactic.go",
+        "pkg/tactic/smtlogics/qffplra_tactic_test.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/qffplra_default.smt2",
+        "pkg/cmd/g3/test_vectors/qffplra_solver.smt2"
+      ],
+      "tests": [
+        "TestQFFPLRASourceStructuralProbe",
+        "TestSMTLibRunnerScripts/qffplra_default.smt2",
+        "TestSMTLibRunnerCPPReference/qffplra_default.smt2",
+        "TestSMTLibRunnerScripts/qffplra_solver.smt2",
+        "TestSMTLibRunnerCPPReference/qffplra_solver.smt2"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "QF_FPLRA tactic wrapper, exact structural probe, default-portfolio branch, logic route and explicit tactic command",
+          "status": "ported",
+          "go_target": "pkg/tactic/smtlogics/qffplra_tactic.go",
+          "tests": [
+            "TestQFFPLRASourceStructuralProbe",
+            "TestSMTLibRunnerScripts/qffplra_default.smt2",
+            "TestSMTLibRunnerCPPReference/qffplra_default.smt2",
+            "TestSMTLibRunnerScripts/qffplra_solver.smt2",
+            "TestSMTLibRunnerCPPReference/qffplra_solver.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete Go probe reserves its header from the manager budget and is reference-counted by tactical composition; the QF_FPLRA tactic delegates to the independently owned QF_FP composition exactly as the source factory does."
+      ],
+      "deviations": [
+        "Native typed family and sort accessors replace the source exception-based AST visitor."
+      ]
     },
     {
       "path": "src/tactic/fpa/qffplra_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qffplra_tactic.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestQFFPLRASourceStructuralProbe",
+        "TestSMTLibRunnerScripts/qffplra_solver.smt2"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -171892,9 +171930,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "QF_FPLRA tactic and probe factory surface",
+          "status": "ported",
+          "go_target": "pkg/tactic/smtlogics/qffplra_tactic.go",
+          "tests": [
+            "TestQFFPLRASourceStructuralProbe",
+            "TestSMTLibRunnerScripts/qffplra_solver.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
