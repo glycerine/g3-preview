@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -16,12 +17,13 @@ import (
 var ErrManagerOwner = errors.New("muz/spacer: invalid or closed manager")
 
 type Manager struct {
-	manager    *ast.ASTManager
-	mux        *SymMux
-	background ast.ASTRef
-	contexts   [3]*SMTContextManager
-	unique     uint32
-	closed     bool
+	manager     *ast.ASTManager
+	mux         *SymMux
+	background  ast.ASTRef
+	contexts    [3]*SMTContextManager
+	cooperation *cooperate.Cooperation
+	unique      uint32
+	closed      bool
 }
 
 func NewManager(manager *ast.ASTManager, params *uparams.ParamsRef, maximumContexts uint32, config smtcore.SMTSolverConfig) (_ *Manager, resultErr error) {
@@ -47,6 +49,22 @@ func NewManager(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 			resultErr = errors.Join(resultErr, result.Close())
 		}
 	}()
+	if config.ModelEvaluator.Context == nil {
+		config.ModelEvaluator.Context = config.Params
+	}
+	if config.ModelEvaluator.Globals == nil {
+		config.ModelEvaluator.Globals = config.Globals
+	}
+	if config.ModelEvaluator.Memory == nil {
+		config.ModelEvaluator.Memory = manager.NumeralService().RuntimeOwner()
+	}
+	if config.ModelEvaluator.Cooperation == nil {
+		result.cooperation, err = cooperate.NewCooperation(manager.Budget())
+		if err != nil {
+			return nil, err
+		}
+		config.ModelEvaluator.Cooperation = result.cooperation
+	}
 	for index := range result.contexts {
 		result.contexts[index], err = NewSMTContextManager(manager, params, maximumContexts, config)
 		if err != nil {
@@ -267,9 +285,13 @@ func (m *Manager) Close() (result error) {
 		}
 	}
 	result = errors.Join(result, m.mux.Close(), m.manager.DelRef(&m.background))
+	if m.cooperation != nil {
+		result = errors.Join(result, m.cooperation.Close())
+	}
 	if result == nil {
 		m.contexts = [3]*SMTContextManager{}
 		m.mux = nil
+		m.cooperation = nil
 		m.manager = nil
 		m.closed = true
 	}

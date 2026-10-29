@@ -284,6 +284,10 @@ func (l *Lemma) Instances() (_ []ast.ASTRef, resultErr error) {
 	if err != nil {
 		return nil, err
 	}
+	return l.instancesOf(body)
+}
+
+func (l *Lemma) instancesOf(body ast.ASTHandle) (_ []ast.ASTRef, resultErr error) {
 	kind, err := l.manager.GetKind(body)
 	if err != nil || kind != ast.ASTQuantifier || len(l.bindings) == 0 {
 		return nil, err

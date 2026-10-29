@@ -30,6 +30,12 @@ type PredicateTransformer struct {
 	invariants               uint64
 	simplifyProofObligations bool
 	useEqualityClasses       bool
+	instantiateQuantified    bool
+	useQuantifiedLemmas      bool
+	blastTermITE             bool
+	rules                    []*spacerNormalizedRule
+	ruleReferences           []ast.ASTRef
+	uses                     []*PredicateTransformer
 	closed                   bool
 }
 
@@ -60,7 +66,7 @@ func newPredicateTransformer(owner *Manager, name string, config PropSolverConfi
 	if owner == nil || owner.open() != nil {
 		return nil, ErrManagerOwner
 	}
-	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name}
+	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name, instantiateQuantified: true, useQuantifiedLemmas: true, blastTermITE: true}
 	if config.Itp.Params == nil && config.Itp.Globals == nil {
 		config.Itp.Params = owner.contexts[0].config.Params
 		config.Itp.Globals = owner.contexts[0].config.Globals
@@ -318,16 +324,28 @@ func (p *PredicateTransformer) AddLemmaCore(lemma *Lemma) error {
 	if level == InfinityLevel {
 		p.invariants++
 	}
-	if !ground {
-		return nil
+	if ground {
+		if level == InfinityLevel {
+			err = p.solver.Assert(body)
+		} else {
+			if err = p.EnsureLevel(level); err == nil {
+				err = p.solver.AssertAtLevel(body, level)
+			}
+		}
+		if err != nil {
+			return err
+		}
 	}
-	if level == InfinityLevel {
-		return p.solver.Assert(body)
+	next := level
+	if next != InfinityLevel {
+		next++
 	}
-	if err = p.EnsureLevel(level); err != nil {
-		return err
+	for _, user := range p.uses {
+		if err = user.addLemmaFromChild(p, lemma, next); err != nil {
+			return err
+		}
 	}
-	return p.solver.AssertAtLevel(body, level)
+	return nil
 }
 
 func (p *PredicateTransformer) IsInvariant(level uint32, formula ast.ASTHandle) (bool, uint32, error) {
@@ -511,6 +529,12 @@ func (p *PredicateTransformer) Close() (result error) {
 		result = errors.Join(result, p.solver.Close())
 	}
 	if p.manager != nil {
+		for i := len(p.rules) - 1; i >= 0; i-- {
+			result = errors.Join(result, p.rules[i].rule.Close())
+		}
+		for i := len(p.ruleReferences) - 1; i >= 0; i-- {
+			result = errors.Join(result, p.manager.DelRef(&p.ruleReferences[i]))
+		}
 		if p.extendLiteral != (ast.ASTRef{}) {
 			result = errors.Join(result, p.manager.DelRef(&p.extendLiteral))
 		}
@@ -532,6 +556,9 @@ func (p *PredicateTransformer) Close() (result error) {
 		p.obligations = nil
 		p.solver = nil
 		p.signature = nil
+		p.rules = nil
+		p.ruleReferences = nil
+		p.uses = nil
 		p.owner = nil
 		p.manager = nil
 		p.closed = true
