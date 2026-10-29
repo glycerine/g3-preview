@@ -91,7 +91,7 @@ func (q *searchResolution) buildLazyClause(j *LazyJustification, explanation *ex
 	if err = explanation.reset(); err != nil {
 		return err
 	}
-	if err = explanation.collectExplanation(literals, false); err != nil {
+	if err = explanation.collectExplanation(literals, explanation.fullDimensional); err != nil {
 		return err
 	}
 	for _, literal := range explanation.output.result {

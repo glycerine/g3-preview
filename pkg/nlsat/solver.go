@@ -241,6 +241,11 @@ func (s *Solver) Check() (lbool.LBool, error) {
 		return lbool.Undef, err
 	}
 	for {
+		fullDimensional, err := s.clauses.isFullDimensional()
+		if err != nil {
+			return lbool.Undef, err
+		}
+		s.explanation.fullDimensional = fullDimensional
 		result, err := s.search.search(s.resolution, s.explanation)
 		if err != nil || result != lbool.True {
 			return result, err

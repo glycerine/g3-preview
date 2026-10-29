@@ -93722,6 +93722,7 @@
         "pkg/nlsat/atom_factory.go",
         "pkg/nlsat/arithmetic_variables.go",
         "pkg/nlsat/clause_order.go",
+        "pkg/nlsat/full_dimensional.go",
         "pkg/nlsat/clause_store.go",
         "pkg/nlsat/search_state.go",
         "pkg/nlsat/search_propagation.go",
@@ -93792,6 +93793,8 @@
             "TestSolverMixedPolynomialSearchAndRepeatedModel",
             "TestSolverMixedLinearConflict",
             "TestSolverIntegerBranchAndBound",
+            "TestFullDimensionalLiteralClassification",
+            "TestSolverCheckPublishesFullDimensionalExplanationMode",
         "TestUnivariateConjunctionRejectsMixedVariablesAndOwnsDomain",
         "TestSMTLibRunnerUnivariateNRA",
         "TestSMTLibRunnerUnivariateNRAUnsupported",
@@ -94338,6 +94341,19 @@
             "TestSearchMainSelectsArithmeticWitness",
             "TestSearchMainLearnsAcrossBooleanStage",
             "TestSearchMainConflictLimitAfterResolvedConflict"
+          ]
+        },
+        {
+          "name": "Full-dimensional literal/input-clause classification and per-check publication to conflict explanation (cpp1313-1316,2242-2288)",
+          "status": "ported",
+          "go_target": "pkg/nlsat/full_dimensional.go",
+          "go_targets": [
+            "pkg/nlsat/solver.go",
+            "pkg/nlsat/search_resolution.go"
+          ],
+          "tests": [
+            "TestFullDimensionalLiteralClassification",
+            "TestSolverCheckPublishesFullDimensionalExplanationMode"
           ]
         },
         {
