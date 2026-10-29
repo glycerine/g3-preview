@@ -252,10 +252,14 @@ func TestSpacerEngineRunsReachableAndInductiveHornQueries(t *testing.T) {
 	if levels == 0 {
 		t.Fatal("Spacer query exposed no frames")
 	}
-	if answer, x := engine.Answer(declarations["Q"]); x == nil {
-		fpMust(t, manager.DelRef(&answer))
-		t.Fatal("incomplete Spacer answer surface accepted")
+	answer, err := engine.Answer(declarations["Q"])
+	fpMust(t, err)
+	answerHandle, err := manager.RefGet(answer)
+	fpMust(t, err)
+	if !manager.IsTrue(answerHandle) {
+		t.Fatal("Spacer fallback answer", answerHandle)
 	}
+	fpMust(t, manager.DelRef(&answer))
 	stats := statistics.New()
 	fpMust(t, engine.CollectStatistics(stats))
 	if stats.Size() == 0 {

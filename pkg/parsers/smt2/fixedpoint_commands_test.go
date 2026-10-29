@@ -37,6 +37,12 @@ func fixedpointReference(t *testing.T, script string) string {
 	return string(output)
 }
 
+func fixedpointSpacerReference(t *testing.T, script string) string {
+	t.Helper()
+	script = strings.Replace(script, "(set-option :fixedpoint.engine pdr)", "(set-option :fixedpoint.engine spacer)", 1)
+	return fixedpointReference(t, script)
+}
+
 func TestSMT2FixedpointPropositionalQueriesMatchCPP(t *testing.T) {
 	script := `(set-option :fixedpoint.engine datalog)
 (declare-rel P ())
@@ -318,7 +324,7 @@ func TestSMT2FixedpointPDRStatistics(t *testing.T) {
 		}
 	})
 	context.PrintSuccess = false
-	script := `(set-option :fixedpoint.engine spacer)
+	script := `(set-option :fixedpoint.engine pdr)
 (declare-rel P (Int))
 (declare-rel Q (Int))
 (declare-var x Int)
@@ -336,7 +342,7 @@ func TestSMT2FixedpointPDRStatistics(t *testing.T) {
 			t.Fatal("missing PDR statistic", expected, text)
 		}
 	}
-	if cpp := fixedpointReference(t, script); !strings.Contains(cpp, "\nsat\n") || !strings.Contains(cpp, ":time") {
+	if cpp := fixedpointSpacerReference(t, script); !strings.Contains(cpp, "\nsat\n") || !strings.Contains(cpp, ":time") {
 		t.Fatal("C++ PDR statistics result", cpp)
 	}
 }
@@ -462,7 +468,7 @@ func TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP(t *testing.T) {
 		}
 	})
 	context.PrintSuccess = false
-	script := `(set-option :fixedpoint.engine spacer)
+	script := `(set-option :fixedpoint.engine pdr)
 (declare-rel P (Int))
 (rule (P 0))
 (query P :print-answer false)
@@ -473,7 +479,7 @@ func TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP(t *testing.T) {
 	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
 		t.Fatal(err)
 	}
-	cpp := fixedpointReference(t, script)
+	cpp := fixedpointSpacerReference(t, script)
 	if output.String() != cpp || cpp != "sat\nunsat\n" {
 		t.Fatal("PDR background SMT-LIB differential", output.String(), cpp)
 	}
@@ -490,7 +496,7 @@ func TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP(t *testing.T) {
 		}
 	})
 	context.PrintSuccess = false
-	script := `(set-option :fixedpoint.engine spacer)
+	script := `(set-option :fixedpoint.engine pdr)
 (declare-rel P (Int))
 (declare-rel Goal ())
 (declare-rel U ())
@@ -505,7 +511,7 @@ func TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP(t *testing.T) {
 	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
 		t.Fatal(err)
 	}
-	cpp := fixedpointReference(t, script)
+	cpp := fixedpointSpacerReference(t, script)
 	want := "sat\n(and (P 1) (P 0))\nunsat\n"
 	if output.String() != cpp || cpp != want {
 		t.Fatal("PDR recursive trace differential", output.String(), cpp)
@@ -518,7 +524,7 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 	}{
 		{
 			"acyclic-branch",
-			`(set-option :fixedpoint.engine spacer)
+			`(set-option :fixedpoint.engine pdr)
 (declare-rel A (Int))
 (declare-rel B (Int))
 (declare-rel C (Int))
@@ -534,7 +540,7 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 		},
 		{
 			"mutual-recursion",
-			`(set-option :fixedpoint.engine spacer)
+			`(set-option :fixedpoint.engine pdr)
 (declare-rel P (Int))
 (declare-rel Q (Int))
 (declare-rel Goal ())
@@ -549,7 +555,7 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 		},
 		{
 			"nonlinear-recursion",
-			`(set-option :fixedpoint.engine spacer)
+			`(set-option :fixedpoint.engine pdr)
 (declare-rel P (Int))
 (declare-rel Q (Int))
 (declare-rel Goal ())
@@ -565,7 +571,7 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 		},
 		{
 			"multiple-initial-facts",
-			`(set-option :fixedpoint.engine spacer)
+			`(set-option :fixedpoint.engine pdr)
 (declare-rel P (Int))
 (declare-rel Goal ())
 (declare-var x Int)
@@ -594,7 +600,7 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 			if err = smt2.ParseCommands(context, strings.NewReader(test.script), &output); err != nil {
 				t.Fatal(err)
 			}
-			cpp := fixedpointReference(t, test.script)
+			cpp := fixedpointSpacerReference(t, test.script)
 			if output.String() != cpp || cpp != test.want {
 				t.Fatal("PDR trace reduction differential", output.String(), cpp)
 			}
@@ -621,7 +627,7 @@ func TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP(t *testing.T) {
 				}
 			})
 			context.PrintSuccess = false
-			script := `(set-option :fixedpoint.engine spacer)
+			script := `(set-option :fixedpoint.engine pdr)
 (set-option :print-success false)
 ` + test.declaration + `
 (declare-rel P (Int))
@@ -637,7 +643,7 @@ func TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP(t *testing.T) {
 			if err == nil || !strings.Contains(err.Error(), "uninterpreted symbols in PDR rules are unsupported") || output.Len() != 0 {
 				t.Fatal("Go PDR uninterpreted-rule guard", err, output.String())
 			}
-			cpp := fixedpointReference(t, script)
+			cpp := fixedpointSpacerReference(t, script)
 			if !strings.Contains(cpp, "Uninterpreted '"+test.symbol+"'") || !strings.HasSuffix(cpp, "unknown\n") {
 				t.Fatal("C++ PDR uninterpreted-rule guard", cpp)
 			}

@@ -1247,7 +1247,10 @@ func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTR
 		return e.pdr.Answer(declaration)
 	}
 	if e.backend == "spacer" {
-		return answer, ErrPropositionalEngine
+		if e.spacer == nil || !e.queried || e.spacerRevision != e.revision {
+			return answer, ErrPropositionalEngine
+		}
+		return e.spacer.Answer(declaration)
 	}
 	state := e.predicates[declaration]
 	if state == nil || !e.queried {
