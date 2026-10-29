@@ -90325,9 +90325,12 @@
       "path": "src/muz/spacer/spacer_unsat_core_learner.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/spacer/unsat_core_learner.go",
+        "pkg/muz/spacer/unsat_core_plugin_lemma.go"
+      ],
+      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"],
       "assertions": [
         {
           "line": 97,
@@ -90338,19 +90341,41 @@
           "text": "SASSERT(id_to_small_id.find(currentNode->get_id()) == id_to_small_id.end());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "registration, reduce-hypotheses preprocessing, proof postorder A/B/hypothesis/closed marking, ordered partial-core dispatch and plugin finalization",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/unsat_core_learner.go",
+          "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"]
+        },
+        {
+          "name": "mark accessors, core publication, B-symbol collection and only_contains_symbols_b purity traversal",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/unsat_core_learner.go",
+          "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"]
+        },
+        {
+          "name": "debug_proof disabled diagnostic dump",
+          "status": "dead",
+          "reason": "The source-local flag is the constant false and no retained configuration can enable this block."
+        }
+      ],
+      "ownership": [
+        "UnsatCoreLearner owns registered plugins and retained core references. ComputeUnsatCore owns its reduced proof root while traversing and returns independently caller-owned ASTRef values."
+      ],
+      "deviations": [
+        "Go maps replace native AST marks and declaration sets. The constant-false debug proof printer is omitted; production proof marking and ordered plugin dispatch are preserved."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_unsat_core_learner.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/spacer/unsat_core_learner.go"],
+      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"],
       "conditionals": [
         {
           "line": 18,
@@ -90361,19 +90386,30 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "plugin registration, unsat-core computation, proof marks, B-purity/open predicates and core insertion",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/unsat_core_learner.go",
+          "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"]
+        }
+      ],
+      "ownership": [
+        "The concrete learner owns each registered plugin and every internally retained lemma; output references have explicit caller ownership."
+      ],
+      "deviations": [
+        "Header guards are represented by Go package compilation; invalid or closed owners return errors."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_unsat_core_plugin.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/unsat_core_plugin_lemma.go"],
+      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"],
       "assertions": [
         {
           "line": 40,
@@ -90548,19 +90584,39 @@
           "text": "SASSERT(m_learner.m.is_proof(current->get_arg(i)));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "unsat_core_plugin_lemma compute_partial_core and add_lowest_split_to_core",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/unsat_core_plugin_lemma.go",
+          "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"]
+        },
+        {
+          "name": "Farkas, optimized Farkas, bounded Farkas and min-cut plugins",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The lemma plugin borrows its owning learner and is closed by that learner; core insertion acquires an owning learner reference."
+      ],
+      "deviations": [
+        "The ordinary fallback lemma plugin is complete. Arithmetic and min-cut plugin families remain open."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_unsat_core_plugin.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/spacer/unsat_core_learner.go",
+        "pkg/muz/spacer/unsat_core_plugin_lemma.go"
+      ],
+      "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"],
       "conditionals": [
         {
           "line": 18,
@@ -90571,11 +90627,28 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "unsat_core_plugin interface and unsat_core_plugin_lemma",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/unsat_core_plugin_lemma.go",
+          "tests": ["TestUnsatCoreLearnerMarksProofAndExtractsLowestBPureSplit"]
+        },
+        {
+          "name": "arithmetic and min-cut plugin declarations",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "UnsatCorePlugin is an explicitly owned Go interface; registered concrete plugins borrow their learner and are destroyed by it."
+      ],
+      "deviations": [
+        "The virtual base becomes a Go interface. Remaining concrete plugin types are tracked separately as unported methods."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_util.cpp",
