@@ -4,6 +4,7 @@ package qe
 // arith_project_util::project, integer coefficient/divisor normalization.
 
 import (
+	"errors"
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -85,4 +86,89 @@ func (p *legacyArithmeticProjection) normalizeIntegers(literals []*legacyLinearL
 		return nil, nil, resultErr
 	}
 	return lcmCoefficients, lcmDivisors, nil
+}
+
+func (p *legacyArithmeticProjection) substituteIntegerLiterals(literals []*legacyLinearLiteral, originals []ast.ASTHandle, xTerm ast.ASTHandle, selected int) (_ *legacyRealProjection, resultErr error) {
+	if p == nil || p.syntax == nil || len(literals) != len(originals) || selected < 0 || selected >= len(literals) {
+		return nil, ast.ErrASTHandle
+	}
+	result := &legacyRealProjection{manager: p.syntax.manager}
+	defer func() {
+		if resultErr != nil {
+			resultErr = errors.Join(resultErr, result.Close())
+		}
+	}()
+	zero, err := p.syntax.manager.ArithmeticIntegerNumeralText("0")
+	if err != nil {
+		return nil, err
+	}
+	for index, literal := range literals {
+		if literal == nil || literal.manager != p.syntax.manager {
+			return nil, ast.ErrASTDomain
+		}
+		if index == selected {
+			replacement, err := p.constantLegacy(true)
+			if err != nil {
+				return nil, err
+			}
+			p.appendLegacyReplacement(result, originals[index], replacement)
+			continue
+		}
+		term, err := p.syntax.manager.RefGet(literal.term)
+		if err != nil {
+			return nil, err
+		}
+		var combined ast.ASTHandle
+		if literal.coefficient.Sign() < 0 {
+			combined, err = p.syntax.manager.MkArithmeticSub(term, xTerm)
+		} else {
+			combined, err = p.syntax.manager.MkArithmeticAdd(term, xTerm)
+		}
+		if err != nil {
+			return nil, err
+		}
+		var replacement ast.ASTRef
+		if literal.divisor.Sign() == 0 {
+			var expression ast.ASTHandle
+			switch {
+			case literal.equality:
+				expression, err = p.syntax.manager.MkEq(combined, zero)
+			case literal.strict:
+				expression, err = p.syntax.manager.MkFamilyApp(p.syntax.family, 4, nil, []ast.ASTHandle{combined, zero})
+			default:
+				expression, err = p.syntax.manager.MkArithmeticLE(combined, zero)
+			}
+			if err == nil {
+				replacement, err = p.rewriteLegacy(expression)
+			}
+		} else {
+			rewritten, rewriteErr := p.rewriteLegacy(combined)
+			if rewriteErr != nil {
+				return nil, rewriteErr
+			}
+			rewrittenHandle, rewriteErr := p.syntax.manager.RefGet(rewritten)
+			if rewriteErr != nil {
+				_ = p.syntax.manager.DelRef(&rewritten)
+				return nil, rewriteErr
+			}
+			modulus, rewriteErr := p.syntax.manager.ArithmeticNumeralRat(literal.divisor, true)
+			if rewriteErr == nil {
+				var modular ast.ASTHandle
+				modular, rewriteErr = p.syntax.manager.MkFamilyApp(p.syntax.family, 13, nil, []ast.ASTHandle{rewrittenHandle, modulus})
+				if rewriteErr == nil {
+					var expression ast.ASTHandle
+					expression, rewriteErr = p.syntax.manager.MkEq(modular, zero)
+					if rewriteErr == nil {
+						replacement, rewriteErr = p.syntax.manager.NewRef(expression)
+					}
+				}
+			}
+			err = errors.Join(rewriteErr, p.syntax.manager.DelRef(&rewritten))
+		}
+		if err != nil {
+			return nil, err
+		}
+		p.appendLegacyReplacement(result, originals[index], replacement)
+	}
+	return result, nil
 }

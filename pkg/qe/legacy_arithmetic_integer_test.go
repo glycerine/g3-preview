@@ -49,4 +49,27 @@ func TestLegacyArithmeticProjectionNormalizesIntegerCoefficients(t *testing.T) {
 	if boundLiteral.coefficient.Cmp(big.NewRat(-6, 1)) != 0 || boundLiteral.divisor.Sign() != 0 {
 		t.Fatal("normalized inequality literal", boundLiteral.coefficient, boundLiteral.divisor)
 	}
+	replacements, err := p.substituteIntegerLiterals(
+		[]*legacyLinearLiteral{divLiteral, boundLiteral},
+		[]ast.ASTHandle{divides, bound},
+		four,
+		1,
+	)
+	fmMust(t, err)
+	if len(replacements.replacements) != 2 {
+		t.Fatal("integer substitution replacement count", len(replacements.replacements))
+	}
+	divReplacement, err := m.RefGet(replacements.replacements[0].replacement)
+	fmMust(t, err)
+	contains, err := p.contains(divReplacement, x)
+	fmMust(t, err)
+	if contains {
+		t.Fatal("integer divisibility replacement retains projected variable")
+	}
+	selectedReplacement, err := m.RefGet(replacements.replacements[1].replacement)
+	fmMust(t, err)
+	if !m.IsTrue(selectedReplacement) {
+		t.Fatal("selected integer literal was not replaced by true")
+	}
+	fmMust(t, replacements.Close())
 }
