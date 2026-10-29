@@ -91684,22 +91684,49 @@
       "path": "src/muz/transforms/dl_mk_array_blast.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/array_blast.go",
+        "pkg/muz/transforms/array_blast_test.go",
+        "pkg/muz/fp/spacer_engine.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_array_blast.smt2"
+      ],
+      "tests": [
+        "TestArrayBlastEliminatesStoreDefinitionAndSelectPairs",
+        "TestSMTLibRunnerScripts/fp_spacer_array_blast.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_array_blast.smt2"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "store-definition elimination, select rewriting, source refusal guards, and pairwise Ackermann consistency reduction",
+          "status": "partial",
+          "go_target": "pkg/muz/transforms/array_blast.go",
+          "tests": [
+            "TestArrayBlastEliminatesStoreDefinitionAndSelectPairs",
+            "TestSMTLibRunnerCPPReference/fp_spacer_array_blast.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "Temporary rewritten and Ackermann expressions remain pinned until the replacement Rule owns every published tail."
+      ],
+      "deviations": [
+        "Rule semantics and the retained fixedpoint.xform.array_blast Spacer stage are ported. Native rewrite-proof attachment remains pending fixedpoint proof conversion."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_array_blast.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/transforms/array_blast.go"
+      ],
+      "tests": [
+        "TestArrayBlastEliminatesStoreDefinitionAndSelectPairs"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -91712,8 +91739,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "concrete prioritized array-blast transform plugin lifecycle",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/array_blast.go"
+        }
+      ],
+      "ownership": [
+        "RuleTransformer owns the plugin, its theory rewriter, and its interpreted-tail simplifier until Close."
+      ],
       "deviations": []
     },
     {
@@ -93574,6 +93609,7 @@
         "pkg/muz/transforms/interp_tail_simplifier.go",
         "pkg/muz/transforms/coi_plugin.go",
         "pkg/muz/transforms/subsumption_checker.go",
+        "pkg/muz/transforms/array_blast.go",
         "pkg/muz/transforms/array_eq_rewrite.go",
         "pkg/muz/transforms/array_instantiation.go",
         "pkg/muz/transforms/quantifier_instantiation.go",
@@ -93590,6 +93626,7 @@
         "TestSubsumptionCheckerDropsTautologicalSelfRule",
         "TestSubsumptionCheckerRemovesTotalPositiveTail",
         "TestSMTLibRunnerCPPReference/fp_spacer_skip_propagate.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_array_blast.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_array_eq_rewrite.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_array_instantiation.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_quantifier_instantiation.smt2",
@@ -93619,7 +93656,12 @@
           "go_target": "pkg/muz/fp/spacer_engine.go"
         },
         {
-          "name": "remaining ordered default transform stages for array blasting, bit blasting, scaling, Karr invariants, and magic sets",
+          "name": "option-gated local-store array blasting and Ackermann reduction stage",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/spacer_engine.go"
+        },
+        {
+          "name": "remaining ordered default transform stages for bit blasting, scaling, Karr invariants, and magic sets",
           "status": "unported"
         }
       ],
@@ -93627,7 +93669,7 @@
         "Each Spacer query owns a finalized transformed RuleSet clone until Context initialization has retained its rules; the engine's original set remains available for subsequent queries."
       ],
       "deviations": [
-        "Every source-scheduled cone, interpreted-tail, subsumption, inliner, array-instantiation/equality, quantified-instantiation, and array-quantification round reached by the retained Spacer consumer is integrated. Array blasting, bit blasting, scaling, Karr invariants, and magic sets remain pending."
+        "Every source-scheduled cone, interpreted-tail, subsumption, inliner, array-instantiation/equality/blasting, quantified-instantiation, and array-quantification round reached by the retained Spacer consumer is integrated. Bit blasting, scaling, Karr invariants, and magic sets remain pending."
       ]
     },
     {

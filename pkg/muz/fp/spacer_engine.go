@@ -122,6 +122,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	arrayBlastName := "xform.array_blast"
+	arrayBlast, err := e.params.GetBoolName(&fixedpoint, &arrayBlastName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -141,6 +146,15 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 		quantifierAbstraction = transforms.NewQuantifierAbstractionPlugin(e.manager, e.rules, 38000)
 		if err = transformer.Register(quantifierAbstraction); err != nil {
 			return nil, errors.Join(err, transformer.Close())
+		}
+	}
+	if arrayBlast && !quantifyArrays {
+		blast, makeErr := transforms.NewArrayBlastPlugin(e.manager, e.rules, e.params, e.globals, 35999)
+		if makeErr != nil {
+			return nil, errors.Join(makeErr, transformer.Close())
+		}
+		if err = transformer.Register(blast); err != nil {
+			return nil, errors.Join(err, blast.Close(), transformer.Close())
 		}
 	}
 	var arrayInstantiation *transforms.ArrayInstantiationPlugin
