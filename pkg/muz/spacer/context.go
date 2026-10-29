@@ -18,28 +18,30 @@ import (
 var ErrContextOwner = errors.New("muz/spacer: invalid or closed context")
 
 type Context struct {
-	manager        *ast.ASTManager
-	owner          *Manager
-	config         PropSolverConfig
-	transformers   map[ast.ASTHandle]*PredicateTransformer
-	order          []ast.ASTHandle
-	query          *PredicateTransformer
-	queryDecl      ast.ASTHandle
-	queue          ProofObligationQueue
-	lastResult     lbool.LBool
-	inductive      uint32
-	skipPropagate  bool
-	resetQueue     bool
-	flexibleTrace  bool
-	flexibleDepth  uint32
-	reusePOBs      bool
-	simplifyPOBs   bool
-	blastTermITE   bool
-	initReachFacts bool
-	reachAsInitial bool
-	initialized    bool
-	solved         bool
-	closed         bool
+	manager         *ast.ASTManager
+	owner           *Manager
+	config          PropSolverConfig
+	transformers    map[ast.ASTHandle]*PredicateTransformer
+	order           []ast.ASTHandle
+	query           *PredicateTransformer
+	queryDecl       ast.ASTHandle
+	queue           ProofObligationQueue
+	lastResult      lbool.LBool
+	inductive       uint32
+	skipPropagate   bool
+	resetQueue      bool
+	flexibleTrace   bool
+	flexibleDepth   uint32
+	reusePOBs       bool
+	simplifyPOBs    bool
+	blastTermITE    bool
+	initReachFacts  bool
+	reachAsInitial  bool
+	useDerivations  bool
+	reverseChildren bool
+	initialized     bool
+	solved          bool
+	closed          bool
 }
 
 func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumContexts uint32, config smtcore.SMTSolverConfig) (*Context, error) {
@@ -101,10 +103,20 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	useDerivations, err := getBool("spacer.use_derivations", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	orderName := "spacer.order_children"
+	orderChildren, err := config.Params.GetUIntName(&fixedpoint, &orderName, 0)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
 		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
 		reusePOBs: reusePOBs, simplifyPOBs: simplifyPOBs, blastTermITE: blastTermITE, initReachFacts: initReachFacts, reachAsInitial: reachAsInitial,
+		useDerivations: useDerivations, reverseChildren: orderChildren == 1,
 	}, nil
 }
 
@@ -292,6 +304,9 @@ func (c *Context) InitializePredicates(set *base.RuleSet, declarations []ast.AST
 			return err
 		}
 		if err = transformer.SetReachAsInitial(c.reachAsInitial); err != nil {
+			return err
+		}
+		if err = transformer.SetDerivationPolicy(c.useDerivations, c.reverseChildren); err != nil {
 			return err
 		}
 	}

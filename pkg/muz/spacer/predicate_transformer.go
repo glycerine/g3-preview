@@ -43,6 +43,8 @@ type PredicateTransformer struct {
 	useEqClassGeneralizer    bool
 	lemmaSanityCheck         bool
 	useLemmaAsCTI            bool
+	useDerivations           bool
+	reverseChildren          bool
 	rules                    []*spacerNormalizedRule
 	ruleReferences           []ast.ASTRef
 	uses                     []*PredicateTransformer
@@ -81,7 +83,7 @@ func newPredicateTransformer(owner *Manager, name string, config PropSolverConfi
 	if owner == nil || owner.open() != nil {
 		return nil, ErrManagerOwner
 	}
-	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name, instantiateQuantified: true, useQuantifiedLemmas: true, blastTermITE: true, useInductiveGeneralizer: config.UseInductiveGeneralizer, useArrayEqGeneralizer: config.UseArrayEqGeneralizer, useEqClassGeneralizer: config.UseEqClassGeneralizer, lemmaSanityCheck: config.LemmaSanityCheck, useLemmaAsCTI: config.UseLemmaAsCTI, reachAsInitial: true, initializeReachFacts: true}
+	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name, instantiateQuantified: true, useQuantifiedLemmas: true, blastTermITE: true, useInductiveGeneralizer: config.UseInductiveGeneralizer, useArrayEqGeneralizer: config.UseArrayEqGeneralizer, useEqClassGeneralizer: config.UseEqClassGeneralizer, lemmaSanityCheck: config.LemmaSanityCheck, useLemmaAsCTI: config.UseLemmaAsCTI, useDerivations: true, reachAsInitial: true, initializeReachFacts: true}
 	if config.Itp.Params == nil && config.Itp.Globals == nil {
 		config.Itp.Params = owner.contexts[0].config.Params
 		config.Itp.Globals = owner.contexts[0].config.Globals
@@ -107,6 +109,15 @@ func newPredicateTransformer(owner *Manager, name string, config PropSolverConfi
 	}
 	committed = true
 	return p, nil
+}
+
+func (p *PredicateTransformer) SetDerivationPolicy(retain, reverseChildren bool) error {
+	if err := p.open(); err != nil {
+		return err
+	}
+	p.useDerivations = retain
+	p.reverseChildren = reverseChildren
+	return nil
 }
 
 // NewPredicateTransformer creates the live solver/frame bridge after rule

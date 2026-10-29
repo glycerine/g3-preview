@@ -88,7 +88,7 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 			}
 			return result, nil
 		}
-		child, err := p.CreateDerivationChild(obligation, check.Rule, check.Model, check.ReachPredUsed, false)
+		child, err := p.CreateDerivationChild(obligation, check.Rule, check.Model, check.ReachPredUsed, p.reverseChildren)
 		if err != nil {
 			return ExpansionResult{}, err
 		}

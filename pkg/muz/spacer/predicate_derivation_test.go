@@ -98,6 +98,18 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 	if level, err := child.Level(); err != nil || level != 1 {
 		t.Fatal("Spacer create_children child level", level, err)
 	}
+	spacerMust(t, transformer.SetDerivationPolicy(false, false))
+	withoutDerivationParent, err := transformer.NewProofObligation(nil, 2, 2, truth, nil)
+	spacerMust(t, err)
+	withoutDerivation, err := transformer.CreateDerivationChild(withoutDerivationParent, recursive, md.Core(), []bool{false}, false)
+	spacerMust(t, err)
+	if withoutDerivation == nil {
+		t.Fatal("Spacer create_children without retained derivations did not produce its first child")
+	}
+	if retained, found, err := withoutDerivation.Derivation(); err != nil || found || retained != nil {
+		t.Fatal("Spacer create_children retained a disabled derivation", retained, found, err)
+	}
+	spacerMust(t, transformer.SetDerivationPolicy(true, false))
 	concrete, err := transformer.MakeReachFact(obligation, recursive, md.Core(), true, true)
 	spacerMust(t, err)
 	justifications, err := concrete.Justifications()

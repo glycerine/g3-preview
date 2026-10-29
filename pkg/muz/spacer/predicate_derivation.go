@@ -124,6 +124,11 @@ func (p *PredicateTransformer) CreateDerivationChild(obligation *ProofObligation
 	if err = child.SetDerivation(derivation); err != nil {
 		return nil, err
 	}
+	if !p.useDerivations {
+		if err = child.SetDerivation(nil); err != nil {
+			return nil, err
+		}
+	}
 	committed = true
 	return child, nil
 }
