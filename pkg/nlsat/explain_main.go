@@ -151,6 +151,9 @@ func (n *explanationAssumptions) collectExplanation(literals []sat.Literal, full
 		if err = n.normalizeCore(&n.simplifiedCore, max); err != nil {
 			return err
 		}
+		if err = n.simplifyCoreEqualities(&n.simplifiedCore, max); err != nil {
+			return err
+		}
 		return n.explainMain(n.simplifiedCore.result)
 	}
 	return n.explainMain(literals)

@@ -92569,6 +92569,7 @@
         "pkg/nlsat/scoped_literal_vector.go",
         "pkg/nlsat/explain_vanishing.go",
         "pkg/nlsat/explain_normalize.go",
+        "pkg/nlsat/explain_simplify.go",
         "pkg/nlsat/explain_projection_coefficients.go",
         "pkg/nlsat/explain_projection_psc.go",
         "pkg/nlsat/explain_projection_discriminant.go",
@@ -92622,6 +92623,8 @@
         "TestExplanationNormalizeCorePreservesBorrowedPendingSET",
         "TestExplanationNormalizeRetainedFactorParity",
         "TestExplanationNormalizeLexicalVectorDestruction",
+        "TestExplanationSimplifyCoreWithEqualityPseudoRemainder",
+        "TestExplanationSelectsMinimumDegreeCoreEquality",
         "TestProjectionFactorsCanonicalDistinctAndDisabledMode",
         "TestProjectionFactorsVanishingAndConstantShortcuts",
         "TestProjectionLeadingCoefficientsFactorAndSkipConstants",
@@ -92975,6 +92978,15 @@
             "TestExplanationNormalizeCorePreservesBorrowedPendingSET",
             "TestExplanationNormalizeRetainedFactorParity",
             "TestExplanationNormalizeLexicalVectorDestruction"
+          ]
+        },
+        {
+          "name": "Conflict-core equality selection and pseudo-remainder rewriting using an equality in the core, including leading-coefficient sign assumptions and lower-stage literal discharge (cpp998-1235,1309-1322)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/explain_simplify.go",
+          "tests": [
+            "TestExplanationSimplifyCoreWithEqualityPseudoRemainder",
+            "TestExplanationSelectsMinimumDegreeCoreEquality"
           ]
         },
         {
