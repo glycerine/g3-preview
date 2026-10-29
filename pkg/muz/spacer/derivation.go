@@ -362,7 +362,7 @@ func (d *Derivation) createProjectedChild(md *model.ModelCore) (_ *ProofObligati
 	if err != nil {
 		return nil, err
 	}
-	preimage, remaining, err := d.project(true, md, variables, preFormula)
+	preimage, remaining, err := d.project(d.parent.transformer.groundCTI, md, variables, preFormula)
 	if err != nil {
 		return nil, err
 	}
@@ -419,7 +419,7 @@ func (d *Derivation) createProjectedChild(md *model.ModelCore) (_ *ProofObligati
 	if err != nil {
 		return nil, err
 	}
-	postRef, remaining, err := d.project(true, md, variables, postFormula)
+	postRef, remaining, err := d.project(d.parent.transformer.groundCTI, md, variables, postFormula)
 	if err != nil {
 		return nil, err
 	}
@@ -582,7 +582,7 @@ func (d *Derivation) CreateNextChild() (_ *ProofObligation, resultErr error) {
 		}
 		variables = append(variables, value)
 	}
-	projected, remaining, err := d.project(true, md, variables, combined)
+	projected, remaining, err := d.project(d.parent.transformer.groundCTI, md, variables, combined)
 	if err != nil {
 		return nil, err
 	}

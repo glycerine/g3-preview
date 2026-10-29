@@ -14,6 +14,7 @@
 (set-option :fixedpoint.spacer.reach_dnf false)
 (set-option :fixedpoint.spacer.instantiate false)
 (set-option :fixedpoint.spacer.qlemmas false)
+(set-option :fixedpoint.spacer.ground_cti false)
 (declare-rel Inv (Int))
 (declare-rel Bad ())
 (declare-var x Int)

@@ -88704,6 +88704,7 @@
         "TestContextConsumesRestartPolicy",
         "TestSearchRestartPolicyUsesStrictLubyThresholds",
         "TestContextConsumesQuantifiedLemmaPolicies",
+        "TestContextConsumesGroundCTIPolicy",
         "TestSMTContextFixedpointSpacerInductiveExports",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
         "TestSMTLibRunnerScripts/fp_spacer_flexible_trace.smt2",
@@ -88979,7 +88980,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "bounded proof-obligation search with Luby lemma restarts, parameterized concrete reach-fact projection, and preorder ground satisfying-answer reconstruction",
+          "name": "bounded proof-obligation search with Luby lemma restarts, configurable ground-CTI derivation projection, parameterized concrete reach-fact projection, and preorder ground satisfying-answer reconstruction",
           "status": "partial",
           "go_target": "pkg/muz/spacer/context_answer.go",
           "tests": [
@@ -88989,6 +88990,7 @@
             "TestContextConsumesRestartPolicy",
             "TestSearchRestartPolicyUsesStrictLubyThresholds",
             "TestContextConsumesQuantifiedLemmaPolicies",
+            "TestContextConsumesGroundCTIPolicy",
             "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_spacer_recursive_trace.smt2"
           ]

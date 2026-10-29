@@ -45,6 +45,7 @@ type Context struct {
 	restartInitial   uint32
 	instantiate      bool
 	quantifiedLemmas bool
+	groundCTI        bool
 	initialized      bool
 	solved           bool
 	closed           bool
@@ -143,6 +144,10 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	groundCTI, err := getBool("spacer.ground_cti", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
 		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
@@ -151,6 +156,7 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 		eliminateAux: eliminateAux, reachDNF: reachDNF,
 		useRestarts: useRestarts, restartInitial: restartInitial,
 		instantiate: instantiate, quantifiedLemmas: quantifiedLemmas,
+		groundCTI: groundCTI,
 	}, nil
 }
 
@@ -347,6 +353,9 @@ func (c *Context) InitializePredicates(set *base.RuleSet, declarations []ast.AST
 			return err
 		}
 		if err = transformer.SetQuantifiedLemmaPolicy(c.instantiate, c.quantifiedLemmas); err != nil {
+			return err
+		}
+		if err = transformer.SetGroundCTI(c.groundCTI); err != nil {
 			return err
 		}
 	}

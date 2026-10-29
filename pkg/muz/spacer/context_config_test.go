@@ -166,3 +166,20 @@ func TestContextConsumesQuantifiedLemmaPolicies(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestContextConsumesGroundCTIPolicy(t *testing.T) {
+	manager, globals := newSpacerTestServices(t)
+	if err := globals.SourceSetName("fixedpoint.spacer.ground_cti", "false"); err != nil {
+		t.Fatal(err)
+	}
+	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if context.groundCTI {
+		t.Fatal("ground CTI parameter policy")
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
