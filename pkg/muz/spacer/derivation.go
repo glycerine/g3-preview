@@ -244,7 +244,7 @@ func (d *Derivation) Transition() (ast.ASTHandle, error) {
 	return d.parent.transformer.manager.RefGet(d.transition)
 }
 
-func (d *Derivation) project(md *model.ModelCore, variables []ast.ASTHandle, formula ast.ASTHandle) (result ast.ASTRef, remaining []ast.ASTRef, resultErr error) {
+func (d *Derivation) project(force bool, md *model.ModelCore, variables []ast.ASTHandle, formula ast.ASTHandle) (result ast.ASTRef, remaining []ast.ASTRef, resultErr error) {
 	manager := d.parent.transformer.manager
 	defer func() {
 		if resultErr != nil {
@@ -281,7 +281,7 @@ func (d *Derivation) project(md *model.ModelCore, variables []ast.ASTHandle, for
 	}
 	defer func() { resultErr = errors.Join(resultErr, projector.Close()) }()
 	if len(variableRefs) != 0 {
-		if err = projector.Project(true, &variableRefs, md, &formRefs); err != nil {
+		if err = projector.Project(force, &variableRefs, md, &formRefs); err != nil {
 			return ast.ASTRef{}, nil, err
 		}
 	}
@@ -362,7 +362,7 @@ func (d *Derivation) createProjectedChild(md *model.ModelCore) (_ *ProofObligati
 	if err != nil {
 		return nil, err
 	}
-	preimage, remaining, err := d.project(md, variables, preFormula)
+	preimage, remaining, err := d.project(true, md, variables, preFormula)
 	if err != nil {
 		return nil, err
 	}
@@ -419,7 +419,7 @@ func (d *Derivation) createProjectedChild(md *model.ModelCore) (_ *ProofObligati
 	if err != nil {
 		return nil, err
 	}
-	postRef, remaining, err := d.project(md, variables, postFormula)
+	postRef, remaining, err := d.project(true, md, variables, postFormula)
 	if err != nil {
 		return nil, err
 	}
@@ -582,7 +582,7 @@ func (d *Derivation) CreateNextChild() (_ *ProofObligation, resultErr error) {
 		}
 		variables = append(variables, value)
 	}
-	projected, remaining, err := d.project(md, variables, combined)
+	projected, remaining, err := d.project(true, md, variables, combined)
 	if err != nil {
 		return nil, err
 	}

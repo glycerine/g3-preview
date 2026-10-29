@@ -38,6 +38,20 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 	spacerMust(t, err)
 	md, err := model.NewModel(manager)
 	spacerMust(t, err)
+	lastReach, found, err := transformer.LastReachCaseVariable()
+	spacerMust(t, err)
+	if !found {
+		t.Fatal("missing initial Spacer reach-case variable")
+	}
+	originReach, err := owner.FormulaNewToOld(lastReach, 0, false)
+	spacerMust(t, err)
+	originReachHandle, err := manager.RefGet(originReach)
+	spacerMust(t, err)
+	originReachDeclaration, err := manager.GetDecl(originReachHandle)
+	spacerMust(t, err)
+	falsity, err := manager.MkFalse()
+	spacerMust(t, err)
+	spacerMust(t, md.Core().RegisterConstant(originReachDeclaration, falsity))
 	child, err := transformer.CreateDerivationChild(obligation, recursive, md.Core(), []bool{false}, false)
 	spacerMust(t, err)
 	if child == nil {
@@ -61,6 +75,24 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 	if level, err := child.Level(); err != nil || level != 1 {
 		t.Fatal("Spacer create_children child level", level, err)
 	}
+	concrete, err := transformer.MakeReachFact(obligation, recursive, md.Core(), true, true)
+	spacerMust(t, err)
+	justifications, err := concrete.Justifications()
+	spacerMust(t, err)
+	if len(justifications) != 1 {
+		t.Fatal("projected Spacer reach-fact justifications", len(justifications))
+	}
+	for _, justification := range justifications {
+		spacerMust(t, justification.Close())
+	}
+	if initial, err := concrete.IsInitial(); err != nil || initial {
+		t.Fatal("computed Spacer reach fact marked initial", initial, err)
+	}
+	if added, err := transformer.AddReachFact(concrete); err != nil || added {
+		t.Fatal("duplicate projected Spacer reach fact", added, err)
+	}
+	spacerMust(t, concrete.Close())
+	spacerMust(t, manager.DelRef(&originReach))
 	spacerMust(t, md.Close())
 	spacerMust(t, recursive.Close())
 	spacerMust(t, initial.Close())

@@ -83,7 +83,7 @@ func (p *PredicateTransformer) CreateDerivationChild(obligation *ProofObligation
 		return nil, err
 	}
 	variables = append(variables, skolems...)
-	projected, remaining, err := derivation.project(md, variables, implicant)
+	projected, remaining, err := derivation.project(true, md, variables, implicant)
 	if err != nil {
 		return nil, err
 	}
