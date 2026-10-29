@@ -17,14 +17,22 @@ type RuleInlinerPlugin struct {
 	rules     *base.RuleManager
 	protected map[ast.ASTHandle]bool
 	priority  uint32
+	eager     bool
+	linear    bool
 	closed    bool
 }
 
 func NewRuleInlinerPlugin(manager *ast.ASTManager, rules *base.RuleManager, protected []ast.ASTHandle, priority uint32) *RuleInlinerPlugin {
+	return NewRuleInlinerPluginWithModes(manager, rules, protected, true, true, priority)
+}
+
+// NewRuleInlinerPluginWithModes constructs the source parameterized eager and
+// straight-line inlining stages.
+func NewRuleInlinerPluginWithModes(manager *ast.ASTManager, rules *base.RuleManager, protected []ast.ASTHandle, eager, linear bool, priority uint32) *RuleInlinerPlugin {
 	if priority == 0 {
 		priority = 35000
 	}
-	p := &RuleInlinerPlugin{manager: manager, rules: rules, protected: make(map[ast.ASTHandle]bool), priority: priority}
+	p := &RuleInlinerPlugin{manager: manager, rules: rules, protected: make(map[ast.ASTHandle]bool), priority: priority, eager: eager, linear: linear}
 	for _, declaration := range protected {
 		p.protected[declaration] = true
 	}
@@ -276,6 +284,49 @@ func (p *RuleInlinerPlugin) Transform(source *base.RuleSet) (_ *base.RuleSet, re
 	if p == nil || p.closed || p.manager == nil || p.rules == nil {
 		return nil, base.ErrRuleTransformerOwner
 	}
+	count, err := source.Len()
+	if err != nil || count == 0 {
+		return nil, err
+	}
+	// The source refuses the complete inliner when any interpreted tail has a
+	// quantifier; mixing transformed and untransformed rules is not supported.
+	for index := 0; index < count; index++ {
+		rule, getErr := source.Rule(index)
+		if getErr != nil {
+			return nil, getErr
+		}
+		uninterpreted, getErr := rule.UninterpretedTailSize()
+		total, totalErr := rule.TailSize()
+		quantified := false
+		for tailIndex := uninterpreted; getErr == nil && totalErr == nil && tailIndex < total; tailIndex++ {
+			tail, _, tailErr := rule.Tail(tailIndex)
+			if tailErr != nil {
+				getErr = tailErr
+				break
+			}
+			quantified, tailErr = p.manager.HasQuantifiers(tail)
+			if tailErr != nil {
+				getErr = tailErr
+				break
+			}
+			if quantified {
+				break
+			}
+		}
+		getErr = errors.Join(getErr, totalErr, rule.Close())
+		if getErr != nil {
+			return nil, getErr
+		}
+		if quantified {
+			return nil, nil
+		}
+	}
+	if !p.eager {
+		if !p.linear {
+			return nil, nil
+		}
+		return p.inlineLinear(source)
+	}
 	allowed, definitions, err := p.plan(source)
 	if err != nil {
 		return nil, err
@@ -295,10 +346,6 @@ func (p *RuleInlinerPlugin) Transform(source *base.RuleSet) (_ *base.RuleSet, re
 		return nil, err
 	}
 	changed := false
-	count, err := source.Len()
-	if err != nil {
-		return nil, err
-	}
 	for index := 0; index < count; index++ {
 		rule, getErr := source.Rule(index)
 		if getErr != nil {
@@ -358,6 +405,9 @@ func (p *RuleInlinerPlugin) Transform(source *base.RuleSet) (_ *base.RuleSet, re
 		}
 	}
 	if !changed {
+		if !p.linear {
+			return nil, nil
+		}
 		linear, linearErr := p.inlineLinear(source)
 		if linearErr != nil {
 			return nil, linearErr
@@ -371,15 +421,17 @@ func (p *RuleInlinerPlugin) Transform(source *base.RuleSet) (_ *base.RuleSet, re
 		}
 		return linear, nil
 	}
-	linear, err := p.inlineLinear(result)
-	if err != nil {
-		return nil, err
-	}
-	if linear != nil {
-		if err = result.Close(); err != nil {
-			return nil, errors.Join(err, linear.Close())
+	if p.linear {
+		linear, linearErr := p.inlineLinear(result)
+		if linearErr != nil {
+			return nil, linearErr
 		}
-		result = linear
+		if linear != nil {
+			if err = result.Close(); err != nil {
+				return nil, errors.Join(err, linear.Close())
+			}
+			result = linear
+		}
 	}
 	keep = true
 	return result, nil

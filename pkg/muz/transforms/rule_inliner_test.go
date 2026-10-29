@@ -10,7 +10,67 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/transforms"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestRuleInlinerHonorsDisabledModes(t *testing.T) {
+	f := newConeFixture(t, "P", "Goal")
+	f.add(t, f.applications["P"], "fact-P")
+	f.edge(t, "P", "Goal")
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["Goal"]))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("disabled inliner fixture rejected")
+	}
+	plugin := transforms.NewRuleInlinerPluginWithModes(f.manager, f.rules, []ast.ASTHandle{f.declarations["Goal"]}, false, false, 0)
+	t.Cleanup(func() { coneMust(t, plugin.Close()) })
+	replacement, err := plugin.Transform(f.set)
+	coneMust(t, err)
+	if replacement != nil {
+		coneMust(t, replacement.Close())
+		t.Fatal("disabled inliner changed rules")
+	}
+}
+
+func TestRuleInlinerRefusesMixedQuantifiedProgram(t *testing.T) {
+	f := newConeFixture(t, "P", "Goal", "Quantified")
+	f.add(t, f.applications["P"], "fact-P")
+	f.edge(t, "P", "Goal")
+	boolean, err := f.manager.MkBoolSort()
+	coneMust(t, err)
+	bound, err := f.manager.MkVar(0, boolean)
+	coneMust(t, err)
+	quantified, err := f.manager.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true,
+		Sorts:  []ast.ASTHandle{boolean},
+		Names:  []usymbol.Symbol{usymbol.Numerical(0)},
+		Body:   bound,
+	})
+	coneMust(t, err)
+	truth, err := f.manager.MkTrue()
+	coneMust(t, err)
+	quantifiedTail, err := f.manager.MkIff(quantified, truth)
+	coneMust(t, err)
+	quantifiedRule, err := f.rules.NewRule(f.applications["Quantified"], []ast.ASTHandle{quantifiedTail}, nil, "quantified")
+	coneMust(t, err)
+	coneMust(t, f.set.Add(quantifiedRule))
+	coneMust(t, quantifiedRule.Close())
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["Goal"]))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("quantified inliner fixture rejected")
+	}
+	plugin := transforms.NewRuleInlinerPlugin(f.manager, f.rules, []ast.ASTHandle{f.declarations["Goal"]}, 0)
+	t.Cleanup(func() { coneMust(t, plugin.Close()) })
+	replacement, err := plugin.Transform(f.set)
+	coneMust(t, err)
+	if replacement != nil {
+		coneMust(t, replacement.Close())
+		t.Fatal("inliner transformed a mixed quantified program")
+	}
+}
 
 func TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput(t *testing.T) {
 	f := newConeFixture(t, "P", "Q", "Goal")

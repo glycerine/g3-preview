@@ -92615,6 +92615,8 @@
         "TestRuleInlinerUsesDisjointVariableBanks",
         "TestRuleInlinerPreservesRecursivePredicate",
         "TestRuleInlinerContractsUniqueLinearGroundChain",
+    "TestRuleInlinerHonorsDisabledModes",
+    "TestRuleInlinerRefusesMixedQuantifiedProgram",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_nonlinear_inlining.smt2",
@@ -92722,7 +92724,16 @@
           ]
         },
         {
-          "name": "complete eager inlining, proof/model conversion, quantified-rule handling, and interpreted-tail simplification during resolution",
+      "name": "xform.inline_eager/xform.inline_linear gating and whole-plugin refusal when any interpreted rule tail contains a quantifier",
+      "status": "ported",
+      "go_target": "pkg/muz/transforms/rule_inliner.go",
+      "tests": [
+        "TestRuleInlinerHonorsDisabledModes",
+        "TestRuleInlinerRefusesMixedQuantifiedProgram"
+      ]
+    },
+    {
+      "name": "remaining SCC break and multiplier planning, oriented eager pass, proof/model conversion, and interpreted-tail unsatisfiability filtering during resolution",
           "status": "unported"
         }
       ],
@@ -92746,7 +92757,9 @@
         "TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput",
         "TestRuleInlinerUsesDisjointVariableBanks",
         "TestRuleInlinerPreservesRecursivePredicate",
-        "TestRuleInlinerContractsUniqueLinearGroundChain"
+    "TestRuleInlinerContractsUniqueLinearGroundChain",
+    "TestRuleInlinerHonorsDisabledModes",
+    "TestRuleInlinerRefusesMixedQuantifiedProgram"
       ],
       "conditionals": [
         {

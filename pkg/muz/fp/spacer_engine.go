@@ -65,12 +65,25 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	inlineEagerName := "xform.inline_eager"
+	inlineEager, err := e.params.GetBoolName(&fixedpoint, &inlineEagerName, true)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	inlineLinearName := "xform.inline_linear"
+	inlineLinear, err := e.params.GetBoolName(&fixedpoint, &inlineLinearName, true)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	newInliner := func(priority uint32) base.RuleTransformPlugin {
+		return transforms.NewRuleInlinerPluginWithModes(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, priority)
+	}
 	if useSubsumption {
 		if err = transformer.Register(transforms.NewSubsumptionCheckerPlugin(useChecker, 35005)); err != nil {
 			return nil, errors.Join(err, transformer.Close())
 		}
 	}
-	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 35000)); err != nil {
+	if err = transformer.Register(newInliner(35000)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
 	if err = transformer.Register(transforms.NewConePlugin(34990)); err != nil {
@@ -88,7 +101,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 			return nil, errors.Join(err, transformer.Close())
 		}
 	}
-	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 34970)); err != nil {
+	if err = transformer.Register(newInliner(34970)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
 	if err = transformer.Register(transforms.NewConePlugin(34960)); err != nil {
@@ -116,7 +129,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 		} {
 			var plugin base.RuleTransformPlugin
 			if stage.inlining {
-				plugin = transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, stage.priority)
+				plugin = newInliner(stage.priority)
 			} else {
 				plugin = transforms.NewSubsumptionCheckerPlugin(useChecker, stage.priority)
 			}
@@ -124,7 +137,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 				return nil, errors.Join(err, plugin.Close(), transformer.Close())
 			}
 		}
-	} else if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 34930)); err != nil {
+	} else if err = transformer.Register(newInliner(34930)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
 	_, err = transformer.Apply(prepared)
