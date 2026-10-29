@@ -79,8 +79,12 @@ func NewQFNIATacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config sm
 	nla := b.keep(arith.NewNLA2BVTactic(m, c, g, nlaParams, config.ModelEvaluator))
 	bvSolver := b.keep(NewQFBVTacticWithOutput(m, p, config, output))
 	bounded := b.then(simplify(simplifyParams), nla, bvSolver, b.keep(tactic.NewFailIfUndecidedTactic(), nil))
-	fallback := b.then(simplify(smtParams), b.keep(smtcore.NewSMTTactic(m, nil, config)))
-	body := b.then(preamble, b.otherwise(bounded, fallback))
+	smtSolver := func() tactic.Tactic {
+		return b.then(simplify(smtParams), b.keep(smtcore.NewSMTTactic(m, nil, config)))
+	}
+	intermediate := b.timed(smtSolver(), 2000)
+	fallback := smtSolver()
+	body := b.then(preamble, b.otherwise(bounded, intermediate, fallback))
 	if b.err != nil {
 		return nil, b.err
 	}

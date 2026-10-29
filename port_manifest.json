@@ -176817,7 +176817,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "QF_NIA preamble through elim01, bounded NIA simplify/nla2bv/QF_BV route, final SMT fallback, tactic command, strategic QF_NIA solver and ALL classifier integration",
+          "name": "QF_NIA preamble through elim01, bounded NIA simplify/nla2bv/QF_BV route, timed SOM-SMT attempt, final SMT fallback, tactic command, strategic QF_NIA solver and ALL classifier integration",
           "status": "partial",
           "go_target": "pkg/tactic/smtlogics/qfnia_tactic.go",
           "tests": [
@@ -176830,7 +176830,7 @@
         "The construction scope owns every concrete child tactic and parameter copy until the using-params graph acquires them; error cleanup releases children in reverse construction order."
       ],
       "deviations": [
-        "The preamble through elim01, first bounded nla2bv route and final complete SMT fallback are retained. Optional skip-if-failed cofactor-term-ITE finishes the preamble; the timed intermediate SMT attempt and QF_NRA/NLSAT attempts remain pending with their unported constituent tactics."
+        "The preamble through elim01, first bounded nla2bv route, timed SOM-SMT attempt and final complete SMT fallback are retained. Optional skip-if-failed cofactor-term-ITE finishes the preamble; the intervening QF_NRA/NLSAT attempt remains pending with its unported constituent tactics."
       ]
     },
     {
