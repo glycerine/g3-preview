@@ -1,0 +1,5 @@
+(set-logic UFBV)
+(declare-fun f ((_ BitVec 4)) (_ BitVec 4))
+(assert (forall ((x (_ BitVec 4))) (= (f x) (bvnot x))))
+(assert (not (= (f #b0000) #b1111)))
+(check-sat-using ufbv)

@@ -180079,22 +180079,46 @@
       "path": "src/tactic/ufbv/ufbv_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/ufbv/ufbv_tactic.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
+        "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "quantified UFBV preprocessing fixed point, parameter policy, SMT backend, and command route",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/ufbv_tactic.go",
+          "tests": [
+            "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
+            "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The source ufbv_pre and ufbv_post trace-only tactics are omitted because they do not change goals, proofs, cores, or models."
+      ]
     },
     {
       "path": "src/tactic/ufbv/ufbv_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/ufbv/ufbv_tactic.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
+        "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -180105,9 +180129,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "UFBV tactic factory and explicit ufbv command registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/ufbv_tactic.go",
+          "tests": [
+            "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
+            "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
