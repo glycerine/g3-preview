@@ -10,6 +10,8 @@
 (set-option :fixedpoint.spacer.reach_as_init false)
 (set-option :fixedpoint.spacer.use_derivations false)
 (set-option :fixedpoint.spacer.order_children 1)
+(set-option :fixedpoint.spacer.elim_aux false)
+(set-option :fixedpoint.spacer.reach_dnf false)
 (declare-rel Inv (Int))
 (declare-rel Bad ())
 (declare-var x Int)

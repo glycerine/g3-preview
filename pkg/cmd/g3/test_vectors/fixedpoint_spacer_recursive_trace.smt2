@@ -1,4 +1,6 @@
 (set-option :fixedpoint.engine spacer)
+(set-option :fixedpoint.spacer.elim_aux false)
+(set-option :fixedpoint.spacer.reach_dnf false)
 (declare-rel P (Int))
 (declare-rel Goal ())
 (declare-rel U ())

@@ -39,6 +39,8 @@ type Context struct {
 	reachAsInitial  bool
 	useDerivations  bool
 	reverseChildren bool
+	eliminateAux    bool
+	reachDNF        bool
 	initialized     bool
 	solved          bool
 	closed          bool
@@ -112,11 +114,20 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	eliminateAux, err := getBool("spacer.elim_aux", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	reachDNF, err := getBool("spacer.reach_dnf", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
 		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
 		reusePOBs: reusePOBs, simplifyPOBs: simplifyPOBs, blastTermITE: blastTermITE, initReachFacts: initReachFacts, reachAsInitial: reachAsInitial,
 		useDerivations: useDerivations, reverseChildren: orderChildren == 1,
+		eliminateAux: eliminateAux, reachDNF: reachDNF,
 	}, nil
 }
 
@@ -307,6 +318,9 @@ func (c *Context) InitializePredicates(set *base.RuleSet, declarations []ast.AST
 			return err
 		}
 		if err = transformer.SetDerivationPolicy(c.useDerivations, c.reverseChildren); err != nil {
+			return err
+		}
+		if err = transformer.SetReachFactPolicy(c.eliminateAux, c.reachDNF); err != nil {
 			return err
 		}
 	}

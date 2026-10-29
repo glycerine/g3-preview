@@ -11,6 +11,10 @@ import (
 	"github.com/glycerine/g3/pkg/muz/base"
 )
 
+func (p *PredicateTransformer) makeConfiguredReachFact(obligation *ProofObligation, rule *base.Rule, md *model.ModelCore) (*ReachFact, error) {
+	return p.MakeReachFact(obligation, rule, md, p.eliminateAuxiliaries, p.reachDNF)
+}
+
 // MakeReachFact constructs a concrete reach fact from a rule path selected by
 // md. The returned fact owns retained references to every child justification.
 func (p *PredicateTransformer) MakeReachFact(obligation *ProofObligation, rule *base.Rule, md *model.ModelCore, eliminateAuxiliaries, reachDNF bool) (result *ReachFact, resultErr error) {

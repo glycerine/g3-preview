@@ -43,7 +43,7 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 		}
 		if check.IsConcrete {
 			if len(predecessors) != 0 {
-				fact, makeErr := p.MakeReachFact(obligation, check.Rule, check.Model, true, true)
+				fact, makeErr := p.makeConfiguredReachFact(obligation, check.Rule, check.Model)
 				if makeErr != nil {
 					return ExpansionResult{}, makeErr
 				}

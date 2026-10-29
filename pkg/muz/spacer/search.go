@@ -31,7 +31,7 @@ func confirmConcreteReachability(obligation *ProofObligation) (_ bool, resultErr
 			return false, fmt.Errorf("spacer: confirm reachability predecessors: %w", err)
 		}
 		if len(predecessors) != 0 {
-			fact, err := obligation.transformer.MakeReachFact(obligation, check.Rule, check.Model, true, true)
+			fact, err := obligation.transformer.makeConfiguredReachFact(obligation, check.Rule, check.Model)
 			if err != nil {
 				return false, fmt.Errorf("spacer: confirm reachability fact: %w", err)
 			}

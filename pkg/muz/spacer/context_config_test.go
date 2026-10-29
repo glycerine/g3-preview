@@ -86,3 +86,23 @@ func TestContextConsumesMinCutCoreMode(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestContextConsumesReachFactPolicies(t *testing.T) {
+	manager, globals := newSpacerTestServices(t)
+	if err := globals.SourceSetName("fixedpoint.spacer.elim_aux", "false"); err != nil {
+		t.Fatal(err)
+	}
+	if err := globals.SourceSetName("fixedpoint.spacer.reach_dnf", "false"); err != nil {
+		t.Fatal(err)
+	}
+	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if context.eliminateAux || context.reachDNF {
+		t.Fatal("reach-fact parameter policy", context.eliminateAux, context.reachDNF)
+	}
+	if err = context.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
