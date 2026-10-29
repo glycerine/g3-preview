@@ -5,6 +5,7 @@ package spacer
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/muz/base"
@@ -39,9 +40,67 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, err
 	}
+	propConfig, err := spacerPropSolverConfig(config)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
-		config: PropSolverConfig{Itp: ItpSolverConfig{Params: config.Params, Globals: config.Globals, FarkasAConst: true}},
+		config: propConfig,
+	}, nil
+}
+
+func spacerPropSolverConfig(config smtcore.SMTSolverConfig) (PropSolverConfig, error) {
+	if config.Params == nil || config.Globals == nil || config.Globals.Context != config.Params {
+		return PropSolverConfig{}, ErrContextOwner
+	}
+	fixedpoint, err := config.Globals.SourceGetModuleName("fixedpoint")
+	if err != nil {
+		return PropSolverConfig{}, err
+	}
+	get := func(name string, fallback bool) (bool, error) {
+		return config.Params.GetBoolName(&fixedpoint, &name, fallback)
+	}
+	newCore, err := get("spacer.new_unsat_core", true)
+	if err != nil {
+		return PropSolverConfig{}, err
+	}
+	minimize, err := get("spacer.minimize_unsat_core", false)
+	if err != nil {
+		return PropSolverConfig{}, err
+	}
+	if minimize {
+		return PropSolverConfig{}, fmt.Errorf("muz/spacer: spacer.minimize_unsat_core is not ported")
+	}
+	optimized, err := get("spacer.farkas_optimized", true)
+	if err != nil {
+		return PropSolverConfig{}, err
+	}
+	split, err := get("spacer.split_farkas_literals", false)
+	if err != nil {
+		return PropSolverConfig{}, err
+	}
+	farkasAConst, err := get("spacer.farkas_a_const", true)
+	if err != nil {
+		return PropSolverConfig{}, err
+	}
+	keepProxy, err := get("spacer.keep_proxy", true)
+	if err != nil {
+		return PropSolverConfig{}, err
+	}
+	mode := ItpCoreLegacyFarkas
+	if newCore {
+		mode = ItpCoreNewFarkas
+		if optimized {
+			mode = ItpCoreNewOptimized
+		}
+	}
+	return PropSolverConfig{
+		Itp: ItpSolverConfig{
+			Params: config.Params, Globals: config.Globals, SplitLiterals: split,
+			CoreMode: mode, FarkasAConst: farkasAConst,
+		},
+		KeepProxy: keepProxy,
 	}, nil
 }
 
