@@ -162069,9 +162069,19 @@
       "path": "src/tactic/arith/elim01_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/elim01_tactic.go",
+        "pkg/tactic/arith/elim01_tactic_test.go",
+        "pkg/tactic/smtlogics/qfnia_tactic.go",
+        "pkg/cmd/g3/test_vectors/qfnia_solver_bounded.smt2"
+      ],
+      "tests": [
+        "TestElim01FiniteRangeRewriteAndModel",
+        "TestElim01ProofsAndNonTargetNoOp",
+        "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
+        "TestSMTLibRunnerCPPReference/qfnia_solver_bounded.smt2"
+      ],
       "assertions": [
         {
           "line": 45,
@@ -162088,17 +162098,40 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "finite nonnegative integer bound selection, Boolean weighted-sum replacement, range axioms, simultaneous theory rewriting, proof update, translation and parameter surface",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/elim01_tactic.go",
+          "tests": [
+            "TestElim01FiniteRangeRewriteAndModel",
+            "TestElim01ProofsAndNonTargetNoOp"
+          ]
+        },
+        {
+          "name": "bool2int model reconstruction and fresh-Boolean filtering",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/arith/elim01_tactic.go",
+          "tests": ["TestElim01FiniteRangeRewriteAndModel"]
+        }
+      ],
+      "ownership": [
+        "The tactic owns its parameter copy, BoundManager and TheoryRewriter. Each application owns a simultaneous replacement and temporary axiom references; the composed filter/extension converter owns original definitions and fresh declarations after publication."
+      ],
+      "deviations": [
+        "The existing concrete extension-plus-filter model converters replace the source-local bool2int converter while preserving weighted integer reconstruction and helper removal. Source TRACE records, assertion gates, exact allocation frontiers and stopped-cleanup campaigns remain unaudited. The implementation retains the source runtime default max_coefficient of 8 despite its description text saying 1."
+      ]
     },
     {
       "path": "src/tactic/arith/elim01_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/tactic/arith/elim01_tactic.go"],
+      "tests": [
+        "TestElim01FiniteRangeRewriteAndModel",
+        "TestElim01ProofsAndNonTargetNoOp"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -162109,10 +162142,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete elim01 tactic factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/elim01_tactic.go",
+          "tests": ["TestElim01FiniteRangeRewriteAndModel"]
+        }
+      ],
+      "ownership": [
+        "The returned clean wrapper owns the concrete Elim01Tactic through the standard counted tactic contract."
+      ],
       "deviations": []
     },
     {
@@ -176775,7 +176817,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "QF_NIA preamble prefix through unconstrained elimination, bounded NIA simplify/nla2bv/QF_BV route, final SMT fallback, tactic command, strategic QF_NIA solver and ALL classifier integration",
+          "name": "QF_NIA preamble through elim01, bounded NIA simplify/nla2bv/QF_BV route, final SMT fallback, tactic command, strategic QF_NIA solver and ALL classifier integration",
           "status": "partial",
           "go_target": "pkg/tactic/smtlogics/qfnia_tactic.go",
           "tests": [
@@ -176788,7 +176830,7 @@
         "The construction scope owns every concrete child tactic and parameter copy until the using-params graph acquires them; error cleanup releases children in reverse construction order."
       ],
       "deviations": [
-        "The preamble prefix through unconstrained elimination, first bounded nla2bv route and final complete SMT fallback are retained. Elim01 and optional cofactor-term-ITE finish the preamble; the timed intermediate SMT attempt and QF_NRA/NLSAT attempts remain pending with their unported constituent tactics."
+        "The preamble through elim01, first bounded nla2bv route and final complete SMT fallback are retained. Optional skip-if-failed cofactor-term-ITE finishes the preamble; the timed intermediate SMT attempt and QF_NRA/NLSAT attempts remain pending with their unported constituent tactics."
       ]
     },
     {

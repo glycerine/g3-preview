@@ -74,6 +74,7 @@ func NewQFNIATacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config sm
 		b.using(b.clean(b.keep(core.NewContextSimplifyTactic(m, c, g, nil, config.ModelEvaluator))), contextParams),
 		simplify(pullParams),
 		b.clean(b.keep(core.NewEliminateUnconstrainedTactic(m, c, g, nil, config.ModelEvaluator))),
+		b.keep(arith.MakeElim01Tactic(m, c, g, nil, config.ModelEvaluator)),
 	)
 	nla := b.keep(arith.NewNLA2BVTactic(m, c, g, nlaParams, config.ModelEvaluator))
 	bvSolver := b.keep(NewQFBVTacticWithOutput(m, p, config, output))
