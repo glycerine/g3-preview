@@ -208,3 +208,21 @@ func (e *PropositionalEngine) Reachable(declaration ast.ASTHandle) (ast.ASTRef, 
 	}
 	return e.spacer.Reachable(declaration)
 }
+
+// GroundSatAnswer returns the latest successful Spacer reach-fact answer.
+func (e *PropositionalEngine) GroundSatAnswer(declaration ast.ASTHandle) (ast.ASTRef, error) {
+	if err := e.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	if e.backend != "spacer" || e.spacer == nil || e.spacerRevision != e.revision {
+		return ast.ASTRef{}, ErrPropositionalEngine
+	}
+	status, err := e.spacer.LastResult()
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	if status != lbool.True {
+		return ast.ASTRef{}, ErrPropositionalEngine
+	}
+	return e.spacer.Answer(declaration)
+}

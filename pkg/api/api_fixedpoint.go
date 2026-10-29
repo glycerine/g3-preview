@@ -170,6 +170,16 @@ func (c *SMTContext) FixedpointReachable(declaration ast.ASTHandle) (ast.ASTRef,
 	return c.command.FixedpointReachable(declaration)
 }
 
+// FixedpointGroundSatAnswer returns one owning reference to the latest
+// successful Spacer ground reach-fact answer. Release it through
+// Manager().DelRef.
+func (c *SMTContext) FixedpointGroundSatAnswer(declaration ast.ASTHandle) (ast.ASTRef, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	return c.command.FixedpointGroundSatAnswer(declaration)
+}
+
 // FixedpointStatistics returns an owning Go copy of current engine statistics.
 func (c *SMTContext) FixedpointStatistics() (statistics.Statistics, error) {
 	if err := c.open(); err != nil {

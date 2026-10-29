@@ -276,6 +276,16 @@ func (c *Context) FixedpointReachable(declaration ast.ASTHandle) (ast.ASTRef, er
 	return engine.Reachable(declaration)
 }
 
+// FixedpointGroundSatAnswer returns the latest successful Spacer ground
+// reach-fact answer as one owning AST reference.
+func (c *Context) FixedpointGroundSatAnswer(declaration ast.ASTHandle) (ast.ASTRef, error) {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	return engine.GroundSatAnswer(declaration)
+}
+
 func (c *Context) FixedpointStatistics() (statistics.Statistics, error) {
 	engine, err := c.fixedpointContext()
 	if err != nil {

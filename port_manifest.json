@@ -5324,7 +5324,7 @@
           "tests": []
         }
       ],
-      "ownership": ["SMTContext owns the shared command/fixedpoint context. FixedpointAnswer, FixedpointCoverDelta, FixedpointReachable and EvaluateFixedpointModel each transfer one concrete ASTRef to the caller; FixedpointModel transfers one concrete model owner; statistics are copied Go values, and relation/rule/cover inputs are borrowed for each call then retained by the underlying context when required."],
+      "ownership": ["SMTContext owns the shared command/fixedpoint context. FixedpointAnswer, FixedpointGroundSatAnswer, FixedpointCoverDelta, FixedpointReachable and EvaluateFixedpointModel each transfer one concrete ASTRef to the caller; FixedpointModel transfers one concrete model owner; statistics are copied Go values, and relation/rule/cover inputs are borrowed for each call then retained by the underlying context when required."],
       "deviations": ["The additive public Go surface reuses SMTContext instead of exposing the native opaque reference-counted fixedpoint object or C ABI. Cover operations are available after a retained PDR/Spacer query and operate on direct predicates; native slice/model-converter remapping remains outside this path. Unlisted api_datalog operations remain unported."]
     },
     {
@@ -5374,11 +5374,12 @@
       "ownership_audited": true,
       "methods": [
         {"name": "Z3_fixedpoint_query_from_lvl typed Go equivalent", "status": "ported", "go_target": "pkg/api/api_fixedpoint.go", "tests": ["TestSMTContextFixedpointSpacerInductiveExports"]},
+        {"name": "Z3_fixedpoint_get_ground_sat_answer typed Go equivalent", "status": "ported", "go_target": "pkg/api/api_fixedpoint.go", "tests": ["TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "Z3_fixedpoint_add_invariant typed Go equivalent", "status": "ported", "go_target": "pkg/api/api_fixedpoint.go", "tests": ["TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "Z3_fixedpoint_get_reachable typed Go equivalent", "status": "ported", "go_target": "pkg/api/api_fixedpoint.go", "tests": ["TestSMTContextFixedpointSpacerInductiveExports"]},
-        {"name": "remaining explicit ground-answer alias and rule/name trace exports", "status": "unported", "go_target": null, "tests": []}
+        {"name": "remaining rule/name trace exports", "status": "unported", "go_target": null, "tests": []}
       ],
-      "ownership": ["FixedpointReachable transfers one ASTRef to the caller; AddFixedpointInvariant borrows its declaration and property for the call, after which the engine retains the normalized lemma."],
+      "ownership": ["FixedpointGroundSatAnswer and FixedpointReachable transfer one ASTRef to the caller; AddFixedpointInvariant borrows its declaration and property for the call, after which the engine retains the normalized lemma."],
       "deviations": ["Typed Go methods replace opaque C handles and saved API trails."]
     },
     {

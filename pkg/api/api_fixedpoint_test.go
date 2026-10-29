@@ -280,4 +280,12 @@ func TestSMTContextFixedpointSpacerInductiveExports(t *testing.T) {
 		t.Fatal("Spacer reachable summary did not export a column variable", text.String())
 	}
 	astTestMust(t, manager.DelRef(&reachable))
+	ground, err := context.FixedpointGroundSatAnswer(p)
+	astTestMust(t, err)
+	groundHandle, err := manager.RefGet(ground)
+	astTestMust(t, err)
+	if groundHandle.IsNull() {
+		t.Fatal("Spacer public ground answer is empty")
+	}
+	astTestMust(t, manager.DelRef(&ground))
 }
