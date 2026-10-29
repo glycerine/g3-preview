@@ -7,7 +7,9 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
+	"github.com/glycerine/g3/pkg/qe"
 )
 
 type DerivationPremise struct {
@@ -240,6 +242,214 @@ func (d *Derivation) Transition() (ast.ASTHandle, error) {
 		return ast.ASTHandle{}, err
 	}
 	return d.parent.transformer.manager.RefGet(d.transition)
+}
+
+func (d *Derivation) project(md *model.ModelCore, variables []ast.ASTHandle, formula ast.ASTHandle) (result ast.ASTRef, remaining []ast.ASTRef, resultErr error) {
+	manager := d.parent.transformer.manager
+	defer func() {
+		if resultErr != nil {
+			if result != (ast.ASTRef{}) {
+				resultErr = errors.Join(resultErr, manager.DelRef(&result))
+			}
+			resultErr = errors.Join(resultErr, releaseNormalizeRefs(manager, remaining))
+			remaining = nil
+		}
+	}()
+	forms, err := manager.FlattenAnd([]ast.ASTHandle{formula})
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	formRefs, err := refsFromHandles(manager, forms)
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, releaseNormalizeRefs(manager, formRefs)) }()
+	variableRefs, err := refsFromHandles(manager, variables)
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	committedVariables := false
+	defer func() {
+		if !committedVariables {
+			resultErr = errors.Join(resultErr, releaseNormalizeRefs(manager, variableRefs))
+		}
+	}()
+	config := d.parent.transformer.owner.contexts[0].config.ModelEvaluator
+	projector, err := qe.NewModelBasedProjection(manager, qe.Config{Context: config.Context, Globals: config.Globals, Cooperation: config.Cooperation, Trace: config.Trace})
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, projector.Close()) }()
+	if len(variableRefs) != 0 {
+		if err = projector.Project(true, &variableRefs, md, &formRefs); err != nil {
+			return ast.ASTRef{}, nil, err
+		}
+	}
+	projected := make([]ast.ASTHandle, len(formRefs))
+	for i := range formRefs {
+		projected[i], err = manager.RefGet(formRefs[i])
+		if err != nil {
+			return ast.ASTRef{}, nil, err
+		}
+	}
+	conjunction, err := manager.MkAndArray(projected)
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	result, err = manager.NewRef(conjunction)
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	committedVariables = true
+	remaining = variableRefs
+	return result, remaining, nil
+}
+
+func (d *Derivation) appendExistentials(values []ast.ASTRef) {
+	d.existentials = append(d.existentials, values...)
+}
+
+func previousSpacerLevel(level uint32) uint32 {
+	if level == 0 || level == InfinityLevel {
+		return level
+	}
+	return level - 1
+}
+
+// CreateFirstChild uses md to skip must premises and construct the first may
+// premise's projected proof obligation.
+func (d *Derivation) CreateFirstChild(md *model.ModelCore) (_ *ProofObligation, resultErr error) {
+	if err := d.open(); err != nil {
+		return nil, err
+	}
+	if md == nil || md.Manager() != d.parent.transformer.manager {
+		return nil, ast.ErrASTHandle
+	}
+	if len(d.premises) == 0 {
+		return nil, nil
+	}
+	d.active = 0
+	manager := d.parent.transformer.manager
+	var summaries []ast.ASTHandle
+	var variables []ast.ASTHandle
+	for d.active < uint32(len(d.premises)) && d.premises[d.active].must {
+		premise := d.premises[d.active]
+		summary, err := premise.Summary()
+		if err != nil {
+			return nil, err
+		}
+		summaries = append(summaries, summary)
+		values, err := premise.Variables()
+		if err != nil {
+			return nil, err
+		}
+		variables = append(variables, values...)
+		d.active++
+	}
+	if d.active >= uint32(len(d.premises)) {
+		return nil, nil
+	}
+	transition, err := manager.RefGet(d.transition)
+	if err != nil {
+		return nil, err
+	}
+	summaries = append(summaries, transition)
+	preFormula, err := manager.MkAndArray(summaries)
+	if err != nil {
+		return nil, err
+	}
+	preimage, remaining, err := d.project(md, variables, preFormula)
+	if err != nil {
+		return nil, err
+	}
+	if err = manager.DelRef(&d.transition); err != nil {
+		return nil, errors.Join(err, manager.DelRef(&preimage), releaseNormalizeRefs(manager, remaining))
+	}
+	d.transition = preimage
+	d.appendExistentials(remaining)
+	active := d.premises[d.active]
+	activeSummary, err := active.Summary()
+	if err != nil {
+		return nil, err
+	}
+	config := d.parent.transformer.owner.contexts[0].config.ModelEvaluator
+	evaluator, err := model.NewModelEvaluator(md, config)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, evaluator.Close()) }()
+	evaluated, err := evaluator.EvaluateValue(activeSummary)
+	if err != nil {
+		return nil, err
+	}
+	value, err := manager.RefGet(evaluated)
+	isTrue := err == nil && manager.IsTrue(value)
+	err = errors.Join(err, manager.DelRef(&evaluated))
+	if err != nil {
+		return nil, err
+	}
+	if !isTrue {
+		return nil, nil
+	}
+	summaries = summaries[:0]
+	variables = variables[:0]
+	for index := d.active + 1; index < uint32(len(d.premises)); index++ {
+		premise := d.premises[index]
+		summary, err := premise.Summary()
+		if err != nil {
+			return nil, err
+		}
+		summaries = append(summaries, summary)
+		values, err := premise.Variables()
+		if err != nil {
+			return nil, err
+		}
+		variables = append(variables, values...)
+	}
+	transition, err = manager.RefGet(d.transition)
+	if err != nil {
+		return nil, err
+	}
+	summaries = append(summaries, transition)
+	postFormula, err := manager.MkAndArray(summaries)
+	if err != nil {
+		return nil, err
+	}
+	postRef, remaining, err := d.project(md, variables, postFormula)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, manager.DelRef(&postRef)) }()
+	d.appendExistentials(remaining)
+	post, err := manager.RefGet(postRef)
+	if err != nil {
+		return nil, err
+	}
+	currentRef, err := d.parent.transformer.owner.FormulaOldToNew(post, active.oldIndex, len(d.existentials) == 0)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, manager.DelRef(&currentRef)) }()
+	current, err := manager.RefGet(currentRef)
+	if err != nil {
+		return nil, err
+	}
+	bindings := make([]ast.ASTHandle, len(d.existentials))
+	for i := range d.existentials {
+		bindings[i], err = manager.RefGet(d.existentials[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	level, err := d.parent.Level()
+	if err != nil {
+		return nil, err
+	}
+	depth, err := d.parent.Depth()
+	if err != nil {
+		return nil, err
+	}
+	return active.transformer.NewProofObligation(d.parent, previousSpacerLevel(level), depth, current, bindings)
 }
 
 func (d *Derivation) Close() (result error) {

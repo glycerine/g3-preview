@@ -175,6 +175,13 @@ func (m *Manager) FormulaNewToOld(formula ast.ASTHandle, oldIndex uint32, homoge
 	return m.mux.ConvertFormula(formula, 0, oldIndex+1, homogeneous)
 }
 
+func (m *Manager) FormulaOldToNew(formula ast.ASTHandle, oldIndex uint32, homogeneous bool) (ast.ASTRef, error) {
+	if err := m.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	return m.mux.ConvertFormula(formula, oldIndex+1, 0, homogeneous)
+}
+
 func (m *Manager) SetBackground(background ast.ASTHandle) error {
 	if err := m.open(); err != nil {
 		return err

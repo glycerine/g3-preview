@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/spacer"
 )
@@ -43,6 +44,43 @@ func TestSpacerDerivationOwnsPremisesAndAttachesToObligation(t *testing.T) {
 	derivation, err := spacer.NewDerivation(root, rule, truth, []ast.ASTHandle{auxiliary})
 	spacerMust(t, err)
 	spacerMust(t, derivation.AddPremise(transformer, 0, truth, false, []ast.ASTHandle{auxiliary}))
+	md, err := model.NewModel(manager)
+	spacerMust(t, err)
+	firstChild, err := derivation.CreateFirstChild(md.Core())
+	spacerMust(t, err)
+	if firstChild == nil {
+		t.Fatal("Spacer derivation did not create its first child")
+	}
+	if level, err := firstChild.Level(); err != nil || level != 1 {
+		t.Fatal("Spacer derivation child level", level, err)
+	}
+	if parent, err := firstChild.Parent(); err != nil || parent != root {
+		t.Fatal("Spacer derivation child parent", parent, err)
+	}
+	bindings, err := firstChild.Bindings()
+	spacerMust(t, err)
+	if len(bindings) != 1 {
+		t.Fatal("Spacer derivation child bindings", len(bindings))
+	}
+	spacerMust(t, md.Close())
+	projected, err := spacer.NewDerivation(root, rule, truth, nil)
+	spacerMust(t, err)
+	spacerMust(t, projected.AddPremise(transformer, 0, truth, true, nil))
+	spacerMust(t, projected.AddPremise(transformer, 1, truth, false, nil))
+	projectionModel, err := model.NewModel(manager)
+	spacerMust(t, err)
+	projectedChild, err := projected.CreateFirstChild(projectionModel.Core())
+	spacerMust(t, err)
+	if projectedChild == nil {
+		t.Fatal("Spacer derivation did not project the leading must premise")
+	}
+	projectedBindings, err := projectedChild.Bindings()
+	spacerMust(t, err)
+	if len(projectedBindings) != 0 {
+		t.Fatal("Spacer derivation retained eliminated variables", len(projectedBindings))
+	}
+	spacerMust(t, projectionModel.Close())
+	spacerMust(t, projected.Close())
 	premises, err := derivation.Premises()
 	spacerMust(t, err)
 	if len(premises) != 1 || premises[0].Must() || premises[0].OldIndex() != 0 || premises[0].Transformer() != transformer {
