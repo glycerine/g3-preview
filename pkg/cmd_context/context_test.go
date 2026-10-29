@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	_ "github.com/glycerine/g3/pkg/engine"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -139,6 +140,29 @@ func TestCommandContextGlobalUpdatesPreserveDisabledLocalAutoConfig(t *testing.T
 	contextMust(t, err)
 	if status != lbool.True {
 		t.Fatal("updated context", status)
+	}
+}
+
+func TestCommandContextGlobalUpdatesRefreshProcessEnvironment(t *testing.T) {
+	c := contextFixture(t)
+	warnings := diagnostic.BorrowProcessWarningService()
+	oldWarnings := warnings.Enabled()
+	oldVerbosity, err := diagnostic.ProcessVerbosityLevel()
+	contextMust(t, err)
+	t.Cleanup(func() {
+		contextMust(t, warnings.Enable(oldWarnings))
+		contextMust(t, diagnostic.SetProcessVerbosityLevel(oldVerbosity))
+	})
+	contextMust(t, c.SetUIntOption("verbose", 17))
+	contextMust(t, c.SetBoolOption("warning", false))
+	verbosity, err := diagnostic.ProcessVerbosityLevel()
+	contextMust(t, err)
+	if verbosity != 17 || warnings.Enabled() {
+		t.Fatal("process environment was not refreshed", verbosity, warnings.Enabled())
+	}
+	contextMust(t, c.SetBoolOption("warning", true))
+	if !warnings.Enabled() {
+		t.Fatal("process warning service did not refresh")
 	}
 }
 

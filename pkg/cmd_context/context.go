@@ -408,6 +408,13 @@ func (c *Context) SetStringOption(name, value string) error {
 // their catalog types in gparams. Only the disabled context auto_config flag
 // is copied into the solver's local update, as in the native command context.
 func (c *Context) globalParametersUpdated() (result error) {
+	global, err := c.config.Globals.Manager()
+	if err != nil {
+		return err
+	}
+	if err = uparams.UpdateProcessEnvParams(global); err != nil {
+		return err
+	}
 	if err := c.parameters.UpdateGlobal(); err != nil {
 		return err
 	}
