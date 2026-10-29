@@ -111,6 +111,20 @@ func TestFarkasLearnerRecognizesArithmeticTheoryLemma(t *testing.T) {
 		t.Fatal("Farkas conclusion coefficient did not produce a combined lemma")
 	}
 	pdrMust(t, manager.DelRef(&combined))
+	lemmaRoot, err := manager.NewRef(lemma)
+	pdrMust(t, err)
+	lemmas, err := learner.GetFarkasLemmas(lemma, []ast.ASTHandle{le})
+	pdrMust(t, err)
+	if len(lemmas) != 1 {
+		t.Fatal("proof traversal did not recover the Farkas lemma", len(lemmas))
+	}
+	pdrMust(t, manager.DelRef(&lemmas[0]))
+	lemmas, err = learner.GetFarkasLemmas(lemma, nil)
+	pdrMust(t, err)
+	if len(lemmas) != 0 {
+		t.Fatal("proof traversal produced a lemma without a B dependency", len(lemmas))
+	}
+	pdrMust(t, manager.DelRef(&lemmaRoot))
 	matched, err = learner.IsFarkasLemma(premise0)
 	pdrMust(t, err)
 	if matched {

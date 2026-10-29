@@ -8,6 +8,7 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/proofs"
 	"github.com/glycerine/g3/pkg/smtcore"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -284,6 +285,224 @@ func (f *FarkasLearner) CombineFarkasLemma(proof ast.ASTHandle, bPure []bool) (_
 	}
 	combined, err := f.CombineConstraints(literals, selectedCoefficients)
 	return combined, err == nil, err
+}
+
+func (f *FarkasLearner) proofPostOrder(root ast.ASTHandle) ([]ast.ASTHandle, error) {
+	type frame struct {
+		proof ast.ASTHandle
+		exit  bool
+	}
+	stack := []frame{{proof: root}}
+	visited := make(map[ast.ASTHandle]bool)
+	order := make([]ast.ASTHandle, 0)
+	for len(stack) != 0 {
+		last := len(stack) - 1
+		current := stack[last]
+		stack = stack[:last]
+		if current.exit {
+			order = append(order, current.proof)
+			continue
+		}
+		if visited[current.proof] {
+			continue
+		}
+		visited[current.proof] = true
+		stack = append(stack, frame{proof: current.proof, exit: true})
+		count, err := f.manager.GetProofNumParents(current.proof)
+		if err != nil {
+			return nil, err
+		}
+		for i := count; i != 0; i-- {
+			parent, err := f.manager.GetProofParent(current.proof, i-1)
+			if err != nil {
+				return nil, err
+			}
+			stack = append(stack, frame{proof: parent})
+		}
+	}
+	return order, nil
+}
+
+func copyFarkasHypotheses(source map[ast.ASTHandle]struct{}) map[ast.ASTHandle]struct{} {
+	result := make(map[ast.ASTHandle]struct{}, len(source))
+	for hypothesis := range source {
+		result[hypothesis] = struct{}{}
+	}
+	return result
+}
+
+// GetFarkasLemmas performs the proof preprocessing and dependency traversal
+// used by get_lemmas, and returns the arithmetic lemmas produced at Farkas
+// theory nodes. General B-pure unit recovery and final subsumption are kept for
+// the remaining full get_lemmas port. Every returned ASTRef is caller-owned.
+func (f *FarkasLearner) GetFarkasLemmas(root ast.ASTHandle, bAssertions []ast.ASTHandle) (_ []ast.ASTRef, resultErr error) {
+	if err := f.open(); err != nil {
+		return nil, err
+	}
+	rootReference, err := f.manager.NewRef(root)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, f.manager.DelRef(&rootReference)) }()
+	if err = proofs.ReduceHypotheses(f.manager, rootReference); err != nil {
+		return nil, err
+	}
+	if err = proofs.PermuteUnitResolution(f.manager, rootReference); err != nil {
+		return nil, err
+	}
+	root, err = f.manager.RefGet(rootReference)
+	if err != nil {
+		return nil, err
+	}
+	order, err := f.proofPostOrder(root)
+	if err != nil {
+		return nil, err
+	}
+	bSet := make(map[ast.ASTHandle]struct{}, len(bAssertions))
+	for _, assertion := range bAssertions {
+		bSet[assertion] = struct{}{}
+	}
+	hypotheses := make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}, len(order))
+	aDependent := make(map[ast.ASTHandle]bool, len(order))
+	bDependent := make(map[ast.ASTHandle]bool, len(order))
+	temporaryReferences := make([]ast.ASTRef, 0)
+	defer func() {
+		for i := range temporaryReferences {
+			resultErr = errors.Join(resultErr, f.manager.DelRef(&temporaryReferences[i]))
+		}
+	}()
+	results := make([]ast.ASTRef, 0)
+	committed := false
+	defer func() {
+		if committed {
+			return
+		}
+		for i := range results {
+			resultErr = errors.Join(resultErr, f.manager.DelRef(&results[i]))
+		}
+	}()
+	seenResults := make(map[ast.ASTHandle]bool)
+	for _, proof := range order {
+		count, err := f.manager.GetProofNumParents(proof)
+		if err != nil {
+			return nil, err
+		}
+		hyps := make(map[ast.ASTHandle]struct{})
+		parents := make([]ast.ASTHandle, count)
+		for i := uint32(0); i < count; i++ {
+			parent, err := f.manager.GetProofParent(proof, i)
+			if err != nil {
+				return nil, err
+			}
+			parents[i] = parent
+			aDependent[proof] = aDependent[proof] || aDependent[parent]
+			bDependent[proof] = bDependent[proof] || bDependent[parent]
+			for hypothesis := range hypotheses[parent] {
+				hyps[hypothesis] = struct{}{}
+			}
+		}
+		hypotheses[proof] = hyps
+		kind, err := f.manager.GetDeclKind(proof)
+		if err != nil {
+			return nil, err
+		}
+		switch kind {
+		case ast.ASTPrAsserted:
+			fact, err := f.manager.GetProofFact(proof)
+			if err != nil {
+				return nil, err
+			}
+			if _, found := bSet[fact]; found {
+				bDependent[proof] = true
+			} else {
+				aDependent[proof] = true
+			}
+		case ast.ASTPrHypothesis:
+			fact, err := f.manager.GetProofFact(proof)
+			if err != nil {
+				return nil, err
+			}
+			hyps = copyFarkasHypotheses(hyps)
+			hyps[fact] = struct{}{}
+			hypotheses[proof] = hyps
+		case ast.ASTPrDefAxiom:
+			// Until the shared-vocabulary collector is added, treating a
+			// definition axiom as A-dependent is conservative: it can only
+			// suppress a candidate lemma.
+			aDependent[proof] = true
+		case ast.ASTPrLemma:
+			fact, err := f.manager.GetProofFact(proof)
+			if err != nil {
+				return nil, err
+			}
+			hyps = copyFarkasHypotheses(hyps)
+			delete(hyps, fact)
+			factKind, err := f.manager.GetKind(fact)
+			if err != nil {
+				return nil, err
+			}
+			isOr := false
+			if factKind == ast.ASTApp {
+				family, err := f.manager.GetFamilyID(fact)
+				if err != nil {
+					return nil, err
+				}
+				declKind, err := f.manager.GetDeclKind(fact)
+				if err != nil {
+					return nil, err
+				}
+				isOr = family == f.manager.BasicFamilyID() && declKind == ast.ASTOpOr
+			}
+			if isOr {
+				arguments, err := f.manager.GetNumArgs(fact)
+				if err != nil {
+					return nil, err
+				}
+				for i := uint32(0); i < arguments; i++ {
+					literal, err := f.manager.GetArg(fact, i)
+					if err != nil {
+						return nil, err
+					}
+					negation, err := f.manager.MkNot(literal)
+					if err != nil {
+						return nil, err
+					}
+					negationReference, err := f.manager.NewRef(negation)
+					if err != nil {
+						return nil, err
+					}
+					temporaryReferences = append(temporaryReferences, negationReference)
+					delete(hyps, negation)
+				}
+			}
+			hypotheses[proof] = hyps
+		case ast.ASTPrTheoryLemma:
+			bPure := make([]bool, len(parents))
+			for i, parent := range parents {
+				bPure[i] = bDependent[parent] && !aDependent[parent] && len(hypotheses[parent]) == 0
+			}
+			lemma, produced, err := f.CombineFarkasLemma(proof, bPure)
+			if err != nil {
+				return nil, err
+			}
+			if produced {
+				handle, err := f.manager.RefGet(lemma)
+				if err != nil {
+					return nil, err
+				}
+				if seenResults[handle] {
+					if err = f.manager.DelRef(&lemma); err != nil {
+						return nil, err
+					}
+				} else {
+					seenResults[handle] = true
+					results = append(results, lemma)
+				}
+			}
+		}
+	}
+	committed = true
+	return results, nil
 }
 
 // CombineConstraints applies the source learner's two combination modes.

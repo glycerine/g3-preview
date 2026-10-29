@@ -83698,7 +83698,15 @@
           ]
         },
         {
-          "name": "proof traversal, lemma extraction, language filtering, guesses and simplification",
+          "name": "proof preprocessing and dependency traversal through Farkas theory-node lemma extraction",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/farkas_learner.go",
+          "tests": [
+            "TestFarkasLearnerRecognizesArithmeticTheoryLemma"
+          ]
+        },
+        {
+          "name": "general B-pure unit recovery, vocabulary filtering, asserted fallback, lemma guesses and simplification",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83708,7 +83716,7 @@
         "The learner owns and closes its SMTFarkasUtil; copied declaration parameters are deleted on every recognition exit; returned combined ASTRef values are caller-owned."
       ],
       "deviations": [
-        "Only the reusable Farkas recognition and constraint-combination primitives are present; proof-DAG traversal and PropSolver integration remain open."
+        "Proof preprocessing and dependency traversal currently extract Farkas theory-node lemmas; general B-pure units, language filtering, simplification and PropSolver integration remain open."
       ]
     },
     {
@@ -83746,7 +83754,15 @@
           ]
         },
         {
-          "name": "remaining learner state and proof-derived lemma interface",
+          "name": "Farkas theory-node proof traversal and owning result interface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/farkas_learner.go",
+          "tests": [
+            "TestFarkasLearnerRecognizesArithmeticTheoryLemma"
+          ]
+        },
+        {
+          "name": "remaining general lemma recovery, filtering, guessing and simplification interface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83756,7 +83772,7 @@
         "The concrete Go learner owns its arithmetic combination utility and returns explicit caller-owned AST references."
       ],
       "deviations": [
-        "The public Go surface currently exposes only the independently testable recognition and combination slice."
+        "The public Go surface exposes the independently testable Farkas-node traversal; the broader learner algorithms remain open."
       ]
     },
     {
