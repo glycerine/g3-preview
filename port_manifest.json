@@ -89252,9 +89252,16 @@
       "path": "src/muz/spacer/spacer_itp_solver.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/spacer/itp_solver.go",
+        "pkg/muz/spacer/farkas_learner.go",
+        "pkg/tactic/arith/arith_bounds.go"
+      ],
+      "tests": [
+        "TestItpSolverExpandsProxyCoreAndScopesDefinitions",
+        "TestItpSolverExtractsFarkasCore"
+      ],
       "assertions": [
         {
           "line": 38,
@@ -89273,19 +89280,56 @@
           "text": "SASSERT (m_defs.size () == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "def_manager proxy creation/recognition/reset, fresh_proxy, mk_proxy and scoped push/pop definition banks",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/itp_solver.go",
+          "tests": ["TestItpSolverExpandsProxyCoreAndScopesDefinitions"]
+        },
+        {
+          "name": "push_bg/pop_bg/check_sat, background filtering, get_unsat_core and undo_proxies",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/itp_solver.go",
+          "tests": ["TestItpSolverExpandsProxyCoreAndScopesDefinitions"]
+        },
+        {
+          "name": "old get_itp_core Farkas path, proxy elimination and retained arithmetic-bound subsumption",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/itp_solver.go",
+          "tests": ["TestItpSolverExtractsFarkasCore"]
+        },
+        {
+          "name": "new unsat_core_learner plugin path",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "refresh backend reconstruction",
+          "status": "dead",
+          "reason": "The source body terminates at NOT_IMPLEMENTED_YET and has no retained caller."
+        }
+      ],
+      "ownership": [
+        "ItpSolver borrows its backend and manager. It owns references for its reusable proxy pool, scoped implication definitions, and persistent/transient assumptions; Close restores outstanding backend scopes and releases those references. Returned interpolating-core ASTRef values transfer to the caller."
+      ],
+      "deviations": [
+        "The retained old-core configuration uses the shared Spacer Farkas learner and concrete Go arithmetic-bound subsumption. The optional newer unsat-core plugin family is not yet ported."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_itp_solver.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/itp_solver.go"],
+      "tests": [
+        "TestItpSolverExpandsProxyCoreAndScopesDefinitions",
+        "TestItpSolverExtractsFarkasCore"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -89296,11 +89340,31 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "Spacer-specific proxy, background, core, scope, model and statistics surface",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/itp_solver.go",
+          "tests": [
+            "TestItpSolverExpandsProxyCoreAndScopesDefinitions",
+            "TestItpSolverExtractsFarkasCore"
+          ]
+        },
+        {
+          "name": "complete inherited solver interface and new unsat-core option surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The Go wrapper explicitly borrows solver.Solver and owns only wrapper AST state; this makes backend ownership independent and testable."
+      ],
+      "deviations": [
+        "Only operations reached by the forthcoming Spacer PropSolver are exposed; universal delegation of the native solver base class is intentionally not reproduced. Header guards and scoped RAII helpers become package compilation and explicit Close calls."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_legacy_frames.cpp",
