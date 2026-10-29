@@ -7,6 +7,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -26,6 +27,7 @@ type Context struct {
 	queryDecl    ast.ASTHandle
 	queue        ProofObligationQueue
 	lastResult   lbool.LBool
+	inductive    uint32
 	initialized  bool
 	solved       bool
 	closed       bool
@@ -312,6 +314,7 @@ func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr e
 				return lbool.Undef, err
 			}
 			if inductive {
+				c.inductive = level
 				c.lastResult = lbool.False
 				return c.lastResult, nil
 			}
@@ -332,15 +335,76 @@ func (c *Context) LastResult() (lbool.LBool, error) {
 	return c.lastResult, nil
 }
 
-// Answer returns the source ground reach-fact trace for a successful query.
+func (c *Context) inductiveProperty() (_ *InductiveProperty, resultErr error) {
+	relations := make([]RelationInfo, 0, len(c.order))
+	bodies := make([]ast.ASTRef, 0, len(c.order))
+	defer func() {
+		for index := len(bodies) - 1; index >= 0; index-- {
+			resultErr = errors.Join(resultErr, c.manager.DelRef(&bodies[index]))
+		}
+	}()
+	for _, declaration := range c.order {
+		if declaration == c.queryDecl {
+			continue
+		}
+		transformer := c.transformers[declaration]
+		body, err := transformer.Formulas(c.inductive, false)
+		if err != nil {
+			return nil, err
+		}
+		converted, err := c.owner.FormulaNewToOld(body, 0, false)
+		if err != nil {
+			return nil, err
+		}
+		bodies = append(bodies, converted)
+		body, err = c.manager.RefGet(converted)
+		if err != nil {
+			return nil, err
+		}
+		signature, err := transformer.Signature()
+		if err != nil {
+			return nil, err
+		}
+		relations = append(relations, RelationInfo{Predicate: declaration, Variables: signature, Body: body})
+	}
+	return NewInductiveProperty(c.manager, relations)
+}
+
+// Model returns the inductive predicate interpretations for an unreachable
+// query. The caller closes the returned model.
+func (c *Context) Model(declaration ast.ASTHandle) (_ *model.Model, resultErr error) {
+	if err := c.open(); err != nil {
+		return nil, err
+	}
+	if !c.solved || c.lastResult != lbool.False || c.queryDecl != declaration {
+		return nil, ast.ErrASTDomain
+	}
+	property, err := c.inductiveProperty()
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, property.Close()) }()
+	return property.Model()
+}
+
+// Answer returns the source ground reach-fact trace for a reachable query or
+// the inductive predicate definitions for an unreachable query.
 func (c *Context) Answer(declaration ast.ASTHandle) (ast.ASTRef, error) {
 	if err := c.open(); err != nil {
 		return ast.ASTRef{}, err
 	}
-	if !c.solved || c.lastResult != lbool.True || c.queryDecl != declaration {
+	if !c.solved || c.queryDecl != declaration || c.lastResult == lbool.Undef {
 		return ast.ASTRef{}, ast.ErrASTDomain
 	}
-	return c.groundSatAnswer()
+	if c.lastResult == lbool.True {
+		return c.groundSatAnswer()
+	}
+	property, err := c.inductiveProperty()
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	result, answerErr := property.Expr()
+	return result, errors.Join(answerErr, property.Close())
 }
 
 func (c *Context) CollectStatistics(destination *statistics.Statistics) error {

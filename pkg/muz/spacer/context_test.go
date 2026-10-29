@@ -110,6 +110,20 @@ func TestSpacerContextSolvesFactAndRecursiveNoBasePrograms(t *testing.T) {
 	if status, err := recursiveContext.Solve(0, 4); err != nil || status != lbool.False {
 		t.Fatal("Spacer recursive no-base program", status, err)
 	}
+	certificate, err := recursiveContext.Answer(recursivePredicate)
+	spacerMust(t, err)
+	certificateHandle, err := manager.RefGet(certificate)
+	spacerMust(t, err)
+	if !manager.IsTrue(certificateHandle) {
+		t.Fatal("single-query Spacer certificate is not the empty conjunction")
+	}
+	spacerMust(t, manager.DelRef(&certificate))
+	inductiveModel, err := recursiveContext.Model(recursivePredicate)
+	spacerMust(t, err)
+	if declarations, err := inductiveModel.Core().NumDeclarations(); err != nil || declarations != 0 {
+		t.Fatal("single-query Spacer model", declarations, err)
+	}
+	spacerMust(t, inductiveModel.Close())
 	spacerMust(t, recursiveContext.Close())
 	spacerMust(t, recursiveSet.Close())
 	spacerMust(t, recursiveRule.Close())
