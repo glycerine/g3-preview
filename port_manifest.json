@@ -91940,9 +91940,19 @@
       "path": "src/muz/transforms/dl_mk_bit_blast.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/bit_blast.go",
+        "pkg/muz/fp/spacer_bit_blast_results.go",
+        "pkg/muz/fp/spacer_engine.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_bit_blast.smt2"
+      ],
+      "tests": [
+        "TestBitBlastExpandsBitVectorPredicateSignatures",
+        "TestSpacerBitBlastReconstructsBitVectorPredicateModel",
+        "TestSMTLibRunnerScripts/fp_spacer_bit_blast.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_bit_blast.smt2"
+      ],
       "assertions": [
         {
           "line": 78,
@@ -91963,17 +91973,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "full/quantified bit blasting, mkbv predicate expansion, output forwarding, and reverse predicate-model reconstruction",
+          "status": "partial",
+          "go_target": "pkg/muz/transforms/bit_blast.go",
+          "tests": [
+            "TestBitBlastExpandsBitVectorPredicateSignatures",
+            "TestSpacerBitBlastReconstructsBitVectorPredicateModel",
+            "TestSMTLibRunnerCPPReference/fp_spacer_bit_blast.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "Bit-blasted and expanded formulas remain pinned until replacement Rules own their reconstructed Horn expressions.",
+        "Reverse model substitution pins every bit2bool projection through FunctionInterpretation registration."
+      ],
+      "deviations": [
+        "Rule semantics, predicate mappings, query forwarding, and model reconstruction are ported. Native asserted-proof replacement remains pending fixedpoint proof conversion."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_bit_blast.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/transforms/bit_blast.go"],
+      "tests": ["TestBitBlastExpandsBitVectorPredicateSignatures"],
       "conditionals": [
         {
           "line": 19,

@@ -54,7 +54,7 @@ func (t *RuleTransformer) order() {
 	if !t.dirty {
 		return
 	}
-	sort.Slice(t.plugins, func(i, j int) bool {
+	sort.SliceStable(t.plugins, func(i, j int) bool {
 		return t.plugins[i].Priority() > t.plugins[j].Priority()
 	})
 	t.dirty = false

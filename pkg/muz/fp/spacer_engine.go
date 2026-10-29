@@ -127,6 +127,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	bitBlastName := "xform.bit_blast"
+	bitBlast, err := e.params.GetBoolName(&fixedpoint, &bitBlastName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -167,6 +172,17 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	}
 	if err = transformer.Register(newInliner(35000)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
+	}
+	var bitBlaster *transforms.BitBlastPlugin
+	var bitBlastedPredicates map[ast.ASTHandle]ast.ASTHandle
+	if bitBlast {
+		bitBlaster, err = transforms.NewBitBlastPlugin(e.manager, e.rules, e.params, e.globals, 35000)
+		if err != nil {
+			return nil, errors.Join(err, transformer.Close())
+		}
+		if err = transformer.Register(bitBlaster); err != nil {
+			return nil, errors.Join(err, bitBlaster.Close(), transformer.Close())
+		}
 	}
 	if transformArrays {
 		arrayRewrite, makeErr := transforms.NewArrayEqRewritePlugin(e.manager, e.rules, e.params, e.globals, 34998)
@@ -254,6 +270,17 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 			e.predicates[declaration] = state
 		}
 	}
+	if err == nil && bitBlaster != nil {
+		bitBlastedPredicates = bitBlaster.FreshPredicates()
+		for _, declaration := range bitBlastedPredicates {
+			state, stateErr := e.predicateState(declaration)
+			if stateErr != nil {
+				err = fmt.Errorf("muz/fp: bit-blasted predicate state: %w", stateErr)
+				break
+			}
+			e.predicates[declaration] = state
+		}
+	}
 	err = errors.Join(err, transformer.Close())
 	if err != nil {
 		return nil, fmt.Errorf("muz/fp: Spacer rule preprocessing: %w", err)
@@ -301,6 +328,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	e.spacerSlices = slicedColumns
 	e.spacerQuantified = quantifiedPredicates
 	e.spacerInstantiated = instantiatedPredicates
+	e.spacerBitBlasted = bitBlastedPredicates
 	keep = true
 	return prepared, nil
 }
@@ -344,20 +372,9 @@ func (e *PropositionalEngine) querySpacerFromLevel(declaration ast.ASTHandle, fr
 		return lbool.Undef, err
 	}
 	defer func() { resultErr = errors.Join(resultErr, prepared.Close()) }()
-	queryDeclaration := e.spacerPredicate(declaration)
-	outputs, err := prepared.OutputPredicates()
-	if err != nil {
-		return lbool.Undef, fmt.Errorf("muz/fp: enumerate preprocessed Spacer outputs: %w", err)
-	}
-	for _, output := range outputs {
-		original, originalErr := prepared.OriginalPredicate(output)
-		if originalErr != nil {
-			return lbool.Undef, fmt.Errorf("muz/fp: inspect preprocessed Spacer output: %w", originalErr)
-		}
-		if original == declaration {
-			queryDeclaration = output
-			break
-		}
+	queryDeclaration, deriveErr := prepared.DerivedPredicate(declaration)
+	if deriveErr != nil {
+		return lbool.Undef, fmt.Errorf("muz/fp: resolve preprocessed Spacer query: %w", deriveErr)
 	}
 	// The retained Context currently owns one completed proof-obligation
 	// search. Rebuild it for a subsequent query until source reset_query is
