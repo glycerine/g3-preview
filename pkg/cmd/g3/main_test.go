@@ -354,7 +354,7 @@ var scriptResults = map[string]string{
 	"fixedpoint_finite_relations.smt2":             "sat\n(and (= (:var 0) true) (= (:var 1) false))\nsat\n(= (:var 0) #b10)\nsat\nsat\n(= (:var 0) #b01)\nsat\n(= (:var 0) #b10)\nsat\nsat\nunsat\nsat\n(= (:var 0) #b10)\nsat\nsat\nunsat\nsat\nunsat\nsat\n(= (:var 0) false)\nsat\nunsat\n",
 	"array_as_array_combined_fallback_gap.smt2":    "sat\nunsat\nsat\n",
 	"default_strategy_fragments.smt2":              "unsat\nunsat\nunsat\nunsat\nunsat\n",
-	"qfnia_solver_bounded.smt2":                    "sat\nunsat\nunsat\nunsat\n",
+	"qfnia_solver_bounded.smt2":                    "sat\n((x 2))\nunsat\nunsat\nunsat\n",
 	"utvpi_mixed_sum_model.smt2":                   "sat\n",
 	"nla2bv_bounded_scopes.smt2":                   "sat\n((x 7))\nunsat\nsat\n((x 7))\n",
 	"nla2bv_under_unknown.smt2":                    "unknown\nsat\n(((= (* x x) 4) true))\n",

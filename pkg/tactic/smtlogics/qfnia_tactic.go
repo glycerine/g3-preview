@@ -1,7 +1,7 @@
 package smtlogics
 
-// Source: src/tactic/smtlogics/qfnia_tactic.cpp/.h retained bounded-NIA
-// bit-vector route and final SMT fallback.
+// Source: src/tactic/smtlogics/qfnia_tactic.cpp/.h retained preamble prefix,
+// bounded-NIA bit-vector route and final SMT fallback.
 
 import (
 	"errors"
@@ -52,7 +52,13 @@ func NewQFNIATacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config sm
 		}
 		return value
 	}
-	main, simplifyParams, nlaParams, smtParams := copyParams(), copyParams(), copyParams(), copyParams()
+	main, pullParams, contextParams := copyParams(), copyParams(), copyParams()
+	simplifyParams, nlaParams, smtParams := copyParams(), copyParams(), copyParams()
+	b.boolean(pullParams, "pull_cheap_ite", true)
+	b.boolean(pullParams, "local_ctx", true)
+	b.uint(pullParams, "local_ctx_limit", 10000000)
+	b.uint(contextParams, "max_depth", 30)
+	b.uint(contextParams, "max_steps", 5000000)
 	b.boolean(simplifyParams, "hoist_mul", true)
 	b.uint(nlaParams, "nla2bv_max_bv_size", 64)
 	b.boolean(smtParams, "som", true)
@@ -62,11 +68,18 @@ func NewQFNIATacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config sm
 	simplify := func(params *uparams.ParamsRef) tactic.Tactic {
 		return b.using(b.clean(b.keep(core.NewSimplifyTactic(m, c, g, nil))), params)
 	}
+	preamble := b.then(
+		simplify(main),
+		b.keep(core.NewPropagateValuesTactic(m, c, g, nil)),
+		b.using(b.clean(b.keep(core.NewContextSimplifyTactic(m, c, g, nil, config.ModelEvaluator))), contextParams),
+		simplify(pullParams),
+		b.clean(b.keep(core.NewEliminateUnconstrainedTactic(m, c, g, nil, config.ModelEvaluator))),
+	)
 	nla := b.keep(arith.NewNLA2BVTactic(m, c, g, nlaParams, config.ModelEvaluator))
 	bvSolver := b.keep(NewQFBVTacticWithOutput(m, p, config, output))
 	bounded := b.then(simplify(simplifyParams), nla, bvSolver, b.keep(tactic.NewFailIfUndecidedTactic(), nil))
 	fallback := b.then(simplify(smtParams), b.keep(smtcore.NewSMTTactic(m, nil, config)))
-	body := b.otherwise(bounded, fallback)
+	body := b.then(preamble, b.otherwise(bounded, fallback))
 	if b.err != nil {
 		return nil, b.err
 	}
