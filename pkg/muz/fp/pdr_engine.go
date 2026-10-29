@@ -7,9 +7,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
-	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/pdr"
-	"github.com/glycerine/g3/pkg/muz/transforms"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -26,61 +24,38 @@ func (e *PropositionalEngine) closePDRForReplacement() error {
 	e.pdr = nil
 	e.pdrRevision = 0
 	e.pdrQuery = ast.ASTHandle{}
-	e.pdrPredicates = nil
-	e.pdrSlices = nil
+	e.clearPDRPreprocessing()
 	return result
 }
 
 func (e *PropositionalEngine) pdrPredicate(declaration ast.ASTHandle) ast.ASTHandle {
-	if derived, found := e.pdrPredicates[declaration]; found {
+	if derived, found := e.pdrDerived[declaration]; found {
 		return derived
 	}
-	return declaration
+	return hornDerivedPredicate(declaration, e.pdrQuantified, e.pdrScaled, e.pdrMagic, e.pdrBitBlasted, e.pdrInstantiated, e.pdrPredicates)
 }
 
-func (e *PropositionalEngine) preparePDRRules(query ast.ASTHandle, sliceRules bool) (_ *base.RuleSet, resultErr error) {
-	prepared, err := base.NewRuleSet(e.rules)
-	if err != nil {
-		return nil, err
-	}
-	keep := false
-	defer func() {
-		if !keep {
-			resultErr = errors.Join(resultErr, prepared.Close())
-		}
-	}()
-	if err = prepared.AddRules(e.set); err != nil {
-		return nil, err
-	}
-	if err = prepared.SetOutputPredicate(query); err != nil {
-		return nil, err
-	}
-	valid, err := prepared.Finalize()
-	if err != nil || !valid {
-		if err == nil {
-			err = fmt.Errorf("muz/fp: negation is not stratified")
-		}
-		return nil, err
-	}
+func (e *PropositionalEngine) clearPDRPreprocessing() {
+	e.pdrDerived = nil
 	e.pdrPredicates = nil
 	e.pdrSlices = nil
-	if sliceRules {
-		transformer := base.NewRuleTransformer()
-		plugin := transforms.NewRuleSlicePlugin(e.manager, e.rules, 1)
-		if err = transformer.Register(plugin); err != nil {
-			return nil, errors.Join(err, plugin.Close(), transformer.Close())
-		}
-		_, applyErr := transformer.Apply(prepared)
-		if applyErr == nil {
-			e.pdrPredicates, e.pdrSlices = plugin.PredicateSlices()
-		}
-		err = errors.Join(applyErr, transformer.Close())
-		if err != nil {
-			return nil, fmt.Errorf("muz/fp: PDR rule slicing: %w", err)
-		}
-	}
-	keep = true
-	return prepared, nil
+	e.pdrQuantified = nil
+	e.pdrInstantiated = nil
+	e.pdrBitBlasted = nil
+	e.pdrScaled = nil
+	e.pdrMagic = nil
+	e.pdrKarr = nil
+}
+
+func (e *PropositionalEngine) installPDRPreprocessing(result *hornPreprocessResult) {
+	e.pdrPredicates = result.slicedPredicates
+	e.pdrSlices = result.slicedColumns
+	e.pdrQuantified = result.quantifiedPredicates
+	e.pdrInstantiated = result.instantiatedPredicates
+	e.pdrBitBlasted = result.bitBlastedPredicates
+	e.pdrScaled = result.scaledPredicates
+	e.pdrMagic = result.magicPredicates
+	e.pdrKarr = result.karrInvariants
 }
 
 func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (_ lbool.LBool, resultErr error) {
@@ -100,6 +75,7 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (_ lbool.LBool
 		e.spacerBitBlasted = nil
 		e.spacerScaled = nil
 		e.spacerMagic = nil
+		e.spacerKarr = nil
 	}
 	finalized, err := e.set.IsFinalized()
 	if err != nil {
@@ -240,33 +216,37 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (_ lbool.LBool
 	if err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
-	sliceName := "xform.slice"
-	sliceRules, err := e.globals.Context.GetBoolName(&fixedpoint, &sliceName, true)
-	if err != nil {
-		return lbool.Undef, errors.Join(err, context.Close())
-	}
 	if err = context.SetFullTraceAnswer(!inlineEager && !inlineLinear); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
-	prepared, err := e.preparePDRRules(declaration, sliceRules)
+	preprocessed, err := e.preprocessHornRules(declaration, false)
 	if err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
-	defer func() { resultErr = errors.Join(resultErr, prepared.Close()) }()
+	defer func() { resultErr = errors.Join(resultErr, preprocessed.Close()) }()
+	prepared := preprocessed.rules
+	e.installPDRPreprocessing(preprocessed)
 	installed := false
 	defer func() {
 		if !installed {
-			e.pdrPredicates = nil
-			e.pdrSlices = nil
+			e.clearPDRPreprocessing()
 		}
 	}()
+	e.pdrDerived = make(map[ast.ASTHandle]ast.ASTHandle, len(e.predicateOrder)+len(e.auxiliary)+1)
+	for _, original := range e.predicateOrder {
+		derived, deriveErr := prepared.DerivedPredicate(original)
+		if deriveErr != nil {
+			return lbool.Undef, errors.Join(fmt.Errorf("muz/fp: resolve preprocessed PDR predicate: %w", deriveErr), context.Close())
+		}
+		e.pdrDerived[original] = derived
+	}
 	queryDeclaration, err := prepared.DerivedPredicate(declaration)
 	if err != nil {
 		return lbool.Undef, errors.Join(fmt.Errorf("muz/fp: resolve preprocessed PDR query: %w", err), context.Close())
 	}
 	auxiliary := make([]ast.ASTHandle, 0, len(e.auxiliary))
 	for declaration := range e.auxiliary {
-		auxiliary = append(auxiliary, declaration)
+		auxiliary = append(auxiliary, e.pdrPredicate(declaration))
 	}
 	if err = context.SetAuxiliaryPredicates(auxiliary); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())

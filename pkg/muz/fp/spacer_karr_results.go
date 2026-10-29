@@ -135,8 +135,8 @@ func (e *PropositionalEngine) applySpacerKarrInvariant(destination *model.ModelC
 	return interpretation.SetElse(body)
 }
 
-func (e *PropositionalEngine) applySpacerKarrInvariants(destination *model.ModelCore) error {
-	for declaration, matrix := range e.spacerKarr {
+func (e *PropositionalEngine) applyHornKarrInvariants(destination *model.ModelCore, invariants map[ast.ASTHandle]rel.KarrMatrix) error {
+	for declaration, matrix := range invariants {
 		if matrix.Len() != 0 {
 			if err := e.applySpacerKarrInvariant(destination, declaration, matrix); err != nil {
 				return err

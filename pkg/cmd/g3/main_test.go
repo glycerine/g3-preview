@@ -923,6 +923,8 @@ var scriptResults = map[string]string{
 	"fixedpoint_pdr_sliced_compound_tail.smt2":          "sat\n(and Goal (P!slice!0 0))\n",
 	"fixedpoint_pdr_sliced_compound_head.smt2":          "unsat\n",
 	"fixedpoint_pdr_inductive_reachability.smt2":        "sat\ntrue\n",
+	"fixedpoint_pdr_bit_blast.smt2":                     "sat\n",
+	"fixedpoint_pdr_scale.smt2":                         "sat\n",
 }
 
 func TestSMTLibRunnerScripts(t *testing.T) {

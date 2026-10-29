@@ -1,0 +1,7 @@
+(set-option :fixedpoint.engine pdr)
+(set-option :fixedpoint.xform.scale true)
+(set-option :fixedpoint.xform.slice false)
+(set-logic HORN)
+(declare-rel p (Real))
+(rule (p 2.0))
+(query p :print-answer false)

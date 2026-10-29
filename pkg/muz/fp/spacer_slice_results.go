@@ -10,26 +10,18 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	astrewriter "github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/muz/rel"
 )
 
 func (e *PropositionalEngine) spacerPredicate(declaration ast.ASTHandle) ast.ASTHandle {
-	if derived, found := e.spacerQuantified[declaration]; found {
-		declaration = derived
-	}
-	if derived, found := e.spacerScaled[declaration]; found {
-		declaration = derived
-	}
-	if derived, found := e.spacerMagic[declaration]; found {
-		declaration = derived
-	}
-	if derived, found := e.spacerBitBlasted[declaration]; found {
-		declaration = derived
-	}
-	if derived, found := e.spacerInstantiated[declaration]; found {
-		declaration = derived
-	}
-	if derived, found := e.spacerPredicates[declaration]; found {
-		declaration = derived
+	return hornDerivedPredicate(declaration, e.spacerQuantified, e.spacerScaled, e.spacerMagic, e.spacerBitBlasted, e.spacerInstantiated, e.spacerPredicates)
+}
+
+func hornDerivedPredicate(declaration ast.ASTHandle, mappings ...map[ast.ASTHandle]ast.ASTHandle) ast.ASTHandle {
+	for _, mapping := range mappings {
+		if derived, found := mapping[declaration]; found {
+			declaration = derived
+		}
 	}
 	return declaration
 }
@@ -230,10 +222,14 @@ func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore,
 }
 
 func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.Model, resultErr error) {
-	if len(e.spacerPredicates) == 0 && len(e.spacerQuantified) == 0 && len(e.spacerBitBlasted) == 0 && len(e.spacerScaled) == 0 && len(e.spacerKarr) == 0 {
+	return e.expandHornModel(source, e.spacerPredicates, e.spacerSlices, e.spacerQuantified, e.spacerBitBlasted, e.spacerScaled, e.spacerKarr)
+}
+
+func (e *PropositionalEngine) expandHornModel(source *model.Model, sliced map[ast.ASTHandle]ast.ASTHandle, columns map[ast.ASTHandle][]bool, quantified, bitBlasted, scaled map[ast.ASTHandle]ast.ASTHandle, karr map[ast.ASTHandle]rel.KarrMatrix) (_ *model.Model, resultErr error) {
+	if len(sliced) == 0 && len(quantified) == 0 && len(bitBlasted) == 0 && len(scaled) == 0 && len(karr) == 0 {
 		return source, nil
 	}
-	source, err := expandSlicedModel(e.manager, e.spacerPredicates, e.spacerSlices, source)
+	source, err := expandSlicedModel(e.manager, sliced, columns, source)
 	if err != nil {
 		return nil, err
 	}
@@ -247,22 +243,22 @@ func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.M
 		}
 	}()
 	core := source.Core()
-	for original, derived := range e.spacerBitBlasted {
+	for original, derived := range bitBlasted {
 		if err := e.expandSpacerBitBlastedFunction(core, original, derived); err != nil {
 			return nil, err
 		}
 	}
-	for original, derived := range e.spacerScaled {
+	for original, derived := range scaled {
 		if err := e.expandSpacerScaledFunction(core, original, derived); err != nil {
 			return nil, err
 		}
 	}
-	for original, derived := range e.spacerQuantified {
+	for original, derived := range quantified {
 		if err := e.expandSpacerQuantifiedFunction(core, original, derived); err != nil {
 			return nil, err
 		}
 	}
-	if err := e.applySpacerKarrInvariants(core); err != nil {
+	if err := e.applyHornKarrInvariants(core, karr); err != nil {
 		return nil, err
 	}
 	return source, nil

@@ -15,7 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *hornPreprocessResult, resultErr error) {
+func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle, allowLossyResultTransforms bool) (_ *hornPreprocessResult, resultErr error) {
 	var slicedPredicates map[ast.ASTHandle]ast.ASTHandle
 	var slicedColumns map[ast.ASTHandle][]bool
 	prepared, err := base.NewRuleSet(e.rules)
@@ -44,15 +44,19 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *hornP
 		return nil, err
 	}
 	transformer := base.NewRuleTransformer()
-	if err = transformer.Register(transforms.NewConePlugin(0)); err != nil {
-		return nil, errors.Join(err, transformer.Close())
+	if allowLossyResultTransforms {
+		if err = transformer.Register(transforms.NewConePlugin(0)); err != nil {
+			return nil, errors.Join(err, transformer.Close())
+		}
 	}
-	firstSimplifier, err := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 40000)
-	if err != nil {
-		return nil, errors.Join(err, transformer.Close())
-	}
-	if err = transformer.Register(firstSimplifier); err != nil {
-		return nil, errors.Join(err, firstSimplifier.Close(), transformer.Close())
+	if allowLossyResultTransforms {
+		firstSimplifier, makeErr := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 40000)
+		if makeErr != nil {
+			return nil, errors.Join(makeErr, transformer.Close())
+		}
+		if err = transformer.Register(firstSimplifier); err != nil {
+			return nil, errors.Join(err, firstSimplifier.Close(), transformer.Close())
+		}
 	}
 	fixedpoint, err := e.globals.SourceGetModuleName("fixedpoint")
 	if err != nil {
@@ -62,6 +66,9 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *hornP
 	useSubsumption, err := e.params.GetBoolName(&fixedpoint, &subsumptionName, true)
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
+	}
+	if !allowLossyResultTransforms {
+		useSubsumption = false
 	}
 	checkerName := "xform.subsumption_checker"
 	useChecker, err := e.params.GetBoolName(&fixedpoint, &checkerName, true)
@@ -77,6 +84,13 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *hornP
 	inlineLinear, err := e.params.GetBoolName(&fixedpoint, &inlineLinearName, true)
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
+	}
+	// PDR exposes relation models and inductive certificates. Until the cone and
+	// inline model/proof converters are retained, preserve those declarations
+	// while still sharing the remaining Horn preprocessing pipeline with Spacer.
+	if !allowLossyResultTransforms {
+		inlineEager = false
+		inlineLinear = false
 	}
 	unfoldName := "xform.unfold_rules"
 	unfoldRounds, err := e.params.GetUIntName(&fixedpoint, &unfoldName, 0)
@@ -233,15 +247,19 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *hornP
 			return nil, errors.Join(err, arrayRewrite.Close(), transformer.Close())
 		}
 	}
-	if err = transformer.Register(transforms.NewConePlugin(34990)); err != nil {
-		return nil, errors.Join(err, transformer.Close())
+	if allowLossyResultTransforms {
+		if err = transformer.Register(transforms.NewConePlugin(34990)); err != nil {
+			return nil, errors.Join(err, transformer.Close())
+		}
 	}
-	secondSimplifier, err := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 34980)
-	if err != nil {
-		return nil, errors.Join(err, transformer.Close())
-	}
-	if err = transformer.Register(secondSimplifier); err != nil {
-		return nil, errors.Join(err, secondSimplifier.Close(), transformer.Close())
+	if allowLossyResultTransforms {
+		secondSimplifier, makeErr := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 34980)
+		if makeErr != nil {
+			return nil, errors.Join(makeErr, transformer.Close())
+		}
+		if err = transformer.Register(secondSimplifier); err != nil {
+			return nil, errors.Join(err, secondSimplifier.Close(), transformer.Close())
+		}
 	}
 	if useSubsumption {
 		if err = transformer.Register(transforms.NewSubsumptionCheckerPlugin(useChecker, 34975)); err != nil {
@@ -251,15 +269,19 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *hornP
 	if err = transformer.Register(newInliner(34970)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
-	if err = transformer.Register(transforms.NewConePlugin(34960)); err != nil {
-		return nil, errors.Join(err, transformer.Close())
+	if allowLossyResultTransforms {
+		if err = transformer.Register(transforms.NewConePlugin(34960)); err != nil {
+			return nil, errors.Join(err, transformer.Close())
+		}
 	}
-	thirdSimplifier, err := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 34950)
-	if err != nil {
-		return nil, errors.Join(err, transformer.Close())
-	}
-	if err = transformer.Register(thirdSimplifier); err != nil {
-		return nil, errors.Join(err, thirdSimplifier.Close(), transformer.Close())
+	if allowLossyResultTransforms {
+		thirdSimplifier, makeErr := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 34950)
+		if makeErr != nil {
+			return nil, errors.Join(makeErr, transformer.Close())
+		}
+		if err = transformer.Register(thirdSimplifier); err != nil {
+			return nil, errors.Join(err, thirdSimplifier.Close(), transformer.Close())
+		}
 	}
 	if useSubsumption {
 		for _, stage := range []struct {
@@ -435,7 +457,7 @@ func (e *PropositionalEngine) querySpacerFromLevel(declaration ast.ASTHandle, fr
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
 	}
-	preprocessed, err := e.preprocessHornRules(declaration)
+	preprocessed, err := e.preprocessHornRules(declaration, true)
 	if err != nil {
 		return lbool.Undef, err
 	}

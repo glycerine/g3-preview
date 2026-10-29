@@ -66,8 +66,15 @@ type PropositionalEngine struct {
 	backend            string
 	pdr                *muzpdr.Context
 	pdrQuery           ast.ASTHandle
+	pdrDerived         map[ast.ASTHandle]ast.ASTHandle
 	pdrPredicates      map[ast.ASTHandle]ast.ASTHandle
 	pdrSlices          map[ast.ASTHandle][]bool
+	pdrQuantified      map[ast.ASTHandle]ast.ASTHandle
+	pdrInstantiated    map[ast.ASTHandle]ast.ASTHandle
+	pdrBitBlasted      map[ast.ASTHandle]ast.ASTHandle
+	pdrScaled          map[ast.ASTHandle]ast.ASTHandle
+	pdrMagic           map[ast.ASTHandle]ast.ASTHandle
+	pdrKarr            map[ast.ASTHandle]rel.KarrMatrix
 	pdrStatistics      statistics.Statistics
 	spacer             *muzspacer.Context
 	scopes             []*base.RuleSet
@@ -1438,7 +1445,7 @@ func (e *PropositionalEngine) Model(declaration ast.ASTHandle) (*model.Model, er
 		if err != nil {
 			return nil, err
 		}
-		return expandSlicedModel(e.manager, e.pdrPredicates, e.pdrSlices, result)
+		return e.expandHornModel(result, e.pdrPredicates, e.pdrSlices, e.pdrQuantified, e.pdrBitBlasted, e.pdrScaled, e.pdrKarr)
 	}
 	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
 		result, err := e.spacer.Model(e.spacerPredicate(declaration))
@@ -1489,8 +1496,7 @@ func (e *PropositionalEngine) Close() (result error) {
 		e.pdr = nil
 		e.pdrRevision = 0
 		e.pdrQuery = ast.ASTHandle{}
-		e.pdrPredicates = nil
-		e.pdrSlices = nil
+		e.clearPDRPreprocessing()
 	}
 	if e.spacer != nil {
 		result = errors.Join(result, e.spacer.Close())
@@ -1503,6 +1509,7 @@ func (e *PropositionalEngine) Close() (result error) {
 		e.spacerBitBlasted = nil
 		e.spacerScaled = nil
 		e.spacerMagic = nil
+		e.spacerKarr = nil
 	}
 	for i := len(e.scopes) - 1; i >= 0; i-- {
 		result = errors.Join(result, e.scopes[i].Close())

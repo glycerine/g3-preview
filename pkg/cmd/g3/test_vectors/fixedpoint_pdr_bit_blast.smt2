@@ -1,0 +1,8 @@
+(set-option :fixedpoint.engine pdr)
+(set-option :fixedpoint.xform.bit_blast true)
+(set-option :fixedpoint.xform.slice false)
+(set-logic HORN)
+(declare-rel p ((_ BitVec 3)))
+(declare-var x (_ BitVec 3))
+(rule (=> (= x #b101) (p x)))
+(query p :print-answer false)
