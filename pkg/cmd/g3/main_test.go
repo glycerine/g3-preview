@@ -347,6 +347,7 @@ var scriptResults = map[string]string{
 	"fixedpoint_pdr_arithmetic_invariant.smt2":     "unsat\n",
 	"fixedpoint_pdr_missing_tail.smt2":             "unsat\n",
 	"fixedpoint_pdr_linear_trace.smt2":             "sat\n(and (Q 1) (P 0))\n",
+	"fixedpoint_pdr_variable_trace.smt2":           "sat\n(and (R 2) (Q 1 1) (P 0 1))\n",
 	"fixedpoint_pdr_repeated_disequalities.smt2":   "sat\ntrue\n",
 	"fixedpoint_pdr_model_generalizer.smt2":        "sat\ntrue\n",
 	"horn_tactic_finite.smt2":                      "unsat\nsat\nunsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\n",

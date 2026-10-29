@@ -7,6 +7,7 @@ package pdr
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
@@ -15,12 +16,68 @@ import (
 )
 
 func (c *Context) instantiateTraceExpression(node *ModelNode, rule *normalizedRule, expression ast.ASTHandle) (result ast.ASTRef, resultErr error) {
-	modelCore, found, err := node.Model()
+	conjuncts, err := c.manager.FlattenAnd([]ast.ASTHandle{node.state})
 	if err != nil {
 		return result, err
 	}
-	if !found {
-		return result, ast.ErrASTDomain
+	values := make(map[ast.ASTHandle]ast.ASTHandle)
+	truth, err := c.manager.MkTrue()
+	if err != nil {
+		return result, err
+	}
+	falsity, err := c.manager.MkFalse()
+	if err != nil {
+		return result, err
+	}
+	for _, conjunct := range conjuncts {
+		kind, x := c.manager.GetKind(conjunct)
+		if x != nil {
+			return result, x
+		}
+		matched := false
+		if kind == ast.ASTApp {
+			family, y := c.manager.GetFamilyID(conjunct)
+			if y != nil {
+				return result, y
+			}
+			operation, y := c.manager.GetDeclKind(conjunct)
+			if y != nil {
+				return result, y
+			}
+			if family == c.manager.BasicFamilyID() && (operation == ast.ASTOpEq || operation == ast.ASTOpIff) {
+				left, y := c.manager.GetArg(conjunct, 0)
+				if y != nil {
+					return result, y
+				}
+				right, y := c.manager.GetArg(conjunct, 1)
+				if y != nil {
+					return result, y
+				}
+				rightValue, y := c.manager.IsValue(right)
+				if y != nil {
+					return result, y
+				}
+				if rightValue {
+					values[left] = right
+					matched = true
+				} else if leftValue, y := c.manager.IsValue(left); y != nil {
+					return result, y
+				} else if leftValue {
+					values[right] = left
+					matched = true
+				}
+			}
+		}
+		if matched {
+			continue
+		}
+		if negated, argument, x := c.manager.IsNot(conjunct); x != nil {
+			return result, x
+		} else if negated {
+			values[argument] = falsity
+		} else {
+			values[conjunct] = truth
+		}
 	}
 	used, err := ast.NewASTUsedVars(c.manager)
 	if err != nil {
@@ -40,27 +97,21 @@ func (c *Context) instantiateTraceExpression(node *ModelNode, rule *normalizedRu
 			result = ast.ASTRef{}
 		}
 	}()
-	valueRef, err := c.manager.NewRef(ast.ASTHandle{})
-	if err != nil {
-		return result, err
-	}
-	defer func() { resultErr = errors.Join(resultErr, c.manager.DelRef(&valueRef)) }()
 	for index, instance := range rule.instances {
-		if instance.IsNull() {
+		if value, found := values[instance]; found {
+			arguments[index] = value
+		} else {
 			sort := used.Contains(uint32(index))
+			if !instance.IsNull() {
+				sort, err = c.manager.GetSort(instance)
+			}
+			if err != nil {
+				return result, err
+			}
 			if sort.IsNull() {
 				continue
 			}
 			arguments[index], err = c.manager.MkVar(uint32(index), sort)
-		} else {
-			var available bool
-			available, err = node.transformer.modelConstant(modelCore, instance, valueRef)
-			if err == nil && !available {
-				err = ast.ErrASTDomain
-			}
-			if err == nil {
-				arguments[index], err = c.manager.RefGet(valueRef)
-			}
 		}
 		if err != nil {
 			return result, err
@@ -430,7 +481,7 @@ func (c *Context) Answer(queryDeclaration ast.ASTHandle) (result ast.ASTRef, res
 	}
 	nonlinear, err := traceHasNonlinearRule(root)
 	if err != nil {
-		return result, err
+		return result, fmt.Errorf("pdr: inspect trace shape: %w", err)
 	}
 	if nonlinear {
 		truth, x := c.manager.MkTrue()
@@ -439,122 +490,38 @@ func (c *Context) Answer(queryDeclaration ast.ASTHandle) (result ast.ASTRef, res
 		}
 		return c.manager.NewRef(truth)
 	}
-	if err = updateTraceModels(root); err != nil {
-		return result, err
-	}
-	anchor, err := traceRecursiveAnchor(root)
+	constraints, err := c.unifiedTraceConstraints(root)
 	if err != nil {
-		return result, err
+		return result, fmt.Errorf("pdr: unify trace: %w", err)
 	}
-	linearPredicates, err := traceHasNestedPredecessor(root)
-	if err != nil {
-		return result, err
-	}
-	linearPredicates = linearPredicates && anchor == nil
-	constraints := make([]ast.ASTHandle, 0)
-	references := make([]ast.ASTRef, 0)
 	defer func() {
-		for index := len(references) - 1; index >= 0; index-- {
-			resultErr = errors.Join(resultErr, c.manager.DelRef(&references[index]))
+		if x := closeASTRefs(c.manager, constraints); x != nil {
+			resultErr = errors.Join(resultErr, fmt.Errorf("pdr: close answer constraints: %w", x))
 		}
 		if resultErr != nil && result != (ast.ASTRef{}) {
 			resultErr = errors.Join(resultErr, c.manager.DelRef(&result))
 			result = ast.ASTRef{}
 		}
 	}()
-	stack := []*ModelNode{root}
-	for len(stack) != 0 {
-		last := len(stack) - 1
-		node := stack[last]
-		stack = stack[:last]
-		rule, x := c.selectedTraceRule(node)
-		if x != nil {
-			return result, x
+	handles := make([]ast.ASTHandle, len(constraints))
+	for i := range constraints {
+		handles[i], err = c.manager.RefGet(constraints[i])
+		if err != nil {
+			return result, fmt.Errorf("pdr: read answer constraint %d: %w", i, err)
 		}
-		uninterpreted, x := rule.rule.UninterpretedTailSize()
-		if x != nil {
-			return result, x
-		}
-		tailSize, x := rule.rule.TailSize()
-		if x != nil {
-			return result, x
-		}
-		if node != root && linearPredicates {
-			head, y := rule.rule.Head()
-			if y != nil {
-				return result, y
-			}
-			instantiated, y := c.instantiateTraceExpression(node, rule, head)
-			if y != nil {
-				return result, y
-			}
-			references = append(references, instantiated)
-			handle, y := c.manager.RefGet(instantiated)
-			if y != nil {
-				return result, y
-			}
-			if !c.manager.IsTrue(handle) {
-				constraints = append(constraints, handle)
-			}
-		}
-		start := uninterpreted
-		if node != root {
-			start = 0
-		}
-		for index := start; index < tailSize; index++ {
-			tail, _, y := rule.rule.Tail(index)
-			if y != nil {
-				return result, y
-			}
-			if index < uninterpreted {
-				if anchor == nil || index >= len(rule.predecessors) || rule.predecessors[index] != anchor {
-					continue
-				}
-			}
-			instantiated, y := c.instantiateTraceExpression(node, rule, tail)
-			if y != nil {
-				return result, y
-			}
-			references = append(references, instantiated)
-			handle, y := c.manager.RefGet(instantiated)
-			if y != nil {
-				return result, y
-			}
-			if index >= uninterpreted && c.implicant != nil {
-				modelCore, present, z := node.Model()
-				if z != nil {
-					return result, z
-				}
-				if present && modelCore.DerivedModel() != nil {
-					evaluated, z := c.implicant.EvalExpr(modelCore.DerivedModel(), handle)
-					if z != nil {
-						return result, z
-					}
-					references = append(references, evaluated)
-					handle, z = c.manager.RefGet(evaluated)
-					if z != nil {
-						return result, z
-					}
-				}
-			}
-			if !c.manager.IsTrue(handle) {
-				constraints = append(constraints, handle)
-			}
-		}
-		children, x := node.Children()
-		if x != nil {
-			return result, x
-		}
-		stack = append(stack, children...)
 	}
 	var formula ast.ASTHandle
-	if len(constraints) == 0 {
+	if len(handles) == 0 {
 		formula, err = c.manager.MkTrue()
 	} else {
-		formula, err = c.manager.MkAndArgs(constraints)
+		formula, err = c.manager.MkAndArgs(handles)
 	}
 	if err != nil {
-		return result, err
+		return result, fmt.Errorf("pdr: combine answer constraints: %w", err)
 	}
-	return c.manager.NewRef(formula)
+	result, err = c.manager.NewRef(formula)
+	if err != nil {
+		return result, fmt.Errorf("pdr: retain answer formula: %w", err)
+	}
+	return result, nil
 }

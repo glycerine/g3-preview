@@ -82888,6 +82888,7 @@
         "pkg/muz/pdr/context_bounded.go",
         "pkg/muz/pdr/context_solve.go",
         "pkg/muz/pdr/answer.go",
+        "pkg/muz/pdr/answer_trace.go",
         "pkg/muz/pdr/model_projection.go",
         "pkg/muz/pdr/model_search.go",
         "pkg/muz/pdr/model_search_test.go"
@@ -82910,6 +82911,7 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
         "TestModelSearchFrontierOrderingClosureAndOwnership",
         "TestModelNodeRejectsInvalidParentLevel"
@@ -83154,7 +83156,7 @@
           ]
         },
         {
-          "name": "successful existential relation-declaration answer, acyclic linear and recursive-SCC model-search traces, initial-rule model recovery and native nonlinear-rule reduction surface (pdr_context.cpp:777-869,1142-1288,1942-1950,1977-1988)",
+          "name": "successful existential relation-declaration answer, banked rule/head unification across acyclic and recursive model-search traces, initial-rule model recovery and native nonlinear-rule reduction surface (pdr_context.cpp:777-869,1142-1288,1942-1950,1977-1988)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/answer.go",
           "tests": [
@@ -83168,6 +83170,7 @@
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_linear_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
           ]
         },
@@ -83217,6 +83220,7 @@
         "pkg/muz/pdr/context_bounded.go",
         "pkg/muz/pdr/context_solve.go",
         "pkg/muz/pdr/answer.go",
+        "pkg/muz/pdr/answer_trace.go",
         "pkg/muz/pdr/model_projection.go",
         "pkg/muz/pdr/model_search.go",
         "pkg/muz/pdr/model_search_test.go"
@@ -83388,6 +83392,7 @@
         "pkg/muz/fp/pdr_engine.go",
         "pkg/muz/fp/register_engine.go",
         "pkg/muz/pdr/answer.go",
+        "pkg/muz/pdr/answer_trace.go",
         "pkg/cmd_context/fixedpoint.go",
         "pkg/api/api_fixedpoint.go",
         "pkg/parsers/smt2/fixedpoint_commands_test.go",
@@ -83396,7 +83401,8 @@
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_initial_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_linear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_nonlinear_trace.smt2",
-        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2"
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_variable_trace.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
@@ -83417,6 +83423,7 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTContextFixedpointPDRLifecycle"
       ],
@@ -83453,7 +83460,7 @@
           ]
         },
         {
-          "name": "successful existential relation-declaration trace and unsuccessful direct-predicate inductive-certificate/model forwarding, including acyclic linear and recursive-SCC traces, initial-rule model recovery and nonlinear-rule reduction (pdr_dl_interface.cpp:175-182,208-227)",
+          "name": "successful existential relation-declaration trace and unsuccessful direct-predicate inductive-certificate/model forwarding, including banked rule/head unification, acyclic and recursive traces, initial-rule model recovery and nonlinear-rule reduction (pdr_dl_interface.cpp:175-182,208-227)",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": [
@@ -83467,6 +83474,7 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
             "TestSMTContextFixedpointPDRLifecycle"
           ]
@@ -83487,7 +83495,7 @@
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "remaining general linear trace unification, proof, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
+          "name": "remaining proof traces, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83497,7 +83505,7 @@
         "PropositionalEngine owns the current PDR Context, reuses it while the exact normalized rules and background remain unchanged, and closes/replaces it after a tracked mutation or engine shutdown; rule and parameter services are borrowed. Returned inductive models transfer ownership to the caller."
       ],
       "deviations": [
-        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding and unsuccessful-query inductive certificates are retained; slicing and model-converter remapping remain unported. Successful existential declaration queries expose empty answers, acyclic linear cross-predicate traces, recursive-SCC state traces, initial-rule model recovery and native nonlinear-rule reduction; remaining general rule/head unification remains unported."
+        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding and unsuccessful-query inductive certificates are retained; slicing and model-converter remapping remain unported. Successful existential declaration queries use native-style two-bank rule/head unification for acyclic and recursive traces, plus initial-rule model recovery and native nonlinear-rule reduction; proof traces remain unported."
       ]
     },
     {
@@ -83509,6 +83517,7 @@
         "pkg/muz/fp/pdr_engine.go",
         "pkg/muz/fp/register_engine.go",
         "pkg/muz/pdr/answer.go",
+        "pkg/muz/pdr/answer_trace.go",
         "pkg/cmd_context/fixedpoint.go",
         "pkg/api/api_fixedpoint.go",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_background.smt2",
@@ -83516,7 +83525,8 @@
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_initial_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_linear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_nonlinear_trace.smt2",
-        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2"
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_variable_trace.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
@@ -83537,6 +83547,7 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTContextFixedpointPDRLifecycle"
       ],
@@ -83571,7 +83582,7 @@
           ]
         },
         {
-          "name": "successful existential relation-declaration trace and unsuccessful direct-predicate inductive-certificate surface, including acyclic linear and recursive-SCC traces, initial-rule model recovery and nonlinear-rule reduction",
+          "name": "successful existential relation-declaration trace and unsuccessful direct-predicate inductive-certificate surface, including banked rule/head unification, acyclic and recursive traces, initial-rule model recovery and nonlinear-rule reduction",
           "status": "partial",
           "go_target": "pkg/muz/fp/propositional_engine.go",
           "tests": [
@@ -83585,6 +83596,7 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
           ]
         },
@@ -83604,7 +83616,7 @@
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "remaining general linear trace unification and proof surface",
+          "name": "remaining proof-trace surface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83614,7 +83626,7 @@
         "The fixedpoint engine owns its concrete PDR Context directly rather than through the native engine_base pointer."
       ],
       "deviations": [
-        "Query dispatch, revision-tracked exact-program context reuse, statistics, empty/acyclic answers and recursive-SCC state traces are exposed; native transformed-rule subsumption reuse, remaining general answer traces and diagnostic surfaces remain open."
+        "Query dispatch, revision-tracked exact-program context reuse, statistics, and native-style banked acyclic/recursive answer traces are exposed; native transformed-rule subsumption reuse, proof traces and diagnostic surfaces remain open."
       ]
     },
     {
