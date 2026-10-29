@@ -90,6 +90,53 @@ func TestPropSolverPublishesNewPluginCore(t *testing.T) {
 	}
 }
 
+func TestPropSolverUsesPooledNativeDefaultBackends(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	spacerMust(t, err)
+	manager, err := command.Manager()
+	spacerMust(t, err)
+	spacerMust(t, manager.ToggleProofMode(ast.ASTProofEnabled))
+	globals, err := command.GlobalParameters()
+	spacerMust(t, err)
+	var pools [2]*spacer.SMTContextManager
+	var backends [2]*spacer.VirtualSolver
+	var generic [2]solver.Solver
+	for index := range pools {
+		pools[index], err = spacer.NewSMTContextManager(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+		spacerMust(t, err)
+		backends[index], err = pools[index].Fresh()
+		spacerMust(t, err)
+		generic[index] = backends[index]
+	}
+	truth, err := manager.MkTrue()
+	spacerMust(t, err)
+	prop, err := spacer.NewPropSolver(manager, generic, truth, "pooled-default", spacer.PropSolverConfig{
+		Itp: spacer.ItpSolverConfig{Params: globals.Context, Globals: globals},
+	})
+	spacerMust(t, err)
+	p := spacerBool(t, manager, "pooled-default-p")
+	notP, err := manager.MkNot(p)
+	spacerMust(t, err)
+	spacerMust(t, prop.Assert(notP))
+	result, err := prop.CheckAssumptions([]ast.ASTHandle{p}, nil, spacer.PropCheckOptions{NeedCore: true})
+	spacerMust(t, err)
+	if result.Status != lbool.False || !result.FarkasCore || len(result.Core) != 1 {
+		t.Fatal("pooled native-default core", result.Status, result.FarkasCore, len(result.Core))
+	}
+	core, err := manager.RefGet(result.Core[0])
+	spacerMust(t, err)
+	if core != p {
+		t.Fatal("pooled native-default core literal", core, p)
+	}
+	spacerMust(t, result.Close(manager))
+	spacerMust(t, prop.Close())
+	for index := len(backends) - 1; index >= 0; index-- {
+		spacerMust(t, backends[index].Close())
+		spacerMust(t, pools[index].Close())
+	}
+	spacerMust(t, command.Close())
+}
+
 func TestPropSolverPublishesFarkasCore(t *testing.T) {
 	fixture := newSpacerPropFixtureWithProofs(t, true, true)
 	p := spacerBool(t, fixture.manager, "spacer-farkas-p")

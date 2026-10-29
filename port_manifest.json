@@ -89906,7 +89906,7 @@
           "name": "construction, add_level/ensure_level/level_cnt, assert_level_atoms and both assert_expr forms",
           "status": "ported",
           "go_target": "pkg/muz/spacer/prop_solver.go",
-          "tests": ["TestPropSolverNormalAndDeltaLevelActivation", "TestPropSolverPublishesNewPluginCore"]
+          "tests": ["TestPropSolverNormalAndDeltaLevelActivation", "TestPropSolverPublishesNewPluginCore", "TestPropSolverUsesPooledNativeDefaultBackends"]
         },
         {
           "name": "maxsmt hard proxying and iterative soft-core removal",
@@ -90189,22 +90189,29 @@
       "path": "src/muz/spacer/spacer_smt_context_manager.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "ported",
+      "go_targets": ["pkg/muz/spacer/smt_context_manager.go"],
+      "tests": ["TestSpacerSMTContextManagerPoolsGuardedSolvers", "TestPropSolverUsesPooledNativeDefaultBackends"],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, bounded/unbounded round-robin factory selection, fresh solver creation, parameter updates and statistics",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/smt_context_manager.go",
+          "tests": ["TestSpacerSMTContextManagerPoolsGuardedSolvers", "TestPropSolverUsesPooledNativeDefaultBackends"]
+        }
+      ],
+      "ownership": ["SMTContextManager owns each VirtualSolverFactory and its SMT backend; all issued virtual solvers must close before their manager."],
+      "deviations": ["The source smt_params value is represented by the retained ParamsRef plus SMTSolverConfig required by the Go SMT backend."]
     },
     {
       "path": "src/muz/spacer/spacer_smt_context_manager.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/spacer/smt_context_manager.go"],
+      "tests": ["TestSpacerSMTContextManagerPoolsGuardedSolvers", "TestPropSolverUsesPooledNativeDefaultBackends"],
       "conditionals": [
         {
           "line": 20,
@@ -90215,11 +90222,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "SMT context pool and statistics surface",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/smt_context_manager.go",
+          "tests": ["TestSpacerSMTContextManagerPoolsGuardedSolvers", "TestPropSolverUsesPooledNativeDefaultBackends"]
+        }
+      ],
+      "ownership": ["The manager explicitly owns factories and rejects closure while issued solver views remain live."],
+      "deviations": ["Header guards become normal Go package compilation and invalid lifetime operations return errors."]
     },
     {
       "path": "src/muz/spacer/spacer_sym_mux.cpp",
@@ -90868,9 +90882,9 @@
       "path": "src/muz/spacer/spacer_virtual_solver.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/virtual_solver.go"],
+      "tests": ["TestVirtualSolverSharesBackendAndIsolatesGuardedViews"],
       "assertions": [
         {
           "line": 58,
@@ -90921,19 +90935,43 @@
           "text": "SASSERT(m_context.get_scope_level() == 0);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "guarded assertion internalization, delayed push/pop, checks, assumptions, cores, models, proof cleanup and factory retirement",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/virtual_solver.go",
+          "tests": ["TestVirtualSolverSharesBackendAndIsolatesGuardedViews"]
+        },
+        {
+          "name": "factory allocation, shared SMT backend, statistics and reset",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/virtual_solver.go",
+          "tests": ["TestVirtualSolverSharesBackendAndIsolatesGuardedViews"]
+        },
+        {
+          "name": "timed SMT-LIB benchmark dumping and dump recheck diagnostics",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "translate unreachable stub and constant-false unconditional benchmark dump",
+          "status": "dead",
+          "reason": "The source translate body is UNREACHABLE and the local unconditional dump branch is guarded by literal false."
+        }
+      ],
+      "ownership": ["VirtualSolverFactory owns one shared backend. Each VirtualSolver owns its guard, cached assertions and cleaned proof reference, and retires its guard before the factory closes."],
+      "deviations": ["Go embeds the shared solver interface for unchanged delegation. Explicit AST references preserve the native guarded-view lifetimes."]
     },
     {
       "path": "src/muz/spacer/spacer_virtual_solver.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/virtual_solver.go"],
+      "tests": ["TestVirtualSolverSharesBackendAndIsolatesGuardedViews"],
       "conditionals": [
         {
           "line": 19,
@@ -90944,11 +90982,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "virtual solver and factory retained construction/check/scope/result surface",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/virtual_solver.go",
+          "tests": ["TestVirtualSolverSharesBackendAndIsolatesGuardedViews"]
+        },
+        {
+          "name": "benchmark dump configuration surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["The Go types make factory ownership of the backend and solver ownership of guard/proof references explicit."],
+      "deviations": ["Header guards and native inheritance become package compilation and interface embedding."]
     },
     {
       "path": "src/muz/tab/CMakeLists.txt",
