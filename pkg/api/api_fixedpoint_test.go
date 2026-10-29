@@ -181,16 +181,26 @@ func TestSMTContextFixedpointSpacerInductiveExports(t *testing.T) {
 	manager, err := context.Manager()
 	astTestMust(t, err)
 	astTestMust(t, context.SetFixedpointEngine("spacer"))
-	p, err := context.DeclareRelation("api-spacer-P", nil)
+	arithmetic, err := manager.ArithmeticFamilyID()
+	astTestMust(t, err)
+	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
+	astTestMust(t, err)
+	zero, err := manager.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, err)
+	one, err := manager.ArithmeticIntegerNumeralText("1")
+	astTestMust(t, err)
+	p, err := context.DeclareRelation("api-spacer-P", []ast.ASTHandle{integer})
 	astTestMust(t, err)
 	u, err := context.DeclareRelation("api-spacer-U", nil)
 	astTestMust(t, err)
-	pAtom, err := manager.MkApp(p, nil)
+	pAtom, err := manager.MkApp(p, []ast.ASTHandle{zero})
+	astTestMust(t, err)
+	pOne, err := manager.MkApp(p, []ast.ASTHandle{one})
 	astTestMust(t, err)
 	uAtom, err := manager.MkApp(u, nil)
 	astTestMust(t, err)
 	astTestMust(t, context.AddFixedpointRule(pAtom, "api-spacer-fact"))
-	recursive, err := manager.MkImplies(uAtom, uAtom)
+	recursive, err := manager.MkImplies(pOne, uAtom)
 	astTestMust(t, err)
 	astTestMust(t, context.AddFixedpointRule(recursive, "api-spacer-recursive"))
 	status, err := context.QueryFixedpoint(u)
@@ -233,4 +243,41 @@ func TestSMTContextFixedpointSpacerInductiveExports(t *testing.T) {
 		t.Fatal("Spacer public invariant cover", coverHandle)
 	}
 	astTestMust(t, manager.DelRef(&cover))
+	status, err = context.QueryFixedpoint(p)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("Spacer public fact query", status)
+	}
+	reachable, err := context.FixedpointReachable(p)
+	astTestMust(t, err)
+	reachableHandle, err := manager.RefGet(reachable)
+	astTestMust(t, err)
+	parts, err := manager.FlattenAnd([]ast.ASTHandle{reachableHandle})
+	astTestMust(t, err)
+	foundVariable := false
+	for _, part := range parts {
+		kind, x := manager.GetKind(part)
+		astTestMust(t, x)
+		if kind != ast.ASTApp {
+			continue
+		}
+		operation, x := manager.GetDeclKind(part)
+		astTestMust(t, x)
+		if operation != ast.ASTOpEq {
+			continue
+		}
+		for index := uint32(0); index < 2; index++ {
+			argument, x := manager.GetArg(part, index)
+			astTestMust(t, x)
+			argumentKind, x := manager.GetKind(argument)
+			astTestMust(t, x)
+			foundVariable = foundVariable || argumentKind == ast.ASTVar
+		}
+	}
+	if !foundVariable {
+		var text strings.Builder
+		astTestMust(t, context.command.WriteExpression(&text, reachableHandle))
+		t.Fatal("Spacer reachable summary did not export a column variable", text.String())
+	}
+	astTestMust(t, manager.DelRef(&reachable))
 }

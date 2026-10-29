@@ -192,3 +192,14 @@ func (e *PropositionalEngine) AddCover(level int, declaration, property ast.ASTH
 	}
 	return context.AddCover(level, declaration, property)
 }
+
+// Reachable returns the accumulated Spacer reach summary for a predicate.
+func (e *PropositionalEngine) Reachable(declaration ast.ASTHandle) (ast.ASTRef, error) {
+	if err := e.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	if e.backend != "spacer" || e.spacer == nil || e.spacerRevision != e.revision {
+		return ast.ASTRef{}, ErrPropositionalEngine
+	}
+	return e.spacer.Reachable(declaration)
+}

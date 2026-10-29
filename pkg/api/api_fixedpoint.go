@@ -143,6 +143,15 @@ func (c *SMTContext) AddFixedpointCover(level int, declaration, property ast.AST
 	return c.command.AddFixedpointCover(level, declaration, property)
 }
 
+// FixedpointReachable returns one owning reference to the accumulated Spacer
+// reach summary. Release it through Manager().DelRef.
+func (c *SMTContext) FixedpointReachable(declaration ast.ASTHandle) (ast.ASTRef, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	return c.command.FixedpointReachable(declaration)
+}
+
 // FixedpointStatistics returns an owning Go copy of current engine statistics.
 func (c *SMTContext) FixedpointStatistics() (statistics.Statistics, error) {
 	if err := c.open(); err != nil {

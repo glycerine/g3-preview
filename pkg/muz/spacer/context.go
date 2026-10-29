@@ -284,6 +284,22 @@ func (c *Context) AddCover(level int, declaration, property ast.ASTHandle) error
 	return transformer.AddCover(level, property)
 }
 
+// Reachable returns the accumulated concrete reach summary for a predicate.
+func (c *Context) Reachable(declaration ast.ASTHandle) (ast.ASTRef, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	transformer := c.transformers[declaration]
+	if transformer == nil {
+		falsity, err := c.manager.MkFalse()
+		if err != nil {
+			return ast.ASTRef{}, err
+		}
+		return c.manager.NewRef(falsity)
+	}
+	return transformer.Reachable()
+}
+
 func (c *Context) propagate(maximum uint32) (bool, error) {
 	for level := uint32(0); level <= maximum; level++ {
 		all := true

@@ -221,6 +221,16 @@ func (c *Context) AddFixedpointCover(level int, declaration, property ast.ASTHan
 	return engine.AddCover(level, declaration, property)
 }
 
+// FixedpointReachable returns the accumulated Spacer reach summary as one
+// owning AST reference.
+func (c *Context) FixedpointReachable(declaration ast.ASTHandle) (ast.ASTRef, error) {
+	engine, err := c.fixedpointContext()
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	return engine.Reachable(declaration)
+}
+
 func (c *Context) FixedpointStatistics() (statistics.Statistics, error) {
 	engine, err := c.fixedpointContext()
 	if err != nil {

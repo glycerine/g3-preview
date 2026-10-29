@@ -83,6 +83,14 @@ func TestSpacerContextSolvesFactAndRecursiveNoBasePrograms(t *testing.T) {
 	if status, err := chainContext.Solve(0, 4); err != nil || status != lbool.True {
 		t.Fatal("Spacer cross-predicate chain", status, err)
 	}
+	reachableBase, err := chainContext.Reachable(basePredicate)
+	spacerMust(t, err)
+	reachableBaseHandle, err := manager.RefGet(reachableBase)
+	spacerMust(t, err)
+	if !manager.IsTrue(reachableBaseHandle) {
+		t.Fatal("Spacer base reach summary", reachableBaseHandle)
+	}
+	spacerMust(t, manager.DelRef(&reachableBase))
 	spacerMust(t, chainContext.Close())
 	spacerMust(t, chainSet.Close())
 	spacerMust(t, chainRule.Close())
