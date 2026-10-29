@@ -204,3 +204,34 @@ func TestSpacerPredicateTransformerConnectsFramesAndSolver(t *testing.T) {
 	spacerMust(t, owner.Close())
 	spacerMust(t, command.Close())
 }
+
+func TestSpacerRulePredicateTransformerBuildsSourceStateSignature(t *testing.T) {
+	command, manager, owner := lemmaOwnerFixture(t)
+	boolean, err := manager.MkBoolSort()
+	spacerMust(t, err)
+	name, err := manager.Symbols.Intern("rule-predicate-transformer")
+	spacerMust(t, err)
+	head, err := manager.MkFuncDecl(name, []ast.ASTHandle{boolean, boolean}, boolean, ast.ASTFuncDeclInfo{})
+	spacerMust(t, err)
+	transformer, err := spacer.NewRulePredicateTransformer(owner, head, spacer.PropSolverConfig{})
+	spacerMust(t, err)
+	if got, err := transformer.Head(); err != nil || got != head {
+		t.Fatal("rule predicate head", got, head, err)
+	}
+	signature, err := transformer.Signature()
+	spacerMust(t, err)
+	if len(signature) != 2 || signature[0] == signature[1] {
+		t.Fatal("rule predicate signature", signature)
+	}
+	truth, err := manager.MkTrue()
+	spacerMust(t, err)
+	falsehood, err := manager.MkFalse()
+	spacerMust(t, err)
+	spacerMust(t, transformer.InitializeSystem(falsehood, truth))
+	if _, err = transformer.Formulas(0, true); err != nil {
+		t.Fatal("initialized rule predicate formulas", err)
+	}
+	spacerMust(t, transformer.Close())
+	spacerMust(t, owner.Close())
+	spacerMust(t, command.Close())
+}

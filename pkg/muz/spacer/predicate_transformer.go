@@ -5,6 +5,7 @@ package spacer
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -17,8 +18,14 @@ type PredicateTransformer struct {
 	solver                   *PropSolver
 	frames                   *Frames
 	obligations              *ProofObligationStore
+	name                     string
+	head                     ast.ASTRef
+	signature                []ast.ASTRef
+	extendLiteral            ast.ASTRef
 	initial                  ast.ASTRef
 	transition               ast.ASTRef
+	initialized              bool
+	allInitial               bool
 	propagations             uint64
 	invariants               uint64
 	simplifyProofObligations bool
@@ -49,13 +56,11 @@ func (p *PredicateTransformer) NewProofObligation(parent *ProofObligation, level
 	return p.obligations.New(parent, level, depth, post, bindings)
 }
 
-// NewPredicateTransformer creates the live solver/frame bridge after rule
-// conversion has produced the initial-state and transition formulas.
-func NewPredicateTransformer(owner *Manager, name string, initial, transition ast.ASTHandle, config PropSolverConfig) (_ *PredicateTransformer, resultErr error) {
+func newPredicateTransformer(owner *Manager, name string, config PropSolverConfig) (_ *PredicateTransformer, resultErr error) {
 	if owner == nil || owner.open() != nil {
 		return nil, ErrManagerOwner
 	}
-	p := &PredicateTransformer{owner: owner, manager: owner.manager}
+	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name}
 	if config.Itp.Params == nil && config.Itp.Globals == nil {
 		config.Itp.Params = owner.contexts[0].config.Params
 		config.Itp.Globals = owner.contexts[0].config.Globals
@@ -67,12 +72,6 @@ func NewPredicateTransformer(owner *Manager, name string, initial, transition as
 		}
 	}()
 	var err error
-	if p.initial, err = p.manager.NewRef(initial); err != nil {
-		return nil, err
-	}
-	if p.transition, err = p.manager.NewRef(transition); err != nil {
-		return nil, err
-	}
 	if p.solver, err = owner.NewPropSolver(name, config); err != nil {
 		return nil, err
 	}
@@ -82,17 +81,189 @@ func NewPredicateTransformer(owner *Manager, name string, initial, transition as
 	if p.obligations, err = NewProofObligationStore(p, true); err != nil {
 		return nil, err
 	}
-	if err = p.solver.Assert(transition); err != nil {
+	committed = true
+	return p, nil
+}
+
+// NewPredicateTransformer creates the live solver/frame bridge after rule
+// conversion has produced the initial-state and transition formulas.
+func NewPredicateTransformer(owner *Manager, name string, initial, transition ast.ASTHandle, config PropSolverConfig) (_ *PredicateTransformer, resultErr error) {
+	p, err := newPredicateTransformer(owner, name, config)
+	if err != nil {
 		return nil, err
 	}
-	if err = p.solver.AssertAtLevel(initial, 0); err != nil {
+	if err = p.InitializeSystem(initial, transition); err != nil {
+		return nil, errors.Join(err, p.Close())
+	}
+	return p, nil
+}
+
+func NewRulePredicateTransformer(owner *Manager, head ast.ASTHandle, config PropSolverConfig) (_ *PredicateTransformer, resultErr error) {
+	if owner == nil || owner.open() != nil {
+		return nil, ErrManagerOwner
+	}
+	kind, err := owner.manager.GetKind(head)
+	if err != nil || kind != ast.ASTFuncDecl {
+		if err == nil {
+			err = ast.ErrASTDomain
+		}
 		return nil, err
 	}
-	if err = p.frames.AddFrame(); err != nil {
+	symbol, err := owner.manager.GetASTName(head)
+	if err != nil {
+		return nil, err
+	}
+	name, err := owner.manager.Symbols.String(symbol)
+	if err != nil {
+		return nil, err
+	}
+	p, err := newPredicateTransformer(owner, name, config)
+	if err != nil {
+		return nil, err
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			resultErr = errors.Join(resultErr, p.Close())
+		}
+	}()
+	if p.head, err = p.manager.NewRef(head); err != nil {
+		return nil, err
+	}
+	if err = p.initializeSignature(name, head); err != nil {
+		return nil, err
+	}
+	if err = p.initializeExtendLiteral(name); err != nil {
 		return nil, err
 	}
 	committed = true
 	return p, nil
+}
+
+func (p *PredicateTransformer) initializeSignature(name string, head ast.ASTHandle) error {
+	arity, err := p.manager.GetArity(head)
+	if err != nil {
+		return err
+	}
+	for i := uint32(0); i < arity; i++ {
+		sort, err := p.manager.GetDomain(head, i)
+		if err != nil {
+			return err
+		}
+		symbol, err := p.manager.Symbols.Intern(fmt.Sprintf("%s_%d", name, i))
+		if err != nil {
+			return err
+		}
+		state, err := p.manager.MkFuncDecl(symbol, nil, sort, ast.ASTFuncDeclInfo{})
+		if err != nil {
+			return err
+		}
+		old, err := p.owner.OldPredicate(state, 0)
+		if err != nil {
+			return err
+		}
+		ref, err := p.manager.NewRef(old)
+		if err != nil {
+			return err
+		}
+		p.signature = append(p.signature, ref)
+	}
+	return nil
+}
+
+func (p *PredicateTransformer) initializeExtendLiteral(name string) error {
+	boolean, err := p.manager.MkBoolSort()
+	if err != nil {
+		return err
+	}
+	symbol, err := p.manager.Symbols.Intern(name + "_ext0")
+	if err != nil {
+		return err
+	}
+	application, err := p.manager.MkConst(symbol, boolean)
+	if err != nil {
+		return err
+	}
+	declaration, err := p.manager.GetDecl(application)
+	if err != nil {
+		return err
+	}
+	current, err := p.owner.NewPredicate(declaration)
+	if err != nil {
+		return err
+	}
+	currentApplication, err := p.manager.MkApp(current, nil)
+	if err != nil {
+		return err
+	}
+	negated, err := p.manager.MkNot(currentApplication)
+	if err != nil {
+		return err
+	}
+	p.extendLiteral, err = p.manager.NewRef(negated)
+	return err
+}
+
+func (p *PredicateTransformer) InitializeSystem(initial, transition ast.ASTHandle) (resultErr error) {
+	if err := p.open(); err != nil {
+		return err
+	}
+	if p.initialized {
+		return ast.ErrASTDomain
+	}
+	initialRef, err := p.manager.NewRef(initial)
+	if err != nil {
+		return err
+	}
+	transitionRef, err := p.manager.NewRef(transition)
+	if err != nil {
+		return errors.Join(err, p.manager.DelRef(&initialRef))
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			resultErr = errors.Join(resultErr, p.manager.DelRef(&transitionRef), p.manager.DelRef(&initialRef))
+		}
+	}()
+	if err = p.solver.Assert(transition); err != nil {
+		return err
+	}
+	if err = p.solver.AssertAtLevel(initial, 0); err != nil {
+		return err
+	}
+	if err = p.frames.AddFrame(); err != nil {
+		return err
+	}
+	p.initial = initialRef
+	p.transition = transitionRef
+	p.initialized = true
+	committed = true
+	return nil
+}
+
+func (p *PredicateTransformer) Head() (ast.ASTHandle, error) {
+	if err := p.open(); err != nil || p.head == (ast.ASTRef{}) {
+		if err == nil {
+			err = ast.ErrASTDomain
+		}
+		return ast.ASTHandle{}, err
+	}
+	return p.manager.RefGet(p.head)
+}
+
+func (p *PredicateTransformer) Signature() ([]ast.ASTHandle, error) {
+	if err := p.open(); err != nil {
+		return nil, err
+	}
+	result := make([]ast.ASTHandle, len(p.signature))
+	for i := range p.signature {
+		handle, err := p.manager.RefGet(p.signature[i])
+		if err != nil {
+			return nil, err
+		}
+		result[i] = handle
+	}
+	return result, nil
 }
 
 func (p *PredicateTransformer) open() error {
@@ -276,6 +447,9 @@ func (p *PredicateTransformer) Formulas(level uint32, addAxioms bool) (ast.ASTHa
 	}
 	var formulas []ast.ASTHandle
 	if addAxioms {
+		if !p.initialized {
+			return ast.ASTHandle{}, ast.ErrASTDomain
+		}
 		background, err := p.owner.Background()
 		if err != nil {
 			return ast.ASTHandle{}, err
@@ -337,6 +511,15 @@ func (p *PredicateTransformer) Close() (result error) {
 		result = errors.Join(result, p.solver.Close())
 	}
 	if p.manager != nil {
+		if p.extendLiteral != (ast.ASTRef{}) {
+			result = errors.Join(result, p.manager.DelRef(&p.extendLiteral))
+		}
+		for i := len(p.signature) - 1; i >= 0; i-- {
+			result = errors.Join(result, p.manager.DelRef(&p.signature[i]))
+		}
+		if p.head != (ast.ASTRef{}) {
+			result = errors.Join(result, p.manager.DelRef(&p.head))
+		}
 		if p.transition != (ast.ASTRef{}) {
 			result = errors.Join(result, p.manager.DelRef(&p.transition))
 		}
@@ -348,6 +531,7 @@ func (p *PredicateTransformer) Close() (result error) {
 		p.frames = nil
 		p.obligations = nil
 		p.solver = nil
+		p.signature = nil
 		p.owner = nil
 		p.manager = nil
 		p.closed = true
