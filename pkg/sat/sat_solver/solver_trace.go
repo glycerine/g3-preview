@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -219,6 +220,7 @@ func (s *Solver) finishDIMACS(w *modelConversion, unknown bool) error {
 	if err != nil {
 		return err
 	}
+	sort.Slice(entries, func(left, right int) bool { return entries[left].Variable < entries[right].Variable })
 	for _, entry := range entries {
 		if _, err = fmt.Fprintf(s.output, "c %d ", entry.Variable); err != nil {
 			return err

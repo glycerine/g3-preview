@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
@@ -84,6 +85,7 @@ func (t *SATTactic) writeDIMACSAtoms(tr *GoalTranslator) error {
 	if err != nil {
 		return err
 	}
+	sort.Slice(entries, func(left, right int) bool { return entries[left].Variable < entries[right].Variable })
 	for _, entry := range entries {
 		atom, v := entry.Expr, entry.Variable
 		text, err := tr.traceGoalFormula(atom)
