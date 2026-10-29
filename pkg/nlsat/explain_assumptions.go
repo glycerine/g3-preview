@@ -31,6 +31,7 @@ type explanationAssumptions struct {
 	fullDimensional         bool
 	projectionFactors       explanationProjectionFactorScope
 	leading                 explanationLeadingScope
+	simplifiedCore          scopedLiteralVector
 	output                  scopedLiteralVector
 	alreadyAdded            []bool
 	marked                  []uint32
@@ -54,6 +55,7 @@ func newExplanationAssumptions(r *searchState) (*explanationAssumptions, error) 
 	}
 	n := &explanationAssumptions{search: r, header: h}
 	n.self = n
+	n.simplifiedCore.factory = r.store.atoms
 	n.output.factory = r.store.atoms
 	r.explanationAssumptions = n
 	var err error
@@ -309,6 +311,9 @@ func (n *explanationAssumptions) cleanup() error {
 			return err
 		}
 	}
+	if err := n.simplifiedCore.cleanup(); err != nil {
+		return err
+	}
 	if err := n.output.cleanup(); err != nil {
 		return err
 	}
@@ -341,6 +346,9 @@ func (n *explanationAssumptions) close() error {
 		return err
 	}
 	n.failed = true
+	if err := n.simplifiedCore.close(); err != nil {
+		return err
+	}
 	if err := n.output.close(); err != nil {
 		return err
 	}

@@ -134,5 +134,24 @@ func (n *explanationAssumptions) collectExplanation(literals []sat.Literal, full
 	}
 	n.fullDimensional = fullDimensional
 	defer func() { err = n.finish(err) }()
+	if n.search.config.SimplifyCores {
+		for _, literal := range literals {
+			if err = n.simplifiedCore.push(literal); err != nil {
+				return err
+			}
+		}
+		defer func() { err = errors.Join(err, n.simplifiedCore.reset()) }()
+		max, maxErr := n.search.store.maxVar(n.simplifiedCore.result)
+		if maxErr != nil {
+			return maxErr
+		}
+		if err = atomAssert("nlsat_explain.cpp", 1357, "max != null_var", max != NullVariable); err != nil {
+			return err
+		}
+		if err = n.normalizeCore(&n.simplifiedCore, max); err != nil {
+			return err
+		}
+		return n.explainMain(n.simplifiedCore.result)
+	}
 	return n.explainMain(literals)
 }

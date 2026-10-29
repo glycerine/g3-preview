@@ -36,14 +36,15 @@ func TestExplanationMainCollectsAtomsAndBuildsProjectedCell(t *testing.T) {
 
 func TestExplanationCollectMinimizesConfiguredConflictCore(t *testing.T) {
 	e, r, n, _ := projectionCoefficientFixture(t, true)
+	r.config.SimplifyCores = true
 	m, err := newExplanationMinimizer(r)
 	assignmentMust(t, err)
 	a, _ := searchInequality(t, e, r, AtomGT, evaluatorTerm{1, 0, 1})
 	b, _ := searchInequality(t, e, r, AtomLT, evaluatorTerm{1, 0, 1})
 	redundant, _ := searchInequality(t, e, r, AtomLT, evaluatorTerm{1, 0, 1}, evaluatorTerm{-4, 0, 0})
 	assignmentMust(t, n.collectExplanation([]sat.Literal{a, b, redundant}, false))
-	if len(m.core) != 2 || len(m.result) != 0 {
-		t.Fatal("configured minimizer core/result lifetime", m.core, m.result)
+	if len(m.core) != 2 || len(m.result) != 0 || len(n.simplifiedCore.result) != 0 {
+		t.Fatal("configured minimizer/normalizer core lifetime", m.core, m.result, n.simplifiedCore.result)
 	}
 }
 
