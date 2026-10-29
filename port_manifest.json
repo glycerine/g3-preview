@@ -5312,7 +5312,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation query, owning trace/inductive-certificate answer, inductive model and model evaluation, PDR/Spacer frame cover, Spacer reachable summary and copied statistics surface",
+          "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation and Spacer-from-level query, owning trace/inductive-certificate answer, inductive model and model evaluation, PDR/Spacer frame cover, Spacer reachable summary and copied statistics surface",
           "status": "partial",
           "go_target": "pkg/api/api_fixedpoint.go",
           "tests": ["TestSMTContextFixedpointPDRLifecycle", "TestSMTContextFixedpointSpacerInductiveExports"]
@@ -5373,9 +5373,10 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {"name": "Z3_fixedpoint_query_from_lvl typed Go equivalent", "status": "ported", "go_target": "pkg/api/api_fixedpoint.go", "tests": ["TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "Z3_fixedpoint_add_invariant typed Go equivalent", "status": "ported", "go_target": "pkg/api/api_fixedpoint.go", "tests": ["TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "Z3_fixedpoint_get_reachable typed Go equivalent", "status": "ported", "go_target": "pkg/api/api_fixedpoint.go", "tests": ["TestSMTContextFixedpointSpacerInductiveExports"]},
-        {"name": "remaining query-from-level, explicit ground-answer alias and rule/name trace exports", "status": "unported", "go_target": null, "tests": []}
+        {"name": "remaining explicit ground-answer alias and rule/name trace exports", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["FixedpointReachable transfers one ASTRef to the caller; AddFixedpointInvariant borrows its declaration and property for the call, after which the engine retains the normalized lemma."],
       "deviations": ["Typed Go methods replace opaque C handles and saved API trails."]
@@ -89068,7 +89069,7 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {"name": "direct-predicate query selection, Spacer context construction and solve routing", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]},
+        {"name": "direct-predicate and from-level query selection, Spacer context construction and solve routing", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]},
         {"name": "answer, inductive model, level count, cover/invariant, reachable summary, statistics and reset forwarding", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "remaining transformed-rule subsumption reuse, slice/unfold/coalesce remapping, trace-rule export, proof and diagnostic certificate display", "status": "unported", "go_target": null, "tests": []}
       ],
@@ -89095,7 +89096,7 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
-        {"name": "retained query, answer, model, level, cover/invariant, reachable summary and statistics interface", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports"]},
+        {"name": "retained query/from-level query, answer, model, level, cover/invariant, reachable summary and statistics interface", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "remaining trace rules, proof, transformed predicate remapping and certificate display surface", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["The Go engine owns one concrete Spacer Context and exposes explicit owner-returning answer/model methods."],

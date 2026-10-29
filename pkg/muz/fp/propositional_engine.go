@@ -1234,6 +1234,20 @@ func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.L
 	return lbool.FromBool(count != 0), nil
 }
 
+// QueryPredicateFromLevel runs a Spacer query beginning at the requested proof
+// level.
+func (e *PropositionalEngine) QueryPredicateFromLevel(declaration ast.ASTHandle, level uint32) (lbool.LBool, error) {
+	if err := e.open(); err != nil {
+		return lbool.Undef, err
+	}
+	if e.backend != "spacer" || e.predicates[declaration] == nil {
+		return lbool.Undef, ErrPropositionalEngine
+	}
+	e.queried = true
+	e.compiled = false
+	return e.querySpacerFromLevel(declaration, level)
+}
+
 // Answer returns an owning formula describing the current finite relation.
 // Each free variable corresponds to the predicate column with the same index.
 func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTRef, result error) {

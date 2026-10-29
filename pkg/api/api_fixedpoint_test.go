@@ -203,7 +203,7 @@ func TestSMTContextFixedpointSpacerInductiveExports(t *testing.T) {
 	recursive, err := manager.MkImplies(pOne, uAtom)
 	astTestMust(t, err)
 	astTestMust(t, context.AddFixedpointRule(recursive, "api-spacer-recursive"))
-	status, err := context.QueryFixedpoint(u)
+	status, err := context.QueryFixedpointFromLevel(u, 1)
 	astTestMust(t, err)
 	if status != lbool.False {
 		t.Fatal("Spacer public unreachable query", status)

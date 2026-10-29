@@ -87,6 +87,15 @@ func (c *SMTContext) QueryFixedpoint(declaration ast.ASTHandle) (lbool.LBool, er
 	return c.command.QueryFixedpoint(declaration)
 }
 
+// QueryFixedpointFromLevel runs a Spacer query beginning at the requested
+// proof level.
+func (c *SMTContext) QueryFixedpointFromLevel(declaration ast.ASTHandle, level uint32) (lbool.LBool, error) {
+	if err := c.open(); err != nil {
+		return lbool.Undef, err
+	}
+	return c.command.QueryFixedpointFromLevel(declaration, level)
+}
+
 // FixedpointAnswer returns one owning AST reference for the latest successful
 // query. The caller releases it through Manager().DelRef.
 func (c *SMTContext) FixedpointAnswer(declaration ast.ASTHandle) (ast.ASTRef, error) {

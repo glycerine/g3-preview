@@ -66,6 +66,10 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 }
 
 func (e *PropositionalEngine) querySpacer(declaration ast.ASTHandle) (_ lbool.LBool, resultErr error) {
+	return e.querySpacerFromLevel(declaration, 0)
+}
+
+func (e *PropositionalEngine) querySpacerFromLevel(declaration ast.ASTHandle, fromLevel uint32) (_ lbool.LBool, resultErr error) {
 	if e.params == nil || e.globals == nil {
 		return lbool.Undef, fmt.Errorf("muz/fp: Spacer requires parameter and global services")
 	}
@@ -143,5 +147,5 @@ func (e *PropositionalEngine) querySpacer(declaration ast.ASTHandle) (_ lbool.LB
 	}
 	e.spacer = context
 	e.spacerRevision = e.revision
-	return context.Solve(0, maximumLevels)
+	return context.Solve(fromLevel, maximumLevels)
 }
