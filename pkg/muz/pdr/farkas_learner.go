@@ -331,11 +331,99 @@ func copyFarkasHypotheses(source map[ast.ASTHandle]struct{}) map[ast.ASTHandle]s
 	return result
 }
 
-// GetFarkasLemmas performs the proof preprocessing and dependency traversal
-// used by get_lemmas, and returns the arithmetic lemmas produced at Farkas
-// theory nodes. General B-pure unit recovery and final subsumption are kept for
-// the remaining full get_lemmas port. Every returned ASTRef is caller-owned.
-func (f *FarkasLearner) GetFarkasLemmas(root ast.ASTHandle, bAssertions []ast.ASTHandle) (_ []ast.ASTRef, resultErr error) {
+func (f *FarkasLearner) collectUninterpretedDeclarations(root ast.ASTHandle, declarations map[ast.ASTHandle]struct{}) error {
+	visited := make(map[ast.ASTHandle]bool)
+	stack := []ast.ASTHandle{root}
+	for len(stack) != 0 {
+		last := len(stack) - 1
+		current := stack[last]
+		stack = stack[:last]
+		if visited[current] {
+			continue
+		}
+		visited[current] = true
+		kind, err := f.manager.GetKind(current)
+		if err != nil {
+			return err
+		}
+		switch kind {
+		case ast.ASTApp:
+			declaration, err := f.manager.GetDecl(current)
+			if err != nil {
+				return err
+			}
+			family, err := f.manager.GetFamilyID(declaration)
+			if err != nil {
+				return err
+			}
+			if family == ast.NullFamilyID {
+				declarations[declaration] = struct{}{}
+			}
+			count, err := f.manager.GetNumArgs(current)
+			if err != nil {
+				return err
+			}
+			for i := count; i != 0; i-- {
+				child, err := f.manager.GetArg(current, i-1)
+				if err != nil {
+					return err
+				}
+				stack = append(stack, child)
+			}
+		case ast.ASTQuantifier:
+			body, err := f.manager.GetQuantifierBody(current)
+			if err != nil {
+				return err
+			}
+			stack = append(stack, body)
+			patterns, err := f.manager.GetNumPatterns(current)
+			if err != nil {
+				return err
+			}
+			for i := patterns; i != 0; i-- {
+				pattern, err := f.manager.GetPattern(current, i-1)
+				if err != nil {
+					return err
+				}
+				stack = append(stack, pattern)
+			}
+			noPatterns, err := f.manager.GetNumNoPatterns(current)
+			if err != nil {
+				return err
+			}
+			for i := noPatterns; i != 0; i-- {
+				pattern, err := f.manager.GetNoPattern(current, i-1)
+				if err != nil {
+					return err
+				}
+				stack = append(stack, pattern)
+			}
+		case ast.ASTVar:
+		default:
+			return ast.ErrASTDomain
+		}
+	}
+	return nil
+}
+
+func (f *FarkasLearner) expressionIsPure(root ast.ASTHandle, declarations map[ast.ASTHandle]struct{}) (bool, error) {
+	reached := make(map[ast.ASTHandle]struct{})
+	if err := f.collectUninterpretedDeclarations(root, reached); err != nil {
+		return false, err
+	}
+	for declaration := range reached {
+		if _, found := declarations[declaration]; !found {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+// GetLemmas performs the source proof preprocessing and dependency traversal,
+// recovering general B-pure units and arithmetic lemmas produced at Farkas
+// theory nodes. Final tactic subsumption remains a separate porting step.
+// Every returned ASTRef is caller-owned.
+func (f *FarkasLearner) GetLemmas(root ast.ASTHandle, bAssertions []ast.ASTHandle) (_ []ast.ASTRef, resultErr error) {
 	if err := f.open(); err != nil {
 		return nil, err
 	}
@@ -359,8 +447,12 @@ func (f *FarkasLearner) GetFarkasLemmas(root ast.ASTHandle, bAssertions []ast.AS
 		return nil, err
 	}
 	bSet := make(map[ast.ASTHandle]struct{}, len(bAssertions))
+	bDeclarations := make(map[ast.ASTHandle]struct{})
 	for _, assertion := range bAssertions {
 		bSet[assertion] = struct{}{}
+		if err := f.collectUninterpretedDeclarations(assertion, bDeclarations); err != nil {
+			return nil, err
+		}
 	}
 	hypotheses := make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}, len(order))
 	aDependent := make(map[ast.ASTHandle]bool, len(order))
@@ -382,6 +474,61 @@ func (f *FarkasLearner) GetFarkasLemmas(root ast.ASTHandle, bAssertions []ast.AS
 		}
 	}()
 	seenResults := make(map[ast.ASTHandle]bool)
+	appendResult := func(handle ast.ASTHandle) error {
+		if seenResults[handle] {
+			return nil
+		}
+		reference, err := f.manager.NewRef(handle)
+		if err != nil {
+			return err
+		}
+		seenResults[handle] = true
+		results = append(results, reference)
+		return nil
+	}
+	bClosed := make(map[ast.ASTHandle]bool)
+	var recoverAsserted func(ast.ASTHandle) error
+	recoverAsserted = func(root ast.ASTHandle) error {
+		stack := []ast.ASTHandle{root}
+		visited := make(map[ast.ASTHandle]bool)
+		for len(stack) != 0 {
+			last := len(stack) - 1
+			current := stack[last]
+			stack = stack[:last]
+			if visited[current] || bClosed[current] {
+				continue
+			}
+			visited[current] = true
+			count, err := f.manager.GetProofNumParents(current)
+			if err != nil {
+				return err
+			}
+			for i := uint32(0); i < count; i++ {
+				parent, err := f.manager.GetProofParent(current, i)
+				if err != nil {
+					return err
+				}
+				stack = append(stack, parent)
+			}
+			asserted, err := f.manager.IsProofKind(current, ast.ASTPrAsserted)
+			if err != nil {
+				return err
+			}
+			if asserted {
+				fact, err := f.manager.GetProofFact(current)
+				if err != nil {
+					return err
+				}
+				if _, found := bSet[fact]; found {
+					if err = appendResult(fact); err != nil {
+						return err
+					}
+					bClosed[current] = true
+				}
+			}
+		}
+		return nil
+	}
 	for _, proof := range order {
 		count, err := f.manager.GetProofNumParents(proof)
 		if err != nil {
@@ -406,6 +553,36 @@ func (f *FarkasLearner) GetFarkasLemmas(root ast.ASTHandle, bAssertions []ast.AS
 		if err != nil {
 			return nil, err
 		}
+		farkasLemma, err := f.IsFarkasLemma(proof)
+		if err != nil {
+			return nil, err
+		}
+		if (len(hyps) != 0 || aDependent[proof]) && bDependent[proof] && !farkasLemma {
+			for _, parent := range parents {
+				bPure := bDependent[parent] && !aDependent[parent] && len(hypotheses[parent]) == 0
+				if !bPure {
+					continue
+				}
+				fact, err := f.manager.GetProofFact(parent)
+				if err != nil {
+					return nil, err
+				}
+				pure, err := f.expressionIsPure(fact, bDeclarations)
+				if err != nil {
+					return nil, err
+				}
+				if pure {
+					if err = appendResult(fact); err != nil {
+						return nil, err
+					}
+				} else {
+					if err = recoverAsserted(proof); err != nil {
+						return nil, err
+					}
+					bClosed[proof] = true
+				}
+			}
+		}
 		switch kind {
 		case ast.ASTPrAsserted:
 			fact, err := f.manager.GetProofFact(proof)
@@ -426,10 +603,17 @@ func (f *FarkasLearner) GetFarkasLemmas(root ast.ASTHandle, bAssertions []ast.AS
 			hyps[fact] = struct{}{}
 			hypotheses[proof] = hyps
 		case ast.ASTPrDefAxiom:
-			// Until the shared-vocabulary collector is added, treating a
-			// definition axiom as A-dependent is conservative: it can only
-			// suppress a candidate lemma.
-			aDependent[proof] = true
+			fact, err := f.manager.GetProofFact(proof)
+			if err != nil {
+				return nil, err
+			}
+			pure, err := f.expressionIsPure(fact, bDeclarations)
+			if err != nil {
+				return nil, err
+			}
+			if !pure {
+				aDependent[proof] = true
+			}
 		case ast.ASTPrLemma:
 			fact, err := f.manager.GetProofFact(proof)
 			if err != nil {
@@ -486,6 +670,7 @@ func (f *FarkasLearner) GetFarkasLemmas(root ast.ASTHandle, bAssertions []ast.AS
 				return nil, err
 			}
 			if produced {
+				bClosed[proof] = true
 				handle, err := f.manager.RefGet(lemma)
 				if err != nil {
 					return nil, err

@@ -113,13 +113,13 @@ func TestFarkasLearnerRecognizesArithmeticTheoryLemma(t *testing.T) {
 	pdrMust(t, manager.DelRef(&combined))
 	lemmaRoot, err := manager.NewRef(lemma)
 	pdrMust(t, err)
-	lemmas, err := learner.GetFarkasLemmas(lemma, []ast.ASTHandle{le})
+	lemmas, err := learner.GetLemmas(lemma, []ast.ASTHandle{le})
 	pdrMust(t, err)
 	if len(lemmas) != 1 {
 		t.Fatal("proof traversal did not recover the Farkas lemma", len(lemmas))
 	}
 	pdrMust(t, manager.DelRef(&lemmas[0]))
-	lemmas, err = learner.GetFarkasLemmas(lemma, nil)
+	lemmas, err = learner.GetLemmas(lemma, nil)
 	pdrMust(t, err)
 	if len(lemmas) != 0 {
 		t.Fatal("proof traversal produced a lemma without a B dependency", len(lemmas))
@@ -184,6 +184,37 @@ func TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals(t *testing.T) {
 	}
 	pdrMust(t, manager.DelRef(&negated))
 
+	pdrMust(t, learner.Close())
+	pdrMust(t, command.Close())
+}
+
+func TestFarkasLearnerRecoversGeneralBPureUnits(t *testing.T) {
+	command, manager, learner := farkasFixture(t)
+	boolean, err := manager.MkBoolSort()
+	pdrMust(t, err)
+	pName, err := manager.Symbols.Intern("unit-b")
+	pdrMust(t, err)
+	p, err := manager.MkConst(pName, boolean)
+	pdrMust(t, err)
+	notP, err := manager.MkNot(p)
+	pdrMust(t, err)
+	bProof, err := manager.MkProofAsserted(p)
+	pdrMust(t, err)
+	aProof, err := manager.MkProofAsserted(notP)
+	pdrMust(t, err)
+	root, err := manager.MkProofUnitResolution([]ast.ASTHandle{bProof, aProof})
+	pdrMust(t, err)
+	lemmas, err := learner.GetLemmas(root, []ast.ASTHandle{p})
+	pdrMust(t, err)
+	if len(lemmas) != 1 {
+		t.Fatal("mixed proof did not recover its B-pure unit", len(lemmas))
+	}
+	lemma, err := manager.RefGet(lemmas[0])
+	pdrMust(t, err)
+	if lemma != p {
+		t.Fatal("recovered the wrong B-pure unit", lemma, p)
+	}
+	pdrMust(t, manager.DelRef(&lemmas[0]))
 	pdrMust(t, learner.Close())
 	pdrMust(t, command.Close())
 }

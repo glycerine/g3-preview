@@ -83583,7 +83583,8 @@
       ],
       "tests": [
         "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
-        "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals"
+        "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals",
+        "TestFarkasLearnerRecoversGeneralBPureUnits"
       ],
       "conditionals": [
         {
@@ -83698,15 +83699,16 @@
           ]
         },
         {
-          "name": "proof preprocessing and dependency traversal through Farkas theory-node lemma extraction",
+          "name": "get_lemmas proof preprocessing, dependency traversal, vocabulary filtering, asserted fallback, general B-pure units and Farkas theory-node extraction",
           "status": "ported",
           "go_target": "pkg/muz/pdr/farkas_learner.go",
           "tests": [
-            "TestFarkasLearnerRecognizesArithmeticTheoryLemma"
+            "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
+            "TestFarkasLearnerRecoversGeneralBPureUnits"
           ]
         },
         {
-          "name": "general B-pure unit recovery, vocabulary filtering, asserted fallback, lemma guesses and simplification",
+          "name": "lemma guesses, consequence mode and final tactic subsumption simplification",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83716,7 +83718,7 @@
         "The learner owns and closes its SMTFarkasUtil; copied declaration parameters are deleted on every recognition exit; returned combined ASTRef values are caller-owned."
       ],
       "deviations": [
-        "Proof preprocessing and dependency traversal currently extract Farkas theory-node lemmas; general B-pure units, language filtering, simplification and PropSolver integration remain open."
+        "Proof preprocessing and dependency traversal extract general B-pure units and Farkas theory-node lemmas; lemma guesses, consequence mode, final tactic subsumption and PropSolver integration remain open."
       ]
     },
     {
@@ -83729,7 +83731,8 @@
       ],
       "tests": [
         "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
-        "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals"
+        "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals",
+        "TestFarkasLearnerRecoversGeneralBPureUnits"
       ],
       "conditionals": [
         {
@@ -83754,15 +83757,16 @@
           ]
         },
         {
-          "name": "Farkas theory-node proof traversal and owning result interface",
+          "name": "get_lemmas proof traversal and owning result interface",
           "status": "ported",
           "go_target": "pkg/muz/pdr/farkas_learner.go",
           "tests": [
-            "TestFarkasLearnerRecognizesArithmeticTheoryLemma"
+            "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
+            "TestFarkasLearnerRecoversGeneralBPureUnits"
           ]
         },
         {
-          "name": "remaining general lemma recovery, filtering, guessing and simplification interface",
+          "name": "remaining guessing, consequence and simplification interface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83772,7 +83776,7 @@
         "The concrete Go learner owns its arithmetic combination utility and returns explicit caller-owned AST references."
       ],
       "deviations": [
-        "The public Go surface exposes the independently testable Farkas-node traversal; the broader learner algorithms remain open."
+        "The public Go surface exposes the independently testable get_lemmas traversal; guessing, consequence and final simplification algorithms remain open."
       ]
     },
     {
