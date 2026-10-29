@@ -54,7 +54,10 @@ func TestSpacerPredicateRulesBuildTaggedInitialAndTransitionSystem(t *testing.T)
 	}
 	recursiveTransition, err := transformer.RuleTransition(recursiveRule)
 	spacerMust(t, err)
-	computed, err := spacer.NewReachFact(manager, recursiveRule, recursiveTransition, nil, false)
+	if recursiveTransition.IsNull() {
+		t.Fatal("missing normalized recursive transition")
+	}
+	computed, err := spacer.NewReachFact(manager, recursiveRule, truth, nil, false)
 	spacerMust(t, err)
 	if added, err := transformer.AddReachFact(computed); err != nil || !added {
 		t.Fatal("computed Spacer reach fact", added, err)
@@ -144,6 +147,28 @@ func TestSpacerPredicateRulesBuildTaggedInitialAndTransitionSystem(t *testing.T)
 		t.Fatal("Spacer origin reach fact not selected")
 	}
 	spacerMust(t, usedOrigin.Close())
+	originSummary, auxiliaries, err := transformer.OriginSummary(md.Core(), 0, 0, true)
+	spacerMust(t, err)
+	originSummaryHandle, err := manager.RefGet(originSummary)
+	spacerMust(t, err)
+	if !manager.IsTrue(originSummaryHandle) || len(auxiliaries) != 0 {
+		t.Fatal("Spacer must origin summary", originSummaryHandle, auxiliaries)
+	}
+	spacerMust(t, manager.DelRef(&originSummary))
+	originState, err := owner.FormulaNewToOld(state, 0, false)
+	spacerMust(t, err)
+	originStateHandle, err := manager.RefGet(originState)
+	spacerMust(t, err)
+	originStateDeclaration, err := manager.GetDecl(originStateHandle)
+	spacerMust(t, err)
+	spacerMust(t, md.Core().RegisterConstant(originStateDeclaration, truth))
+	maySummary, auxiliaries, err := transformer.OriginSummary(md.Core(), 0, 0, false)
+	spacerMust(t, err)
+	if maySummary == (ast.ASTRef{}) || len(auxiliaries) != 0 {
+		t.Fatal("Spacer may origin summary", maySummary, auxiliaries)
+	}
+	spacerMust(t, manager.DelRef(&maySummary))
+	spacerMust(t, manager.DelRef(&originState))
 	selection, err := transformer.SelectRule(md.Core())
 	spacerMust(t, err)
 	if selection.Rule == nil || !selection.IsConcrete || selection.NumReuseReach != 1 || len(selection.ReachPredUsed) != 1 || !selection.ReachPredUsed[0] {

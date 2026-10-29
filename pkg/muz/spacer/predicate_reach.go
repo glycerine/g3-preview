@@ -407,3 +407,77 @@ func (p *PredicateTransformer) UsedOriginReachFact(md *model.ModelCore, oldIndex
 	result, found, resultErr = p.usedReachFact(evaluator, true, &oldIndex)
 	return
 }
+
+// OriginSummary returns an owning reference to a model implicant of either the
+// may-frame formulas or the selected must-reach fact at oldIndex. Auxiliaries
+// are borrowed from the selected fact and are empty for may summaries.
+func (p *PredicateTransformer) OriginSummary(md *model.ModelCore, level, oldIndex uint32, must bool) (result ast.ASTRef, auxiliaries []ast.ASTHandle, resultErr error) {
+	if err := p.open(); err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	defer func() {
+		if resultErr != nil && result != (ast.ASTRef{}) {
+			resultErr = errors.Join(resultErr, p.manager.DelRef(&result))
+		}
+	}()
+	if md == nil || md.DerivedModel() == nil {
+		return ast.ASTRef{}, nil, ast.ErrASTHandle
+	}
+	var summary ast.ASTHandle
+	if must {
+		fact, found, err := p.UsedOriginReachFact(md, oldIndex)
+		if err != nil || !found {
+			if err == nil {
+				err = ast.ErrASTDomain
+			}
+			return ast.ASTRef{}, nil, err
+		}
+		defer func() { resultErr = errors.Join(resultErr, fact.Close()) }()
+		summary, err = fact.Fact()
+		if err != nil {
+			return ast.ASTRef{}, nil, err
+		}
+		auxiliaries, err = fact.Auxiliaries()
+		if err != nil {
+			return ast.ASTRef{}, nil, err
+		}
+	} else {
+		var err error
+		summary, err = p.Formulas(level, false)
+		if err != nil {
+			return ast.ASTRef{}, nil, err
+		}
+	}
+	originRef, err := p.owner.FormulaNewToOld(summary, oldIndex, false)
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, p.manager.DelRef(&originRef)) }()
+	origin, err := p.manager.RefGet(originRef)
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	implicant, err := model.NewModelImplicant(p.manager, p.owner.contexts[0].config.ModelEvaluator)
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, implicant.Close()) }()
+	literals, err := implicant.MinimizeLiterals([]ast.ASTHandle{origin}, md.DerivedModel())
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, releaseNormalizeRefs(p.manager, literals)) }()
+	handles := make([]ast.ASTHandle, len(literals))
+	for i := range literals {
+		handles[i], err = p.manager.RefGet(literals[i])
+		if err != nil {
+			return ast.ASTRef{}, nil, err
+		}
+	}
+	conjunction, err := p.manager.MkAndArray(handles)
+	if err != nil {
+		return ast.ASTRef{}, nil, err
+	}
+	result, err = p.manager.NewRef(conjunction)
+	return result, auxiliaries, err
+}
