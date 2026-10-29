@@ -19,6 +19,18 @@ type ExpansionResult struct {
 	LemmaAdded bool
 }
 
+func shouldGeneralizeLemma(obligation *ProofObligation, lemma *Lemma) (bool, error) {
+	useFarkas, err := obligation.UseFarkas()
+	if err != nil || !useFarkas {
+		return false, err
+	}
+	body, err := lemma.Body()
+	if err != nil {
+		return false, err
+	}
+	return !lemma.manager.IsFalse(body), nil
+}
+
 // ExpandObligation applies one Spacer search expansion without queue policy or
 // lemma generalizers. Undef with a child means search continues at that child.
 func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ ExpansionResult, resultErr error) {
@@ -112,7 +124,11 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 		if err != nil {
 			return ExpansionResult{}, err
 		}
-		if p.useEqClassGeneralizer {
+		generalize, err := shouldGeneralizeLemma(obligation, lemma)
+		if err != nil {
+			return ExpansionResult{}, errors.Join(err, lemma.Close())
+		}
+		if generalize && p.useEqClassGeneralizer {
 			generalized, generalizeErr := p.generalizeEqualityClasses(obligation, lemma)
 			if generalizeErr != nil {
 				return ExpansionResult{}, errors.Join(generalizeErr, lemma.Close())
@@ -124,7 +140,7 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 				lemma = generalized
 			}
 		}
-		if p.useInductiveGeneralizer {
+		if generalize && p.useInductiveGeneralizer {
 			generalized, generalizeErr := p.generalizeInductiveLemma(obligation, lemma)
 			if generalizeErr != nil {
 				return ExpansionResult{}, errors.Join(generalizeErr, lemma.Close())
@@ -136,7 +152,7 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 				lemma = generalized
 			}
 		}
-		if p.useArrayEqGeneralizer {
+		if generalize && p.useArrayEqGeneralizer {
 			generalized, generalizeErr := p.generalizeArrayEqualityLemma(obligation, lemma)
 			if generalizeErr != nil {
 				return ExpansionResult{}, errors.Join(generalizeErr, lemma.Close())
@@ -148,7 +164,7 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 				lemma = generalized
 			}
 		}
-		if p.lemmaSanityCheck {
+		if generalize && p.lemmaSanityCheck {
 			if sanityErr := p.checkLemmaSanity(lemma); sanityErr != nil {
 				return ExpansionResult{}, errors.Join(sanityErr, lemma.Close())
 			}
