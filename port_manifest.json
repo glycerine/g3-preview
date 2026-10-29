@@ -83285,6 +83285,12 @@
           ]
         },
         {
+          "name": "pre-initialization Farkas selection, scoped non-Boolean proof mode and create_children no-proof projection surface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/context.go",
+          "tests": ["TestContextActivatesFarkasBeforeArithmeticSolvers", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP", "TestSMT2FixedpointPDRTraceReductionMatchesCPP"]
+        },
+        {
           "name": "retained model_node and model_search ownership, frontier, cache, closure and backtracking surface",
           "status": "ported",
           "go_target": "pkg/muz/pdr/model_search.go",
@@ -83331,6 +83337,12 @@
           "status": "partial",
           "go_target": "pkg/muz/pdr/predicate_transformer.go",
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "non-Boolean program classification, scoped proof-mode activation, create_children no-proof projection and Farkas PropSolver forwarding",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/context.go",
+          "tests": ["TestContextActivatesFarkasBeforeArithmeticSolvers", "TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP", "TestSMT2FixedpointPDRTraceReductionMatchesCPP"]
         },
         {
           "name": "remaining cover model-converter remapping plus general linear model-trace unification and proof reconstruction, core_generalizer, optional model-cone generalizer mode and post-QE disequality reduction",
@@ -83401,7 +83413,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "PDR/Spacer engine selection, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
+          "name": "PDR/Spacer engine selection, fixedpoint.pdr.farkas parameter forwarding, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [

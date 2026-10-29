@@ -705,15 +705,18 @@ func (p *PropSolver) extractTheoryCore(safe *safeAssumptions, wantConsequences b
 	defer func() { resultErr = errors.Join(resultErr, learner.Close()) }()
 	learned, err := learner.GetLemmas(proof, safe.atoms)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("muz/pdr: Farkas lemma extraction: %w", err)
 	}
 	core, err := p.publishTheoryResults(safe, learned)
 	if err != nil || len(core) == 0 || !wantConsequences {
+		if err != nil {
+			err = fmt.Errorf("muz/pdr: Farkas core publication: %w", err)
+		}
 		return core, nil, err
 	}
 	learnedConsequences, err := learner.GetConsequences(proof, safe.atoms)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("muz/pdr: Farkas consequence extraction: %w", err)
 	}
 	consequences, err := p.publishTheoryResults(safe, learnedConsequences)
 	return core, consequences, err

@@ -49,6 +49,18 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err != nil {
 		return lbool.Undef, err
 	}
+	fixedpoint, err := e.globals.SourceGetModuleName("fixedpoint")
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	farkasName := "pdr.farkas"
+	useFarkas, err := e.globals.Context.GetBoolName(&fixedpoint, &farkasName, true)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetUseFarkas(useFarkas); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	background, err := e.manager.RefGet(e.background)
 	if err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())

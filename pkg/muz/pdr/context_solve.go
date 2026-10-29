@@ -6,6 +6,7 @@ package pdr
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -39,7 +40,7 @@ func (c *Context) expandNode(node *ModelNode) (resultStatus lbool.LBool, resultE
 	}
 	check, err := node.transformer.CheckReachable(node.level, node.state, true, true)
 	if err != nil {
-		return lbool.Undef, err
+		return lbool.Undef, fmt.Errorf("muz/pdr: reachability check: %w", err)
 	}
 	if check.Status == lbool.True {
 		if check.Model == nil {
@@ -54,19 +55,22 @@ func (c *Context) expandNode(node *ModelNode) (resultStatus lbool.LBool, resultE
 		if node.level == 0 {
 			return lbool.True, c.closeNode(node)
 		}
-		return lbool.True, c.createChildrenProjected(node)
+		if err = c.createChildrenProjected(node); err != nil {
+			return lbool.Undef, fmt.Errorf("muz/pdr: projected child construction: %w", err)
+		}
+		return lbool.True, nil
 	}
 	if check.Status == lbool.False {
 		lemma, x := c.owner.NotAnd(check.Core)
 		if x != nil {
-			return lbool.Undef, x
+			return lbool.Undef, fmt.Errorf("muz/pdr: core negation: %w", x)
 		}
 		level := InfinityLevel
 		if check.AssumesLevel {
 			level = node.level
 		}
 		if _, x = node.transformer.AddProperty(lemma, level); x != nil {
-			return lbool.Undef, x
+			return lbool.Undef, fmt.Errorf("muz/pdr: blocking property: %w", x)
 		}
 		if x = c.search.BacktrackLevel(false, node); x != nil {
 			return lbool.Undef, x
@@ -131,10 +135,15 @@ func (c *Context) propagate(maximum uint32) (bool, error) {
 // Solve runs the retained frame-expansion and propagation loop for the query
 // predicate. Child projection preserves transition literals between predecessor
 // states; native implicant minimization and QE generalization refine that cube.
-func (c *Context) Solve(queryDeclaration ast.ASTHandle) (lbool.LBool, error) {
+func (c *Context) Solve(queryDeclaration ast.ASTHandle) (result lbool.LBool, resultErr error) {
 	if err := c.open(); err != nil {
 		return lbool.Undef, err
 	}
+	restoreProofMode, err := c.enterFarkasProofMode()
+	if err != nil {
+		return lbool.Undef, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, restoreProofMode()) }()
 	if !c.initialized || c.search == nil {
 		return lbool.Undef, ast.ErrASTDomain
 	}

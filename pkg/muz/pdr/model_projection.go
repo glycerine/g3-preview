@@ -5,6 +5,7 @@ package pdr
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
@@ -68,6 +69,16 @@ func (c *Context) substituteModelValues(modelCore *model.ModelCore, transformer 
 }
 
 func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
+	proofsEnabled, err := c.manager.ProofsEnabled()
+	if err != nil {
+		return err
+	}
+	if proofsEnabled {
+		if err = c.manager.ToggleProofMode(ast.ASTProofDisabled); err != nil {
+			return err
+		}
+		defer func() { resultErr = errors.Join(resultErr, c.manager.ToggleProofMode(ast.ASTProofEnabled)) }()
+	}
 	modelCore, found, err := node.Model()
 	if err != nil {
 		return err
@@ -111,7 +122,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 	if derived := modelCore.DerivedModel(); c.implicant != nil && derived != nil {
 		minimized, x := c.implicant.MinimizeLiterals(forms, derived)
 		if x != nil {
-			return x
+			return fmt.Errorf("muz/pdr: implicant minimization: %w", x)
 		}
 		references = append(references, minimized...)
 		forms = forms[:0]
@@ -147,7 +158,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 			variableRefs = append(variableRefs, reference)
 		}
 		if x = c.lite.EliminateConstants(&variableRefs, formulaRef); x != nil {
-			return x
+			return fmt.Errorf("muz/pdr: QE-lite projection: %w", x)
 		}
 		eliminated = eliminated[:0]
 		for _, reference := range variableRefs {
@@ -170,7 +181,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 	for _, formula := range forms {
 		reference, x := c.substituteModelValues(modelCore, node.transformer, formula, eliminated)
 		if x != nil {
-			return x
+			return fmt.Errorf("muz/pdr: projected model substitution: %w", x)
 		}
 		references = append(references, reference)
 		handle, x := c.manager.RefGet(reference)
@@ -196,7 +207,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 		}
 		converted, x := c.owner.FormulaOldToNew(formula, index, true)
 		if x != nil {
-			return x
+			return fmt.Errorf("muz/pdr: child-state renaming: %w", x)
 		}
 		reference, x := c.manager.NewRef(converted)
 		if x != nil {
@@ -209,7 +220,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 	for _, literal := range projected {
 		indices, x := c.owner.mux.CollectIndices(literal)
 		if x != nil {
-			return x
+			return fmt.Errorf("muz/pdr: projected state-index collection: %w", x)
 		}
 		if len(indices) == 0 {
 			continue
@@ -222,7 +233,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 		}
 		variables, x := c.owner.mux.CollectVariables(literal)
 		if x != nil {
-			return x
+			return fmt.Errorf("muz/pdr: projected state-variable collection: %w", x)
 		}
 		replaced := make([]ast.ASTHandle, 0)
 		for _, index := range indices[1:] {
@@ -253,7 +264,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 		}
 		reduced, x := c.substituteModelValues(modelCore, node.transformer, literal, replaced)
 		if x != nil {
-			return x
+			return fmt.Errorf("muz/pdr: coupled-state model substitution: %w", x)
 		}
 		references = append(references, reduced)
 		reducedHandle, x := c.manager.RefGet(reduced)
@@ -272,7 +283,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 		}
 		child, x := NewModelNode(node, cube, predecessor, node.level-1)
 		if x != nil {
-			return x
+			return fmt.Errorf("muz/pdr: projected model-node construction: %w", x)
 		}
 		c.nodes++
 		if child.depth > c.maxDepth {

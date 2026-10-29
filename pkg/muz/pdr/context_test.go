@@ -252,6 +252,55 @@ func TestContextSolveFindsInductiveUnreachablePredicate(t *testing.T) {
 	pdrMust(t, command.Close())
 }
 
+func TestContextActivatesFarkasBeforeArithmeticSolvers(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	pdrMust(t, err)
+	manager, err := command.Manager()
+	pdrMust(t, err)
+	globals, err := command.GlobalParameters()
+	pdrMust(t, err)
+	context, err := pdr.NewContext(manager, nil, 2, pdr.ReachableHashCache, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	pdrMust(t, err)
+	pdrMust(t, context.SetUseFarkas(true))
+	arithmetic, err := manager.RegisterArithmeticPlugin()
+	pdrMust(t, err)
+	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
+	pdrMust(t, err)
+	boolean, err := manager.MkBoolSort()
+	pdrMust(t, err)
+	predicate := pdrFunction(t, manager, "farkas_context", []ast.ASTHandle{integer}, boolean)
+	ruleManager, err := base.NewRuleManager(manager)
+	pdrMust(t, err)
+	pdrMust(t, ruleManager.RegisterPredicate(predicate))
+	set, err := base.NewRuleSet(ruleManager)
+	pdrMust(t, err)
+	variable, err := manager.MkVar(0, integer)
+	pdrMust(t, err)
+	head, err := manager.MkApp(predicate, []ast.ASTHandle{variable})
+	pdrMust(t, err)
+	tail, err := manager.MkApp(predicate, []ast.ASTHandle{variable})
+	pdrMust(t, err)
+	rule, err := ruleManager.NewRule(head, []ast.ASTHandle{tail}, nil, "farkas-self")
+	pdrMust(t, err)
+	pdrMust(t, set.Add(rule))
+	pdrMust(t, rule.Close())
+	pdrMust(t, context.Initialize(set))
+	active, err := context.FarkasActive()
+	pdrMust(t, err)
+	proofs, err := manager.ProofsEnabled()
+	pdrMust(t, err)
+	if !active || proofs {
+		t.Fatal("arithmetic PDR did not scope Farkas proof mode", active, proofs)
+	}
+	if err = context.SetUseFarkas(false); err == nil {
+		t.Fatal("initialized context accepted a Farkas mode change")
+	}
+	pdrMust(t, context.Close())
+	pdrMust(t, set.Close())
+	pdrMust(t, ruleManager.Close())
+	pdrMust(t, command.Close())
+}
+
 func TestContextSolveProjectsCoupledPredecessors(t *testing.T) {
 	command, err := cmd_context.NewStandaloneContext()
 	pdrMust(t, err)

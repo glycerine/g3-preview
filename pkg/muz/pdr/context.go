@@ -39,6 +39,8 @@ type Context struct {
 	inductive    uint32
 	nodes        uint32
 	maxDepth     uint32
+	useFarkas    bool
+	farkasActive bool
 	initialized  bool
 	closed       bool
 }
@@ -103,6 +105,71 @@ func (c *Context) SetBackground(background ast.ASTHandle) error {
 	return c.owner.SetBackground(background)
 }
 
+// SetUseFarkas selects source proof-derived arithmetic cores. It must be set
+// before Initialize, because proof mode is fixed before child SMT solvers are
+// constructed.
+func (c *Context) SetUseFarkas(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.useFarkas = enabled
+	return nil
+}
+
+func (c *Context) FarkasActive() (bool, error) {
+	if err := c.open(); err != nil {
+		return false, err
+	}
+	return c.farkasActive, nil
+}
+
+func (c *Context) enterFarkasProofMode() (func() error, error) {
+	if !c.farkasActive {
+		return func() error { return nil }, nil
+	}
+	previous, err := c.manager.ProofsEnabled()
+	if err != nil {
+		return nil, err
+	}
+	if !previous {
+		if err = c.manager.ToggleProofMode(ast.ASTProofEnabled); err != nil {
+			return nil, err
+		}
+	}
+	return func() error {
+		if previous {
+			return nil
+		}
+		return c.manager.ToggleProofMode(ast.ASTProofDisabled)
+	}, nil
+}
+
+func (c *Context) declarationsUseNonBooleanSort(order []ast.ASTHandle) (bool, error) {
+	boolean, err := c.manager.MkBoolSort()
+	if err != nil {
+		return false, err
+	}
+	for _, declaration := range order {
+		arity, err := c.manager.GetArity(declaration)
+		if err != nil {
+			return false, err
+		}
+		for i := uint32(0); i < arity; i++ {
+			sort, err := c.manager.GetDomain(declaration, i)
+			if err != nil {
+				return false, err
+			}
+			if sort != boolean {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
 func appendDeclaration(order *[]ast.ASTHandle, seen map[ast.ASTHandle]bool, declaration ast.ASTHandle) {
 	if !seen[declaration] {
 		seen[declaration] = true
@@ -160,6 +227,16 @@ func (c *Context) Initialize(set *base.RuleSet) (resultErr error) {
 		}
 	}
 	transformers := make(map[ast.ASTHandle]*PredicateTransformer, len(order))
+	nonBoolean, err := c.declarationsUseNonBooleanSort(order)
+	if err != nil {
+		return err
+	}
+	c.farkasActive = c.useFarkas && nonBoolean
+	restoreProofMode, err := c.enterFarkasProofMode()
+	if err != nil {
+		return err
+	}
+	defer func() { resultErr = errors.Join(resultErr, restoreProofMode()) }()
 	committed := false
 	defer func() {
 		if committed {
@@ -177,6 +254,9 @@ func (c *Context) Initialize(set *base.RuleSet) (resultErr error) {
 			return x
 		}
 		transformers[declaration] = transformer
+		if err = transformer.solver.SetUseFarkas(c.farkasActive); err != nil {
+			return err
+		}
 	}
 	for _, declaration := range order {
 		if err = transformers[declaration].InitializeRules(transformers, buckets[declaration]); err != nil {
