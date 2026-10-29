@@ -89036,9 +89036,10 @@
       "path": "src/muz/spacer/spacer_farkas_learner.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/spacer/farkas_learner.go",
+        "pkg/muz/spacer/simplify_bounds.go",
         "pkg/muz/pdr/farkas_learner.go",
         "pkg/smtcore/smt_farkas_util.go"
       ],
@@ -89046,7 +89047,8 @@
         "TestFarkasLearnerExtractsProofLemmaAndGuardsLifetime",
         "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
         "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals",
-        "TestFarkasLearnerRecoversGeneralBPureUnits"
+        "TestFarkasLearnerRecoversGeneralBPureUnits",
+        "TestSimplifyBoundsRunsValuesThenInequalities"
       ],
       "assertions": [
         {
@@ -89131,16 +89133,16 @@
         },
         {
           "name": "final simplify_bounds propagation over the extracted lemma vector",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/simplify_bounds.go",
+          "tests": ["TestSimplifyBoundsRunsValuesThenInequalities"]
         }
       ],
       "ownership": [
         "The Spacer wrapper owns and closes the shared concrete PDR learner. The learner owns its SMTFarkasUtil, proof preprocessing owns a temporary root reference, and every returned ASTRef transfers to the caller."
       ],
       "deviations": [
-        "The revised Spacer source and retained PDR source use the same proof-dependency and Farkas combination algorithm, so Go shares that concrete implementation rather than copying it. The Spacer source's final propagate-values/propagate-inequalities simplify_bounds pass remains open."
+        "The revised Spacer source and retained PDR source use the same proof-dependency and Farkas combination algorithm, so Go shares that concrete implementation rather than copying it. Spacer then applies the source propagate-values/propagate-inequalities simplification pipeline."
       ]
     },
     {
@@ -89296,7 +89298,7 @@
           "tests": ["TestItpSolverExpandsProxyCoreAndScopesDefinitions"]
         },
         {
-          "name": "old get_itp_core Farkas path, proxy elimination and retained arithmetic-bound subsumption",
+          "name": "old get_itp_core Farkas path, proof-correct proxy elimination and source simplify_bounds pipeline",
           "status": "ported",
           "go_target": "pkg/muz/spacer/itp_solver.go",
           "tests": ["TestItpSolverExtractsFarkasCore"]
@@ -89317,7 +89319,7 @@
         "ItpSolver borrows its backend and manager. It owns references for its reusable proxy pool, scoped implication definitions, and persistent/transient assumptions; Close restores outstanding backend scopes and releases those references. Returned interpolating-core ASTRef values transfer to the caller."
       ],
       "deviations": [
-        "The retained old-core configuration uses the shared Spacer Farkas learner and concrete Go arithmetic-bound subsumption. CoreMode must select this legacy path explicitly; unspecified/default-new configuration is rejected until the newer unsat-core plugin family is ported."
+        "The retained old-core configuration uses the shared Spacer Farkas learner and the exact propagate-values/propagate-inequalities simplify_bounds pipeline. CoreMode must select this legacy path explicitly; unspecified/default-new configuration is rejected until the newer unsat-core plugin family is ported."
       ]
     },
     {
@@ -90579,9 +90581,9 @@
       "path": "src/muz/spacer/spacer_util.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/simplify_bounds.go"],
+      "tests": ["TestSimplifyBoundsRunsValuesThenInequalities"],
       "assertions": [
         {
           "line": 168,
@@ -90694,7 +90696,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "simplify_bounds_new and simplify_bounds: proof-disabled goal, propagate-values followed by propagate-inequalities, and single-goal result transfer",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/simplify_bounds.go",
+          "tests": ["TestSimplifyBoundsRunsValuesThenInequalities"]
+        },
+        {
+          "name": "remaining Spacer utility algorithms",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -90702,9 +90717,9 @@
       "path": "src/muz/spacer/spacer_util.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/simplify_bounds.go"],
+      "tests": ["TestSimplifyBoundsRunsValuesThenInequalities"],
       "conditionals": [
         {
           "line": 22,
@@ -90717,7 +90732,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "simplify_bounds retained lemma-vector simplification interface",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/simplify_bounds.go",
+          "tests": ["TestSimplifyBoundsRunsValuesThenInequalities"]
+        },
+        {
+          "name": "remaining Spacer utility declarations",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
       "deviations": []
     },

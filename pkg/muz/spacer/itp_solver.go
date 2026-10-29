@@ -11,7 +11,6 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/solver"
-	tacticarith "github.com/glycerine/g3/pkg/tactic/arith"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -505,42 +504,6 @@ func (s *ItpSolver) eliminateProxies(values []ast.ASTRef) (_ []ast.ASTRef, resul
 	return result, nil
 }
 
-func (s *ItpSolver) simplifyBounds(values []ast.ASTRef) (_ []ast.ASTRef, resultErr error) {
-	committed := false
-	defer func() {
-		if committed {
-			return
-		}
-		for i := range values {
-			if values[i] != (ast.ASTRef{}) {
-				resultErr = errors.Join(resultErr, s.manager.DelRef(&values[i]))
-			}
-		}
-	}()
-	handles := make([]ast.ASTHandle, len(values))
-	for i := range values {
-		var err error
-		handles[i], err = s.manager.RefGet(values[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	keep, err := tacticarith.ArithmeticBoundsKeep(s.manager, handles)
-	if err != nil {
-		return nil, err
-	}
-	result := values[:0]
-	for i := range values {
-		if keep[i] {
-			result = append(result, values[i])
-		} else if err = s.manager.DelRef(&values[i]); err != nil {
-			return nil, err
-		}
-	}
-	committed = true
-	return result, nil
-}
-
 // ItpCore extracts the retained old-style Spacer Farkas core. Returned
 // references are caller-owned.
 func (s *ItpSolver) ItpCore() (_ []ast.ASTRef, resultErr error) {
@@ -578,7 +541,7 @@ func (s *ItpSolver) ItpCore() (_ []ast.ASTRef, resultErr error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.simplifyBounds(values)
+	return simplifyBounds(s.manager, s.config.Params, s.config.Globals, values)
 }
 
 func (s *ItpSolver) CollectStatistics(destination *statistics.Statistics) error {

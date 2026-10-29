@@ -13,8 +13,11 @@ import (
 // FarkasLearner extracts B-vocabulary arithmetic consequences from a proof.
 // Returned ASTRef values are owned by the caller.
 type FarkasLearner struct {
-	inner  *pdr.FarkasLearner
-	closed bool
+	manager *ast.ASTManager
+	context *uparams.ParamsContext
+	globals *uparams.GlobalParamsService
+	inner   *pdr.FarkasLearner
+	closed  bool
 }
 
 func NewFarkasLearner(manager *ast.ASTManager, context *uparams.ParamsContext, globals *uparams.GlobalParamsService) (*FarkasLearner, error) {
@@ -22,7 +25,7 @@ func NewFarkasLearner(manager *ast.ASTManager, context *uparams.ParamsContext, g
 	if err != nil {
 		return nil, err
 	}
-	return &FarkasLearner{inner: inner}, nil
+	return &FarkasLearner{manager: manager, context: context, globals: globals, inner: inner}, nil
 }
 
 func (f *FarkasLearner) open() error {
@@ -47,7 +50,11 @@ func (f *FarkasLearner) GetLemmas(root ast.ASTHandle, bAssertions []ast.ASTHandl
 	if err := f.open(); err != nil {
 		return nil, err
 	}
-	return f.inner.GetLemmas(root, bAssertions)
+	values, err := f.inner.GetLemmas(root, bAssertions)
+	if err != nil {
+		return nil, err
+	}
+	return simplifyBounds(f.manager, f.context, f.globals, values)
 }
 
 // CollectStatistics matches the source learner, which records no statistics.
@@ -71,5 +78,8 @@ func (f *FarkasLearner) Close() error {
 	f.closed = true
 	err := f.inner.Close()
 	f.inner = nil
+	f.manager = nil
+	f.context = nil
+	f.globals = nil
 	return err
 }
