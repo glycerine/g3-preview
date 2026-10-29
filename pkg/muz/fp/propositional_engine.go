@@ -349,6 +349,9 @@ func (e *PropositionalEngine) validateFragment() error {
 		if x == nil && (positive > uninterpreted || uninterpreted > tailSize) {
 			x = ErrPropositionalHorn
 		}
+		if x == nil && (e.backend == "pdr" || e.backend == "spacer") && positive != uninterpreted {
+			x = fmt.Errorf("%w: rule contains a negative predicate", ErrPropositionalHorn)
+		}
 		for j := 0; x == nil && j < uninterpreted; j++ {
 			declaration, y := rule.TailDeclaration(j)
 			if y != nil {

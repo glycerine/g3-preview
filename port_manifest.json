@@ -81867,7 +81867,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/parsers/smt2/fixedpoint_commands_test.go"],
-      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP"],
+      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates"],
       "assertions": [
         {
           "line": 193,
@@ -81884,14 +81884,20 @@
           "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP"]
         },
         {
-          "name": "remaining rule-property collection, existential-tail, negative-predicate, quantifier, infinite-sort and datatype checks",
+          "name": "PDR/Spacer check_for_negated_predicates rejection before solver initialization (rule_properties.cpp:72-80)",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestPDRAndSpacerRejectNegativePredicates"]
+        },
+        {
+          "name": "remaining rule-property collection, existential-tail, quantifier, infinite-sort and datatype checks",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
       "ownership": [],
-      "deviations": ["The retained PDR guard traverses interpreted rule-tail expressions directly after HNF binding and returns a checked Go error instead of constructing the native rule display exception. Other rule-property collectors and engine-specific checks remain unported."]
+      "deviations": ["The retained PDR guards inspect the concrete HNF rule set and return checked Go errors instead of constructing native rule display exceptions. Other rule-property collectors and engine-specific checks remain unported."]
     },
     {
       "path": "src/muz/base/rule_properties.h",
@@ -81899,7 +81905,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go"],
-      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP"],
+      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates"],
       "conditionals": [
         {
           "line": 21,
@@ -81914,10 +81920,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained PDR/Spacer uninterpreted-free rule-check surface",
+          "name": "retained PDR/Spacer uninterpreted-free and negative-predicate rule-check surface",
           "status": "ported",
           "go_target": "pkg/muz/fp/propositional_engine.go",
-          "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP"]
+          "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates"]
         },
         {
           "name": "remaining rule_properties collection and validation surface",

@@ -4,6 +4,7 @@ package fp_test
 // fixedpoint Datalog result for the positive propositional Horn fragment.
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -583,6 +584,48 @@ func TestPropositionalEngineExecutesStratifiedNegation(t *testing.T) {
 	fpMust(t, err)
 	if !compiled {
 		t.Fatal("stratified finite negation bypassed relational bytecode")
+	}
+}
+
+func TestPDRAndSpacerRejectNegativePredicates(t *testing.T) {
+	for _, backend := range []string{"pdr", "spacer"} {
+		t.Run(backend, func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			fpMust(t, err)
+			t.Cleanup(func() { fpMust(t, context.Close()) })
+			manager, err := context.Manager()
+			fpMust(t, err)
+			globals, err := context.GlobalParameters()
+			fpMust(t, err)
+			engine, err := fp.NewPropositionalEngineWithServices(manager, globals.Context, globals)
+			fpMust(t, err)
+			t.Cleanup(func() { fpMust(t, engine.Close()) })
+			fpMust(t, engine.SelectEngine(backend))
+			boolean, err := manager.MkBoolSort()
+			fpMust(t, err)
+			applications := make(map[string]ast.ASTHandle)
+			declarations := make(map[string]ast.ASTHandle)
+			for _, predicate := range []string{"P", "Q"} {
+				symbol, x := manager.Symbols.Intern("fp-" + backend + "-reject-negative-" + predicate)
+				fpMust(t, x)
+				declarations[predicate], x = manager.MkFuncDecl(symbol, nil, boolean, ast.ASTFuncDeclInfo{})
+				fpMust(t, x)
+				applications[predicate], x = manager.MkApp(declarations[predicate], nil)
+				fpMust(t, x)
+				fpMust(t, engine.RegisterPredicate(declarations[predicate]))
+			}
+			body, err := manager.MkNot(applications["P"])
+			fpMust(t, err)
+			formula, err := manager.MkImplies(body, applications["Q"])
+			fpMust(t, err)
+			formulaRef, err := manager.NewRef(formula)
+			fpMust(t, err)
+			t.Cleanup(func() { fpMust(t, manager.DelRef(&formulaRef)) })
+			fpMust(t, engine.AddRule(formula, "negative"))
+			if _, err = engine.QueryPredicate(declarations["Q"]); !errors.Is(err, fp.ErrPropositionalHorn) {
+				t.Fatal("unsupported PDR rule was accepted", err)
+			}
+		})
 	}
 }
 
