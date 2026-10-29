@@ -295,6 +295,64 @@ func (p *PropSolver) datatypeEquality(expression ast.ASTHandle) (term, value, co
 	return right, left, constructor, true, nil
 }
 
+func (p *PropSolver) bitVectorEquality(expression ast.ASTHandle) (term ast.ASTHandle, bits []bool, matched bool, resultErr error) {
+	left, right, equality, err := p.binaryEquality(expression)
+	if err != nil || !equality {
+		return term, nil, false, err
+	}
+	service := p.manager.NumeralService()
+	value, err := service.NewValue()
+	if err != nil {
+		return term, nil, false, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, service.Del(&value)) }()
+	var width uint32
+	matched, err = p.manager.BitVectorNumeralValue(right, &value, &width)
+	if err != nil {
+		return term, nil, false, err
+	}
+	if matched {
+		term = left
+	} else {
+		matched, err = p.manager.BitVectorNumeralValue(left, &value, &width)
+		if err != nil || !matched {
+			return term, nil, false, err
+		}
+		term = right
+	}
+	two, err := service.NewValue()
+	if err != nil {
+		return term, nil, false, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, service.Del(&two)) }()
+	if err = service.SetUnsigned(&two, 2); err != nil {
+		return term, nil, false, err
+	}
+	bits = make([]bool, width)
+	for index := range bits {
+		remainder, x := service.Mod(&value, &two)
+		if x != nil {
+			return term, nil, false, x
+		}
+		zero, x := service.IsZero(&remainder)
+		x = errors.Join(x, service.Del(&remainder))
+		if x != nil {
+			return term, nil, false, x
+		}
+		bits[index] = !zero
+		quotient, x := service.IDiv(&value, &two)
+		if x != nil {
+			return term, nil, false, x
+		}
+		x = service.Del(&value)
+		value = quotient
+		if x != nil {
+			return term, nil, false, x
+		}
+	}
+	return term, bits, true, nil
+}
+
 func (p *PropSolver) expandEqualities(atoms []ast.ASTHandle) (result []ast.ASTHandle, references []ast.ASTRef, generated map[ast.ASTHandle]bool, resultErr error) {
 	generated = make(map[ast.ASTHandle]bool)
 	pin := func(expression ast.ASTHandle, topLevel bool) error {
@@ -353,6 +411,51 @@ func (p *PropSolver) expandEqualities(atoms []ast.ASTHandle) (result []ast.ASTHa
 			return nil, references, generated, err
 		}
 		if !matched {
+			bitTerm, bits, bitVector, x := p.bitVectorEquality(atoms[index])
+			if x != nil {
+				return nil, references, generated, x
+			}
+			if !bitVector {
+				continue
+			}
+			one, x := p.manager.BitVectorNumeralUint64(1, 1)
+			if x != nil {
+				return nil, references, generated, x
+			}
+			if x = pin(one, false); x != nil {
+				return nil, references, generated, x
+			}
+			for bitIndex, set := range bits {
+				extract, x := p.manager.MkBitVectorExtract(uint32(bitIndex), uint32(bitIndex), bitTerm)
+				if x != nil {
+					return nil, references, generated, x
+				}
+				if x = pin(extract, false); x != nil {
+					return nil, references, generated, x
+				}
+				bitEquality, x := p.manager.MkEq(one, extract)
+				if x != nil {
+					return nil, references, generated, x
+				}
+				if x = pin(bitEquality, set); x != nil {
+					return nil, references, generated, x
+				}
+				literal := bitEquality
+				if !set {
+					literal, x = p.manager.MkNot(bitEquality)
+					if x != nil {
+						return nil, references, generated, x
+					}
+					if x = pin(literal, true); x != nil {
+						return nil, references, generated, x
+					}
+				}
+				if bitIndex == 0 {
+					atoms[index] = literal
+				} else {
+					atoms = append(atoms, literal)
+				}
+			}
 			continue
 		}
 		recognizer, err := p.manager.DatatypeConstructorRecognizer(constructor)

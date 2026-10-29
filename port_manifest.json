@@ -83898,7 +83898,8 @@
         "TestPropSolverLevelFramesCoresAndModels",
         "TestPropSolverSafeProxyCoreAndTemporaryFormulaRollback",
         "TestPropSolverExpandsArithmeticEqualityForSubsetCore",
-        "TestPropSolverExpandsDatatypeEqualityForSubsetCore"
+        "TestPropSolverExpandsDatatypeEqualityForSubsetCore",
+        "TestPropSolverExpandsBitVectorEqualityForSubsetCore"
       ],
       "assertions": [
         {
@@ -83963,7 +83964,15 @@
           ]
         },
         {
-          "name": "bit-vector literal expansion, proof Farkas theory cores and consequences (pdr_prop_solver.cpp:133-165,380-423)",
+          "name": "bit-vector numeral equality literal expansion (pdr_prop_solver.cpp:133-153)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/prop_solver.go",
+          "tests": [
+            "TestPropSolverExpandsBitVectorEqualityForSubsetCore"
+          ]
+        },
+        {
+          "name": "proof Farkas theory cores and consequences (pdr_prop_solver.cpp:380-423)",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83974,7 +83983,7 @@
         "PropCheckResult cores borrow caller expressions. Synthesized equality-expansion terms are retained by PropSolver until its next check or Close. Successful requested models are acquired owning ModelCore references and must be released by the caller."
       ],
       "deviations": [
-        "The Go API uses CheckAtLevel instead of a mutable RAII scoped_level flag and returns status/core/model/assumes-level as one concrete result. It currently always uses the source subset-core path; proof-derived theory cores, consequence extraction, and bit-vector equality expansion remain explicit blockers to source-unit completion.",
+        "The Go API uses CheckAtLevel instead of a mutable RAII scoped_level flag and returns status/core/model/assumes-level as one concrete result. It currently always uses the source subset-core path; proof-derived theory cores and consequence extraction remain explicit blockers to source-unit completion.",
         "Typed errors replace assertion-only malformed assumption and level conditions. Native slices and maps replace source ref-vectors and object maps; duplicate complex assumptions reuse one proxy within a check."
       ]
     },

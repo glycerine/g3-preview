@@ -200,3 +200,78 @@ func TestPropSolverExpandsDatatypeEqualityForSubsetCore(t *testing.T) {
 	pdrMust(t, contexts.Close())
 	pdrMust(t, command.Close())
 }
+
+func TestPropSolverExpandsBitVectorEqualityForSubsetCore(t *testing.T) {
+	for _, test := range []struct {
+		name  string
+		width uint32
+		bit   uint32
+		set   bool
+	}{
+		{name: "set", width: 3, bit: 0, set: true},
+		{name: "clear", width: 3, bit: 1, set: false},
+		{name: "wide-clear", width: 65, bit: 64, set: false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			command, manager, contexts := pdrContextFixture(t, 0)
+			truth, err := manager.MkTrue()
+			pdrMust(t, err)
+			solver, err := pdr.NewPropSolver(manager, contexts, truth, "bit-vector-core")
+			pdrMust(t, err)
+			value, err := manager.BitVectorNumeralUint64(5, test.width)
+			pdrMust(t, err)
+			sort, err := manager.GetSort(value)
+			pdrMust(t, err)
+			term, err := manager.MkFreshConst("bit-vector-core-value", sort)
+			pdrMust(t, err)
+			one, err := manager.BitVectorNumeralUint64(1, 1)
+			pdrMust(t, err)
+			extract, err := manager.MkBitVectorExtract(test.bit, test.bit, term)
+			pdrMust(t, err)
+			bitEquality, err := manager.MkEq(one, extract)
+			pdrMust(t, err)
+			background := bitEquality
+			if test.set {
+				background, err = manager.MkNot(bitEquality)
+			}
+			pdrMust(t, err)
+			pdrMust(t, solver.AddFormula(background))
+			equality, err := manager.MkEq(term, value)
+			pdrMust(t, err)
+
+			result, err := solver.CheckAssumptions([]ast.ASTHandle{equality}, true, false)
+			pdrMust(t, err)
+			if result.Status != lbool.False || len(result.Core) != 1 {
+				t.Fatal("expanded bit-vector subset core", result.Status, result.Core)
+			}
+			core := result.Core[0]
+			negated, argument, err := manager.IsNot(core)
+			pdrMust(t, err)
+			if negated {
+				core = argument
+			}
+			if negated == test.set {
+				t.Fatal("expanded bit-vector polarity", negated, test.set)
+			}
+			kind, err := manager.GetDeclKind(core)
+			pdrMust(t, err)
+			coreOne, err := manager.GetArg(core, 0)
+			pdrMust(t, err)
+			coreExtract, err := manager.GetArg(core, 1)
+			pdrMust(t, err)
+			high, err := manager.BitVectorExtractHigh(coreExtract)
+			pdrMust(t, err)
+			low, err := manager.BitVectorExtractLow(coreExtract)
+			pdrMust(t, err)
+			coreTerm, err := manager.GetArg(coreExtract, 0)
+			pdrMust(t, err)
+			if kind != ast.ASTOpEq || coreOne != one || high != test.bit || low != test.bit || coreTerm != term {
+				t.Fatal("expanded bit-vector literal", kind, coreOne, high, low, coreTerm)
+			}
+
+			pdrMust(t, solver.Close())
+			pdrMust(t, contexts.Close())
+			pdrMust(t, command.Close())
+		})
+	}
+}
