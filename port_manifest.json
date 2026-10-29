@@ -91680,9 +91680,17 @@
       "path": "src/muz/transforms/dl_mk_interp_tail_simplifier.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/interp_tail_simplifier.go",
+        "pkg/muz/fp/spacer_engine.go"
+      ],
+      "tests": [
+        "TestInterpTailSimplifierPropagatesEqualityAndRemovesTruth",
+        "TestInterpTailSimplifierDropsFalseRule",
+        "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2"
+      ],
       "assertions": [
         {
           "line": 47,
@@ -91745,19 +91753,50 @@
           "text": "SASSERT(rule_counter().get_max_rule_var(*r.get())==0 ||"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "simplify_expr and transform_rule theory rewriting, conjunction flattening, true removal, and false-rule elimination",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/interp_tail_simplifier.go"
+        },
+        {
+          "name": "rule_substitution and propagate_variable_equivalences for Boolean variables and flexible equality/iff terms",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/interp_tail_simplifier.go"
+        },
+        {
+          "name": "normalizer_cfg sorted AND/OR duplicate normalization and paired-clause equivalence recognition",
+          "status": "unported"
+        },
+        {
+          "name": "propagate_variable_equivalences negated-iff polarity cases and paired arithmetic inequality recognition",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The plugin owns its theory rewriter; each rewritten AST result is held by an ASTRef until replacement Rule construction has retained every expression.",
+        "Incremental substitutions and unifiers own their temporary range and cache references and are closed on every return path.",
+        "Transform owns replacement rules until RuleSet.Add retains them and returns a replacement RuleSet only when at least one rule changed or was removed."
+      ],
+      "deviations": [
+        "The retained live Spacer specialization uses the general TheoryRewriter but does not yet reproduce the source-only sorted AND/OR equivalence normalizer.",
+        "Arithmetic <=/>= pair tracking is not retained because the source branch that turns a pair into equality is compiled out behind `if (false)`."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_interp_tail_simplifier.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/interp_tail_simplifier.go"
+      ],
+      "tests": [
+        "TestInterpTailSimplifierPropagatesEqualityAndRemovesTruth",
+        "TestInterpTailSimplifierDropsFalseRule"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -91768,11 +91807,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mk_interp_tail_simplifier plugin surface and rule_substitution live specialization",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/interp_tail_simplifier.go"
+        },
+        {
+          "name": "normalizer_cfg and normalizer_rw specialized Boolean normalizer declarations",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "InterpTailSimplifierPlugin follows RuleTransformPlugin ownership: RuleTransformer owns the plugin after registration and closes its TheoryRewriter."
+      ],
+      "deviations": [
+        "Go represents the source nested helper owners directly with scoped substitution/unifier values rather than exposing universal adapter types."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_karr_invariants.cpp",
@@ -92632,11 +92685,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/fp/spacer_engine.go",
-        "pkg/muz/transforms/rule_inliner.go"
+        "pkg/muz/transforms/rule_inliner.go",
+        "pkg/muz/transforms/interp_tail_simplifier.go"
       ],
       "tests": [
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
+        "TestInterpTailSimplifierPropagatesEqualityAndRemovesTruth",
+        "TestInterpTailSimplifierDropsFalseRule"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -92647,7 +92703,12 @@
           "go_target": "pkg/muz/fp/spacer_engine.go"
         },
         {
-          "name": "complete ordered default transform pipeline including interpreted-tail simplification, array/quantifier transforms, repeated inlining/subsumption, bit blasting, scaling, and magic sets",
+          "name": "live Spacer query specialization: run interpreted-tail simplification, acyclic inlining, and a second simplification/inlining pass in source order",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/spacer_engine.go"
+        },
+        {
+          "name": "complete ordered default transform pipeline including array/quantifier transforms, subsumption, bit blasting, scaling, and magic sets",
           "status": "unported"
         }
       ],
@@ -92655,7 +92716,7 @@
         "Each Spacer query owns a finalized transformed RuleSet clone until Context initialization has retained its rules; the engine's original set remains available for subsequent queries."
       ],
       "deviations": [
-        "Only the source-reached Spacer inliner stage is integrated here; the complete default transformation schedule remains pending."
+        "Only the source-reached Spacer interpreted-tail and inliner stages are integrated here; the complete default transformation schedule remains pending."
       ]
     },
     {

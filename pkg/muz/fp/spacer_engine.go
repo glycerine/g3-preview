@@ -36,7 +36,24 @@ func (e *PropositionalEngine) spacerRules(query ast.ASTHandle) (_ *base.RuleSet,
 		return nil, err
 	}
 	transformer := base.NewRuleTransformer()
-	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 0)); err != nil {
+	firstSimplifier, err := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 40000)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	if err = transformer.Register(firstSimplifier); err != nil {
+		return nil, errors.Join(err, firstSimplifier.Close(), transformer.Close())
+	}
+	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 35000)); err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	secondSimplifier, err := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 30000)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	if err = transformer.Register(secondSimplifier); err != nil {
+		return nil, errors.Join(err, secondSimplifier.Close(), transformer.Close())
+	}
+	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 25000)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
 	_, err = transformer.Apply(prepared)
