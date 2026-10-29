@@ -92109,6 +92109,7 @@
       "tests": [
         "TestInterpTailSimplifierPropagatesEqualityAndRemovesTruth",
         "TestInterpTailSimplifierDropsFalseRule",
+        "TestInterpTailSimplifierPropagatesIffPolarity",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2"
       ],
@@ -92192,8 +92193,14 @@
           "status": "unported"
         },
         {
-          "name": "propagate_variable_equivalences negated-iff polarity cases and paired arithmetic inequality recognition",
-          "status": "unported"
+          "name": "propagate_variable_equivalences nested and negated IFF polarity cases",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/interp_tail_simplifier.go",
+          "tests": ["TestInterpTailSimplifierPropagatesIffPolarity"]
+        },
+        {
+          "name": "paired arithmetic inequality recognition guarded by the literal source condition if (false)",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
@@ -92216,7 +92223,8 @@
       ],
       "tests": [
         "TestInterpTailSimplifierPropagatesEqualityAndRemovesTruth",
-        "TestInterpTailSimplifierDropsFalseRule"
+        "TestInterpTailSimplifierDropsFalseRule",
+        "TestInterpTailSimplifierPropagatesIffPolarity"
       ],
       "conditionals": [
         {

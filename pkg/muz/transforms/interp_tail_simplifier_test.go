@@ -130,3 +130,96 @@ func TestInterpTailSimplifierDropsFalseRule(t *testing.T) {
 		t.Fatal("false rule remains", count, getErr)
 	}
 }
+
+func TestInterpTailSimplifierPropagatesIffPolarity(t *testing.T) {
+	for _, test := range []struct {
+		name string
+		make func(*ast.ASTManager, ast.ASTHandle, ast.ASTHandle, ast.ASTHandle) (ast.ASTHandle, error)
+		want bool
+	}{
+		{"negated-iff-true", func(m *ast.ASTManager, variable, truth, _ ast.ASTHandle) (ast.ASTHandle, error) {
+			iff, err := m.MkIff(variable, truth)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			return m.MkNot(iff)
+		}, false},
+		{"negated-left", func(m *ast.ASTManager, variable, truth, _ ast.ASTHandle) (ast.ASTHandle, error) {
+			negative, err := m.MkNot(variable)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			return m.MkIff(negative, truth)
+		}, false},
+		{"double-polarity", func(m *ast.ASTManager, variable, _ ast.ASTHandle, falsehood ast.ASTHandle) (ast.ASTHandle, error) {
+			negative, err := m.MkNot(variable)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			iff, err := m.MkIff(negative, falsehood)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			return m.MkNot(iff)
+		}, false},
+		{"cancelled-negations", func(m *ast.ASTManager, variable, truth, _ ast.ASTHandle) (ast.ASTHandle, error) {
+			negative, err := m.MkNot(variable)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			iff, err := m.MkIff(negative, truth)
+			if err != nil {
+				return ast.ASTHandle{}, err
+			}
+			return m.MkNot(iff)
+		}, true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			f := newInterpTailFixture(t)
+			boolean, err := f.manager.MkBoolSort()
+			coneMust(t, err)
+			variable, err := f.manager.MkVar(0, boolean)
+			coneMust(t, err)
+			truth, err := f.manager.MkTrue()
+			coneMust(t, err)
+			falsehood, err := f.manager.MkFalse()
+			coneMust(t, err)
+			condition, err := test.make(f.manager, variable, truth, falsehood)
+			coneMust(t, err)
+			predicate := f.predicate(t, test.name, []ast.ASTHandle{boolean})
+			head, err := f.manager.MkApp(predicate, []ast.ASTHandle{variable})
+			coneMust(t, err)
+			rule, err := f.rules.NewRule(head, []ast.ASTHandle{condition}, nil, test.name)
+			coneMust(t, err)
+			coneMust(t, f.set.Add(rule))
+			coneMust(t, rule.Close())
+			coneMust(t, f.set.SetOutputPredicate(predicate))
+			valid, err := f.set.Finalize()
+			coneMust(t, err)
+			if !valid {
+				t.Fatal("IFF polarity fixture rejected")
+			}
+			transformer := base.NewRuleTransformer()
+			t.Cleanup(func() { coneMust(t, transformer.Close()) })
+			coneMust(t, transformer.Register(f.plugin))
+			modified, err := transformer.Apply(f.set)
+			coneMust(t, err)
+			if !modified {
+				t.Fatal("IFF polarity was not propagated")
+			}
+			result, err := f.set.Rule(0)
+			coneMust(t, err)
+			defer func() { coneMust(t, result.Close()) }()
+			resultHead, err := result.Head()
+			coneMust(t, err)
+			argument, err := f.manager.GetArg(resultHead, 0)
+			coneMust(t, err)
+			if test.want && !f.manager.IsTrue(argument) || !test.want && !f.manager.IsFalse(argument) {
+				t.Fatal("IFF polarity head", argument, "want", test.want)
+			}
+			if tails, getErr := result.TailSize(); getErr != nil || tails != 0 {
+				t.Fatal("IFF polarity tail remains", tails, getErr)
+			}
+		})
+	}
+}

@@ -251,7 +251,7 @@ func (p *InterpTailSimplifierPlugin) propagate(rule *base.Rule) (_ *base.Rule, c
 			}
 			continue
 		}
-		if negative || operation != ast.ASTOpEq && operation != ast.ASTOpIff {
+		if operation != ast.ASTOpEq && operation != ast.ASTOpIff {
 			continue
 		}
 		left, getErr := p.manager.GetArg(term, 0)
@@ -262,6 +262,37 @@ func (p *InterpTailSimplifierPlugin) propagate(rule *base.Rule) (_ *base.Rule, c
 		if getErr != nil {
 			return nil, false, getErr
 		}
+		if operation == ast.ASTOpIff {
+			for {
+				negated, bare, e := p.manager.IsNot(left)
+				if e != nil {
+					return nil, false, e
+				}
+				if !negated {
+					break
+				}
+				left = bare
+				negative = !negative
+			}
+			for {
+				negated, bare, e := p.manager.IsNot(right)
+				if e != nil {
+					return nil, false, e
+				}
+				if !negated {
+					break
+				}
+				right = bare
+				negative = !negative
+			}
+			leftKind, e := p.manager.GetKind(left)
+			if e != nil {
+				return nil, false, e
+			}
+			if leftKind != ast.ASTVar {
+				left, right = right, left
+			}
+		}
 		leftFlex, getErr := flexible(left)
 		if getErr != nil {
 			return nil, false, getErr
@@ -270,13 +301,34 @@ func (p *InterpTailSimplifierPlugin) propagate(rule *base.Rule) (_ *base.Rule, c
 		if getErr != nil {
 			return nil, false, getErr
 		}
-		if leftFlex && rightFlex {
-			unified, unifyErr := tryUnify(left, right)
-			if unifyErr != nil {
-				return nil, false, unifyErr
-			}
-			changed = changed || unified
+		if !leftFlex || !rightFlex {
+			continue
 		}
+		leftKind, getErr := p.manager.GetKind(left)
+		if getErr != nil {
+			return nil, false, getErr
+		}
+		var target ast.ASTHandle
+		switch {
+		case operation == ast.ASTOpEq && !negative:
+			target = right
+		case operation == ast.ASTOpIff && leftKind == ast.ASTVar && !negative:
+			target = right
+		case operation == ast.ASTOpIff && leftKind == ast.ASTVar && negative && p.manager.IsTrue(right):
+			target, getErr = p.manager.MkFalse()
+		case operation == ast.ASTOpIff && leftKind == ast.ASTVar && negative && p.manager.IsFalse(right):
+			target, getErr = p.manager.MkTrue()
+		default:
+			continue
+		}
+		if getErr != nil {
+			return nil, false, getErr
+		}
+		unified, unifyErr := tryUnify(left, target)
+		if unifyErr != nil {
+			return nil, false, unifyErr
+		}
+		changed = changed || unified
 	}
 	if !changed {
 		return nil, false, nil
