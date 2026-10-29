@@ -90,14 +90,52 @@ func (c *Context) selectedTraceRule(node *ModelNode) (*normalizedRule, error) {
 	if node.selected != nil {
 		return node.selected, nil
 	}
-	modelCore, found, err := node.Model()
+	initial := make([]*normalizedRule, 0)
+	tags := make([]ast.ASTHandle, 0)
+	for _, rule := range node.transformer.rules {
+		if len(rule.predecessors) != 0 {
+			continue
+		}
+		initial = append(initial, rule)
+		if !rule.tag.IsNull() {
+			tags = append(tags, rule.tag)
+		}
+	}
+	if len(initial) == 1 {
+		return initial[0], nil
+	}
+	if len(initial) == 0 || len(tags) != len(initial) {
+		return nil, ast.ErrASTDomain
+	}
+	selection, err := c.manager.MkOrArray(tags)
 	if err != nil {
 		return nil, err
 	}
-	if !found {
-		return nil, ast.ErrASTDomain
+	check, err := node.transformer.solver.CheckAtLevel(0, []ast.ASTHandle{selection, node.state}, false, true)
+	if err != nil {
+		return nil, err
 	}
-	return node.transformer.selectInitialRule(modelCore)
+	if check.Status != lbool.True || check.Model == nil {
+		if check.Model != nil {
+			err = check.Model.DecRef()
+		}
+		return nil, errors.Join(ast.ErrASTDomain, err)
+	}
+	rule, selectErr := node.transformer.selectInitialRule(check.Model)
+	if selectErr == nil {
+		selectErr = node.SetModel(check.Model)
+	}
+	if selectErr == nil {
+		selectErr = node.SetRule(rule.rule)
+	}
+	if selectErr == nil {
+		node.selected = rule
+	}
+	selectErr = errors.Join(selectErr, check.Model.DecRef())
+	if selectErr != nil {
+		return nil, selectErr
+	}
+	return rule, nil
 }
 
 func traceTransformerReaches(current, target *PredicateTransformer, seen map[*PredicateTransformer]bool) bool {

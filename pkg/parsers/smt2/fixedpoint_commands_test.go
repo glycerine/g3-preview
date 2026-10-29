@@ -563,6 +563,20 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 `,
 			"sat\ntrue\n",
 		},
+		{
+			"multiple-initial-facts",
+			`(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(declare-rel Goal ())
+(declare-var x Int)
+(rule (P 0))
+(rule (P 1))
+(rule (=> (and (P x) (< x 2)) (P (+ x 1))))
+(rule (=> (P 2) Goal))
+(query Goal :print-answer true)
+`,
+			"sat\n(and (P 1))\n",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
