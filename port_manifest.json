@@ -171758,22 +171758,54 @@
       "path": "src/tactic/fpa/qffp_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qffp_tactic.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
+        "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained QF_FPBV/QF_BVFP simplify, FPA-to-BV, Ackermannization, bit-blast, SAT-or-SMT strategy and combined-solver command dispatch",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qffp_tactic.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
+            "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "The returned parameterized tactical independently owns the composed children before construction owners are released; FPA-to-BV goal/model conversion ownership is recorded with its source unit."
+      ],
+      "deviations": [
+        "The source is_fp_qfnra structural probe is not yet retained. The current post-bit-blast fallback uses the concrete QF_NRA arithmetic-fragment probe; default QF_FP therefore remains on direct SMT, while QF_FPBV and QF_BVFP use the retained strategic route."
+      ]
     },
     {
       "path": "src/tactic/fpa/qffp_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qffp_tactic.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
+        "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -171786,9 +171818,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "QF_FP tactic factory surface used by the retained QF_FPBV/QF_BVFP command route",
+          "status": "partial",
+          "go_target": "pkg/tactic/smtlogics/qffp_tactic.go",
+          "tests": [
+            "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The source structural QF_FP/QF_NRA probe factory remains open with the default QF_FP route."
+      ]
     },
     {
       "path": "src/tactic/fpa/qffplra_tactic.cpp",
@@ -173699,6 +173742,21 @@
           ]
         },
         {
+          "name": "Retained QF_FPBV and QF_BVFP branches select the floating-point reduction strategy and combine tactic2solver with incremental SMT under source fallback and result-provider policy",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/smtlogics/qffp_tactic.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
+            "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2"
+          ]
+        },
+        {
           "name": "Remaining logic dispatcher branches, complete default tactic classifier, QF_BV incremental-SAT selection and general stored-logic strategic solver_factory owner/public constructor; concrete FD backend composition and QF_FD command selection are now recorded separately",
           "status": "unported"
         },
@@ -173877,7 +173935,7 @@
         "Construction uses local counted tactic/solver references. The returned combined solver owns both child solvers; the tactic solver owns the concrete strategy. Context closes the combined owner before manager/services teardown. Evaluator/parameter services are borrowed through the same concrete configuration used by the incremental backend."
       ],
       "deviations": [
-        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL and QF_LIA branches use shared combined-solver construction. The general ALL dispatcher now has a narrow OP_AS_ARRAY branch; its complete default classifier and other remaining branches are unported. Output-taking QF_IDL/QF_LIA constructors borrow io.Writer; convenience factories default to os.Stdout."
+        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL, QF_LIA, QF_FPBV and QF_BVFP branches use shared combined-solver construction. The general ALL dispatcher now has a narrow OP_AS_ARRAY branch; its complete default classifier and other remaining branches are unported. Output-taking QF_IDL/QF_LIA/QF_FP constructors borrow io.Writer; convenience factories default to os.Stdout. Default QF_FP awaits the exact retained structural FP/NRA probe."
       ]
     },
     {
