@@ -13,8 +13,11 @@ import (
 )
 
 func (e *PropositionalEngine) spacerPredicate(declaration ast.ASTHandle) ast.ASTHandle {
+	if derived, found := e.spacerQuantified[declaration]; found {
+		declaration = derived
+	}
 	if derived, found := e.spacerPredicates[declaration]; found {
-		return derived
+		declaration = derived
 	}
 	return declaration
 }
@@ -135,7 +138,7 @@ func (e *PropositionalEngine) expandSpacerFunction(destination *model.ModelCore,
 }
 
 func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.Model, resultErr error) {
-	if len(e.spacerPredicates) == 0 {
+	if len(e.spacerPredicates) == 0 && len(e.spacerQuantified) == 0 {
 		return source, nil
 	}
 	if source == nil {
@@ -188,6 +191,11 @@ func (e *PropositionalEngine) expandSpacerModel(source *model.Model) (_ *model.M
 			return nil, errors.Join(err, interpretation.Close())
 		}
 		if err = core.UnregisterDeclaration(derived); err != nil {
+			return nil, err
+		}
+	}
+	for original, derived := range e.spacerQuantified {
+		if err := e.expandSpacerQuantifiedFunction(core, original, derived); err != nil {
 			return nil, err
 		}
 	}

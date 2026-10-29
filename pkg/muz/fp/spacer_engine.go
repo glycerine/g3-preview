@@ -121,6 +121,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 		}
 	}
 	var quantifierAbstraction *transforms.QuantifierAbstractionPlugin
+	var quantifiedPredicates map[ast.ASTHandle]ast.ASTHandle
 	if quantifyArrays {
 		quantifierAbstraction = transforms.NewQuantifierAbstractionPlugin(e.manager, e.rules, 38000)
 		if err = transformer.Register(quantifierAbstraction); err != nil {
@@ -195,7 +196,8 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	}
 	_, err = transformer.Apply(prepared)
 	if err == nil && quantifierAbstraction != nil {
-		for _, declaration := range quantifierAbstraction.FreshPredicates() {
+		quantifiedPredicates = quantifierAbstraction.FreshPredicates()
+		for _, declaration := range quantifiedPredicates {
 			state, stateErr := e.predicateState(declaration)
 			if stateErr != nil {
 				err = stateErr
@@ -249,6 +251,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	}
 	e.spacerPredicates = slicedPredicates
 	e.spacerSlices = slicedColumns
+	e.spacerQuantified = quantifiedPredicates
 	keep = true
 	return prepared, nil
 }

@@ -77,6 +77,7 @@ type PropositionalEngine struct {
 	spacerRevision   uint64
 	spacerPredicates map[ast.ASTHandle]ast.ASTHandle
 	spacerSlices     map[ast.ASTHandle][]bool
+	spacerQuantified map[ast.ASTHandle]ast.ASTHandle
 	closed           bool
 }
 
@@ -1471,6 +1472,7 @@ func (e *PropositionalEngine) Close() (result error) {
 		e.spacerRevision = 0
 		e.spacerPredicates = nil
 		e.spacerSlices = nil
+		e.spacerQuantified = nil
 	}
 	for i := len(e.scopes) - 1; i >= 0; i-- {
 		result = errors.Join(result, e.scopes[i].Close())

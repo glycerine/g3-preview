@@ -24,6 +24,7 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 		e.spacerRevision = 0
 		e.spacerPredicates = nil
 		e.spacerSlices = nil
+		e.spacerQuantified = nil
 	}
 	finalized, err := e.set.IsFinalized()
 	if err != nil {

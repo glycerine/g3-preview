@@ -92606,10 +92606,13 @@
         "pkg/muz/transforms/quantifier_abstraction.go",
         "pkg/muz/transforms/quantifier_abstraction_test.go",
         "pkg/muz/fp/spacer_engine.go",
+        "pkg/muz/fp/spacer_quantifier_results.go",
+        "pkg/muz/fp/spacer_quantifier_results_test.go",
         "pkg/cmd/g3/test_vectors/fp_spacer_quantifier_abstraction.smt2"
       ],
       "tests": [
         "TestQuantifierAbstractionExpandsInternalArrayPredicate",
+        "TestSpacerQuantifierAbstractionReconstructsArrayPredicateModel",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference"
       ],
@@ -92646,11 +92649,19 @@
             "TestQuantifierAbstractionExpandsInternalArrayPredicate",
             "TestSMTLibRunnerCPPReference"
           ]
+        },
+        {
+          "name": "qa_model_converter array-predicate interpretation reconstruction (dl_mk_quantifier_abstraction.cpp:33-101)",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/spacer_quantifier_results.go",
+          "tests": [
+            "TestSpacerQuantifierAbstractionReconstructsArrayPredicateModel"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "Rule semantics, declaration mapping, and the retained fixedpoint.xform.quantify_arrays Spacer pipeline stage are ported. The qa_model_converter that reconstructs original predicate interpretations and native proof conversion remain unported, so the unit remains partial."
+        "Rule semantics, declaration mapping, the retained fixedpoint.xform.quantify_arrays Spacer pipeline stage, and qa_model_converter interpretation reconstruction are ported. Native proof conversion remains unported, so the unit remains partial."
       ]
     },
     {
