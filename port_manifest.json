@@ -168592,9 +168592,20 @@
       "path": "src/tactic/core/der_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/der_tactic.go",
+        "pkg/tactic/core/der_tactic_test.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/der_tactic.smt2"
+      ],
+      "tests": [
+        "TestDERTacticUnitQuantifierAndOwnership",
+        "TestDERTacticProofComposition",
+        "TestSMTLibRunnerScripts/der_tactic.smt2",
+        "TestSMTLibRunnerCPPReference/der_tactic.smt2"
+      ],
       "assertions": [
         {
           "line": 37,
@@ -168605,19 +168616,40 @@
           "text": "SASSERT(g.is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "DER tactic factory, all-formula rewrite loop, proof composition, dependency-preserving goal updates, redundancy elimination, depth/result publication, reset, cleanup and translation",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/der_tactic.go",
+          "tests": [
+            "TestDERTacticUnitQuantifierAndOwnership",
+            "TestDERTacticProofComposition",
+            "TestSMTLibRunnerScripts/der_tactic.smt2",
+            "TestSMTLibRunnerCPPReference/der_tactic.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "The tactic owns the already-ported DER rewriter and reusable expression/proof references for each invocation; the result retains the mutated input goal under the ordinary tactic result contract."
+      ],
       "deviations": []
     },
     {
       "path": "src/tactic/core/der_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/der_tactic.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestDERTacticUnitQuantifierAndOwnership",
+        "TestDERTacticProofComposition",
+        "TestSMTLibRunnerScripts/der_tactic.smt2"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -168628,9 +168660,20 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "DER tactic factory and explicit der command registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/der_tactic.go",
+          "tests": [
+            "TestDERTacticUnitQuantifierAndOwnership",
+            "TestDERTacticProofComposition",
+            "TestSMTLibRunnerScripts/der_tactic.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },

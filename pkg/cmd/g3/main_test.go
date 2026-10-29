@@ -368,6 +368,7 @@ var scriptResults = map[string]string{
 	"fd_wide_offset_model.smt2":                    "sat\n((x 36893488147419103233))\n",
 	"fd_mixed_scopes_models.smt2":                  "sat\n((n 2) (colour green) (p true) (q true) (r false))\nunsat\n(too-small)\nsat\n((n 2) (colour green))\nsat\nunsat\nsat\n",
 	"dt2bv_models_scopes.smt2":                     "sat\n((x green))\nunsat\n(chosen clash)\nsat\n((x green))\nsat\n((x amber))\n",
+	"der_tactic.smt2":                              "unsat\n",
 	"fpa_canonical_model_scopes.smt2":              "sat\n(((= (fp.to_ieee_bv x) #b1011001) true)\n ((fp.isNormal x) true)\n ((= rm RNA) true))\nunsat\nsat\n(((fp.isZero x) true)\n ((fp.isNegative x) true))\nsat\n(((fp.isNaN x) true)\n ((= rm RNA) true))\n",
 	"fpa2bv_tactic.smt2":                           "sat\n",
 	"qffp_solver_models_scopes.smt2":               "sat\n(((fp.isNaN x) true))\nunsat\nsat\nsat\n",
