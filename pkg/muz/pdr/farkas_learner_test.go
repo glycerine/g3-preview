@@ -175,6 +175,36 @@ func TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals(t *testing.T) {
 	}
 	pdrMust(t, manager.DelRef(&combined))
 
+	xSplitName, err := manager.Symbols.Intern("combine-split-x")
+	pdrMust(t, err)
+	xSplit, err := manager.MkConst(xSplitName, integer)
+	pdrMust(t, err)
+	yName, err := manager.Symbols.Intern("combine-y")
+	pdrMust(t, err)
+	y, err := manager.MkConst(yName, integer)
+	pdrMust(t, err)
+	splitZero, err := manager.ArithmeticIntegerNumeralText("0")
+	pdrMust(t, err)
+	yLE, err := manager.MkFamilyApp(arithmetic, 2, nil, []ast.ASTHandle{y, splitZero})
+	pdrMust(t, err)
+	xLE, err := manager.MkFamilyApp(arithmetic, 2, nil, []ast.ASTHandle{xSplit, splitZero})
+	pdrMust(t, err)
+	pdrMust(t, learner.SetSplitLiterals(true))
+	split, err := learner.CombineConstraints([]ast.ASTHandle{xLE, yLE}, []*big.Rat{big.NewRat(1, 1), big.NewRat(1, 1)})
+	pdrMust(t, err)
+	splitHandle, err := manager.RefGet(split)
+	pdrMust(t, err)
+	if family, err := manager.GetFamilyID(splitHandle); err != nil || family != manager.BasicFamilyID() {
+		t.Fatalf("split result family = %d, err %v", family, err)
+	}
+	if op, err := manager.GetDeclKind(splitHandle); err != nil || op != ast.ASTOpOr {
+		t.Fatalf("split result op = %d, err %v", op, err)
+	}
+	if count, err := manager.GetNumArgs(splitHandle); err != nil || count != 2 {
+		t.Fatalf("split result count = %d, err %v", count, err)
+	}
+	pdrMust(t, manager.DelRef(&split))
+
 	pdrMust(t, learner.SetCombineCoefficients(false))
 	boolean, err := manager.MkBoolSort()
 	pdrMust(t, err)

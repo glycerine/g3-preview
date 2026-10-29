@@ -65,6 +65,15 @@ func (f *FarkasLearner) SetCombineCoefficients(enabled bool) error {
 	return nil
 }
 
+// SetSplitLiterals selects whether disconnected arithmetic constraints are
+// returned as separate disjuncts, matching smt::farkas_util.
+func (f *FarkasLearner) SetSplitLiterals(enabled bool) error {
+	if err := f.open(); err != nil {
+		return err
+	}
+	return f.utility.SetSplitLiterals(enabled)
+}
+
 func (f *FarkasLearner) parameterIsSymbol(parameter ast.ASTParameter, want string) (bool, error) {
 	symbol, err := f.manager.ParameterSymbol(parameter)
 	if err != nil {

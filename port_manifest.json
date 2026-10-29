@@ -89036,9 +89036,18 @@
       "path": "src/muz/spacer/spacer_farkas_learner.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/spacer/farkas_learner.go",
+        "pkg/muz/pdr/farkas_learner.go",
+        "pkg/smtcore/smt_farkas_util.go"
+      ],
+      "tests": [
+        "TestFarkasLearnerExtractsProofLemmaAndGuardsLifetime",
+        "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
+        "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals",
+        "TestFarkasLearnerRecoversGeneralBPureUnits"
+      ],
       "assertions": [
         {
           "line": 201,
@@ -89101,19 +89110,52 @@
           "text": "SASSERT(m.is_proof(arg));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_farkas_lemma, combine_constraints, is_pure_expr and get_asserted proof helpers",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/farkas_learner.go",
+          "tests": [
+            "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
+            "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals",
+            "TestFarkasLearnerRecoversGeneralBPureUnits"
+          ]
+        },
+        {
+          "name": "get_lemmas revised dependency traversal, Farkas extraction and B-vocabulary filtering",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/farkas_learner.go",
+          "tests": ["TestFarkasLearnerExtractsProofLemmaAndGuardsLifetime"]
+        },
+        {
+          "name": "final simplify_bounds propagation over the extracted lemma vector",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The Spacer wrapper owns and closes the shared concrete PDR learner. The learner owns its SMTFarkasUtil, proof preprocessing owns a temporary root reference, and every returned ASTRef transfers to the caller."
+      ],
+      "deviations": [
+        "The revised Spacer source and retained PDR source use the same proof-dependency and Farkas combination algorithm, so Go shares that concrete implementation rather than copying it. The Spacer source's final propagate-values/propagate-inequalities simplify_bounds pass remains open."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_farkas_learner.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/spacer/farkas_learner.go",
+        "pkg/muz/pdr/farkas_learner.go"
+      ],
+      "tests": [
+        "TestFarkasLearnerExtractsProofLemmaAndGuardsLifetime",
+        "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -89124,11 +89166,25 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, get_lemmas, set_split_literals, collect_statistics and reset_statistics",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/farkas_learner.go",
+          "tests": [
+            "TestFarkasLearnerExtractsProofLemmaAndGuardsLifetime",
+            "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals"
+          ]
+        }
+      ],
+      "ownership": [
+        "The concrete wrapper owns its learner and rejects operations after idempotent Close; GetLemmas returns explicit caller-owned AST references."
+      ],
+      "deviations": [
+        "The empty native statistics methods map to a nil statistics map and a lifetime-checked no-op reset. Header guards are represented by normal Go package compilation."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_generalizers.cpp",
