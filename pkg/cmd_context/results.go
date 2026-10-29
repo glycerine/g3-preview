@@ -31,13 +31,13 @@ type EvaluationOptions struct {
 	Timeout, RLimit, ModelIndex        uint32
 }
 
-type evaluationTimeoutHandler struct {
+type contextTimeoutHandler struct {
 	mu            sync.Mutex
 	limit         *control.Reslimit
 	active, fired bool
 }
 
-func (h *evaluationTimeoutHandler) HandleEvent(control.EventCaller) {
+func (h *contextTimeoutHandler) HandleEvent(control.EventCaller) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	if !h.active || h.fired {
@@ -47,7 +47,7 @@ func (h *evaluationTimeoutHandler) HandleEvent(control.EventCaller) {
 	h.fired = true
 }
 
-func (h *evaluationTimeoutHandler) close() {
+func (h *contextTimeoutHandler) close() {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.active = false
@@ -164,7 +164,7 @@ func (c *Context) EvaluateWithOptions(expression ast.ASTHandle, options Evaluati
 		return result, err
 	}
 	defer manager.ResourceLimit().Pop()
-	handler := &evaluationTimeoutHandler{limit: manager.ResourceLimit(), active: true}
+	handler := &contextTimeoutHandler{limit: manager.ResourceLimit(), active: true}
 	timer, err := control.NewScopedTimer(options.Timeout, handler)
 	if err != nil {
 		return result, err

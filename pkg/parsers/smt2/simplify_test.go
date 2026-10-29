@@ -75,3 +75,28 @@ func TestSMT2SimplifyCommandRejectsUnknownParameterBeforeOutput(t *testing.T) {
 		t.Fatal("simplify parameter refusal", err, output.String())
 	}
 }
+
+func TestSMT2SimplifyCommandRecoversFromRewriterFailure(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	var output bytes.Buffer
+	script := `(simplify (+ 1 2) :max_steps 0 :print_statistics true :timeout 4294967295)`
+	if err = ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	lines := strings.Split(output.String(), "\n")
+	if len(lines) != 4 || lines[0] != `(error "simplifier failed: max. steps exceeded")` || lines[1] != "(+ 1 2)" || lines[3] != "" {
+		t.Fatal("simplify recovery output", output.String())
+	}
+	pattern := regexp.MustCompile(`^\(:time [0-9]+\.[0-9]{2} :num-steps 1 :memory [0-9]+\.[0-9]{2} :max-memory [0-9]+\.[0-9]{2} :cache-size: 0 :num-nodes-before 3\)$`)
+	if !pattern.MatchString(lines[2]) {
+		t.Fatal("simplify recovery statistics", lines[2])
+	}
+}

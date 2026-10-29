@@ -4,10 +4,12 @@ package cmd_context
 
 import (
 	"errors"
+	"math"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/smtcore"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
@@ -17,6 +19,8 @@ type SimplifyDetails struct {
 	Seconds                                                float64
 	Steps, CacheSize, NodesBefore, SharedNodes, NodesAfter uint32
 	MemoryBytes, MaximumMemoryBytes                        uint64
+	Failed                                                 bool
+	Failure                                                string
 }
 
 type simplifyExpressionSolver struct {
@@ -73,6 +77,16 @@ func (c *Context) SimplifyWithProof(expression ast.ASTHandle, params *uparams.Pa
 // SimplifyWithDetails optionally captures the source command's statistics
 // fields while the simplified term remains rooted for node accounting.
 func (c *Context) SimplifyWithDetails(expression ast.ASTHandle, params *uparams.ParamsRef, produceProof, collectStatistics bool) (result, proof ast.ASTRef, details SimplifyDetails, resultErr error) {
+	return c.simplifyWithDetails(expression, params, produceProof, collectStatistics, false)
+}
+
+// SimplifyCommandWithDetails adds simplify_cmd's recoverable diagnostic
+// behavior to the underlying rewrite operation.
+func (c *Context) SimplifyCommandWithDetails(expression ast.ASTHandle, params *uparams.ParamsRef, produceProof, collectStatistics bool) (result, proof ast.ASTRef, details SimplifyDetails, resultErr error) {
+	return c.simplifyWithDetails(expression, params, produceProof, collectStatistics, true)
+}
+
+func (c *Context) simplifyWithDetails(expression ast.ASTHandle, params *uparams.ParamsRef, produceProof, collectStatistics, catchFailure bool) (result, proof ast.ASTRef, details SimplifyDetails, resultErr error) {
 	if err := c.valid(); err != nil {
 		return result, proof, details, err
 	}
@@ -118,6 +132,33 @@ func (c *Context) SimplifyWithDetails(expression ast.ASTHandle, params *uparams.
 			return result, proof, details, err
 		}
 	}
+	local := params
+	empty := c.config.Params.EmptyValue()
+	if local == nil {
+		local = &empty
+	}
+	timeoutName, rlimitName := "timeout", "rlimit"
+	timeout, err := c.config.Params.GetUIntName(local, &timeoutName, math.MaxUint32)
+	if err != nil {
+		return result, proof, details, err
+	}
+	rlimit, err := c.config.Params.GetUIntName(local, &rlimitName, math.MaxUint32)
+	if err != nil {
+		return result, proof, details, err
+	}
+	if err = m.ResourceLimit().Push(rlimit); err != nil {
+		return result, proof, details, err
+	}
+	defer m.ResourceLimit().Pop()
+	handler := &contextTimeoutHandler{limit: m.ResourceLimit(), active: true}
+	timer, err := control.NewScopedTimer(timeout, handler)
+	if err != nil {
+		return result, proof, details, err
+	}
+	defer func() {
+		resultErr = errors.Join(resultErr, timer.Close())
+		handler.close()
+	}()
 	watch := stopwatch.New(nil)
 	if err = watch.Start(); err != nil {
 		return result, proof, details, err
@@ -127,9 +168,19 @@ func (c *Context) SimplifyWithDetails(expression ast.ASTHandle, params *uparams.
 	} else {
 		err = value.Rewrite(expression, result)
 	}
-	err = errors.Join(err, watch.Stop())
-	if err != nil {
-		return result, proof, details, err
+	rewriteErr := err
+	if err = watch.Stop(); err != nil {
+		return result, proof, details, errors.Join(rewriteErr, err)
+	}
+	if rewriteErr != nil {
+		if !catchFailure || !rewriter.IsRewriterException(rewriteErr) {
+			return result, proof, details, rewriteErr
+		}
+		details.Failed = true
+		details.Failure = rewriteErr.Error()
+		if err = m.SetRef(result, expression); err != nil {
+			return result, proof, details, err
+		}
 	}
 	if collectStatistics {
 		if details.Seconds, err = watch.Seconds(); err != nil {
@@ -141,23 +192,25 @@ func (c *Context) SimplifyWithDetails(expression ast.ASTHandle, params *uparams.
 		if details.CacheSize, err = value.CacheSize(); err != nil {
 			return result, proof, details, err
 		}
-		h, e := m.RefGet(result)
-		if e != nil {
-			return result, proof, details, e
-		}
-		if details.NodesAfter, e = m.GetNumExprs(h); e != nil {
-			return result, proof, details, e
-		}
-		shared, e := ast.NewASTSharedOccurrences(m)
-		if e != nil {
-			return result, proof, details, e
-		}
-		if e = shared.Collect(h); e == nil {
-			details.SharedNodes = shared.NumShared()
-		}
-		e = errors.Join(e, shared.Close())
-		if e != nil {
-			return result, proof, details, e
+		if !details.Failed {
+			h, e := m.RefGet(result)
+			if e != nil {
+				return result, proof, details, e
+			}
+			if details.NodesAfter, e = m.GetNumExprs(h); e != nil {
+				return result, proof, details, e
+			}
+			shared, e := ast.NewASTSharedOccurrences(m)
+			if e != nil {
+				return result, proof, details, e
+			}
+			if e = shared.Collect(h); e == nil {
+				details.SharedNodes = shared.NumShared()
+			}
+			e = errors.Join(e, shared.Close())
+			if e != nil {
+				return result, proof, details, e
+			}
 		}
 		runtime := c.config.Params.NumeralsField.RuntimeOwner()
 		if details.MemoryBytes, err = runtime.AllocationSize(); err != nil {

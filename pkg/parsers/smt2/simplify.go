@@ -51,6 +51,16 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 		if err = p.advance(); err != nil {
 			return err
 		}
+		if key == "timeout" {
+			value, e := p.unsigned()
+			if e != nil {
+				return e
+			}
+			if e = globals.Context.SetUIntName(&settings, &key, value); e != nil {
+				return e
+			}
+			continue
+		}
 		if key == "print" || key == "print_proofs" || key == "print_statistics" {
 			if p.token != SymbolToken || p.scanner.ID() != "true" && p.scanner.ID() != "false" {
 				return fmt.Errorf("invalid simplify parameter value, true or false expected")
@@ -100,7 +110,7 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 			return err
 		}
 	}
-	result, proof, details, err := p.context.SimplifyWithDetails(expression, &settings, printProof, printStatistics)
+	result, proof, details, err := p.context.SimplifyCommandWithDetails(expression, &settings, printProof, printStatistics)
 	if err != nil {
 		return err
 	}
@@ -110,6 +120,12 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 		}
 		resultErr = errors.Join(resultErr, m.DelRef(&result))
 	}()
+	if details.Failed {
+		message := strings.ReplaceAll(details.Failure, "\"", "\"\"")
+		if _, e := fmt.Fprintf(p.out, "(error \"simplifier failed: %s\")\n", message); e != nil {
+			return e
+		}
+	}
 	if printResult {
 		simplified, e := m.RefGet(result)
 		if e != nil {
@@ -122,7 +138,7 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 			return e
 		}
 	}
-	if printProof {
+	if printProof && !details.Failed {
 		proofExpression, e := m.RefGet(proof)
 		if e != nil {
 			return e
@@ -136,9 +152,15 @@ func (p *commandParser) simplifyCommand() (resultErr error) {
 	}
 	if printStatistics {
 		megabyte := float64(1024 * 1024)
-		_, err = fmt.Fprintf(p.out, "(:time %.2f :num-steps %d :memory %.2f :max-memory %.2f :cache-size: %d :num-nodes-before %d :num-shared %d :num-nodes %d)\n",
+		_, err = fmt.Fprintf(p.out, "(:time %.2f :num-steps %d :memory %.2f :max-memory %.2f :cache-size: %d :num-nodes-before %d",
 			details.Seconds, details.Steps, float64(details.MemoryBytes)/megabyte, float64(details.MaximumMemoryBytes)/megabyte,
-			details.CacheSize, details.NodesBefore, details.SharedNodes, details.NodesAfter)
+			details.CacheSize, details.NodesBefore)
+		if err == nil && !details.Failed {
+			_, err = fmt.Fprintf(p.out, " :num-shared %d :num-nodes %d", details.SharedNodes, details.NodesAfter)
+		}
+		if err == nil {
+			_, err = fmt.Fprintln(p.out, ")")
+		}
 		return err
 	}
 	return nil
