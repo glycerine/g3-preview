@@ -92178,8 +92178,11 @@
         "TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput",
         "TestRuleInlinerUsesDisjointVariableBanks",
         "TestRuleInlinerPreservesRecursivePredicate",
+        "TestRuleInlinerContractsUniqueLinearGroundChain",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
+        "TestSMTLibRunnerScripts/fixedpoint_spacer_nonlinear_inlining.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_nonlinear_inlining.smt2"
       ],
       "assertions": [
         {
@@ -92274,7 +92277,16 @@
           ]
         },
         {
-          "name": "complete eager/linear inlining, proof/model conversion, quantified-rule handling, and interpreted-tail simplification after resolution",
+          "name": "inline_linear unique-head/unique-tail guarded straight-line contraction",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_inliner.go",
+          "tests": [
+            "TestRuleInlinerContractsUniqueLinearGroundChain",
+            "TestSMTLibRunnerCPPReference/fixedpoint_spacer_nonlinear_inlining.smt2"
+          ]
+        },
+        {
+          "name": "complete eager inlining, proof/model conversion, quantified-rule handling, and interpreted-tail simplification during resolution",
           "status": "unported"
         }
       ],
@@ -92282,7 +92294,8 @@
         "The Go plugin owns its protected set; every definition, work-queue rule, substitution result, and transformed RuleSet is retained until transfer or reverse-order cleanup."
       ],
       "deviations": [
-        "The current live Spacer specialization excludes every recursively cyclic predicate instead of the source planner's finer SCC break selection; this preserves recursive rules while the linear/eager source passes remain pending."
+        "The elimination planner excludes every recursively cyclic predicate instead of the source planner's finer SCC break selection; the subsequent source-faithful linear pass still contracts uniquely justified finite recursive chains.",
+        "The Go linear pass uses direct concrete unifier probes in place of the source substitution-tree indexes; this changes indexing cost, not the unique-head/unique-tail decision."
       ]
     },
     {
@@ -92296,7 +92309,8 @@
       "tests": [
         "TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput",
         "TestRuleInlinerUsesDisjointVariableBanks",
-        "TestRuleInlinerPreservesRecursivePredicate"
+        "TestRuleInlinerPreservesRecursivePredicate",
+        "TestRuleInlinerContractsUniqueLinearGroundChain"
       ],
       "conditionals": [
         {
@@ -92313,6 +92327,11 @@
       "methods": [
         {
           "name": "RuleInlinerPlugin construction, transformation surface, cancellation, and ownership lifecycle",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_inliner.go"
+        },
+        {
+          "name": "inline_linear live rule-vector and unification-index specialization",
           "status": "ported",
           "go_target": "pkg/muz/transforms/rule_inliner.go"
         }
@@ -92692,7 +92711,10 @@
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestInterpTailSimplifierPropagatesEqualityAndRemovesTruth",
-        "TestInterpTailSimplifierDropsFalseRule"
+        "TestInterpTailSimplifierDropsFalseRule",
+        "TestRuleInlinerContractsUniqueLinearGroundChain",
+        "TestSMTLibRunnerScripts/fixedpoint_spacer_nonlinear_inlining.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_nonlinear_inlining.smt2"
       ],
       "methods_audited": false,
       "ownership_audited": false,

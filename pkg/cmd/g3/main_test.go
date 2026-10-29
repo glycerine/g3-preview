@@ -352,6 +352,7 @@ var scriptResults = map[string]string{
 	"fixedpoint_pdr_model_generalizer.smt2":        "sat\ntrue\n",
 	"fixedpoint_spacer_core.smt2":                  "sat\nunsat\n",
 	"fixedpoint_spacer_acyclic_inlining.smt2":      "sat\ntrue\n",
+	"fixedpoint_spacer_nonlinear_inlining.smt2":    "sat\ntrue\n",
 	"fixedpoint_spacer_recursive_trace.smt2":       "sat\n(and (P 1) (P 0))\nunsat\n",
 	"horn_tactic_finite.smt2":                      "unsat\nsat\nunsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"horn_solver_finite.smt2":                      "unsat\nsat\n",

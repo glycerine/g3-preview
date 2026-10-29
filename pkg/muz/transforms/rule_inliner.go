@@ -358,10 +358,199 @@ func (p *RuleInlinerPlugin) Transform(source *base.RuleSet) (_ *base.RuleSet, re
 		}
 	}
 	if !changed {
-		return nil, nil
+		linear, linearErr := p.inlineLinear(source)
+		if linearErr != nil {
+			return nil, linearErr
+		}
+		if linear == nil {
+			return nil, nil
+		}
+		keep = false
+		if closeErr := result.Close(); closeErr != nil {
+			return nil, errors.Join(closeErr, linear.Close())
+		}
+		return linear, nil
+	}
+	linear, err := p.inlineLinear(result)
+	if err != nil {
+		return nil, err
+	}
+	if linear != nil {
+		if err = result.Close(); err != nil {
+			return nil, errors.Join(err, linear.Close())
+		}
+		result = linear
 	}
 	keep = true
 	return result, nil
+}
+
+// inlineLinear is the source straight-line relation pass. A defining rule is
+// consumed only when its head unifies with one live tail position and that
+// tail has one live defining rule, so every successful step removes a rule
+// and cannot create an inlining cycle.
+func (p *RuleInlinerPlugin) inlineLinear(source *base.RuleSet) (_ *base.RuleSet, resultErr error) {
+	count, err := source.Len()
+	if err != nil || count == 0 {
+		return nil, err
+	}
+	rules := make([]*base.Rule, count)
+	valid := make([]bool, count)
+	canRemove := make([]bool, count)
+	canExpand := make([]bool, count)
+	defer func() { resultErr = errors.Join(resultErr, closeRules(rules)) }()
+	for index := 0; index < count; index++ {
+		rule, getErr := source.Rule(index)
+		if getErr != nil {
+			return nil, getErr
+		}
+		rules[index], valid[index] = rule, true
+		head, getErr := rule.HeadDeclaration()
+		if getErr != nil {
+			return nil, getErr
+		}
+		canRemove[index] = !p.protected[head]
+		uninterpreted, getErr := rule.UninterpretedTailSize()
+		positive, positiveErr := rule.PositiveTailSize()
+		if getErr != nil || positiveErr != nil {
+			return nil, errors.Join(getErr, positiveErr)
+		}
+		if uninterpreted == 1 && positive == 1 {
+			tail, declarationErr := rule.TailDeclaration(0)
+			if declarationErr != nil {
+				return nil, declarationErr
+			}
+			canExpand[index] = !p.protected[tail]
+		}
+	}
+	changed := false
+	for index := 0; index < count; index++ {
+		for valid[index] && canExpand[index] {
+			current := rules[index]
+			declaration, getErr := current.TailDeclaration(0)
+			if getErr != nil {
+				return nil, getErr
+			}
+			candidateIndex := -1
+			var replacement *base.Rule
+			for definitionIndex, definition := range rules {
+				if !valid[definitionIndex] {
+					continue
+				}
+				head, headErr := definition.HeadDeclaration()
+				if headErr != nil {
+					return nil, errors.Join(headErr, closeRuleIf(replacement))
+				}
+				if head != declaration {
+					continue
+				}
+				resolved, resolveErr := p.resolve(current, 0, definition)
+				if resolveErr != nil {
+					return nil, errors.Join(resolveErr, closeRuleIf(replacement))
+				}
+				if resolved == nil {
+					continue
+				}
+				if candidateIndex >= 0 {
+					if closeErr := errors.Join(resolved.Close(), replacement.Close()); closeErr != nil {
+						return nil, closeErr
+					}
+					replacement = nil
+					candidateIndex = -2
+					break
+				}
+				candidateIndex, replacement = definitionIndex, resolved
+			}
+			if candidateIndex < 0 {
+				if replacement != nil {
+					if getErr = replacement.Close(); getErr != nil {
+						return nil, getErr
+					}
+				}
+				break
+			}
+			if candidateIndex == index || !canRemove[candidateIndex] {
+				if getErr = replacement.Close(); getErr != nil {
+					return nil, getErr
+				}
+				break
+			}
+			matches := 0
+			for targetIndex, target := range rules {
+				if !valid[targetIndex] {
+					continue
+				}
+				positive, positiveErr := target.PositiveTailSize()
+				if positiveErr != nil {
+					return nil, errors.Join(positiveErr, replacement.Close())
+				}
+				for tailIndex := 0; tailIndex < positive; tailIndex++ {
+					tailDeclaration, tailErr := target.TailDeclaration(tailIndex)
+					if tailErr != nil {
+						return nil, errors.Join(tailErr, replacement.Close())
+					}
+					if tailDeclaration != declaration {
+						continue
+					}
+					probe, probeErr := p.resolve(target, tailIndex, rules[candidateIndex])
+					if probeErr != nil {
+						return nil, errors.Join(probeErr, replacement.Close())
+					}
+					if probe != nil {
+						matches++
+						if probeErr = probe.Close(); probeErr != nil {
+							return nil, errors.Join(probeErr, replacement.Close())
+						}
+					}
+				}
+			}
+			if matches != 1 {
+				if getErr = replacement.Close(); getErr != nil {
+					return nil, getErr
+				}
+				break
+			}
+			if getErr = current.Close(); getErr != nil {
+				return nil, errors.Join(getErr, replacement.Close())
+			}
+			rules[index] = replacement
+			valid[candidateIndex] = false
+			canExpand[index] = canExpand[candidateIndex]
+			changed = true
+		}
+	}
+	if !changed {
+		return nil, nil
+	}
+	result, err := base.NewRuleSet(p.rules)
+	if err != nil {
+		return nil, err
+	}
+	keep := false
+	defer func() {
+		if !keep {
+			resultErr = errors.Join(resultErr, result.Close())
+		}
+	}()
+	if err = result.InheritPredicates(source); err != nil {
+		return nil, err
+	}
+	for index, rule := range rules {
+		if valid[index] {
+			if err = result.Add(rule); err != nil {
+				return nil, err
+			}
+		}
+	}
+	keep = true
+	return result, nil
+}
+
+func closeRuleIf(rule *base.Rule) error {
+	if rule == nil {
+		return nil
+	}
+	return rule.Close()
 }
 
 func (p *RuleInlinerPlugin) Close() error {

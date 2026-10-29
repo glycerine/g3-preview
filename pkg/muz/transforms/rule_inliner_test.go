@@ -126,3 +126,72 @@ func TestRuleInlinerPreservesRecursivePredicate(t *testing.T) {
 		t.Fatal("recursive predicate was inlined")
 	}
 }
+
+func TestRuleInlinerContractsUniqueLinearGroundChain(t *testing.T) {
+	f := newConeFixture(t)
+	boolean, err := f.manager.MkBoolSort()
+	coneMust(t, err)
+	zero, err := f.manager.ArithmeticNumeralRat(big.NewRat(0, 1), true)
+	coneMust(t, err)
+	integer, err := f.manager.GetSort(zero)
+	coneMust(t, err)
+	declare := func(name string, domain []ast.ASTHandle) ast.ASTHandle {
+		symbol, e := f.manager.Symbols.Intern("linear-" + name)
+		coneMust(t, e)
+		declaration, e := f.manager.MkFuncDecl(symbol, domain, boolean, ast.ASTFuncDeclInfo{})
+		coneMust(t, e)
+		coneMust(t, f.rules.RegisterPredicate(declaration))
+		return declaration
+	}
+	predicate := declare("P", []ast.ASTHandle{integer})
+	goal := declare("Goal", nil)
+	values := make([]ast.ASTHandle, 3)
+	applications := make([]ast.ASTHandle, 3)
+	for index := range values {
+		if index == 0 {
+			values[index] = zero
+		} else {
+			values[index], err = f.manager.ArithmeticNumeralRat(big.NewRat(int64(index), 1), true)
+			coneMust(t, err)
+		}
+		applications[index], err = f.manager.MkApp(predicate, []ast.ASTHandle{values[index]})
+		coneMust(t, err)
+	}
+	add := func(head ast.ASTHandle, tails []ast.ASTHandle, name string) {
+		rule, e := f.rules.NewRule(head, tails, nil, name)
+		coneMust(t, e)
+		coneMust(t, f.set.Add(rule))
+		coneMust(t, rule.Close())
+	}
+	add(applications[0], nil, "fact")
+	add(applications[1], []ast.ASTHandle{applications[0]}, "step-1")
+	add(applications[2], []ast.ASTHandle{applications[1]}, "step-2")
+	goalApplication, err := f.manager.MkApp(goal, nil)
+	coneMust(t, err)
+	add(goalApplication, []ast.ASTHandle{applications[2]}, "goal")
+	coneMust(t, f.set.SetOutputPredicate(goal))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("linear chain fixture rejected")
+	}
+	transformer := base.NewRuleTransformer()
+	t.Cleanup(func() { coneMust(t, transformer.Close()) })
+	coneMust(t, transformer.Register(transforms.NewRuleInlinerPlugin(f.manager, f.rules, []ast.ASTHandle{goal}, 0)))
+	modified, err := transformer.Apply(f.set)
+	coneMust(t, err)
+	if !modified {
+		t.Fatal("unique linear chain was not contracted")
+	}
+	if count, getErr := f.set.Len(); getErr != nil || count != 1 {
+		t.Fatal("contracted rule count", count, getErr)
+	}
+	rule, err := f.set.Rule(0)
+	coneMust(t, err)
+	defer func() { coneMust(t, rule.Close()) }()
+	head, err := rule.HeadDeclaration()
+	coneMust(t, err)
+	if tails, getErr := rule.TailSize(); getErr != nil || head != goal || tails != 0 {
+		t.Fatal("contracted goal fact", head, tails, getErr)
+	}
+}
