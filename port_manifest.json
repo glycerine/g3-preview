@@ -93198,9 +93198,16 @@
       "path": "src/muz/transforms/dl_mk_unfold.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/rule_unfold.go",
+        "pkg/muz/fp/spacer_engine.go"
+      ],
+      "tests": [
+        "TestRuleUnfoldExpandsOriginalTailOnce",
+        "TestSMTLibRunnerScripts/fixedpoint_spacer_unfold_rules.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_unfold_rules.smt2"
+      ],
       "assertions": [
         {
           "line": 32,
@@ -93209,17 +93216,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "one-round recursive expansion of each original uninterpreted tail with normalized rule unification and predicate inheritance",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_unfold.go",
+          "tests": [
+            "TestRuleUnfoldExpandsOriginalTailOnce",
+            "TestSMTLibRunnerCPPReference/fixedpoint_spacer_unfold_rules.smt2"
+          ]
+        },
+        {
+          "name": "hyper-resolution proof trace attachment for unfolded rules",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Each source definition and recursive resolved rule is held by an owning Go Rule reference through expansion and closed after insertion or failure."
+      ],
+      "deviations": [
+        "The retained transformation preserves rule semantics and interpreted-tail normalization but does not yet attach native hyper-resolution proof traces."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_unfold.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/transforms/rule_unfold.go"
+      ],
+      "tests": [
+        "TestRuleUnfoldExpandsOriginalTailOnce"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -93232,8 +93261,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "RuleUnfoldPlugin construction, transformation contract, priority, cancellation metadata, and owned lifecycle",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_unfold.go"
+        }
+      ],
+      "ownership": [
+        "RuleTransformer owns and closes the concrete RuleUnfoldPlugin and its internal normalized resolver."
+      ],
       "deviations": []
     },
     {

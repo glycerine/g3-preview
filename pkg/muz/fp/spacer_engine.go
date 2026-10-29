@@ -75,6 +75,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	unfoldName := "xform.unfold_rules"
+	unfoldRounds, err := e.params.GetUIntName(&fixedpoint, &unfoldName, 0)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -144,6 +149,18 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	err = errors.Join(err, transformer.Close())
 	if err != nil {
 		return nil, fmt.Errorf("muz/fp: Spacer rule preprocessing: %w", err)
+	}
+	for round := uint32(0); round < unfoldRounds; round++ {
+		unfolder := base.NewRuleTransformer()
+		plugin := transforms.NewRuleUnfoldPlugin(e.manager, e.rules, e.params, e.globals, 100)
+		if err = unfolder.Register(plugin); err != nil {
+			return nil, errors.Join(err, plugin.Close(), unfolder.Close())
+		}
+		_, err = unfolder.Apply(prepared)
+		err = errors.Join(err, unfolder.Close())
+		if err != nil {
+			return nil, fmt.Errorf("muz/fp: Spacer rule unfolding round %d: %w", round+1, err)
+		}
 	}
 	keep = true
 	return prepared, nil
