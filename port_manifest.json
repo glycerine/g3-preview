@@ -50130,8 +50130,8 @@
       "path": "src/math/hilbert/CMakeLists.txt",
       "component": "math",
       "role": "build_specification",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/math/hilbert/hilbert_basis.go"],
       "tests": [],
       "registrations": [
         {
@@ -50139,18 +50139,18 @@
           "text": "z3_add_component(hilbert"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Go package discovery replaces the Hilbert CMake component and preserves the pkg/math/hilbert package boundary."]
     },
     {
       "path": "src/math/hilbert/heap_trie.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/math/hilbert/hilbert_basis.go"],
       "tests": [],
       "conditionals": [
         {
@@ -50220,19 +50220,19 @@
           "text": "SASSERT(is_leaf(n));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The retained source saturate_orig algorithm uses small concrete Go slices for its passive worklist and subsumption index. The optimized project heap-trie container and disabled implementation block are not independently ported."]
     },
     {
       "path": "src/math/hilbert/hilbert_basis.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/math/hilbert/hilbert_basis.go", "pkg/math/hilbert/hilbert_basis_test.go"],
+      "tests": ["TestBasisSourceExamples", "TestBasisIntegerCoordinatesAndCancellation", "TestBasisRefusesInvalidNumeralsAndDimensions"],
       "assertions": [
         {
           "line": 421,
@@ -50271,19 +50271,26 @@
           "text": "SASSERT(get_sign(i) != get_sign(j));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, reset, integer coordinates, equality/inequality assertion, saturation, basis and inequality inspection",
+          "status": "ported",
+          "go_target": "pkg/math/hilbert/hilbert_basis.go",
+          "tests": ["TestBasisSourceExamples", "TestBasisIntegerCoordinatesAndCancellation", "TestBasisRefusesInvalidNumeralsAndDimensions"]
+        }
+      ],
+      "ownership": ["Basis owns its exact integer inequality rows, work vectors and resulting basis. BasisSolution and Inequality return independent math/big.Rat values."],
+      "deviations": ["Go retains the source saturate_orig resolution, support and subsumption algorithm. Concrete slices replace the source heap-trie and region-allocated offset store; checked int64 arithmetic returns ErrOverflow where the native rational manager would throw or exceed the retained Karr integer domain."]
     },
     {
       "path": "src/math/hilbert/hilbert_basis.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/math/hilbert/hilbert_basis.go", "pkg/math/hilbert/hilbert_basis_test.go"],
+      "tests": ["TestBasisSourceExamples", "TestBasisIntegerCoordinatesAndCancellation", "TestBasisRefusesInvalidNumeralsAndDimensions"],
       "conditionals": [
         {
           "line": 28,
@@ -50294,11 +50301,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained public Hilbert basis API used by Karr relation dualization",
+          "status": "ported",
+          "go_target": "pkg/math/hilbert/hilbert_basis.go",
+          "tests": ["TestBasisSourceExamples", "TestBasisIntegerCoordinatesAndCancellation", "TestBasisRefusesInvalidNumeralsAndDimensions"]
+        }
+      ],
+      "ownership": ["The Go owner contains all asserted constraints and generated basis vectors; no borrowed vector storage escapes."],
+      "deviations": ["Unused statistics, display tuning and alternate ordered-support controls are omitted because no retained Go consumer selects them."]
     },
     {
       "path": "src/math/interval/CMakeLists.txt",
@@ -200528,7 +200542,9 @@
         },
         {
           "name": "Hilbert basis passive and passive2 weight heaps (hilbert_basis.cpp:389,508)",
-          "status": "unported"
+          "status": "platform_replacement",
+          "go_target": "pkg/math/hilbert/hilbert_basis.go",
+          "tests": ["TestBasisSourceExamples", "TestBasisIntegerCoordinatesAndCancellation"]
         },
         {
           "name": "simplex variable-order heap (simplex.h:58)",
