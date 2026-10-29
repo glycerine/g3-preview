@@ -73,6 +73,7 @@ type PropSolver struct {
 	levelAtoms    map[ast.ASTHandle]bool
 	references    []ast.ASTRef
 	keepProxy     bool
+	ownedBackends [2]*VirtualSolver
 	closed        bool
 }
 
@@ -431,6 +432,12 @@ func (p *PropSolver) Close() (result error) {
 		if p.contexts[i] != nil {
 			result = errors.Join(result, p.contexts[i].Close())
 			p.contexts[i] = nil
+		}
+	}
+	for i := len(p.ownedBackends) - 1; i >= 0; i-- {
+		if p.ownedBackends[i] != nil {
+			result = errors.Join(result, p.ownedBackends[i].Close())
+			p.ownedBackends[i] = nil
 		}
 	}
 	if p.manager != nil {

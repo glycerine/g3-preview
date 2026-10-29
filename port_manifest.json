@@ -89655,9 +89655,9 @@
       "path": "src/muz/spacer/spacer_manager.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/manager.go"],
+      "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices"],
       "assertions": [
         {
           "line": 193,
@@ -89676,19 +89676,38 @@
           "text": "SASSERT(res);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "manager construction, current/old state creation and conversion, background, unique numbering, three solver pools and statistics",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/manager.go",
+          "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices"]
+        },
+        {
+          "name": "inductive_property model conversion, expression export and diagnostic display",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "state/value atom recognition and Skolem-constant helpers",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["Manager owns the state SymMux, background reference, three SMTContextManager pools, and manager-created PropSolver virtual backends."],
+      "deviations": ["SMT backend configuration is explicit in Go. PropSolver.Close retires manager-created virtual views before the pools close."]
     },
     {
       "path": "src/muz/spacer/spacer_manager.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/manager.go"],
+      "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices"],
       "conditionals": [
         {
           "line": 21,
@@ -89713,11 +89732,24 @@
           "text": "SASSERT(o_index(0) == 1);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained manager state conversion, background, solver creation and statistics surface",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/manager.go",
+          "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices"]
+        },
+        {
+          "name": "model cubes, atom partition/filter helpers and inductive_property surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["The Go manager explicitly owns its multiplexer, pools, and background formula reference."],
+      "deviations": ["Header guards and RAII fields become Go package compilation and explicit Close ownership."]
     },
     {
       "path": "src/muz/spacer/spacer_matrix.cpp",
@@ -90239,9 +90271,9 @@
       "path": "src/muz/spacer/spacer_sym_mux.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/sym_mux.go"],
+      "tests": ["TestSymMuxCreatesAndRewritesStateVariants"],
       "conditionals": [
         {
           "line": 576,
@@ -90318,19 +90350,43 @@
           "text": "SASSERT(!contains(e, idx));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "suffix allocation, tuple creation/growth, index/primary lookup, declaration conversion, formula conversion and shifting",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/sym_mux.go",
+          "tests": ["TestSymMuxCreatesAndRewritesStateVariants"]
+        },
+        {
+          "name": "contains traversal and non-model marking",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/sym_mux.go",
+          "tests": ["TestSymMuxCreatesAndRewritesStateVariants"]
+        },
+        {
+          "name": "homogeneity vector checks, index/variable collectors, literal filtering/partitioning, model cube extraction and model printer",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        },
+        {
+          "name": "index_renamer_cfg block",
+          "status": "dead",
+          "reason": "The source implementation is excluded by #if 0."
+        }
+      ],
+      "ownership": ["SymMux owns references to every prefix and generated declaration; returned formula conversions transfer one owning ASTRef to the caller."],
+      "deviations": ["Concrete Go maps and slices replace native object maps and vectors; quantifier bodies and annotations are rebuilt explicitly."]
     },
     {
       "path": "src/muz/spacer/spacer_sym_mux.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/spacer/sym_mux.go"],
+      "tests": ["TestSymMuxCreatesAndRewritesStateVariants"],
       "conditionals": [
         {
           "line": 20,
@@ -90347,11 +90403,24 @@
           "text": "SASSERT(is_muxed(sym));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained state tuple, lookup and formula conversion surface",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/sym_mux.go",
+          "tests": ["TestSymMuxCreatesAndRewritesStateVariants"]
+        },
+        {
+          "name": "model and literal filtering surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["The concrete multiplexer owns all generated declarations and prefix pins until Close."],
+      "deviations": ["Header guards become Go package compilation; failed invariants return errors."]
     },
     {
       "path": "src/muz/spacer/spacer_unsat_core_learner.cpp",
