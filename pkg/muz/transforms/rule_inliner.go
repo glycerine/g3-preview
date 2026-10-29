@@ -258,9 +258,8 @@ func inlinerComponents(order []ast.ASTHandle, candidate, forbidden map[ast.ASTHa
 
 func breakInliningCycles(order []ast.ASTHandle, candidate map[ast.ASTHandle]bool, edges map[ast.ASTHandle]map[ast.ASTHandle]bool) map[ast.ASTHandle]bool {
 	forbidden := make(map[ast.ASTHandle]bool)
-	// The retained eager implementation resolves against original definition
-	// buckets rather than the source's incrementally accumulated topological
-	// buckets. Keep self-recursion out until those buckets land.
+	// A singleton self-cycle remains unchanged by resolution, so attempting to
+	// eliminate it would keep re-enqueuing the same rule indefinitely.
 	for _, declaration := range order {
 		if candidate[declaration] && edges[declaration][declaration] {
 			forbidden[declaration] = true
@@ -395,6 +394,75 @@ func (p *RuleInlinerPlugin) forbidMultipleMultipliers(source *base.RuleSet, orde
 	return nil
 }
 
+func (p *RuleInlinerPlugin) expandDefinition(rule *base.Rule, allowed, processed map[ast.ASTHandle]bool, definitions map[ast.ASTHandle][]*base.Rule) (_ []*base.Rule, resultErr error) {
+	initial, err := rule.Retain()
+	if err != nil {
+		return nil, err
+	}
+	queue := []*base.Rule{initial}
+	var result []*base.Rule
+	defer func() {
+		if resultErr != nil {
+			resultErr = errors.Join(resultErr, closeRules(queue), closeRules(result))
+		}
+	}()
+	for len(queue) != 0 {
+		current := queue[len(queue)-1]
+		queue = queue[:len(queue)-1]
+		positive, currentErr := current.PositiveTailSize()
+		inlineIndex := -1
+		var declaration ast.ASTHandle
+		for tailIndex := 0; currentErr == nil && tailIndex < positive; tailIndex++ {
+			declaration, currentErr = current.TailDeclaration(tailIndex)
+			if currentErr == nil && allowed[declaration] && processed[declaration] {
+				inlineIndex = tailIndex
+				break
+			}
+		}
+		if currentErr != nil {
+			return nil, errors.Join(currentErr, current.Close())
+		}
+		if inlineIndex < 0 {
+			result = append(result, current)
+			continue
+		}
+		for _, definition := range definitions[declaration] {
+			resolved, resolveErr := p.resolve(current, inlineIndex, definition)
+			if resolveErr != nil {
+				return nil, errors.Join(resolveErr, current.Close())
+			}
+			if resolved != nil {
+				queue = append(queue, resolved)
+			}
+		}
+		if currentErr = current.Close(); currentErr != nil {
+			return nil, currentErr
+		}
+	}
+	return result, nil
+}
+
+func (p *RuleInlinerPlugin) accumulateDefinitions(order []ast.ASTHandle, allowed map[ast.ASTHandle]bool, edges map[ast.ASTHandle]map[ast.ASTHandle]bool, original map[ast.ASTHandle][]*base.Rule) (_ map[ast.ASTHandle][]*base.Rule, resultErr error) {
+	result := make(map[ast.ASTHandle][]*base.Rule)
+	processed := make(map[ast.ASTHandle]bool)
+	defer func() {
+		if resultErr != nil {
+			resultErr = errors.Join(resultErr, closeRuleBuckets(result))
+		}
+	}()
+	for _, declaration := range inlinerTopologicalOrder(order, allowed, nil, edges) {
+		for _, rule := range original[declaration] {
+			expanded, err := p.expandDefinition(rule, allowed, processed, result)
+			if err != nil {
+				return nil, err
+			}
+			result[declaration] = append(result[declaration], expanded...)
+		}
+		processed[declaration] = true
+	}
+	return result, nil
+}
+
 func (p *RuleInlinerPlugin) plan(source *base.RuleSet) (map[ast.ASTHandle]bool, map[ast.ASTHandle][]*base.Rule, error) {
 	count, err := source.Len()
 	if err != nil {
@@ -452,7 +520,14 @@ func (p *RuleInlinerPlugin) plan(source *base.RuleSet) (map[ast.ASTHandle]bool, 
 	for declaration := range candidate {
 		allowed[declaration] = candidate[declaration] && !forbidden[declaration]
 	}
-	return allowed, definitions, nil
+	expanded, err := p.accumulateDefinitions(declarationOrder, allowed, edges, definitions)
+	if err != nil {
+		return nil, nil, errors.Join(err, closeRuleBuckets(definitions))
+	}
+	if err = closeRuleBuckets(definitions); err != nil {
+		return nil, nil, errors.Join(err, closeRuleBuckets(expanded))
+	}
+	return allowed, expanded, nil
 }
 
 func closeRuleBuckets(buckets map[ast.ASTHandle][]*base.Rule) (result error) {

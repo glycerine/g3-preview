@@ -92744,7 +92744,17 @@
           ]
         },
         {
-      "name": "remaining source topological definition accumulation/self-recursive handling, oriented eager pass, proof/model conversion, and interpreted-tail unsatisfiability filtering during resolution",
+          "name": "dependency-first accumulation of already-expanded inliner definition buckets",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_inliner.go",
+          "tests": [
+            "TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput",
+            "TestRuleInlinerUsesDisjointVariableBanks",
+            "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2"
+          ]
+        },
+        {
+      "name": "remaining oriented eager pass, proof/model conversion, and interpreted-tail unsatisfiability filtering during resolution",
           "status": "unported"
         }
       ],
@@ -92752,7 +92762,7 @@
         "The Go plugin owns its protected set; every definition, work-queue rule, substitution result, and transformed RuleSet is retained until transfer or reverse-order cleanup."
       ],
       "deviations": [
-        "The elimination planner breaks each multi-predicate SCC at one declaration like the source, but still excludes self-recursive predicates until incrementally accumulated topological definition buckets are ported; the subsequent source-faithful linear pass still contracts uniquely justified finite recursive chains.",
+        "The elimination planner breaks each multi-predicate SCC at one declaration like the source, but excludes singleton self-recursive predicates because direct elimination would repeatedly reproduce the same tail; the subsequent source-faithful linear pass still contracts uniquely justified finite recursive chains.",
         "The Go linear pass uses direct concrete unifier probes in place of the source substitution-tree indexes; this changes indexing cost, not the unique-head/unique-tail decision."
       ]
     },
