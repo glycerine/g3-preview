@@ -93793,6 +93793,7 @@
             "TestSolverMixedPolynomialSearchAndRepeatedModel",
             "TestSolverMixedLinearConflict",
             "TestSolverIntegerBranchAndBound",
+            "TestSolverConflictMinimizationWithEquality",
             "TestFullDimensionalLiteralClassification",
             "TestSolverCheckPublishesFullDimensionalExplanationMode",
         "TestUnivariateConjunctionRejectsMixedVariablesAndOwnsDomain",
@@ -94363,7 +94364,8 @@
           "tests": [
             "TestSolverMixedPolynomialSearchAndRepeatedModel",
             "TestSolverMixedLinearConflict",
-            "TestSolverIntegerBranchAndBound"
+            "TestSolverIntegerBranchAndBound",
+            "TestSolverConflictMinimizationWithEquality"
           ]
         }
       ],
@@ -94634,7 +94636,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/nlsat/tactic/nlsat_tactic.go"],
-      "tests": ["TestNLSATTacticPublishesSatModel", "TestNLSATTacticPublishesUnsatCore", "TestNLSATTacticRejectsProofGoal", "TestSMTLibRunnerScripts/nlsat_direct.smt2"],
+      "tests": ["TestNLSATTacticPublishesSatModel", "TestNLSATTacticPublishesUnsatCore", "TestNLSATTacticRejectsProofGoal", "TestNLSATTacticAdvertisesConflictMinimization", "TestSMTLibRunnerScripts/nlsat_direct.smt2"],
       "assertions": [
         {
           "line": 136,
@@ -94656,7 +94658,7 @@
           "name": "retained tactic application, SAT model publication, and UNSAT core publication",
           "status": "partial",
           "go_target": "pkg/nlsat/tactic/nlsat_tactic.go",
-          "tests": ["TestNLSATTacticPublishesSatModel", "TestNLSATTacticPublishesUnsatCore", "TestNLSATTacticRejectsProofGoal", "TestSMTLibRunnerScripts/nlsat_direct.smt2"]
+          "tests": ["TestNLSATTacticPublishesSatModel", "TestNLSATTacticPublishesUnsatCore", "TestNLSATTacticRejectsProofGoal", "TestNLSATTacticAdvertisesConflictMinimization", "TestSMTLibRunnerScripts/nlsat_direct.smt2"]
         }
       ],
       "ownership": [],

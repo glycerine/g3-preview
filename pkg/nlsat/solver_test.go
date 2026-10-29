@@ -9,6 +9,10 @@ import (
 )
 
 func solverFixture(t *testing.T) *Solver {
+	return solverFixtureConfig(t, SolverConfig{SimplifyCore: true})
+}
+
+func solverFixtureConfig(t *testing.T, config SolverConfig) *Solver {
 	t.Helper()
 	am, _, limit := assignmentFixtureWithLimit(t)
 	q, err := am.RationalManager()
@@ -16,10 +20,26 @@ func solverFixture(t *testing.T) *Solver {
 	pm, err := polynomial.NewMultivariatePolynomialManager(polynomial.MultivariatePolynomialManagerConfig{Core: polynomial.MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: limit.Inc, Cooperation: func() error { return nil }}})
 	assignmentMust(t, err)
 	t.Cleanup(func() { assignmentMust(t, pm.CloseChecked()) })
-	s, err := NewSolver(SolverConfig{Algebraic: am, Polynomial: pm, Limit: limit, SimplifyCore: true})
+	config.Algebraic, config.Polynomial, config.Limit = am, pm, limit
+	s, err := NewSolver(config)
 	assignmentMust(t, err)
 	t.Cleanup(func() { assignmentMust(t, s.Close()) })
 	return s
+}
+
+func TestSolverConflictMinimizationWithEquality(t *testing.T) {
+	s := solverFixtureConfig(t, SolverConfig{SimplifyCore: true, MinimizeCore: true, Factor: true})
+	_, err := s.MkVar(false)
+	assignmentMust(t, err)
+	equality := evaluatorPolynomial(t, s.evaluator, evaluatorTerm{1, 1, 0}, evaluatorTerm{-1, 0, 0})
+	consequence := evaluatorPolynomial(t, s.evaluator, evaluatorTerm{1, 2, 0}, evaluatorTerm{-1, 0, 0})
+	solverUnit(t, s, AtomEQ, equality)
+	solverUnit(t, s, AtomGT, consequence)
+	result, err := s.Check()
+	assignmentMust(t, err)
+	if result != lbool.False {
+		t.Fatal("minimized equality conflict", result)
+	}
 }
 
 func solverUnit(t *testing.T, s *Solver, kind AtomKind, p polynomial.Polynomial) sat.Literal {

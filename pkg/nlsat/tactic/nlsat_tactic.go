@@ -163,6 +163,7 @@ func (t *NLSATTactic) CollectParamDescrs(out *uparams.ParamDescrs) error {
 	}{
 		{"lazy", "how lazy the solver is.", uparams.ParamUInt},
 		{"simplify_conflicts", "simplify conflicts using equalities before resolving them.", uparams.ParamBool},
+		{"minimize_conflicts", "minimize conflicts.", uparams.ParamBool},
 		{"randomize", "randomize selection of a witness.", uparams.ParamBool},
 		{"max_conflicts", "maximum number of conflicts.", uparams.ParamUInt},
 		{"factor", "factor polynomials produced during conflict resolution.", uparams.ParamBool},

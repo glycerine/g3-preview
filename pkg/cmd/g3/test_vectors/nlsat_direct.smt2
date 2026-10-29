@@ -8,7 +8,7 @@
 (set-logic QF_NIA)
 (declare-const x Int)
 (assert (= (* 2 x) 1))
-(check-sat-using nlsat)
+(check-sat-using (using-params nlsat :minimize_conflicts true :simplify_conflicts true))
 (reset)
 (set-logic QF_NRA)
 (declare-const x Real)

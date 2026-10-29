@@ -5,7 +5,24 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	basetactic "github.com/glycerine/g3/pkg/tactic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
+
+func TestNLSATTacticAdvertisesConflictMinimization(t *testing.T) {
+	fixture := newGoalCompilerFixture(t)
+	value, err := NewNLSATTactic(fixture.manager, fixture.context, fixture.globals, nil, fixture.services)
+	compilerMust(t, err)
+	t.Cleanup(func() { compilerMust(t, value.Close()) })
+	descriptions, err := uparams.NewParamDescrs(fixture.manager.Symbols, uparams.ParamDescrsConfig{Budget: fixture.manager.Budget()})
+	compilerMust(t, err)
+	t.Cleanup(func() { compilerMust(t, descriptions.Close()) })
+	compilerMust(t, value.CollectParamDescrs(descriptions))
+	found, err := descriptions.ContainsName("minimize_conflicts")
+	compilerMust(t, err)
+	if !found {
+		t.Fatal("minimize_conflicts is not accepted by using-params")
+	}
+}
 
 func TestNLSATTacticPublishesSatModel(t *testing.T) {
 	fixture := newGoalCompilerFixture(t)
