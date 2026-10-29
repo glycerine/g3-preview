@@ -90263,8 +90263,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/qe/legacy_arithmetic_linear.go", "pkg/qe/legacy_arithmetic_bounds.go", "pkg/qe/legacy_arithmetic_compare.go", "pkg/qe/legacy_arithmetic_real.go", "pkg/qe/legacy_arithmetic_integer.go", "pkg/qe/legacy_arithmetic_integer_project.go", "pkg/qe/legacy_arithmetic_mod.go", "pkg/qe/legacy_arithmetic_factor_mod.go", "pkg/qe/legacy_arithmetic_formula.go"],
-      "tests": ["TestLegacyArithmeticProjectionClassifiesLinearLiterals", "TestLegacyArithmeticProjectionClassifiesEqualities", "TestLegacyArithmeticProjectionSelectsModelBounds", "TestLegacyArithmeticProjectionBuildsBoundComparisons", "TestLegacyArithmeticProjectionProjectsRealBounds", "TestLegacyArithmeticProjectionNormalizesIntegerCoefficients", "TestLegacyArithmeticProjectionProjectsIntegerPaths", "TestLegacyArithmeticProjectionRewritesModEquality", "TestLegacyArithmeticProjectionFactorsSharedModTerms", "TestLegacyArithmeticProjectionCoordinatesFormula"],
+      "go_targets": ["pkg/qe/legacy_arithmetic_linear.go", "pkg/qe/legacy_arithmetic_bounds.go", "pkg/qe/legacy_arithmetic_compare.go", "pkg/qe/legacy_arithmetic_real.go", "pkg/qe/legacy_arithmetic_integer.go", "pkg/qe/legacy_arithmetic_integer_project.go", "pkg/qe/legacy_arithmetic_mod.go", "pkg/qe/legacy_arithmetic_factor_mod.go", "pkg/qe/legacy_arithmetic_formula.go", "pkg/qe/legacy_array_equalities.go"],
+      "tests": ["TestLegacyArithmeticProjectionClassifiesLinearLiterals", "TestLegacyArithmeticProjectionClassifiesEqualities", "TestLegacyArithmeticProjectionSelectsModelBounds", "TestLegacyArithmeticProjectionBuildsBoundComparisons", "TestLegacyArithmeticProjectionProjectsRealBounds", "TestLegacyArithmeticProjectionNormalizesIntegerCoefficients", "TestLegacyArithmeticProjectionProjectsIntegerPaths", "TestLegacyArithmeticProjectionRewritesModEquality", "TestLegacyArithmeticProjectionFactorsSharedModTerms", "TestLegacyArithmeticProjectionCoordinatesFormula", "TestLegacyArrayProjectionFindsStoreEqualitiesButBlocksSelects"],
       "assertions": [
         {
           "line": 101,
@@ -90427,7 +90427,8 @@
         {"name": "legacy mod-equality conversion to divisibility and remainder range constraints", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_mod.go", "tests": ["TestLegacyArithmeticProjectionRewritesModEquality"]},
         {"name": "legacy arbitrary shared mod factoring with fresh variables, defining equalities and model interpretations", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_factor_mod.go", "tests": ["TestLegacyArithmeticProjectionFactorsSharedModTerms"]},
         {"name": "legacy formula literal collection, replacement and top-level arithmetic projection coordinator", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_formula.go", "tests": ["TestLegacyArithmeticProjectionCoordinatesFormula"]},
-        {"name": "legacy array equality/select reduction and projection", "status": "unported", "go_target": null, "tests": []}
+        {"name": "legacy relevant array equality discovery and store propagation with select barriers", "status": "ported", "go_target": "pkg/qe/legacy_array_equalities.go", "tests": ["TestLegacyArrayProjectionFindsStoreEqualitiesButBlocksSelects"]},
+        {"name": "legacy array partial-equality substitution, select reduction and select ackermannization", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["Each classified legacy literal owns its residual arithmetic term reference; the projection owner owns the shared concrete arithmetic syntax service."],
       "deviations": ["This checkpoint exposes no public or live fallback: Spacer remains on the newer general MBP until the complete legacy arithmetic and array coordinator is ready."]
