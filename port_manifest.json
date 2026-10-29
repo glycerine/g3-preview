@@ -5289,20 +5289,20 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation query, owning successful answer and copied statistics surface",
+          "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation query, owning successful answer, PDR frame count/cover and copied statistics surface",
           "status": "partial",
           "go_target": "pkg/api/api_fixedpoint.go",
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "remaining standalone fixedpoint owner, table facts/assertions, relation-vector and level queries, rule update/enumeration, cover/invariant/reachable, parser/file, parameter descriptors, callbacks and string display surface",
+          "name": "remaining standalone fixedpoint owner, table facts/assertions, relation-vector queries, rule update/enumeration, invariant/reachable, parser/file, parameter descriptors, callbacks and string display surface",
           "status": "unported",
           "go_target": null,
           "tests": []
         }
       ],
-      "ownership": ["SMTContext owns the shared command/fixedpoint context. FixedpointAnswer transfers one concrete ASTRef to the caller; statistics are copied Go values, and relation/rule inputs are borrowed for each call then retained by the underlying context."],
-      "deviations": ["The additive public Go surface reuses SMTContext instead of exposing the native opaque reference-counted fixedpoint object or C ABI. It covers only operations implemented by the retained command-context engine; unlisted api_datalog operations remain unported."]
+      "ownership": ["SMTContext owns the shared command/fixedpoint context. FixedpointAnswer and FixedpointCoverDelta each transfer one concrete ASTRef to the caller; statistics are copied Go values, and relation/rule/cover inputs are borrowed for each call then retained by the underlying context when required."],
+      "deviations": ["The additive public Go surface reuses SMTContext instead of exposing the native opaque reference-counted fixedpoint object or C ABI. Cover operations are available after a retained PDR/Spacer query and operate on direct predicates; native slice/model-converter remapping remains outside this path. Unlisted api_datalog operations remain unported."]
     },
     {
       "path": "src/api/api_datalog.h",
@@ -5325,7 +5325,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained public fixedpoint registration, rule-scope, query, answer and statistics subset",
+          "name": "retained public fixedpoint registration, rule-scope, query, answer, frame count/cover and statistics subset",
           "status": "partial",
           "go_target": "pkg/api/api_fixedpoint.go",
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
@@ -83112,7 +83112,13 @@
           ]
         },
         {
-          "name": "cover/model conversion, remaining general linear rule/model trace unification, optional model-cone generalizer mode and post-QE disequality reduction",
+          "name": "pred_transformer/context finite-level count, bound-variable cover insertion and exact finite/invariant cover-delta retrieval (pdr_context.cpp:359-412,1563-1594)",
+          "status": "partial",
+          "go_target": "pkg/muz/pdr/predicate_transformer.go",
+          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "cover model-converter remapping, remaining general linear rule/model trace unification, optional model-cone generalizer mode and post-QE disequality reduction",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83127,7 +83133,7 @@
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
         "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth.",
         "Solve now drives the unbounded native frame/model-search loop, minimizes selected transition/state literals with model_implicant, applies the native QE-lite constant-elimination overload, and partitions projected literals among predecessor states. The optional pdr_use_model_generalizer cone mode and its post-QE disequality reduction remain explicit port obligations.",
-        "Successful retained relation-declaration queries reconstruct native-compatible empty/acyclic answers, recursive-SCC state traces, multiple-initial-rule leaf selection and nonlinear selected-rule reduction to true. Remaining general linear trace unification, proof traces and unsatisfiable invariant answers remain unported."
+        "Successful retained relation-declaration queries reconstruct native-compatible empty/acyclic answers, recursive-SCC state traces, multiple-initial-rule leaf selection and nonlinear selected-rule reduction to true. Cover translation matches direct retained predicates; native model-converter/slice remapping remains unported. Remaining general linear trace unification, proof traces and unsatisfiable invariant answers remain unported."
       ]
     },
     {
@@ -83259,7 +83265,13 @@
           ]
         },
         {
-          "name": "remaining pred_transformer cover/model surface plus general linear model-trace unification and proof reconstruction, core_generalizer, optional model-cone generalizer mode and post-QE disequality reduction",
+          "name": "retained pred_transformer/context finite-level count and direct-predicate cover surface",
+          "status": "partial",
+          "go_target": "pkg/muz/pdr/predicate_transformer.go",
+          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "remaining cover model-converter remapping plus general linear model-trace unification and proof reconstruction, core_generalizer, optional model-cone generalizer mode and post-QE disequality reduction",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83369,7 +83381,13 @@
           ]
         },
         {
-          "name": "cover, remaining general linear trace unification and certificate answer, model/proof, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
+          "name": "PDR finite-level count and direct-predicate cover forwarding (pdr_dl_interface.cpp:175-195)",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/pdr_engine.go",
+          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "remaining general linear trace unification and certificate answer, model/proof, native transformed-rule subsumption reuse and slice/unfold/coalesce integration",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83379,7 +83397,7 @@
         "PropositionalEngine owns the current PDR Context, reuses it while the exact normalized rules and background remain unchanged, and closes/replaces it after a tracked mutation or engine shutdown; rule and parameter services are borrowed."
       ],
       "deviations": [
-        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Successful existential declaration queries expose empty/acyclic answers, recursive-SCC state traces, initial-rule model recovery and native nonlinear-rule reduction; remaining general linear trace unification and certificate reconstruction remain unported."
+        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding is retained; slicing and model-converter remapping remain unported. Successful existential declaration queries expose empty/acyclic answers, recursive-SCC state traces, initial-rule model recovery and native nonlinear-rule reduction; remaining general linear trace unification and certificate reconstruction remain unported."
       ]
     },
     {
@@ -83474,7 +83492,13 @@
           ]
         },
         {
-          "name": "cover, remaining general linear trace unification and certificate answer, model, proof and parameter-update surface",
+          "name": "PDR finite-level count and direct-predicate cover forwarding",
+          "status": "partial",
+          "go_target": "pkg/muz/fp/pdr_engine.go",
+          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "remaining general linear trace unification and certificate answer, model, proof and parameter-update surface",
           "status": "unported",
           "go_target": null,
           "tests": []

@@ -200,6 +200,49 @@ func (c *Context) Transformer(declaration ast.ASTHandle) (*PredicateTransformer,
 	return transformer, found, nil
 }
 
+// NumLevels reports the number of finite frames retained for a predicate.
+func (c *Context) NumLevels(declaration ast.ASTHandle) (uint32, error) {
+	transformer, found, err := c.Transformer(declaration)
+	if err != nil || !found {
+		return 0, err
+	}
+	return transformer.NumLevels()
+}
+
+// CoverDelta returns one predicate cover frame as an owning AST reference.
+// Level -1 selects the invariant frame.
+func (c *Context) CoverDelta(level int, declaration ast.ASTHandle) (ast.ASTRef, error) {
+	transformer, found, err := c.Transformer(declaration)
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	if !found {
+		truth, x := c.manager.MkTrue()
+		if x != nil {
+			return ast.ASTRef{}, x
+		}
+		return c.manager.NewRef(truth)
+	}
+	return transformer.CoverDelta(level)
+}
+
+// AddCover adds a bound-variable property to one predicate frame.
+func (c *Context) AddCover(level int, declaration, property ast.ASTHandle) error {
+	transformer, found, err := c.Transformer(declaration)
+	if err != nil {
+		return err
+	}
+	if !found {
+		transformer, err = NewPredicateTransformer(c.owner, declaration, c.cacheMode)
+		if err != nil {
+			return err
+		}
+		c.transformers[declaration] = transformer
+		c.order = append(c.order, declaration)
+	}
+	return transformer.AddCover(level, property)
+}
+
 func (c *Context) queryState(query ast.ASTHandle) (*PredicateTransformer, ast.ASTHandle, []ast.ASTRef, error) {
 	references := make([]ast.ASTRef, 0)
 	fail := func(err error) (*PredicateTransformer, ast.ASTHandle, []ast.ASTRef, error) {

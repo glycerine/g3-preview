@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -310,6 +311,129 @@ func (p *PredicateTransformer) AddProperty(lemma ast.ASTHandle, level uint32) (b
 		}
 	}
 	return changed, nil
+}
+
+// NumLevels returns the number of finite PDR frames currently retained for
+// this predicate. The invariant frame at InfinityLevel is not included.
+func (p *PredicateTransformer) NumLevels() (uint32, error) {
+	if err := p.open(); err != nil {
+		return 0, err
+	}
+	return uint32(len(p.levels)), nil
+}
+
+// AddCover installs a property expressed over the predicate's bound
+// variables. Level -1 denotes the invariant frame.
+func (p *PredicateTransformer) AddCover(level int, property ast.ASTHandle) (resultErr error) {
+	if err := p.open(); err != nil {
+		return err
+	}
+	if level < -1 {
+		return ast.ErrASTDomain
+	}
+	arguments := make([]ast.ASTHandle, len(p.signature))
+	for index, declaration := range p.signature {
+		stateDeclaration, err := p.owner.OldToNew(declaration, 0)
+		if err != nil {
+			return err
+		}
+		arguments[index], err = p.manager.MkApp(stateDeclaration, nil)
+		if err != nil {
+			return err
+		}
+	}
+	substitution, err := rewriter.NewVarSubstitution(p.manager, false)
+	if err != nil {
+		return err
+	}
+	defer func() { resultErr = errors.Join(resultErr, substitution.Close()) }()
+	converted, err := p.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return err
+	}
+	defer func() { resultErr = errors.Join(resultErr, p.manager.DelRef(&converted)) }()
+	if err = substitution.Substitute(property, arguments, converted); err != nil {
+		return err
+	}
+	handle, err := p.manager.RefGet(converted)
+	if err != nil {
+		return err
+	}
+	target := InfinityLevel
+	if level >= 0 {
+		target = uint32(level)
+	}
+	_, err = p.AddProperty(handle, target)
+	return err
+}
+
+// CoverDelta returns an owning reference to exactly one finite frame, or to
+// the invariant frame for level -1, translated back to bound variables.
+func (p *PredicateTransformer) CoverDelta(level int) (result ast.ASTRef, resultErr error) {
+	if err := p.open(); err != nil {
+		return result, err
+	}
+	defer func() {
+		if resultErr != nil && result != (ast.ASTRef{}) {
+			resultErr = errors.Join(resultErr, p.manager.DelRef(&result))
+			result = ast.ASTRef{}
+		}
+	}()
+	var formula ast.ASTHandle
+	var err error
+	switch {
+	case level == -1:
+		formula, err = p.manager.MkAndArray(p.invariants)
+	case level >= 0 && level < len(p.levels):
+		formula, err = p.manager.MkAndArray(p.levels[level])
+	default:
+		formula, err = p.manager.MkTrue()
+	}
+	if err != nil {
+		return result, err
+	}
+	substitution, err := p.manager.NewExprSubstitution()
+	if err != nil {
+		return result, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, p.manager.DelExprSubstitution(&substitution)) }()
+	for index, declaration := range p.signature {
+		stateDeclaration, x := p.owner.OldToNew(declaration, 0)
+		if x != nil {
+			return result, x
+		}
+		constant, x := p.manager.MkApp(stateDeclaration, nil)
+		if x != nil {
+			return result, x
+		}
+		sort, x := p.manager.GetRange(declaration)
+		if x != nil {
+			return result, x
+		}
+		variable, x := p.manager.MkVar(uint32(index), sort)
+		if x != nil {
+			return result, x
+		}
+		if x = p.manager.ExprSubstitutionInsert(substitution, constant, variable, ast.ASTHandle{}, ast.ASTDependency{}); x != nil {
+			return result, x
+		}
+	}
+	replacer, err := rewriter.NewDefaultExprReplacer(p.manager)
+	if err != nil {
+		return result, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, replacer.Close()) }()
+	if err = replacer.SetSubstitution(&substitution); err != nil {
+		return result, err
+	}
+	result, err = p.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return result, err
+	}
+	if err = replacer.Rewrite(formula, result); err != nil {
+		return ast.ASTRef{}, errors.Join(err, p.manager.DelRef(&result))
+	}
+	return result, nil
 }
 
 func (p *PredicateTransformer) Formulas(level uint32, addAxioms bool) (ast.ASTHandle, error) {

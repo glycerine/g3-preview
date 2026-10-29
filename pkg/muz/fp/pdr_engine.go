@@ -63,3 +63,40 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	e.pdrRevision = e.revision
 	return context.Solve(declaration)
 }
+
+func (e *PropositionalEngine) pdrContext() (*pdr.Context, error) {
+	if err := e.open(); err != nil {
+		return nil, err
+	}
+	if e.backend != "pdr" || e.pdr == nil || e.pdrRevision != e.revision {
+		return nil, ErrPropositionalEngine
+	}
+	return e.pdr, nil
+}
+
+// NumLevels returns the finite PDR frame count for a relation after a query.
+func (e *PropositionalEngine) NumLevels(declaration ast.ASTHandle) (uint32, error) {
+	context, err := e.pdrContext()
+	if err != nil {
+		return 0, err
+	}
+	return context.NumLevels(declaration)
+}
+
+// CoverDelta returns an owning reference to a PDR cover frame after a query.
+func (e *PropositionalEngine) CoverDelta(level int, declaration ast.ASTHandle) (ast.ASTRef, error) {
+	context, err := e.pdrContext()
+	if err != nil {
+		return ast.ASTRef{}, err
+	}
+	return context.CoverDelta(level, declaration)
+}
+
+// AddCover installs a bound-variable property in a retained PDR frame.
+func (e *PropositionalEngine) AddCover(level int, declaration, property ast.ASTHandle) error {
+	context, err := e.pdrContext()
+	if err != nil {
+		return err
+	}
+	return context.AddCover(level, declaration, property)
+}

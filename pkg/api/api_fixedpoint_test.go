@@ -63,6 +63,26 @@ func TestSMTContextFixedpointPDRLifecycle(t *testing.T) {
 	}
 	astTestMust(t, manager.DelRef(&answer))
 
+	levels, err := context.FixedpointNumLevels(q)
+	astTestMust(t, err)
+	if levels == 0 {
+		t.Fatal("public fixedpoint query retained no PDR levels")
+	}
+	bound := pin(manager.MkVar(0, integer))
+	coverProperty := pin(manager.MkEq(bound, zero))
+	astTestMust(t, context.AddFixedpointCover(-1, q, coverProperty))
+	cover, err := context.FixedpointCoverDelta(-1, q)
+	astTestMust(t, err)
+	coverHandle, err := manager.RefGet(cover)
+	astTestMust(t, err)
+	if coverHandle != coverProperty {
+		t.Fatalf("public fixedpoint invariant cover = %v, want %v", coverHandle, coverProperty)
+	}
+	astTestMust(t, manager.DelRef(&cover))
+	if err = context.AddFixedpointCover(-2, q, coverProperty); !errors.Is(err, ast.ErrASTDomain) {
+		t.Fatal("invalid public fixedpoint cover level", err)
+	}
+
 	status, err = context.QueryFixedpoint(u)
 	astTestMust(t, err)
 	if status != lbool.False {

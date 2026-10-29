@@ -95,6 +95,34 @@ func (c *SMTContext) FixedpointAnswer(declaration ast.ASTHandle) (ast.ASTRef, er
 	return c.command.FixedpointAnswer(declaration)
 }
 
+// FixedpointNumLevels returns the current number of finite PDR frames for a
+// relation. It is available after a PDR/Spacer query.
+func (c *SMTContext) FixedpointNumLevels(declaration ast.ASTHandle) (uint32, error) {
+	if err := c.open(); err != nil {
+		return 0, err
+	}
+	return c.command.FixedpointNumLevels(declaration)
+}
+
+// FixedpointCoverDelta returns an owning reference to exactly one PDR cover
+// frame. Level -1 denotes the invariant frame; release the result via
+// Manager().DelRef.
+func (c *SMTContext) FixedpointCoverDelta(level int, declaration ast.ASTHandle) (ast.ASTRef, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	return c.command.FixedpointCoverDelta(level, declaration)
+}
+
+// AddFixedpointCover adds a property over bound predicate arguments to one PDR
+// frame. Level -1 denotes the invariant frame.
+func (c *SMTContext) AddFixedpointCover(level int, declaration, property ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.AddFixedpointCover(level, declaration, property)
+}
+
 // FixedpointStatistics returns an owning Go copy of current engine statistics.
 func (c *SMTContext) FixedpointStatistics() (statistics.Statistics, error) {
 	if err := c.open(); err != nil {
