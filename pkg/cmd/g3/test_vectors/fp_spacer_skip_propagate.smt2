@@ -1,5 +1,6 @@
 (set-option :fixedpoint.engine spacer)
 (set-option :fixedpoint.spacer.skip_propagate true)
+(set-option :fixedpoint.spacer.reset_obligation_queue false)
 (set-option :fixedpoint.spacer.max_level 3)
 (declare-rel Loop ())
 (rule (=> Loop Loop))

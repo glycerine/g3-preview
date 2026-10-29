@@ -78,11 +78,17 @@ func confirmConcreteReachability(obligation *ProofObligation) (_ bool, resultErr
 // queue's current maximum level. True means a concrete trace reached the root;
 // false means the root was blocked at this level.
 func (q *ProofObligationQueue) CheckReachability() (bool, error) {
+	return q.checkReachability(true)
+}
+
+func (q *ProofObligationQueue) checkReachability(reset bool) (bool, error) {
 	if q == nil || q.root == nil || q.root.valid() != nil {
 		return false, ErrManagerOwner
 	}
-	if err := q.Reset(); err != nil {
-		return false, err
+	if reset {
+		if err := q.Reset(); err != nil {
+			return false, err
+		}
 	}
 	q.expanded = InfinityLevel
 	for {

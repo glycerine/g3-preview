@@ -29,6 +29,7 @@ type Context struct {
 	lastResult    lbool.LBool
 	inductive     uint32
 	skipPropagate bool
+	resetQueue    bool
 	initialized   bool
 	solved        bool
 	closed        bool
@@ -55,9 +56,14 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	resetName := "spacer.reset_obligation_queue"
+	resetQueue, err := config.Params.GetBoolName(&fixedpoint, &resetName, true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
-		config: propConfig, skipPropagate: skipPropagate,
+		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue,
 	}, nil
 }
 
@@ -379,7 +385,7 @@ func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr e
 	c.solved = true
 	level := fromLevel
 	for attempt := uint32(0); attempt < maxLevels; attempt++ {
-		reachable, err := c.queue.CheckReachability()
+		reachable, err := c.queue.checkReachability(c.resetQueue)
 		if err != nil {
 			return lbool.Undef, err
 		}
