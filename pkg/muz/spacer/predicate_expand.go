@@ -151,11 +151,39 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 				return ExpansionResult{}, errors.Join(sanityErr, lemma.Close())
 			}
 		}
+		var cti ast.ASTRef
+		if p.useLemmaAsCTI {
+			cube, cubeErr := lemma.Cube()
+			if cubeErr != nil {
+				return ExpansionResult{}, errors.Join(cubeErr, lemma.Close())
+			}
+			conjunction, conjunctionErr := p.manager.MkAndArray(cube)
+			if conjunctionErr != nil {
+				return ExpansionResult{}, errors.Join(conjunctionErr, lemma.Close())
+			}
+			cti, err = p.manager.NewRef(conjunction)
+			if err != nil {
+				return ExpansionResult{}, errors.Join(err, lemma.Close())
+			}
+			defer func() { resultErr = errors.Join(resultErr, p.manager.DelRef(&cti)) }()
+		}
 		added, err := p.frames.AddLemma(lemma)
 		if err != nil {
 			return ExpansionResult{}, errors.Join(err, lemma.Close())
 		}
 		result.LemmaAdded = added
+		if added && cti != (ast.ASTRef{}) {
+			post, getErr := p.manager.RefGet(cti)
+			if getErr != nil {
+				return ExpansionResult{}, getErr
+			}
+			if getErr = obligation.NewPost(post); getErr != nil {
+				return ExpansionResult{}, getErr
+			}
+			if getErr = obligation.SetUseFarkas(false); getErr != nil {
+				return ExpansionResult{}, getErr
+			}
+		}
 		return result, nil
 	default:
 		return result, nil

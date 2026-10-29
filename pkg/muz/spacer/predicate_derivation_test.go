@@ -20,7 +20,7 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 	spacerMust(t, err)
 	predicate, err := manager.MkFuncDecl(name, nil, boolean, ast.ASTFuncDeclInfo{})
 	spacerMust(t, err)
-	transformer, err := spacer.NewRulePredicateTransformer(owner, predicate, spacer.PropSolverConfig{LemmaSanityCheck: true})
+	transformer, err := spacer.NewRulePredicateTransformer(owner, predicate, spacer.PropSolverConfig{LemmaSanityCheck: true, UseLemmaAsCTI: true})
 	spacerMust(t, err)
 	ruleManager, err := base.NewRuleManager(manager)
 	spacerMust(t, err)
@@ -57,6 +57,9 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 	spacerMust(t, err)
 	if blockedExpansion.Status != lbool.False || !blockedExpansion.LemmaAdded {
 		t.Fatal("Spacer blocking expansion", blockedExpansion.Status, blockedExpansion.LemmaAdded)
+	}
+	if useFarkas, farkasErr := blocked.UseFarkas(); farkasErr != nil || useFarkas {
+		t.Fatal("Spacer lemma-as-CTI retained Farkas generalization", useFarkas, farkasErr)
 	}
 	md, err := model.NewModel(manager)
 	spacerMust(t, err)

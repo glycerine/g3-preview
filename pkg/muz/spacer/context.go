@@ -30,6 +30,8 @@ type Context struct {
 	inductive     uint32
 	skipPropagate bool
 	resetQueue    bool
+	flexibleTrace bool
+	flexibleDepth uint32
 	initialized   bool
 	solved        bool
 	closed        bool
@@ -61,9 +63,19 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	flexibleName := "pdr.flexible_trace"
+	flexibleTrace, err := config.Params.GetBoolName(&fixedpoint, &flexibleName, false)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	depthName := "pdr.flexible_trace_depth"
+	flexibleDepth, err := config.Params.GetUIntName(&fixedpoint, &depthName, InfinityLevel)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
-		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue,
+		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
 	}, nil
 }
 
@@ -118,6 +130,10 @@ func spacerPropSolverConfig(config smtcore.SMTSolverConfig) (PropSolverConfig, e
 	if err != nil {
 		return PropSolverConfig{}, err
 	}
+	useLemmaAsCTI, err := get("spacer.use_lemma_as_cti", false)
+	if err != nil {
+		return PropSolverConfig{}, err
+	}
 	mode := ItpCoreLegacyFarkas
 	if newCore {
 		mode = ItpCoreNewFarkas
@@ -130,7 +146,7 @@ func spacerPropSolverConfig(config smtcore.SMTSolverConfig) (PropSolverConfig, e
 			Params: config.Params, Globals: config.Globals, SplitLiterals: split,
 			CoreMode: mode, FarkasAConst: farkasAConst, MinimizeUnsatCore: minimize,
 		},
-		KeepProxy: keepProxy, UseInductiveGeneralizer: useInductiveGeneralizer, UseArrayEqGeneralizer: useArrayEqGeneralizer, UseEqClassGeneralizer: useEqClassGeneralizer, LemmaSanityCheck: lemmaSanityCheck,
+		KeepProxy: keepProxy, UseInductiveGeneralizer: useInductiveGeneralizer, UseArrayEqGeneralizer: useArrayEqGeneralizer, UseEqClassGeneralizer: useEqClassGeneralizer, LemmaSanityCheck: lemmaSanityCheck, UseLemmaAsCTI: useLemmaAsCTI,
 	}, nil
 }
 
@@ -385,7 +401,7 @@ func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr e
 	c.solved = true
 	level := fromLevel
 	for attempt := uint32(0); attempt < maxLevels; attempt++ {
-		reachable, err := c.queue.checkReachability(c.resetQueue)
+		reachable, err := c.queue.checkReachability(c.resetQueue, c.flexibleTrace, c.flexibleDepth)
 		if err != nil {
 			return lbool.Undef, err
 		}

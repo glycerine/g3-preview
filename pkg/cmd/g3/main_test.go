@@ -355,6 +355,7 @@ var scriptResults = map[string]string{
 	"fp_spacer_arith_inv.smt2":                     "unsat\n",
 	"fp_spacer_linear_inv.smt2":                    "unsat\n",
 	"fp_spacer_generalizers_inv.smt2":              "unsat\n",
+	"fp_spacer_flexible_trace.smt2":                "unsat\n",
 	"fp_spacer_skip_propagate.smt2":                "unknown\n",
 	"fp_spacer_mincut_inv.smt2":                    "unsat\n",
 	"fp_spacer_mutual_inv.smt2":                    "unsat\n",

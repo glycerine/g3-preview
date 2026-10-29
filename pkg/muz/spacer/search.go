@@ -78,10 +78,10 @@ func confirmConcreteReachability(obligation *ProofObligation) (_ bool, resultErr
 // queue's current maximum level. True means a concrete trace reached the root;
 // false means the root was blocked at this level.
 func (q *ProofObligationQueue) CheckReachability() (bool, error) {
-	return q.checkReachability(true)
+	return q.checkReachability(true, false, InfinityLevel)
 }
 
-func (q *ProofObligationQueue) checkReachability(reset bool) (bool, error) {
+func (q *ProofObligationQueue) checkReachability(reset, flexible bool, flexibleDepth uint32) (bool, error) {
 	if q == nil || q.root == nil || q.root.valid() != nil {
 		return false, ErrManagerOwner
 	}
@@ -179,6 +179,17 @@ func (q *ProofObligationQueue) checkReachability(reset bool) (bool, error) {
 			}
 			if err = node.IncrementLevel(); err != nil {
 				return false, err
+			}
+			if flexible {
+				nodeLevel, levelErr := node.Level()
+				if levelErr != nil {
+					return false, levelErr
+				}
+				if nodeLevel >= q.maximum || q.maximum-nodeLevel <= flexibleDepth {
+					if err = q.Push(node); err != nil {
+						return false, err
+					}
+				}
 			}
 			if q.IsRoot(node) {
 				return false, nil
