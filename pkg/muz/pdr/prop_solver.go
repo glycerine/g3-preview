@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -19,6 +20,7 @@ type PropCheckResult struct {
 	Core         []ast.ASTHandle
 	Model        *model.ModelCore
 	AssumesLevel bool
+	FarkasCore   bool
 }
 
 // PropSolver is the PDR-facing frame and safe-assumption wrapper over one
@@ -37,6 +39,8 @@ type PropSolver struct {
 	auxiliary      map[ast.ASTHandle]bool
 	references     []ast.ASTRef
 	coreReferences []ast.ASTRef
+	useFarkas      bool
+	subsetCore     bool
 	closed         bool
 }
 
@@ -74,6 +78,33 @@ func (p *PropSolver) open() error {
 		return ErrPropSolverOwner
 	}
 	return p.context.open()
+}
+
+// SetUseFarkas selects proof-derived arithmetic cores when proof production is
+// enabled. The source default is false.
+func (p *PropSolver) SetUseFarkas(enabled bool) error {
+	if err := p.open(); err != nil {
+		return err
+	}
+	p.useFarkas = enabled
+	return nil
+}
+
+func (p *PropSolver) UseFarkas() (bool, error) {
+	if err := p.open(); err != nil {
+		return false, err
+	}
+	return p.useFarkas, nil
+}
+
+// SetSubsetBasedCore forces the source subset-core path even when Farkas core
+// extraction is enabled.
+func (p *PropSolver) SetSubsetBasedCore(enabled bool) error {
+	if err := p.open(); err != nil {
+		return err
+	}
+	p.subsetCore = enabled
+	return nil
 }
 
 func (p *PropSolver) pin(handle ast.ASTHandle) error {
@@ -592,6 +623,88 @@ func (p *PropSolver) clearCoreReferences() (result error) {
 	return result
 }
 
+func (p *PropSolver) extractTheoryCore(safe *safeAssumptions) (_ []ast.ASTHandle, resultErr error) {
+	if p.contexts.config.Params == nil || p.contexts.config.Globals == nil {
+		return nil, nil
+	}
+	proof, err := p.context.Proof()
+	if err != nil || proof.IsNull() {
+		return nil, err
+	}
+	learner, err := NewFarkasLearner(p.manager, p.contexts.config.Params, p.contexts.config.Globals)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, learner.Close()) }()
+	learned, err := learner.GetLemmas(proof, safe.atoms)
+	if err != nil {
+		return nil, err
+	}
+	committed := false
+	defer func() {
+		if committed {
+			return
+		}
+		for i := range learned {
+			resultErr = errors.Join(resultErr, p.manager.DelRef(&learned[i]))
+		}
+	}()
+	if len(learned) == 0 {
+		committed = true
+		return nil, nil
+	}
+	if len(safe.proxyToFormula) != 0 {
+		substitution, err := p.manager.NewExprSubstitutionPolicy(false, false)
+		if err != nil {
+			return nil, err
+		}
+		defer func() { resultErr = errors.Join(resultErr, p.manager.DelExprSubstitution(&substitution)) }()
+		for proxy, formula := range safe.proxyToFormula {
+			if err = p.manager.ExprSubstitutionInsert(substitution, proxy, formula, ast.ASTHandle{}, ast.ASTDependency{}); err != nil {
+				return nil, err
+			}
+		}
+		replacer, err := rewriter.NewDefaultExprReplacer(p.manager)
+		if err != nil {
+			return nil, err
+		}
+		defer func() { resultErr = errors.Join(resultErr, replacer.Close()) }()
+		if err = replacer.SetSubstitution(&substitution); err != nil {
+			return nil, err
+		}
+		for i := range learned {
+			original, err := p.manager.RefGet(learned[i])
+			if err != nil {
+				return nil, err
+			}
+			rewritten, err := p.manager.NewRef(ast.ASTHandle{})
+			if err != nil {
+				return nil, err
+			}
+			if err = replacer.Rewrite(original, rewritten); err != nil {
+				resultErr = errors.Join(err, p.manager.DelRef(&rewritten))
+				return nil, resultErr
+			}
+			if err = p.manager.DelRef(&learned[i]); err != nil {
+				_ = p.manager.DelRef(&rewritten)
+				return nil, err
+			}
+			learned[i] = rewritten
+		}
+	}
+	core := make([]ast.ASTHandle, 0, len(learned))
+	for i := range learned {
+		handle, err := p.manager.RefGet(learned[i])
+		if err != nil {
+			return nil, err
+		}
+		core = append(core, handle)
+	}
+	p.coreReferences = append(p.coreReferences, learned...)
+	committed = true
+	return core, nil
+}
+
 func (p *PropSolver) check(atoms []ast.ASTHandle, formula ast.ASTHandle, level *uint32, wantCore, wantModel bool) (result PropCheckResult, resultErr error) {
 	if err := p.open(); err != nil {
 		return result, err
@@ -664,6 +777,20 @@ func (p *PropSolver) check(atoms []ast.ASTHandle, formula ast.ASTHandle, level *
 			}
 			if wantCore && !auxiliary {
 				result.Core = append(result.Core, item)
+			}
+		}
+		proofsEnabled, x := p.manager.ProofsEnabled()
+		if x != nil {
+			return result, x
+		}
+		if wantCore && p.useFarkas && !p.subsetCore && proofsEnabled {
+			theoryCore, x := p.extractTheoryCore(safe)
+			if x != nil {
+				return result, x
+			}
+			if len(theoryCore) != 0 {
+				result.Core = theoryCore
+				result.FarkasCore = true
 			}
 		}
 	} else if result.Status == lbool.True && wantModel {

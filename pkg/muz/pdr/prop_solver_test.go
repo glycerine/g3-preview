@@ -136,6 +136,92 @@ func TestPropSolverExpandsArithmeticEqualityForSubsetCore(t *testing.T) {
 	pdrMust(t, command.Close())
 }
 
+func TestPropSolverExtractsFarkasTheoryCore(t *testing.T) {
+	command, manager, contexts := pdrContextFixture(t, 0)
+	pdrMust(t, manager.ToggleProofMode(ast.ASTProofEnabled))
+	truth, err := manager.MkTrue()
+	pdrMust(t, err)
+	solver, err := pdr.NewPropSolver(manager, contexts, truth, "farkas-core")
+	pdrMust(t, err)
+	pdrMust(t, solver.SetUseFarkas(true))
+	if enabled, err := solver.UseFarkas(); err != nil || !enabled {
+		t.Fatal("Farkas core mode was not retained", enabled, err)
+	}
+	arithmetic, err := manager.RegisterArithmeticPlugin()
+	pdrMust(t, err)
+	realSort, err := manager.MkFamilySort(arithmetic, 0, nil)
+	pdrMust(t, err)
+	x, err := manager.MkFreshConst("farkas-core-x", realSort)
+	pdrMust(t, err)
+	y, err := manager.MkFreshConst("farkas-core-y", realSort)
+	pdrMust(t, err)
+	zero, err := manager.ArithmeticRealNumeralText("0")
+	pdrMust(t, err)
+	minusOne, err := manager.ArithmeticRealNumeralText("-1")
+	pdrMust(t, err)
+	sum, err := manager.MkArithmeticAdd(x, y)
+	pdrMust(t, err)
+	lessEqual, err := manager.MkArithmeticLE(sum, minusOne)
+	pdrMust(t, err)
+	xNonnegative, err := manager.MkArithmeticGE(x, zero)
+	pdrMust(t, err)
+	yNonnegative, err := manager.MkArithmeticGE(y, zero)
+	pdrMust(t, err)
+	pdrMust(t, solver.AddFormula(lessEqual))
+
+	result, err := solver.CheckAssumptions([]ast.ASTHandle{xNonnegative, yNonnegative}, true, false)
+	pdrMust(t, err)
+	if result.Status != lbool.False || len(result.Core) == 0 {
+		t.Fatal("Farkas proof did not produce an arithmetic core", result.Status, result.Core)
+	}
+	if !result.FarkasCore {
+		t.Fatal("Farkas mode silently fell back to the subset core")
+	}
+	for _, lemma := range result.Core {
+		if _, err = manager.GetKind(lemma); err != nil {
+			t.Fatal("Farkas core did not retain its result", err)
+		}
+	}
+	pdrMust(t, solver.SetSubsetBasedCore(true))
+	result, err = solver.CheckAssumptions([]ast.ASTHandle{xNonnegative, yNonnegative}, true, false)
+	pdrMust(t, err)
+	if result.Status != lbool.False || result.FarkasCore || len(result.Core) != 2 {
+		t.Fatal("forced subset-core mode", result.Status, result.FarkasCore, result.Core)
+	}
+
+	pdrMust(t, solver.Close())
+	pdrMust(t, contexts.Close())
+	pdrMust(t, command.Close())
+}
+
+func TestPropSolverFarkasCoreRestoresSafeProxy(t *testing.T) {
+	command, manager, contexts := pdrContextFixture(t, 0)
+	pdrMust(t, manager.ToggleProofMode(ast.ASTProofEnabled))
+	truth, err := manager.MkTrue()
+	pdrMust(t, err)
+	solver, err := pdr.NewPropSolver(manager, contexts, truth, "farkas-proxy")
+	pdrMust(t, err)
+	pdrMust(t, solver.SetUseFarkas(true))
+	p := pdrBool(t, manager, "farkas-proxy-p")
+	q := pdrBool(t, manager, "farkas-proxy-q")
+	notP, err := manager.MkNot(p)
+	pdrMust(t, err)
+	notQ, err := manager.MkNot(q)
+	pdrMust(t, err)
+	disjunction, err := manager.MkOr(p, q)
+	pdrMust(t, err)
+	pdrMust(t, solver.AddFormula(notP))
+	pdrMust(t, solver.AddFormula(notQ))
+	result, err := solver.CheckAssumptions([]ast.ASTHandle{disjunction}, true, false)
+	pdrMust(t, err)
+	if result.Status != lbool.False || !result.FarkasCore || len(result.Core) != 1 || result.Core[0] != disjunction {
+		t.Fatal("Farkas proxy restoration", result.Status, result.FarkasCore, result.Core, disjunction)
+	}
+	pdrMust(t, solver.Close())
+	pdrMust(t, contexts.Close())
+	pdrMust(t, command.Close())
+}
+
 func TestPropSolverExpandsDatatypeEqualityForSubsetCore(t *testing.T) {
 	command, manager, contexts := pdrContextFixture(t, 0)
 	truth, err := manager.MkTrue()
