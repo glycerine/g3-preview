@@ -76,12 +76,6 @@ func (c *Context) unifiedTraceConstraints(root *ModelNode) (result []ast.ASTRef,
 	if err != nil {
 		return nil, err
 	}
-	nested, err := traceHasNestedPredecessor(root)
-	if err != nil {
-		return nil, err
-	}
-	seenAnchor := false
-	seenShallow := false
 	theory, err := rewriter.NewTheoryRewriter(c.manager, c.owner.contexts.config.Params, c.owner.contexts.config.Globals, nil)
 	if err != nil {
 		return nil, err
@@ -206,21 +200,8 @@ func (c *Context) unifiedTraceConstraints(root *ModelNode) (result []ast.ASTRef,
 			_ = substitution.Close()
 			return nil, x
 		}
-		if iteration != 0 {
-			keep := false
-			switch {
-			case anchor != nil && current.node.transformer == anchor:
-				keep = seenAnchor
-				seenAnchor = true
-			case anchor == nil && nested:
-				keep = true
-			case anchor == nil:
-				keep = seenShallow
-				seenShallow = true
-			}
-			if keep {
-				constraints = append(constraints, predicate)
-			}
+		if iteration != 0 && (anchor == nil || current.node.transformer == anchor) {
+			constraints = append(constraints, predicate)
 		}
 		appliedTails := make([]ast.ASTHandle, len(tails))
 		for i := range tails {

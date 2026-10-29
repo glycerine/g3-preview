@@ -14,7 +14,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-func (e *PropositionalEngine) spacerRules(query ast.ASTHandle) (_ *base.RuleSet, resultErr error) {
+func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.RuleSet, resultErr error) {
 	prepared, err := base.NewRuleSet(e.rules)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (e *PropositionalEngine) querySpacer(declaration ast.ASTHandle) (_ lbool.LB
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
 	}
-	prepared, err := e.spacerRules(declaration)
+	prepared, err := e.preprocessHornRules(declaration)
 	if err != nil {
 		return lbool.Undef, err
 	}

@@ -82946,6 +82946,8 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
         "TestModelSearchFrontierOrderingClosureAndOwnership",
         "TestModelNodeRejectsInvalidParentLevel"
       ],
@@ -83204,7 +83206,9 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_linear_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2"
           ]
         },
         {
@@ -83235,7 +83239,7 @@
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
         "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth.",
         "Solve now drives the unbounded native frame/model-search loop, selects literal or model-cone minimization through pdr.use_model_generalizer, applies the native QE-lite constant-elimination overload, reduces repeated disequalities in literal mode, and partitions projected literals among predecessor states.",
-        "Successful retained relation-declaration queries reconstruct native-compatible empty answers, acyclic linear cross-predicate traces, recursive-SCC state traces, multiple-initial-rule leaf selection and nonlinear selected-rule reduction to true. Unsuccessful queries expose direct-predicate universally quantified frame definitions and filter retained simple-join auxiliary predicates; other native model-converter remapping and clause presentation normalization remain unported. Cover translation matches direct retained predicates; native model-converter/slice remapping remains unported. Remaining general rule/head unification and proof traces remain unported."
+        "Successful retained relation-declaration queries reconstruct the native model-search trace by retaining every non-root predicate after two-bank rule/head unification. Acyclic and nonlinear successful traces reduce to the native true answer, while recursive traces retain the reached root state and all predecessors. Unsuccessful queries expose direct-predicate universally quantified frame definitions and filter retained simple-join auxiliary predicates; other native model-converter remapping and clause presentation normalization remain unported. Cover translation matches direct retained predicates; native model-converter/slice remapping and proof traces remain unported."
       ]
     },
     {
@@ -83458,6 +83462,8 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
         "TestSMTContextFixedpointPDRLifecycle"
       ],
       "assertions": [
@@ -83509,6 +83515,8 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
             "TestSMTContextFixedpointPDRLifecycle"
           ]
         },
@@ -83538,7 +83546,7 @@
         "PropositionalEngine owns the current PDR Context, reuses it while the exact normalized rules and background remain unchanged, and closes/replaces it after a tracked mutation or engine shutdown; rule and parameter services are borrowed. Returned inductive models transfer ownership to the caller."
       ],
       "deviations": [
-        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding and unsuccessful-query inductive certificates are retained; slicing and model-converter remapping remain unported. Successful existential declaration queries use native-style two-bank rule/head unification for acyclic and recursive traces, plus initial-rule model recovery and native nonlinear-rule reduction; proof traces remain unported."
+        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding and unsuccessful-query inductive certificates are retained; slicing and model-converter remapping remain unported. Successful existential declaration queries use native-style two-bank rule/head unification for recursive traces, retain every non-root predicate, and reduce acyclic or nonlinear successful traces to the native true answer; proof traces remain unported."
       ]
     },
     {

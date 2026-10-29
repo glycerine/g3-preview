@@ -574,8 +574,8 @@ func TestSMT2FixedpointPDRRecursiveTraceAnswerMatchesCPP(t *testing.T) {
 	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
 		t.Fatal(err)
 	}
-	cpp := fixedpointSpacerReference(t, script)
-	want := "sat\n(and (P 1) (P 0))\nunsat\n"
+	cpp := fixedpointReference(t, script)
+	want := "sat\n(and (P 2) (P 1) (P 0))\nunsat\n"
 	if output.String() != cpp || cpp != want {
 		t.Fatal("PDR recursive trace differential", output.String(), cpp)
 	}
@@ -614,7 +614,7 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 (rule (=> (P 2) Goal))
 (query Goal :print-answer true)
 `,
-			"sat\n(and (P 0))\n",
+			"sat\n(and (P 2) (P 0))\n",
 		},
 		{
 			"nonlinear-recursion",
@@ -644,7 +644,7 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 (rule (=> (P 2) Goal))
 (query Goal :print-answer true)
 `,
-			"sat\n(and (P 1))\n",
+			"sat\n(and (P 2) (P 1))\n",
 		},
 	}
 	for _, test := range tests {
@@ -663,7 +663,7 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 			if err = smt2.ParseCommands(context, strings.NewReader(test.script), &output); err != nil {
 				t.Fatal(err)
 			}
-			cpp := fixedpointSpacerReference(t, test.script)
+			cpp := fixedpointReference(t, test.script)
 			if output.String() != cpp || cpp != test.want {
 				t.Fatal("PDR trace reduction differential", output.String(), cpp)
 			}

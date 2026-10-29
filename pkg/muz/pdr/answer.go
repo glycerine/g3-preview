@@ -225,23 +225,6 @@ func traceRecursiveAnchor(root *ModelNode) (*PredicateTransformer, error) {
 	return nil, nil
 }
 
-func traceHasNestedPredecessor(root *ModelNode) (bool, error) {
-	children, err := root.Children()
-	if err != nil {
-		return false, err
-	}
-	for _, child := range children {
-		grandchildren, x := child.Children()
-		if x != nil {
-			return false, x
-		}
-		if len(grandchildren) != 0 {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
 func updateTraceModels(root *ModelNode) error {
 	byState := make(map[ast.ASTHandle]*ModelNode)
 	nodes := []*ModelNode{root}
@@ -484,6 +467,17 @@ func (c *Context) Answer(queryDeclaration ast.ASTHandle) (result ast.ASTRef, res
 		return result, fmt.Errorf("pdr: inspect trace shape: %w", err)
 	}
 	if nonlinear {
+		truth, x := c.manager.MkTrue()
+		if x != nil {
+			return result, x
+		}
+		return c.manager.NewRef(truth)
+	}
+	anchor, err := traceRecursiveAnchor(root)
+	if err != nil {
+		return result, fmt.Errorf("pdr: inspect recursive trace: %w", err)
+	}
+	if anchor == nil {
 		truth, x := c.manager.MkTrue()
 		if x != nil {
 			return result, x
