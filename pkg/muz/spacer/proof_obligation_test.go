@@ -107,3 +107,33 @@ func TestSpacerProofObligationBindingsDirtyStateAndQueue(t *testing.T) {
 	spacerMust(t, owner.Close())
 	spacerMust(t, command.Close())
 }
+
+func TestSpacerProofObligationStoreReusesNormalizedPostAndParent(t *testing.T) {
+	command, manager, owner := lemmaOwnerFixture(t)
+	truth, err := manager.MkTrue()
+	spacerMust(t, err)
+	falsehood, err := manager.MkFalse()
+	spacerMust(t, err)
+	transformer, err := spacer.NewPredicateTransformer(owner, "proof-obligation-store", falsehood, truth, spacer.PropSolverConfig{})
+	spacerMust(t, err)
+	p := spacerBool(t, manager, "proof-obligation-store-p")
+	first, err := transformer.NewProofObligation(nil, 1, 2, p, nil)
+	spacerMust(t, err)
+	second, err := transformer.NewProofObligation(nil, 4, 5, p, nil)
+	spacerMust(t, err)
+	if first != second {
+		t.Fatal("normalized proof obligation was not reused")
+	}
+	if level, err := first.Level(); err != nil || level != 4 {
+		t.Fatal("reused proof-obligation level", level, err)
+	}
+	spacerMust(t, transformer.SetProofObligationReuse(false))
+	third, err := transformer.NewProofObligation(nil, 4, 5, p, nil)
+	spacerMust(t, err)
+	if third == first {
+		t.Fatal("disabled proof-obligation reuse")
+	}
+	spacerMust(t, transformer.Close())
+	spacerMust(t, owner.Close())
+	spacerMust(t, command.Close())
+}

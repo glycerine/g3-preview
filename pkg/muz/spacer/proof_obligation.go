@@ -306,6 +306,44 @@ func (p *ProofObligation) SetUseFarkas(value bool) error {
 	return nil
 }
 
+func (p *ProofObligation) inherit(other *ProofObligation) error {
+	if err := p.valid(); err != nil {
+		return err
+	}
+	if other == nil || other.valid() != nil || p.parent != other.parent || p.transformer != other.transformer || p.newPost != (ast.ASTRef{}) {
+		return ErrManagerOwner
+	}
+	left, err := p.Post()
+	if err != nil {
+		return err
+	}
+	right, err := other.Post()
+	if err != nil || left != right {
+		if err == nil {
+			err = ast.ErrASTDomain
+		}
+		return err
+	}
+	bindings, err := other.Bindings()
+	if err != nil {
+		return err
+	}
+	refs, err := refsFromHandles(p.transformer.manager, bindings)
+	if err != nil {
+		return err
+	}
+	if err = releaseNormalizeRefs(p.transformer.manager, p.bindings); err != nil {
+		return errors.Join(err, releaseNormalizeRefs(p.transformer.manager, refs))
+	}
+	p.bindings = refs
+	p.level = other.level
+	p.depth = other.depth
+	p.open = other.open
+	p.useFarkas = other.useFarkas
+	p.weakness = other.weakness
+	return nil
+}
+
 func (p *ProofObligation) Release() (result error) {
 	if p == nil {
 		return ErrManagerOwner

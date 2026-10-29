@@ -16,6 +16,7 @@ type PredicateTransformer struct {
 	manager                  *ast.ASTManager
 	solver                   *PropSolver
 	frames                   *Frames
+	obligations              *ProofObligationStore
 	initial                  ast.ASTRef
 	transition               ast.ASTRef
 	propagations             uint64
@@ -32,6 +33,20 @@ func (p *PredicateTransformer) SetProofObligationNormalization(simplifyBounds, f
 	p.simplifyProofObligations = simplifyBounds
 	p.useEqualityClasses = factorEqualities
 	return nil
+}
+
+func (p *PredicateTransformer) SetProofObligationReuse(reuse bool) error {
+	if err := p.open(); err != nil {
+		return err
+	}
+	return p.obligations.SetReuse(reuse)
+}
+
+func (p *PredicateTransformer) NewProofObligation(parent *ProofObligation, level, depth uint32, post ast.ASTHandle, bindings []ast.ASTHandle) (*ProofObligation, error) {
+	if err := p.open(); err != nil {
+		return nil, err
+	}
+	return p.obligations.New(parent, level, depth, post, bindings)
 }
 
 // NewPredicateTransformer creates the live solver/frame bridge after rule
@@ -62,6 +77,9 @@ func NewPredicateTransformer(owner *Manager, name string, initial, transition as
 		return nil, err
 	}
 	if p.frames, err = NewFrames(p.manager, p); err != nil {
+		return nil, err
+	}
+	if p.obligations, err = NewProofObligationStore(p, true); err != nil {
 		return nil, err
 	}
 	if err = p.solver.Assert(transition); err != nil {
@@ -310,6 +328,9 @@ func (p *PredicateTransformer) Close() (result error) {
 		return nil
 	}
 	if p.frames != nil {
+		if p.obligations != nil {
+			result = errors.Join(result, p.obligations.Close())
+		}
 		result = errors.Join(result, p.frames.Close())
 	}
 	if p.solver != nil {
@@ -325,6 +346,7 @@ func (p *PredicateTransformer) Close() (result error) {
 	}
 	if result == nil {
 		p.frames = nil
+		p.obligations = nil
 		p.solver = nil
 		p.owner = nil
 		p.manager = nil
