@@ -169337,9 +169337,15 @@
       "path": "src/tactic/core/nnf_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/nnf_tactic.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestNNFTacticFullModeProofComposition",
+        "TestSMTLibRunnerScripts/nnf_tactics.smt2"
+      ],
       "assertions": [
         {
           "line": 62,
@@ -169350,9 +169356,19 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "NNF/SNF goal adapter, introduced definitions, proofs, model filtering, and commands",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/nnf_tactic.go",
+          "tests": [
+            "TestNNFTacticFullModeProofComposition",
+            "TestSMTLibRunnerScripts/nnf_tactics.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -169360,9 +169376,15 @@
       "path": "src/tactic/core/nnf_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/nnf_tactic.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestNNFTacticFullModeProofComposition",
+        "TestSMTLibRunnerScripts/nnf_tactics.smt2"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -169373,9 +169395,19 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "NNF/SNF tactic factories and command registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/nnf_tactic.go",
+          "tests": [
+            "TestNNFTacticFullModeProofComposition",
+            "TestSMTLibRunnerScripts/nnf_tactics.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
