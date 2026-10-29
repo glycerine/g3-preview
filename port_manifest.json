@@ -12,6 +12,7 @@
       ],
       "tests": [
         "TestExpandInductiveArithmeticEquality",
+        "TestExpandInductiveDatatypeAndBitVectorEqualities",
         "TestContextConsumesPropSolverFarkasParameters",
         "TestContextCanDisableInductiveGeneralizer"
       ],
@@ -19,11 +20,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "lemma_bool_inductive_generalizer with inductive cube reduction and arithmetic equality literal expansion",
-          "status": "partial",
+          "name": "lemma_bool_inductive_generalizer with inductive cube reduction and arithmetic, datatype-constructor, and bit-vector numeral literal expansion",
+          "status": "ported",
           "go_target": "pkg/muz/spacer/lemma_generalizer.go",
           "tests": [
-            "TestExpandInductiveArithmeticEquality"
+            "TestExpandInductiveArithmeticEquality",
+            "TestExpandInductiveDatatypeAndBitVectorEqualities"
           ]
         },
         {
@@ -35,7 +37,7 @@
         "Generalization constructs a replacement owning Lemma and closes the original only after successful construction; solver cores and recursive-rule assumptions retain explicit scoped AST references."
       ],
       "deviations": [
-        "The retained arithmetic equality branch of expand_literals is implemented. Datatype-constructor and bit-vector numeral expansion, array equality generalization, optional sanity checking, and the disabled native unsat-core generalizer remain pending."
+        "Array equality generalization, optional sanity checking, and the disabled native unsat-core generalizer remain pending."
       ]
     },
     {
@@ -47,14 +49,15 @@
         "pkg/muz/spacer/lemma_generalizer.go"
       ],
       "tests": [
-        "TestExpandInductiveArithmeticEquality"
+        "TestExpandInductiveArithmeticEquality",
+        "TestExpandInductiveDatatypeAndBitVectorEqualities"
       ],
       "methods_audited": false,
       "ownership_audited": true,
       "methods": [
         {
           "name": "lemma_bool_inductive_generalizer retained interface and default context integration",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/muz/spacer/lemma_generalizer.go"
         }
       ],
