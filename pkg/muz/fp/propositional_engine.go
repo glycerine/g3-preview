@@ -263,6 +263,50 @@ func (e *PropositionalEngine) Pop() error {
 	return snapshot.Close()
 }
 
+func (e *PropositionalEngine) hasUninterpretedRuleSymbol(root ast.ASTHandle) (bool, error) {
+	stack := []ast.ASTHandle{root}
+	seen := make(map[ast.ASTHandle]bool)
+	for len(stack) != 0 {
+		last := len(stack) - 1
+		expression := stack[last]
+		stack = stack[:last]
+		if seen[expression] {
+			continue
+		}
+		seen[expression] = true
+		kind, err := e.manager.GetKind(expression)
+		if err != nil {
+			return false, err
+		}
+		if kind != ast.ASTApp {
+			continue
+		}
+		declaration, err := e.manager.GetDecl(expression)
+		if err != nil {
+			return false, err
+		}
+		family, err := e.manager.GetFamilyID(declaration)
+		if err != nil {
+			return false, err
+		}
+		if family == ast.NullFamilyID && e.predicates[declaration] == nil {
+			return true, nil
+		}
+		arguments, err := e.manager.GetNumArgs(expression)
+		if err != nil {
+			return false, err
+		}
+		for index := uint32(0); index < arguments; index++ {
+			argument, x := e.manager.GetArg(expression, index)
+			if x != nil {
+				return false, x
+			}
+			stack = append(stack, argument)
+		}
+	}
+	return false, nil
+}
+
 func (e *PropositionalEngine) validateFragment() error {
 	count, err := e.set.Len()
 	if err != nil {
@@ -292,6 +336,21 @@ func (e *PropositionalEngine) validateFragment() error {
 			}
 			if e.predicates[declaration] == nil {
 				x = ErrPropositionalHorn
+			}
+		}
+		for j := uninterpreted; x == nil && j < tailSize; j++ {
+			tail, _, y := rule.Tail(j)
+			if y != nil {
+				x = y
+				break
+			}
+			unsupported, y := e.hasUninterpretedRuleSymbol(tail)
+			if y != nil {
+				x = y
+				break
+			}
+			if unsupported {
+				x = fmt.Errorf("%w: uninterpreted symbols in PDR rules are unsupported", ErrPropositionalHorn)
 			}
 		}
 		x = errors.Join(x, rule.Close())

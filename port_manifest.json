@@ -80819,10 +80819,10 @@
           "tests": ["TestPropositionalEngineScopeGuards", "TestSMT2FixedpointRuleScopesMatchCPP", "TestSMTLibRunnerScripts/fixedpoint_propositional.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_propositional.smt2"]
         },
         {
-          "name": "infinite-domain predicate registration and PDR/Spacer query dispatch through the retained rule context",
+          "name": "infinite-domain predicate registration, PDR/Spacer uninterpreted-symbol rule guard and query dispatch through the retained rule context",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
-          "tests": ["TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP"]
+          "tests": ["TestPDREngineMatchesCPPIntegerHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP", "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP", "TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP"]
         }
       ],
       "ownership": [
@@ -81724,9 +81724,9 @@
       "path": "src/muz/base/rule_properties.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/parsers/smt2/fixedpoint_commands_test.go"],
+      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP"],
       "assertions": [
         {
           "line": 193,
@@ -81735,17 +81735,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "PDR/Spacer check_uninterpreted_free rejection of ordinary uninterpreted constants and functions in interpreted rule tails (rule_properties.cpp:83-96)",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP"]
+        },
+        {
+          "name": "remaining rule-property collection, existential-tail, negative-predicate, quantifier, infinite-sort and datatype checks",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The retained PDR guard traverses interpreted rule-tail expressions directly after HNF binding and returns a checked Go error instead of constructing the native rule display exception. Other rule-property collectors and engine-specific checks remain unported."]
     },
     {
       "path": "src/muz/base/rule_properties.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/fp/propositional_engine.go"],
+      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP"],
       "conditionals": [
         {
           "line": 21,
@@ -81758,9 +81771,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "retained PDR/Spacer uninterpreted-free rule-check surface",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP"]
+        },
+        {
+          "name": "remaining rule_properties collection and validation surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The Go PDR engine performs the retained check through its concrete rule set without adding a general rule_properties owner."]
     },
     {
       "path": "src/muz/bmc/CMakeLists.txt",
@@ -83246,6 +83272,7 @@
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
         "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
         "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
+        "TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP",
         "TestSMT2FixedpointPDRStatistics",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
@@ -83282,6 +83309,7 @@
             "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
             "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
             "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
+            "TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2",
@@ -83349,6 +83377,7 @@
         "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
         "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
         "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
+        "TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP",
         "TestSMT2FixedpointPDRStatistics",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
@@ -83385,6 +83414,7 @@
             "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP",
             "TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP",
             "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
+            "TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2",

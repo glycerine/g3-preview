@@ -602,6 +602,49 @@ func TestSMT2FixedpointPDRTraceReductionMatchesCPP(t *testing.T) {
 	}
 }
 
+func TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP(t *testing.T) {
+	tests := []struct {
+		name, declaration, constraint, symbol string
+	}{
+		{"function", "(declare-fun f (Int) Int)", "(= (f x) 1)", "f"},
+		{"constant", "(declare-const c Int)", "(= x c)", "c"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				if err := context.Close(); err != nil {
+					t.Fatal(err)
+				}
+			})
+			context.PrintSuccess = false
+			script := `(set-option :fixedpoint.engine spacer)
+(set-option :print-success false)
+` + test.declaration + `
+(declare-rel P (Int))
+(declare-rel Goal ())
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (and (P x) ` + test.constraint + ` (< x 1)) (P (+ x 1))))
+(rule (=> (P 1) Goal))
+(query Goal :print-answer true)
+`
+			var output bytes.Buffer
+			err = smt2.ParseCommands(context, strings.NewReader(script), &output)
+			if err == nil || !strings.Contains(err.Error(), "uninterpreted symbols in PDR rules are unsupported") || output.Len() != 0 {
+				t.Fatal("Go PDR uninterpreted-rule guard", err, output.String())
+			}
+			cpp := fixedpointReference(t, script)
+			if !strings.Contains(cpp, "Uninterpreted '"+test.symbol+"'") || !strings.HasSuffix(cpp, "unknown\n") {
+				t.Fatal("C++ PDR uninterpreted-rule guard", cpp)
+			}
+		})
+	}
+}
+
 func TestSMT2FixedpointAutoConfigIntegerQueriesMatchCPP(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	if err != nil {
