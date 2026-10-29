@@ -305,6 +305,31 @@ func (s *Solver) Check() (lbool.LBool, error) {
 	}
 }
 
+func (s *Solver) Statistics() (map[string]float64, error) {
+	if err := s.open(); err != nil {
+		return nil, err
+	}
+	return map[string]float64{
+		"nlsat conflicts":              float64(s.search.conflicts),
+		"nlsat propagations":           float64(s.search.propagations),
+		"nlsat decisions":              float64(s.search.decisions),
+		"nlsat stages":                 float64(s.search.stages),
+		"nlsat irrational assignments": float64(s.search.irrationalAssignments),
+	}, nil
+}
+
+func (s *Solver) ResetStatistics() error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	s.search.conflicts = 0
+	s.search.propagations = 0
+	s.search.decisions = 0
+	s.search.stages = 0
+	s.search.irrationalAssignments = 0
+	return nil
+}
+
 func (s *Solver) integerFloor(value *polynomial.Algebraic, out *unumeral.Rational) (err error) {
 	var lower polynomial.Algebraic
 	if err = s.config.Algebraic.IntLT(value, &lower); err != nil {

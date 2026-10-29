@@ -94358,7 +94358,7 @@
           ]
         },
         {
-          "name": "Concrete public solver composition, variable/atom/input-clause construction, real/integer check with branch-and-bound cuts, model values, Boolean values and core extraction (cpp167-231,1258-1309; solver.h38-55,64-112,172-205,214), excluding parameter/reordering/simplification frontends",
+          "name": "Concrete public solver composition, variable/atom/input-clause construction, real/integer check with branch-and-bound cuts, model values, Boolean values, core extraction, and exact five-counter statistics/reset (cpp167-231,1258-1309,1875-1890; solver.h38-55,64-112,172-205,214-216), excluding reordering/simplification frontends",
           "status": "partial",
           "go_target": "pkg/nlsat/solver.go",
           "tests": [
@@ -94655,14 +94655,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained tactic application, SAT model publication, and UNSAT core publication",
+          "name": "retained tactic application, SAT model publication, UNSAT core publication, solver statistics capture, and statistics reset",
           "status": "partial",
           "go_target": "pkg/nlsat/tactic/nlsat_tactic.go",
           "tests": ["TestNLSATTacticPublishesSatModel", "TestNLSATTacticPublishesUnsatCore", "TestNLSATTacticRejectsProofGoal", "TestNLSATTacticAdvertisesConflictMinimization", "TestSMTLibRunnerScripts/nlsat_direct.smt2"]
         }
       ],
       "ownership": [],
-      "deviations": ["Statistics forwarding and the source display-variable diagnostic hook remain pending; solving, model, and core behavior are integrated."]
+      "deviations": ["The source display-variable diagnostic hook remains pending; solving, model, core, exact five-counter statistics forwarding, and reset behavior are integrated."]
     },
     {
       "path": "src/nlsat/tactic/nlsat_tactic.h",

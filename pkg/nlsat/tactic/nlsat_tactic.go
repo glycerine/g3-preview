@@ -29,6 +29,7 @@ type NLSATTactic struct {
 	globals     *uparams.GlobalParamsService
 	services    model.ModelEvaluatorConfig
 	params      uparams.ParamsRef
+	statistics  map[string]float64
 	ownerBytes  uint64
 	refs        uint32
 	paramsReady bool
@@ -176,8 +177,20 @@ func (t *NLSATTactic) CollectParamDescrs(out *uparams.ParamDescrs) error {
 	return nil
 }
 
-func (t *NLSATTactic) CollectStatistics() map[string]float64  { return nil }
-func (t *NLSATTactic) ResetStatistics() error                 { return t.open() }
+func (t *NLSATTactic) CollectStatistics() map[string]float64 {
+	result := make(map[string]float64, len(t.statistics))
+	for name, value := range t.statistics {
+		result[name] = value
+	}
+	return result
+}
+func (t *NLSATTactic) ResetStatistics() error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	t.statistics = nil
+	return nil
+}
 func (t *NLSATTactic) SetLogic(usymbol.Symbol) error          { return t.open() }
 func (t *NLSATTactic) SetProgressCallback(func(uint32)) error { return t.open() }
 
@@ -272,6 +285,11 @@ func (t *NLSATTactic) Apply(goal *basetactic.Goal, result *basetactic.TacticResu
 			err = errors.Join(err, compiler.Close())
 		}
 		if solver != nil {
+			if statistics, cause := solver.Statistics(); cause != nil {
+				err = errors.Join(err, cause)
+			} else {
+				t.statistics = statistics
+			}
 			err = errors.Join(err, solver.Close())
 		}
 		err = errors.Join(err, polynomials.CloseChecked())

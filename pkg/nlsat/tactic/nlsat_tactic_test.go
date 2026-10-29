@@ -104,6 +104,14 @@ func TestNLSATTacticPublishesUnsatCore(t *testing.T) {
 	if len(leaves) != 2 {
 		t.Fatalf("tactic core = %#v", leaves)
 	}
+	statistics := tacticValue.CollectStatistics()
+	if len(statistics) != 5 || statistics["nlsat conflicts"] == 0 || statistics["nlsat stages"] == 0 {
+		t.Fatal("NLSAT tactic statistics", statistics)
+	}
+	compilerMust(t, tacticValue.ResetStatistics())
+	if statistics = tacticValue.CollectStatistics(); len(statistics) != 0 {
+		t.Fatal("NLSAT tactic statistics reset", statistics)
+	}
 }
 
 func TestNLSATTacticRejectsProofGoal(t *testing.T) {

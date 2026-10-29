@@ -40,6 +40,19 @@ func TestSolverConflictMinimizationWithEquality(t *testing.T) {
 	if result != lbool.False {
 		t.Fatal("minimized equality conflict", result)
 	}
+	statistics, err := s.Statistics()
+	assignmentMust(t, err)
+	if statistics["nlsat conflicts"] == 0 || statistics["nlsat stages"] == 0 {
+		t.Fatal("solver statistics", statistics)
+	}
+	assignmentMust(t, s.ResetStatistics())
+	statistics, err = s.Statistics()
+	assignmentMust(t, err)
+	for name, value := range statistics {
+		if value != 0 {
+			t.Fatal("statistic reset", name, value)
+		}
+	}
 }
 
 func solverUnit(t *testing.T, s *Solver, kind AtomKind, p polynomial.Polynomial) sat.Literal {
