@@ -5,6 +5,8 @@ package spacer
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
@@ -271,6 +273,175 @@ func (m *Manager) ModelString(modelCore *model.ModelCore) (string, error) {
 		return "", err
 	}
 	return m.mux.ModelString(modelCore)
+}
+
+func (m *Manager) matchEquality(expression ast.ASTHandle) (ast.ASTHandle, ast.ASTHandle, bool, error) {
+	kind, err := m.manager.GetKind(expression)
+	if err != nil || kind != ast.ASTApp {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	family, err := m.manager.GetFamilyID(expression)
+	if err != nil || family != m.manager.BasicFamilyID() {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	operation, err := m.manager.GetDeclKind(expression)
+	if err != nil || operation != ast.ASTOpEq && operation != ast.ASTOpIff {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	left, err := m.manager.GetArg(expression, 0)
+	if err != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, false, err
+	}
+	right, err := m.manager.GetArg(expression, 1)
+	return left, right, err == nil, err
+}
+
+func (m *Manager) TryStateAndValueFromAtom(atom ast.ASTHandle) (state, value ast.ASTHandle, found bool, resultErr error) {
+	if err := m.open(); err != nil {
+		return state, value, false, err
+	}
+	kind, err := m.manager.GetKind(atom)
+	if err != nil || kind != ast.ASTApp {
+		return state, value, false, err
+	}
+	if negated, argument, x := m.manager.IsNot(atom); x != nil {
+		return state, value, false, x
+	} else if negated {
+		if kind, x = m.manager.GetKind(argument); x != nil || kind != ast.ASTApp {
+			return state, value, false, x
+		}
+		state = argument
+		value, err = m.manager.MkFalse()
+		if err != nil {
+			return state, value, false, err
+		}
+	} else if left, right, equality, x := m.matchEquality(atom); x != nil {
+		return state, value, false, x
+	} else if equality {
+		leftKind, x := m.manager.GetKind(left)
+		if x != nil {
+			return state, value, false, x
+		}
+		rightKind, x := m.manager.GetKind(right)
+		if x != nil || leftKind != ast.ASTApp || rightKind != ast.ASTApp {
+			return state, value, false, x
+		}
+		leftDeclaration, x := m.manager.GetDecl(left)
+		if x != nil {
+			return state, value, false, x
+		}
+		muxed, x := m.mux.IsMuxed(leftDeclaration)
+		if x != nil {
+			return state, value, false, x
+		}
+		if !muxed {
+			left, right = right, left
+		}
+		state, value = left, right
+	} else {
+		state = atom
+		value, err = m.manager.MkTrue()
+		if err != nil {
+			return state, value, false, err
+		}
+	}
+	declaration, err := m.manager.GetDecl(state)
+	if err != nil {
+		return state, value, false, err
+	}
+	found, err = m.mux.IsMuxed(declaration)
+	return state, value, found, err
+}
+
+func (m *Manager) TryStateDeclarationFromAtom(atom ast.ASTHandle) (ast.ASTHandle, bool, error) {
+	state, _, found, err := m.TryStateAndValueFromAtom(atom)
+	if err != nil || !found {
+		return ast.ASTHandle{}, false, err
+	}
+	declaration, err := m.manager.GetDecl(state)
+	return declaration, err == nil, err
+}
+
+func MkZKConst(manager *ast.ASTManager, index uint32, sort ast.ASTHandle) (ast.ASTHandle, error) {
+	if manager == nil {
+		return ast.ASTHandle{}, ErrManagerOwner
+	}
+	name, err := manager.Symbols.Intern("sk!" + strconv.FormatUint(uint64(index), 10))
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkConst(name, sort)
+}
+
+func FindZKConstants(manager *ast.ASTManager, expression ast.ASTHandle) ([]ast.ASTHandle, error) {
+	if manager == nil {
+		return nil, ErrManagerOwner
+	}
+	var result []ast.ASTHandle
+	seen := make(map[ast.ASTHandle]bool)
+	stack := []ast.ASTHandle{expression}
+	for len(stack) != 0 {
+		last := len(stack) - 1
+		current := stack[last]
+		stack = stack[:last]
+		if seen[current] {
+			continue
+		}
+		seen[current] = true
+		kind, err := manager.GetKind(current)
+		if err != nil {
+			return nil, err
+		}
+		switch kind {
+		case ast.ASTApp:
+			declaration, err := manager.GetDecl(current)
+			if err != nil {
+				return nil, err
+			}
+			family, err := manager.GetFamilyID(declaration)
+			if err != nil {
+				return nil, err
+			}
+			arity, err := manager.GetArity(declaration)
+			if err != nil {
+				return nil, err
+			}
+			name, err := manager.GetASTName(declaration)
+			if err != nil {
+				return nil, err
+			}
+			text, err := manager.Symbols.Display(name)
+			if err != nil {
+				return nil, err
+			}
+			if family == ast.NullFamilyID && arity == 0 && strings.HasPrefix(text, "sk!") {
+				result = append(result, current)
+			}
+			count, err := manager.GetNumArgs(current)
+			if err != nil {
+				return nil, err
+			}
+			for index := uint32(0); index < count; index++ {
+				argument, err := manager.GetArg(current, index)
+				if err != nil {
+					return nil, err
+				}
+				stack = append(stack, argument)
+			}
+		case ast.ASTQuantifier:
+			body, err := manager.GetQuantifierBody(current)
+			if err != nil {
+				return nil, err
+			}
+			stack = append(stack, body)
+		}
+	}
+	return result, nil
+}
+
+func HasZKConst(manager *ast.ASTManager, expression ast.ASTHandle) (bool, error) {
+	values, err := FindZKConstants(manager, expression)
+	return len(values) != 0, err
 }
 
 func (m *Manager) SetBackground(background ast.ASTHandle) error {

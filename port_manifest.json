@@ -89736,9 +89736,9 @@
         },
         {
           "name": "state/value atom recognition and Skolem-constant helpers",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/manager.go",
+          "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices"]
         }
       ],
       "ownership": ["Manager owns the state SymMux, background reference, three SMTContextManager pools, and manager-created PropSolver virtual backends."],
@@ -89795,6 +89795,12 @@
           "status": "ported",
           "go_target": "pkg/muz/spacer/manager.go",
           "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"]
+        },
+        {
+          "name": "state/value atom recognition and Skolem-constant helpers",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/manager.go",
+          "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices"]
         },
         {
           "name": "model cubes and inductive_property surface",

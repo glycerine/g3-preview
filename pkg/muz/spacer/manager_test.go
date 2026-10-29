@@ -74,9 +74,40 @@ func TestSpacerManagerBuildsStateAndPropSolverServices(t *testing.T) {
 	if len(filtered) != 1 || filtered[0] != old0Atom {
 		t.Fatal("manager old-atom filter", filtered)
 	}
-	modelCore, err := model.NewModelCore(manager)
-	spacerMust(t, err)
 	truth, err := manager.MkTrue()
+	spacerMust(t, err)
+	equality, err := manager.MkEq(truth, currentAtom)
+	spacerMust(t, err)
+	state, value, found, err := owner.TryStateAndValueFromAtom(equality)
+	spacerMust(t, err)
+	if !found || state != currentAtom || value != truth {
+		t.Fatal("reversed state equality", state, value, found)
+	}
+	negated, err := manager.MkNot(currentAtom)
+	spacerMust(t, err)
+	state, value, found, err = owner.TryStateAndValueFromAtom(negated)
+	spacerMust(t, err)
+	if !found || state != currentAtom || !manager.IsFalse(value) {
+		t.Fatal("negated state atom", state, value, found)
+	}
+	declaration, found, err := owner.TryStateDeclarationFromAtom(currentAtom)
+	spacerMust(t, err)
+	if !found || declaration != current {
+		t.Fatal("state declaration", declaration, found)
+	}
+	skolem, err := spacer.MkZKConst(manager, 7, boolean)
+	spacerMust(t, err)
+	skolemFormula, err := manager.MkAnd(skolem, currentAtom)
+	spacerMust(t, err)
+	skolemValues, err := spacer.FindZKConstants(manager, skolemFormula)
+	spacerMust(t, err)
+	if len(skolemValues) != 1 || skolemValues[0] != skolem {
+		t.Fatal("Skolem collection", skolemValues)
+	}
+	if has, err := spacer.HasZKConst(manager, currentAtom); err != nil || has {
+		t.Fatal("ordinary state classified as Skolem-bearing", has, err)
+	}
+	modelCore, err := model.NewModelCore(manager)
 	spacerMust(t, err)
 	spacerMust(t, modelCore.RegisterConstant(old0, truth))
 	modelText, err := owner.ModelString(modelCore)
