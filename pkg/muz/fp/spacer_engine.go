@@ -76,7 +76,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 		return nil, errors.Join(err, transformer.Close())
 	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
-		return transforms.NewRuleInlinerPluginWithModes(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, priority)
+		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
 	if useSubsumption {
 		if err = transformer.Register(transforms.NewSubsumptionCheckerPlugin(useChecker, 35005)); err != nil {

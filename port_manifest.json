@@ -92620,6 +92620,7 @@
         "TestRuleInlinerBreaksMutualCycleAtOnePredicate",
         "TestRuleInlinerForbidsSecondRuleMultiplier",
         "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition",
+        "TestRuleInlinerDropsResolvedFalseInterpretedTail",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_nonlinear_inlining.smt2",
@@ -92763,7 +92764,15 @@
           ]
         },
         {
-      "name": "remaining proof/model conversion and interpreted-tail unsatisfiability filtering during resolution",
+          "name": "post-resolution interpreted-tail normalization, propagation, and unsatisfiable-rule filtering",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_inliner.go",
+          "tests": [
+            "TestRuleInlinerDropsResolvedFalseInterpretedTail"
+          ]
+        },
+        {
+      "name": "remaining proof/model conversion",
           "status": "unported"
         }
       ],
@@ -92792,7 +92801,8 @@
     "TestRuleInlinerRefusesMixedQuantifiedProgram",
     "TestRuleInlinerBreaksMutualCycleAtOnePredicate",
     "TestRuleInlinerForbidsSecondRuleMultiplier",
-    "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition"
+    "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition",
+    "TestRuleInlinerDropsResolvedFalseInterpretedTail"
       ],
       "conditionals": [
         {

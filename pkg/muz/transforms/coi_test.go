@@ -11,6 +11,7 @@ import (
 	_ "github.com/glycerine/g3/pkg/engine"
 	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/transforms"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func coneMust(t *testing.T, err error) {
@@ -24,6 +25,7 @@ type coneFixture struct {
 	manager      *ast.ASTManager
 	rules        *base.RuleManager
 	set          *base.RuleSet
+	globals      *uparams.GlobalParamsService
 	declarations map[string]ast.ASTHandle
 	applications map[string]ast.ASTHandle
 }
@@ -35,6 +37,8 @@ func newConeFixture(t *testing.T, names ...string) *coneFixture {
 	t.Cleanup(func() { coneMust(t, context.Close()) })
 	manager, err := context.Manager()
 	coneMust(t, err)
+	globals, err := context.GlobalParameters()
+	coneMust(t, err)
 	rules, err := base.NewRuleManager(manager)
 	coneMust(t, err)
 	t.Cleanup(func() { coneMust(t, rules.Close()) })
@@ -43,7 +47,7 @@ func newConeFixture(t *testing.T, names ...string) *coneFixture {
 	t.Cleanup(func() { coneMust(t, set.Close()) })
 	boolean, err := manager.MkBoolSort()
 	coneMust(t, err)
-	f := &coneFixture{manager: manager, rules: rules, set: set,
+	f := &coneFixture{manager: manager, rules: rules, set: set, globals: globals,
 		declarations: make(map[string]ast.ASTHandle), applications: make(map[string]ast.ASTHandle)}
 	for _, name := range names {
 		symbol, e := manager.Symbols.Intern("cone-" + name)

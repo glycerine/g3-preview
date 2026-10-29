@@ -10,16 +10,28 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/substitution"
 	"github.com/glycerine/g3/pkg/muz/base"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type RuleInlinerPlugin struct {
-	manager   *ast.ASTManager
-	rules     *base.RuleManager
-	protected map[ast.ASTHandle]bool
-	priority  uint32
-	eager     bool
-	linear    bool
-	closed    bool
+	manager    *ast.ASTManager
+	rules      *base.RuleManager
+	protected  map[ast.ASTHandle]bool
+	priority   uint32
+	eager      bool
+	linear     bool
+	params     *uparams.ParamsContext
+	globals    *uparams.GlobalParamsService
+	simplifier *InterpTailSimplifierPlugin
+	closed     bool
+}
+
+// NewRuleInlinerPluginWithServices enables the source post-resolution
+// interpreted-tail simplifier using the owning parameter services.
+func NewRuleInlinerPluginWithServices(manager *ast.ASTManager, rules *base.RuleManager, protected []ast.ASTHandle, eager, linear bool, params *uparams.ParamsContext, globals *uparams.GlobalParamsService, priority uint32) *RuleInlinerPlugin {
+	p := NewRuleInlinerPluginWithModes(manager, rules, protected, eager, linear, priority)
+	p.params, p.globals = params, globals
+	return p
 }
 
 func NewRuleInlinerPlugin(manager *ast.ASTManager, rules *base.RuleManager, protected []ast.ASTHandle, priority uint32) *RuleInlinerPlugin {
@@ -195,7 +207,29 @@ func (p *RuleInlinerPlugin) resolve(target *base.Rule, tailIndex int, source *ba
 	if err != nil {
 		return nil, fmt.Errorf("muz/transforms: construct resolved rule: %w", err)
 	}
-	return resolved, nil
+	if p.params == nil || p.globals == nil {
+		return resolved, nil
+	}
+	if p.simplifier == nil {
+		p.simplifier, err = NewInterpTailSimplifierPlugin(p.manager, p.rules, p.params, p.globals, p.priority)
+		if err != nil {
+			return nil, errors.Join(err, resolved.Close())
+		}
+	}
+	replacement, dropped, changed, err := p.simplifier.transformRule(resolved)
+	if err != nil {
+		return nil, errors.Join(err, resolved.Close())
+	}
+	if dropped {
+		return nil, resolved.Close()
+	}
+	if !changed || replacement == nil {
+		return resolved, nil
+	}
+	if err = resolved.Close(); err != nil {
+		return nil, errors.Join(err, replacement.Close())
+	}
+	return replacement, nil
 }
 
 func releaseTransformRefs(manager *ast.ASTManager, refs []ast.ASTRef) (result error) {
@@ -1108,5 +1142,12 @@ func (p *RuleInlinerPlugin) Close() error {
 	}
 	p.closed = true
 	p.protected = nil
+	p.params = nil
+	p.globals = nil
+	if p.simplifier != nil {
+		err := p.simplifier.Close()
+		p.simplifier = nil
+		return err
+	}
 	return nil
 }

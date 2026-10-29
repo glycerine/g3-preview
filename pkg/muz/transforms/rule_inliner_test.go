@@ -243,6 +243,64 @@ func TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition(t *testing.T) {
 	}
 }
 
+func TestRuleInlinerDropsResolvedFalseInterpretedTail(t *testing.T) {
+	f := newConeFixture(t)
+	boolean, err := f.manager.MkBoolSort()
+	coneMust(t, err)
+	zero, err := f.manager.ArithmeticNumeralRat(big.NewRat(0, 1), true)
+	coneMust(t, err)
+	one, err := f.manager.ArithmeticNumeralRat(big.NewRat(1, 1), true)
+	coneMust(t, err)
+	integer, err := f.manager.GetSort(zero)
+	coneMust(t, err)
+	pName, err := f.manager.Symbols.Intern("resolved-false-P")
+	coneMust(t, err)
+	p, err := f.manager.MkFuncDecl(pName, []ast.ASTHandle{integer}, boolean, ast.ASTFuncDeclInfo{})
+	coneMust(t, err)
+	goalName, err := f.manager.Symbols.Intern("resolved-false-Goal")
+	coneMust(t, err)
+	goal, err := f.manager.MkFuncDecl(goalName, nil, boolean, ast.ASTFuncDeclInfo{})
+	coneMust(t, err)
+	coneMust(t, f.rules.RegisterPredicate(p))
+	coneMust(t, f.rules.RegisterPredicate(goal))
+	variable, err := f.manager.MkVar(0, integer)
+	coneMust(t, err)
+	pVariable, err := f.manager.MkApp(p, []ast.ASTHandle{variable})
+	coneMust(t, err)
+	equality, err := f.manager.MkEq(variable, one)
+	coneMust(t, err)
+	definition, err := f.rules.NewRule(pVariable, []ast.ASTHandle{equality}, nil, "definition")
+	coneMust(t, err)
+	coneMust(t, f.set.Add(definition))
+	coneMust(t, definition.Close())
+	pZero, err := f.manager.MkApp(p, []ast.ASTHandle{zero})
+	coneMust(t, err)
+	goalApp, err := f.manager.MkApp(goal, nil)
+	coneMust(t, err)
+	query, err := f.rules.NewRule(goalApp, []ast.ASTHandle{pZero}, nil, "query")
+	coneMust(t, err)
+	coneMust(t, f.set.Add(query))
+	coneMust(t, query.Close())
+	coneMust(t, f.set.SetOutputPredicate(goal))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("resolved-false inliner fixture rejected")
+	}
+	transformer := base.NewRuleTransformer()
+	t.Cleanup(func() { coneMust(t, transformer.Close()) })
+	plugin := transforms.NewRuleInlinerPluginWithServices(f.manager, f.rules, []ast.ASTHandle{goal}, true, false, f.globals.Context, f.globals, 0)
+	coneMust(t, transformer.Register(plugin))
+	modified, err := transformer.Apply(f.set)
+	coneMust(t, err)
+	if !modified {
+		t.Fatal("resolved false interpreted tail was not removed")
+	}
+	if count, countErr := f.set.Len(); countErr != nil || count != 0 {
+		t.Fatal("resolved false rules", count, countErr)
+	}
+}
+
 func TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput(t *testing.T) {
 	f := newConeFixture(t, "P", "Q", "Goal")
 	f.add(t, f.applications["P"], "fact-P")
