@@ -8,10 +8,13 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
+
+var ErrLemmaSanity = errors.New("muz/spacer: generalized lemma is not inductive")
 
 func (p *PredicateTransformer) checkInductiveCube(cube []ast.ASTHandle, level uint32) (_ []ast.ASTHandle, usesLevel uint32, inductive bool, resultErr error) {
 	conjunction, err := p.manager.MkAndArray(cube)
@@ -247,6 +250,9 @@ func (p *PredicateTransformer) generalizeInductiveLemma(obligation *ProofObligat
 	if err != nil || len(cube) == 0 {
 		return lemma, err
 	}
+	p.boolGeneralizations++
+	started := time.Now()
+	defer func() { p.boolGeneralizerTime += time.Since(started) }()
 	level, err := lemma.Level()
 	if err != nil {
 		return lemma, err
@@ -311,10 +317,30 @@ func (p *PredicateTransformer) generalizeInductiveLemma(obligation *ProofObligat
 		}
 		cube[index] = literal
 		processed = append(processed, literal)
+		p.boolGeneralizerFailures++
 		index++
 	}
 	if !dirty {
 		return lemma, nil
 	}
 	return NewLemmaFromProofObligation(obligation, cube, usesLevel)
+}
+
+func (p *PredicateTransformer) checkLemmaSanity(lemma *Lemma) error {
+	cube, err := lemma.Cube()
+	if err != nil {
+		return err
+	}
+	level, err := lemma.Level()
+	if err != nil {
+		return err
+	}
+	_, _, inductive, err := p.checkInductiveCube(cube, level)
+	if err != nil {
+		return err
+	}
+	if !inductive {
+		return ErrLemmaSanity
+	}
+	return nil
 }

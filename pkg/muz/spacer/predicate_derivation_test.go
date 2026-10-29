@@ -20,7 +20,7 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 	spacerMust(t, err)
 	predicate, err := manager.MkFuncDecl(name, nil, boolean, ast.ASTFuncDeclInfo{})
 	spacerMust(t, err)
-	transformer, err := spacer.NewRulePredicateTransformer(owner, predicate, spacer.PropSolverConfig{})
+	transformer, err := spacer.NewRulePredicateTransformer(owner, predicate, spacer.PropSolverConfig{LemmaSanityCheck: true})
 	spacerMust(t, err)
 	ruleManager, err := base.NewRuleManager(manager)
 	spacerMust(t, err)

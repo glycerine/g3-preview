@@ -46,6 +46,9 @@ func TestContextCanDisableInductiveGeneralizer(t *testing.T) {
 	if err := globals.SourceSetName("fixedpoint.spacer.use_eqclass", "true"); err != nil {
 		t.Fatal(err)
 	}
+	if err := globals.SourceSetName("fixedpoint.spacer.lemma_sanity_check", "true"); err != nil {
+		t.Fatal(err)
+	}
 	context, err := NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
 	if err != nil {
 		t.Fatal(err)
@@ -58,6 +61,9 @@ func TestContextCanDisableInductiveGeneralizer(t *testing.T) {
 	}
 	if !context.config.UseEqClassGeneralizer {
 		t.Fatal("enabled equivalence-class generalizer was retained as disabled")
+	}
+	if !context.config.LemmaSanityCheck {
+		t.Fatal("enabled lemma sanity checker was retained as disabled")
 	}
 	if err = context.Close(); err != nil {
 		t.Fatal(err)

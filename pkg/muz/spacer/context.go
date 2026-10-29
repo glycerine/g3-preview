@@ -98,6 +98,10 @@ func spacerPropSolverConfig(config smtcore.SMTSolverConfig) (PropSolverConfig, e
 	if err != nil {
 		return PropSolverConfig{}, err
 	}
+	lemmaSanityCheck, err := get("spacer.lemma_sanity_check", false)
+	if err != nil {
+		return PropSolverConfig{}, err
+	}
 	mode := ItpCoreLegacyFarkas
 	if newCore {
 		mode = ItpCoreNewFarkas
@@ -110,7 +114,7 @@ func spacerPropSolverConfig(config smtcore.SMTSolverConfig) (PropSolverConfig, e
 			Params: config.Params, Globals: config.Globals, SplitLiterals: split,
 			CoreMode: mode, FarkasAConst: farkasAConst, MinimizeUnsatCore: minimize,
 		},
-		KeepProxy: keepProxy, UseInductiveGeneralizer: useInductiveGeneralizer, UseArrayEqGeneralizer: useArrayEqGeneralizer, UseEqClassGeneralizer: useEqClassGeneralizer,
+		KeepProxy: keepProxy, UseInductiveGeneralizer: useInductiveGeneralizer, UseArrayEqGeneralizer: useArrayEqGeneralizer, UseEqClassGeneralizer: useEqClassGeneralizer, LemmaSanityCheck: lemmaSanityCheck,
 	}, nil
 }
 

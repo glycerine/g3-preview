@@ -6,6 +6,7 @@ package spacer
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -29,6 +30,9 @@ type PredicateTransformer struct {
 	allInitial               bool
 	propagations             uint64
 	invariants               uint64
+	boolGeneralizations      uint64
+	boolGeneralizerFailures  uint64
+	boolGeneralizerTime      time.Duration
 	simplifyProofObligations bool
 	useEqualityClasses       bool
 	instantiateQuantified    bool
@@ -37,6 +41,7 @@ type PredicateTransformer struct {
 	useInductiveGeneralizer  bool
 	useArrayEqGeneralizer    bool
 	useEqClassGeneralizer    bool
+	lemmaSanityCheck         bool
 	rules                    []*spacerNormalizedRule
 	ruleReferences           []ast.ASTRef
 	uses                     []*PredicateTransformer
@@ -75,7 +80,7 @@ func newPredicateTransformer(owner *Manager, name string, config PropSolverConfi
 	if owner == nil || owner.open() != nil {
 		return nil, ErrManagerOwner
 	}
-	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name, instantiateQuantified: true, useQuantifiedLemmas: true, blastTermITE: true, useInductiveGeneralizer: config.UseInductiveGeneralizer, useArrayEqGeneralizer: config.UseArrayEqGeneralizer, useEqClassGeneralizer: config.UseEqClassGeneralizer, reachAsInitial: true, initializeReachFacts: true}
+	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name, instantiateQuantified: true, useQuantifiedLemmas: true, blastTermITE: true, useInductiveGeneralizer: config.UseInductiveGeneralizer, useArrayEqGeneralizer: config.UseArrayEqGeneralizer, useEqClassGeneralizer: config.UseEqClassGeneralizer, lemmaSanityCheck: config.LemmaSanityCheck, reachAsInitial: true, initializeReachFacts: true}
 	if config.Itp.Params == nil && config.Itp.Globals == nil {
 		config.Itp.Params = owner.contexts[0].config.Params
 		config.Itp.Globals = owner.contexts[0].config.Globals
@@ -535,6 +540,9 @@ func (p *PredicateTransformer) CollectStatistics(destination *statistics.Statist
 	destination.UpdateUint64("SPACER num propagations", p.propagations)
 	destination.UpdateUint("SPACER num properties", uint32(lemmas))
 	destination.UpdateUint64("SPACER num invariants", p.invariants)
+	destination.UpdateUint64("bool inductive gen", p.boolGeneralizations)
+	destination.UpdateUint64("bool inductive gen failures", p.boolGeneralizerFailures)
+	destination.UpdateDouble("time.spacer.solve.reach.gen.bool_ind", p.boolGeneralizerTime.Seconds())
 	return nil
 }
 
@@ -547,6 +555,9 @@ func (p *PredicateTransformer) ResetStatistics() error {
 	}
 	p.propagations = 0
 	p.invariants = 0
+	p.boolGeneralizations = 0
+	p.boolGeneralizerFailures = 0
+	p.boolGeneralizerTime = 0
 	return nil
 }
 

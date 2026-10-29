@@ -146,6 +146,11 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 				lemma = generalized
 			}
 		}
+		if p.lemmaSanityCheck {
+			if sanityErr := p.checkLemmaSanity(lemma); sanityErr != nil {
+				return ExpansionResult{}, errors.Join(sanityErr, lemma.Close())
+			}
+		}
 		added, err := p.frames.AddLemma(lemma)
 		if err != nil {
 			return ExpansionResult{}, errors.Join(err, lemma.Close())

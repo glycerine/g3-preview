@@ -89270,7 +89270,7 @@
       "path": "src/muz/spacer/spacer_generalizers.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/spacer/lemma_generalizer.go",
         "pkg/muz/spacer/lemma_array_generalizer.go",
@@ -89283,7 +89283,8 @@
         "TestExpandInductiveDatatypeAndBitVectorEqualities",
         "TestArrayEqualityGeneralizerStrengthensContradictoryLiteral",
         "TestContextConsumesPropSolverFarkasParameters",
-        "TestContextCanDisableInductiveGeneralizer"
+        "TestContextCanDisableInductiveGeneralizer",
+        "TestSpacerPredicateCreatesAndAttachesProjectedDerivation"
       ],
       "assertions": [
         {
@@ -89311,7 +89312,7 @@
           "text": "SASSERT(lits.size() == i);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -89330,22 +89331,27 @@
           "go_target": "pkg/muz/spacer/lemma_eq_generalizer.go"
         },
         {
-          "name": "lemma_sanity_checker and unsat_core_generalizer",
-          "status": "unported"
+          "name": "lemma_sanity_checker",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/lemma_generalizer.go"
+        },
+        {
+          "name": "unsat_core_generalizer",
+          "status": "dead"
         }
       ],
       "ownership": [
         "Generalizers construct replacement owned lemmas only after successful solver checks; temporary cores, assumptions, and the array checker have explicit scoped cleanup."
       ],
       "deviations": [
-        "Optional sanity checking and the disabled native unsat-core generalizer remain pending."
+        "The native unsat-core generalizer is explicitly commented out by its only consumer because of performance problems, so it is not retained."
       ]
     },
     {
       "path": "src/muz/spacer/spacer_generalizers.h",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/spacer/lemma_generalizer.go",
         "pkg/muz/spacer/lemma_array_generalizer.go",
@@ -89366,7 +89372,7 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -89379,7 +89385,7 @@
         "Go uses concrete owned Lemma replacement instead of native mutable lemma_ref callbacks."
       ],
       "deviations": [
-        "Other optional generalizer interfaces remain unported. Header guards are represented by normal Go package compilation."
+        "The unretained unsat-core interface is omitted with its commented-out implementation. Header guards are represented by normal Go package compilation."
       ]
     },
     {

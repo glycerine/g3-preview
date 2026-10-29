@@ -23,6 +23,7 @@ type PropSolverConfig struct {
 	UseInductiveGeneralizer bool
 	UseArrayEqGeneralizer   bool
 	UseEqClassGeneralizer   bool
+	LemmaSanityCheck        bool
 }
 
 type PropCheckOptions struct {
