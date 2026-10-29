@@ -31,7 +31,7 @@ func TestSMTContextFixedpointPDRLifecycle(t *testing.T) {
 	integer := pin(manager.MkFamilySort(arithmetic, 1, nil))
 	zero := pin(manager.ArithmeticIntegerNumeralText("0"))
 
-	astTestMust(t, context.SetFixedpointEngine("spacer"))
+	astTestMust(t, context.SetFixedpointEngine("pdr"))
 	p, err := context.DeclareRelation("api-fp-P", []ast.ASTHandle{integer})
 	astTestMust(t, err)
 	q, err := context.DeclareRelation("api-fp-Q", []ast.ASTHandle{integer})
@@ -155,7 +155,7 @@ func TestSMTContextFixedpointParameterUpdateRebuildsPDR(t *testing.T) {
 	context, err := NewSMTContext()
 	astTestMust(t, err)
 	t.Cleanup(func() { astTestMust(t, context.Close()) })
-	astTestMust(t, context.SetFixedpointEngine("spacer"))
+	astTestMust(t, context.SetFixedpointEngine("pdr"))
 	predicate, err := context.DeclareRelation("api-fp-parameter-P", nil)
 	astTestMust(t, err)
 	manager, err := context.Manager()
