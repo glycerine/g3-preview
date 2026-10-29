@@ -513,6 +513,7 @@ var scriptResults = map[string]string{
 	"qfbv_limits_recovery.smt2":                    "unknown\n(:reason-unknown \"max. steps exceeded\")\nsat\n(((= (bvmul x y) #x6) true)\n ((bvult x y) true))\n",
 	"qfbv_core.smt2":                               "unsat\n(impossible)\n",
 	"qfbv_div0_fallback.smt2":                      "sat\n(((bvult (bvudiv x #x0) (bvudiv y #x0)) false)\n ((distinct x y) true))\n",
+	"qfbv_incremental_sat_backend.smt2":            "p cnf 3 1\n1 2 3 0\nc 1 p\nc 2 q\nsat\n",
 	"qfbv_equality_models.smt2":                    "sat\n(((not (= ((_ extract 1 0) x) ((_ extract 1 0) y))) true))\n",
 	"qfbv_proof.smt2":                              "unsat\n",
 	"qfbv_sat_models_scopes.smt2":                  "sat\n(((= (bvmul x y) #x6) true)\n ((bvult x y) true))\nunsat\nsat\n(((= (bvmul x y) #x6) true)\n ((bvult x y) true))\n",

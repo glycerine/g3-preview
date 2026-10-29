@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	muzfp "github.com/glycerine/g3/pkg/muz/fp"
+	incsat "github.com/glycerine/g3/pkg/sat/sat_solver"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
@@ -326,7 +327,22 @@ func NewQFBVStrategicSolverWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, p
 	if err != nil {
 		return nil, err
 	}
-	return newStrategicSolver(m, strategy, "QF_BV", p, proofs, models, cores, config)
+	var targetServices func(*ast.ASTManager) (model.ModelEvaluatorConfig, error)
+	if config.TargetConfig != nil {
+		targetServices = func(target *ast.ASTManager) (model.ModelEvaluatorConfig, error) {
+			targetConfig, targetErr := config.TargetConfig(target)
+			return targetConfig.ModelEvaluator, targetErr
+		}
+	}
+	backend, err := incsat.NewIncrementalSolverWithConfig(m, p, incsat.IncrementalSolverConfig{
+		Services:       config.ModelEvaluator,
+		TargetServices: targetServices,
+		Output:         output,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolverWithBackend(m, strategy, backend, "QF_BV", p, proofs, models, cores, config)
 }
 
 func NewQFAUFBVStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
@@ -424,6 +440,14 @@ func NewHornStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mod
 }
 
 func newStrategicSolver(m *ast.ASTManager, strategy tactic.Tactic, logic string, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (result solver.Solver, err error) {
+	second, err := smtcore.NewSMTSolver(m, p, logic, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolverWithBackend(m, strategy, second, logic, p, proofs, models, cores, config)
+}
+
+func newStrategicSolverWithBackend(m *ast.ASTManager, strategy tactic.Tactic, second solver.Solver, logic string, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (result solver.Solver, err error) {
 	if err = strategy.IncRef(); err != nil {
 		return nil, err
 	}
@@ -441,10 +465,6 @@ func newStrategicSolver(m *ast.ASTManager, strategy tactic.Tactic, logic string,
 		return nil, err
 	}
 	defer func() { err = errors.Join(err, first.DecRef()) }()
-	second, err := smtcore.NewSMTSolver(m, p, logic, config)
-	if err != nil {
-		return nil, err
-	}
 	if err = second.IncRef(); err != nil {
 		return nil, err
 	}

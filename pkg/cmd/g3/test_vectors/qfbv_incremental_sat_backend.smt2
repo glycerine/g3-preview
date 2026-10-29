@@ -1,0 +1,7 @@
+(set-option :sat.dimacs.display true)
+(set-logic QF_BV)
+(declare-const p Bool)
+(declare-const q Bool)
+(push 1)
+(assert (or p q))
+(check-sat)

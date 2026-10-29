@@ -173708,9 +173708,11 @@
         "pkg/tactic/smtlogics/qfbv_tactic.go",
         "pkg/tactic/smtlogics/qfbv_tactic_test.go",
         "pkg/tactic/smtlogics/qfbv_translation_test.go",
+        "pkg/sat/sat_solver/solver.go",
         "pkg/cmd_context/qfbv_solver_test.go",
         "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
         "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+        "pkg/cmd/g3/test_vectors/qfbv_incremental_sat_backend.smt2",
         "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
         "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
         "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
@@ -173990,17 +173992,18 @@
           ]
         },
         {
-          "name": "Remaining logic dispatcher branches, complete default tactic classifier, QF_BV incremental-SAT selection and general stored-logic strategic solver_factory owner/public constructor; concrete FD backend composition and QF_FD command selection are now recorded separately",
+          "name": "Remaining logic dispatcher branches, complete default tactic classifier and general stored-logic strategic solver_factory owner/public constructor; concrete QF_BV incremental-SAT and FD backend selections are recorded separately",
           "status": "unported"
         },
         {
-          "name": "Retained QF_BV logic branch selects the complete bit-vector strategy and combines tactic2solver with the incremental SMT solver using source ordinary-mode/fallback policy",
+          "name": "Retained QF_BV logic branch selects the complete bit-vector strategy and combines tactic2solver with the incremental SAT solver selected by the source default hi_div0 policy, preserving ordinary-mode/fallback policy and session output",
           "status": "ported",
           "go_targets": [
             "pkg/tactic/smtlogics/qfbv_tactic.go",
             "pkg/tactic/smtlogics/qflia_tactic.go",
             "pkg/tactic/smtlogics/qfbv_tactic_test.go",
             "pkg/tactic/smtlogics/qfbv_translation_test.go",
+            "pkg/sat/sat_solver/solver.go",
             "pkg/tactic/portfolio/smt_strategic_solver.go",
             "pkg/cmd_context/tactic_commands.go",
             "pkg/cmd_context/context.go",
@@ -174008,6 +174011,7 @@
             "pkg/cmd/g3/main_test.go",
             "pkg/cmd/g3/test_vectors/qfbv_core.smt2",
             "pkg/cmd/g3/test_vectors/qfbv_div0_fallback.smt2",
+            "pkg/cmd/g3/test_vectors/qfbv_incremental_sat_backend.smt2",
             "pkg/cmd/g3/test_vectors/qfbv_equality_models.smt2",
             "pkg/cmd/g3/test_vectors/qfbv_limits_recovery.smt2",
             "pkg/cmd/g3/test_vectors/qfbv_proof.smt2",
@@ -174026,6 +174030,8 @@
             "TestQFBVTacticTranslatedProofAndCoreRoutes",
             "TestCommandContextQFBVCombinedSolverProofResult",
             "TestSMTLibRunnerQFBVBranchEvidence",
+            "TestSMTLibRunnerScripts/qfbv_incremental_sat_backend.smt2",
+            "TestSMTLibRunnerCPPReference/qfbv_incremental_sat_backend.smt2",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
