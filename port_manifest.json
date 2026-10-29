@@ -88237,9 +88237,9 @@
       "path": "src/muz/rel/karr_relation.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/rel/karr_relation.go", "pkg/muz/rel/karr_relation_test.go"],
+      "tests": ["TestKarrFactUnionAndDualization", "TestKarrJoinProjectAndRename", "TestKarrFiltersAndSourceEqualQuirk", "TestKarrGuards"],
       "assertions": [
         {
           "line": 46,
@@ -88278,19 +88278,31 @@
           "text": "SASSERT(is_sat == l_true);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "concrete relation construction, fact insertion, clone, join, projection, rename, union, identical/equal filters and Hilbert dualization",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/karr_relation.go",
+          "tests": ["TestKarrFactUnionAndDualization", "TestKarrJoinProjectAndRename", "TestKarrFiltersAndSourceEqualQuirk", "TestKarrGuards"]
+        },
+        {
+          "name": "AST interpreted-filter parsing and formula materialization",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": ["KarrRelation owns both lazy matrix representations and deep-copies rows at every public boundary. Concrete operations return independent relation owners."],
+      "deviations": ["Go exposes the live concrete Karr relation directly instead of recreating the unused generic C++ relation-plugin callback hierarchy. The source filter_equal fixed -1 constant is intentionally retained and tested."]
     },
     {
       "path": "src/muz/rel/karr_relation.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/rel/karr_relation.go", "pkg/muz/rel/karr_relation_test.go"],
+      "tests": ["TestKarrFactUnionAndDualization", "TestKarrJoinProjectAndRename", "TestKarrFiltersAndSourceEqualQuirk", "TestKarrGuards"],
       "conditionals": [
         {
           "line": 19,
@@ -88301,11 +88313,23 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "live concrete Karr relation and operation surface used by invariant discovery",
+          "status": "ported",
+          "go_target": "pkg/muz/rel/karr_relation.go",
+          "tests": ["TestKarrFactUnionAndDualization", "TestKarrJoinProjectAndRename", "TestKarrFiltersAndSourceEqualQuirk", "TestKarrGuards"]
+        },
+        {
+          "name": "generic relation_plugin registration adapters",
+          "status": "unported",
+          "tests": []
+        }
+      ],
+      "ownership": ["The concrete Go owner replaces relation_base allocation and plugin downcasts for the only retained Karr consumer."],
+      "deviations": ["No universal relation adapter is added; the retained Horn saturation consumer uses typed KarrRelation operations."]
     },
     {
       "path": "src/muz/rel/rel_context.cpp",
