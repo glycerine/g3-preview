@@ -19,6 +19,9 @@ func (e *PropositionalEngine) spacerPredicate(declaration ast.ASTHandle) ast.AST
 	if derived, found := e.spacerScaled[declaration]; found {
 		declaration = derived
 	}
+	if derived, found := e.spacerMagic[declaration]; found {
+		declaration = derived
+	}
 	if derived, found := e.spacerBitBlasted[declaration]; found {
 		declaration = derived
 	}

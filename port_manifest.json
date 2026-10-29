@@ -92662,22 +92662,42 @@
       "path": "src/muz/transforms/dl_mk_magic_symbolic.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/transforms/magic_symbolic.go",
+        "pkg/muz/fp/spacer_engine.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_magic.smt2"
+      ],
+      "tests": [
+        "TestMagicSymbolicBuildsAnswerAndPrefixQueryRules",
+        "TestSMTLibRunnerScripts/fp_spacer_magic.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_magic.smt2"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "answer clauses, output query seeds, and left-to-right symbolic query propagation",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/magic_symbolic.go",
+          "tests": [
+            "TestMagicSymbolicBuildsAnswerAndPrefixQueryRules",
+            "TestSMTLibRunnerCPPReference/fp_spacer_magic.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "Rule-local query and answer applications remain pinned until every generated prefix Rule owns its head and tails."
+      ],
       "deviations": []
     },
     {
       "path": "src/muz/transforms/dl_mk_magic_symbolic.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/transforms/magic_symbolic.go"],
+      "tests": ["TestMagicSymbolicBuildsAnswerAndPrefixQueryRules"],
       "conditionals": [
         {
           "line": 19,

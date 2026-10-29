@@ -137,6 +137,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	magicName := "xform.magic"
+	magic, err := e.params.GetBoolName(&fixedpoint, &magicName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -156,6 +161,14 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 		scaler = transforms.NewScalePlugin(e.manager, e.rules, 36030)
 		if err = transformer.Register(scaler); err != nil {
 			return nil, errors.Join(err, scaler.Close(), transformer.Close())
+		}
+	}
+	var magicTransformer *transforms.MagicSymbolicPlugin
+	var magicPredicates map[ast.ASTHandle]ast.ASTHandle
+	if magic {
+		magicTransformer = transforms.NewMagicSymbolicPlugin(e.manager, e.rules, 36020)
+		if err = transformer.Register(magicTransformer); err != nil {
+			return nil, errors.Join(err, magicTransformer.Close(), transformer.Close())
 		}
 	}
 	var quantifierAbstraction *transforms.QuantifierAbstractionPlugin
@@ -305,6 +318,17 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 			e.predicates[declaration] = state
 		}
 	}
+	if err == nil && magicTransformer != nil {
+		magicPredicates = magicTransformer.AnswerPredicates()
+		for _, declaration := range magicPredicates {
+			state, stateErr := e.predicateState(declaration)
+			if stateErr != nil {
+				err = fmt.Errorf("muz/fp: magic answer predicate state: %w", stateErr)
+				break
+			}
+			e.predicates[declaration] = state
+		}
+	}
 	err = errors.Join(err, transformer.Close())
 	if err != nil {
 		return nil, fmt.Errorf("muz/fp: Spacer rule preprocessing: %w", err)
@@ -354,6 +378,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	e.spacerInstantiated = instantiatedPredicates
 	e.spacerBitBlasted = bitBlastedPredicates
 	e.spacerScaled = scaledPredicates
+	e.spacerMagic = magicPredicates
 	keep = true
 	return prepared, nil
 }
