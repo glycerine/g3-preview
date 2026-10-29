@@ -92625,6 +92625,7 @@
         "TestExplanationNormalizeLexicalVectorDestruction",
         "TestExplanationSimplifyCoreWithEqualityPseudoRemainder",
         "TestExplanationSelectsMinimumDegreeCoreEquality",
+        "TestExplanationSimplifiesWithCachedLowerStageEquality",
         "TestProjectionFactorsCanonicalDistinctAndDisabledMode",
         "TestProjectionFactorsVanishingAndConstantShortcuts",
         "TestProjectionLeadingCoefficientsFactorAndSkipConstants",
@@ -92987,6 +92988,14 @@
           "tests": [
             "TestExplanationSimplifyCoreWithEqualityPseudoRemainder",
             "TestExplanationSelectsMinimumDegreeCoreEquality"
+          ]
+        },
+        {
+          "name": "Cached lower-stage equality selection, constant-leading-coefficient guard, pseudo-remainder rewrite and explanation premise insertion (cpp1237-1307,1323-1336)",
+          "status": "partial",
+          "go_target": "pkg/nlsat/explain_simplify.go",
+          "tests": [
+            "TestExplanationSimplifiesWithCachedLowerStageEquality"
           ]
         },
         {

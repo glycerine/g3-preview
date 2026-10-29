@@ -267,13 +267,77 @@ func (n *explanationAssumptions) simplifyCoreWithEquality(core *scopedLiteralVec
 func (n *explanationAssumptions) simplifyCoreEqualities(core *scopedLiteralVector, max uint32) error {
 	for len(core.result) != 0 {
 		equality, err := n.selectCoreEquality(core, max)
-		if err != nil || equality == (polynomial.Polynomial{}) {
+		if err != nil {
 			return err
+		}
+		if equality == (polynomial.Polynomial{}) {
+			break
 		}
 		modified, err := n.simplifyCoreWithEquality(core, equality, max)
 		if err != nil || !modified {
 			return err
 		}
 	}
+	for len(core.result) != 0 {
+		equality, err := n.selectLowerStageEquality(core, max)
+		if err != nil || equality == nil {
+			return err
+		}
+		modified, err := n.simplifyCoreWithEquality(core, equality.factors[0].Polynomial, max)
+		if err != nil {
+			return err
+		}
+		if err = atomAssert("nlsat_explain.cpp", 1333, "simplify(C, eq_p, max)", modified); err != nil {
+			return err
+		}
+		if !modified {
+			return ErrSearchPending
+		}
+		if err = n.addLiteral(sat.MakeLiteral(equality.boolVar, true)); err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+func (n *explanationAssumptions) selectLowerStageEquality(core *scopedLiteralVector, max uint32) (*InequalityAtom, error) {
+	polynomials := n.search.store.atoms.ineq.core
+	for _, literal := range core.result {
+		atom, err := n.search.store.literalAtom(literal)
+		if err != nil {
+			return nil, err
+		}
+		inequality, ok := atom.(*InequalityAtom)
+		if !ok {
+			continue
+		}
+		for _, factor := range inequality.factors {
+			for variable := uint32(0); variable < max && uint64(variable) < uint64(len(n.search.store.vars.equalities)); variable++ {
+				candidate, ok := n.search.store.vars.equalities[variable].(*InequalityAtom)
+				if !ok || candidate == nil || len(candidate.factors) != 1 || candidate.factors[0].Even {
+					continue
+				}
+				equality := candidate.factors[0].Polynomial
+				degree, err := polynomials.Degree(equality, variable)
+				if err != nil {
+					return nil, err
+				}
+				constant, err := polynomials.NonzeroConstantCoefficient(equality, variable, degree)
+				if err != nil {
+					return nil, err
+				}
+				if !constant {
+					continue
+				}
+				factorDegree, err := polynomials.Degree(factor.Polynomial, variable)
+				if err != nil {
+					return nil, err
+				}
+				if factorDegree >= degree {
+					return candidate, nil
+				}
+			}
+		}
+	}
+	return nil, nil
 }

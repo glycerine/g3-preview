@@ -44,3 +44,37 @@ func TestExplanationSelectsMinimumDegreeCoreEquality(t *testing.T) {
 		t.Fatal("did not select minimum-degree equality")
 	}
 }
+
+func TestExplanationSimplifiesWithCachedLowerStageEquality(t *testing.T) {
+	e, r, n := explanationAssumptionFixture(t)
+	evaluatorSetFraction(t, e, 0, 1, 1)
+	evaluatorSetFraction(t, e, 1, 0, 1)
+	equality := evaluatorPolynomial(t, e, evaluatorTerm{1, 1, 0}, evaluatorTerm{-1, 0, 0})
+	mixed := evaluatorPolynomial(t, e, evaluatorTerm{1, 1, 0}, evaluatorTerm{1, 0, 1}, evaluatorTerm{-2, 0, 0})
+	eq := normalizationLiteral(t, r, AtomEQ, []polynomial.Polynomial{equality}, []bool{false})
+	conflict := normalizationLiteral(t, r, AtomGT, []polynomial.Polynomial{mixed}, []bool{false})
+	r.store.vars.equalities = make([]ArithmeticAtom, 2)
+	r.store.vars.equalities[0] = r.store.atoms.bools.atoms[eq.Variable()]
+	core := scopedLiteralVector{factory: r.store.atoms}
+	assignmentMust(t, core.push(conflict))
+	t.Cleanup(func() { assignmentMust(t, core.close()) })
+	selected, err := n.selectLowerStageEquality(&core, 1)
+	assignmentMust(t, err)
+	if selected == nil {
+		t.Fatal("cached lower-stage equality was not selected")
+	}
+	assignmentMust(t, n.start())
+	assignmentMust(t, n.simplifyCoreEqualities(&core, 1))
+	assignmentMust(t, n.finish(nil))
+	if len(core.result) != 1 || len(n.output.result) != 1 || n.output.result[0] != eq.Negated() {
+		t.Fatal("cached lower-stage equality rewrite", core.result, n.output.result)
+	}
+	rewritten := r.store.atoms.bools.atoms[core.result[0].Variable()].(*InequalityAtom)
+	yDegree, err := e.core.Degree(rewritten.factors[0].Polynomial, 0)
+	assignmentMust(t, err)
+	xDegree, err := e.core.Degree(rewritten.factors[0].Polynomial, 1)
+	assignmentMust(t, err)
+	if yDegree != 0 || xDegree != 1 {
+		t.Fatal("lower-stage variable was not eliminated", yDegree, xDegree)
+	}
+}
