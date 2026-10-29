@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
+	tacticarith "github.com/glycerine/g3/pkg/tactic/arith"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -690,6 +691,42 @@ func (p *PropSolver) publishTheoryResults(safe *safeAssumptions, learned []ast.A
 	return result, nil
 }
 
+func (p *PropSolver) simplifyTheoryResults(learned []ast.ASTRef) (_ []ast.ASTRef, resultErr error) {
+	committed := false
+	defer func() {
+		if committed {
+			return
+		}
+		for i := range learned {
+			if learned[i] != (ast.ASTRef{}) {
+				resultErr = errors.Join(resultErr, p.manager.DelRef(&learned[i]))
+			}
+		}
+	}()
+	formulas := make([]ast.ASTHandle, len(learned))
+	for i := range learned {
+		var err error
+		formulas[i], err = p.manager.RefGet(learned[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	keep, err := tacticarith.ArithmeticBoundsKeep(p.manager, formulas)
+	if err != nil {
+		return nil, err
+	}
+	kept := learned[:0]
+	for i := range learned {
+		if keep[i] {
+			kept = append(kept, learned[i])
+		} else if err = p.manager.DelRef(&learned[i]); err != nil {
+			return nil, err
+		}
+	}
+	committed = true
+	return kept, nil
+}
+
 func (p *PropSolver) extractTheoryCore(safe *safeAssumptions, wantConsequences bool) (_ []ast.ASTHandle, _ []ast.ASTHandle, resultErr error) {
 	if p.contexts.config.Params == nil || p.contexts.config.Globals == nil {
 		return nil, nil, nil
@@ -707,6 +744,10 @@ func (p *PropSolver) extractTheoryCore(safe *safeAssumptions, wantConsequences b
 	if err != nil {
 		return nil, nil, fmt.Errorf("muz/pdr: Farkas lemma extraction: %w", err)
 	}
+	learned, err = p.simplifyTheoryResults(learned)
+	if err != nil {
+		return nil, nil, fmt.Errorf("muz/pdr: Farkas lemma simplification: %w", err)
+	}
 	core, err := p.publishTheoryResults(safe, learned)
 	if err != nil || len(core) == 0 || !wantConsequences {
 		if err != nil {
@@ -717,6 +758,10 @@ func (p *PropSolver) extractTheoryCore(safe *safeAssumptions, wantConsequences b
 	learnedConsequences, err := learner.GetConsequences(proof, safe.atoms)
 	if err != nil {
 		return nil, nil, fmt.Errorf("muz/pdr: Farkas consequence extraction: %w", err)
+	}
+	learnedConsequences, err = p.simplifyTheoryResults(learnedConsequences)
+	if err != nil {
+		return nil, nil, fmt.Errorf("muz/pdr: Farkas consequence simplification: %w", err)
 	}
 	consequences, err := p.publishTheoryResults(safe, learnedConsequences)
 	return core, consequences, err

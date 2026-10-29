@@ -83623,7 +83623,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/muz/pdr/farkas_learner.go"
+        "pkg/muz/pdr/farkas_learner.go",
+        "pkg/muz/pdr/prop_solver.go",
+        "pkg/tactic/arith/arith_bounds.go"
       ],
       "tests": [
         "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
@@ -83760,7 +83762,13 @@
           ]
         },
         {
-          "name": "lemma guesses and final tactic subsumption simplification",
+          "name": "final arithmetic-bound tactic subsumption in the retained PropSolver consumer",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/arith_bounds.go",
+          "tests": ["TestArithmeticBoundsKeepStrongestBounds", "TestPropSolverExtractsFarkasTheoryCore"]
+        },
+        {
+          "name": "lemma guesses",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83770,7 +83778,7 @@
         "The learner owns and closes its SMTFarkasUtil; copied declaration parameters are deleted on every recognition exit; returned combined ASTRef values are caller-owned."
       ],
       "deviations": [
-        "Proof preprocessing and dependency traversal extract general B-pure units, Farkas theory-node lemmas and consequence-mode literals, and PropSolver consumes both owning result forms. Lemma guesses and final tactic subsumption remain open."
+        "Proof preprocessing and dependency traversal extract general B-pure units, Farkas theory-node lemmas and consequence-mode literals. PropSolver consumes both owning result forms after applying the retained arithmetic-bound subsumption. Lemma guesses remain open."
       ]
     },
     {
@@ -83779,7 +83787,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/muz/pdr/farkas_learner.go"
+        "pkg/muz/pdr/farkas_learner.go",
+        "pkg/muz/pdr/prop_solver.go",
+        "pkg/tactic/arith/arith_bounds.go"
       ],
       "tests": [
         "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
@@ -83826,7 +83836,13 @@
           ]
         },
         {
-          "name": "remaining guessing and simplification interface",
+          "name": "retained simplification consumer interface",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/arith_bounds.go",
+          "tests": ["TestArithmeticBoundsKeepStrongestBounds", "TestPropSolverExtractsFarkasTheoryCore"]
+        },
+        {
+          "name": "remaining guessing interface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83836,7 +83852,7 @@
         "The concrete Go learner owns its arithmetic combination utility and returns explicit caller-owned AST references."
       ],
       "deviations": [
-        "The public Go surface exposes independently testable get_lemmas and get_consequences traversals; guessing and final simplification algorithms remain open."
+        "The public Go surface exposes independently testable get_lemmas and get_consequences traversals; their retained PropSolver consumer applies final arithmetic-bound simplification. Guessing remains open."
       ]
     },
     {
@@ -84177,12 +84193,13 @@
           ]
         },
         {
-          "name": "proof Farkas theory-core extraction, subset fallback and proxy restoration (pdr_prop_solver.cpp:332-423)",
+          "name": "proof Farkas theory-core extraction, arithmetic-bound simplification, subset fallback and proxy restoration (pdr_prop_solver.cpp:332-423)",
           "status": "ported",
           "go_target": "pkg/muz/pdr/prop_solver.go",
           "tests": [
             "TestPropSolverExtractsFarkasTheoryCore",
-            "TestPropSolverFarkasCoreRestoresSafeProxy"
+            "TestPropSolverFarkasCoreRestoresSafeProxy",
+            "TestArithmeticBoundsKeepStrongestBounds"
           ]
         },
         {
@@ -160213,18 +160230,38 @@
       "path": "src/tactic/arith/arith_bounds_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
+        "pkg/tactic/arith/arith_bounds.go",
+        "pkg/tactic/arith/arith_bounds_test.go",
+        "pkg/muz/pdr/prop_solver.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2"
       ],
       "tests": [
+        "TestArithmeticBoundsKeepStrongestBounds",
+        "TestPropSolverExtractsFarkasTheoryCore",
         "TestSMTLibRunnerUTVPINonincrementalStrategyGap"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "bounds_arith_subsumption retained proof-disabled Farkas-lemma instantiation",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/arith_bounds.go",
+          "tests": ["TestArithmeticBoundsKeepStrongestBounds", "TestPropSolverExtractsFarkasTheoryCore"]
+        },
+        {
+          "name": "remaining tactic object and nonincremental strategic-pipeline registration",
+          "status": "unported",
+          "go_target": null,
+          "tests": ["TestSMTLibRunnerUTVPINonincrementalStrategyGap"]
+        }
+      ],
+      "ownership": [
+        "The concrete retained helper returns a native Go keep mask and does not acquire formula ownership; PropSolver owns and releases filtered AST references."
+      ],
       "deviations": [
         "Confirmed integration gap: the native nonincremental strategic pipeline solves the mixed integer/real sum fixture as SAT, while its incremental UTVPI core (after push) refuses a fractional Int candidate as UNKNOWN. Go currently uses the direct core and returns UNKNOWN in both cases. The explicit gap regression verifies those separate results; it is not part of the strict C++ agreement count. The strategic pipeline remains unported."
       ]
@@ -160233,9 +160270,9 @@
       "path": "src/tactic/arith/arith_bounds_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/tactic/arith/arith_bounds.go"],
+      "tests": ["TestArithmeticBoundsKeepStrongestBounds"],
       "conditionals": [
         {
           "line": 31,
@@ -160246,11 +160283,24 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained arithmetic-bound subsumption entry point",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/arith_bounds.go",
+          "tests": ["TestArithmeticBoundsKeepStrongestBounds"]
+        },
+        {
+          "name": "remaining generic tactic factory surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["The concrete helper borrows its manager and formula handles."],
+      "deviations": ["Only the live concrete Farkas consumer is ported; no unused universal tactic adapter is introduced."]
     },
     {
       "path": "src/tactic/arith/bound_manager.cpp",
