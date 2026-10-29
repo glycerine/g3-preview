@@ -10,12 +10,34 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/opt"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func releaseOptimizationBoxModels(models []*model.ModelCore) (result error) {
+	for i := len(models) - 1; i >= 0; i-- {
+		if models[i] != nil {
+			consumed, err := models[i].DecRefConsumed()
+			if consumed {
+				models[i] = nil
+			}
+			result = errors.Join(result, err)
+		}
+	}
+	return result
+}
+
+func (c *Context) clearOptimizationBoxModels() error {
+	err := releaseOptimizationBoxModels(c.optimizationBoxModels)
+	if err == nil {
+		c.optimizationBoxModels = nil
+	}
+	return err
+}
 
 func (c *Context) AddObjective(expression ast.ASTHandle, maximize bool) error {
 	m, err := c.Manager()
@@ -284,7 +306,11 @@ func (c *Context) checkOptimizeLex(assumptions []ast.ASTHandle) (optimized *opt.
 }
 
 func (c *Context) checkOptimizeBox(assumptions []ast.ASTHandle, continuation bool) (optimized *opt.ArithmeticResult, resultErr error) {
-	if !continuation || !c.optimizationBoxActive {
+	fresh := !continuation || !c.optimizationBoxActive
+	if fresh {
+		if err := c.clearOptimizationBoxModels(); err != nil {
+			return nil, err
+		}
 		c.optimizationBoxNext = 0
 	}
 	c.optimizationBoxActive = true
@@ -295,10 +321,12 @@ func (c *Context) checkOptimizeBox(assumptions []ast.ASTHandle, continuation boo
 	selected := c.optimizationBoxNext
 	c.optimizationBoxNext++
 	combined := &opt.ArithmeticResult{Status: lbool.True, Values: make([]opt.ObjectiveValue, len(c.objectives)), Optimal: true}
+	var boxModels []*model.ModelCore
 	defer func() {
 		if resultErr != nil {
 			resultErr = errors.Join(resultErr, combined.Close())
 		}
+		resultErr = errors.Join(resultErr, releaseOptimizationBoxModels(boxModels))
 	}()
 	for i := range c.objectives {
 		optimizer, err := c.newOptimizer(assumptions)
@@ -320,6 +348,14 @@ func (c *Context) checkOptimizeBox(assumptions []ast.ASTHandle, continuation boo
 			combined.Status, combined.Optimal = one.Status, one.Optimal
 			return combined, one.Close()
 		}
+		if fresh {
+			if one.Model != nil {
+				if err = one.Model.IncRef(); err != nil {
+					return nil, errors.Join(err, one.Close())
+				}
+			}
+			boxModels = append(boxModels, one.Model)
+		}
 		combined.Values[i] = one.Values[0]
 		if i == selected {
 			combined.Model = one.Model
@@ -328,6 +364,10 @@ func (c *Context) checkOptimizeBox(assumptions []ast.ASTHandle, continuation boo
 		if err = one.Close(); err != nil {
 			return nil, err
 		}
+	}
+	if fresh {
+		c.optimizationBoxModels = boxModels
+		boxModels = nil
 	}
 	return combined, nil
 }
@@ -346,9 +386,15 @@ func (c *Context) checkOptimize(assumptions []ast.ASTHandle, continuation bool) 
 	if priority == "box" {
 		optimized, err = c.checkOptimizeBox(assumptions, continuation)
 	} else if priority == "pareto" {
+		if err = c.clearOptimizationBoxModels(); err != nil {
+			return lbool.Undef, err
+		}
 		c.optimizationBoxActive = false
 		optimized, err = c.checkOptimizePareto(assumptions, continuation)
 	} else {
+		if err = c.clearOptimizationBoxModels(); err != nil {
+			return lbool.Undef, err
+		}
 		c.optimizationBoxActive = false
 		optimized, err = c.checkOptimizeLex(assumptions)
 	}

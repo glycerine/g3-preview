@@ -92,6 +92,7 @@ type Context struct {
 	softObjectiveTrail               []int
 	optimizationBoxNext              int
 	optimizationBoxActive            bool
+	optimizationBoxModels            []*model.ModelCore
 	optimizationParetoActive         bool
 	optimizationParetoBackend        *smtcore.SMTSolver
 	scopes                           []scope
@@ -847,6 +848,9 @@ func (c *Context) CheckSat(assumptions []ast.ASTHandle) (status lbool.LBool, err
 	if len(c.objectives) != 0 {
 		return c.checkOptimize(assumptions, optimizationContinuation)
 	}
+	if err = c.clearOptimizationBoxModels(); err != nil {
+		return lbool.Undef, err
+	}
 	status, err = c.solver.CheckSat(assumptions)
 	if err != nil {
 		var fatal z3exception.Z3Error
@@ -972,6 +976,9 @@ func (c *Context) resetManagerState() error {
 		return construction
 	}
 	if err := c.closeParetoBackend(); err != nil {
+		return err
+	}
+	if err := c.clearOptimizationBoxModels(); err != nil {
 		return err
 	}
 	if err := c.clearCheckSatResult(); err != nil {

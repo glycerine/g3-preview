@@ -91,12 +91,25 @@ func (c *Context) Evaluate(expression ast.ASTHandle, completion bool) (result as
 // EvaluateWithOptions evaluates an expression using command-local evaluator
 // parameters. The caller owns the returned AST reference.
 func (c *Context) EvaluateWithOptions(expression ast.ASTHandle, options EvaluationOptions) (result ast.ASTRef, resultErr error) {
-	if options.ModelIndex != 0 {
-		return result, fmt.Errorf("box optimization model index is not available")
-	}
 	md, err := c.Model()
 	if err != nil {
 		return result, err
+	}
+	if options.ModelIndex != 0 && len(c.objectives) != 0 {
+		if err = md.DecRef(); err != nil {
+			return result, err
+		}
+		if uint64(options.ModelIndex) >= uint64(len(c.optimizationBoxModels)) {
+			return result, fmt.Errorf("index into models is out of bounds")
+		}
+		index := int(options.ModelIndex)
+		md = c.optimizationBoxModels[index]
+		if md == nil {
+			return result, fmt.Errorf("model is not available")
+		}
+		if err = md.IncRef(); err != nil {
+			return result, err
+		}
 	}
 	defer func() { resultErr = errors.Join(resultErr, md.DecRef()) }()
 	params, err := c.config.Params.NewValue()
