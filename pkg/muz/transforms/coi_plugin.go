@@ -9,6 +9,7 @@ import (
 
 type ConePlugin struct {
 	priority uint32
+	steps    []ConeModelStep
 	closed   bool
 }
 
@@ -27,7 +28,23 @@ func (p *ConePlugin) Transform(source *base.RuleSet) (*base.RuleSet, error) {
 	if p == nil || p.closed {
 		return nil, base.ErrRuleTransformerOwner
 	}
-	return ConeOfInfluence(source)
+	result, steps, err := coneOfInfluence(source, true)
+	if err != nil {
+		return nil, err
+	}
+	p.steps = append(p.steps, steps...)
+	return result, nil
+}
+
+// TakeModelSteps transfers the ordered owning model-converter steps emitted
+// by successful transformations. The caller closes them.
+func (p *ConePlugin) TakeModelSteps() ([]ConeModelStep, error) {
+	if p == nil || p.closed {
+		return nil, base.ErrRuleTransformerOwner
+	}
+	result := p.steps
+	p.steps = nil
+	return result, nil
 }
 
 func (p *ConePlugin) Cancel() {}
@@ -37,5 +54,7 @@ func (p *ConePlugin) Close() error {
 		return base.ErrRuleTransformerOwner
 	}
 	p.closed = true
-	return nil
+	result := CloseConeModelSteps(p.steps)
+	p.steps = nil
+	return result
 }

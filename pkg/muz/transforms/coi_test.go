@@ -129,6 +129,55 @@ func TestConeOfInfluencePrunesOutsideAndUnfoundedRules(t *testing.T) {
 	}
 }
 
+func TestConePluginCapturesOrderedModelDefinitions(t *testing.T) {
+	f := newConeFixture(t, "P", "R", "X", "S", "U")
+	f.add(t, f.applications["P"], "fact-P")
+	f.edge(t, "P", "R")
+	f.edge(t, "X", "S")
+	f.add(t, f.applications["U"], "fact-U")
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["R"]))
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["S"]))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("cone converter fixture rejected")
+	}
+	plugin := transforms.NewConePlugin(1)
+	filtered, err := plugin.Transform(f.set)
+	coneMust(t, err)
+	if filtered == nil {
+		t.Fatal("changed cone returned nil")
+	}
+	t.Cleanup(func() { coneMust(t, filtered.Close()) })
+	steps, err := plugin.TakeModelSteps()
+	coneMust(t, err)
+	t.Cleanup(func() { coneMust(t, transforms.CloseConeModelSteps(steps)) })
+	if len(steps) != 2 {
+		t.Fatal("cone converter pass count", len(steps))
+	}
+	foundTop, foundBottom := false, false
+	for _, definition := range steps[0] {
+		if definition.Declaration != f.declarations["U"] {
+			continue
+		}
+		formula, getErr := f.manager.RefGet(definition.Formula)
+		coneMust(t, getErr)
+		foundTop = f.manager.IsTrue(formula)
+	}
+	for _, definition := range steps[1] {
+		if definition.Declaration != f.declarations["S"] {
+			continue
+		}
+		formula, getErr := f.manager.RefGet(definition.Formula)
+		coneMust(t, getErr)
+		foundBottom = f.manager.IsFalse(formula)
+	}
+	if !foundTop || !foundBottom {
+		t.Fatal("cone converter definitions", foundTop, foundBottom)
+	}
+	coneMust(t, plugin.Close())
+}
+
 func TestConeOfInfluenceReturnsNilWhenUnchanged(t *testing.T) {
 	f := newConeFixture(t, "P")
 	f.add(t, f.applications["P"], "fact-P")
