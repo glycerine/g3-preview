@@ -80,6 +80,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	coalesceName := "xform.coalesce_rules"
+	coalesceRules, err := e.params.GetBoolName(&fixedpoint, &coalesceName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -149,6 +154,18 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	err = errors.Join(err, transformer.Close())
 	if err != nil {
 		return nil, fmt.Errorf("muz/fp: Spacer rule preprocessing: %w", err)
+	}
+	if unfoldRounds > 0 && coalesceRules {
+		coalescer := base.NewRuleTransformer()
+		plugin := transforms.NewRuleCoalescePlugin(e.manager, e.rules, 50)
+		if err = coalescer.Register(plugin); err != nil {
+			return nil, errors.Join(err, plugin.Close(), coalescer.Close())
+		}
+		_, err = coalescer.Apply(prepared)
+		err = errors.Join(err, coalescer.Close())
+		if err != nil {
+			return nil, fmt.Errorf("muz/fp: Spacer rule coalescing: %w", err)
+		}
 	}
 	for round := uint32(0); round < unfoldRounds; round++ {
 		unfolder := base.NewRuleTransformer()
