@@ -168683,9 +168683,9 @@
       "path": "src/tactic/core/elim_term_ite_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "complete",
+      "go_targets": ["pkg/tactic/core/elim_term_ite_tactic.go"],
+      "tests": ["TestEliminateTermITEProofCoreAndModelFilter", "TestEliminateTermITELeavesBooleanITEAndRecoversAfterCleanup"],
       "assertions": [
         {
           "line": 107,
@@ -168696,19 +168696,26 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "term ITE rewriting and fresh definitions",
+          "status": "complete",
+          "go_target": "pkg/tactic/core/elim_term_ite_tactic.go",
+          "tests": ["TestEliminateTermITEProofCoreAndModelFilter", "TestEliminateTermITELeavesBooleanITEAndRecoversAfterCleanup"]
+        }
+      ],
+      "ownership": ["Defined names, traversal state, proof references, and filter-model declarations have explicit owners and cleanup."],
       "deviations": []
     },
     {
       "path": "src/tactic/core/elim_term_ite_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "complete",
+      "go_targets": ["pkg/tactic/core/elim_term_ite_tactic.go"],
+      "tests": ["TestEliminateTermITEProofCoreAndModelFilter", "TestEliminateTermITELeavesBooleanITEAndRecoversAfterCleanup"],
       "conditionals": [
         {
           "line": 20,
@@ -168719,8 +168726,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
       "deviations": []
