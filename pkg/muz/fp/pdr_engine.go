@@ -137,6 +137,24 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = context.SetFlexibleTrace(flexible); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
+	inlineEagerName := "xform.inline_eager"
+	inlineEager, err := e.globals.Context.GetBoolName(&fixedpoint, &inlineEagerName, true)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	inlineLinearName := "xform.inline_linear"
+	inlineLinear, err := e.globals.Context.GetBoolName(&fixedpoint, &inlineLinearName, true)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	sliceName := "xform.slice"
+	sliceRules, err := e.globals.Context.GetBoolName(&fixedpoint, &sliceName, true)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetFullTraceAnswer(!inlineEager && !inlineLinear && !sliceRules); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	auxiliary := make([]ast.ASTHandle, 0, len(e.auxiliary))
 	for declaration := range e.auxiliary {
 		auxiliary = append(auxiliary, declaration)

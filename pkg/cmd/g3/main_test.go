@@ -913,6 +913,9 @@ var scriptResults = map[string]string{
 	"unbounded_real_optimization.smt2":             "sat\n(objectives\n (x oo)\n)\n((x 0.0))\nsat\n(objectives\n (x (* (- 1) oo))\n)\n((x 0.0))\n",
 	"unbounded_lexicographic_interval.smt2":        "sat\n(objectives\n (x oo)\n (y  (interval (* (- 1) oo) oo))\n)\n((x 0.0)\n (y 0.0))\n",
 	"weighted_soft_optimization.smt2":              "sat\n(objectives\n ( 1)\n)\n((a false)\n (b true))\nsat\n(objectives\n (first 0)\n (second (/ 9.0 4.0))\n)\n((a true)\n (b false))\nsat\n(objectives\n (second (- 2))\n)\n((a false))\nsat\n(objectives\n (soft-first (- 2))\n (x 1)\n (soft-last 0)\n)\n((a false)\n (x 1))\nsat\n(objectives\n (duplicate 2)\n)\n((a true))\nsat\n(objectives\n (zero 0)\n)\n",
+
+	"fixedpoint_pdr_untransformed_linear_trace.smt2":    "sat\n(and Goal (P 0 7))\n",
+	"fixedpoint_pdr_untransformed_nonlinear_trace.smt2": "sat\n(and Goal (P 0) (Q 0))\n",
 }
 
 func TestSMTLibRunnerScripts(t *testing.T) {

@@ -31,7 +31,7 @@ func (c *Context) traceMaximumVariable(expressions ...[]ast.ASTHandle) (uint32, 
 	return used.MaxFoundVarIndexPlusOne(), nil
 }
 
-func (c *Context) unifiedTraceConstraints(root *ModelNode) (result []ast.ASTRef, resultErr error) {
+func (c *Context) unifiedTraceConstraints(root *ModelNode, complete bool) (result []ast.ASTRef, resultErr error) {
 	phase := "update models"
 	defer func() {
 		if resultErr != nil {
@@ -72,9 +72,12 @@ func (c *Context) unifiedTraceConstraints(root *ModelNode) (result []ast.ASTRef,
 	}
 	work := []traceObligation{{node: root, predicate: head}}
 	constraints := make([]ast.ASTHandle, 0)
-	anchor, err := traceRecursiveAnchor(root)
-	if err != nil {
-		return nil, err
+	var anchor *PredicateTransformer
+	if !complete {
+		anchor, err = traceRecursiveAnchor(root)
+		if err != nil {
+			return nil, err
+		}
 	}
 	theory, err := rewriter.NewTheoryRewriter(c.manager, c.owner.contexts.config.Params, c.owner.contexts.config.Globals, nil)
 	if err != nil {
@@ -200,7 +203,7 @@ func (c *Context) unifiedTraceConstraints(root *ModelNode) (result []ast.ASTRef,
 			_ = substitution.Close()
 			return nil, x
 		}
-		if iteration != 0 && (anchor == nil || current.node.transformer == anchor) {
+		if complete || iteration != 0 && (anchor == nil || current.node.transformer == anchor) {
 			constraints = append(constraints, predicate)
 		}
 		appliedTails := make([]ast.ASTHandle, len(tails))
@@ -227,8 +230,8 @@ func (c *Context) unifiedTraceConstraints(root *ModelNode) (result []ast.ASTRef,
 		if len(children) != uninterpreted {
 			return nil, fmt.Errorf("pdr: trace has %d children for %d uninterpreted tails: %w", len(children), uninterpreted, ast.ErrASTDomain)
 		}
-		for i, child := range children {
-			work = append(work, traceObligation{node: child, predicate: appliedTails[i]})
+		for i := len(children) - 1; i >= 0; i-- {
+			work = append(work, traceObligation{node: children[i], predicate: appliedTails[i]})
 		}
 		iteration++
 	}

@@ -462,29 +462,31 @@ func (c *Context) Answer(queryDeclaration ast.ASTHandle) (result ast.ASTRef, res
 		}
 		return result, ast.ErrASTDomain
 	}
-	nonlinear, err := traceHasNonlinearRule(root)
-	if err != nil {
-		return result, fmt.Errorf("pdr: inspect trace shape: %w", err)
-	}
-	if nonlinear {
-		truth, x := c.manager.MkTrue()
+	if !c.fullTraceAnswer {
+		nonlinear, x := traceHasNonlinearRule(root)
 		if x != nil {
-			return result, x
+			return result, fmt.Errorf("pdr: inspect trace shape: %w", x)
 		}
-		return c.manager.NewRef(truth)
-	}
-	anchor, err := traceRecursiveAnchor(root)
-	if err != nil {
-		return result, fmt.Errorf("pdr: inspect recursive trace: %w", err)
-	}
-	if anchor == nil {
-		truth, x := c.manager.MkTrue()
+		if nonlinear {
+			truth, y := c.manager.MkTrue()
+			if y != nil {
+				return result, y
+			}
+			return c.manager.NewRef(truth)
+		}
+		anchor, x := traceRecursiveAnchor(root)
 		if x != nil {
-			return result, x
+			return result, fmt.Errorf("pdr: inspect recursive trace: %w", x)
 		}
-		return c.manager.NewRef(truth)
+		if anchor == nil {
+			truth, y := c.manager.MkTrue()
+			if y != nil {
+				return result, y
+			}
+			return c.manager.NewRef(truth)
+		}
 	}
-	constraints, err := c.unifiedTraceConstraints(root)
+	constraints, err := c.unifiedTraceConstraints(root, c.fullTraceAnswer)
 	if err != nil {
 		return result, fmt.Errorf("pdr: unify trace: %w", err)
 	}

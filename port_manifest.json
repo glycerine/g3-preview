@@ -83072,6 +83072,8 @@
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
         "TestModelSearchFrontierOrderingClosureAndOwnership",
         "TestModelNodeRejectsInvalidParentLevel"
       ],
@@ -83334,7 +83336,9 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2"
           ]
         },
         {
@@ -83365,7 +83369,7 @@
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
         "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth.",
         "Solve now drives the unbounded native frame/model-search loop, selects literal or model-cone minimization through pdr.use_model_generalizer, applies the native QE-lite constant-elimination overload, reduces repeated disequalities in literal mode, and partitions projected literals among predecessor states.",
-        "Successful retained relation-declaration queries reconstruct the native model-search trace by retaining every non-root predicate after two-bank rule/head unification. Acyclic and nonlinear successful traces reduce to the native true answer, while recursive traces retain the reached root state and all predecessors. Unsuccessful queries expose direct-predicate universally quantified frame definitions and filter retained simple-join auxiliary predicates; other native model-converter remapping and clause presentation normalization remain unported. Cover translation matches direct retained predicates; native model-converter/slice remapping and proof traces remain unported."
+        "Successful retained relation-declaration queries reconstruct the native model-search trace after two-bank rule/head unification. With fixedpoint slicing and both inliners disabled, the query predicate and every reached predicate are retained in source-tail order; two exact C++ vectors cover linear and nonlinear traces. Default transformed acyclic/nonlinear answers retain the native true presentation, while recursive traces retain reached recursive states. Unsuccessful queries expose direct-predicate universally quantified frame definitions and filter retained simple-join auxiliary predicates; other native model-converter remapping and clause presentation normalization remain unported. Cover translation matches direct retained predicates; native model-converter/slice remapping and proof traces remain unported."
       ]
     },
     {
@@ -83506,7 +83510,9 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2"
           ]
         },
         {
@@ -83572,6 +83578,8 @@
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_nonlinear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_variable_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_untransformed_linear_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_both.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_closure.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_interior.smt2"
@@ -83599,6 +83607,8 @@
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_both.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_both.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_closure.smt2",
@@ -83660,6 +83670,8 @@
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
             "TestSMTContextFixedpointPDRLifecycle"
           ]
         },
@@ -83689,7 +83701,7 @@
         "PropositionalEngine owns the current PDR Context, reuses it while the exact normalized rules and background remain unchanged, and closes/replaces it after a tracked mutation or engine shutdown; rule and parameter services are borrowed. Returned inductive models transfer ownership to the caller."
       ],
       "deviations": [
-        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding and unsuccessful-query inductive certificates are retained; slicing and model-converter remapping remain unported. Successful existential declaration queries use native-style two-bank rule/head unification for recursive traces, retain every non-root predicate, and reduce acyclic or nonlinear successful traces to the native true answer; proof traces remain unported."
+        "The integration reuses PDR state when the exact normalized rules and background are unchanged, but rebuilds after a tracked mutation instead of applying native transformed-rule subsumption reuse. Direct-predicate cover forwarding and unsuccessful-query inductive certificates are retained; slicing and model-converter remapping remain unported. Successful existential declaration queries use native-style two-bank rule/head unification; when slicing and both inliners are disabled they retain the query and every reached predicate in source-tail order, while default transformed acyclic/nonlinear answers preserve the native true presentation. Proof traces remain unported."
       ]
     },
     {
@@ -83711,6 +83723,8 @@
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_nonlinear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_variable_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_untransformed_linear_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_both.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_closure.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_interior.smt2"
@@ -83736,6 +83750,8 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_both.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_both.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_closure.smt2",
@@ -83792,7 +83808,9 @@
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_nonlinear_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_recursive_trace.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_variable_trace.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2"
           ]
         },
         {

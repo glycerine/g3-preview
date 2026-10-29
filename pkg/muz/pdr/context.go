@@ -48,6 +48,7 @@ type Context struct {
 	useConvexClosure  bool
 	useConvexInterior bool
 	flexibleTrace     bool
+	fullTraceAnswer   bool
 	initialized       bool
 	closed            bool
 }
@@ -212,6 +213,19 @@ func (c *Context) SetFlexibleTrace(enabled bool) error {
 		return ast.ErrASTDomain
 	}
 	c.flexibleTrace = enabled
+	return nil
+}
+
+// SetFullTraceAnswer retains the query predicate and every reached predicate
+// when no fixedpoint rule transformation will supply an answer converter.
+func (c *Context) SetFullTraceAnswer(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.fullTraceAnswer = enabled
 	return nil
 }
 
