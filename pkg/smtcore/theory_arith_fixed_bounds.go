@@ -277,6 +277,10 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticBoundAtoms() error {
 		return nil
 	}
 	bases := t.arithmeticAtomBases()
+	rowsByColumn, err := t.indexArithmeticPropagationRows(solver)
+	if err != nil {
+		return err
+	}
 	proofs, err := t.state.manager.ProofsEnabled()
 	if err != nil {
 		return err
@@ -297,7 +301,7 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticBoundAtoms() error {
 		base := bases[index]
 		for _, truth := range []bool{true, false} {
 			lower, threshold := smtLinearAtomBound(atom, truth, t.integralAtom(atom))
-			endpoint, explanation, found, err := t.impliedArithmeticRowEndpoint(solver, base, lower)
+			endpoint, explanation, found, err := t.impliedArithmeticRowEndpoint(solver, rowsByColumn[base], base, lower)
 			if err != nil {
 				return err
 			}
@@ -321,6 +325,35 @@ func (t *SMTLinearArithmeticTheory) propagateArithmeticBoundAtoms() error {
 		}
 	}
 	return nil
+}
+
+// indexArithmeticPropagationRows preserves the source row scan while sharing
+// it across every candidate atom. Without this reverse index, a large set of
+// independent arithmetic atoms rescans the complete simplex matrix twice per
+// atom even though almost every row cannot mention the candidate column.
+func (t *SMTLinearArithmeticTheory) indexArithmeticPropagationRows(solver *simplex.Solver) (map[uint32][][]simplex.RowEntry, error) {
+	result := make(map[uint32][][]simplex.RowEntry)
+	maxLemmaSize := t.maxLemmaSize
+	if maxLemmaSize == 0 {
+		maxLemmaSize = 128
+	}
+	for basic := uint32(0); basic < solver.NumVariables(); basic++ {
+		row, exists := solver.BasicRow(basic)
+		if !exists {
+			continue
+		}
+		entries, err := solver.RowEntries(row)
+		if err != nil {
+			return nil, err
+		}
+		if uint64(len(entries)) >= uint64(maxLemmaSize) || t.skipRowsWithBigCoefficients && smtArithmeticRowHasBigCoefficient(entries) {
+			continue
+		}
+		for _, entry := range entries {
+			result[entry.Variable] = append(result[entry.Variable], entries)
+		}
+	}
+	return result, nil
 }
 
 func (t *SMTLinearArithmeticTheory) arithmeticAtomBases() []uint32 {
@@ -347,7 +380,7 @@ func (t *SMTLinearArithmeticTheory) arithmeticAtomBases() []uint32 {
 // endpoint for one column without installing it. This is the source
 // imply_bound_for_monomial operation: integer normalization happens only when
 // comparing against an integer atom threshold, never by changing the tableau.
-func (t *SMTLinearArithmeticTheory) impliedArithmeticRowEndpoint(solver *simplex.Solver, column uint32, lower bool) (simplex.Infinitesimal, *smtArithmeticBoundExplanation, bool, error) {
+func (t *SMTLinearArithmeticTheory) impliedArithmeticRowEndpoint(solver *simplex.Solver, rows [][]simplex.RowEntry, column uint32, lower bool) (simplex.Infinitesimal, *smtArithmeticBoundExplanation, bool, error) {
 	var best simplex.Infinitesimal
 	var explanation *smtArithmeticBoundExplanation
 	found := false
@@ -362,25 +395,7 @@ func (t *SMTLinearArithmeticTheory) impliedArithmeticRowEndpoint(solver *simplex
 			best, explanation, found = endpoint, reason, true
 		}
 	}
-	maxLemmaSize := t.maxLemmaSize
-	if maxLemmaSize == 0 {
-		maxLemmaSize = 128
-	}
-	for basic := uint32(0); basic < solver.NumVariables(); basic++ {
-		row, exists := solver.BasicRow(basic)
-		if !exists {
-			continue
-		}
-		entries, err := solver.RowEntries(row)
-		if err != nil {
-			return simplex.Infinitesimal{}, nil, false, err
-		}
-		if uint64(len(entries)) >= uint64(maxLemmaSize) {
-			continue
-		}
-		if t.skipRowsWithBigCoefficients && smtArithmeticRowHasBigCoefficient(entries) {
-			continue
-		}
+	for _, entries := range rows {
 		for _, target := range entries {
 			if target.Variable != column {
 				continue
