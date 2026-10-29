@@ -83708,7 +83708,15 @@
           ]
         },
         {
-          "name": "lemma guesses, consequence mode and final tactic subsumption simplification",
+          "name": "get_consequences literal-combination mode",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/farkas_learner.go",
+          "tests": [
+            "TestFarkasLearnerRecognizesArithmeticTheoryLemma"
+          ]
+        },
+        {
+          "name": "lemma guesses and final tactic subsumption simplification",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83718,7 +83726,7 @@
         "The learner owns and closes its SMTFarkasUtil; copied declaration parameters are deleted on every recognition exit; returned combined ASTRef values are caller-owned."
       ],
       "deviations": [
-        "Proof preprocessing and dependency traversal extract general B-pure units and Farkas theory-node lemmas; lemma guesses, consequence mode, final tactic subsumption and PropSolver integration remain open."
+        "Proof preprocessing and dependency traversal extract general B-pure units, Farkas theory-node lemmas and consequence-mode literals; lemma guesses, final tactic subsumption and PropSolver integration remain open."
       ]
     },
     {
@@ -83766,7 +83774,15 @@
           ]
         },
         {
-          "name": "remaining guessing, consequence and simplification interface",
+          "name": "get_consequences owning result interface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/farkas_learner.go",
+          "tests": [
+            "TestFarkasLearnerRecognizesArithmeticTheoryLemma"
+          ]
+        },
+        {
+          "name": "remaining guessing and simplification interface",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83776,7 +83792,7 @@
         "The concrete Go learner owns its arithmetic combination utility and returns explicit caller-owned AST references."
       ],
       "deviations": [
-        "The public Go surface exposes the independently testable get_lemmas traversal; guessing, consequence and final simplification algorithms remain open."
+        "The public Go surface exposes independently testable get_lemmas and get_consequences traversals; guessing and final simplification algorithms remain open."
       ]
     },
     {

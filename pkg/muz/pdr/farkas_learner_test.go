@@ -124,6 +124,19 @@ func TestFarkasLearnerRecognizesArithmeticTheoryLemma(t *testing.T) {
 	if len(lemmas) != 0 {
 		t.Fatal("proof traversal produced a lemma without a B dependency", len(lemmas))
 	}
+	consequences, err := learner.GetConsequences(lemma, []ast.ASTHandle{le})
+	pdrMust(t, err)
+	if len(consequences) != 1 {
+		t.Fatal("consequence traversal did not recover the Farkas consequence", len(consequences))
+	}
+	consequence, err := manager.RefGet(consequences[0])
+	pdrMust(t, err)
+	isNot, argument, err := manager.IsNot(consequence)
+	pdrMust(t, err)
+	if !isNot || argument != ge {
+		t.Fatal("consequence mode did not negate the remaining literal", isNot, argument, ge)
+	}
+	pdrMust(t, manager.DelRef(&consequences[0]))
 	pdrMust(t, manager.DelRef(&lemmaRoot))
 	matched, err = learner.IsFarkasLemma(premise0)
 	pdrMust(t, err)

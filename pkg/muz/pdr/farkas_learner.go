@@ -690,6 +690,18 @@ func (f *FarkasLearner) GetLemmas(root ast.ASTHandle, bAssertions []ast.ASTHandl
 	return results, nil
 }
 
+// GetConsequences runs get_lemmas in the source literal-combination mode and
+// restores coefficient combination before returning.
+func (f *FarkasLearner) GetConsequences(root ast.ASTHandle, bAssertions []ast.ASTHandle) ([]ast.ASTRef, error) {
+	if err := f.open(); err != nil {
+		return nil, err
+	}
+	previous := f.combineCoefficients
+	f.combineCoefficients = false
+	defer func() { f.combineCoefficients = previous }()
+	return f.GetLemmas(root, bAssertions)
+}
+
 // CombineConstraints applies the source learner's two combination modes.
 func (f *FarkasLearner) CombineConstraints(literals []ast.ASTHandle, coefficients []*big.Rat) (_ ast.ASTRef, resultErr error) {
 	if err := f.open(); err != nil {
