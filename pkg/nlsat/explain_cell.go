@@ -108,11 +108,195 @@ func (n *explanationAssumptions) addLinearRootLiteral(k AtomKind, y uint32, p po
 	return true, n.addLinearRoot(k, p, negative)
 }
 
+func (n *explanationAssumptions) ensurePolynomialSign(p polynomial.Polynomial) (int, error) {
+	sign, err := n.sign(p)
+	if err != nil {
+		return 0, err
+	}
+	constant, err := n.search.store.atoms.ineq.core.IsConstant(p)
+	if err != nil || constant {
+		return sign, err
+	}
+	k := AtomGT
+	if sign == 0 {
+		k = AtomEQ
+	} else if sign < 0 {
+		k = AtomLT
+	}
+	return sign, n.addSimpleAssumption(k, p, false)
+}
+
+type explanationQuadraticRefs struct {
+	refs []*polynomial.PolynomialRef
+}
+
+func (s *explanationQuadraticRefs) close() (err error) {
+	for i := len(s.refs) - 1; i >= 0; i-- {
+		err = errors.Join(err, s.refs[i].Close())
+	}
+	s.refs = nil
+	return err
+}
+
+func (s *explanationQuadraticRefs) keep(core *polynomial.MultivariatePolynomialCore, value polynomial.Polynomial, cause error) (polynomial.Polynomial, error) {
+	if cause != nil {
+		return polynomial.Polynomial{}, cause
+	}
+	ref, err := polynomial.NewPolynomialRef(core)
+	if err != nil {
+		return polynomial.Polynomial{}, err
+	}
+	s.refs = append(s.refs, ref)
+	if err = ref.Assign(value); err != nil {
+		return polynomial.Polynomial{}, err
+	}
+	return ref.Get()
+}
+
+func (n *explanationAssumptions) addPseudoLinearRoot(k AtomKind, y uint32, p polynomial.Polynomial) (bool, error) {
+	core := n.search.store.atoms.ineq.core
+	degree, err := core.Degree(p, y)
+	if err != nil || degree != 1 {
+		return false, err
+	}
+	coefficient, err := core.Coeff(p, y, 1)
+	if err != nil {
+		return false, err
+	}
+	ref, err := polynomial.NewPolynomialRef(core)
+	if err != nil {
+		return false, err
+	}
+	defer func() { err = errors.Join(err, ref.Close()) }()
+	if err = ref.Assign(coefficient); err != nil {
+		return false, err
+	}
+	coefficient, err = ref.Get()
+	if err != nil {
+		return false, err
+	}
+	sign, err := n.sign(coefficient)
+	if err != nil || sign == 0 {
+		return false, err
+	}
+	if _, err = n.ensurePolynomialSign(coefficient); err != nil {
+		return false, err
+	}
+	return true, n.addLinearRoot(k, p, sign < 0)
+}
+
+func (n *explanationAssumptions) addQuadraticRootLiteral(k AtomKind, y, index uint32, p polynomial.Polynomial) (matched bool, err error) {
+	core := n.search.store.atoms.ineq.core
+	degree, err := core.Degree(p, y)
+	if err != nil || degree != 2 || index < 1 || index > 2 {
+		return false, err
+	}
+	assigned, err := n.search.assignment.Contains(y)
+	if err != nil {
+		return false, err
+	}
+	if err = atomAssert("nlsat_explain.cpp", 788, "m_assignment.is_assigned(y)", assigned); err != nil {
+		return false, err
+	}
+	if !assigned {
+		return false, arena.ErrConfig
+	}
+	var owned explanationQuadraticRefs
+	defer func() { err = errors.Join(err, owned.close()) }()
+	coefficient := func(power uint32) (polynomial.Polynomial, error) {
+		value, e := core.Coeff(p, y, power)
+		return owned.keep(core, value, e)
+	}
+	keep := func(value polynomial.Polynomial, cause error) (polynomial.Polynomial, error) {
+		return owned.keep(core, value, cause)
+	}
+	a, err := coefficient(2)
+	if err != nil {
+		return false, err
+	}
+	b, err := coefficient(1)
+	if err != nil {
+		return false, err
+	}
+	c, err := coefficient(0)
+	if err != nil {
+		return false, err
+	}
+	bb, err := keep(core.Mul(b, b))
+	if err != nil {
+		return false, err
+	}
+	ac, err := keep(core.Mul(a, c))
+	if err != nil {
+		return false, err
+	}
+	twoAC, err := keep(core.Add(ac, ac))
+	if err != nil {
+		return false, err
+	}
+	fourAC, err := keep(core.Add(twoAC, twoAC))
+	if err != nil {
+		return false, err
+	}
+	discriminant, err := keep(core.Sub(bb, fourAC))
+	if err != nil {
+		return false, err
+	}
+	yy, err := keep(core.MkVariable(y, 1))
+	if err != nil {
+		return false, err
+	}
+	ay, err := keep(core.Mul(a, yy))
+	if err != nil {
+		return false, err
+	}
+	twoAY, err := keep(core.Add(ay, ay))
+	if err != nil {
+		return false, err
+	}
+	derivative, err := keep(core.Add(twoAY, b))
+	if err != nil {
+		return false, err
+	}
+	discriminantSign, err := n.ensurePolynomialSign(discriminant)
+	if err != nil || discriminantSign < 0 {
+		return false, err
+	}
+	aSign, err := n.ensurePolynomialSign(a)
+	if err != nil {
+		return false, err
+	}
+	if aSign == 0 {
+		by, e := keep(core.Mul(b, yy))
+		if e != nil {
+			return false, e
+		}
+		linear, e := keep(core.Add(by, c))
+		if e != nil {
+			return false, e
+		}
+		return n.addPseudoLinearRoot(k, y, linear)
+	}
+	if _, err = n.ensurePolynomialSign(derivative); err != nil {
+		return false, err
+	}
+	if discriminantSign > 0 {
+		if _, err = n.ensurePolynomialSign(p); err != nil {
+			return false, err
+		}
+	}
+	return true, nil
+}
+
 // addRootLiteral uses the source's constant-coefficient linear rewrite before
 // falling back to a root atom. The pseudo-linear and quadratic optimizations
 // remain separate because their coefficient signs require projected guards.
 func (n *explanationAssumptions) addRootLiteral(k AtomKind, y, index uint32, p polynomial.Polynomial) error {
 	matched, err := n.addLinearRootLiteral(k, y, p)
+	if err != nil || matched {
+		return err
+	}
+	matched, err = n.addQuadraticRootLiteral(k, y, index, p)
 	if err != nil || matched {
 		return err
 	}

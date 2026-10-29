@@ -57,10 +57,14 @@ func TestExplanationCellLiteralsExactRootAndNearestBounds(t *testing.T) {
 	if len(atoms) != 2 {
 		t.Fatal("nearest lower/upper root count", atoms)
 	}
-	lower, lowerOK := atoms[0].(*RootAtom)
-	upper, upperOK := atoms[1].(*RootAtom)
-	if !lowerOK || !upperOK || lower.kind != AtomRootGT || lower.index != 1 || lower.polynomial != square || upper.kind != AtomRootLT || upper.index != 2 || upper.polynomial != square {
-		t.Fatal("nearest lower/upper roots", atoms)
+	if _, lowerOK := atoms[0].(*InequalityAtom); !lowerOK {
+		t.Fatal("quadratic lower boundary did not use Thom signs", atoms)
+	}
+	if _, upperOK := atoms[1].(*InequalityAtom); !upperOK {
+		t.Fatal("quadratic upper boundary did not use Thom signs", atoms)
+	}
+	if atoms[0].(*InequalityAtom).kind != AtomEQ || atoms[1].(*InequalityAtom).kind != AtomLT {
+		t.Fatal("quadratic derivative/polynomial Thom signs", atoms)
 	}
 	assignmentMust(t, n.reset())
 
@@ -95,10 +99,11 @@ func TestExplanationCellLiteralsSkipLowerStagePolynomials(t *testing.T) {
 	if len(atoms) != 2 {
 		t.Fatal("lower-stage root count", atoms)
 	}
-	lower, lowerOK := atoms[0].(*RootAtom)
-	upper, upperOK := atoms[1].(*RootAtom)
-	if !lowerOK || !upperOK || lower.polynomial != current || upper.polynomial != current {
-		t.Fatal("lower-stage polynomial contributed a current cell root", atoms)
+	if _, lowerOK := atoms[0].(*InequalityAtom); !lowerOK {
+		t.Fatal("quadratic lower-stage boundary did not use Thom signs", atoms)
+	}
+	if _, upperOK := atoms[1].(*InequalityAtom); !upperOK {
+		t.Fatal("quadratic lower-stage upper boundary did not use Thom signs", atoms)
 	}
 }
 
@@ -140,5 +145,29 @@ func TestExplanationLinearRootNegativeCoefficientRelationMapping(t *testing.T) {
 				t.Fatal("linear root explanation is true in its model", tc, literal)
 			}
 		})
+	}
+}
+
+func TestExplanationQuadraticRootDegenerateLeadingCoefficient(t *testing.T) {
+	e, r, n := explanationAssumptionFixture(t)
+	// x0*x1^2 + x1 - 2 reduces to x1 - 2 at the current x0 = 0.
+	p := evaluatorPolynomial(t, e, evaluatorTerm{1, 1, 2}, evaluatorTerm{1, 0, 1}, evaluatorTerm{-2, 0, 0})
+	evaluatorSetFraction(t, e, 0, 0, 1)
+	evaluatorSetFraction(t, e, 1, 3, 1)
+	atoms := explanationCellAtoms(t, e, r, n, explanationCellVector(t, e, p), 1, false)
+	if len(atoms) != 3 {
+		t.Fatal("degenerate quadratic assumptions", atoms)
+	}
+	seenEQ, seenGT := false, false
+	for _, atom := range atoms {
+		ineq, ok := atom.(*InequalityAtom)
+		if !ok {
+			t.Fatal("degenerate quadratic retained root atom", atom)
+		}
+		seenEQ = seenEQ || ineq.kind == AtomEQ
+		seenGT = seenGT || ineq.kind == AtomGT
+	}
+	if !seenEQ || !seenGT {
+		t.Fatal("missing zero-leading or linear-boundary assumption", atoms)
 	}
 }
