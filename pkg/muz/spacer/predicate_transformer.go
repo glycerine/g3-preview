@@ -35,6 +35,7 @@ type PredicateTransformer struct {
 	useQuantifiedLemmas      bool
 	blastTermITE             bool
 	useInductiveGeneralizer  bool
+	useArrayEqGeneralizer    bool
 	rules                    []*spacerNormalizedRule
 	ruleReferences           []ast.ASTRef
 	uses                     []*PredicateTransformer
@@ -73,7 +74,7 @@ func newPredicateTransformer(owner *Manager, name string, config PropSolverConfi
 	if owner == nil || owner.open() != nil {
 		return nil, ErrManagerOwner
 	}
-	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name, instantiateQuantified: true, useQuantifiedLemmas: true, blastTermITE: true, useInductiveGeneralizer: config.UseInductiveGeneralizer, reachAsInitial: true, initializeReachFacts: true}
+	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name, instantiateQuantified: true, useQuantifiedLemmas: true, blastTermITE: true, useInductiveGeneralizer: config.UseInductiveGeneralizer, useArrayEqGeneralizer: config.UseArrayEqGeneralizer, reachAsInitial: true, initializeReachFacts: true}
 	if config.Itp.Params == nil && config.Itp.Globals == nil {
 		config.Itp.Params = owner.contexts[0].config.Params
 		config.Itp.Globals = owner.contexts[0].config.Globals

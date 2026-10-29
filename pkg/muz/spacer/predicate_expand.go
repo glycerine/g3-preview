@@ -122,6 +122,18 @@ func (p *PredicateTransformer) ExpandObligation(obligation *ProofObligation) (_ 
 				lemma = generalized
 			}
 		}
+		if p.useArrayEqGeneralizer {
+			generalized, generalizeErr := p.generalizeArrayEqualityLemma(obligation, lemma)
+			if generalizeErr != nil {
+				return ExpansionResult{}, errors.Join(generalizeErr, lemma.Close())
+			}
+			if generalized != lemma {
+				if closeErr := lemma.Close(); closeErr != nil {
+					return ExpansionResult{}, errors.Join(closeErr, generalized.Close())
+				}
+				lemma = generalized
+			}
+		}
 		added, err := p.frames.AddLemma(lemma)
 		if err != nil {
 			return ExpansionResult{}, errors.Join(err, lemma.Close())

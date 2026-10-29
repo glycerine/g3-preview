@@ -21,6 +21,7 @@ type PropSolverConfig struct {
 	Itp                     ItpSolverConfig
 	KeepProxy               bool
 	UseInductiveGeneralizer bool
+	UseArrayEqGeneralizer   bool
 }
 
 type PropCheckOptions struct {
