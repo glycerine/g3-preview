@@ -87,7 +87,7 @@ func (p *ProofObligation) SetDerivation(derivation *Derivation) error {
 	if err := p.valid(); err != nil {
 		return err
 	}
-	if derivation != nil && (derivation.closed || derivation.parent != p) {
+	if derivation != nil && (derivation.closed || (derivation.parent != p && p.parent != derivation.parent)) {
 		return ErrManagerOwner
 	}
 	if p.derivation != nil && p.derivation != derivation {
