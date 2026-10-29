@@ -121,6 +121,14 @@ func (n *explanationAssumptions) collectExplanation(literals []sat.Literal, full
 	if err = n.projectionReady(); err != nil {
 		return err
 	}
+	if n.search.minimizer != nil && len(literals) > 1 {
+		minimized, minimizeErr := n.search.minimizer.minimize(literals)
+		if minimizeErr != nil {
+			return minimizeErr
+		}
+		defer func() { err = errors.Join(err, n.search.minimizer.resetResult()) }()
+		literals = minimized
+	}
 	if err = n.start(); err != nil {
 		return err
 	}

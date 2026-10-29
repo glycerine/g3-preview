@@ -23,6 +23,7 @@ type SolverConfig struct {
 	MaxMemory    uint64
 	Lazy         uint32
 	SimplifyCore bool
+	MinimizeCore bool
 	Randomize    bool
 	Factor       bool
 	MaxConflicts uint32
@@ -101,6 +102,11 @@ func NewSolver(config SolverConfig) (s *Solver, err error) {
 	s.explanation, err = newExplanationAssumptions(s.search)
 	if err != nil {
 		return s, err
+	}
+	if config.MinimizeCore {
+		if _, err = newExplanationMinimizer(s.search); err != nil {
+			return s, err
+		}
 	}
 	s.projection, err = newProjectionWorklist(s.search)
 	if err != nil {
