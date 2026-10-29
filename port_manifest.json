@@ -93537,7 +93537,10 @@
         "pkg/muz/transforms/rule_inliner.go",
         "pkg/muz/transforms/interp_tail_simplifier.go",
         "pkg/muz/transforms/coi_plugin.go",
-        "pkg/muz/transforms/subsumption_checker.go"
+        "pkg/muz/transforms/subsumption_checker.go",
+        "pkg/muz/transforms/array_eq_rewrite.go",
+        "pkg/muz/transforms/quantifier_instantiation.go",
+        "pkg/muz/transforms/quantifier_abstraction.go"
       ],
       "tests": [
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
@@ -93549,7 +93552,10 @@
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_nonlinear_inlining.smt2",
         "TestSubsumptionCheckerDropsTautologicalSelfRule",
         "TestSubsumptionCheckerRemovesTotalPositiveTail",
-        "TestSMTLibRunnerCPPReference/fp_spacer_skip_propagate.smt2"
+        "TestSMTLibRunnerCPPReference/fp_spacer_skip_propagate.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_array_eq_rewrite.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_quantifier_instantiation.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_quantifier_abstraction.smt2"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -93565,7 +93571,12 @@
           "go_target": "pkg/muz/fp/spacer_engine.go"
         },
         {
-          "name": "remaining ordered default transform stages for arrays, quantifiers, bit blasting, scaling, Karr invariants, and magic sets",
+          "name": "ordered array equality rewrite, quantified Horn instantiation, and array quantifier abstraction stages",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/spacer_engine.go"
+        },
+        {
+          "name": "remaining ordered default transform stages for array instantiation/blasting, bit blasting, scaling, Karr invariants, and magic sets",
           "status": "unported"
         }
       ],
@@ -93573,7 +93584,7 @@
         "Each Spacer query owns a finalized transformed RuleSet clone until Context initialization has retained its rules; the engine's original set remains available for subsequent queries."
       ],
       "deviations": [
-        "Every source-scheduled cone, interpreted-tail, subsumption, and inliner round is integrated here; array/quantifier transforms, bit blasting, scaling, Karr invariants, and magic sets stay pending until reached by retained consumers."
+        "Every source-scheduled cone, interpreted-tail, subsumption, inliner, array-equality, quantified-instantiation, and array-quantification round reached by the retained Spacer consumer is integrated. Array instantiation/blasting, bit blasting, scaling, Karr invariants, and magic sets remain pending."
       ]
     },
     {
