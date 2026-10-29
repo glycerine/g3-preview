@@ -18,23 +18,28 @@ import (
 var ErrContextOwner = errors.New("muz/spacer: invalid or closed context")
 
 type Context struct {
-	manager       *ast.ASTManager
-	owner         *Manager
-	config        PropSolverConfig
-	transformers  map[ast.ASTHandle]*PredicateTransformer
-	order         []ast.ASTHandle
-	query         *PredicateTransformer
-	queryDecl     ast.ASTHandle
-	queue         ProofObligationQueue
-	lastResult    lbool.LBool
-	inductive     uint32
-	skipPropagate bool
-	resetQueue    bool
-	flexibleTrace bool
-	flexibleDepth uint32
-	initialized   bool
-	solved        bool
-	closed        bool
+	manager        *ast.ASTManager
+	owner          *Manager
+	config         PropSolverConfig
+	transformers   map[ast.ASTHandle]*PredicateTransformer
+	order          []ast.ASTHandle
+	query          *PredicateTransformer
+	queryDecl      ast.ASTHandle
+	queue          ProofObligationQueue
+	lastResult     lbool.LBool
+	inductive      uint32
+	skipPropagate  bool
+	resetQueue     bool
+	flexibleTrace  bool
+	flexibleDepth  uint32
+	reusePOBs      bool
+	simplifyPOBs   bool
+	blastTermITE   bool
+	initReachFacts bool
+	reachAsInitial bool
+	initialized    bool
+	solved         bool
+	closed         bool
 }
 
 func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumContexts uint32, config smtcore.SMTSolverConfig) (*Context, error) {
@@ -73,9 +78,33 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	getBool := func(name string, fallback bool) (bool, error) {
+		return config.Params.GetBoolName(&fixedpoint, &name, fallback)
+	}
+	reusePOBs, err := getBool("spacer.reuse_pobs", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	simplifyPOBs, err := getBool("spacer.simplify_pob", false)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	blastTermITE, err := getBool("spacer.blast_term_ite", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	initReachFacts, err := getBool("spacer.init_reach_facts", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	reachAsInitial, err := getBool("spacer.reach_as_init", true)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
 		config: propConfig, skipPropagate: skipPropagate, resetQueue: resetQueue, flexibleTrace: flexibleTrace, flexibleDepth: flexibleDepth,
+		reusePOBs: reusePOBs, simplifyPOBs: simplifyPOBs, blastTermITE: blastTermITE, initReachFacts: initReachFacts, reachAsInitial: reachAsInitial,
 	}, nil
 }
 
@@ -250,6 +279,21 @@ func (c *Context) InitializePredicates(set *base.RuleSet, declarations []ast.AST
 			return err
 		}
 		created[declaration] = transformer
+		if err = transformer.SetProofObligationNormalization(c.simplifyPOBs, c.config.UseEqClassGeneralizer); err != nil {
+			return err
+		}
+		if err = transformer.SetProofObligationReuse(c.reusePOBs); err != nil {
+			return err
+		}
+		if err = transformer.SetBlastTermITE(c.blastTermITE); err != nil {
+			return err
+		}
+		if err = transformer.SetInitializeReachFacts(c.initReachFacts); err != nil {
+			return err
+		}
+		if err = transformer.SetReachAsInitial(c.reachAsInitial); err != nil {
+			return err
+		}
 	}
 	for _, declaration := range order {
 		if err = created[declaration].InitializeRules(created, buckets[declaration]); err != nil {
