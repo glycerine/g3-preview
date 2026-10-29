@@ -180021,15 +180021,16 @@
           "tests": [
             "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
             "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
-            "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference"
+            "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference",
+            "TestUFBVRewriterAdapterRetainsQuantifiedBitVectorResult"
           ]
         }
       ],
       "ownership": [
-        "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. Its copied input-formula and proof slices each pin their AST entries until the younger rewritten-formula owners release; both survive goal reset and release in insertion order after result publication. Successful publication adds a separate goal reference after the depth increment; the caller releases it with DecRef."
+        "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. Its copied input-formula and proof slices each pin their AST entries until the younger rewritten-formula owners release; both survive goal reset and release in insertion order after result publication. Successful publication adds a separate goal reference after the depth increment; the common adapter transfers that exact reference into TacticResult ownership."
       ],
       "deviations": [
-        "The result is the input goal with a second owning reference; converter outputs are absent because the source sets all three to null. The common tactic adapter balances that source result-buffer reference. Proof-producing demodulator rewrites and explicit registry exposure remain open."
+        "The result is the input goal with a second owning reference; converter outputs are absent because the source sets all three to null. The common tactic adapter transfers that source result-buffer reference to its result owner. Proof-producing demodulator rewrites and explicit registry exposure remain open."
       ]
     },
     {
@@ -180044,7 +180045,8 @@
       "tests": [
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
-        "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference"
+        "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference",
+        "TestUFBVRewriterAdapterRetainsQuantifiedBitVectorResult"
       ],
       "conditionals": [
         {
@@ -180066,13 +180068,14 @@
           "tests": [
             "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
             "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
-            "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference"
+            "TestUFBVRewriterCommonTacticAdapterBalancesGoalReference",
+            "TestUFBVRewriterAdapterRetainsQuantifiedBitVectorResult"
           ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The concrete Go constructor takes the existing parameter context and global service needed by its Boolean reducer. A common tactic adapter now supplies reference-balanced composition and translation; proof-producing rewrites and explicit registry exposure remain open."
+        "The concrete Go constructor takes the existing parameter context and global service needed by its Boolean reducer. A common tactic adapter now transfers the published goal reference into result ownership and supplies composition and translation; proof-producing rewrites and explicit registry exposure remain open."
       ]
     },
     {
@@ -180092,7 +180095,9 @@
         "TestSMTLibRunnerScripts/ufbv_solver.smt2",
         "TestSMTLibRunnerCPPReference/ufbv_solver.smt2",
         "TestSMTLibRunnerScripts/bv_quantified_strategy.smt2",
-        "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2"
+        "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2",
+        "TestSMTLibRunnerScripts/bv_quantified_mbqi.smt2",
+        "TestSMTLibRunnerCPPReference/bv_quantified_mbqi.smt2"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -180107,7 +180112,9 @@
             "TestSMTLibRunnerScripts/ufbv_solver.smt2",
             "TestSMTLibRunnerCPPReference/ufbv_solver.smt2",
             "TestSMTLibRunnerScripts/bv_quantified_strategy.smt2",
-            "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2"
+            "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2",
+            "TestSMTLibRunnerScripts/bv_quantified_mbqi.smt2",
+            "TestSMTLibRunnerCPPReference/bv_quantified_mbqi.smt2"
           ]
         }
       ],
@@ -180133,7 +180140,9 @@
         "TestSMTLibRunnerScripts/ufbv_solver.smt2",
         "TestSMTLibRunnerCPPReference/ufbv_solver.smt2",
         "TestSMTLibRunnerScripts/bv_quantified_strategy.smt2",
-        "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2"
+        "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2",
+        "TestSMTLibRunnerScripts/bv_quantified_mbqi.smt2",
+        "TestSMTLibRunnerCPPReference/bv_quantified_mbqi.smt2"
       ],
       "conditionals": [
         {
@@ -180158,7 +180167,9 @@
             "TestSMTLibRunnerScripts/ufbv_solver.smt2",
             "TestSMTLibRunnerCPPReference/ufbv_solver.smt2",
             "TestSMTLibRunnerScripts/bv_quantified_strategy.smt2",
-            "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2"
+            "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2",
+            "TestSMTLibRunnerScripts/bv_quantified_mbqi.smt2",
+            "TestSMTLibRunnerCPPReference/bv_quantified_mbqi.smt2"
           ]
         }
       ],

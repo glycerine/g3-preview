@@ -94,12 +94,12 @@ func (t *RewriterTacticAdapter) Apply(goal *tactic.Goal, result *tactic.TacticRe
 	if published != goal {
 		return errors.Join(ast.ErrASTDomain, published.DecRef())
 	}
-	if err = result.AddGoal(goal); err != nil {
+	if err = result.TakeGoal(goal); err != nil {
 		return errors.Join(err, published.DecRef())
 	}
-	// RewriterTactic publishes the source goal_ref_buffer reference. The common
-	// result records this in-place goal as borrowed, so retire that extra pin.
-	return published.DecRef()
+	// RewriterTactic publishes the source goal_ref_buffer reference. Transfer
+	// that exact incremented reference into the common result owner.
+	return nil
 }
 func (t *RewriterTacticAdapter) UpdateParams(*uparams.ParamsRef) error         { return t.open() }
 func (t *RewriterTacticAdapter) CollectParamDescrs(*uparams.ParamDescrs) error { return t.open() }
