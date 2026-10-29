@@ -29,3 +29,8 @@
 (assert (<= x 0.0))
 (assert (>= x 1.0))
 (check-sat)
+(reset)
+(set-logic ALL)
+(declare-const x Real)
+(assert (= (* x x) (- 1.0)))
+(check-sat)
