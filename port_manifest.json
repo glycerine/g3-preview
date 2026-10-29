@@ -93193,12 +93193,12 @@
           "go_target": "pkg/muz/fp/spacer_engine.go"
         },
         {
-          "name": "live Spacer query specialization: mark the query output, then run cone filtering, interpreted-tail simplification, retained subsumption, acyclic inlining, and a second simplification/inlining pass in source priority order",
+          "name": "live Spacer query specialization: mark the query output, then run every source-scheduled cone, interpreted-tail simplification, retained subsumption, and acyclic-inlining round in exact priority order",
           "status": "ported",
           "go_target": "pkg/muz/fp/spacer_engine.go"
         },
         {
-          "name": "complete ordered default transform pipeline including array/quantifier transforms, subsumption, bit blasting, scaling, and magic sets",
+          "name": "remaining ordered default transform stages for arrays, quantifiers, bit blasting, scaling, Karr invariants, and magic sets",
           "status": "unported"
         }
       ],
@@ -93206,7 +93206,7 @@
         "Each Spacer query owns a finalized transformed RuleSet clone until Context initialization has retained its rules; the engine's original set remains available for subsequent queries."
       ],
       "deviations": [
-        "The source-reached Spacer cone, interpreted-tail, subsumption, and inliner stages are integrated here; array/quantifier transforms, bit blasting, scaling, magic sets, and the remaining repeated schedule stay pending until reached by retained consumers."
+        "Every source-scheduled cone, interpreted-tail, subsumption, and inliner round is integrated here; array/quantifier transforms, bit blasting, scaling, Karr invariants, and magic sets stay pending until reached by retained consumers."
       ]
     },
     {

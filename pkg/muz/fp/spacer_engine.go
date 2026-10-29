@@ -73,14 +73,58 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 35000)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
-	secondSimplifier, err := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 30000)
+	if err = transformer.Register(transforms.NewConePlugin(34990)); err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	secondSimplifier, err := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 34980)
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
 	if err = transformer.Register(secondSimplifier); err != nil {
 		return nil, errors.Join(err, secondSimplifier.Close(), transformer.Close())
 	}
-	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 25000)); err != nil {
+	if useSubsumption {
+		if err = transformer.Register(transforms.NewSubsumptionCheckerPlugin(useChecker, 34975)); err != nil {
+			return nil, errors.Join(err, transformer.Close())
+		}
+	}
+	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 34970)); err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	if err = transformer.Register(transforms.NewConePlugin(34960)); err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	thirdSimplifier, err := transforms.NewInterpTailSimplifierPlugin(e.manager, e.rules, e.params, e.globals, 34950)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	if err = transformer.Register(thirdSimplifier); err != nil {
+		return nil, errors.Join(err, thirdSimplifier.Close(), transformer.Close())
+	}
+	if useSubsumption {
+		for _, stage := range []struct {
+			priority uint32
+			inlining bool
+		}{
+			{priority: 34940},
+			{priority: 34930, inlining: true},
+			{priority: 34920},
+			{priority: 34910, inlining: true},
+			{priority: 34900},
+			{priority: 34890, inlining: true},
+			{priority: 34880},
+		} {
+			var plugin base.RuleTransformPlugin
+			if stage.inlining {
+				plugin = transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, stage.priority)
+			} else {
+				plugin = transforms.NewSubsumptionCheckerPlugin(useChecker, stage.priority)
+			}
+			if err = transformer.Register(plugin); err != nil {
+				return nil, errors.Join(err, plugin.Close(), transformer.Close())
+			}
+		}
+	} else if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 34930)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
 	_, err = transformer.Apply(prepared)
