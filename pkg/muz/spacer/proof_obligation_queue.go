@@ -166,6 +166,10 @@ func (q *ProofObligationQueue) Root() (*ProofObligation, error) {
 	return q.root, nil
 }
 
+func (q *ProofObligationQueue) IsRoot(obligation *ProofObligation) bool {
+	return q != nil && q.root != nil && q.root == obligation
+}
+
 func (q *ProofObligationQueue) IncrementLevel() error {
 	if q.root == nil {
 		return ErrManagerOwner

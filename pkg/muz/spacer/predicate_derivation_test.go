@@ -120,6 +120,13 @@ func TestSpacerPredicateCreatesAndAttachesProjectedDerivation(t *testing.T) {
 	if concreteExpansion.Status != lbool.True || !concreteExpansion.Concrete || concreteExpansion.Child != nil {
 		t.Fatal("Spacer concrete expansion", concreteExpansion.Status, concreteExpansion.Concrete, concreteExpansion.Child)
 	}
+	queueRoot, err := transformer.NewProofObligation(nil, 0, 3, truth, nil)
+	spacerMust(t, err)
+	var queue spacer.ProofObligationQueue
+	spacerMust(t, queue.SetRoot(queueRoot))
+	if reached, err := queue.CheckReachability(); err != nil || !reached {
+		t.Fatal("concrete Spacer obligation search", reached, err)
+	}
 	spacerMust(t, manager.DelRef(&originReach))
 	spacerMust(t, md.Close())
 	spacerMust(t, recursive.Close())
@@ -159,6 +166,14 @@ func TestSpacerAbstractExpansionCreatesDerivationChild(t *testing.T) {
 	}
 	if _, found, err := expansion.Child.Derivation(); err != nil || !found {
 		t.Fatal("Spacer abstract child derivation", found, err)
+	}
+	spacerMust(t, transformer.SetProofObligationReuse(false))
+	queueRoot, err := transformer.NewProofObligation(nil, 1, 1, truth, nil)
+	spacerMust(t, err)
+	var queue spacer.ProofObligationQueue
+	spacerMust(t, queue.SetRoot(queueRoot))
+	if reached, err := queue.CheckReachability(); err != nil || reached {
+		t.Fatal("blocked recursive Spacer obligation search", reached, err)
 	}
 	spacerMust(t, recursive.Close())
 	spacerMust(t, ruleManager.Close())
