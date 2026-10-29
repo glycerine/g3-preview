@@ -102,6 +102,22 @@ func (p *legacyArrayProjection) projectFormula(md *model.ModelCore, variables []
 			}
 			continue
 		}
+		currentHandle, err = p.syntax.manager.RefGet(current)
+		if err != nil {
+			return nil, err
+		}
+		polarized, err := p.replaceEqualityPolarities(md, variable, currentHandle)
+		if err != nil {
+			return nil, err
+		}
+		next, err := p.syntax.manager.RefGet(polarized.formula)
+		if err == nil {
+			err = p.syntax.manager.SetRef(current, next)
+		}
+		err = errors.Join(err, polarized.Close())
+		if err != nil {
+			return nil, err
+		}
 		remaining = append(remaining, variable)
 	}
 	currentHandle, err := p.syntax.manager.RefGet(current)

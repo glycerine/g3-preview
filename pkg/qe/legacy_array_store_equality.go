@@ -196,7 +196,46 @@ func (p *legacyArrayProjection) projectStoreEquality(md *model.ModelCore, variab
 		return nil, false, err
 	}
 	defer func() { resultErr = errors.Join(resultErr, partial.Close()) }()
-	expansion, err := partial.Expand(rhs != variable)
+	factored, err := p.factorPartialSelects(md, evaluator, variable, partial)
+	if err != nil {
+		return nil, false, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, factored.Close()) }()
+	for _, variableRef := range factored.variables {
+		handle, err := p.syntax.manager.RefGet(variableRef)
+		if err != nil {
+			return nil, false, err
+		}
+		copy, err := p.syntax.manager.NewRef(handle)
+		if err != nil {
+			return nil, false, err
+		}
+		result.variables = append(result.variables, copy)
+	}
+	for _, equalityRef := range factored.equalities {
+		handle, err := p.syntax.manager.RefGet(equalityRef)
+		if err != nil {
+			return nil, false, err
+		}
+		auxiliary = append(auxiliary, handle)
+	}
+	factoredLHS, err := p.syntax.manager.RefGet(factored.partial.lhs)
+	if err != nil {
+		return nil, false, err
+	}
+	factoredRHS, err := p.syntax.manager.RefGet(factored.partial.rhs)
+	if err != nil {
+		return nil, false, err
+	}
+	factoredIndices := make([]ast.ASTHandle, 0, len(factored.partial.indices))
+	for _, indexRef := range factored.partial.indices {
+		handle, err := p.syntax.manager.RefGet(indexRef)
+		if err != nil {
+			return nil, false, err
+		}
+		factoredIndices = append(factoredIndices, handle)
+	}
+	expansion, err := factored.partial.Expand(factoredRHS != variable)
 	if err != nil {
 		return nil, false, err
 	}
@@ -211,7 +250,7 @@ func (p *legacyArrayProjection) projectStoreEquality(md *model.ModelCore, variab
 			return nil, false, err
 		}
 		result.variables = append(result.variables, constantCopy)
-		selectTerm, err := p.syntax.manager.MkFamilyApp(p.syntax.family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{lhs, indices[index]})
+		selectTerm, err := p.syntax.manager.MkFamilyApp(p.syntax.family, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{factoredLHS, factoredIndices[index]})
 		if err != nil {
 			return nil, false, err
 		}
