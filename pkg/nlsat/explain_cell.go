@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/polynomial"
 	"github.com/glycerine/g3/pkg/sat"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type explanationCellScope struct {
@@ -44,9 +45,77 @@ func (n *explanationAssumptions) finishCell() error {
 	return nil
 }
 
-// addRootLiteral currently uses the source fallback representation. Linear and
-// quadratic rewrites are equivalent optimizations and remain separate work.
+func (n *explanationAssumptions) addLinearRoot(k AtomKind, p polynomial.Polynomial, negativeCoefficient bool) error {
+	sign := false
+	switch k {
+	case AtomRootEQ:
+		k = AtomEQ
+	case AtomRootLT:
+		k = AtomLT
+	case AtomRootGT:
+		k = AtomGT
+	case AtomRootLE:
+		k, sign = AtomGT, true
+	case AtomRootGE:
+		k, sign = AtomLT, true
+	default:
+		return arena.ErrConfig
+	}
+	// The source negates p when its y coefficient is negative. Flipping the
+	// strict comparison is the identical predicate and avoids constructing a
+	// second polynomial; equality and literal polarity are unchanged.
+	if negativeCoefficient {
+		switch k {
+		case AtomLT:
+			k = AtomGT
+		case AtomGT:
+			k = AtomLT
+		}
+	}
+	return n.addSimpleAssumption(k, p, sign)
+}
+
+func (n *explanationAssumptions) addLinearRootLiteral(k AtomKind, y uint32, p polynomial.Polynomial) (matched bool, err error) {
+	core := n.search.store.atoms.ineq.core
+	degree, err := core.Degree(p, y)
+	if err != nil || degree != 1 {
+		return false, err
+	}
+	integers, err := core.IntegerManager()
+	if err != nil {
+		return false, err
+	}
+	var coefficient unumeral.Int
+	defer func() { err = errors.Join(err, integers.Del(&coefficient)) }()
+	constant, err := core.ConstantCoefficient(p, y, 1, &coefficient)
+	if err != nil || !constant {
+		return false, err
+	}
+	zero, err := integers.IsZero(&coefficient)
+	if err != nil {
+		return false, err
+	}
+	if err = atomAssert("nlsat_explain.cpp", 743, "!m_pm.m().is_zero(c)", !zero); err != nil {
+		return false, err
+	}
+	if zero {
+		return false, arena.ErrConfig
+	}
+	negative, err := integers.IsNeg(&coefficient)
+	if err != nil {
+		return false, err
+	}
+	return true, n.addLinearRoot(k, p, negative)
+}
+
+// addRootLiteral uses the source's constant-coefficient linear rewrite before
+// falling back to a root atom. The pseudo-linear and quadratic optimizations
+// remain separate because their coefficient signs require projected guards.
 func (n *explanationAssumptions) addRootLiteral(k AtomKind, y, index uint32, p polynomial.Polynomial) error {
+	matched, err := n.addLinearRootLiteral(k, y, p)
+	if err != nil || matched {
+		return err
+	}
 	b, err := n.search.store.atoms.mkRoot(k, y, index, p)
 	if err != nil {
 		return err

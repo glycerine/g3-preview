@@ -106,9 +106,9 @@ func TestSearchResolutionLazyClauseUsesComposedExplanation(t *testing.T) {
 	if len(q.lazy.result) != 2 || q.lazy.result[1] != conflict.Negated() || len(n.output.result) != 0 {
 		t.Fatal("lazy explanation clause composition", q.lazy.result, n.output.result)
 	}
-	root, ok := r.store.atoms.bools.atoms[q.lazy.result[0].Variable()].(*RootAtom)
-	if !ok || root.kind != AtomRootLT || !q.lazy.result[0].Sign() {
-		t.Fatal("lazy clause projected boundary", q.lazy.result[0], root)
+	inequality, ok := r.store.atoms.bools.atoms[q.lazy.result[0].Variable()].(*InequalityAtom)
+	if !ok || inequality.kind != AtomLT || inequality.maxVar != 0 || len(inequality.factors) != 1 || !q.lazy.result[0].Sign() {
+		t.Fatal("lazy clause projected boundary", q.lazy.result[0], inequality)
 	}
 }
 

@@ -23,11 +23,11 @@ func TestExplanationMainCollectsAtomsAndBuildsProjectedCell(t *testing.T) {
 		t.Fatal("complete explanation projection frontier", empty, n.output.result)
 	}
 	boundary := n.output.result[0]
-	root, ok := r.store.atoms.bools.atoms[boundary.Variable()].(*RootAtom)
-	if !ok || !boundary.Sign() || root.kind != AtomRootLT || root.Variable() != 0 || root.Index() != 1 {
-		t.Fatal("projected explanation boundary", boundary, root)
+	inequality, ok := r.store.atoms.bools.atoms[boundary.Variable()].(*InequalityAtom)
+	if !ok || !boundary.Sign() || inequality.kind != AtomLT || inequality.maxVar != 0 || len(inequality.factors) != 1 {
+		t.Fatal("projected explanation boundary", boundary, inequality)
 	}
-	value, err := e.Eval(root, boundary.Sign())
+	value, err := e.Eval(inequality, boundary.Sign())
 	assignmentMust(t, err)
 	if value {
 		t.Fatal("explanation boundary is true in the conflicting interpretation")

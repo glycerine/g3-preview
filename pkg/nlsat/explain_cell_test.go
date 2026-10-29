@@ -17,24 +17,21 @@ func explanationCellVector(t *testing.T, e *Evaluator, values ...polynomial.Poly
 	return v
 }
 
-func explanationCellAtoms(t *testing.T, e *Evaluator, r *searchState, n *explanationAssumptions, ps *polynomial.PolynomialRefVector, y uint32, full bool) []*RootAtom {
+func explanationCellAtoms(t *testing.T, e *Evaluator, r *searchState, n *explanationAssumptions, ps *polynomial.PolynomialRefVector, y uint32, full bool) []ArithmeticAtom {
 	t.Helper()
 	assignmentMust(t, n.collectCellLiterals(ps, y, full))
-	result := make([]*RootAtom, len(n.output.result))
+	result := make([]ArithmeticAtom, len(n.output.result))
 	for i, literal := range n.output.result {
-		if !literal.Sign() {
-			t.Fatal("cell literal must negate its selected root boundary", literal)
+		a := r.store.atoms.bools.atoms[literal.Variable()]
+		if a == nil {
+			t.Fatal("cell did not construct an arithmetic atom", literal)
 		}
-		root, ok := r.store.atoms.bools.atoms[literal.Variable()].(*RootAtom)
-		if !ok {
-			t.Fatal("cell fallback did not construct a root atom", literal)
-		}
-		value, err := e.Eval(root, literal.Sign())
+		value, err := e.Eval(a, literal.Sign())
 		assignmentMust(t, err)
 		if value {
 			t.Fatal("explanation cell literal is true in the current interpretation", literal)
 		}
-		result[i] = root
+		result[i] = a
 	}
 	return result
 }
@@ -47,26 +44,43 @@ func TestExplanationCellLiteralsExactRootAndNearestBounds(t *testing.T) {
 
 	evaluatorSetFraction(t, e, 1, 0, 1)
 	atoms := explanationCellAtoms(t, e, r, n, explanationCellVector(t, e, x), 1, false)
-	if len(atoms) != 1 || atoms[0].kind != AtomRootEQ || atoms[0].index != 1 || atoms[0].polynomial != x {
+	if len(atoms) != 1 {
+		t.Fatal("exact cell root count", atoms)
+	}
+	linear, ok := atoms[0].(*InequalityAtom)
+	if !ok || linear.kind != AtomEQ || len(linear.factors) != 1 || linear.factors[0].Polynomial != x {
 		t.Fatal("exact cell root", atoms)
 	}
 	assignmentMust(t, n.reset())
 
 	atoms = explanationCellAtoms(t, e, r, n, explanationCellVector(t, e, square, linearUpper), 1, false)
-	if len(atoms) != 2 || atoms[0].kind != AtomRootGT || atoms[0].index != 1 || atoms[0].polynomial != square || atoms[1].kind != AtomRootLT || atoms[1].index != 2 || atoms[1].polynomial != square {
+	if len(atoms) != 2 {
+		t.Fatal("nearest lower/upper root count", atoms)
+	}
+	lower, lowerOK := atoms[0].(*RootAtom)
+	upper, upperOK := atoms[1].(*RootAtom)
+	if !lowerOK || !upperOK || lower.kind != AtomRootGT || lower.index != 1 || lower.polynomial != square || upper.kind != AtomRootLT || upper.index != 2 || upper.polynomial != square {
 		t.Fatal("nearest lower/upper roots", atoms)
 	}
 	assignmentMust(t, n.reset())
 
 	evaluatorSetFraction(t, e, 1, 3, 1)
 	atoms = explanationCellAtoms(t, e, r, n, explanationCellVector(t, e, square, linearUpper), 1, false)
-	if len(atoms) != 1 || atoms[0].kind != AtomRootGT || atoms[0].index != 1 || atoms[0].polynomial != linearUpper {
+	if len(atoms) != 1 {
+		t.Fatal("nearest finite lower root count", atoms)
+	}
+	linear, ok = atoms[0].(*InequalityAtom)
+	if !ok || linear.kind != AtomGT || len(linear.factors) != 1 || linear.factors[0].Polynomial != linearUpper {
 		t.Fatal("nearest finite lower root", atoms)
 	}
 	assignmentMust(t, n.reset())
 
 	atoms = explanationCellAtoms(t, e, r, n, explanationCellVector(t, e, square, linearUpper), 1, true)
-	if len(atoms) != 1 || atoms[0].kind != AtomRootGE || atoms[0].index != 1 || atoms[0].polynomial != linearUpper {
+	if len(atoms) != 1 {
+		t.Fatal("full-dimensional lower root count", atoms)
+	}
+	linear, ok = atoms[0].(*InequalityAtom)
+	if !ok || linear.kind != AtomLT || len(linear.factors) != 1 || linear.factors[0].Polynomial != linearUpper {
 		t.Fatal("full-dimensional closed lower boundary", atoms)
 	}
 }
@@ -78,7 +92,53 @@ func TestExplanationCellLiteralsSkipLowerStagePolynomials(t *testing.T) {
 	evaluatorSetFraction(t, e, 0, 1, 1)
 	evaluatorSetFraction(t, e, 1, 0, 1)
 	atoms := explanationCellAtoms(t, e, r, n, explanationCellVector(t, e, lowerStage, current), 1, false)
-	if len(atoms) != 2 || atoms[0].polynomial != current || atoms[1].polynomial != current {
+	if len(atoms) != 2 {
+		t.Fatal("lower-stage root count", atoms)
+	}
+	lower, lowerOK := atoms[0].(*RootAtom)
+	upper, upperOK := atoms[1].(*RootAtom)
+	if !lowerOK || !upperOK || lower.polynomial != current || upper.polynomial != current {
 		t.Fatal("lower-stage polynomial contributed a current cell root", atoms)
+	}
+}
+
+func TestExplanationLinearRootNegativeCoefficientRelationMapping(t *testing.T) {
+	e, r, n := explanationAssumptionFixture(t)
+	p := evaluatorPolynomial(t, e, evaluatorTerm{-1, 0, 1}, evaluatorTerm{2, 0, 0})
+	ps := explanationCellVector(t, e, p)
+	for _, tc := range []struct {
+		name       string
+		value      int64
+		full       bool
+		kind       AtomKind
+		literalNeg bool
+	}{
+		{"equal", 2, false, AtomEQ, true},
+		{"below-open", 1, false, AtomLT, true},
+		{"above-open", 3, false, AtomGT, true},
+		{"below-closed", 1, true, AtomGT, false},
+		{"above-closed", 3, true, AtomLT, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			evaluatorSetFraction(t, e, 1, tc.value, 1)
+			assignmentMust(t, n.collectCellLiterals(ps, 1, tc.full))
+			defer func() { assignmentMust(t, n.reset()) }()
+			if len(n.output.result) != 1 {
+				t.Fatal("linear boundary count", n.output.result)
+			}
+			literal := n.output.result[0]
+			ineq, ok := r.store.atoms.bools.atoms[literal.Variable()].(*InequalityAtom)
+			if !ok || ineq.kind != tc.kind || len(ineq.factors) != 1 || literal.Sign() != tc.literalNeg {
+				if ok {
+					t.Fatal("negative-coefficient root mapping", ineq.kind, ineq.factors, literal.Sign(), tc)
+				}
+				t.Fatal("negative-coefficient root mapping", literal)
+			}
+			value, err := e.Eval(ineq, literal.Sign())
+			assignmentMust(t, err)
+			if value {
+				t.Fatal("linear root explanation is true in its model", tc, literal)
+			}
+		})
 	}
 }

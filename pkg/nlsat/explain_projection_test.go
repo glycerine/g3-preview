@@ -36,11 +36,11 @@ func TestExplanationProjectionBuildsLowerCell(t *testing.T) {
 	if !literal.Sign() {
 		t.Fatal("projection explanation must negate the selected boundary", literal)
 	}
-	root, ok := r.store.atoms.bools.atoms[literal.Variable()].(*RootAtom)
-	if !ok || root.kind != AtomRootLT || root.Variable() != 0 || root.index != 1 || root.polynomial != values[0] {
-		t.Fatal("wrong projected cell root", root)
+	inequality, ok := r.store.atoms.bools.atoms[literal.Variable()].(*InequalityAtom)
+	if !ok || inequality.kind != AtomLT || inequality.maxVar != 0 || len(inequality.factors) != 1 {
+		t.Fatal("wrong projected cell inequality", inequality)
 	}
-	value, err := e.Eval(root, literal.Sign())
+	value, err := e.Eval(inequality, literal.Sign())
 	assignmentMust(t, err)
 	if value {
 		t.Fatal("projected explanation is true in the current interpretation")
