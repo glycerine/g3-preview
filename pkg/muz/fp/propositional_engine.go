@@ -54,31 +54,32 @@ func (e *PropositionalEngine) predicateState(declaration ast.ASTHandle) (*predic
 // PropositionalEngine owns the retained rule, finite-relation, and optional
 // ground-guard rewriting services.
 type PropositionalEngine struct {
-	manager          *ast.ASTManager
-	rules            *base.RuleManager
-	set              *base.RuleSet
-	binder           *base.VariableBinder
-	relations        *rel.RelationManager
-	guard            *astrewriter.TheoryRewriter
-	background       ast.ASTRef
-	params           *uparams.ParamsContext
-	globals          *uparams.GlobalParamsService
-	backend          string
-	pdr              *muzpdr.Context
-	spacer           *muzspacer.Context
-	scopes           []*base.RuleSet
-	predicates       map[ast.ASTHandle]*predicateState
-	predicateOrder   []ast.ASTHandle
-	auxiliary        map[ast.ASTHandle]bool
-	compiled         bool
-	queried          bool
-	revision         uint64
-	pdrRevision      uint64
-	spacerRevision   uint64
-	spacerPredicates map[ast.ASTHandle]ast.ASTHandle
-	spacerSlices     map[ast.ASTHandle][]bool
-	spacerQuantified map[ast.ASTHandle]ast.ASTHandle
-	closed           bool
+	manager            *ast.ASTManager
+	rules              *base.RuleManager
+	set                *base.RuleSet
+	binder             *base.VariableBinder
+	relations          *rel.RelationManager
+	guard              *astrewriter.TheoryRewriter
+	background         ast.ASTRef
+	params             *uparams.ParamsContext
+	globals            *uparams.GlobalParamsService
+	backend            string
+	pdr                *muzpdr.Context
+	spacer             *muzspacer.Context
+	scopes             []*base.RuleSet
+	predicates         map[ast.ASTHandle]*predicateState
+	predicateOrder     []ast.ASTHandle
+	auxiliary          map[ast.ASTHandle]bool
+	compiled           bool
+	queried            bool
+	revision           uint64
+	pdrRevision        uint64
+	spacerRevision     uint64
+	spacerPredicates   map[ast.ASTHandle]ast.ASTHandle
+	spacerSlices       map[ast.ASTHandle][]bool
+	spacerQuantified   map[ast.ASTHandle]ast.ASTHandle
+	spacerInstantiated map[ast.ASTHandle]ast.ASTHandle
+	closed             bool
 }
 
 // NewPropositionalEngineWithServices adds the retained AST theory rewriter
@@ -1473,6 +1474,7 @@ func (e *PropositionalEngine) Close() (result error) {
 		e.spacerPredicates = nil
 		e.spacerSlices = nil
 		e.spacerQuantified = nil
+		e.spacerInstantiated = nil
 	}
 	for i := len(e.scopes) - 1; i >= 0; i-- {
 		result = errors.Join(result, e.scopes[i].Close())

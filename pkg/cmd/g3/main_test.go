@@ -360,10 +360,11 @@ var scriptResults = map[string]string{
 	"fp_spacer_mincut_inv.smt2":                    "unsat\n",
 	"fp_spacer_mutual_inv.smt2":                    "unsat\n",
 	"fixedpoint_spacer_nonlinear_inlining.smt2":    "sat\ntrue\n",
-	"fixedpoint_spacer_inliner_resolution.smt2":   "sat\ntrue\nunsat\n",
-	"fixedpoint_spacer_unfold_rules.smt2":         "sat\n",
-	"fixedpoint_spacer_coalesce_unfold.smt2":      "sat\n",
-	"fixedpoint_spacer_slice_columns.smt2":        "sat\n",
+	"fixedpoint_spacer_inliner_resolution.smt2":    "sat\ntrue\nunsat\n",
+	"fixedpoint_spacer_unfold_rules.smt2":          "sat\n",
+	"fixedpoint_spacer_coalesce_unfold.smt2":       "sat\n",
+	"fixedpoint_spacer_slice_columns.smt2":         "sat\n",
+	"fp_spacer_array_instantiation.smt2":           "sat\n",
 	"fixedpoint_spacer_recursive_trace.smt2":       "sat\n(and (P 1) (P 0))\nunsat\n",
 	"horn_tactic_finite.smt2":                      "unsat\nsat\nunsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"horn_solver_finite.smt2":                      "unsat\nsat\n",
@@ -1000,6 +1001,19 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 }
 
 func canonicalReferenceOutput(name, output string) string {
+	if name == "fp_spacer_array_instantiation.smt2" {
+		// dl_mk_array_instantiation.cpp writes its complete input/output rule
+		// dumps to stdout unconditionally. Compare the actual command response
+		// while retaining the native executable as the semantic oracle.
+		var responses []string
+		for _, line := range strings.Split(output, "\n") {
+			line = strings.TrimSpace(line)
+			if line == "sat" || line == "unsat" || line == "unknown" {
+				responses = append(responses, line)
+			}
+		}
+		return strings.Join(responses, "\n")
+	}
 	if name == "difference_shortcut_cores_real.smt2" || name == "difference_shortcut_cores_int.smt2" {
 		// Conflict analysis stores core labels in an unordered declaration map.
 		// Compare exact membership within each core, keeping every result/scope.

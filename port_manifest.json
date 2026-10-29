@@ -88781,6 +88781,7 @@
         "TestContextConsumesWeakAbstractionPolicy",
         "TestContextConsumesResultValidationPolicy",
         "TestContextConsumesFrameSimplificationPolicies",
+        "TestSpacerContextInitializesOutputWithoutRetainedRules",
         "TestSpacerFramesSimplifySameLevelLemmasByUnitPropagation",
         "TestLemmaGeneralizerGateRequiresNonFalseFarkasLemma",
         "TestPropSolverScopesWeakAbstractionParameters",
@@ -91791,9 +91792,18 @@
       "path": "src/muz/transforms/dl_mk_array_instantiation.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/transforms/array_instantiation.go",
+        "pkg/muz/transforms/array_instantiation_test.go",
+        "pkg/muz/fp/spacer_engine.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_array_instantiation.smt2"
+      ],
+      "tests": [
+        "TestArrayInstantiationExpandsPredicateCellsAndIndices",
+        "TestSMTLibRunnerScripts/fp_spacer_array_instantiation.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_array_instantiation.smt2"
+      ],
       "assertions": [
         {
           "line": 158,
@@ -91802,17 +91812,35 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "predicate-cell expansion, linked-select discovery through array equivalence classes, source chosen-vector instantiation traversal, enforced array removal, and output remapping",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/array_instantiation.go",
+          "tests": [
+            "TestArrayInstantiationExpandsPredicateCellsAndIndices",
+            "TestSMTLibRunnerCPPReference/fp_spacer_array_instantiation.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "Generated predicate declarations are retained by RuleManager and RuleSet mappings; generated expressions transfer into owning transformed Rules."
+      ],
+      "deviations": [
+        "The native transform unconditionally prints complete input and output rule dumps to stdout. Go omits this diagnostic pollution; the differential harness isolates the actual SMT command response for this vector."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_array_instantiation.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/transforms/array_instantiation.go"
+      ],
+      "tests": [
+        "TestArrayInstantiationExpandsPredicateCellsAndIndices"
+      ],
       "conditionals": [
         {
           "line": 69,
@@ -91825,8 +91853,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "concrete prioritized array-instantiation plugin and transformed-predicate mapping",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/array_instantiation.go"
+        }
+      ],
+      "ownership": [
+        "Normal Go package compilation replaces header guards; the RuleTransformer owns and closes the plugin."
+      ],
       "deviations": []
     },
     {
@@ -93539,6 +93575,7 @@
         "pkg/muz/transforms/coi_plugin.go",
         "pkg/muz/transforms/subsumption_checker.go",
         "pkg/muz/transforms/array_eq_rewrite.go",
+        "pkg/muz/transforms/array_instantiation.go",
         "pkg/muz/transforms/quantifier_instantiation.go",
         "pkg/muz/transforms/quantifier_abstraction.go"
       ],
@@ -93554,6 +93591,7 @@
         "TestSubsumptionCheckerRemovesTotalPositiveTail",
         "TestSMTLibRunnerCPPReference/fp_spacer_skip_propagate.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_array_eq_rewrite.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_array_instantiation.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_quantifier_instantiation.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_quantifier_abstraction.smt2"
       ],
@@ -93576,7 +93614,12 @@
           "go_target": "pkg/muz/fp/spacer_engine.go"
         },
         {
-          "name": "remaining ordered default transform stages for array instantiation/blasting, bit blasting, scaling, Karr invariants, and magic sets",
+          "name": "ordered predicate-cell array instantiation stage",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/spacer_engine.go"
+        },
+        {
+          "name": "remaining ordered default transform stages for array blasting, bit blasting, scaling, Karr invariants, and magic sets",
           "status": "unported"
         }
       ],
@@ -93584,7 +93627,7 @@
         "Each Spacer query owns a finalized transformed RuleSet clone until Context initialization has retained its rules; the engine's original set remains available for subsequent queries."
       ],
       "deviations": [
-        "Every source-scheduled cone, interpreted-tail, subsumption, inliner, array-equality, quantified-instantiation, and array-quantification round reached by the retained Spacer consumer is integrated. Array instantiation/blasting, bit blasting, scaling, Karr invariants, and magic sets remain pending."
+        "Every source-scheduled cone, interpreted-tail, subsumption, inliner, array-instantiation/equality, quantified-instantiation, and array-quantification round reached by the retained Spacer consumer is integrated. Array blasting, bit blasting, scaling, Karr invariants, and magic sets remain pending."
       ]
     },
     {

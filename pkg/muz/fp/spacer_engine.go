@@ -107,6 +107,21 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	instantiateArraysName := "xform.instantiate_arrays"
+	instantiateArrays, err := e.params.GetBoolName(&fixedpoint, &instantiateArraysName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	instantiateArraysEnforceName := "xform.instantiate_arrays.enforce"
+	instantiateArraysEnforce, err := e.params.GetBoolName(&fixedpoint, &instantiateArraysEnforceName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	instantiateArraysQuantifiersName := "xform.instantiate_arrays.nb_quantifier"
+	instantiateArraysQuantifiers, err := e.params.GetUIntName(&fixedpoint, &instantiateArraysQuantifiersName, 1)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -125,6 +140,14 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if quantifyArrays {
 		quantifierAbstraction = transforms.NewQuantifierAbstractionPlugin(e.manager, e.rules, 38000)
 		if err = transformer.Register(quantifierAbstraction); err != nil {
+			return nil, errors.Join(err, transformer.Close())
+		}
+	}
+	var arrayInstantiation *transforms.ArrayInstantiationPlugin
+	var instantiatedPredicates map[ast.ASTHandle]ast.ASTHandle
+	if instantiateArrays {
+		arrayInstantiation = transforms.NewArrayInstantiationPlugin(e.manager, e.rules, instantiateArraysQuantifiers, instantiateArraysEnforce, 34999)
+		if err = transformer.Register(arrayInstantiation); err != nil {
 			return nil, errors.Join(err, transformer.Close())
 		}
 	}
@@ -206,6 +229,17 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 			e.predicates[declaration] = state
 		}
 	}
+	if err == nil && arrayInstantiation != nil {
+		instantiatedPredicates = arrayInstantiation.FreshPredicates()
+		for _, declaration := range instantiatedPredicates {
+			state, stateErr := e.predicateState(declaration)
+			if stateErr != nil {
+				err = fmt.Errorf("muz/fp: array-instantiated predicate state: %w", stateErr)
+				break
+			}
+			e.predicates[declaration] = state
+		}
+	}
 	err = errors.Join(err, transformer.Close())
 	if err != nil {
 		return nil, fmt.Errorf("muz/fp: Spacer rule preprocessing: %w", err)
@@ -252,6 +286,7 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	e.spacerPredicates = slicedPredicates
 	e.spacerSlices = slicedColumns
 	e.spacerQuantified = quantifiedPredicates
+	e.spacerInstantiated = instantiatedPredicates
 	keep = true
 	return prepared, nil
 }
@@ -295,9 +330,20 @@ func (e *PropositionalEngine) querySpacerFromLevel(declaration ast.ASTHandle, fr
 		return lbool.Undef, err
 	}
 	defer func() { resultErr = errors.Join(resultErr, prepared.Close()) }()
-	queryDeclaration, err := prepared.DerivedPredicate(declaration)
+	queryDeclaration := e.spacerPredicate(declaration)
+	outputs, err := prepared.OutputPredicates()
 	if err != nil {
-		return lbool.Undef, err
+		return lbool.Undef, fmt.Errorf("muz/fp: enumerate preprocessed Spacer outputs: %w", err)
+	}
+	for _, output := range outputs {
+		original, originalErr := prepared.OriginalPredicate(output)
+		if originalErr != nil {
+			return lbool.Undef, fmt.Errorf("muz/fp: inspect preprocessed Spacer output: %w", originalErr)
+		}
+		if original == declaration {
+			queryDeclaration = output
+			break
+		}
 	}
 	// The retained Context currently owns one completed proof-obligation
 	// search. Rebuild it for a subsequent query until source reset_query is
@@ -338,7 +384,7 @@ func (e *PropositionalEngine) querySpacerFromLevel(declaration ast.ASTHandle, fr
 		return lbool.Undef, errors.Join(fmt.Errorf("muz/fp: initialize preprocessed Spacer rules: %w", err), context.Close())
 	}
 	if err = context.SetQuery(queryDeclaration); err != nil {
-		return lbool.Undef, errors.Join(err, context.Close())
+		return lbool.Undef, errors.Join(fmt.Errorf("muz/fp: set preprocessed Spacer query: %w", err), context.Close())
 	}
 	e.spacer = context
 	e.spacerRevision = e.revision

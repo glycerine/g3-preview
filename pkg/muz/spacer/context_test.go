@@ -168,3 +168,40 @@ func TestSpacerContextSolvesFactAndRecursiveNoBasePrograms(t *testing.T) {
 	spacerMust(t, recursiveManager.Close())
 	spacerMust(t, command.Close())
 }
+
+func TestSpacerContextInitializesOutputWithoutRetainedRules(t *testing.T) {
+	command, err := cmd_context.NewStandaloneContext()
+	spacerMust(t, err)
+	t.Cleanup(func() { spacerMust(t, command.Close()) })
+	manager, err := command.Manager()
+	spacerMust(t, err)
+	globals, err := command.GlobalParameters()
+	spacerMust(t, err)
+	rules, err := base.NewRuleManager(manager)
+	spacerMust(t, err)
+	t.Cleanup(func() { spacerMust(t, rules.Close()) })
+	set, err := base.NewRuleSet(rules)
+	spacerMust(t, err)
+	t.Cleanup(func() { spacerMust(t, set.Close()) })
+	boolean, err := manager.MkBoolSort()
+	spacerMust(t, err)
+	name, err := manager.Symbols.Intern("spacer-ruleless-output")
+	spacerMust(t, err)
+	declaration, err := manager.MkFuncDecl(name, nil, boolean, ast.ASTFuncDeclInfo{})
+	spacerMust(t, err)
+	spacerMust(t, rules.RegisterPredicate(declaration))
+	spacerMust(t, set.SetOutputPredicate(declaration))
+	valid, err := set.Finalize()
+	spacerMust(t, err)
+	if !valid {
+		t.Fatal("ruleless output set is unstratified")
+	}
+	context, err := spacer.NewContext(manager, nil, 1, smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals})
+	spacerMust(t, err)
+	t.Cleanup(func() { spacerMust(t, context.Close()) })
+	spacerMust(t, context.InitializePredicates(set, nil))
+	spacerMust(t, context.SetQuery(declaration))
+	if status, solveErr := context.Solve(0, 1); solveErr != nil || status != lbool.False {
+		t.Fatal("ruleless output query", status, solveErr)
+	}
+}

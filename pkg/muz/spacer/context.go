@@ -314,6 +314,13 @@ func (c *Context) InitializePredicates(set *base.RuleSet, declarations []ast.AST
 	for _, declaration := range declarations {
 		appendSpacerDeclaration(&order, seen, declaration)
 	}
+	outputs, err := set.OutputPredicates()
+	if err != nil {
+		return err
+	}
+	for _, declaration := range outputs {
+		appendSpacerDeclaration(&order, seen, declaration)
+	}
 	for index := 0; index < count; index++ {
 		rule, err := set.Rule(index)
 		if err != nil {
