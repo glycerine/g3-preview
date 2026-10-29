@@ -43,7 +43,17 @@ type GoalCompiler struct {
 	expressions *ast.Expr2Polynomial
 	arithmetic  ast.FamilyID
 	attachments []DependencyAttachment
+	factor      bool
 	closed      bool
+}
+
+// SetFactor selects goal2nlsat's source polynomial-factorization branch.
+func (c *GoalCompiler) SetFactor(factor bool) error {
+	if c == nil || c.closed {
+		return arena.ErrClosed
+	}
+	c.factor = factor
+	return nil
 }
 
 func NewGoalCompiler(manager *ast.ASTManager, solver *nlsat.Solver) (compiler *GoalCompiler, err error) {
@@ -187,7 +197,53 @@ func (c *GoalCompiler) processArithmeticAtom(expression ast.ASTHandle, kind nlsa
 		return 0, errors.Join(err, owned.Close())
 	}
 	defer func() { err = errors.Join(err, owned.Close()) }()
-	return c.solver.MkInequality(kind, []polynomial.Polynomial{difference}, []bool{false}, false)
+	maxVariable, err := core.MaxVariable(difference)
+	if err != nil {
+		return 0, err
+	}
+	if !c.factor || maxVariable == nlsat.NullVariable {
+		return c.solver.MkInequality(kind, []polynomial.Polynomial{difference}, []bool{false}, false)
+	}
+	factors, err := polynomial.NewPolynomialFactors(c.polynomials)
+	if err != nil {
+		return 0, err
+	}
+	defer func() { err = errors.Join(err, factors.CloseChecked()) }()
+	if err = c.polynomials.Factor(difference, factors, polynomial.DefaultUPolynomialFactorParams()); err != nil {
+		return 0, err
+	}
+	count, err := factors.Distinct()
+	if err != nil || count == 0 {
+		return 0, errors.Join(polynomial.ErrPolynomialPartial, err)
+	}
+	constant, err := factors.Constant()
+	if err != nil {
+		return 0, err
+	}
+	negative, err := integers.IsNeg(constant)
+	if err != nil {
+		return 0, err
+	}
+	if negative {
+		kind, err = kind.Flip()
+		if err != nil {
+			return 0, err
+		}
+	}
+	pieces := make([]polynomial.Polynomial, count)
+	even := make([]bool, count)
+	for i := uint32(0); i < count; i++ {
+		pieces[i], err = factors.Factor(i)
+		if err != nil {
+			return 0, err
+		}
+		degree, cause := factors.Degree(i)
+		if cause != nil {
+			return 0, cause
+		}
+		even[i] = degree%2 == 0
+	}
+	return c.solver.MkInequality(kind, pieces, even, false)
 }
 
 func (c *GoalCompiler) processAtom(expression ast.ASTHandle) (sat.Literal, error) {

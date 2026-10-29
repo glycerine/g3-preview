@@ -9,3 +9,8 @@
 (declare-const x Int)
 (assert (= (* 2 x) 1))
 (check-sat-using nlsat)
+(reset)
+(set-logic QF_NRA)
+(declare-const x Real)
+(assert (= (* x x) 1.0))
+(check-sat-using (using-params nlsat :factor true))

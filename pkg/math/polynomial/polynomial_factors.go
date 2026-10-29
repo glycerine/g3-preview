@@ -148,6 +148,15 @@ func (f *PolynomialFactors) Degree(i uint32) (uint32, error) {
 	}
 	return f.degree(i)
 }
+
+// Factor returns the borrowed polynomial at i. The factors owner retains its
+// reference until Reset or CloseChecked.
+func (f *PolynomialFactors) Factor(i uint32) (Polynomial, error) {
+	if e := f.ready(); e != nil {
+		return Polynomial{}, e
+	}
+	return f.factor(i)
+}
 func (f *PolynomialFactors) sourceSize() (uint32, error) {
 	if e := f.identity(); e != nil {
 		return 0, e

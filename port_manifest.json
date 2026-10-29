@@ -94557,14 +94557,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained nonfactoring goal compiler, model reconstruction, and core mapping",
+          "name": "retained goal compiler, polynomial factor atoms, model reconstruction, and core mapping",
           "status": "partial",
           "go_target": "pkg/nlsat/tactic/goal2nlsat.go",
           "tests": ["TestGoalCompilerRealQuadraticSat", "TestGoalCompilerIntegerLinearUnsat", "TestGoalCompilerRationalDenominatorClearing", "TestGoalCompilerBooleanAbstractionModel", "TestGoalCompilerUnsatCoreDependencies"]
         }
       ],
       "ownership": [],
-      "deviations": ["The live QF_NIA route requests factor=false and is complete for the retained compiler fragment. Source polynomial factor_atom and nlsat2goal diagnostic conversion remain pending."]
+      "deviations": ["The nlsat2goal diagnostic conversion remains pending; solving uses the retained factor and nonfactor compiler branches."]
     },
     {
       "path": "src/nlsat/tactic/goal2nlsat.h",

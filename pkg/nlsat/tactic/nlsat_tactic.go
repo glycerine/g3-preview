@@ -16,6 +16,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	primegen "github.com/glycerine/g3/pkg/util/prime"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -243,16 +244,21 @@ func (t *NLSATTactic) Apply(goal *basetactic.Goal, result *basetactic.TacticResu
 	if err != nil {
 		return err
 	}
+	primes, err := primegen.NewGenerator(t.manager.Budget())
+	if err != nil {
+		return err
+	}
 	polynomials, err := polynomial.NewMultivariatePolynomialManager(polynomial.MultivariatePolynomialManagerConfig{
 		Core: polynomial.MultivariatePolynomialConfig{
 			Integer: rationals.Integers(), Rationals: rationals,
 			Checkpoint:  t.manager.Limit.Inc,
 			Cooperation: func() error { return t.services.Cooperation.Cooperate("nlsat") },
 		},
-		Trace: t.services.Trace,
+		Factorization: polynomial.UPolynomialFactorizationConfig{Primes: primes},
+		Trace:         t.services.Trace,
 	})
 	if err != nil {
-		return err
+		return errors.Join(err, primes.Close())
 	}
 	var solver *nlsat.Solver
 	var compiler *GoalCompiler
@@ -264,6 +270,7 @@ func (t *NLSATTactic) Apply(goal *basetactic.Goal, result *basetactic.TacticResu
 			err = errors.Join(err, solver.Close())
 		}
 		err = errors.Join(err, polynomials.CloseChecked())
+		err = errors.Join(err, primes.Close())
 	}()
 	config, err := t.solverConfig(polynomials, algebraic)
 	if err != nil {
@@ -275,6 +282,9 @@ func (t *NLSATTactic) Apply(goal *basetactic.Goal, result *basetactic.TacticResu
 	}
 	compiler, err = NewGoalCompiler(t.manager, solver)
 	if err != nil {
+		return err
+	}
+	if err = compiler.SetFactor(config.Factor); err != nil {
 		return err
 	}
 	if err = compiler.Compile(goal); err != nil {
