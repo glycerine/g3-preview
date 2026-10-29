@@ -94650,21 +94650,21 @@
       "path": "src/nlsat/tactic/qfnra_nlsat_tactic.cpp",
       "component": "nlsat",
       "role": "production",
-      "status": "partial",
-      "go_targets": ["pkg/tactic/smtlogics/qfnra_tactic.go"],
-      "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"],
+      "status": "complete",
+      "go_targets": ["pkg/tactic/smtlogics/qfnra_tactic.go", "pkg/tactic/core/tseitin_cnf_tactic.go", "pkg/tactic/core/tseitin_cnf_encode.go"],
+      "tests": ["TestTseitinCNFNestedIffAndITEChain", "TestTseitinCNFCommonPatternAndBoundedDistributivity", "TestSMTLibRunnerScripts/qfnra_nlsat.smt2"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
         {
           "name": "retained polynomial-CNF route into NLSAT",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/tactic/smtlogics/qfnra_tactic.go",
           "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"]
         }
       ],
       "ownership": [],
-      "deviations": ["Purify-arith, factor, and term-ITE stages are integrated in source order. Tseitin-CNF remains pending; unsupported cases still fall through to bounded or SMT routes."]
+      "deviations": []
     },
     {
       "path": "src/nlsat/tactic/qfnra_nlsat_tactic.h",
@@ -171078,9 +171078,9 @@
       "path": "src/tactic/core/tseitin_cnf_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "complete",
+      "go_targets": ["pkg/tactic/core/tseitin_cnf_tactic.go", "pkg/tactic/core/tseitin_cnf_encode.go", "pkg/cmd_context/tactic_commands.go"],
+      "tests": ["TestTseitinCNFNestedIffAndITEChain", "TestTseitinCNFCoreDependenciesModelFilterAndGuards", "TestTseitinCNFCommonPatternAndBoundedDistributivity"],
       "assertions": [
         {
           "line": 182,
@@ -171107,19 +171107,30 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "full Tseitin CNF traversal, specialized encodings, bounded distributivity, tactic factories and statistics",
+          "status": "complete",
+          "go_target": "pkg/tactic/core/tseitin_cnf_encode.go",
+          "tests": ["TestTseitinCNFNestedIffAndITEChain", "TestTseitinCNFCoreDependenciesModelFilterAndGuards", "TestTseitinCNFCommonPatternAndBoundedDistributivity"]
+        }
+      ],
+      "ownership": [
+        "Each invocation explicitly owns cached domains, fresh variables, generated clauses and unsat-core dependencies until publication. Goal assertions acquire their own expression/dependency references; auxiliary declarations are published through an owning filter model converter. Temporary invocation state is rebuilt on every Apply, which is equivalent to the source cleanup reconstruction."
+      ],
+      "deviations": [
+        "The source updates each original assertion to true before resetting the goal as a peak-memory optimization. Go retains the original goal until every clause has been constructed, then resets it atomically before publication; generated clauses and dependencies remain identical."
+      ]
     },
     {
       "path": "src/tactic/core/tseitin_cnf_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "complete",
+      "go_targets": ["pkg/tactic/core/tseitin_cnf_tactic.go", "pkg/cmd_context/tactic_commands.go"],
+      "tests": ["TestTseitinCNFCoreDependenciesModelFilterAndGuards"],
       "conditionals": [
         {
           "line": 20,
@@ -171130,10 +171141,10 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [{"name": "tseitin-cnf and tseitin-cnf-core factories", "status": "complete", "go_target": "pkg/tactic/core/tseitin_cnf_tactic.go", "tests": ["TestTseitinCNFCoreDependenciesModelFilterAndGuards"]}],
+      "ownership": ["The public composite factory owns the core, simplifying fallback and retry through counted tactic edges."],
       "deviations": []
     },
     {
@@ -176913,7 +176924,7 @@
       "path": "src/tactic/smtlogics/qfnra_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "complete",
       "go_targets": ["pkg/tactic/smtlogics/qfnra_tactic.go"],
       "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"],
       "methods_audited": false,
@@ -176921,13 +176932,13 @@
       "methods": [
         {
           "name": "retained QF_NRA route ordering",
-          "status": "partial",
+          "status": "complete",
           "go_target": "pkg/tactic/smtlogics/qfnra_tactic.go",
           "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"]
         }
       ],
       "ownership": [],
-      "deviations": ["NLSAT, bounded NLA2BV, and timed SMT routes retain source order. QF_NRA purification, factorization, and term-ITE stages are integrated; Tseitin-CNF remains pending."]
+      "deviations": []
     },
     {
       "path": "src/tactic/smtlogics/qfnra_tactic.h",

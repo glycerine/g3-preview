@@ -94,6 +94,8 @@ func NewQFNRATactic(m *ast.ASTManager, p *uparams.ParamsRef, config smtcore.SMTS
 			b.clean(b.keep(core.NewSolveEquationsTactic(m, c, g, params, config.ModelEvaluator))),
 			b.clean(b.keep(arith.NewQFNRAPurifyTactic(m, c, g, purifyParams, config.ModelEvaluator))),
 			simplify(params),
+			b.clean(b.keep(core.NewTseitinCNFCoreTactic(m, c, g, params, config.ModelEvaluator))),
+			simplify(params),
 			backend,
 		)
 		if requireDecision {
