@@ -469,7 +469,7 @@ func TestSMT2FixedpointSpacerRebuildsAfterBoundedRecursiveSearch(t *testing.T) {
 	})
 	context.PrintSuccess = false
 	script := `(set-option :fixedpoint.engine spacer)
-(set-option :fixedpoint.spacer.max_level 3)
+(set-option :fixedpoint.spacer.max_level 4)
 (declare-rel P (Int))
 (declare-rel Goal ())
 (declare-rel U ())
@@ -483,9 +483,9 @@ func TestSMT2FixedpointSpacerRebuildsAfterBoundedRecursiveSearch(t *testing.T) {
 `
 	var output bytes.Buffer
 	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
-		t.Fatal(err)
+		t.Fatal(err, output.String())
 	}
-	if text := output.String(); !strings.HasSuffix(text, "unsat\n") || !strings.HasPrefix(text, "unknown\n") && !strings.HasPrefix(text, "sat\n") {
+	if text := output.String(); text != "sat\nunsat\n" {
 		t.Fatal("bounded Spacer query lifecycle", text)
 	}
 }

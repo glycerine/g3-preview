@@ -5,6 +5,7 @@ package spacer
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -18,7 +19,7 @@ func confirmConcreteReachability(obligation *ProofObligation) (_ bool, resultErr
 	check, err := obligation.transformer.CheckReachability(obligation)
 	obligation.level = saved
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("spacer: confirm concrete reachability: %w", err)
 	}
 	defer func() { resultErr = errors.Join(resultErr, check.Close(obligation.transformer.manager)) }()
 	if check.Status != lbool.True || !check.IsConcrete {
@@ -27,48 +28,48 @@ func confirmConcreteReachability(obligation *ProofObligation) (_ bool, resultErr
 	if check.Rule != nil {
 		predecessors, err := obligation.transformer.RulePredecessors(check.Rule)
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("spacer: confirm reachability predecessors: %w", err)
 		}
 		if len(predecessors) != 0 {
 			fact, err := obligation.transformer.MakeReachFact(obligation, check.Rule, check.Model, true, true)
 			if err != nil {
-				return false, err
+				return false, fmt.Errorf("spacer: confirm reachability fact: %w", err)
 			}
 			_, addErr := obligation.transformer.AddReachFact(fact)
 			closeErr := fact.Close()
 			if addErr != nil || closeErr != nil {
-				return false, errors.Join(addErr, closeErr)
+				return false, fmt.Errorf("spacer: confirm reachability add fact: %w", errors.Join(addErr, closeErr))
 			}
 		}
 	}
 	derivation, found, err := obligation.Derivation()
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("spacer: confirm reachability derivation: %w", err)
 	}
 	if found {
 		derivation, err = obligation.DetachDerivation()
 		if err != nil {
-			return false, err
+			return false, fmt.Errorf("spacer: confirm reachability detach derivation: %w", err)
 		}
 	}
 	if err = obligation.Close(); err != nil {
 		if derivation != nil {
 			_ = derivation.Close()
 		}
-		return false, err
+		return false, fmt.Errorf("spacer: confirm reachability close obligation: %w", err)
 	}
 	if derivation == nil {
 		return true, nil
 	}
 	next, err := derivation.CreateNextChild()
 	if err != nil {
-		return false, errors.Join(err, derivation.Close())
+		return false, fmt.Errorf("spacer: confirm reachability next child: %w", errors.Join(err, derivation.Close()))
 	}
 	if next == nil {
 		return true, derivation.Close()
 	}
 	if err = next.SetDerivation(derivation); err != nil {
-		return false, errors.Join(err, derivation.Close())
+		return false, fmt.Errorf("spacer: confirm reachability set derivation: %w", errors.Join(err, derivation.Close()))
 	}
 	return confirmConcreteReachability(next)
 }

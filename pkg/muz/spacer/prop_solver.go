@@ -300,7 +300,7 @@ func (p *PropSolver) CheckAssumptions(hard, soft []ast.ASTHandle, options PropCh
 	if err := p.open(); err != nil {
 		return nil, err
 	}
-	if options.Level != nil {
+	if options.Level != nil && *options.Level != InfinityLevel {
 		if err := p.EnsureLevel(*options.Level); err != nil {
 			return nil, err
 		}

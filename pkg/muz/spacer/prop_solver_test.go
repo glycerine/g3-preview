@@ -240,6 +240,19 @@ func TestPropSolverNormalAndDeltaLevelActivation(t *testing.T) {
 	}
 	spacerMust(t, result.Close(fixture.manager))
 
+	infinity := spacer.InfinityLevel
+	notPAtInfinity, err := fixture.manager.MkNot(p)
+	spacerMust(t, err)
+	result, err = fixture.solver.CheckAssumptions([]ast.ASTHandle{notPAtInfinity}, nil, spacer.PropCheckOptions{Level: &infinity, NeedModel: true})
+	spacerMust(t, err)
+	if result.Status != lbool.True || result.Model == nil {
+		t.Fatal("infinite level did not deactivate finite frames", result.Status, result.Model)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+	if levels, err := fixture.solver.LevelCount(); err != nil || levels != 2 {
+		t.Fatal("infinite level allocated finite guards", levels, err)
+	}
+
 	background := spacerBool(t, fixture.manager, "spacer-background")
 	notBackground, err := fixture.manager.MkNot(background)
 	spacerMust(t, err)
