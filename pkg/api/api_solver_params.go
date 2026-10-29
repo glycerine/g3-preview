@@ -48,9 +48,15 @@ const (
 	SMTStringAggressiveLength   SMTBoolParameter = "smt.str.aggressive_length_testing"
 	SMTStringAggressiveValue    SMTBoolParameter = "smt.str.aggressive_value_testing"
 	SMTStringAggressiveUnroll   SMTBoolParameter = "smt.str.aggressive_unroll_testing"
+	SMTStringFastLengthCache    SMTBoolParameter = "smt.str.fast_length_tester_cache"
+	SMTStringFastValueCache     SMTBoolParameter = "smt.str.fast_value_tester_cache"
+	SMTStringConstantCache      SMTBoolParameter = "smt.str.string_constant_cache"
 	SMTStringBinarySearch       SMTBoolParameter = "smt.str.use_binary_search"
 	SMTStringFiniteOverlap      SMTBoolParameter = "smt.str.finite_overlap_models"
 	SMTStringRegexAutomata      SMTBoolParameter = "smt.str.regex_automata"
+	SMTCoreMinimize             SMTBoolParameter = "smt.core.minimize"
+	SMTCoreExtendPatterns       SMTBoolParameter = "smt.core.extend_patterns"
+	SMTCoreExtendNonlocal       SMTBoolParameter = "smt.core.extend_nonlocal_patterns"
 )
 
 const (
@@ -81,6 +87,11 @@ const (
 	SMTStringBinarySearchStart     SMTUIntParameter = "smt.str.binary_search_start"
 	SMTStringRegexDifficulty       SMTUIntParameter = "smt.str.regex_automata_difficulty_threshold"
 	SMTStringRegexIntersection     SMTUIntParameter = "smt.str.regex_automata_intersection_difficulty_threshold"
+	SMTStringRegexFailedAutomaton  SMTUIntParameter = "smt.str.regex_automata_failed_automaton_threshold"
+	SMTStringRegexFailedIntersect  SMTUIntParameter = "smt.str.regex_automata_failed_intersection_threshold"
+	SMTStringRegexLengthAttempts   SMTUIntParameter = "smt.str.regex_automata_length_attempt_threshold"
+	SMTCoreExtendPatternDistance   SMTUIntParameter = "smt.core.extend_patterns.max_distance"
+	SMTLemmaGCStrategy             SMTUIntParameter = "smt.lemma_gc_strategy"
 )
 
 const (

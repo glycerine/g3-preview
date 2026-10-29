@@ -17,6 +17,8 @@ func TestSMTContextTypedParameterCatalog(t *testing.T) {
 	astTestMust(t, c.SetSMTUInt(SMTRandomSeed, 73))
 	astTestMust(t, c.SetSMTDouble(SMTRestartFactor, 1.25))
 	astTestMust(t, c.SetSMTSymbol(SMTStringSolver, "seq"))
+	astTestMust(t, c.SetSMTBool(SMTCoreExtendPatterns, true))
+	astTestMust(t, c.SetSMTUInt(SMTStringRegexLengthAttempts, 17))
 
 	for _, expected := range []struct {
 		name, value string
@@ -25,6 +27,8 @@ func TestSMTContextTypedParameterCatalog(t *testing.T) {
 		{"smt.random_seed", "73"},
 		{"smt.restart_factor", "1.25"},
 		{"smt.string_solver", "seq"},
+		{"smt.core.extend_patterns", "true"},
+		{"smt.str.regex_automata_length_attempt_threshold", "17"},
 	} {
 		value, ok, err := c.command.GetOption(expected.name)
 		astTestMust(t, err)
