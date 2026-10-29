@@ -168681,9 +168681,16 @@
       "path": "src/tactic/core/distribute_forall_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/distribute_forall_tactic.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestDistributeForallConjunctionAndNegatedDisjunction",
+        "TestDistributeForallProofComposition",
+        "TestSMTLibRunnerScripts/distribute_forall_tactic.smt2"
+      ],
       "assertions": [
         {
           "line": 107,
@@ -168694,9 +168701,20 @@
           "text": "SASSERT(g->is_well_sorted());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "distribute-forall rewriter, tactic wrapper, and explicit command registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/distribute_forall_tactic.go",
+          "tests": [
+            "TestDistributeForallConjunctionAndNegatedDisjunction",
+            "TestDistributeForallProofComposition",
+            "TestSMTLibRunnerScripts/distribute_forall_tactic.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -168704,9 +168722,16 @@
       "path": "src/tactic/core/distribute_forall_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/tactic/core/distribute_forall_tactic.go",
+        "pkg/cmd_context/tactic_commands.go"
+      ],
+      "tests": [
+        "TestDistributeForallConjunctionAndNegatedDisjunction",
+        "TestDistributeForallProofComposition",
+        "TestSMTLibRunnerScripts/distribute_forall_tactic.smt2"
+      ],
       "conditionals": [
         {
           "line": 17,
@@ -168717,9 +168742,20 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "distribute-forall tactic factory and explicit command registration",
+          "status": "ported",
+          "go_target": "pkg/tactic/core/distribute_forall_tactic.go",
+          "tests": [
+            "TestDistributeForallConjunctionAndNegatedDisjunction",
+            "TestDistributeForallProofComposition",
+            "TestSMTLibRunnerScripts/distribute_forall_tactic.smt2"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
