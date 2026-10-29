@@ -5272,9 +5272,9 @@
       "path": "src/api/api_datalog.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/api/api_fixedpoint.go", "pkg/api/api_fixedpoint_test.go", "pkg/cmd_context/fixedpoint.go"],
+      "tests": ["TestSMTContextFixedpointPDRLifecycle"],
       "assertions": [
         {
           "line": 57,
@@ -5287,17 +5287,30 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation query, owning successful answer and copied statistics surface",
+          "status": "partial",
+          "go_target": "pkg/api/api_fixedpoint.go",
+          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "remaining standalone fixedpoint owner, table facts/assertions, relation-vector and level queries, rule update/enumeration, cover/invariant/reachable, parser/file, parameter descriptors, callbacks and string display surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["SMTContext owns the shared command/fixedpoint context. FixedpointAnswer transfers one concrete ASTRef to the caller; statistics are copied Go values, and relation/rule inputs are borrowed for each call then retained by the underlying context."],
+      "deviations": ["The additive public Go surface reuses SMTContext instead of exposing the native opaque reference-counted fixedpoint object or C ABI. It covers only operations implemented by the retained command-context engine; unlisted api_datalog operations remain unported."]
     },
     {
       "path": "src/api/api_datalog.h",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/api/api_fixedpoint.go"],
+      "tests": ["TestSMTContextFixedpointPDRLifecycle"],
       "conditionals": [
         {
           "line": 19,
@@ -5310,9 +5323,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained public fixedpoint registration, rule-scope, query, answer and statistics subset",
+          "status": "partial",
+          "go_target": "pkg/api/api_fixedpoint.go",
+          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+        },
+        {
+          "name": "remaining fixedpoint_context and external-relation callback declaration surface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": ["The public Go SMTContext is the owning fixedpoint integration root; no separate fixedpoint reference wrapper is introduced."],
+      "deviations": ["Go methods and explicit Close/ASTRef ownership replace the native opaque handle declaration surface."]
     },
     {
       "path": "src/api/api_datalog_spacer.inc",

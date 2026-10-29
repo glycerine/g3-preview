@@ -1,0 +1,101 @@
+package api
+
+// Public fixedpoint/Horn integration over the retained command context.
+
+import (
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/statistics"
+)
+
+// SetFixedpointEngine selects the fixedpoint backend used by later queries.
+// Supported retained choices are auto-config, datalog, pdr, and spacer.
+func (c *SMTContext) SetFixedpointEngine(name string) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.SetSymbolOption("fixedpoint.engine", name)
+}
+
+// DeclareRelation declares and registers a Boolean fixedpoint relation.
+func (c *SMTContext) DeclareRelation(name string, domain []ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return c.command.DeclareRelation(name, domain)
+}
+
+// DeclareFixedpointVariable declares one implicit variable used by later
+// fixedpoint rules.
+func (c *SMTContext) DeclareFixedpointVariable(name string, sort ast.ASTHandle) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.DeclareFixedpointVariable(name, sort)
+}
+
+// AddFixedpointRule adds a Horn rule to the current fixedpoint scope.
+func (c *SMTContext) AddFixedpointRule(formula ast.ASTHandle, name string) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.AddFixedpointRule(formula, name)
+}
+
+// AddFixedpointRuleWithBound adds a Horn rule with the retained duality-engine
+// recursion-bound field. Current datalog/PDR backends consume but ignore it.
+func (c *SMTContext) AddFixedpointRuleWithBound(formula ast.ASTHandle, name string, bound uint32) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.AddFixedpointRuleWithBound(formula, name, bound)
+}
+
+// PushFixedpoint saves the current fixedpoint rule set.
+func (c *SMTContext) PushFixedpoint() error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.PushFixedpoint()
+}
+
+// PopFixedpoint restores the most recent fixedpoint rule-set snapshot.
+func (c *SMTContext) PopFixedpoint() error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.PopFixedpoint()
+}
+
+// QueryFixedpoint asks whether the registered relation is reachable.
+func (c *SMTContext) QueryFixedpoint(declaration ast.ASTHandle) (lbool.LBool, error) {
+	if err := c.open(); err != nil {
+		return lbool.Undef, err
+	}
+	return c.command.QueryFixedpoint(declaration)
+}
+
+// FixedpointAnswer returns one owning AST reference for the latest successful
+// query. The caller releases it through Manager().DelRef.
+func (c *SMTContext) FixedpointAnswer(declaration ast.ASTHandle) (ast.ASTRef, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTRef{}, err
+	}
+	return c.command.FixedpointAnswer(declaration)
+}
+
+// FixedpointStatistics returns an owning Go copy of current engine statistics.
+func (c *SMTContext) FixedpointStatistics() (statistics.Statistics, error) {
+	if err := c.open(); err != nil {
+		return statistics.Statistics{}, err
+	}
+	return c.command.FixedpointStatistics()
+}
+
+// ResetFixedpointStatistics clears counters retained by the current engine.
+func (c *SMTContext) ResetFixedpointStatistics() error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	return c.command.ResetFixedpointStatistics()
+}
