@@ -42,6 +42,7 @@ type Context struct {
 	maxDepth      uint32
 	useFarkas     bool
 	farkasActive  bool
+	useModel      bool
 	useInductive  bool
 	flexibleTrace bool
 	initialized   bool
@@ -132,6 +133,19 @@ func (c *Context) SetUseInductiveGeneralizer(enabled bool) error {
 		return ast.ErrASTDomain
 	}
 	c.useInductive = enabled
+	return nil
+}
+
+// SetUseModelGeneralizer selects model-cone backward propagation instead of
+// literal simulation. It must be set before Initialize.
+func (c *Context) SetUseModelGeneralizer(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.useModel = enabled
 	return nil
 }
 

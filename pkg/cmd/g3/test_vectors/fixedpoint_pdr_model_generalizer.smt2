@@ -1,0 +1,8 @@
+(set-option :fixedpoint.engine spacer)
+(set-option :fixedpoint.pdr.use_model_generalizer true)
+(declare-rel P (Int))
+(declare-rel Goal ())
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (and (P x) (>= x 0)) Goal))
+(query Goal :print-answer true)

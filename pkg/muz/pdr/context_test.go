@@ -269,6 +269,7 @@ func TestContextActivatesFarkasBeforeArithmeticSolvers(t *testing.T) {
 	}
 	pdrMust(t, context.SetBreadthFirstModelSearch(false))
 	pdrMust(t, context.SetFlexibleTrace(true))
+	pdrMust(t, context.SetUseModelGeneralizer(true))
 	arithmetic, err := manager.RegisterArithmeticPlugin()
 	pdrMust(t, err)
 	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
@@ -307,6 +308,9 @@ func TestContextActivatesFarkasBeforeArithmeticSolvers(t *testing.T) {
 	}
 	if err = context.SetFlexibleTrace(false); err == nil {
 		t.Fatal("initialized context accepted a flexible-trace change")
+	}
+	if err = context.SetUseModelGeneralizer(false); err == nil {
+		t.Fatal("initialized context accepted a model-generalizer change")
 	}
 	pdrMust(t, context.Close())
 	pdrMust(t, set.Close())

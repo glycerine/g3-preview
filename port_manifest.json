@@ -83139,7 +83139,7 @@
           ]
         },
         {
-          "name": "frame reachability expansion, tagged rule selection, model-implicant literal minimization, QE-lite/model-value projection, predecessor-literal partitioning, child obligations, blocking with optional flexible-trace level raising, propagation, top-level PDR solve loop and search statistics (pdr_context.cpp:1544-1769,1893-2215,2255-2335)",
+          "name": "frame reachability expansion, tagged rule selection, selectable model-implicant literal/model-cone minimization, QE-lite/model-value projection, predecessor-literal partitioning, child obligations, blocking with optional flexible-trace level raising, propagation, top-level PDR solve loop and search statistics (pdr_context.cpp:1544-1769,1893-2215,2255-2335)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/context_solve.go",
           "tests": [
@@ -83149,6 +83149,7 @@
             "TestSMTLibRunnerScripts/fixedpoint_pdr_arithmetic_invariant.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_missing_tail.smt2",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_model_generalizer.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_missing_tail.smt2"
           ]
         },
@@ -83183,7 +83184,7 @@
           "tests": ["TestSMTContextFixedpointPDRLifecycle"]
         },
         {
-          "name": "remaining cover model-converter remapping, non-simple-join model-converter application, general linear rule/model trace unification and optional model-cone generalizer mode",
+          "name": "remaining cover model-converter remapping, non-simple-join model-converter application and general linear rule/model trace unification",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83197,7 +83198,7 @@
       "deviations": [
         "InitializeSystem remains available for independently testing the frame engine; InitializeRules provides the retained native rule-to-transition path. Typed results replace mutable model/core output pointers.",
         "CheckBounded is an explicit staging API requested to expose an end-to-end Horn path early. It composes the native tagged transitions soundly to a finite depth.",
-        "Solve now drives the unbounded native frame/model-search loop, minimizes selected transition/state literals with model_implicant, applies the native QE-lite constant-elimination overload, reduces repeated disequalities to model equalities, and partitions projected literals among predecessor states. The optional pdr_use_model_generalizer cone mode remains an explicit port obligation.",
+        "Solve now drives the unbounded native frame/model-search loop, selects literal or model-cone minimization through pdr.use_model_generalizer, applies the native QE-lite constant-elimination overload, reduces repeated disequalities in literal mode, and partitions projected literals among predecessor states.",
         "Successful retained relation-declaration queries reconstruct native-compatible empty answers, acyclic linear cross-predicate traces, recursive-SCC state traces, multiple-initial-rule leaf selection and nonlinear selected-rule reduction to true. Unsuccessful queries expose direct-predicate universally quantified frame definitions and filter retained simple-join auxiliary predicates; other native model-converter remapping and clause presentation normalization remain unported. Cover translation matches direct retained predicates; native model-converter/slice remapping remains unported. Remaining general rule/head unification and proof traces remain unported."
       ]
     },
@@ -83309,13 +83310,14 @@
           ]
         },
         {
-          "name": "retained unbounded context frame expansion, tagged rule selection, model-implicant literal minimization, QE-lite/model substitution, predecessor-literal partitioning, child obligations, blocking, propagation and search-statistics surface",
+          "name": "retained unbounded context frame expansion, tagged rule selection, selectable model-implicant literal/model-cone minimization, QE-lite/model substitution, predecessor-literal partitioning, child obligations, blocking, propagation and search-statistics surface",
           "status": "partial",
           "go_target": "pkg/muz/pdr/context_solve.go",
           "tests": [
             "TestContextBoundedQueryTraversesTaggedHornChain",
             "TestContextSolveFindsInductiveUnreachablePredicate",
-            "TestContextSolveProjectsCoupledPredecessors"
+            "TestContextSolveProjectsCoupledPredecessors",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_model_generalizer.smt2"
           ]
         },
         {
@@ -83360,7 +83362,7 @@
           "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestContextSolveFindsInductiveUnreachablePredicate"]
         },
         {
-          "name": "remaining cover and non-simple-join model-converter remapping plus general linear model-trace unification and proof reconstruction, optional core generalizers and optional model-cone generalizer mode",
+          "name": "remaining cover and non-simple-join model-converter remapping plus general linear model-trace unification and proof reconstruction and optional core generalizers",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -83374,7 +83376,7 @@
       "deviations": [
         "The Go frame API uses explicit methods and returned result values rather than C++ reference outputs and scoped mutable solver settings.",
         "CheckBounded remains a finite-depth context operation for early integration coverage.",
-        "Solve applies model-implicant literal minimization, QE-lite and repeated-disequality reduction before model-substituting any surviving current and auxiliary state, then partitions projected transition literals into child cubes. The optional model-cone generalizer mode remains unported."
+        "Solve selects model-implicant literal minimization or model-cone equalities, applies QE-lite and literal-mode repeated-disequality reduction before model-substituting surviving current and auxiliary state, then partitions projected transition literals into child cubes."
       ]
     },
     {
@@ -83440,6 +83442,7 @@
             "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP",
             "TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP",
             "TestPDREngineReadsContextAndCacheParameters",
+            "TestSMTLibRunnerScripts/fixedpoint_pdr_model_generalizer.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerScripts/fixedpoint_pdr_background.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2",

@@ -120,7 +120,13 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 		}
 	}()
 	if derived := modelCore.DerivedModel(); c.implicant != nil && derived != nil {
-		minimized, x := c.implicant.MinimizeLiterals(forms, derived)
+		var minimized []ast.ASTRef
+		var x error
+		if c.useModel {
+			minimized, x = c.implicant.MinimizeModel(forms, derived)
+		} else {
+			minimized, x = c.implicant.MinimizeLiterals(forms, derived)
+		}
 		if x != nil {
 			return fmt.Errorf("muz/pdr: implicant minimization: %w", x)
 		}
@@ -172,7 +178,7 @@ func (c *Context) createChildrenProjected(node *ModelNode) (resultErr error) {
 		if x != nil {
 			return x
 		}
-		if derived := modelCore.DerivedModel(); c.implicant != nil && derived != nil {
+		if derived := modelCore.DerivedModel(); !c.useModel && c.implicant != nil && derived != nil {
 			reduced, y := c.reduceDisequalities(derived, 3, formula)
 			if y != nil {
 				return fmt.Errorf("muz/pdr: disequality reduction: %w", y)
