@@ -12,6 +12,13 @@ import (
 // InstantiateQuantifier substitutes the quantified declarations in standard
 // order, then removes their de Bruijn level from free variables in the result.
 func InstantiateQuantifier(m *ast.ASTManager, q ast.ASTHandle, values []ast.ASTHandle, out ast.ASTRef) (result error) {
+	return InstantiateQuantifierWithOrder(m, q, values, true, out)
+}
+
+// InstantiateQuantifierWithOrder exposes the source var_subst order flag used
+// by Spacer lemma bindings. Standard order binds variable zero to the last
+// value; false binds it to the first value.
+func InstantiateQuantifierWithOrder(m *ast.ASTManager, q ast.ASTHandle, values []ast.ASTHandle, standardOrder bool, out ast.ASTRef) (result error) {
 	if m == nil {
 		return ast.ErrASTHandle
 	}
@@ -26,7 +33,7 @@ func InstantiateQuantifier(m *ast.ASTManager, q ast.ASTHandle, values []ast.ASTH
 	if e != nil {
 		return e
 	}
-	subst, e := NewVarSubstitution(m, true)
+	subst, e := NewVarSubstitution(m, standardOrder)
 	if e != nil {
 		if subst != nil {
 			return errors.Join(e, subst.Close())
