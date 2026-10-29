@@ -90262,9 +90262,9 @@
       "path": "src/muz/spacer/spacer_qe_project.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/qe/legacy_arithmetic_linear.go"],
+      "tests": ["TestLegacyArithmeticProjectionClassifiesLinearLiterals", "TestLegacyArithmeticProjectionClassifiesEqualities"],
       "assertions": [
         {
           "line": 101,
@@ -90416,10 +90416,14 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {"name": "arith_project_util syntactic variable occurrence, linear term decomposition, inequality polarity, equality/disequality and divisibility classification", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_linear.go", "tests": ["TestLegacyArithmeticProjectionClassifiesLinearLiterals", "TestLegacyArithmeticProjectionClassifiesEqualities"]},
+        {"name": "legacy arithmetic model selection, real/integer virtual substitution, mod factoring and formula replacement", "status": "unported", "go_target": null, "tests": []},
+        {"name": "legacy array equality/select reduction and projection", "status": "unported", "go_target": null, "tests": []}
+      ],
+      "ownership": ["Each classified legacy literal owns its residual arithmetic term reference; the projection owner owns the shared concrete arithmetic syntax service."],
+      "deviations": ["This checkpoint exposes no public or live fallback: Spacer remains on the newer general MBP until the complete legacy arithmetic and array coordinator is ready."]
     },
     {
       "path": "src/muz/spacer/spacer_qe_project.h",
