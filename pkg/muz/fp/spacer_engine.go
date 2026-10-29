@@ -7,12 +7,48 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/muz/base"
 	"github.com/glycerine/g3/pkg/muz/spacer"
+	"github.com/glycerine/g3/pkg/muz/transforms"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
-func (e *PropositionalEngine) querySpacer(declaration ast.ASTHandle) (lbool.LBool, error) {
+func (e *PropositionalEngine) spacerRules(query ast.ASTHandle) (_ *base.RuleSet, resultErr error) {
+	prepared, err := base.NewRuleSet(e.rules)
+	if err != nil {
+		return nil, err
+	}
+	keep := false
+	defer func() {
+		if !keep {
+			resultErr = errors.Join(resultErr, prepared.Close())
+		}
+	}()
+	if err = prepared.AddRules(e.set); err != nil {
+		return nil, err
+	}
+	valid, err := prepared.Finalize()
+	if err != nil || !valid {
+		if err == nil {
+			err = fmt.Errorf("muz/fp: negation is not stratified")
+		}
+		return nil, err
+	}
+	transformer := base.NewRuleTransformer()
+	if err = transformer.Register(transforms.NewRuleInlinerPlugin(e.manager, e.rules, []ast.ASTHandle{query}, 0)); err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
+	_, err = transformer.Apply(prepared)
+	err = errors.Join(err, transformer.Close())
+	if err != nil {
+		return nil, fmt.Errorf("muz/fp: Spacer rule preprocessing: %w", err)
+	}
+	keep = true
+	return prepared, nil
+}
+
+func (e *PropositionalEngine) querySpacer(declaration ast.ASTHandle) (_ lbool.LBool, resultErr error) {
 	if e.params == nil || e.globals == nil {
 		return lbool.Undef, fmt.Errorf("muz/fp: Spacer requires parameter and global services")
 	}
@@ -42,6 +78,11 @@ func (e *PropositionalEngine) querySpacer(declaration ast.ASTHandle) (lbool.LBoo
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
 	}
+	prepared, err := e.spacerRules(declaration)
+	if err != nil {
+		return lbool.Undef, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, prepared.Close()) }()
 	// The retained Context currently owns one completed proof-obligation
 	// search. Rebuild it for a subsequent query until source reset_query is
 	// ported; the rule set and AST expressions remain borrowed by the engine.
@@ -77,8 +118,8 @@ func (e *PropositionalEngine) querySpacer(declaration ast.ASTHandle) (lbool.LBoo
 	if err = context.SetBackground(background); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
-	if err = context.InitializePredicates(e.set, e.predicateOrder); err != nil {
-		return lbool.Undef, errors.Join(err, context.Close())
+	if err = context.InitializePredicates(prepared, e.predicateOrder); err != nil {
+		return lbool.Undef, errors.Join(fmt.Errorf("muz/fp: initialize preprocessed Spacer rules: %w", err), context.Close())
 	}
 	if err = context.SetQuery(declaration); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())

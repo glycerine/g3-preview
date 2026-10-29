@@ -92116,9 +92116,18 @@
       "path": "src/muz/transforms/dl_mk_rule_inliner.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/rule_inliner.go",
+        "pkg/muz/fp/spacer_engine.go"
+      ],
+      "tests": [
+        "TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput",
+        "TestRuleInlinerUsesDisjointVariableBanks",
+        "TestRuleInlinerPreservesRecursivePredicate",
+        "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2"
+      ],
       "assertions": [
         {
           "line": 88,
@@ -92199,17 +92208,43 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained acyclic planning, protected-output exclusion, disjoint variable-bank unification, resolution, duplicate-tail removal, and eliminated-predicate rewriting",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_inliner.go",
+          "tests": [
+            "TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput",
+            "TestRuleInlinerUsesDisjointVariableBanks",
+            "TestRuleInlinerPreservesRecursivePredicate",
+            "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2"
+          ]
+        },
+        {
+          "name": "complete eager/linear inlining, proof/model conversion, quantified-rule handling, and interpreted-tail simplification after resolution",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The Go plugin owns its protected set; every definition, work-queue rule, substitution result, and transformed RuleSet is retained until transfer or reverse-order cleanup."
+      ],
+      "deviations": [
+        "The current live Spacer specialization excludes every recursively cyclic predicate instead of the source planner's finer SCC break selection; this preserves recursive rules while the linear/eager source passes remain pending."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_rule_inliner.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/rule_inliner.go"
+      ],
+      "tests": [
+        "TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput",
+        "TestRuleInlinerUsesDisjointVariableBanks",
+        "TestRuleInlinerPreservesRecursivePredicate"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -92222,8 +92257,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "RuleInlinerPlugin construction, transformation surface, cancellation, and ownership lifecycle",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_inliner.go"
+        }
+      ],
+      "ownership": [
+        "RuleTransformer owns and closes the concrete RuleInlinerPlugin after its transformed RuleSet has been transferred."
+      ],
       "deviations": []
     },
     {
@@ -92586,14 +92629,34 @@
       "path": "src/muz/transforms/dl_transforms.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/fp/spacer_engine.go",
+        "pkg/muz/transforms/rule_inliner.go"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "live Spacer query specialization: clone finalized rules and run the retained acyclic inliner without mutating rules needed by later queries",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/spacer_engine.go"
+        },
+        {
+          "name": "complete ordered default transform pipeline including interpreted-tail simplification, array/quantifier transforms, repeated inlining/subsumption, bit blasting, scaling, and magic sets",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "Each Spacer query owns a finalized transformed RuleSet clone until Context initialization has retained its rules; the engine's original set remains available for subsequent queries."
+      ],
+      "deviations": [
+        "Only the source-reached Spacer inliner stage is integrated here; the complete default transformation schedule remains pending."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_transforms.h",
