@@ -113,6 +113,14 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = context.SetUseConvexInteriorGeneralizer(useConvexInterior); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
+	utvpiName := "pdr.utvpi"
+	useUTVPI, err := e.globals.Context.GetBoolName(&fixedpoint, &utvpiName, true)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetUseUTVPI(useUTVPI); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	modelGeneralizerName := "pdr.use_model_generalizer"
 	useModelGeneralizer, err := e.globals.Context.GetBoolName(&fixedpoint, &modelGeneralizerName, false)
 	if err != nil {

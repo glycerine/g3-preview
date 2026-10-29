@@ -83041,6 +83041,10 @@
         "pkg/muz/pdr/context_solve.go",
         "pkg/muz/pdr/generalizers.go",
         "pkg/muz/pdr/pdr_closure.go",
+        "pkg/muz/pdr/fragment.go",
+        "pkg/smtcore/smt_solver_arithmetic_state.go",
+        "pkg/muz/pdr/fragment.go",
+        "pkg/smtcore/smt_solver_arithmetic_state.go",
         "pkg/muz/pdr/answer.go",
         "pkg/muz/pdr/answer_trace.go",
         "pkg/muz/pdr/model_projection.go",
@@ -83057,6 +83061,10 @@
         "TestContextSolveFindsInductiveUnreachablePredicate",
         "TestContextSolveProjectsCoupledPredecessors",
         "TestConvexClosureAndInteriorOwnExpectedEndpointRegions",
+        "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup",
+        "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment",
+        "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup",
+        "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
         "TestPDREngineMatchesCPPIntegerHornQueries",
@@ -83281,6 +83289,13 @@
           ]
         },
         {
+          "name": "default non-Boolean proof activation, common arithmetic tuning, DL/UTVPI/general backend classification before child solver construction, and selected-fragment term-ITE blasting after transition rewriting (pdr_context.cpp:1600-1690,1815-1843)",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/context.go",
+          "go_targets": ["pkg/muz/pdr/fragment.go", "pkg/muz/pdr/predicate_rules.go", "pkg/muz/pdr/smt_context_manager.go", "pkg/smtcore/smt_solver_arithmetic_state.go"],
+          "tests": ["TestPDRDifferenceAndUTVPIFragmentClassification", "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup", "TestSMTSolverArithmeticStateOverrideSelectsBackendAndFreezesAtSetup", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_utvpi_fragment.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_general_arithmetic_fragment.smt2"]
+        },
+        {
           "name": "bounded tag-selected transition composition used as the narrow Go end-to-end integration path while native model_search is ported",
           "status": "partial",
           "go_target": "pkg/muz/pdr/context_bounded.go",
@@ -83471,10 +83486,10 @@
           ]
         },
         {
-          "name": "pre-initialization Farkas selection, scoped non-Boolean proof mode and create_children no-proof projection surface",
+          "name": "pre-initialization Farkas/UTVPI selection, scoped non-Boolean proof mode, arithmetic backend tuning and create_children no-proof projection surface",
           "status": "ported",
           "go_target": "pkg/muz/pdr/context.go",
-          "tests": ["TestContextActivatesFarkasBeforeArithmeticSolvers", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP", "TestSMT2FixedpointPDRTraceReductionMatchesCPP"]
+          "tests": ["TestContextActivatesFarkasBeforeArithmeticSolvers", "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup", "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment", "TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP", "TestSMT2FixedpointPDRTraceReductionMatchesCPP"]
         },
         {
           "name": "retained model_node and model_search ownership, frontier, cache, closure and backtracking surface",
@@ -83578,6 +83593,8 @@
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_nonlinear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_recursive_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_variable_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_utvpi_fragment.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_general_arithmetic_fragment.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_untransformed_linear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_both.smt2",
@@ -83607,6 +83624,8 @@
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_recursive_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_linear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_variable_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_utvpi_fragment.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_general_arithmetic_fragment.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_both.smt2",
@@ -83631,7 +83650,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "PDR/Spacer engine selection, fixedpoint PDR Farkas/generalizer/search/flexible-trace/cache/context-limit parameter forwarding, parameter-update context invalidation, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
+          "name": "PDR/Spacer engine selection, fixedpoint PDR Farkas/generalizer/UTVPI/search/flexible-trace/cache/context-limit parameter forwarding, parameter-update context invalidation, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [
@@ -83648,7 +83667,9 @@
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_integer.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_background.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_utvpi_fragment.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_general_arithmetic_fragment.smt2"
           ]
         },
         {
@@ -83716,6 +83737,8 @@
         "pkg/muz/pdr/answer_trace.go",
         "pkg/cmd_context/fixedpoint.go",
         "pkg/api/api_fixedpoint.go",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_utvpi_fragment.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_general_arithmetic_fragment.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_background.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_integer.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_initial_trace.smt2",
@@ -83758,6 +83781,8 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_interior.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_utvpi_fragment.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_general_arithmetic_fragment.smt2",
         "TestSMTContextFixedpointPDRLifecycle"
       ],
       "conditionals": [
@@ -84379,6 +84404,7 @@
         "TestPropSolverExpandsArithmeticEqualityForSubsetCore",
         "TestPropSolverExtractsFarkasTheoryCore",
         "TestPropSolverFarkasCoreRestoresSafeProxy",
+        "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment",
         "TestPropSolverExpandsDatatypeEqualityForSubsetCore",
         "TestPropSolverExpandsBitVectorEqualityForSubsetCore"
       ],
@@ -84459,6 +84485,7 @@
           "tests": [
             "TestPropSolverExtractsFarkasTheoryCore",
             "TestPropSolverFarkasCoreRestoresSafeProxy",
+            "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment",
             "TestArithmeticBoundsKeepStrongestBounds"
           ]
         },
@@ -84485,7 +84512,7 @@
         "PropCheckResult subset cores borrow caller expressions. Synthesized equality-expansion and proof-derived Farkas core terms are retained by PropSolver until its next check or Close. Successful requested models are acquired owning ModelCore references and must be released by the caller."
       ],
       "deviations": [
-        "The Go API uses CheckAtLevel instead of a mutable RAII scoped_level flag and returns status/core/model/assumes-level/Farkas-core provenance as one concrete result. Proof-derived theory cores fall back to subset cores when proof mode yields no learned lemma; CheckAssumptionsWithConsequences replaces the optional native output pointer.",
+        "The Go API uses CheckAtLevel instead of a mutable RAII scoped_level flag and returns status/core/model/assumes-level/Farkas-core provenance as one concrete result. Proof-derived theory cores fall back to subset cores when proof mode yields no learned lemma or when proxy-eliminated lemmas escape the selected DL/UTVPI fragment; CheckAssumptionsWithConsequences replaces the optional native output pointer.",
         "Typed errors replace assertion-only malformed assumption and level conditions. Native slices and maps replace source ref-vectors and object maps; duplicate complex assumptions reuse one proxy within a check."
       ]
     },
@@ -84502,7 +84529,8 @@
         "TestPropSolverLevelFramesCoresAndModels",
         "TestPropSolverSafeProxyCoreAndTemporaryFormulaRollback",
         "TestPropSolverExtractsFarkasTheoryCore",
-        "TestPropSolverFarkasCoreRestoresSafeProxy"
+        "TestPropSolverFarkasCoreRestoresSafeProxy",
+        "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment"
       ],
       "conditionals": [
         {
@@ -84917,10 +84945,12 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/pdr/pdr_util.go",
+        "pkg/muz/pdr/fragment.go",
+        "pkg/muz/pdr/fragment_test.go",
         "pkg/muz/pdr/model_projection.go",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_repeated_disequalities.smt2"
       ],
-      "tests": ["TestSMTLibRunnerScripts/fixedpoint_pdr_repeated_disequalities.smt2"],
+      "tests": ["TestSMTLibRunnerScripts/fixedpoint_pdr_repeated_disequalities.smt2", "TestPDRDifferenceAndUTVPIFragmentClassification", "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup", "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment"],
       "assertions": [
         {
           "line": 133,
@@ -84989,7 +85019,13 @@
           "tests": ["TestSMTLibRunnerScripts/fixedpoint_pdr_repeated_disequalities.smt2"]
         },
         {
-          "name": "remaining diagnostic cube formatting, arithmetic normalization and difference-logic/UTVPI classification helpers reached only by optional modes",
+          "name": "difference-logic and UTVPI expression traversal/classification used by default PDR arithmetic backend selection and Farkas fallback",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/fragment.go",
+          "tests": ["TestPDRDifferenceAndUTVPIFragmentClassification", "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup", "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment"]
+        },
+        {
+          "name": "remaining diagnostic cube formatting and arithmetic normalization helpers",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -84999,7 +85035,7 @@
         "The reducer owns model-evaluated values, defining equalities and rewritten conjunct references until the returned conjunction reference is acquired."
       ],
       "deviations": [
-        "Only reduce_disequalities is reached by the retained default PDR child-projection path; unused source overloads and optional-mode classifiers remain unported."
+        "The default pdr.utvpi path uses the retained source classifier before child solver construction and reuses it to reject proof-derived lemmas outside the selected fragment. Diagnostic cube formatting and the separately unused arithmetic normalizer remain unported."
       ]
     },
     {
@@ -85007,8 +85043,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/pdr/pdr_util.go"],
-      "tests": ["TestSMTLibRunnerScripts/fixedpoint_pdr_repeated_disequalities.smt2"],
+      "go_targets": ["pkg/muz/pdr/pdr_util.go", "pkg/muz/pdr/fragment.go"],
+      "tests": ["TestSMTLibRunnerScripts/fixedpoint_pdr_repeated_disequalities.smt2", "TestPDRDifferenceAndUTVPIFragmentClassification", "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup", "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment"],
       "conditionals": [
         {
           "line": 20,
@@ -85029,7 +85065,13 @@
           "tests": ["TestSMTLibRunnerScripts/fixedpoint_pdr_repeated_disequalities.smt2"]
         },
         {
-          "name": "remaining optional utility declarations",
+          "name": "retained difference-logic and UTVPI classifier declarations",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/fragment.go",
+          "tests": ["TestPDRDifferenceAndUTVPIFragmentClassification", "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup", "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment"]
+        },
+        {
+          "name": "remaining utility declarations without retained consumers",
           "status": "unported",
           "go_target": null,
           "tests": []

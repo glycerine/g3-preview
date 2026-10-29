@@ -47,6 +47,7 @@ type Context struct {
 	useInductive      bool
 	useConvexClosure  bool
 	useConvexInterior bool
+	useUTVPI          bool
 	flexibleTrace     bool
 	fullTraceAnswer   bool
 	initialized       bool
@@ -61,7 +62,7 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, err
 	}
-	result := &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(true), lastResult: lbool.Undef, useInductive: true, auxiliary: make(map[ast.ASTHandle]bool)}
+	result := &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(true), lastResult: lbool.Undef, useInductive: true, useUTVPI: true, auxiliary: make(map[ast.ASTHandle]bool)}
 	fail := func(cause error) (*Context, error) {
 		cleanup := result.Close()
 		if cleanup != nil {
@@ -85,6 +86,7 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	services.Globals = config.Globals
 	services.Memory = manager.NumeralService().RuntimeOwner()
 	services.Cooperation = result.cooperation
+	result.owner.contexts.config.ModelEvaluator = services
 	result.implicant, err = model.NewModelImplicant(manager, services)
 	if err != nil {
 		return fail(err)
@@ -163,6 +165,19 @@ func (c *Context) SetUseConvexInteriorGeneralizer(enabled bool) error {
 		return ast.ErrASTDomain
 	}
 	c.useConvexInterior = enabled
+	return nil
+}
+
+// SetUseUTVPI selects source PDR arithmetic-fragment specialization. It must
+// be set before Initialize because child SMT backends are selected there.
+func (c *Context) SetUseUTVPI(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.useUTVPI = enabled
 	return nil
 }
 
@@ -260,6 +275,29 @@ func (c *Context) FarkasActive() (bool, error) {
 	return c.farkasActive, nil
 }
 
+// IsDifferenceLogic reports whether Initialize selected the source PDR
+// difference-logic arithmetic backend.
+func (c *Context) IsDifferenceLogic() (bool, error) {
+	if err := c.open(); err != nil {
+		return false, err
+	}
+	if !c.initialized {
+		return false, ast.ErrASTDomain
+	}
+	return c.owner.contexts.arithmeticMode() == smtcore.SMTArithmeticDifferenceLogic, nil
+}
+
+// IsUTVPI reports whether Initialize selected the source PDR UTVPI backend.
+func (c *Context) IsUTVPI() (bool, error) {
+	if err := c.open(); err != nil {
+		return false, err
+	}
+	if !c.initialized {
+		return false, ast.ErrASTDomain
+	}
+	return c.owner.contexts.arithmeticMode() == smtcore.SMTArithmeticUTVPI, nil
+}
+
 func (c *Context) enterPDRProofMode() (func() error, error) {
 	if !c.proofActive {
 		return func() error { return nil }, nil
@@ -281,24 +319,54 @@ func (c *Context) enterPDRProofMode() (func() error, error) {
 	}, nil
 }
 
-func (c *Context) declarationsUseNonBooleanSort(order []ast.ASTHandle) (bool, error) {
+func (c *Context) expressionsUseNonBooleanSort(expressions []ast.ASTHandle) (bool, error) {
 	boolean, err := c.manager.MkBoolSort()
 	if err != nil {
 		return false, err
 	}
-	for _, declaration := range order {
-		arity, err := c.manager.GetArity(declaration)
+	seen := make(map[ast.ASTHandle]bool)
+	stack := append([]ast.ASTHandle(nil), expressions...)
+	for len(stack) != 0 {
+		last := len(stack) - 1
+		expression := stack[last]
+		stack = stack[:last]
+		if seen[expression] {
+			continue
+		}
+		seen[expression] = true
+		sort, err := c.manager.GetSort(expression)
 		if err != nil {
 			return false, err
 		}
-		for i := uint32(0); i < arity; i++ {
-			sort, err := c.manager.GetDomain(declaration, i)
-			if err != nil {
-				return false, err
+		if sort != boolean {
+			return true, nil
+		}
+		kind, err := c.manager.GetKind(expression)
+		if err != nil {
+			return false, err
+		}
+		switch kind {
+		case ast.ASTApp:
+			count, x := c.manager.GetNumArgs(expression)
+			if x != nil {
+				return false, x
 			}
-			if sort != boolean {
-				return true, nil
+			for i := uint32(0); i < count; i++ {
+				argument, x := c.manager.GetArg(expression, i)
+				if x != nil {
+					return false, x
+				}
+				stack = append(stack, argument)
 			}
+		case ast.ASTQuantifier:
+			body, x := c.manager.GetQuantifierBody(expression)
+			if x != nil {
+				return false, x
+			}
+			stack = append(stack, body)
+		case ast.ASTVar:
+		default:
+			return false, ast.ErrASTDomain
 		}
 	}
 	return false, nil
@@ -336,6 +404,7 @@ func (c *Context) Initialize(set *base.RuleSet) (resultErr error) {
 	order := make([]ast.ASTHandle, 0)
 	seen := make(map[ast.ASTHandle]bool)
 	buckets := make(map[ast.ASTHandle][]*base.Rule)
+	forms := make([]ast.ASTHandle, 0)
 	defer func() { resultErr = errors.Join(resultErr, closeRuleBuckets(buckets)) }()
 	for index := 0; index < count; index++ {
 		rule, x := set.Rule(index)
@@ -348,6 +417,11 @@ func (c *Context) Initialize(set *base.RuleSet) (resultErr error) {
 		}
 		appendDeclaration(&order, seen, head)
 		buckets[head] = append(buckets[head], rule)
+		headExpression, x := rule.Head()
+		if x != nil {
+			return x
+		}
+		forms = append(forms, headExpression)
 		uninterpreted, x := rule.UninterpretedTailSize()
 		if x != nil {
 			return x
@@ -359,14 +433,50 @@ func (c *Context) Initialize(set *base.RuleSet) (resultErr error) {
 			}
 			appendDeclaration(&order, seen, declaration)
 		}
+		tailSize, x := rule.TailSize()
+		if x != nil {
+			return x
+		}
+		for tail := uninterpreted; tail < tailSize; tail++ {
+			expression, _, y := rule.Tail(tail)
+			if y != nil {
+				return y
+			}
+			forms = append(forms, expression)
+		}
 	}
 	transformers := make(map[ast.ASTHandle]*PredicateTransformer, len(order))
-	nonBoolean, err := c.declarationsUseNonBooleanSort(order)
+	nonBoolean, err := c.expressionsUseNonBooleanSort(forms)
 	if err != nil {
 		return err
 	}
 	c.farkasActive = c.useFarkas && nonBoolean
-	c.proofActive = c.farkasActive || c.useConvexClosure || c.useConvexInterior
+	c.proofActive = nonBoolean || c.useConvexClosure || c.useConvexInterior
+	if nonBoolean {
+		selectMode := c.useUTVPI && !c.useConvexClosure && !c.useConvexInterior
+		mode := smtcore.SMTArithmeticSimplex
+		eq2ineq := false
+		if selectMode {
+			difference, x := IsDifferenceLogic(c.manager, forms)
+			if x != nil {
+				return x
+			}
+			if difference {
+				mode, eq2ineq = smtcore.SMTArithmeticDifferenceLogic, true
+			} else {
+				utvpi, y := IsUTVPILogic(c.manager, forms)
+				if y != nil {
+					return y
+				}
+				if utvpi {
+					mode, eq2ineq = smtcore.SMTArithmeticUTVPI, true
+				}
+			}
+		}
+		if err = c.owner.contexts.configureArithmetic(selectMode, mode, eq2ineq); err != nil {
+			return err
+		}
+	}
 	restoreProofMode, err := c.enterPDRProofMode()
 	if err != nil {
 		return err

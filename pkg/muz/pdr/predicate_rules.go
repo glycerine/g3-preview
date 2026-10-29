@@ -11,6 +11,9 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/base"
+	"github.com/glycerine/g3/pkg/smtcore"
+	"github.com/glycerine/g3/pkg/tactic"
+	tacticcore "github.com/glycerine/g3/pkg/tactic/core"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -187,6 +190,50 @@ func (b *predicateRuleBuilder) rewrite(formula ast.ASTHandle) (ast.ASTHandle, er
 		return ast.ASTHandle{}, errors.Join(err, b.transformer.manager.DelRef(&out))
 	}
 	b.references = append(b.references, out)
+	return result, nil
+}
+
+func (b *predicateRuleBuilder) blastTermITE(formula ast.ASTHandle) (_ ast.ASTHandle, resultErr error) {
+	proofs, err := b.transformer.manager.ProofsEnabled()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	goal, err := tactic.NewGoal(b.transformer.manager, proofs, false, false)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, goal.Close()) }()
+	if err = goal.Assert(formula); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	config := b.transformer.owner.contexts.config
+	runner, err := tacticcore.NewEliminateTermITETactic(b.transformer.manager, config.Params, config.Globals, nil, config.ModelEvaluator)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = runner.IncRef(); err != nil {
+		return ast.ASTHandle{}, errors.Join(err, runner.Close())
+	}
+	defer func() { resultErr = errors.Join(resultErr, runner.DecRef()) }()
+	output := &tactic.TacticResult{}
+	defer func() { resultErr = errors.Join(resultErr, output.Close()) }()
+	if err = runner.Apply(goal, output); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if len(output.Goals) != 1 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	formulas, err := output.Goals[0].AppendFormulas(nil)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	result, err := b.transformer.manager.MkAndArray(formulas)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = b.pin(result); err != nil {
+		return ast.ASTHandle{}, err
+	}
 	return result, nil
 }
 
@@ -404,6 +451,17 @@ func (b *predicateRuleBuilder) normalizeRule(source *base.Rule) (*normalizedRule
 	result.transition, err = b.rewrite(formula)
 	if err != nil {
 		return nil, err
+	}
+	mode := b.transformer.owner.contexts.arithmeticMode()
+	if mode == smtcore.SMTArithmeticDifferenceLogic || mode == smtcore.SMTArithmeticUTVPI {
+		result.transition, err = b.blastTermITE(result.transition)
+		if err != nil {
+			return nil, err
+		}
+		result.transition, err = b.rewrite(result.transition)
+		if err != nil {
+			return nil, err
+		}
 	}
 	ground, err := b.transformer.manager.IsGround(result.transition)
 	if err != nil || !ground {

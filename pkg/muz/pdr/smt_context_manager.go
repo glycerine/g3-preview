@@ -27,7 +27,12 @@ type SMTContextManager struct {
 	predicates []ast.ASTRef
 	auxiliary  map[ast.ASTHandle]bool
 	active     uint32
-	closed     bool
+	arithmetic struct {
+		enabled, selectMode, eq2ineq bool
+		mode                         uint32
+		effective                    uint32
+	}
+	closed bool
 }
 
 func NewSMTContextManager(manager *ast.ASTManager, params *uparams.ParamsRef, maximum uint32, config smtcore.SMTSolverConfig) (*SMTContextManager, error) {
@@ -49,11 +54,47 @@ func (m *SMTContextManager) newSolver() (*smtcore.SMTSolver, error) {
 	if err != nil {
 		return nil, err
 	}
+	if m.arithmetic.enabled {
+		state, x := solver.ArithmeticState()
+		if x != nil {
+			return nil, errors.Join(x, solver.Close())
+		}
+		state.BoundProp = 0
+		state.AutoConfigSimplex = true
+		state.PropagateEqs = false
+		state.EagerEqAxioms = false
+		if m.arithmetic.selectMode {
+			state.Mode = m.arithmetic.mode
+			state.Eq2Ineq = m.arithmetic.eq2ineq
+		}
+		if x = solver.SetArithmeticState(state); x != nil {
+			return nil, errors.Join(x, solver.Close())
+		}
+		m.arithmetic.effective = state.Mode
+	}
 	if err = solver.SetProduceModels(true); err != nil {
 		return nil, errors.Join(err, solver.Close())
 	}
 	m.solvers = append(m.solvers, solver)
 	return solver, nil
+}
+
+func (m *SMTContextManager) configureArithmetic(selectMode bool, mode uint32, eq2ineq bool) error {
+	if err := m.open(); err != nil {
+		return err
+	}
+	if len(m.solvers) != 0 || mode > smtcore.SMTArithmeticOptInf {
+		return ast.ErrASTDomain
+	}
+	m.arithmetic.enabled = true
+	m.arithmetic.selectMode = selectMode
+	m.arithmetic.mode = mode
+	m.arithmetic.eq2ineq = eq2ineq
+	return nil
+}
+
+func (m *SMTContextManager) arithmeticMode() uint32 {
+	return m.arithmetic.effective
 }
 
 func (m *SMTContextManager) Fresh() (_ *SMTContext, resultErr error) {
