@@ -197,6 +197,16 @@ func (e *PropositionalEngine) SetBackground(background ast.ASTHandle) error {
 	return nil
 }
 
+// ParametersUpdated invalidates a retained backend context so the next query
+// reconstructs it from current fixedpoint parameters.
+func (e *PropositionalEngine) ParametersUpdated() error {
+	if err := e.open(); err != nil {
+		return err
+	}
+	e.revision++
+	return nil
+}
+
 func (e *PropositionalEngine) AddRule(formula ast.ASTHandle, name string) error {
 	if err := e.open(); err != nil {
 		return err

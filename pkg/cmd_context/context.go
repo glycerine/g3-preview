@@ -417,6 +417,11 @@ func (c *Context) globalParametersUpdated() (result error) {
 	if state.SMTLib2Compliant {
 		c.PrintSuccess = true
 	}
+	if c.fixedpoint != nil {
+		if err := c.fixedpoint.ParametersUpdated(); err != nil {
+			return err
+		}
+	}
 	if c.solver == nil {
 		return nil
 	}

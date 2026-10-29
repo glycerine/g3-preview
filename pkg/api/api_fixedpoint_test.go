@@ -4,6 +4,7 @@ package api
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -147,5 +148,28 @@ func TestSMTContextFixedpointPDRLifecycle(t *testing.T) {
 	astTestMust(t, context.Close())
 	if _, err = context.QueryFixedpoint(p); !errors.Is(err, ErrSMTContextOwner) {
 		t.Fatal("closed public fixedpoint query", err)
+	}
+}
+
+func TestSMTContextFixedpointParameterUpdateRebuildsPDR(t *testing.T) {
+	context, err := NewSMTContext()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, context.Close()) })
+	astTestMust(t, context.SetFixedpointEngine("spacer"))
+	predicate, err := context.DeclareRelation("api-fp-parameter-P", nil)
+	astTestMust(t, err)
+	manager, err := context.Manager()
+	astTestMust(t, err)
+	fact, err := manager.MkApp(predicate, nil)
+	astTestMust(t, err)
+	astTestMust(t, context.AddFixedpointRule(fact, "api-fp-parameter-fact"))
+	status, err := context.QueryFixedpoint(predicate)
+	astTestMust(t, err)
+	if status != lbool.True {
+		t.Fatal("initial fixedpoint parameter query", status)
+	}
+	astTestMust(t, context.SetUIntOption("fixedpoint.pdr.cache_mode", 3))
+	if _, err = context.QueryFixedpoint(predicate); err == nil || !strings.Contains(err.Error(), "invalid pdr.cache_mode 3") {
+		t.Fatal("fixedpoint parameter update reused stale PDR context", err)
 	}
 }
