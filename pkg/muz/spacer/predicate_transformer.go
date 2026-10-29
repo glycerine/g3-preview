@@ -468,6 +468,20 @@ func (p *PredicateTransformer) PropagateToNextLevel(level uint32) (bool, error) 
 	return p.frames.PropagateToNextLevel(level)
 }
 
+func (p *PredicateTransformer) PropagateToInfinity(level uint32) error {
+	if err := p.open(); err != nil {
+		return err
+	}
+	return p.frames.PropagateToInfinity(level)
+}
+
+func (p *PredicateTransformer) NumLevels() (uint32, error) {
+	if err := p.open(); err != nil {
+		return 0, err
+	}
+	return p.frames.Size()
+}
+
 func (p *PredicateTransformer) Formulas(level uint32, addAxioms bool) (ast.ASTHandle, error) {
 	if err := p.open(); err != nil {
 		return ast.ASTHandle{}, err
