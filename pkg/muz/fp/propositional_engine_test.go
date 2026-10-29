@@ -724,6 +724,43 @@ func TestDatalogRejectsInfinitePredicateSorts(t *testing.T) {
 	}
 }
 
+func TestDatalogRejectsQuantifiedInterpretedTails(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngine(manager)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	predicateName, err := manager.Symbols.Intern("fp-datalog-quantified-P")
+	fpMust(t, err)
+	predicate, err := manager.MkFuncDecl(predicateName, nil, boolean, ast.ASTFuncDeclInfo{})
+	fpMust(t, err)
+	predicateApp, err := manager.MkApp(predicate, nil)
+	fpMust(t, err)
+	fpMust(t, engine.RegisterPredicate(predicate))
+	variable, err := manager.MkVar(0, boolean)
+	fpMust(t, err)
+	variableName, err := manager.Symbols.Intern("fp-datalog-quantified-x")
+	fpMust(t, err)
+	quantifier, err := manager.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{boolean}, Names: []usymbol.Symbol{variableName}, Body: variable,
+	})
+	fpMust(t, err)
+	formula, err := manager.MkImplies(quantifier, predicateApp)
+	fpMust(t, err)
+	formulaRef, err := manager.NewRef(formula)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, manager.DelRef(&formulaRef)) })
+	fpMust(t, engine.AddRule(formula, "quantified-tail"))
+	if _, err = engine.QueryPredicate(predicate); !errors.Is(err, fp.ErrPropositionalHorn) || !strings.Contains(err.Error(), "quantifier") {
+		t.Fatal("Datalog accepted a quantified interpreted tail", err)
+	}
+}
+
 func TestPropositionalEngineScopeGuards(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)

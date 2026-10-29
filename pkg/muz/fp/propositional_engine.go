@@ -416,6 +416,17 @@ func (e *PropositionalEngine) validateFragment() error {
 				x = y
 				break
 			}
+			if e.backend == "datalog" {
+				quantified, quantifierErr := e.manager.HasQuantifiers(tail)
+				if quantifierErr != nil {
+					x = quantifierErr
+					break
+				}
+				if quantified {
+					x = fmt.Errorf("%w: cannot process a quantifier in a Datalog rule", ErrPropositionalHorn)
+					break
+				}
+			}
 			unsupported, y := e.hasUninterpretedRuleSymbol(tail)
 			if y != nil {
 				x = y

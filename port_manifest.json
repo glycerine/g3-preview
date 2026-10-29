@@ -81867,7 +81867,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/parsers/smt2/fixedpoint_commands_test.go"],
-      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates", "TestPDRAndSpacerRejectPartialDatatypeAccessors", "TestDatalogRejectsInfinitePredicateSorts"],
+      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates", "TestPDRAndSpacerRejectPartialDatatypeAccessors", "TestDatalogRejectsInfinitePredicateSorts", "TestDatalogRejectsQuantifiedInterpretedTails"],
       "assertions": [
         {
           "line": 193,
@@ -81902,7 +81902,13 @@
           "tests": ["TestDatalogRejectsInfinitePredicateSorts"]
         },
         {
-          "name": "remaining rule-property collection, existential-tail and quantifier checks",
+          "name": "Datalog check_quantifier_free over interpreted rule tails (rule_properties.cpp:37-48,62-70,181-183)",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestDatalogRejectsQuantifiedInterpretedTails"]
+        },
+        {
+          "name": "remaining rule-property collection and existential-tail check",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -81917,7 +81923,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go"],
-      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates", "TestPDRAndSpacerRejectPartialDatatypeAccessors", "TestDatalogRejectsInfinitePredicateSorts"],
+      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates", "TestPDRAndSpacerRejectPartialDatatypeAccessors", "TestDatalogRejectsInfinitePredicateSorts", "TestDatalogRejectsQuantifiedInterpretedTails"],
       "conditionals": [
         {
           "line": 21,
@@ -81932,10 +81938,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained engine-specific uninterpreted-free, partial-datatype-accessor, negative-predicate and infinite-sort rule-check surface",
+          "name": "retained engine-specific uninterpreted-free, partial-datatype-accessor, negative-predicate, infinite-sort and quantifier-free rule-check surface",
           "status": "ported",
           "go_target": "pkg/muz/fp/propositional_engine.go",
-          "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates", "TestPDRAndSpacerRejectPartialDatatypeAccessors", "TestDatalogRejectsInfinitePredicateSorts"]
+          "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates", "TestPDRAndSpacerRejectPartialDatatypeAccessors", "TestDatalogRejectsInfinitePredicateSorts", "TestDatalogRejectsQuantifiedInterpretedTails"]
         },
         {
           "name": "remaining rule_properties collection and validation surface",
