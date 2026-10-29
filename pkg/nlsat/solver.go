@@ -141,6 +141,24 @@ func (s *Solver) MkVar(integer bool) (uint32, error) {
 	return s.clauses.mkVar(integer)
 }
 
+// MkExprPolynomialVariable implements ast.ExprPolynomialVariables for the
+// retained goal-to-NLSAT specialization.
+func (s *Solver) MkExprPolynomialVariable(integer bool) (uint32, error) {
+	return s.MkVar(integer)
+}
+
+// IsExprPolynomialInteger implements ast.ExprPolynomialVariables for the
+// retained goal-to-NLSAT specialization.
+func (s *Solver) IsExprPolynomialInteger(variable uint32) (bool, error) {
+	if err := s.open(); err != nil {
+		return false, err
+	}
+	if uint64(variable) >= uint64(len(s.clauses.vars.isInt)) {
+		return false, arena.ErrBounds
+	}
+	return s.clauses.vars.isInt[variable], nil
+}
+
 func (s *Solver) MkBoolVar() (sat.BoolVar, error) {
 	if err := s.open(); err != nil {
 		return sat.NullBoolVar, err
