@@ -54,7 +54,7 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return nil, err
 	}
 	switch name {
-	case "qe-light", "qsat", "qe2", "qe_rec", "smt", "horn", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "dt2bv", "bv_bound_chk", "reduce-bv-size", "reduce-args", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "nla2bv", "diff-neq", "lia2pb", "card2bv", "pb2bv", "qfbv", "qfaufbv", "qfufbv", "qfufbv_ackr", "qfidl", "qflia", "qfauflia", "qflra", "qfuf", "ufnia", "uflra", "auflia", "auflira", "aufnira", "skip", "fail", "fail-if-undecided":
+	case "qe-light", "qsat", "qe2", "qe_rec", "smt", "horn", "sat", "sat-preprocess", "simplify", "ctx-simplify", "add-bounds", "elim-and", "propagate-values", "propagate-ineqs", "max-bv-sharing", "bit-blast", "bv1-blast", "dt2bv", "bv_bound_chk", "reduce-bv-size", "reduce-args", "ackermannize_bv", "aig", "solve-eqs", "elim-uncnstr", "symmetry-reduce", "fix-dl-var", "normalize-bounds", "nla2bv", "diff-neq", "lia2pb", "card2bv", "pb2bv", "qfbv", "qfaufbv", "qfufbv", "qfufbv_ackr", "qfidl", "qflia", "qfnia", "qfauflia", "qflra", "qfuf", "ufnia", "uflra", "auflia", "auflira", "aufnira", "skip", "fail", "fail-if-undecided":
 	default:
 		return nil, fmt.Errorf("invalid tactic, unknown tactic %s", name)
 	}
@@ -136,6 +136,8 @@ func (c *Context) NewBuiltinTacticWithOutput(name string, output io.Writer) (tac
 		return smtlogics.NewQFIDLTacticWithOutput(m, nil, c.config, output)
 	case "qflia":
 		return smtlogics.NewQFLIATacticWithOutput(m, nil, c.config, output)
+	case "qfnia":
+		return smtlogics.NewQFNIATacticWithOutput(m, nil, c.config, output)
 	case "qfbv":
 		return smtlogics.NewQFBVTacticWithOutput(m, nil, c.config, output)
 	case "qflra":

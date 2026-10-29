@@ -172787,6 +172787,7 @@
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2",
         "pkg/cmd/g3/test_vectors/default_strategy_fragments.smt2",
+        "pkg/cmd/g3/test_vectors/qfnia_solver_bounded.smt2",
         "pkg/tactic/smtlogics/quant_tactics.go",
         "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2",
         "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2"
@@ -172794,6 +172795,7 @@
       "tests": [
         "TestSMTLibRunnerAsArrayCombinedSolverFallback",
         "TestSMTLibRunnerScripts/default_strategy_fragments.smt2",
+        "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference"
       ],
@@ -172801,7 +172803,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained ALL default-strategy integration for the native ordered QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA and QF_LRA classifiers, OP_AS_ARRAY compatibility routing, and quantifier-free mixed linear integer/real goals: simplify before selecting the source preprocessing branch and preserve ordinary combined-solver incremental fallback and exception behavior",
+          "name": "Retained ALL default-strategy integration for the native ordered QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA, QF_LRA and bounded QF_NIA classifiers, OP_AS_ARRAY compatibility routing, and quantifier-free mixed linear integer/real goals: simplify before selecting the source preprocessing branch and preserve ordinary combined-solver incremental fallback and exception behavior",
           "status": "partial",
           "go_targets": [
             "pkg/tactic/portfolio/all_as_array_probe.go",
@@ -172811,6 +172813,7 @@
             "pkg/cmd/g3/main_test.go",
             "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2",
             "pkg/cmd/g3/test_vectors/default_strategy_fragments.smt2",
+            "pkg/cmd/g3/test_vectors/qfnia_solver_bounded.smt2",
             "pkg/tactic/smtlogics/quant_tactics.go",
             "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2",
             "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2"
@@ -172818,6 +172821,7 @@
           "tests": [
             "TestSMTLibRunnerAsArrayCombinedSolverFallback",
             "TestSMTLibRunnerScripts/default_strategy_fragments.smt2",
+            "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -172825,7 +172829,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The nested default tactic classifier now retains the source simplify-first ordering and the QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA, QF_LRA and mixed LIRA branches. QF_NRA, QF_NIA, NRA, QF_FP and QF_FPLRA remain unported, so those and other unmatched ALL goals retain the direct SMT tactic path. The OP_AS_ARRAY compatibility route remains ahead of the source classifiers. End-to-end vectors cover each retained classifier, strict array and mixed UTVPI combined-solver fallback, native model-construction exception conversion and unrelated single-sort unknown preservation."
+        "The nested default tactic classifier now retains the source simplify-first ordering and the QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA, QF_LRA, bounded QF_NIA and mixed LIRA branches. QF_NRA, NRA, QF_FP and QF_FPLRA remain unported, so those and other unmatched ALL goals retain the direct SMT tactic path. QF_NIA retains its first bounded bit-vector solver and final SMT fallback while the intervening NLSAT attempts remain pending. The OP_AS_ARRAY compatibility route remains ahead of the source classifiers. End-to-end vectors cover each retained classifier, strict array and mixed UTVPI combined-solver fallback, native model-construction exception conversion and unrelated single-sort unknown preservation."
       ]
     },
     {
@@ -173234,6 +173238,8 @@
         "pkg/cmd_context/qfauflia_solver_test.go",
         "pkg/cmd/g3/main_test.go",
         "pkg/cmd/g3/test_vectors/default_strategy_fragments.smt2",
+        "pkg/tactic/smtlogics/qfnia_tactic.go",
+        "pkg/cmd/g3/test_vectors/qfnia_solver_bounded.smt2",
         "pkg/tactic/smtlogics/qflra_tactic.go",
         "pkg/cmd_context/qflra_solver_test.go",
         "pkg/tactic/smtlogics/qfuf_tactic.go",
@@ -173331,6 +173337,7 @@
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
         "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
         "TestSMTLibRunnerScripts/default_strategy_fragments.smt2",
+        "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
         "TestSMTLibRunnerScripts",
         "TestSMTLibRunnerCPPReference",
         "TestCommandContextQFLRACombinedSolverProofResult",
@@ -173374,7 +173381,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Retained general ALL factory operator integration for the native ordered QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA and QF_LRA classifiers, OP_AS_ARRAY compatibility routing, and quantifier-free mixed LIRA goals: simplify-first tactic solver plus direct ALL incremental SMT under combined-solver scope, unknown fallback, source exception conversion and result-provider policy",
+          "name": "Retained general ALL factory operator integration for the native ordered QF_BV, QF_AUFBV, QF_LIA, QF_AUFLIA, QF_LRA and bounded QF_NIA classifiers, OP_AS_ARRAY compatibility routing, and quantifier-free mixed LIRA goals: simplify-first tactic solver plus direct ALL incremental SMT under combined-solver scope, unknown fallback, source exception conversion and result-provider policy",
           "status": "partial",
           "go_targets": [
             "pkg/tactic/portfolio/all_as_array_probe.go",
@@ -173384,6 +173391,8 @@
             "pkg/cmd/g3/main_test.go",
             "pkg/cmd/g3/test_vectors/array_as_array_combined_fallback_gap.smt2",
             "pkg/cmd/g3/test_vectors/default_strategy_fragments.smt2",
+            "pkg/tactic/smtlogics/qfnia_tactic.go",
+            "pkg/cmd/g3/test_vectors/qfnia_solver_bounded.smt2",
             "pkg/tactic/smtlogics/quant_tactics.go",
             "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model.smt2",
             "pkg/cmd/g3/test_vectors/utvpi_mixed_sum_model_refusal.smt2"
@@ -173391,6 +173400,7 @@
           "tests": [
             "TestSMTLibRunnerAsArrayCombinedSolverFallback",
             "TestSMTLibRunnerScripts/default_strategy_fragments.smt2",
+            "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
             "TestSMTLibRunnerScripts",
             "TestSMTLibRunnerCPPReference"
           ]
@@ -176748,22 +176758,46 @@
       "path": "src/tactic/smtlogics/qfnia_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/smtlogics/qfnia_tactic.go",
+        "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/cmd_context/context.go",
+        "pkg/cmd_context/tactic_commands.go",
+        "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/qfnia_solver_bounded.smt2"
+      ],
+      "tests": [
+        "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
+        "TestSMTLibRunnerCPPReference/qfnia_solver_bounded.smt2"
+      ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "bounded NIA simplify/nla2bv/QF_BV route, final SMT fallback, tactic command, strategic QF_NIA solver and ALL classifier integration",
+          "status": "partial",
+          "go_target": "pkg/tactic/smtlogics/qfnia_tactic.go",
+          "tests": [
+            "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
+            "TestSMTLibRunnerCPPReference/qfnia_solver_bounded.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "The construction scope owns every concrete child tactic and parameter copy until the using-params graph acquires them; error cleanup releases children in reverse construction order."
+      ],
+      "deviations": [
+        "The first bounded nla2bv route and final complete SMT fallback are retained. The full preamble, timed intermediate SMT attempt and QF_NRA/NLSAT attempts remain pending with their unported constituent tactics."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfnia_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/tactic/smtlogics/qfnia_tactic.go"],
+      "tests": ["TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2"],
       "conditionals": [
         {
           "line": 19,
@@ -176776,9 +176810,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained partial QF_NIA factory surface",
+          "status": "partial",
+          "go_target": "pkg/tactic/smtlogics/qfnia_tactic.go",
+          "tests": ["TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2"]
+        }
+      ],
+      "ownership": [
+        "The returned uncounted tactic graph owns counted child references and parameter copies."
+      ],
+      "deviations": [
+        "Factory completion depends on the remaining QF_NRA/NLSAT and preamble tactics."
+      ]
     },
     {
       "path": "src/tactic/smtlogics/qfnra_tactic.cpp",
