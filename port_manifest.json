@@ -92659,9 +92659,18 @@
       "path": "src/muz/transforms/dl_mk_quantifier_instantiation.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/quantifier_instantiation.go",
+        "pkg/muz/transforms/quantifier_instantiation_test.go",
+        "pkg/muz/fp/spacer_engine.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_quantifier_instantiation.smt2"
+      ],
+      "tests": [
+        "TestQuantifierInstantiationMatchesPatternAgainstHornEGraph",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 82,
@@ -92674,17 +92683,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "option-gated forall extraction, pattern inference, rule-variable constant protection, equality e-graph collection, multi-pattern E-matching, binding instantiation and quantifier removal (dl_mk_quantifier_instantiation.cpp:35-292)",
+          "status": "partial",
+          "go_target": "pkg/muz/transforms/quantifier_instantiation.go",
+          "tests": [
+            "TestQuantifierInstantiationMatchesPatternAgainstHornEGraph",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Rule semantics and the retained fixedpoint.xform.instantiate_quantifiers Spacer pipeline stage are ported. Native proof weakening/attachment remains pending fixedpoint proof conversion, so the unit remains partial."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_quantifier_instantiation.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/quantifier_instantiation.go"
+      ],
+      "tests": [
+        "TestQuantifierInstantiationMatchesPatternAgainstHornEGraph"
+      ],
       "conditionals": [
         {
           "line": 25,
@@ -92697,9 +92722,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "mk_quantifier_instantiation concrete rule-transform plugin and retained matching state",
+          "status": "partial",
+          "go_target": "pkg/muz/transforms/quantifier_instantiation.go",
+          "tests": [
+            "TestQuantifierInstantiationMatchesPatternAgainstHornEGraph"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go uses concrete maps, slices, BasicUnionFind, and ExprSafeReplace owners for the live instantiation rather than reproducing C++ container templates. Proof conversion remains outside this batch."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_rule_inliner.cpp",

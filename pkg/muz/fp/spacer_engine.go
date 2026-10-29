@@ -97,11 +97,21 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	instantiateQuantifiersName := "xform.instantiate_quantifiers"
+	instantiateQuantifiers, err := e.params.GetBoolName(&fixedpoint, &instantiateQuantifiersName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
 	if useSubsumption {
 		if err = transformer.Register(transforms.NewSubsumptionCheckerPlugin(useChecker, 35005)); err != nil {
+			return nil, errors.Join(err, transformer.Close())
+		}
+	}
+	if instantiateQuantifiers {
+		if err = transformer.Register(transforms.NewQuantifierInstantiationPlugin(e.manager, e.rules, 37000)); err != nil {
 			return nil, errors.Join(err, transformer.Close())
 		}
 	}
