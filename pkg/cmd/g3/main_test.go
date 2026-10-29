@@ -360,6 +360,7 @@ var scriptResults = map[string]string{
 	"fp_spacer_mincut_inv.smt2":                    "unsat\n",
 	"fp_spacer_mutual_inv.smt2":                    "unsat\n",
 	"fixedpoint_spacer_nonlinear_inlining.smt2":    "sat\ntrue\n",
+	"fixedpoint_spacer_inliner_resolution.smt2":   "sat\ntrue\nunsat\n",
 	"fixedpoint_spacer_recursive_trace.smt2":       "sat\n(and (P 1) (P 0))\nunsat\n",
 	"horn_tactic_finite.smt2":                      "unsat\nsat\nunsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\nunsat\nsat\n",
 	"horn_solver_finite.smt2":                      "unsat\nsat\n",

@@ -92621,6 +92621,8 @@
         "TestRuleInlinerForbidsSecondRuleMultiplier",
         "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition",
         "TestRuleInlinerDropsResolvedFalseInterpretedTail",
+        "TestSMTLibRunnerScripts/fixedpoint_spacer_inliner_resolution.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_inliner_resolution.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_nonlinear_inlining.smt2",
@@ -92760,7 +92762,8 @@
           "status": "ported",
           "go_target": "pkg/muz/transforms/rule_inliner.go",
           "tests": [
-            "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition"
+            "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition",
+            "TestSMTLibRunnerCPPReference/fixedpoint_spacer_inliner_resolution.smt2"
           ]
         },
         {
@@ -92768,7 +92771,8 @@
           "status": "ported",
           "go_target": "pkg/muz/transforms/rule_inliner.go",
           "tests": [
-            "TestRuleInlinerDropsResolvedFalseInterpretedTail"
+            "TestRuleInlinerDropsResolvedFalseInterpretedTail",
+            "TestSMTLibRunnerCPPReference/fixedpoint_spacer_inliner_resolution.smt2"
           ]
         },
         {
@@ -92802,7 +92806,8 @@
     "TestRuleInlinerBreaksMutualCycleAtOnePredicate",
     "TestRuleInlinerForbidsSecondRuleMultiplier",
     "TestRuleInlinerOrientedEagerUsesUniqueUnifyingDefinition",
-    "TestRuleInlinerDropsResolvedFalseInterpretedTail"
+    "TestRuleInlinerDropsResolvedFalseInterpretedTail",
+    "TestSMTLibRunnerCPPReference/fixedpoint_spacer_inliner_resolution.smt2"
       ],
       "conditionals": [
         {
