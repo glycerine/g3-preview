@@ -16,6 +16,7 @@ type PredicateTransformer struct {
 	owner                    *Manager
 	manager                  *ast.ASTManager
 	solver                   *PropSolver
+	reachSolver              *VirtualSolver
 	frames                   *Frames
 	obligations              *ProofObligationStore
 	name                     string
@@ -36,6 +37,10 @@ type PredicateTransformer struct {
 	rules                    []*spacerNormalizedRule
 	ruleReferences           []ast.ASTRef
 	uses                     []*PredicateTransformer
+	reachFacts               []*ReachFact
+	reachCaseVariables       []ast.ASTRef
+	initialReachFacts        uint32
+	reachAsInitial           bool
 	closed                   bool
 }
 
@@ -66,7 +71,7 @@ func newPredicateTransformer(owner *Manager, name string, config PropSolverConfi
 	if owner == nil || owner.open() != nil {
 		return nil, ErrManagerOwner
 	}
-	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name, instantiateQuantified: true, useQuantifiedLemmas: true, blastTermITE: true}
+	p := &PredicateTransformer{owner: owner, manager: owner.manager, name: name, instantiateQuantified: true, useQuantifiedLemmas: true, blastTermITE: true, reachAsInitial: true}
 	if config.Itp.Params == nil && config.Itp.Globals == nil {
 		config.Itp.Params = owner.contexts[0].config.Params
 		config.Itp.Globals = owner.contexts[0].config.Globals
@@ -79,6 +84,9 @@ func newPredicateTransformer(owner *Manager, name string, config PropSolverConfi
 	}()
 	var err error
 	if p.solver, err = owner.NewPropSolver(name, config); err != nil {
+		return nil, err
+	}
+	if p.reachSolver, err = owner.Fresh(2); err != nil {
 		return nil, err
 	}
 	if p.frames, err = NewFrames(p.manager, p); err != nil {
@@ -273,7 +281,7 @@ func (p *PredicateTransformer) Signature() ([]ast.ASTHandle, error) {
 }
 
 func (p *PredicateTransformer) open() error {
-	if p == nil || p.closed || p.owner == nil || p.manager == nil || p.solver == nil || p.frames == nil {
+	if p == nil || p.closed || p.owner == nil || p.manager == nil || p.solver == nil || p.reachSolver == nil || p.frames == nil {
 		return ErrManagerOwner
 	}
 	return nil
@@ -528,7 +536,14 @@ func (p *PredicateTransformer) Close() (result error) {
 	if p.solver != nil {
 		result = errors.Join(result, p.solver.Close())
 	}
+	if p.reachSolver != nil {
+		result = errors.Join(result, p.reachSolver.Close())
+	}
 	if p.manager != nil {
+		for i := len(p.reachFacts) - 1; i >= 0; i-- {
+			result = errors.Join(result, p.reachFacts[i].Close())
+		}
+		result = errors.Join(result, releaseNormalizeRefs(p.manager, p.reachCaseVariables))
 		for i := len(p.rules) - 1; i >= 0; i-- {
 			result = errors.Join(result, p.rules[i].rule.Close())
 		}
@@ -555,10 +570,13 @@ func (p *PredicateTransformer) Close() (result error) {
 		p.frames = nil
 		p.obligations = nil
 		p.solver = nil
+		p.reachSolver = nil
 		p.signature = nil
 		p.rules = nil
 		p.ruleReferences = nil
 		p.uses = nil
+		p.reachFacts = nil
+		p.reachCaseVariables = nil
 		p.owner = nil
 		p.manager = nil
 		p.closed = true

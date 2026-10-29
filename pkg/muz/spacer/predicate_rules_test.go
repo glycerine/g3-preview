@@ -47,6 +47,29 @@ func TestSpacerPredicateRulesBuildTaggedInitialAndTransitionSystem(t *testing.T)
 	recursiveRule, err := ruleManager.NewRule(recursiveHead, []ast.ASTHandle{recursiveTail}, nil, "recursive")
 	spacerMust(t, err)
 	spacerMust(t, transformer.InitializeRules(map[ast.ASTHandle]*spacer.PredicateTransformer{pDecl: transformer}, []*base.Rule{initialRule, recursiveRule}))
+	spacerMust(t, transformer.InitReachFacts())
+	if has, err := transformer.HasReachFacts(); err != nil || !has {
+		t.Fatal("initial Spacer reach facts", has, err)
+	}
+	recursiveTransition, err := transformer.RuleTransition(recursiveRule)
+	spacerMust(t, err)
+	computed, err := spacer.NewReachFact(manager, recursiveRule, recursiveTransition, nil, false)
+	spacerMust(t, err)
+	if added, err := transformer.AddReachFact(computed); err != nil || !added {
+		t.Fatal("computed Spacer reach fact", added, err)
+	}
+	spacerMust(t, computed.Close())
+	reachFacts, err := transformer.ReachFacts()
+	spacerMust(t, err)
+	if len(reachFacts) != 2 {
+		t.Fatal("Spacer reach fact count", len(reachFacts))
+	}
+	for _, fact := range reachFacts {
+		spacerMust(t, fact.Close())
+	}
+	if _, found, err := transformer.LastReachCaseVariable(); err != nil || !found {
+		t.Fatal("last Spacer reach-case variable", found, err)
+	}
 	rules, err := transformer.Rules()
 	spacerMust(t, err)
 	if len(rules) != 2 {
