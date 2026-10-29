@@ -173,6 +173,23 @@ func traceRecursiveAnchor(root *ModelNode) (*PredicateTransformer, error) {
 	return nil, nil
 }
 
+func traceHasNestedPredecessor(root *ModelNode) (bool, error) {
+	children, err := root.Children()
+	if err != nil {
+		return false, err
+	}
+	for _, child := range children {
+		grandchildren, x := child.Children()
+		if x != nil {
+			return false, x
+		}
+		if len(grandchildren) != 0 {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func updateTraceModels(root *ModelNode) error {
 	byState := make(map[ast.ASTHandle]*ModelNode)
 	nodes := []*ModelNode{root}
@@ -372,6 +389,11 @@ func (c *Context) Answer(queryDeclaration ast.ASTHandle) (result ast.ASTRef, res
 	if err != nil {
 		return result, err
 	}
+	linearPredicates, err := traceHasNestedPredecessor(root)
+	if err != nil {
+		return result, err
+	}
+	linearPredicates = linearPredicates && anchor == nil
 	constraints := make([]ast.ASTHandle, 0)
 	references := make([]ast.ASTRef, 0)
 	defer func() {
@@ -399,6 +421,24 @@ func (c *Context) Answer(queryDeclaration ast.ASTHandle) (result ast.ASTRef, res
 		tailSize, x := rule.rule.TailSize()
 		if x != nil {
 			return result, x
+		}
+		if node != root && linearPredicates {
+			head, y := rule.rule.Head()
+			if y != nil {
+				return result, y
+			}
+			instantiated, y := c.instantiateTraceExpression(node, rule, head)
+			if y != nil {
+				return result, y
+			}
+			references = append(references, instantiated)
+			handle, y := c.manager.RefGet(instantiated)
+			if y != nil {
+				return result, y
+			}
+			if !c.manager.IsTrue(handle) {
+				constraints = append(constraints, handle)
+			}
 		}
 		start := uninterpreted
 		if node != root {
