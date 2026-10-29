@@ -6,9 +6,11 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/polynomial"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/nlsat"
 	basetactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	uparams "github.com/glycerine/g3/pkg/util/params"
@@ -19,6 +21,9 @@ type goalCompilerFixture struct {
 	manager  *ast.ASTManager
 	solver   *nlsat.Solver
 	compiler *GoalCompiler
+	context  *uparams.ParamsContext
+	globals  *uparams.GlobalParamsService
+	services model.ModelEvaluatorConfig
 }
 
 func compilerMust(t *testing.T, err error) {
@@ -63,6 +68,9 @@ func newGoalCompilerFixture(t *testing.T) *goalCompilerFixture {
 		_, restoreErr := uparams.BindProcessGlobalParamsService(previous)
 		compilerMust(t, restoreErr)
 	})
+	cooperation, err := cooperate.NewCooperation(budget)
+	compilerMust(t, err)
+	t.Cleanup(func() { compilerMust(t, cooperation.Close()) })
 	manager, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget})
 	compilerMust(t, err)
 	t.Cleanup(func() { compilerMust(t, manager.Close()) })
@@ -91,7 +99,10 @@ func newGoalCompilerFixture(t *testing.T) *goalCompilerFixture {
 	compiler, err := NewGoalCompiler(manager, solver)
 	compilerMust(t, err)
 	t.Cleanup(func() { compilerMust(t, compiler.Close()) })
-	return &goalCompilerFixture{manager: manager, solver: solver, compiler: compiler}
+	return &goalCompilerFixture{
+		manager: manager, solver: solver, compiler: compiler, context: context, globals: globals,
+		services: model.ModelEvaluatorConfig{Context: context, Globals: globals, Memory: numerals.RuntimeOwner(), Cooperation: cooperation},
+	}
 }
 
 func compilerConst(t *testing.T, manager *ast.ASTManager, name string, sort ast.ASTHandle) ast.ASTHandle {
