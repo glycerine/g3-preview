@@ -19,6 +19,7 @@ type legacyLiteralReplacement struct {
 type legacyRealProjection struct {
 	manager      *ast.ASTManager
 	substitution ast.ASTRef
+	divisibility ast.ASTRef
 	replacements []legacyLiteralReplacement
 }
 
@@ -32,6 +33,9 @@ func (r *legacyRealProjection) Close() (result error) {
 	r.replacements = nil
 	if r.substitution != (ast.ASTRef{}) {
 		result = errors.Join(result, r.manager.DelRef(&r.substitution))
+	}
+	if r.divisibility != (ast.ASTRef{}) {
+		result = errors.Join(result, r.manager.DelRef(&r.divisibility))
 	}
 	if result == nil {
 		r.manager = nil

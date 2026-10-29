@@ -90263,8 +90263,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/qe/legacy_arithmetic_linear.go", "pkg/qe/legacy_arithmetic_bounds.go", "pkg/qe/legacy_arithmetic_compare.go", "pkg/qe/legacy_arithmetic_real.go", "pkg/qe/legacy_arithmetic_integer.go"],
-      "tests": ["TestLegacyArithmeticProjectionClassifiesLinearLiterals", "TestLegacyArithmeticProjectionClassifiesEqualities", "TestLegacyArithmeticProjectionSelectsModelBounds", "TestLegacyArithmeticProjectionBuildsBoundComparisons", "TestLegacyArithmeticProjectionProjectsRealBounds", "TestLegacyArithmeticProjectionNormalizesIntegerCoefficients"],
+      "go_targets": ["pkg/qe/legacy_arithmetic_linear.go", "pkg/qe/legacy_arithmetic_bounds.go", "pkg/qe/legacy_arithmetic_compare.go", "pkg/qe/legacy_arithmetic_real.go", "pkg/qe/legacy_arithmetic_integer.go", "pkg/qe/legacy_arithmetic_integer_project.go"],
+      "tests": ["TestLegacyArithmeticProjectionClassifiesLinearLiterals", "TestLegacyArithmeticProjectionClassifiesEqualities", "TestLegacyArithmeticProjectionSelectsModelBounds", "TestLegacyArithmeticProjectionBuildsBoundComparisons", "TestLegacyArithmeticProjectionProjectsRealBounds", "TestLegacyArithmeticProjectionNormalizesIntegerCoefficients", "TestLegacyArithmeticProjectionProjectsIntegerPaths"],
       "assertions": [
         {
           "line": 101,
@@ -90423,7 +90423,8 @@
         {"name": "legacy opposite-side, same-side and equality-at-bound comparison construction with theory rewriting", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_compare.go", "tests": ["TestLegacyArithmeticProjectionBuildsBoundComparisons"]},
         {"name": "legacy real arithmetic equality, infinity and selected-bound virtual substitution", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_real.go", "tests": ["TestLegacyArithmeticProjectionProjectsRealBounds"]},
         {"name": "legacy integer coefficient, residual term and divisibility-modulus LCM normalization plus selected-value literal substitution", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_integer.go", "tests": ["TestLegacyArithmeticProjectionNormalizesIntegerCoefficients"]},
-        {"name": "legacy integer test-point selection and infinity substitution, mod factoring and formula replacement", "status": "unported", "go_target": null, "tests": []},
+        {"name": "legacy integer equality, infinity and finite test-point virtual substitution with congruence side constraints", "status": "ported", "go_target": "pkg/qe/legacy_arithmetic_integer_project.go", "tests": ["TestLegacyArithmeticProjectionProjectsIntegerPaths"]},
+        {"name": "legacy mod factoring and formula replacement", "status": "unported", "go_target": null, "tests": []},
         {"name": "legacy array equality/select reduction and projection", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["Each classified legacy literal owns its residual arithmetic term reference; the projection owner owns the shared concrete arithmetic syntax service."],
