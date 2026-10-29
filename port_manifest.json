@@ -88666,9 +88666,19 @@
       "path": "src/muz/spacer/spacer_context.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/spacer/context_answer.go",
+        "pkg/muz/spacer/context.go",
+        "pkg/muz/spacer/predicate_reach_projection.go",
+        "pkg/muz/spacer/search.go"
+      ],
+      "tests": [
+        "TestSMT2FixedpointSpacerRebuildsAfterBoundedRecursiveSearch",
+        "TestSMT2FixedpointSpacerRecursiveTraceAnswerMatchesCPP",
+        "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_recursive_trace.smt2"
+      ],
       "assertions": [
         {
           "line": 148,
@@ -88933,9 +88943,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "bounded proof-obligation search, concrete reach-fact projection, and preorder ground satisfying-answer reconstruction",
+          "status": "partial",
+          "go_target": "pkg/muz/spacer/context_answer.go",
+          "tests": [
+            "TestSMT2FixedpointSpacerRebuildsAfterBoundedRecursiveSearch",
+            "TestSMT2FixedpointSpacerRecursiveTraceAnswerMatchesCPP",
+            "TestSMTLibRunnerCPPReference/fixedpoint_spacer_recursive_trace.smt2"
+          ]
+        }
+      ],
+      "ownership": [
+        "Ground answer traversal retains every queued reach fact, renamed constraint, evaluated argument, and emitted predicate application through local SMT model evaluation, then releases them in reverse owner order."
+      ],
+      "deviations": [
+        "The retained Go query path uses the requested predicate directly instead of introducing the source synthetic query rule; answer traversal therefore discards the direct query reach fact before walking its single justification."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_context.h",

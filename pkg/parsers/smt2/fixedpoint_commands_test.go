@@ -490,6 +490,36 @@ func TestSMT2FixedpointSpacerRebuildsAfterBoundedRecursiveSearch(t *testing.T) {
 	}
 }
 
+func TestSMT2FixedpointSpacerRecursiveTraceAnswerMatchesCPP(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	context.PrintSuccess = false
+	script := `(set-option :fixedpoint.engine spacer)
+(declare-rel P (Int))
+(declare-rel Goal ())
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (and (P x) (< x 2)) (P (+ x 1))))
+(rule (=> (P 2) Goal))
+(query Goal :print-answer true)
+`
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err, output.String())
+	}
+	cpp := fixedpointReference(t, script)
+	if want := "sat\n(and (P 1) (P 0))\n"; output.String() != cpp || cpp != want {
+		t.Fatal("Spacer recursive trace differential", output.String(), cpp)
+	}
+}
+
 func TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	if err != nil {

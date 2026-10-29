@@ -336,10 +336,7 @@ func (c *Context) LastResult() (lbool.LBool, error) {
 	return c.lastResult, nil
 }
 
-// Answer returns the retained source fallback for a reachable trace. Ground
-// trace reconstruction is added independently as reach-fact traversal grows;
-// the source also returns true when a concrete explanation is trivial or
-// unavailable.
+// Answer returns the source ground reach-fact trace for a successful query.
 func (c *Context) Answer(declaration ast.ASTHandle) (ast.ASTRef, error) {
 	if err := c.open(); err != nil {
 		return ast.ASTRef{}, err
@@ -347,11 +344,7 @@ func (c *Context) Answer(declaration ast.ASTHandle) (ast.ASTRef, error) {
 	if !c.solved || c.lastResult != lbool.True || c.queryDecl != declaration {
 		return ast.ASTRef{}, ast.ErrASTDomain
 	}
-	truth, err := c.manager.MkTrue()
-	if err != nil {
-		return ast.ASTRef{}, err
-	}
-	return c.manager.NewRef(truth)
+	return c.groundSatAnswer()
 }
 
 func (c *Context) CollectStatistics(destination *statistics.Statistics) error {
