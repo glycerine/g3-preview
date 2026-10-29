@@ -205,6 +205,92 @@ func releaseTransformRefs(manager *ast.ASTManager, refs []ast.ASTRef) (result er
 	return result
 }
 
+func inlinerComponents(order []ast.ASTHandle, candidate, forbidden map[ast.ASTHandle]bool, edges map[ast.ASTHandle]map[ast.ASTHandle]bool) [][]ast.ASTHandle {
+	index := 0
+	indices := make(map[ast.ASTHandle]int)
+	lowlink := make(map[ast.ASTHandle]int)
+	onStack := make(map[ast.ASTHandle]bool)
+	var stack []ast.ASTHandle
+	var components [][]ast.ASTHandle
+	var visit func(ast.ASTHandle)
+	visit = func(node ast.ASTHandle) {
+		index++
+		indices[node] = index
+		lowlink[node] = index
+		stack = append(stack, node)
+		onStack[node] = true
+		for next := range edges[node] {
+			if !candidate[next] || forbidden[next] {
+				continue
+			}
+			if indices[next] == 0 {
+				visit(next)
+				if lowlink[next] < lowlink[node] {
+					lowlink[node] = lowlink[next]
+				}
+			} else if onStack[next] && indices[next] < lowlink[node] {
+				lowlink[node] = indices[next]
+			}
+		}
+		if lowlink[node] != indices[node] {
+			return
+		}
+		var component []ast.ASTHandle
+		for {
+			last := len(stack) - 1
+			member := stack[last]
+			stack = stack[:last]
+			onStack[member] = false
+			component = append(component, member)
+			if member == node {
+				break
+			}
+		}
+		components = append(components, component)
+	}
+	for _, declaration := range order {
+		if candidate[declaration] && !forbidden[declaration] && indices[declaration] == 0 {
+			visit(declaration)
+		}
+	}
+	return components
+}
+
+func breakInliningCycles(order []ast.ASTHandle, candidate map[ast.ASTHandle]bool, edges map[ast.ASTHandle]map[ast.ASTHandle]bool) map[ast.ASTHandle]bool {
+	forbidden := make(map[ast.ASTHandle]bool)
+	// The retained eager implementation resolves against original definition
+	// buckets rather than the source's incrementally accumulated topological
+	// buckets. Keep self-recursion out until those buckets land.
+	for _, declaration := range order {
+		if candidate[declaration] && edges[declaration][declaration] {
+			forbidden[declaration] = true
+		}
+	}
+	position := make(map[ast.ASTHandle]int, len(order))
+	for index, declaration := range order {
+		position[declaration] = index
+	}
+	for {
+		changed := false
+		for _, component := range inlinerComponents(order, candidate, forbidden, edges) {
+			if len(component) <= 1 {
+				continue
+			}
+			selected := component[0]
+			for _, declaration := range component[1:] {
+				if position[declaration] < position[selected] {
+					selected = declaration
+				}
+			}
+			forbidden[selected] = true
+			changed = true
+		}
+		if !changed {
+			return forbidden
+		}
+	}
+}
+
 func (p *RuleInlinerPlugin) plan(source *base.RuleSet) (map[ast.ASTHandle]bool, map[ast.ASTHandle][]*base.Rule, error) {
 	count, err := source.Len()
 	if err != nil {
@@ -215,6 +301,7 @@ func (p *RuleInlinerPlugin) plan(source *base.RuleSet) (map[ast.ASTHandle]bool, 
 	negative := make(map[ast.ASTHandle]bool)
 	edges := make(map[ast.ASTHandle]map[ast.ASTHandle]bool)
 	definitions := make(map[ast.ASTHandle][]*base.Rule)
+	var declarationOrder []ast.ASTHandle
 	for index := 0; index < count; index++ {
 		rule, getErr := source.Rule(index)
 		if getErr != nil {
@@ -223,6 +310,9 @@ func (p *RuleInlinerPlugin) plan(source *base.RuleSet) (map[ast.ASTHandle]bool, 
 		head, getErr := rule.HeadDeclaration()
 		if getErr != nil {
 			return nil, nil, errors.Join(getErr, rule.Close(), closeRuleBuckets(definitions))
+		}
+		if headCount[head] == 0 {
+			declarationOrder = append(declarationOrder, head)
 		}
 		headCount[head]++
 		definitions[head] = append(definitions[head], rule)
@@ -246,29 +336,14 @@ func (p *RuleInlinerPlugin) plan(source *base.RuleSet) (map[ast.ASTHandle]bool, 
 			edges[head][declaration] = true
 		}
 	}
-	cyclic := make(map[ast.ASTHandle]bool)
-	for declaration := range headCount {
-		seen := make(map[ast.ASTHandle]bool)
-		var reaches func(ast.ASTHandle) bool
-		reaches = func(current ast.ASTHandle) bool {
-			for next := range edges[current] {
-				if next == declaration {
-					return true
-				}
-				if !seen[next] {
-					seen[next] = true
-					if reaches(next) {
-						return true
-					}
-				}
-			}
-			return false
-		}
-		cyclic[declaration] = reaches(declaration)
-	}
-	allowed := make(map[ast.ASTHandle]bool)
+	candidate := make(map[ast.ASTHandle]bool)
 	for declaration, heads := range headCount {
-		allowed[declaration] = !p.protected[declaration] && !negative[declaration] && !cyclic[declaration] && (heads <= 1 || tailCount[declaration] <= 1 && heads <= 4)
+		candidate[declaration] = !p.protected[declaration] && !negative[declaration] && (heads <= 1 || tailCount[declaration] <= 1 && heads <= 4)
+	}
+	forbidden := breakInliningCycles(declarationOrder, candidate, edges)
+	allowed := make(map[ast.ASTHandle]bool)
+	for declaration := range candidate {
+		allowed[declaration] = candidate[declaration] && !forbidden[declaration]
 	}
 	return allowed, definitions, nil
 }

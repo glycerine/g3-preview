@@ -4,6 +4,7 @@ package transforms_test
 // protected outputs, and recursive-predicate exclusion.
 
 import (
+	"errors"
 	"math/big"
 	"testing"
 
@@ -69,6 +70,49 @@ func TestRuleInlinerRefusesMixedQuantifiedProgram(t *testing.T) {
 	if replacement != nil {
 		coneMust(t, replacement.Close())
 		t.Fatal("inliner transformed a mixed quantified program")
+	}
+}
+
+func TestRuleInlinerBreaksMutualCycleAtOnePredicate(t *testing.T) {
+	f := newConeFixture(t, "A", "B", "Goal")
+	f.add(t, f.applications["A"], "fact-A")
+	f.edge(t, "B", "A")
+	f.edge(t, "A", "B")
+	f.edge(t, "B", "Goal")
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["Goal"]))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("mutual-cycle inliner fixture rejected")
+	}
+	transformer := base.NewRuleTransformer()
+	t.Cleanup(func() { coneMust(t, transformer.Close()) })
+	coneMust(t, transformer.Register(transforms.NewRuleInlinerPluginWithModes(f.manager, f.rules, []ast.ASTHandle{f.declarations["Goal"]}, true, false, 0)))
+	modified, err := transformer.Apply(f.set)
+	coneMust(t, err)
+	if !modified {
+		t.Fatal("mutual cycle did not inline after one SCC break")
+	}
+	count, err := f.set.Len()
+	coneMust(t, err)
+	for index := 0; index < count; index++ {
+		rule, getErr := f.set.Rule(index)
+		coneMust(t, getErr)
+		head, getErr := rule.HeadDeclaration()
+		if getErr == nil && head == f.declarations["B"] {
+			getErr = errors.New("inlined predicate B still has a defining rule")
+		}
+		uninterpreted, tailErr := rule.UninterpretedTailSize()
+		for tailIndex := 0; getErr == nil && tailErr == nil && tailIndex < uninterpreted; tailIndex++ {
+			declaration, declarationErr := rule.TailDeclaration(tailIndex)
+			if declarationErr != nil {
+				tailErr = declarationErr
+			} else if declaration == f.declarations["B"] {
+				tailErr = errors.New("inlined predicate B remains in a tail")
+			}
+		}
+		getErr = errors.Join(getErr, tailErr, rule.Close())
+		coneMust(t, getErr)
 	}
 }
 

@@ -92615,8 +92615,9 @@
         "TestRuleInlinerUsesDisjointVariableBanks",
         "TestRuleInlinerPreservesRecursivePredicate",
         "TestRuleInlinerContractsUniqueLinearGroundChain",
-    "TestRuleInlinerHonorsDisabledModes",
-    "TestRuleInlinerRefusesMixedQuantifiedProgram",
+        "TestRuleInlinerHonorsDisabledModes",
+        "TestRuleInlinerRefusesMixedQuantifiedProgram",
+        "TestRuleInlinerBreaksMutualCycleAtOnePredicate",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_nonlinear_inlining.smt2",
@@ -92704,13 +92705,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained acyclic planning, protected-output exclusion, disjoint variable-bank unification, resolution, duplicate-tail removal, and eliminated-predicate rewriting",
+          "name": "retained acyclic and multi-SCC-break planning, protected-output exclusion, disjoint variable-bank unification, resolution, duplicate-tail removal, and eliminated-predicate rewriting",
           "status": "ported",
           "go_target": "pkg/muz/transforms/rule_inliner.go",
           "tests": [
             "TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput",
             "TestRuleInlinerUsesDisjointVariableBanks",
             "TestRuleInlinerPreservesRecursivePredicate",
+            "TestRuleInlinerBreaksMutualCycleAtOnePredicate",
             "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2"
           ]
         },
@@ -92733,7 +92735,7 @@
       ]
     },
     {
-      "name": "remaining SCC break and multiplier planning, oriented eager pass, proof/model conversion, and interpreted-tail unsatisfiability filtering during resolution",
+      "name": "remaining multiplier planning, source topological definition accumulation/self-recursive handling, oriented eager pass, proof/model conversion, and interpreted-tail unsatisfiability filtering during resolution",
           "status": "unported"
         }
       ],
@@ -92741,7 +92743,7 @@
         "The Go plugin owns its protected set; every definition, work-queue rule, substitution result, and transformed RuleSet is retained until transfer or reverse-order cleanup."
       ],
       "deviations": [
-        "The elimination planner excludes every recursively cyclic predicate instead of the source planner's finer SCC break selection; the subsequent source-faithful linear pass still contracts uniquely justified finite recursive chains.",
+        "The elimination planner breaks each multi-predicate SCC at one declaration like the source, but still excludes self-recursive predicates until incrementally accumulated topological definition buckets are ported; the subsequent source-faithful linear pass still contracts uniquely justified finite recursive chains.",
         "The Go linear pass uses direct concrete unifier probes in place of the source substitution-tree indexes; this changes indexing cost, not the unique-head/unique-tail decision."
       ]
     },
@@ -92759,7 +92761,8 @@
         "TestRuleInlinerPreservesRecursivePredicate",
     "TestRuleInlinerContractsUniqueLinearGroundChain",
     "TestRuleInlinerHonorsDisabledModes",
-    "TestRuleInlinerRefusesMixedQuantifiedProgram"
+    "TestRuleInlinerRefusesMixedQuantifiedProgram",
+    "TestRuleInlinerBreaksMutualCycleAtOnePredicate"
       ],
       "conditionals": [
         {
