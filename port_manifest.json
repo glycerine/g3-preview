@@ -88679,13 +88679,19 @@
         "pkg/muz/spacer/context_answer.go",
         "pkg/muz/spacer/context.go",
         "pkg/muz/spacer/predicate_reach_projection.go",
-        "pkg/muz/spacer/search.go"
+        "pkg/muz/spacer/search.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_arith_inv.smt2",
+        "pkg/cmd/g3/test_vectors/fp_spacer_linear_inv.smt2",
+        "pkg/cmd/g3/test_vectors/fp_spacer_mutual_inv.smt2"
       ],
       "tests": [
         "TestSMT2FixedpointSpacerRebuildsAfterBoundedRecursiveSearch",
         "TestSMT2FixedpointSpacerRecursiveTraceAnswerMatchesCPP",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_recursive_trace.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_recursive_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_arith_inv.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_linear_inv.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_mutual_inv.smt2"
       ],
       "assertions": [
         {
@@ -89931,12 +89937,18 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/spacer/prop_solver.go",
-        "pkg/muz/spacer/itp_solver.go"
+        "pkg/muz/spacer/itp_solver.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_arith_inv.smt2",
+        "pkg/cmd/g3/test_vectors/fp_spacer_linear_inv.smt2",
+        "pkg/cmd/g3/test_vectors/fp_spacer_mutual_inv.smt2"
       ],
       "tests": [
         "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
         "TestPropSolverNormalAndDeltaLevelActivation",
-        "TestPropSolverPublishesFarkasCore"
+        "TestPropSolverPublishesFarkasCore",
+        "TestSMTLibRunnerCPPReference/fp_spacer_arith_inv.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_linear_inv.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_mutual_inv.smt2"
       ],
       "assertions": [
         {
