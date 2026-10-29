@@ -94664,7 +94664,7 @@
         }
       ],
       "ownership": [],
-      "deviations": ["The complete purify-arith, factor, term-ITE elimination, and Tseitin-CNF preprocessing chain remains pending; unsupported cases fall through to bounded or SMT routes."]
+      "deviations": ["Purify-arith, factor, and term-ITE stages are integrated in source order. Tseitin-CNF remains pending; unsupported cases still fall through to bounded or SMT routes."]
     },
     {
       "path": "src/nlsat/tactic/qfnra_nlsat_tactic.h",
@@ -94687,7 +94687,7 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The retained route is complete through purification, factorization, and term-ITE elimination; Tseitin-CNF remains pending."]
     },
     {
       "path": "src/opt/CMakeLists.txt",
@@ -164837,9 +164837,9 @@
       "path": "src/tactic/arith/purify_arith_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/tactic/arith/qfnra_purify_tactic.go"],
+      "tests": ["TestQFNRAPurifyDivisionProofCoreAndModelFilter", "TestQFNRAPurifyZeroOddAndEvenPowers", "TestQFNRAPurifyLeavesPositiveIntegerPower", "TestSMTLibRunnerScripts/qfnra_nlsat.smt2"],
       "assertions": [
         {
           "line": 367,
@@ -164892,17 +164892,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "retained quantifier-free real DIV and zero/rational-root POWER purification",
+          "status": "complete",
+          "go_target": "pkg/tactic/arith/qfnra_purify_tactic.go",
+          "tests": ["TestQFNRAPurifyDivisionProofCoreAndModelFilter", "TestQFNRAPurifyZeroOddAndEvenPowers", "TestQFNRAPurifyLeavesPositiveIntegerPower", "TestSMTLibRunnerScripts/qfnra_nlsat.smt2"]
+        }
+      ],
+      "ownership": ["The QF_NRA invocation owns cached source terms, fresh constants, definition proofs, constraints, and filter-model declarations until result publication."],
+      "deviations": ["The retained QF_NRA instantiation is complete. Integer div/mod/to-int, quantified purification, algebraic root-object elimination, and trigonometric branches belong to other source consumers and remain unported."]
     },
     {
       "path": "src/tactic/arith/purify_arith_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/tactic/arith/qfnra_purify_tactic.go"],
+      "tests": ["TestQFNRAPurifyDivisionProofCoreAndModelFilter", "TestQFNRAPurifyZeroOddAndEvenPowers", "TestQFNRAPurifyLeavesPositiveIntegerPower"],
       "conditionals": [
         {
           "line": 48,
@@ -164917,7 +164924,7 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Only the concrete quantifier-free real specialization reached by QF_NRA is currently exported."]
     },
     {
       "path": "src/tactic/arith/recover_01_tactic.cpp",
@@ -176920,7 +176927,7 @@
         }
       ],
       "ownership": [],
-      "deviations": ["NLSAT, bounded NLA2BV, and timed SMT routes retain source order. Full qfnra_nlsat preprocessing remains pending."]
+      "deviations": ["NLSAT, bounded NLA2BV, and timed SMT routes retain source order. QF_NRA purification, factorization, and term-ITE stages are integrated; Tseitin-CNF remains pending."]
     },
     {
       "path": "src/tactic/smtlogics/qfnra_tactic.h",
