@@ -82,7 +82,7 @@ func (c *Context) expandNode(node *ModelNode) (resultStatus lbool.LBool, resultE
 		if _, x = node.transformer.AddProperty(lemma, level); x != nil {
 			return lbool.Undef, fmt.Errorf("muz/pdr: blocking property: %w", x)
 		}
-		if x = c.search.BacktrackLevel(false, node); x != nil {
+		if x = c.search.BacktrackLevel(usesLevel && c.flexibleTrace, node); x != nil {
 			return lbool.Undef, x
 		}
 		return lbool.False, nil

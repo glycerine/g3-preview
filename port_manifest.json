@@ -83135,7 +83135,7 @@
           ]
         },
         {
-          "name": "frame reachability expansion, tagged rule selection, model-implicant literal minimization, QE-lite/model-value projection, predecessor-literal partitioning, child obligations, blocking, propagation, top-level PDR solve loop and search statistics (pdr_context.cpp:1544-1769,1893-2215,2255-2335)",
+          "name": "frame reachability expansion, tagged rule selection, model-implicant literal minimization, QE-lite/model-value projection, predecessor-literal partitioning, child obligations, blocking with optional flexible-trace level raising, propagation, top-level PDR solve loop and search statistics (pdr_context.cpp:1544-1769,1893-2215,2255-2335)",
           "status": "partial",
           "go_target": "pkg/muz/pdr/context_solve.go",
           "tests": [
@@ -83421,7 +83421,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "PDR/Spacer engine selection, fixedpoint PDR Farkas/generalizer/search/cache/context-limit parameter forwarding, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
+          "name": "PDR/Spacer engine selection, fixedpoint PDR Farkas/generalizer/search/flexible-trace/cache/context-limit parameter forwarding, finalized rule-set and command-background handoff, revision-tracked unchanged-program context reuse and lbool solve dispatch (pdr_dl_interface.cpp:84-173)",
           "status": "partial",
           "go_target": "pkg/muz/fp/pdr_engine.go",
           "tests": [

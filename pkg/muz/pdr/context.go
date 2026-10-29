@@ -22,28 +22,29 @@ var ErrContextOwner = errors.New("muz/pdr: invalid or closed context")
 // Context owns the PDR manager and the predicate transformers for one Horn
 // rule set. The conflict/search loop is layered on this initialized program.
 type Context struct {
-	manager      *ast.ASTManager
-	owner        *Manager
-	cacheMode    ReachableCacheMode
-	transformers map[ast.ASTHandle]*PredicateTransformer
-	order        []ast.ASTHandle
-	search       *ModelSearch
-	implicant    *model.ModelImplicant
-	lite         *qe.Lite
-	cooperation  *cooperate.Cooperation
-	ownedCoop    bool
-	lastResult   lbool.LBool
-	query        *PredicateTransformer
-	queryDecl    ast.ASTHandle
-	expanded     uint32
-	inductive    uint32
-	nodes        uint32
-	maxDepth     uint32
-	useFarkas    bool
-	farkasActive bool
-	useInductive bool
-	initialized  bool
-	closed       bool
+	manager       *ast.ASTManager
+	owner         *Manager
+	cacheMode     ReachableCacheMode
+	transformers  map[ast.ASTHandle]*PredicateTransformer
+	order         []ast.ASTHandle
+	search        *ModelSearch
+	implicant     *model.ModelImplicant
+	lite          *qe.Lite
+	cooperation   *cooperate.Cooperation
+	ownedCoop     bool
+	lastResult    lbool.LBool
+	query         *PredicateTransformer
+	queryDecl     ast.ASTHandle
+	expanded      uint32
+	inductive     uint32
+	nodes         uint32
+	maxDepth      uint32
+	useFarkas     bool
+	farkasActive  bool
+	useInductive  bool
+	flexibleTrace bool
+	initialized   bool
+	closed        bool
 }
 
 func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumContexts uint32, cacheMode ReachableCacheMode, config smtcore.SMTSolverConfig) (*Context, error) {
@@ -154,6 +155,20 @@ func (c *Context) BreadthFirstModelSearch() (bool, error) {
 		return false, ast.ErrASTDomain
 	}
 	return c.search.breadthFirst, nil
+}
+
+// SetFlexibleTrace selects source level-raising backtracking for blocking
+// cores that still depend on the current frame. It must be set before
+// Initialize.
+func (c *Context) SetFlexibleTrace(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.flexibleTrace = enabled
+	return nil
 }
 
 func (c *Context) FarkasActive() (bool, error) {

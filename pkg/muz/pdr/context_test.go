@@ -268,6 +268,7 @@ func TestContextActivatesFarkasBeforeArithmeticSolvers(t *testing.T) {
 		t.Fatal("PDR context did not default to breadth-first model search")
 	}
 	pdrMust(t, context.SetBreadthFirstModelSearch(false))
+	pdrMust(t, context.SetFlexibleTrace(true))
 	arithmetic, err := manager.RegisterArithmeticPlugin()
 	pdrMust(t, err)
 	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
@@ -303,6 +304,9 @@ func TestContextActivatesFarkasBeforeArithmeticSolvers(t *testing.T) {
 	}
 	if err = context.SetBreadthFirstModelSearch(true); err == nil {
 		t.Fatal("initialized context accepted a model-search strategy change")
+	}
+	if err = context.SetFlexibleTrace(false); err == nil {
+		t.Fatal("initialized context accepted a flexible-trace change")
 	}
 	pdrMust(t, context.Close())
 	pdrMust(t, set.Close())

@@ -91,6 +91,14 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = context.SetBreadthFirstModelSearch(breadthFirst); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
+	flexibleName := "pdr.flexible_trace"
+	flexible, err := e.globals.Context.GetBoolName(&fixedpoint, &flexibleName, false)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetFlexibleTrace(flexible); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	background, err := e.manager.RefGet(e.background)
 	if err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
