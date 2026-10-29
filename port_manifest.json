@@ -92670,10 +92670,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/muz/transforms/quantifier_abstraction.go"
+        "pkg/muz/transforms/quantifier_abstraction.go",
+        "pkg/muz/fp/spacer_quantifier_results.go",
+        "pkg/muz/fp/spacer_quantifier_results_test.go"
       ],
       "tests": [
-        "TestQuantifierAbstractionExpandsInternalArrayPredicate"
+        "TestQuantifierAbstractionExpandsInternalArrayPredicate",
+        "TestSpacerQuantifierAbstractionReconstructsArrayPredicateModel"
       ],
       "conditionals": [
         {
@@ -92693,13 +92696,14 @@
           "status": "partial",
           "go_target": "pkg/muz/transforms/quantifier_abstraction.go",
           "tests": [
-            "TestQuantifierAbstractionExpandsInternalArrayPredicate"
+            "TestQuantifierAbstractionExpandsInternalArrayPredicate",
+            "TestSpacerQuantifierAbstractionReconstructsArrayPredicateModel"
           ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The Go plugin exposes fresh predicate mappings directly to the fixedpoint engine. Model conversion remains the missing retained surface."
+        "The Go plugin exposes fresh predicate mappings directly to the fixedpoint engine and reconstructs original array-predicate model interpretations. Native proof conversion remains outside this batch."
       ]
     },
     {
