@@ -44289,30 +44289,30 @@
       "path": "src/cmd_context/simplify_cmd.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/cmd_context/simplify.go", "pkg/parsers/smt2/simplify.go", "pkg/cmd/g3/test_vectors/simplify_command.smt2", "pkg/cmd/g3/test_vectors/simplify_sequence_command.smt2"],
-      "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMT2SimplifyCommandStatistics", "TestSMT2SimplifyCommandRejectsUnknownParameterBeforeOutput", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMT2SimplifyCommandStatistics", "TestSMT2SimplifyCommandRecoversFromRewriterFailure", "TestSMT2SimplifyCommandRejectsUnknownParameterBeforeOutput", "TestSMTLibRunnerScripts", "TestSMTLibRunnerCPPReference"],
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "simplify_cmd term and optional rewrite-proof production, lazy SMT sequence-expression callback, theory-rewriter parameter validation, som/flat normalization, conditional result printing and statistics fields (simplify_cmd.cpp:30-148)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/parsers/smt2/simplify.go",
           "go_targets": ["pkg/cmd_context/simplify.go"],
-          "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMT2SimplifyCommandStatistics", "TestSMT2SimplifyCommandRejectsUnknownParameterBeforeOutput", "TestSMTLibRunnerCPPReference"]
+          "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMT2SimplifyCommandStatistics", "TestSMT2SimplifyCommandRecoversFromRewriterFailure", "TestSMT2SimplifyCommandRejectsUnknownParameterBeforeOutput", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": ["Each command owns its local ParamsRef, parameter descriptors and simplified AST reference; the context call owns and closes the temporary TheoryRewriter."],
-      "deviations": ["Timeout/rlimit command wrappers and caught simplifier diagnostics remain unported. Timing and allocator fields use the Go runtime services while preserving the source output schema."]
+      "deviations": ["Timing and allocator fields use the Go runtime services while preserving the source output schema."]
     },
     {
       "path": "src/cmd_context/simplify_cmd.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
+      "status": "platform_replacement",
       "go_targets": ["pkg/cmd_context/simplify.go", "pkg/parsers/smt2/simplify.go"],
-      "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMTLibRunnerCPPReference"],
+      "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMT2SimplifyCommandRecoversFromRewriterFailure", "TestSMTLibRunnerCPPReference"],
       "conditionals": [
         {
           "line": 18,
@@ -44323,18 +44323,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "retained simplify command installation and default execution surface (simplify_cmd.h:23)",
-          "status": "partial",
+          "status": "platform_replacement",
           "go_target": "pkg/parsers/smt2/commands.go",
           "tests": ["TestSMT2SimplifyCommandEndToEnd", "TestSMTLibRunnerCPPReference"]
         }
       ],
       "ownership": ["Go command dispatch directly calls the concrete context rewrite operation; no command registry allocation is retained."],
-      "deviations": ["The unported optional proof/statistics/resource-control behavior keeps this header unit partial."]
+      "deviations": ["The C++ declaration-only installation header is replaced by direct typed Go command dispatch."]
     },
     {
       "path": "src/cmd_context/tactic_cmds.cpp",
