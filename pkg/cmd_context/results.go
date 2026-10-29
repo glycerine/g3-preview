@@ -1,6 +1,7 @@
 package cmd_context
 
-// Source: src/cmd_context/basic_cmds.cpp get-value, get-assignment,
+// Source: src/cmd_context/eval_cmd.cpp; src/cmd_context/basic_cmds.cpp
+// get-value, get-assignment,
 // get-consequences, get-proof and get-unsat-core; cmd_context.cpp result
 // availability checks.
 // Original get-value term text follows smt2parser.cpp parse_get_value.
@@ -9,14 +10,51 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
+	"sync"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	usmt2 "github.com/glycerine/g3/pkg/util/smt2"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
+
+// EvaluationOptions are the command-local parameters accepted by eval_cmd.
+// Nil fields preserve the corresponding context/global evaluator parameter.
+type EvaluationOptions struct {
+	MaxMemory, MaxSteps                *uint32
+	Completion, Cache, ArrayEqualities *bool
+	Timeout, RLimit, ModelIndex        uint32
+}
+
+type evaluationTimeoutHandler struct {
+	mu            sync.Mutex
+	limit         *control.Reslimit
+	active, fired bool
+}
+
+func (h *evaluationTimeoutHandler) HandleEvent(control.EventCaller) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if !h.active || h.fired {
+		return
+	}
+	h.limit.IncCancel()
+	h.fired = true
+}
+
+func (h *evaluationTimeoutHandler) close() {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.active = false
+	if h.fired {
+		h.limit.DecCancel()
+	}
+}
 
 func (c *Context) WriteExpression(out io.Writer, expression ast.ASTHandle) (result error) {
 	format, err := c.manager.SMT2PPExprTree(expression, nil)
@@ -47,29 +85,100 @@ func (c *Context) WriteValues(out io.Writer, expressions []ast.ASTHandle) (resul
 // Evaluate evaluates an expression in the latest model and returns one owning
 // AST reference. The caller must release it through Manager.DelRef.
 func (c *Context) Evaluate(expression ast.ASTHandle, completion bool) (result ast.ASTRef, resultErr error) {
+	return c.EvaluateWithOptions(expression, EvaluationOptions{Completion: &completion})
+}
+
+// EvaluateWithOptions evaluates an expression using command-local evaluator
+// parameters. The caller owns the returned AST reference.
+func (c *Context) EvaluateWithOptions(expression ast.ASTHandle, options EvaluationOptions) (result ast.ASTRef, resultErr error) {
+	if options.ModelIndex != 0 {
+		return result, fmt.Errorf("box optimization model index is not available")
+	}
 	md, err := c.Model()
 	if err != nil {
 		return result, err
 	}
 	defer func() { resultErr = errors.Join(resultErr, md.DecRef()) }()
-	evaluator, err := model.NewModelEvaluator(md, c.config.ModelEvaluator)
+	params, err := c.config.Params.NewValue()
+	if err != nil {
+		return result, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, c.config.Params.Del(&params)) }()
+	if err = c.config.Params.Append(&params, &c.params); err != nil {
+		return result, err
+	}
+	setUInt := func(name string, value *uint32) error {
+		if value == nil {
+			return nil
+		}
+		return c.config.Params.SetUIntName(&params, &name, *value)
+	}
+	setBool := func(name string, value *bool) error {
+		if value == nil {
+			return nil
+		}
+		return c.config.Params.SetBoolName(&params, &name, *value)
+	}
+	if err = setUInt("max_memory", options.MaxMemory); err != nil {
+		return result, err
+	}
+	if err = setUInt("max_steps", options.MaxSteps); err != nil {
+		return result, err
+	}
+	if err = setBool("completion", options.Completion); err != nil {
+		return result, err
+	}
+	if err = setBool("cache", options.Cache); err != nil {
+		return result, err
+	}
+	if err = setBool("array_equalities", options.ArrayEqualities); err != nil {
+		return result, err
+	}
+	config := c.config.ModelEvaluator
+	config.Params = &params
+	evaluator, err := model.NewModelEvaluator(md, config)
 	if evaluator != nil {
 		defer func() { resultErr = errors.Join(resultErr, evaluator.Close()) }()
 	}
 	if err != nil {
 		return result, err
 	}
-	if err = evaluator.SetModelCompletion(completion); err != nil {
+	manager, err := c.Manager()
+	if err != nil {
 		return result, err
 	}
+	if err = manager.ResourceLimit().Push(options.RLimit); err != nil {
+		return result, err
+	}
+	defer manager.ResourceLimit().Pop()
+	handler := &evaluationTimeoutHandler{limit: manager.ResourceLimit(), active: true}
+	timer, err := control.NewScopedTimer(options.Timeout, handler)
+	if err != nil {
+		return result, err
+	}
+	defer func() {
+		resultErr = errors.Join(resultErr, timer.Close())
+		handler.close()
+	}()
 	return evaluator.EvaluateValue(expression)
 }
 
 // WriteEvaluation evaluates one expression and prints its value using the
 // command context's SMT-LIB expression printer.
 func (c *Context) WriteEvaluation(out io.Writer, expression ast.ASTHandle, completion bool) (resultErr error) {
-	value, err := c.Evaluate(expression, completion)
+	return c.WriteEvaluationWithOptions(out, expression, EvaluationOptions{Completion: &completion})
+}
+
+// WriteEvaluationWithOptions implements eval_cmd's parameterized evaluation
+// and its recoverable model-evaluator diagnostic.
+func (c *Context) WriteEvaluationWithOptions(out io.Writer, expression ast.ASTHandle, options EvaluationOptions) (resultErr error) {
+	value, err := c.EvaluateWithOptions(expression, options)
 	if err != nil {
+		if rewriter.IsRewriterException(err) {
+			message := strings.ReplaceAll(err.Error(), "\"", "\"\"")
+			_, resultErr = fmt.Fprintf(out, "(error \"evaluator failed: %s\")\n", message)
+			return resultErr
+		}
 		return err
 	}
 	defer func() { resultErr = errors.Join(resultErr, c.manager.DelRef(&value)) }()

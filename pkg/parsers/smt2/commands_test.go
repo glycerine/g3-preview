@@ -52,7 +52,9 @@ func TestSMT2ParseAssertionsIgnoresCheckCommands(t *testing.T) {
 
 func TestSMT2EvalCommandMatchesCPP(t *testing.T) {
 	script := `(set-logic QF_UF)(declare-const p Bool)(check-sat)
-(eval p)(eval p :completion true)(eval p)`
+(eval p)(eval p :completion true)(eval p)
+(eval p :cache false :array_equalities false :max_memory 4294967295 :max_steps 4294967295 :timeout 4294967295 :rlimit 0)
+(eval (not p) :max_steps 0)`
 	c, err := cmd_context.NewStandaloneContext()
 	if err != nil {
 		t.Fatal(err)
@@ -66,7 +68,7 @@ func TestSMT2EvalCommandMatchesCPP(t *testing.T) {
 	if err = ParseCommands(c, strings.NewReader(script), &output); err != nil {
 		t.Fatal(err, output.String())
 	}
-	if want := "sat\np\nfalse\nfalse\n"; output.String() != want {
+	if want := "sat\np\nfalse\nfalse\nfalse\n(error \"evaluator failed: max. steps exceeded\")\n"; output.String() != want {
 		t.Fatal("eval output", output.String(), want)
 	}
 	if reference := os.Getenv("G3_CPP_REFERENCE"); reference != "" {

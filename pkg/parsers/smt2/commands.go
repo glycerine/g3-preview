@@ -794,23 +794,54 @@ func (p *commandParser) command() (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		completion := false
+		options := cmd_context.EvaluationOptions{Timeout: ^uint32(0)}
 		for p.token != RightParenToken {
-			if p.token != KeywordToken || p.scanner.ID() != ":completion" {
+			if p.token != KeywordToken {
 				return false, fmt.Errorf("invalid keyword argument")
 			}
+			keyword := p.scanner.ID()
 			if err = p.advance(); err != nil {
 				return false, err
 			}
-			if p.token != SymbolToken || p.scanner.ID() != "true" && p.scanner.ID() != "false" {
-				return false, fmt.Errorf("invalid parameter value, true or false expected")
-			}
-			completion = p.scanner.ID() == "true"
-			if err = p.advance(); err != nil {
-				return false, err
+			switch keyword {
+			case ":completion", ":cache", ":array_equalities", ":array-equalities":
+				if p.token != SymbolToken || p.scanner.ID() != "true" && p.scanner.ID() != "false" {
+					return false, fmt.Errorf("invalid parameter value, true or false expected")
+				}
+				value := p.scanner.ID() == "true"
+				switch keyword {
+				case ":completion":
+					options.Completion = &value
+				case ":cache":
+					options.Cache = &value
+				default:
+					options.ArrayEqualities = &value
+				}
+				if err = p.advance(); err != nil {
+					return false, err
+				}
+			case ":max_memory", ":max-memory", ":max_steps", ":max-steps", ":timeout", ":rlimit", ":model_index", ":model-index":
+				value, e := p.unsigned()
+				if e != nil {
+					return false, e
+				}
+				switch keyword {
+				case ":max_memory", ":max-memory":
+					options.MaxMemory = &value
+				case ":max_steps", ":max-steps":
+					options.MaxSteps = &value
+				case ":timeout":
+					options.Timeout = value
+				case ":rlimit":
+					options.RLimit = value
+				default:
+					options.ModelIndex = value
+				}
+			default:
+				return false, fmt.Errorf("invalid keyword argument")
 			}
 		}
-		if err = p.context.WriteEvaluation(p.out, expression, completion); err != nil {
+		if err = p.context.WriteEvaluationWithOptions(p.out, expression, options); err != nil {
 			return false, err
 		}
 		success = false
