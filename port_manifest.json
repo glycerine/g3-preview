@@ -83577,9 +83577,14 @@
       "path": "src/muz/pdr/pdr_farkas_learner.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/pdr/farkas_learner.go"
+      ],
+      "tests": [
+        "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
+        "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals"
+      ],
       "conditionals": [
         {
           "line": 192,
@@ -83681,18 +83686,43 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "is_farkas_lemma and combine_constraints coefficient/literal modes",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/farkas_learner.go",
+          "tests": [
+            "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
+            "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals"
+          ]
+        },
+        {
+          "name": "proof traversal, lemma extraction, language filtering, guesses and simplification",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The learner owns and closes its SMTFarkasUtil; copied declaration parameters are deleted on every recognition exit; returned combined ASTRef values are caller-owned."
+      ],
+      "deviations": [
+        "Only the reusable Farkas recognition and constraint-combination primitives are present; proof-DAG traversal and PropSolver integration remain open."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_farkas_learner.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/pdr/farkas_learner.go"
+      ],
+      "tests": [
+        "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
+        "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -83704,10 +83734,30 @@
         }
       ],
       "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "learner construction, Farkas recognition and constraint combination surface",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/farkas_learner.go",
+          "tests": [
+            "TestFarkasLearnerRecognizesArithmeticTheoryLemma",
+            "TestFarkasLearnerCombinesCoefficientsAndNegatedLiterals"
+          ]
+        },
+        {
+          "name": "remaining learner state and proof-derived lemma interface",
+          "status": "unported",
+          "go_target": null,
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "The concrete Go learner owns its arithmetic combination utility and returns explicit caller-owned AST references."
+      ],
+      "deviations": [
+        "The public Go surface currently exposes only the independently testable recognition and combination slice."
+      ]
     },
     {
       "path": "src/muz/pdr/pdr_generalizers.cpp",
