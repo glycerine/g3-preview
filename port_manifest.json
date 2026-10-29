@@ -83633,7 +83633,7 @@
       "path": "src/muz/pdr/pdr_farkas_learner.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/pdr/farkas_learner.go",
         "pkg/muz/pdr/prop_solver.go",
@@ -83744,7 +83744,7 @@
           "text": "SASSERT(m.is_proof(arg));"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -83780,24 +83780,23 @@
           "tests": ["TestArithmeticBoundsKeepStrongestBounds", "TestPropSolverExtractsFarkasTheoryCore"]
         },
         {
-          "name": "lemma guesses",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "get_lemma_guesses, its private proof kernel/statistics, and the local self-test harness",
+          "status": "dead",
+          "reason": "The only production caller is core_farkas_generalizer, which context::init_core_generalizers never installs; the remaining calls are the source-local test harness. Retained PropSolver consumers use get_lemmas/get_consequences directly."
         }
       ],
       "ownership": [
         "The learner owns and closes its SMTFarkasUtil; copied declaration parameters are deleted on every recognition exit; returned combined ASTRef values are caller-owned."
       ],
       "deviations": [
-        "Proof preprocessing and dependency traversal extract general B-pure units, Farkas theory-node lemmas and consequence-mode literals. PropSolver consumes both owning result forms after applying the retained arithmetic-bound subsumption. Lemma guesses remain open."
+        "Proof preprocessing and dependency traversal extract general B-pure units, Farkas theory-node lemmas and consequence-mode literals. PropSolver consumes both owning result forms after applying the retained arithmetic-bound subsumption. The separate lemma-guessing kernel is dead for retained source consumers because context::init_core_generalizers never installs core_farkas_generalizer."
       ]
     },
     {
       "path": "src/muz/pdr/pdr_farkas_learner.h",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/pdr/farkas_learner.go",
         "pkg/muz/pdr/prop_solver.go",
@@ -83818,7 +83817,7 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -83854,17 +83853,16 @@
           "tests": ["TestArithmeticBoundsKeepStrongestBounds", "TestPropSolverExtractsFarkasTheoryCore"]
         },
         {
-          "name": "remaining guessing interface",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "lemma-guessing, private-kernel statistics, and self-test-only declarations",
+          "status": "dead",
+          "reason": "No retained production consumer reaches them: context::init_core_generalizers does not install core_farkas_generalizer."
         }
       ],
       "ownership": [
         "The concrete Go learner owns its arithmetic combination utility and returns explicit caller-owned AST references."
       ],
       "deviations": [
-        "The public Go surface exposes independently testable get_lemmas and get_consequences traversals; their retained PropSolver consumer applies final arithmetic-bound simplification. Guessing remains open."
+        "The public Go surface exposes independently testable get_lemmas and get_consequences traversals; their retained PropSolver consumer applies final arithmetic-bound simplification. The uninstalled experimental guessing surface is intentionally not ported."
       ]
     },
     {
@@ -83920,10 +83918,15 @@
           "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestContextSolveFindsInductiveUnreachablePredicate", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_invariant.smt2"]
         },
         {
-          "name": "core_multi_generalizer, core_farkas_generalizer lemma guessing, convex hull, arithmetic and induction generalizers",
+          "name": "core_multi_generalizer, live convex-hull method1, arithmetic and induction generalizers",
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "core_farkas_generalizer and consequence-driven convex-hull method3",
+          "status": "dead",
+          "reason": "context::init_core_generalizers never installs core_farkas_generalizer, and core_convex_hull_generalizer::operator() has the method3 call commented out in favor of method1."
         }
       ],
       "ownership": [
@@ -83960,10 +83963,15 @@
           "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore"]
         },
         {
-          "name": "remaining optional core generalizer declarations",
+          "name": "remaining live optional core generalizer declarations",
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "core_farkas_generalizer declaration",
+          "status": "dead",
+          "reason": "context::init_core_generalizers never constructs this class."
         }
       ],
       "ownership": [
@@ -84120,7 +84128,7 @@
       "path": "src/muz/pdr/pdr_prop_solver.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/pdr/prop_solver.go",
         "pkg/muz/pdr/prop_solver_test.go"
@@ -84160,7 +84168,7 @@
           "text": "SASSERT(is_app(core_expr));"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -84222,6 +84230,14 @@
             "TestPropSolverExtractsFarkasTheoryCore",
             "TestPropSolverFarkasCoreRestoresSafeProxy"
           ]
+        },
+        {
+          "name": "empty collect_statistics and reset_statistics hooks",
+          "status": "platform_replacement",
+          "go_target": "pkg/muz/pdr/predicate_transformer.go",
+          "tests": [
+            "TestContextInitializesHornProgramAndAnswersInitialQueries"
+          ]
         }
       ],
       "ownership": [
@@ -84237,7 +84253,7 @@
       "path": "src/muz/pdr/pdr_prop_solver.h",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/pdr/prop_solver.go",
         "pkg/muz/pdr/prop_solver_test.go"
@@ -84264,7 +84280,7 @@
           "text": "SASSERT(!m_lev); m_lev = true; ps.m_current_level = lvl;"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
@@ -84292,6 +84308,14 @@
           "tests": [
             "TestPropSolverExtractsFarkasTheoryCore",
             "TestPropSolverFarkasCoreRestoresSafeProxy"
+          ]
+        },
+        {
+          "name": "source-empty statistics hooks",
+          "status": "platform_replacement",
+          "go_target": "pkg/muz/pdr/predicate_transformer.go",
+          "tests": [
+            "TestContextInitializesHornProgramAndAnswersInitialQueries"
           ]
         }
       ],
