@@ -4,11 +4,13 @@ package spacer_test
 // unique numbering, three solver pools, and PropSolver construction.
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/cmd_context"
 	_ "github.com/glycerine/g3/pkg/engine"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/spacer"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -72,6 +74,17 @@ func TestSpacerManagerBuildsStateAndPropSolverServices(t *testing.T) {
 	if len(filtered) != 1 || filtered[0] != old0Atom {
 		t.Fatal("manager old-atom filter", filtered)
 	}
+	modelCore, err := model.NewModelCore(manager)
+	spacerMust(t, err)
+	truth, err := manager.MkTrue()
+	spacerMust(t, err)
+	spacerMust(t, modelCore.RegisterConstant(old0, truth))
+	modelText, err := owner.ModelString(modelCore)
+	spacerMust(t, err)
+	if !strings.Contains(modelText, "manager-state_0 -> true") {
+		t.Fatal("manager model display", modelText)
+	}
+	spacerMust(t, modelCore.Close())
 	if first, err := owner.Unique(); err != nil || first != 0 {
 		t.Fatal("first unique", first, err)
 	}

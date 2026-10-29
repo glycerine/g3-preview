@@ -89791,6 +89791,12 @@
           "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"]
         },
         {
+          "name": "diagnostic model display",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/manager.go",
+          "tests": ["TestSpacerManagerBuildsStateAndPropSolverServices", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"]
+        },
+        {
           "name": "model cubes and inductive_property surface",
           "status": "unported",
           "go_target": null,
@@ -90326,7 +90332,7 @@
       "path": "src/muz/spacer/spacer_sym_mux.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/muz/spacer/sym_mux.go"],
       "tests": ["TestSymMuxCreatesAndRewritesStateVariants", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"],
       "conditionals": [
@@ -90427,10 +90433,15 @@
           "tests": ["TestSymMuxClassifiesCollectsAndFiltersStateLiterals", "TestSpacerManagerBuildsStateAndPropSolverServices"]
         },
         {
-          "name": "model cube extraction and model printer",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "diagnostic model printer",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/sym_mux.go",
+          "tests": ["TestSymMuxClassifiesCollectsAndFiltersStateLiterals"]
+        },
+        {
+          "name": "get_muxed_cube_from_model declaration",
+          "status": "dead",
+          "reason": "The method has no C++ definition or retained caller."
         },
         {
           "name": "index_renamer_cfg block",
@@ -90445,7 +90456,7 @@
       "path": "src/muz/spacer/spacer_sym_mux.h",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": ["pkg/muz/spacer/sym_mux.go"],
       "tests": ["TestSymMuxCreatesAndRewritesStateVariants", "TestSymMuxClassifiesCollectsAndFiltersStateLiterals"],
       "conditionals": [
@@ -90480,10 +90491,15 @@
           "tests": ["TestSymMuxClassifiesCollectsAndFiltersStateLiterals"]
         },
         {
-          "name": "model cube and diagnostic model surface",
-          "status": "unported",
-          "go_target": null,
-          "tests": []
+          "name": "diagnostic model surface",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/sym_mux.go",
+          "tests": ["TestSymMuxClassifiesCollectsAndFiltersStateLiterals"]
+        },
+        {
+          "name": "get_muxed_cube_from_model declaration",
+          "status": "dead",
+          "reason": "The declaration has no source definition or retained caller."
         }
       ],
       "ownership": ["The concrete multiplexer owns all generated declarations and prefix pins until Close."],

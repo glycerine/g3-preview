@@ -4,11 +4,13 @@ package spacer_test
 // conversion, formula rewriting, and shifting.
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/cmd_context"
 	_ "github.com/glycerine/g3/pkg/engine"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/muz/spacer"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -176,6 +178,24 @@ func TestSymMuxClassifiesCollectsAndFiltersStateLiterals(t *testing.T) {
 	if len(primaries) != 1 || primaries[0] != tuple[0] {
 		t.Fatal("primary predicates", primaries)
 	}
+	modelCore, err := model.NewModelCore(manager)
+	spacerMust(t, err)
+	spacerMust(t, modelCore.RegisterConstant(thirdDeclaration, plain))
+	spacerMust(t, modelCore.RegisterConstant(tuple[0], old))
+	plainName, err := manager.Symbols.Intern("unmuxed")
+	spacerMust(t, err)
+	plainDeclaration, err := manager.MkFuncDecl(plainName, nil, boolean, ast.ASTFuncDeclInfo{})
+	spacerMust(t, err)
+	spacerMust(t, modelCore.RegisterConstant(plainDeclaration, plain))
+	text, err := mux.ModelString(modelCore)
+	spacerMust(t, err)
+	first := strings.Index(text, "ClassifiedState_n -> ClassifiedState_0")
+	second := strings.Index(text, "ClassifiedState_1 -> true")
+	last := strings.Index(text, "unmuxed -> true")
+	if first < 0 || second <= first || last <= second {
+		t.Fatal("model ordering", text)
+	}
+	spacerMust(t, modelCore.Close())
 	spacerMust(t, mux.Close())
 	spacerMust(t, command.Close())
 }

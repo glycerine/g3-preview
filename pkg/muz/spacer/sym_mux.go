@@ -4,10 +4,15 @@ package spacer
 // src/muz/spacer/spacer_sym_mux.h and spacer_sym_mux.cpp.
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	"sort"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 )
 
 var ErrSymMuxOwner = errors.New("muz/spacer: invalid or closed symbol multiplexer")
@@ -81,6 +86,19 @@ func (m *SymMux) declarationSignature(declaration ast.ASTHandle) ([]ast.ASTHandl
 	}
 	rangeSort, err := m.manager.GetRange(declaration)
 	return domain, rangeSort, err
+}
+
+func (m *SymMux) declarationName(declaration ast.ASTHandle) (string, error) {
+	name, err := m.manager.GetASTName(declaration)
+	if err != nil {
+		return "", err
+	}
+	if text, present, x := m.manager.Symbols.BareString(name); x != nil {
+		return "", x
+	} else if present {
+		return text, nil
+	}
+	return m.manager.Symbols.Display(name)
 }
 
 func (m *SymMux) createVariant(prefix ast.ASTHandle, index uint32) (ast.ASTHandle, error) {
@@ -648,6 +666,83 @@ func (m *SymMux) PrimaryPredicates() ([]ast.ASTHandle, error) {
 		return nil, err
 	}
 	return append([]ast.ASTHandle(nil), m.primary...), nil
+}
+
+func (m *SymMux) WriteModel(out io.Writer, modelCore *model.ModelCore) error {
+	if err := m.open(); err != nil {
+		return err
+	}
+	if out == nil || modelCore == nil {
+		return ErrSymMuxOwner
+	}
+	count, err := modelCore.NumConstants()
+	if err != nil {
+		return err
+	}
+	type modelRow struct {
+		declaration ast.ASTHandle
+		name        string
+		index       uint32
+	}
+	rows := make([]modelRow, count)
+	for index := range rows {
+		declaration, x := modelCore.Constant(uint32(index))
+		if x != nil {
+			return x
+		}
+		name, x := m.declarationName(declaration)
+		if x != nil {
+			return x
+		}
+		muxIndex := ^uint32(0)
+		if value, found := m.symbolToIndex[declaration]; found {
+			muxIndex = value
+		}
+		rows[index] = modelRow{declaration: declaration, name: name, index: muxIndex}
+	}
+	sort.SliceStable(rows, func(left, right int) bool {
+		if rows[left].index != rows[right].index {
+			return rows[left].index < rows[right].index
+		}
+		return rows[left].name < rows[right].name
+	})
+	printer, err := ast.NewSimpleASTPrinterContext(m.manager, nil, nil)
+	if err != nil {
+		return err
+	}
+	for index, row := range rows {
+		const arrow = " -> "
+		if _, err = io.WriteString(out, row.name+arrow); err != nil {
+			return err
+		}
+		value, x := modelCore.ConstantInterpretation(row.declaration)
+		if x != nil {
+			return x
+		}
+		var rendered bytes.Buffer
+		if x = printer.DisplayExpr(&rendered, value, 0); x != nil {
+			return x
+		}
+		indent := strings.Repeat(" ", len(row.name)+len(arrow))
+		text := strings.ReplaceAll(rendered.String(), "\n", "\n"+indent)
+		if _, err = io.WriteString(out, text+"\n"); err != nil {
+			return err
+		}
+		if index+1 != len(rows) && row.index != rows[index+1].index {
+			if _, err = io.WriteString(out, "\n"); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (m *SymMux) ModelString(modelCore *model.ModelCore) (string, error) {
+	var out bytes.Buffer
+	if err := m.WriteModel(&out, modelCore); err != nil {
+		return "", err
+	}
+	return out.String(), nil
 }
 
 func (m *SymMux) Close() (result error) {

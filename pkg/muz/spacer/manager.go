@@ -7,6 +7,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/util/cooperate"
@@ -263,6 +264,13 @@ func (m *Manager) FilterNonModelAtoms(formulas []ast.ASTHandle) ([]ast.ASTHandle
 		return nil, err
 	}
 	return m.mux.FilterNonModel(formulas)
+}
+
+func (m *Manager) ModelString(modelCore *model.ModelCore) (string, error) {
+	if err := m.open(); err != nil {
+		return "", err
+	}
+	return m.mux.ModelString(modelCore)
 }
 
 func (m *Manager) SetBackground(background ast.ASTHandle) error {
