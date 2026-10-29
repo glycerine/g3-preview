@@ -102,6 +102,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	quantifyArraysName := "xform.quantify_arrays"
+	quantifyArrays, err := e.params.GetBoolName(&fixedpoint, &quantifyArraysName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -112,6 +117,13 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	}
 	if instantiateQuantifiers {
 		if err = transformer.Register(transforms.NewQuantifierInstantiationPlugin(e.manager, e.rules, 37000)); err != nil {
+			return nil, errors.Join(err, transformer.Close())
+		}
+	}
+	var quantifierAbstraction *transforms.QuantifierAbstractionPlugin
+	if quantifyArrays {
+		quantifierAbstraction = transforms.NewQuantifierAbstractionPlugin(e.manager, e.rules, 38000)
+		if err = transformer.Register(quantifierAbstraction); err != nil {
 			return nil, errors.Join(err, transformer.Close())
 		}
 	}
@@ -182,6 +194,16 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 		return nil, errors.Join(err, transformer.Close())
 	}
 	_, err = transformer.Apply(prepared)
+	if err == nil && quantifierAbstraction != nil {
+		for _, declaration := range quantifierAbstraction.FreshPredicates() {
+			state, stateErr := e.predicateState(declaration)
+			if stateErr != nil {
+				err = stateErr
+				break
+			}
+			e.predicates[declaration] = state
+		}
+	}
 	err = errors.Join(err, transformer.Close())
 	if err != nil {
 		return nil, fmt.Errorf("muz/fp: Spacer rule preprocessing: %w", err)

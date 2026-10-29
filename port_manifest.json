@@ -92601,9 +92601,18 @@
       "path": "src/muz/transforms/dl_mk_quantifier_abstraction.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/quantifier_abstraction.go",
+        "pkg/muz/transforms/quantifier_abstraction_test.go",
+        "pkg/muz/fp/spacer_engine.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_quantifier_abstraction.smt2"
+      ],
+      "tests": [
+        "TestQuantifierAbstractionExpandsInternalArrayPredicate",
+        "TestSMTLibRunnerScripts",
+        "TestSMTLibRunnerCPPReference"
+      ],
       "assertions": [
         {
           "line": 75,
@@ -92628,17 +92637,33 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "option-gated internal array-predicate declaration expansion, indexed/value head construction, shifted quantified tail construction, output retention and transform chaining (dl_mk_quantifier_abstraction.cpp:139-366)",
+          "status": "partial",
+          "go_target": "pkg/muz/transforms/quantifier_abstraction.go",
+          "tests": [
+            "TestQuantifierAbstractionExpandsInternalArrayPredicate",
+            "TestSMTLibRunnerCPPReference"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Rule semantics, declaration mapping, and the retained fixedpoint.xform.quantify_arrays Spacer pipeline stage are ported. The qa_model_converter that reconstructs original predicate interpretations and native proof conversion remain unported, so the unit remains partial."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_quantifier_abstraction.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/quantifier_abstraction.go"
+      ],
+      "tests": [
+        "TestQuantifierAbstractionExpandsInternalArrayPredicate"
+      ],
       "conditionals": [
         {
           "line": 25,
@@ -92651,9 +92676,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "mk_quantifier_abstraction concrete rule-transform plugin and original-to-expanded predicate mapping",
+          "status": "partial",
+          "go_target": "pkg/muz/transforms/quantifier_abstraction.go",
+          "tests": [
+            "TestQuantifierAbstractionExpandsInternalArrayPredicate"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The Go plugin exposes fresh predicate mappings directly to the fixedpoint engine. Model conversion remains the missing retained surface."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_quantifier_instantiation.cpp",
