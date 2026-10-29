@@ -173200,6 +173200,8 @@
       "go_targets": [
         "pkg/tactic/portfolio/all_as_array_probe.go",
         "pkg/tactic/portfolio/smt_strategic_solver.go",
+        "pkg/tactic/portfolio/strategic_solver_factory.go",
+        "pkg/tactic/portfolio/strategic_solver_factory_test.go",
         "pkg/cmd_context/context.go",
         "pkg/cmd/g3/combined_solver_gap_test.go",
         "pkg/cmd/g3/main_test.go",
@@ -173217,6 +173219,7 @@
       ],
       "tests": [
         "TestSMTLibRunnerAsArrayCombinedSolverFallback",
+        "TestStrategicSolverFactoryPinsLogicAndSessionOutput",
         "TestSMTLibRunnerScripts/default_strategy_fragments.smt2",
         "TestSMTLibRunnerScripts/qfnia_solver_bounded.smt2",
         "TestSMTLibRunnerScripts/qffp_default.smt2",
@@ -173992,8 +173995,19 @@
           ]
         },
         {
-          "name": "Remaining logic dispatcher branches, complete default tactic classifier and general stored-logic strategic solver_factory owner/public constructor; concrete QF_BV incremental-SAT and FD backend selections are recorded separately",
+          "name": "Remaining logic dispatcher branches and complete default tactic classifier; the stored-logic factory surface and concrete QF_BV incremental-SAT and FD backend selections are recorded separately",
           "status": "unported"
+        },
+        {
+          "name": "smt_strategic_solver_factory stored-logic selection, caller-logic fallback, public construction, borrowed session output and close guard over every retained dispatcher branch",
+          "status": "ported",
+          "go_targets": [
+            "pkg/tactic/portfolio/strategic_solver_factory.go",
+            "pkg/tactic/portfolio/strategic_solver_factory_test.go"
+          ],
+          "tests": [
+            "TestStrategicSolverFactoryPinsLogicAndSessionOutput"
+          ]
         },
         {
           "name": "Retained QF_BV logic branch selects the complete bit-vector strategy and combines tactic2solver with the incremental SAT solver selected by the source default hi_div0 policy, preserving ordinary-mode/fallback policy and session output",
@@ -174196,8 +174210,10 @@
       "path": "src/tactic/portfolio/smt_strategic_solver.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
+        "pkg/tactic/portfolio/strategic_solver_factory.go",
+        "pkg/tactic/portfolio/strategic_solver_factory_test.go",
         "pkg/tactic/smtlogics/qflia_tactic.go",
         "pkg/tactic/smtlogics/qflia_tactic_test.go",
         "pkg/cmd_context/qflia_solver_test.go",
@@ -174240,6 +174256,7 @@
         "pkg/cmd/g3/test_vectors/fd_unbounded_unknown.smt2"
       ],
       "tests": [
+        "TestStrategicSolverFactoryPinsLogicAndSessionOutput",
         "TestCommandContextQFLIACombinedSolverProofResult",
         "TestSMTLibRunnerQFLIABranchEvidence",
         "TestSMT2QFLIAStrategicDIMACSFollowsCurrentOutput",
@@ -174268,9 +174285,17 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "mk_smt_strategic_solver_factory public factory surface with optional stored logic",
+          "status": "ported",
+          "go_target": "pkg/tactic/portfolio/strategic_solver_factory.go",
+          "tests": [
+            "TestStrategicSolverFactoryPinsLogicAndSessionOutput"
+          ]
+        },
         {
           "name": "QF_LIA mk_tactic_for_logic branch and factory operator(): full QF_LIA tactic solver and incremental SMT under combined-solver ordinary, scoped, assumption, fallback and result-provider policies, with current borrowed SAT output transport",
           "status": "ported",
@@ -174379,7 +174404,9 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The Go factory owns only immutable configuration and borrows its output and parameter/model services. Close invalidates future construction; each returned solver independently owns its composed children."
+      ],
       "deviations": [
         "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL, QF_LIA and HORN branches use shared combined-solver construction. Other branches and the remaining default-dispatcher gaps remain unported. Output-taking QF_IDL/QF_LIA constructors borrow io.Writer; convenience factories default to os.Stdout."
       ]
