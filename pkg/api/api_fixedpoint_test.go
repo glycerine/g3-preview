@@ -173,3 +173,53 @@ func TestSMTContextFixedpointParameterUpdateRebuildsPDR(t *testing.T) {
 		t.Fatal("fixedpoint parameter update reused stale PDR context", err)
 	}
 }
+
+func TestSMTContextFixedpointSpacerInductiveExports(t *testing.T) {
+	context, err := NewSMTContext()
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, context.Close()) })
+	manager, err := context.Manager()
+	astTestMust(t, err)
+	astTestMust(t, context.SetFixedpointEngine("spacer"))
+	p, err := context.DeclareRelation("api-spacer-P", nil)
+	astTestMust(t, err)
+	u, err := context.DeclareRelation("api-spacer-U", nil)
+	astTestMust(t, err)
+	pAtom, err := manager.MkApp(p, nil)
+	astTestMust(t, err)
+	uAtom, err := manager.MkApp(u, nil)
+	astTestMust(t, err)
+	astTestMust(t, context.AddFixedpointRule(pAtom, "api-spacer-fact"))
+	recursive, err := manager.MkImplies(uAtom, uAtom)
+	astTestMust(t, err)
+	astTestMust(t, context.AddFixedpointRule(recursive, "api-spacer-recursive"))
+	status, err := context.QueryFixedpoint(u)
+	astTestMust(t, err)
+	if status != lbool.False {
+		t.Fatal("Spacer public unreachable query", status)
+	}
+	certificate, err := context.FixedpointAnswer(u)
+	astTestMust(t, err)
+	certificateHandle, err := manager.RefGet(certificate)
+	astTestMust(t, err)
+	if manager.IsTrue(certificateHandle) {
+		t.Fatal("Spacer public certificate omitted retained predicates")
+	}
+	astTestMust(t, manager.DelRef(&certificate))
+	inductiveModel, err := context.FixedpointModel(u)
+	astTestMust(t, err)
+	present, err := inductiveModel.Core().HasInterpretation(p)
+	astTestMust(t, err)
+	if !present {
+		t.Fatal("Spacer public model omitted retained predicate")
+	}
+	astTestMust(t, inductiveModel.Close())
+	value, err := context.EvaluateFixedpointModel(u, pAtom, true)
+	astTestMust(t, err)
+	valueHandle, err := manager.RefGet(value)
+	astTestMust(t, err)
+	if !manager.IsTrue(valueHandle) {
+		t.Fatal("Spacer public model does not satisfy fact", valueHandle)
+	}
+	astTestMust(t, manager.DelRef(&value))
+}

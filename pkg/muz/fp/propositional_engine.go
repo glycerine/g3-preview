@@ -1322,16 +1322,22 @@ func (e *PropositionalEngine) Answer(declaration ast.ASTHandle) (answer ast.ASTR
 	return e.manager.NewRef(formula)
 }
 
-// Model returns the inductive PDR model for the latest unreachable query. The
-// caller owns and closes the returned model.
+// Model returns the inductive PDR or Spacer model for the latest unreachable
+// query. The caller owns and closes the returned model.
 func (e *PropositionalEngine) Model(declaration ast.ASTHandle) (*model.Model, error) {
 	if err := e.open(); err != nil {
 		return nil, err
 	}
-	if e.backend != "pdr" || e.pdr == nil || !e.queried {
+	if !e.queried {
 		return nil, ErrPropositionalEngine
 	}
-	return e.pdr.Model(declaration)
+	if e.backend == "pdr" && e.pdr != nil {
+		return e.pdr.Model(declaration)
+	}
+	if e.backend == "spacer" && e.spacer != nil && e.spacerRevision == e.revision {
+		return e.spacer.Model(declaration)
+	}
+	return nil, ErrPropositionalEngine
 }
 
 // Query accepts the zero-arity predicate application used by the original

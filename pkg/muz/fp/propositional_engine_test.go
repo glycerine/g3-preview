@@ -270,6 +270,20 @@ func TestSpacerEngineRunsReachableAndInductiveHornQueries(t *testing.T) {
 	if unreachable != lbool.False {
 		t.Fatal("Spacer inductive query", unreachable)
 	}
+	certificate, err := engine.Answer(declarations["U"])
+	fpMust(t, err)
+	certificateHandle, err := manager.RefGet(certificate)
+	fpMust(t, err)
+	if manager.IsTrue(certificateHandle) {
+		t.Fatal("Spacer unsuccessful query exposed an empty certificate")
+	}
+	fpMust(t, manager.DelRef(&certificate))
+	inductiveModel, err := engine.Model(declarations["U"])
+	fpMust(t, err)
+	if declarations, err := inductiveModel.Core().NumDeclarations(); err != nil || declarations == 0 {
+		t.Fatal("Spacer inductive model", declarations, err)
+	}
+	fpMust(t, inductiveModel.Close())
 }
 
 func TestPDREngineReadsContextAndCacheParameters(t *testing.T) {

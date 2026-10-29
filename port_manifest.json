@@ -5297,7 +5297,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/api/api_fixedpoint.go", "pkg/api/api_fixedpoint_test.go", "pkg/cmd_context/fixedpoint.go"],
-      "tests": ["TestSMTContextFixedpointPDRLifecycle"],
+      "tests": ["TestSMTContextFixedpointPDRLifecycle", "TestSMTContextFixedpointSpacerInductiveExports"],
       "assertions": [
         {
           "line": 57,
@@ -5315,7 +5315,7 @@
           "name": "idiomatic Go relation registration, implicit-variable and rule insertion, rule scopes, backend selection, relation query, owning trace/inductive-certificate answer, inductive model and model evaluation, PDR frame count/cover and copied statistics surface",
           "status": "partial",
           "go_target": "pkg/api/api_fixedpoint.go",
-          "tests": ["TestSMTContextFixedpointPDRLifecycle"]
+          "tests": ["TestSMTContextFixedpointPDRLifecycle", "TestSMTContextFixedpointSpacerInductiveExports"]
         },
         {
           "name": "remaining standalone fixedpoint owner, table facts/assertions, relation-vector queries, rule update/enumeration, invariant/reachable, parser/file, parameter descriptors, callbacks and string display surface",
@@ -5333,7 +5333,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/api/api_fixedpoint.go"],
-      "tests": ["TestSMTContextFixedpointPDRLifecycle"],
+      "tests": ["TestSMTContextFixedpointPDRLifecycle", "TestSMTContextFixedpointSpacerInductiveExports"],
       "conditionals": [
         {
           "line": 19,
@@ -89029,9 +89029,9 @@
       "path": "src/muz/spacer/spacer_dl_interface.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/muz/spacer/context.go", "pkg/cmd_context/fixedpoint.go", "pkg/api/api_fixedpoint.go"],
+      "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"],
       "assertions": [
         {
           "line": 274,
@@ -89042,19 +89042,23 @@
           "text": "SASSERT(pred);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "direct-predicate query selection, Spacer context construction and solve routing", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]},
+        {"name": "answer, inductive model, level count, statistics and reset forwarding", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports"]},
+        {"name": "remaining transformed-rule subsumption reuse, slice/unfold/coalesce remapping, trace-rule export, proof and diagnostic certificate display", "status": "unported", "go_target": null, "tests": []}
+      ],
+      "ownership": ["PropositionalEngine owns the active Spacer Context and rebuilds it after tracked rule or parameter changes; returned answers and inductive models transfer ownership to the caller."],
+      "deviations": ["Go selects direct predicate declarations through the typed engine API. The retained pipeline does not yet apply native slice/unfold/coalesce transforms or their model converters."]
     },
     {
       "path": "src/muz/spacer/spacer_dl_interface.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/api/api_fixedpoint.go"],
+      "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports"],
       "conditionals": [
         {
           "line": 19,
@@ -89065,11 +89069,14 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {"name": "retained query, answer, model, level and statistics interface", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports"]},
+        {"name": "remaining trace rules, proof, transformed cover/reachable remapping and certificate display surface", "status": "unported", "go_target": null, "tests": []}
+      ],
+      "ownership": ["The Go engine owns one concrete Spacer Context and exposes explicit owner-returning answer/model methods."],
+      "deviations": ["The virtual C++ engine boundary becomes direct typed dispatch in PropositionalEngine."]
     },
     {
       "path": "src/muz/spacer/spacer_farkas_learner.cpp",

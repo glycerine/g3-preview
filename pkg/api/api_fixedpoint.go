@@ -97,7 +97,7 @@ func (c *SMTContext) FixedpointAnswer(declaration ast.ASTHandle) (ast.ASTRef, er
 }
 
 // FixedpointModel returns the inductive model from the latest unreachable PDR
-// query. The caller owns and closes the returned model.
+// or Spacer query. The caller owns and closes the returned model.
 func (c *SMTContext) FixedpointModel(declaration ast.ASTHandle) (*model.Model, error) {
 	if err := c.open(); err != nil {
 		return nil, err
@@ -106,7 +106,8 @@ func (c *SMTContext) FixedpointModel(declaration ast.ASTHandle) (*model.Model, e
 }
 
 // EvaluateFixedpointModel evaluates an expression in the inductive model from
-// the latest unreachable PDR query and returns one owning AST reference.
+// the latest unreachable PDR or Spacer query and returns one owning AST
+// reference.
 func (c *SMTContext) EvaluateFixedpointModel(declaration, expression ast.ASTHandle, completion bool) (ast.ASTRef, error) {
 	if err := c.open(); err != nil {
 		return ast.ASTRef{}, err
