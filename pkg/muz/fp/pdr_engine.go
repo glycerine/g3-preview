@@ -174,6 +174,14 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (_ lbool.LBool
 	if err = context.SetUseArithmeticInductiveGeneralizer(useArithmeticInductive); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
+	inductiveReachabilityName := "pdr.inductive_reachability_check"
+	useInductiveReachability, err := e.globals.Context.GetBoolName(&fixedpoint, &inductiveReachabilityName, false)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetUseInductiveReachabilityGeneralizer(useInductiveReachability); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	convexClosureName := "pdr.use_convex_closure_generalizer"
 	useConvexClosure, err := e.globals.Context.GetBoolName(&fixedpoint, &convexClosureName, false)
 	if err != nil {

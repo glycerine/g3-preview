@@ -1,0 +1,5 @@
+(set-option :fixedpoint.engine pdr)
+(set-option :fixedpoint.pdr.inductive_reachability_check true)
+(declare-rel Bad ())
+(rule Bad)
+(query Bad :print-answer true)

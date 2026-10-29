@@ -46,6 +46,7 @@ type Context struct {
 	useModel          bool
 	useInductive      bool
 	useArithInductive bool
+	useInduction      bool
 	useConvexClosure  bool
 	useConvexInterior bool
 	useUTVPI          bool
@@ -153,6 +154,19 @@ func (c *Context) SetUseArithmeticInductiveGeneralizer(enabled bool) error {
 		return ast.ErrASTDomain
 	}
 	c.useArithInductive = enabled
+	return nil
+}
+
+// SetUseInductiveReachabilityGeneralizer selects the source bounded induction
+// check over parent obligations. It must be set before Initialize.
+func (c *Context) SetUseInductiveReachabilityGeneralizer(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.useInduction = enabled
 	return nil
 }
 
