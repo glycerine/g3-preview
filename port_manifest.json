@@ -13849,7 +13849,7 @@
           ]
         },
         {
-          "name": "Concrete basic Boolean factories and is_not argument unwrap (src/ast/ast.h:1984,2008-2018,2039-2046)",
+          "name": "Concrete basic Boolean factories and family-safe is_not argument unwrap/non-match (src/ast/ast.h:1984,2008-2018,2039-2046)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_boolean_factories.go",
           "tests": [
@@ -83607,7 +83607,9 @@
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_both.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_closure.smt2",
         "pkg/cmd/g3/test_vectors/fixedpoint_pdr_convex_interior.smt2",
-        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_sliced_trace.smt2"
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_sliced_trace.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_sliced_compound_tail.smt2",
+        "pkg/cmd/g3/test_vectors/fixedpoint_pdr_sliced_compound_head.smt2"
       ],
       "tests": [
         "TestPDREngineMatchesCPPIntegerHornQueries",
@@ -83644,7 +83646,9 @@
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
         "TestSMTContextFixedpointPDRLifecycle",
         "TestPDREngineExpandsSlicedModelsAndCovers",
-        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_tail.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_head.smt2"
       ],
       "assertions": [
         {
@@ -83680,7 +83684,9 @@
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_utvpi_fragment.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_general_arithmetic_fragment.smt2",
-            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2"
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_tail.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_head.smt2"
           ]
         },
         {
@@ -83705,6 +83711,8 @@
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_linear_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_untransformed_nonlinear_trace.smt2",
             "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_tail.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_head.smt2",
             "TestPDREngineExpandsSlicedModelsAndCovers",
             "TestSMTContextFixedpointPDRLifecycle"
           ]
@@ -83735,7 +83743,7 @@
         "PropositionalEngine owns the current query-specific sliced RuleSet through PDR initialization, snapshots original/derived declarations and removed-column masks while the Context retains their ASTs, closes/replaces the Context before clearing those maps, and transfers returned expanded inductive models to the caller."
       ],
       "deviations": [
-        "The integration reuses PDR state only for the same query and exact normalized rules/background because slicing is query-dependent; it rebuilds after another query or tracked mutation instead of applying native transformed-rule subsumption reuse. Covers and inductive models are expanded to original predicate columns, while relation-query SAT answers intentionally retain native sliced vocabulary. Until the complete native normalization chain preceding slicing is retained, compound predicate applications that violate the slicer's normalized-input precondition remain safely unsliced. Successful declaration queries use native-style two-bank rule/head unification. Go's declaration-query surface omits the native synthetic query predicate, so exact differential comparison normalizes only the resulting nonsemantic slice fresh-ID offset. Proof traces remain unported."
+        "The integration reuses PDR state only for the same query and exact normalized rules/background because slicing is query-dependent; it rebuilds after another query or tracked mutation instead of applying native transformed-rule subsumption reuse. Covers and inductive models are expanded to original predicate columns, while relation-query SAT answers intentionally retain native sliced vocabulary. Source compound predicate arguments remain hoisted before slicing, and arbitrary interpreted conjuncts are classified without mistaking theory-local operator numbers for basic equality/ITE. Successful declaration queries use native-style two-bank rule/head unification. Go's declaration-query surface omits the native synthetic query predicate, so exact differential comparison normalizes only the resulting nonsemantic slice fresh-ID offset. Proof traces remain unported."
       ]
     },
     {
@@ -93545,6 +93553,8 @@
         "TestSpacerEngineExpandsSlicedModelPredicates",
         "TestPDREngineExpandsSlicedModelsAndCovers",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_trace.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_tail.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_head.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_slice_columns.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_slice_columns.smt2"
       ],
@@ -93591,7 +93601,9 @@
           "go_target": "pkg/muz/transforms/rule_slice.go",
           "tests": [
             "TestRuleSliceRemovesUnconstrainedPredicateColumns",
-            "TestRuleSliceRetainsConstantConstrainedColumn"
+            "TestRuleSliceRetainsConstantConstrainedColumn",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_tail.smt2",
+            "TestSMTLibRunnerCPPReference/fixedpoint_pdr_sliced_compound_head.smt2"
           ]
         },
         {

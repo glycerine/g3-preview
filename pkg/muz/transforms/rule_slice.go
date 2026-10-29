@@ -189,6 +189,13 @@ func (p *RuleSlicePlugin) solvedEquality(expression ast.ASTHandle) (uint32, ast.
 			return index, falsity, getErr == nil, getErr
 		}
 	}
+	family, err := p.manager.GetFamilyID(expression)
+	if err != nil {
+		return 0, ast.ASTHandle{}, false, err
+	}
+	if family != p.manager.BasicFamilyID() {
+		return 0, ast.ASTHandle{}, false, nil
+	}
 	operation, err := p.manager.GetDeclKind(expression)
 	if err != nil {
 		return 0, ast.ASTHandle{}, false, err

@@ -53,4 +53,19 @@ func TestASTSortingBooleanFactoryRealNodesAndNotUnwrap(t *testing.T) {
 	if one != x {
 		t.Fatal("singleton clause pointer")
 	}
+	arithmetic, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	integer, e := m.MkFamilySort(arithmetic, 1, nil)
+	astTestMust(t, e)
+	n, e := m.MkVar(0, integer)
+	astTestMust(t, e)
+	zero, e := m.ArithmeticIntegerNumeralText("0")
+	astTestMust(t, e)
+	bound, e := m.MkArithmeticLE(n, zero)
+	astTestMust(t, e)
+	yes, _, e = m.IsNot(bound)
+	astTestMust(t, e)
+	if yes {
+		t.Fatal("arithmetic comparison is not NOT")
+	}
 }

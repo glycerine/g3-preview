@@ -920,6 +920,8 @@ var scriptResults = map[string]string{
 	"fixedpoint_pdr_general_arithmetic_fragment.smt2":   "unsat\n",
 	"fixedpoint_pdr_arithmetic_inductive.smt2":          "unsat\n",
 	"fixedpoint_pdr_sliced_trace.smt2":                  "sat\n(and Goal (P!slice!0 0))\n",
+	"fixedpoint_pdr_sliced_compound_tail.smt2":          "sat\n(and Goal (P!slice!0 0))\n",
+	"fixedpoint_pdr_sliced_compound_head.smt2":          "unsat\n",
 }
 
 func TestSMTLibRunnerScripts(t *testing.T) {
@@ -1016,7 +1018,7 @@ func TestSMTLibRunnerCPPReference(t *testing.T) {
 }
 
 func canonicalReferenceOutput(name, output string) string {
-	if name == "fixedpoint_pdr_sliced_trace.smt2" {
+	if name == "fixedpoint_pdr_sliced_trace.smt2" || name == "fixedpoint_pdr_sliced_compound_tail.smt2" || name == "fixedpoint_pdr_sliced_compound_head.smt2" {
 		// Native relation-query setup first allocates a synthetic query
 		// predicate, while Go's public declaration-query surface does not.
 		// The resulting slice fresh-ID offset is nonsemantic.

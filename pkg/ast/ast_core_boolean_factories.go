@@ -60,15 +60,11 @@ func (m *ASTManager) IsNot(a ASTHandle) (bool, ASTHandle, error) {
 		return false, ASTHandle{}, nil
 	}
 	app := m.appAt(r.slot)
-	decl := m.declAt(app.decl.slot)
-	if decl.info == (ASTFuncDeclInfo{}) {
-		return false, ASTHandle{}, nil
-	}
-	info, e := m.funcInfo(decl.info)
+	family, kind, e := m.declIdentity(app.decl)
 	if e != nil {
 		return false, ASTHandle{}, e
 	}
-	if info.family != 0 || info.kind != ASTOpNot {
+	if family != FamilyID(0) || kind != ASTOpNot {
 		return false, ASTHandle{}, nil
 	}
 	child, e := m.readInternal(app.args, 0)

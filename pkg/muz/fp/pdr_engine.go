@@ -73,11 +73,6 @@ func (e *PropositionalEngine) preparePDRRules(query ast.ASTHandle, sliceRules bo
 		_, applyErr := transformer.Apply(prepared)
 		if applyErr == nil {
 			e.pdrPredicates, e.pdrSlices = plugin.PredicateSlices()
-		} else if errors.Is(applyErr, ast.ErrASTDomain) {
-			// The native slicer runs after rule normalization. Until that
-			// complete transform chain is retained, leave unsupported compound
-			// applications unsliced instead of rejecting a valid PDR program.
-			applyErr = nil
 		}
 		err = errors.Join(applyErr, transformer.Close())
 		if err != nil {
