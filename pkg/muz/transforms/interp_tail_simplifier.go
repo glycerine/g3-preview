@@ -87,6 +87,27 @@ func (p *InterpTailSimplifierPlugin) simplifyRule(rule *base.Rule) (_ *base.Rule
 	if err != nil {
 		return nil, false, false, err
 	}
+	normalized, err := normalizeBooleanExpression(p.manager, simplified)
+	if err != nil {
+		return nil, false, false, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, p.manager.DelRef(&normalized)) }()
+	normalizedHandle, err := p.manager.RefGet(normalized)
+	if err != nil {
+		return nil, false, false, err
+	}
+	final, err := p.manager.NewRef(ast.ASTHandle{})
+	if err != nil {
+		return nil, false, false, err
+	}
+	defer func() { resultErr = errors.Join(resultErr, p.manager.DelRef(&final)) }()
+	if err = p.rewriter.Rewrite(normalizedHandle, final); err != nil {
+		return nil, false, false, err
+	}
+	simplified, err = p.manager.RefGet(final)
+	if err != nil {
+		return nil, false, false, err
+	}
 	changed = changed || simplified != combined
 	if p.manager.IsFalse(simplified) {
 		return nil, true, true, nil

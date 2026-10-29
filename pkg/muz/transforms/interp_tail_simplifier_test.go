@@ -223,3 +223,57 @@ func TestInterpTailSimplifierPropagatesIffPolarity(t *testing.T) {
 		})
 	}
 }
+
+func TestInterpTailSimplifierRecognizesPairedClauseEquivalence(t *testing.T) {
+	f := newInterpTailFixture(t)
+	boolean, err := f.manager.MkBoolSort()
+	coneMust(t, err)
+	left, err := f.manager.MkVar(0, boolean)
+	coneMust(t, err)
+	right, err := f.manager.MkVar(1, boolean)
+	coneMust(t, err)
+	notLeft, err := f.manager.MkNot(left)
+	coneMust(t, err)
+	notRight, err := f.manager.MkNot(right)
+	coneMust(t, err)
+	first, err := f.manager.MkOr(notLeft, right)
+	coneMust(t, err)
+	second, err := f.manager.MkOr(left, notRight)
+	coneMust(t, err)
+	predicate := f.predicate(t, "paired-equivalence", []ast.ASTHandle{boolean, boolean})
+	head, err := f.manager.MkApp(predicate, []ast.ASTHandle{left, right})
+	coneMust(t, err)
+	rule, err := f.rules.NewRule(head, []ast.ASTHandle{first, second}, nil, "paired-equivalence")
+	coneMust(t, err)
+	coneMust(t, f.set.Add(rule))
+	coneMust(t, rule.Close())
+	coneMust(t, f.set.SetOutputPredicate(predicate))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("paired-equivalence fixture rejected")
+	}
+	transformer := base.NewRuleTransformer()
+	t.Cleanup(func() { coneMust(t, transformer.Close()) })
+	coneMust(t, transformer.Register(f.plugin))
+	modified, err := transformer.Apply(f.set)
+	coneMust(t, err)
+	if !modified {
+		t.Fatal("paired clauses were not normalized")
+	}
+	result, err := f.set.Rule(0)
+	coneMust(t, err)
+	defer func() { coneMust(t, result.Close()) }()
+	resultHead, err := result.Head()
+	coneMust(t, err)
+	firstArgument, err := f.manager.GetArg(resultHead, 0)
+	coneMust(t, err)
+	secondArgument, err := f.manager.GetArg(resultHead, 1)
+	coneMust(t, err)
+	if firstArgument != secondArgument {
+		t.Fatal("paired equivalence was not propagated into the head", firstArgument, secondArgument)
+	}
+	if tails, getErr := result.TailSize(); getErr != nil || tails != 0 {
+		t.Fatal("paired equivalence tail remains", tails, getErr)
+	}
+}
