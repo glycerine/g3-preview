@@ -43743,36 +43743,36 @@
       "path": "src/cmd_context/eval_cmd.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "partial",
-      "go_targets": ["pkg/cmd_context/results.go"],
-      "tests": ["TestSMT2EvalCommandMatchesCPP"],
+      "status": "ported",
+      "go_targets": ["pkg/cmd_context/results.go", "pkg/cmd_context/optimization.go", "pkg/parsers/smt2/commands.go"],
+      "tests": ["TestSMT2EvalCommandMatchesCPP", "TestSMT2BoxOptimizationEndToEnd"],
       "assertions": [
         {
           "line": 66,
           "text": "SASSERT(last_result);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "eval command expression evaluation, model availability guard, completion parameter, and SMT-LIB result printing; timeout, rlimit, cache, array-equality, and box-model-index parameters remain open",
-          "status": "partial",
+          "name": "eval command expression evaluation, model availability guard, complete evaluator parameter parsing, timeout/rlimit scopes, caught evaluator diagnostics, box-model-index selection, and SMT-LIB result printing",
+          "status": "ported",
           "go_target": "pkg/cmd_context/results.go",
-          "go_targets": ["pkg/parsers/smt2/commands.go"],
-          "tests": ["TestSMT2EvalCommandMatchesCPP"]
+          "go_targets": ["pkg/cmd_context/optimization.go", "pkg/parsers/smt2/commands.go"],
+          "tests": ["TestSMT2EvalCommandMatchesCPP", "TestSMT2BoxOptimizationEndToEnd"]
         }
       ],
-      "ownership": [],
+      "ownership": ["Each evaluation owns its command-local ParamsRef, evaluator, timer and acquired model reference. Context-owned box models retain one ModelCore reference per objective until the next fresh/non-box optimization check or context reset."],
       "deviations": []
     },
     {
       "path": "src/cmd_context/eval_cmd.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "platform_replacement",
+      "go_targets": ["pkg/parsers/smt2/commands.go"],
+      "tests": ["TestSMT2EvalCommandMatchesCPP", "TestSMT2BoxOptimizationEndToEnd"],
       "conditionals": [
         {
           "line": 19,
@@ -43783,11 +43783,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "retained eval command installation and execution surface",
+          "status": "platform_replacement",
+          "go_target": "pkg/parsers/smt2/commands.go",
+          "tests": ["TestSMT2EvalCommandMatchesCPP", "TestSMT2BoxOptimizationEndToEnd"]
+        }
+      ],
+      "ownership": ["Go command dispatch directly calls the concrete context evaluation operation; no command registry allocation is retained."],
+      "deviations": ["The C++ declaration-only installation header is replaced by direct typed Go command dispatch."]
     },
     {
       "path": "src/cmd_context/extra_cmds/CMakeLists.txt",
