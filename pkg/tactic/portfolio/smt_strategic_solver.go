@@ -12,6 +12,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
+	muzfp "github.com/glycerine/g3/pkg/muz/fp"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
@@ -387,6 +388,16 @@ func NewAUFNIRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, 
 		return nil, err
 	}
 	return newStrategicSolver(m, strategy, "AUFNIRA", p, proofs, models, cores, config)
+}
+
+// NewHornStrategicSolver retains the source HORN tactic-first combined solver.
+// The ordinary SMT solver remains the incremental and unknown fallback.
+func NewHornStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := muzfp.NewHornTactic(m, config.Params, config.Globals)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "HORN", p, proofs, models, cores, config)
 }
 
 func newStrategicSolver(m *ast.ASTManager, strategy tactic.Tactic, logic string, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (result solver.Solver, err error) {

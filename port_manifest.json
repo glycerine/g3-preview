@@ -173527,6 +173527,7 @@
         "pkg/cmd_context/context.go",
         "pkg/cmd_context/qfauflia_solver_test.go",
         "pkg/cmd/g3/main_test.go",
+        "pkg/cmd/g3/test_vectors/horn_solver_finite.smt2",
         "pkg/cmd/g3/test_vectors/default_strategy_fragments.smt2",
         "pkg/tactic/smtlogics/qfnia_tactic.go",
         "pkg/cmd/g3/test_vectors/qfnia_solver_bounded.smt2",
@@ -173624,6 +173625,8 @@
       ],
       "tests": [
         "TestSMTLibRunnerAsArrayCombinedSolverFallback",
+        "TestSMTLibRunnerScripts/horn_solver_finite.smt2",
+        "TestSMTLibRunnerCPPReference/horn_solver_finite.smt2",
         "TestCommandContextQFAUFLIACombinedSolverProofResult",
         "TestCommandContextQFAUFLIATypedArrayFallbackAndAssumptionRouting",
         "TestSMTLibRunnerScripts/default_strategy_fragments.smt2",
@@ -173997,6 +174000,21 @@
           ]
         },
         {
+          "name": "Retained HORN logic branch selects the Horn tactic and combines tactic2solver with incremental SMT under the source fallback and result-provider policy",
+          "status": "ported",
+          "go_targets": [
+            "pkg/muz/fp/horn_tactic.go",
+            "pkg/tactic/portfolio/smt_strategic_solver.go",
+            "pkg/cmd_context/context.go",
+            "pkg/cmd/g3/main_test.go",
+            "pkg/cmd/g3/test_vectors/horn_solver_finite.smt2"
+          ],
+          "tests": [
+            "TestSMTLibRunnerScripts/horn_solver_finite.smt2",
+            "TestSMTLibRunnerCPPReference/horn_solver_finite.smt2"
+          ]
+        },
+        {
           "name": "Retained QF_FD special solver selection uses actual FD stack when manager proofs are disabled; retain pending factory cleanup before command manager retirement",
           "status": "ported",
           "go_targets": [
@@ -174208,7 +174226,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL and QF_LIA branches use shared combined-solver construction. Other branches and the general default dispatcher remain unported. Output-taking QF_IDL/QF_LIA constructors borrow io.Writer; convenience factories default to os.Stdout."
+        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL, QF_LIA and HORN branches use shared combined-solver construction. Other branches and the remaining default-dispatcher gaps remain unported. Output-taking QF_IDL/QF_LIA constructors borrow io.Writer; convenience factories default to os.Stdout."
       ]
     },
     {
