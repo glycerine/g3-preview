@@ -12,15 +12,26 @@ import (
 )
 
 type PredicateTransformer struct {
-	owner        *Manager
-	manager      *ast.ASTManager
-	solver       *PropSolver
-	frames       *Frames
-	initial      ast.ASTRef
-	transition   ast.ASTRef
-	propagations uint64
-	invariants   uint64
-	closed       bool
+	owner                    *Manager
+	manager                  *ast.ASTManager
+	solver                   *PropSolver
+	frames                   *Frames
+	initial                  ast.ASTRef
+	transition               ast.ASTRef
+	propagations             uint64
+	invariants               uint64
+	simplifyProofObligations bool
+	useEqualityClasses       bool
+	closed                   bool
+}
+
+func (p *PredicateTransformer) SetProofObligationNormalization(simplifyBounds, factorEqualities bool) error {
+	if err := p.open(); err != nil {
+		return err
+	}
+	p.simplifyProofObligations = simplifyBounds
+	p.useEqualityClasses = factorEqualities
+	return nil
 }
 
 // NewPredicateTransformer creates the live solver/frame bridge after rule

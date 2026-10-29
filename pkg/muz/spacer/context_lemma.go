@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	astrewriter "github.com/glycerine/g3/pkg/ast/rewriter"
 	uparams "github.com/glycerine/g3/pkg/util/params"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 const InfinityLevel = ^uint32(0)
@@ -33,6 +34,124 @@ func NewLemma(owner *Manager, formula ast.ASTHandle, level uint32) (_ *Lemma, re
 		return nil, err
 	}
 	return &Lemma{manager: owner.manager, context: config.Params, globals: config.Globals, body: body, level: level}, nil
+}
+
+func NewLemmaFromProofObligation(obligation *ProofObligation, cube []ast.ASTHandle, level uint32) (_ *Lemma, resultErr error) {
+	if obligation == nil || obligation.valid() != nil {
+		return nil, ErrManagerOwner
+	}
+	p := obligation.transformer
+	manager := p.manager
+	config := p.owner.contexts[0].config
+	if cube == nil {
+		post, err := obligation.Post()
+		if err != nil {
+			return nil, err
+		}
+		cube, err = manager.FlattenAnd([]ast.ASTHandle{post})
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(cube) == 0 {
+		truth, err := manager.MkTrue()
+		if err != nil {
+			return nil, err
+		}
+		cube = append(cube, truth)
+	}
+	cubeRefs, err := refsFromHandles(manager, cube)
+	if err != nil {
+		return nil, err
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			resultErr = errors.Join(resultErr, releaseNormalizeRefs(manager, cubeRefs))
+		}
+	}()
+	conjunction, err := manager.MkAndArray(cube)
+	if err != nil {
+		return nil, err
+	}
+	clause, err := manager.PushNot(conjunction)
+	if err != nil {
+		return nil, err
+	}
+	body, err := normalizeFormula(manager, config.Params, config.Globals, clause, true, false)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if !committed {
+			resultErr = errors.Join(resultErr, manager.DelRef(&body))
+		}
+	}()
+	bindings, err := obligation.Bindings()
+	if err != nil {
+		return nil, err
+	}
+	if len(bindings) != 0 {
+		skolem, err := obligation.Skolems()
+		if err != nil {
+			return nil, err
+		}
+		for left, right := 0, len(skolem)-1; left < right; left, right = left+1, right-1 {
+			skolem[left], skolem[right] = skolem[right], skolem[left]
+		}
+		handle, err := manager.RefGet(body)
+		if err != nil {
+			return nil, err
+		}
+		abstractor, err := ast.NewExprAbstractor(manager)
+		if err != nil {
+			return nil, err
+		}
+		if err = abstractor.Abstract(0, skolem, handle, body); err != nil {
+			return nil, errors.Join(err, abstractor.Close())
+		}
+		if err = abstractor.Close(); err != nil {
+			return nil, err
+		}
+		sorts := make([]ast.ASTHandle, len(skolem))
+		names := make([]usymbol.Symbol, len(skolem))
+		for i := range skolem {
+			sorts[i], err = manager.GetSort(skolem[i])
+			if err != nil {
+				return nil, err
+			}
+			decl, declErr := manager.GetDecl(skolem[i])
+			if declErr != nil {
+				return nil, declErr
+			}
+			names[i], err = manager.GetASTName(decl)
+			if err != nil {
+				return nil, err
+			}
+		}
+		abstracted, err := manager.RefGet(body)
+		if err != nil {
+			return nil, err
+		}
+		id, err := manager.GetASTID(abstracted)
+		if err != nil {
+			return nil, err
+		}
+		quantifier, err := manager.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: sorts, Names: names, Body: abstracted, QID: usymbol.Numerical(id)})
+		if err != nil {
+			return nil, err
+		}
+		if err = manager.SetRef(body, quantifier); err != nil {
+			return nil, err
+		}
+	}
+	bindingRefs, err := refsFromHandles(manager, bindings)
+	if err != nil {
+		return nil, err
+	}
+	result := &Lemma{manager: manager, context: config.Params, globals: config.Globals, body: body, cube: cubeRefs, bindings: bindingRefs, level: level}
+	committed = true
+	return result, nil
 }
 
 func (l *Lemma) open() error {
