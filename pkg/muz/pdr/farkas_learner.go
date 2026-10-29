@@ -183,6 +183,109 @@ func (f *FarkasLearner) FarkasPremises(proof ast.ASTHandle) (_ []ast.ASTHandle, 
 	return facts, coefficients, true, nil
 }
 
+// CombineFarkasLemma performs the theory-lemma branch of get_lemmas after the
+// proof traversal has classified each parent. A true bPure entry removes that
+// B-derived parent from the arithmetic combination. Coefficients attached to
+// the lemma conclusion are applied to the negated conclusion literals.
+func (f *FarkasLearner) CombineFarkasLemma(proof ast.ASTHandle, bPure []bool) (_ ast.ASTRef, _ bool, resultErr error) {
+	facts, coefficients, matched, err := f.FarkasPremises(proof)
+	if err != nil || !matched {
+		return ast.ASTRef{}, false, err
+	}
+	if len(bPure) != len(facts) {
+		return ast.ASTRef{}, false, ast.ErrASTDomain
+	}
+	literals := make([]ast.ASTHandle, 0, len(facts))
+	selectedCoefficients := make([]*big.Rat, 0, len(coefficients))
+	bPureCount := 0
+	for i := range facts {
+		if bPure[i] {
+			bPureCount++
+			continue
+		}
+		literals = append(literals, facts[i])
+		selectedCoefficients = append(selectedCoefficients, coefficients[i])
+	}
+	if bPureCount == 0 {
+		return ast.ASTRef{}, false, nil
+	}
+
+	declaration, err := f.manager.GetDecl(proof)
+	if err != nil {
+		return ast.ASTRef{}, false, err
+	}
+	parameters, err := f.manager.GetDeclParametersCopy(declaration)
+	if err != nil {
+		return ast.ASTRef{}, false, err
+	}
+	defer func() {
+		for i := range parameters {
+			resultErr = errors.Join(resultErr, f.manager.DelParameter(&parameters[i]))
+		}
+	}()
+	parentParameterEnd := len(facts) + 2
+	if len(parameters) > parentParameterEnd {
+		fact, err := f.manager.GetProofFact(proof)
+		if err != nil {
+			return ast.ASTRef{}, false, err
+		}
+		conclusionLiterals := []ast.ASTHandle{fact}
+		family, err := f.manager.GetFamilyID(fact)
+		if err != nil {
+			return ast.ASTRef{}, false, err
+		}
+		kind, err := f.manager.GetDeclKind(fact)
+		if err != nil {
+			return ast.ASTRef{}, false, err
+		}
+		if family == f.manager.BasicFamilyID() && kind == ast.ASTOpOr {
+			count, err := f.manager.GetNumArgs(fact)
+			if err != nil {
+				return ast.ASTRef{}, false, err
+			}
+			conclusionLiterals = make([]ast.ASTHandle, count)
+			for i := uint32(0); i < count; i++ {
+				conclusionLiterals[i], err = f.manager.GetArg(fact, i)
+				if err != nil {
+					return ast.ASTRef{}, false, err
+				}
+			}
+		}
+		if len(parameters) != parentParameterEnd+len(conclusionLiterals) {
+			return ast.ASTRef{}, false, ast.ErrASTDomain
+		}
+		negationReferences := make([]ast.ASTRef, 0, len(conclusionLiterals))
+		defer func() {
+			for i := range negationReferences {
+				resultErr = errors.Join(resultErr, f.manager.DelRef(&negationReferences[i]))
+			}
+		}()
+		for i, literal := range conclusionLiterals {
+			negation, err := f.manager.MkNot(literal)
+			if err != nil {
+				return ast.ASTRef{}, false, err
+			}
+			negationReference, err := f.manager.NewRef(negation)
+			if err != nil {
+				return ast.ASTRef{}, false, err
+			}
+			negationReferences = append(negationReferences, negationReference)
+			coefficient, err := f.rationalParameter(parameters[parentParameterEnd+i])
+			if err != nil {
+				return ast.ASTRef{}, false, err
+			}
+			coefficient.Abs(coefficient)
+			literals = append(literals, negation)
+			selectedCoefficients = append(selectedCoefficients, coefficient)
+		}
+	}
+	if len(literals) == 0 {
+		return ast.ASTRef{}, false, ast.ErrASTDomain
+	}
+	combined, err := f.CombineConstraints(literals, selectedCoefficients)
+	return combined, err == nil, err
+}
+
 // CombineConstraints applies the source learner's two combination modes.
 func (f *FarkasLearner) CombineConstraints(literals []ast.ASTHandle, coefficients []*big.Rat) (_ ast.ASTRef, resultErr error) {
 	if err := f.open(); err != nil {

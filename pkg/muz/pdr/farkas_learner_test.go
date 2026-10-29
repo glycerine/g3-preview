@@ -63,9 +63,15 @@ func TestFarkasLearnerRecognizesArithmeticTheoryLemma(t *testing.T) {
 	pdrMust(t, manager.NumeralService().SetString(&coefficientValue, "5"))
 	coefficient1, err := manager.NewParameterRational(&coefficientValue)
 	pdrMust(t, err)
+	pdrMust(t, manager.NumeralService().SetString(&coefficientValue, "7"))
+	conclusionCoefficient, err := manager.NewParameterRational(&coefficientValue)
+	pdrMust(t, err)
 	pdrMust(t, manager.NumeralService().Del(&coefficientValue))
 	lemma, err := manager.MkProofTheoryLemma(arithmetic, falsity, []ast.ASTHandle{premise0, premise1}, []ast.ASTParameter{farkas, coefficient0, coefficient1})
 	pdrMust(t, err)
+	lemmaWithConclusion, err := manager.MkProofTheoryLemma(arithmetic, le, []ast.ASTHandle{premise0, premise1}, []ast.ASTParameter{farkas, coefficient0, coefficient1, conclusionCoefficient})
+	pdrMust(t, err)
+	pdrMust(t, manager.DelParameter(&conclusionCoefficient))
 	pdrMust(t, manager.DelParameter(&coefficient1))
 	pdrMust(t, manager.DelParameter(&coefficient0))
 	pdrMust(t, manager.DelParameter(&farkas))
@@ -83,6 +89,28 @@ func TestFarkasLearnerRecognizesArithmeticTheoryLemma(t *testing.T) {
 	if coefficients[0].Cmp(big.NewRat(3, 2)) != 0 || coefficients[1].Cmp(big.NewRat(5, 1)) != 0 {
 		t.Fatal("Farkas coefficients were not extracted and normalized", coefficients)
 	}
+	combined, produced, err := learner.CombineFarkasLemma(lemma, []bool{true, false})
+	pdrMust(t, err)
+	if !produced {
+		t.Fatal("B-pure Farkas parent did not produce a combined lemma")
+	}
+	combinedHandle, err := manager.RefGet(combined)
+	pdrMust(t, err)
+	if combinedHandle.IsNull() {
+		t.Fatal("Farkas theory-lemma reduction returned a null lemma")
+	}
+	pdrMust(t, manager.DelRef(&combined))
+	combined, produced, err = learner.CombineFarkasLemma(lemma, []bool{false, false})
+	pdrMust(t, err)
+	if produced || combined != (ast.ASTRef{}) {
+		t.Fatal("Farkas theory lemma without a B-pure parent produced output")
+	}
+	combined, produced, err = learner.CombineFarkasLemma(lemmaWithConclusion, []bool{true, false})
+	pdrMust(t, err)
+	if !produced {
+		t.Fatal("Farkas conclusion coefficient did not produce a combined lemma")
+	}
+	pdrMust(t, manager.DelRef(&combined))
 	matched, err = learner.IsFarkasLemma(premise0)
 	pdrMust(t, err)
 	if matched {
