@@ -331,8 +331,11 @@ func (c *Context) Reachable(declaration ast.ASTHandle) (ast.ASTRef, error) {
 	return transformer.Reachable()
 }
 
-func (c *Context) propagate(maximum uint32) (bool, error) {
-	for level := uint32(0); level <= maximum; level++ {
+func (c *Context) propagate(minimum, maximum uint32) (bool, error) {
+	if minimum == InfinityLevel {
+		return false, nil
+	}
+	for level := minimum; level <= maximum; level++ {
 		all := true
 		for _, declaration := range c.order {
 			propagated, err := c.transformers[declaration].PropagateToNextLevel(level)
@@ -385,7 +388,7 @@ func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr e
 			return c.lastResult, nil
 		}
 		if level > 0 && !c.skipPropagate {
-			inductive, err := c.propagate(level)
+			inductive, err := c.propagate(c.queue.ExpandedLevel(), level)
 			if err != nil {
 				return lbool.Undef, err
 			}

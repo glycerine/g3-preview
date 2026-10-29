@@ -175,6 +175,9 @@ func TestSpacerAbstractExpansionCreatesDerivationChild(t *testing.T) {
 	if reached, err := queue.CheckReachability(); err != nil || reached {
 		t.Fatal("blocked recursive Spacer obligation search", reached, err)
 	}
+	if expanded := queue.ExpandedLevel(); expanded != 0 {
+		t.Fatal("blocked Spacer obligation expansion level", expanded)
+	}
 	spacerMust(t, recursive.Close())
 	spacerMust(t, ruleManager.Close())
 	spacerMust(t, transformer.Close())

@@ -84,6 +84,7 @@ func (q *ProofObligationQueue) CheckReachability() (bool, error) {
 	if err := q.Reset(); err != nil {
 		return false, err
 	}
+	q.expanded = InfinityLevel
 	for {
 		node, err := q.Top()
 		if err != nil {
@@ -153,6 +154,13 @@ func (q *ProofObligationQueue) CheckReachability() (bool, error) {
 				}
 			}
 		case lbool.False:
+			level, levelErr := node.Level()
+			if levelErr != nil {
+				return false, levelErr
+			}
+			if level < q.expanded {
+				q.expanded = level
+			}
 			if _, err = q.Pop(); err != nil {
 				return false, err
 			}

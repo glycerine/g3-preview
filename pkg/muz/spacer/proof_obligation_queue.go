@@ -9,6 +9,7 @@ type ProofObligationQueue struct {
 	root         *ProofObligation
 	maximum      uint32
 	minimumDepth uint32
+	expanded     uint32
 	items        []*ProofObligation
 }
 
@@ -197,6 +198,7 @@ func (q *ProofObligationQueue) IncrementLevel() error {
 	return nil
 }
 
-func (q *ProofObligationQueue) MaximumLevel() uint32 { return q.maximum }
-func (q *ProofObligationQueue) MinimumDepth() uint32 { return q.minimumDepth }
-func (q *ProofObligationQueue) Len() int             { return len(q.items) }
+func (q *ProofObligationQueue) MaximumLevel() uint32  { return q.maximum }
+func (q *ProofObligationQueue) MinimumDepth() uint32  { return q.minimumDepth }
+func (q *ProofObligationQueue) ExpandedLevel() uint32 { return q.expanded }
+func (q *ProofObligationQueue) Len() int              { return len(q.items) }

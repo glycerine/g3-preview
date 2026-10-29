@@ -115,6 +115,9 @@ func NewPredicateTransformer(owner *Manager, name string, initial, transition as
 	if err != nil {
 		return nil, err
 	}
+	if err = p.initializeExtendLiteral(name); err != nil {
+		return nil, errors.Join(err, p.Close())
+	}
 	if err = p.InitializeSystem(initial, transition); err != nil {
 		return nil, errors.Join(err, p.Close())
 	}
@@ -369,6 +372,10 @@ func (p *PredicateTransformer) IsInvariant(level uint32, formula ast.ASTHandle) 
 	if err := p.open(); err != nil {
 		return false, 0, err
 	}
+	extension, err := p.manager.RefGet(p.extendLiteral)
+	if err != nil {
+		return false, 0, err
+	}
 	negated, err := p.manager.MkNotSimplified(formula)
 	if err != nil {
 		return false, 0, err
@@ -376,6 +383,7 @@ func (p *PredicateTransformer) IsInvariant(level uint32, formula ast.ASTHandle) 
 	result, err := p.solver.CheckAssumptions([]ast.ASTHandle{negated}, nil, PropCheckOptions{
 		SubsetBasedCore: true,
 		Level:           &level,
+		Background:      []ast.ASTHandle{extension},
 	})
 	if err != nil {
 		return false, 0, err
