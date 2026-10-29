@@ -691,6 +691,39 @@ func TestPDRAndSpacerRejectPartialDatatypeAccessors(t *testing.T) {
 	}
 }
 
+func TestDatalogRejectsInfinitePredicateSorts(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, context.Close()) })
+	manager, err := context.Manager()
+	fpMust(t, err)
+	engine, err := fp.NewPropositionalEngine(manager)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, engine.Close()) })
+	boolean, err := manager.MkBoolSort()
+	fpMust(t, err)
+	arithmetic, err := manager.ArithmeticFamilyID()
+	fpMust(t, err)
+	integer, err := manager.MkFamilySort(arithmetic, 1, nil)
+	fpMust(t, err)
+	name, err := manager.Symbols.Intern("fp-datalog-infinite-P")
+	fpMust(t, err)
+	predicate, err := manager.MkFuncDecl(name, []ast.ASTHandle{integer}, boolean, ast.ASTFuncDeclInfo{})
+	fpMust(t, err)
+	fpMust(t, engine.RegisterPredicate(predicate))
+	zero, err := manager.ArithmeticIntegerNumeralText("0")
+	fpMust(t, err)
+	fact, err := manager.MkApp(predicate, []ast.ASTHandle{zero})
+	fpMust(t, err)
+	factRef, err := manager.NewRef(fact)
+	fpMust(t, err)
+	t.Cleanup(func() { fpMust(t, manager.DelRef(&factRef)) })
+	fpMust(t, engine.AddRule(fact, "infinite-sort-fact"))
+	if _, err = engine.QueryPredicate(predicate); !errors.Is(err, fp.ErrPropositionalHorn) || !strings.Contains(err.Error(), "infinite") {
+		t.Fatal("Datalog accepted an infinite predicate sort", err)
+	}
+}
+
 func TestPropositionalEngineScopeGuards(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	fpMust(t, err)

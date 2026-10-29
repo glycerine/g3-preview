@@ -366,6 +366,30 @@ func (e *PropositionalEngine) validateFragment() error {
 		if x == nil && e.predicates[head] == nil {
 			x = ErrPropositionalHorn
 		}
+		if x == nil && e.backend == "datalog" {
+			arity, y := e.manager.GetArity(head)
+			for column := uint32(0); y == nil && column < arity; column++ {
+				sort, getErr := e.manager.GetDomain(head, column)
+				if getErr != nil {
+					y = getErr
+					break
+				}
+				size, getErr := e.manager.GetSortSize(sort)
+				if getErr != nil {
+					y = getErr
+					break
+				}
+				ruleSort, getErr := e.manager.IsDatalogRuleSort(sort)
+				if getErr != nil {
+					y = getErr
+					break
+				}
+				if !size.IsFinite() && !ruleSort {
+					y = fmt.Errorf("%w: rule contains an infinite predicate sort", ErrPropositionalHorn)
+				}
+			}
+			x = errors.Join(x, y)
+		}
 		positive, pErr := rule.PositiveTailSize()
 		uninterpreted, uErr := rule.UninterpretedTailSize()
 		tailSize, tErr := rule.TailSize()
@@ -1224,9 +1248,6 @@ func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.L
 		e.compiled = false
 		return e.querySpacer(declaration)
 	}
-	if state.table == nil {
-		return lbool.Undef, ErrPropositionalHorn
-	}
 	finalized, err := e.set.IsFinalized()
 	if err != nil {
 		return lbool.Undef, err
@@ -1245,6 +1266,9 @@ func (e *PropositionalEngine) QueryPredicate(declaration ast.ASTHandle) (lbool.L
 	}
 	if err = e.validateFragment(); err != nil {
 		return lbool.Undef, err
+	}
+	if state.table == nil {
+		return lbool.Undef, ErrPropositionalHorn
 	}
 	e.compiled, err = e.tryCompiledSaturation()
 	if err != nil {
