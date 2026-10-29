@@ -116,6 +116,69 @@ func TestRuleInlinerBreaksMutualCycleAtOnePredicate(t *testing.T) {
 	}
 }
 
+func TestRuleInlinerForbidsSecondRuleMultiplier(t *testing.T) {
+	f := newConeFixture(t, "P", "Q", "Goal")
+	f.add(t, f.applications["P"], "fact-P-1")
+	f.add(t, f.applications["P"], "fact-P-2")
+	f.add(t, f.applications["Q"], "fact-Q-1")
+	f.add(t, f.applications["Q"], "fact-Q-2")
+	goal, err := f.rules.NewRule(f.applications["Goal"], []ast.ASTHandle{f.applications["P"], f.applications["Q"]}, nil, "goal")
+	coneMust(t, err)
+	coneMust(t, f.set.Add(goal))
+	coneMust(t, goal.Close())
+	coneMust(t, f.set.SetOutputPredicate(f.declarations["Goal"]))
+	valid, err := f.set.Finalize()
+	coneMust(t, err)
+	if !valid {
+		t.Fatal("multiplier inliner fixture rejected")
+	}
+	transformer := base.NewRuleTransformer()
+	t.Cleanup(func() { coneMust(t, transformer.Close()) })
+	coneMust(t, transformer.Register(transforms.NewRuleInlinerPluginWithModes(f.manager, f.rules, []ast.ASTHandle{f.declarations["Goal"]}, true, false, 0)))
+	modified, err := transformer.Apply(f.set)
+	coneMust(t, err)
+	if !modified {
+		t.Fatal("multiplier fixture was not partially inlined")
+	}
+	count, err := f.set.Len()
+	coneMust(t, err)
+	if count != 4 {
+		t.Fatalf("multiplier guard produced %d rules, want 4", count)
+	}
+	qHeads := 0
+	goalHeads := 0
+	for index := 0; index < count; index++ {
+		rule, getErr := f.set.Rule(index)
+		coneMust(t, getErr)
+		head, getErr := rule.HeadDeclaration()
+		if getErr == nil {
+			switch head {
+			case f.declarations["P"]:
+				getErr = errors.New("first multiplier P was not inlined")
+			case f.declarations["Q"]:
+				qHeads++
+			case f.declarations["Goal"]:
+				goalHeads++
+				positive, tailErr := rule.PositiveTailSize()
+				if tailErr != nil {
+					getErr = tailErr
+				} else if positive != 1 {
+					getErr = errors.New("partially inlined goal does not have one tail")
+				} else if tail, tailErr := rule.TailDeclaration(0); tailErr != nil {
+					getErr = tailErr
+				} else if tail != f.declarations["Q"] {
+					getErr = errors.New("second multiplier Q was not retained")
+				}
+			}
+		}
+		getErr = errors.Join(getErr, rule.Close())
+		coneMust(t, getErr)
+	}
+	if qHeads != 2 || goalHeads != 2 {
+		t.Fatal("multiplier guard heads", qHeads, goalHeads)
+	}
+}
+
 func TestRuleInlinerEliminatesAcyclicChainIntoProtectedOutput(t *testing.T) {
 	f := newConeFixture(t, "P", "Q", "Goal")
 	f.add(t, f.applications["P"], "fact-P")

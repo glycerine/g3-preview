@@ -92618,6 +92618,7 @@
         "TestRuleInlinerHonorsDisabledModes",
         "TestRuleInlinerRefusesMixedQuantifiedProgram",
         "TestRuleInlinerBreaksMutualCycleAtOnePredicate",
+        "TestRuleInlinerForbidsSecondRuleMultiplier",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_nonlinear_inlining.smt2",
@@ -92735,7 +92736,15 @@
       ]
     },
     {
-      "name": "remaining multiplier planning, source topological definition accumulation/self-recursive handling, oriented eager pass, proof/model conversion, and interpreted-tail unsatisfiability filtering during resolution",
+          "name": "multi-definition multiplier planning that prevents combinatorial eager expansion",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_inliner.go",
+          "tests": [
+            "TestRuleInlinerForbidsSecondRuleMultiplier"
+          ]
+        },
+        {
+      "name": "remaining source topological definition accumulation/self-recursive handling, oriented eager pass, proof/model conversion, and interpreted-tail unsatisfiability filtering during resolution",
           "status": "unported"
         }
       ],
@@ -92762,7 +92771,8 @@
     "TestRuleInlinerContractsUniqueLinearGroundChain",
     "TestRuleInlinerHonorsDisabledModes",
     "TestRuleInlinerRefusesMixedQuantifiedProgram",
-    "TestRuleInlinerBreaksMutualCycleAtOnePredicate"
+    "TestRuleInlinerBreaksMutualCycleAtOnePredicate",
+    "TestRuleInlinerForbidsSecondRuleMultiplier"
       ],
       "conditionals": [
         {

@@ -291,6 +291,110 @@ func breakInliningCycles(order []ast.ASTHandle, candidate map[ast.ASTHandle]bool
 	}
 }
 
+func inlinerTopologicalOrder(order []ast.ASTHandle, candidate, forbidden map[ast.ASTHandle]bool, edges map[ast.ASTHandle]map[ast.ASTHandle]bool) []ast.ASTHandle {
+	visited := make(map[ast.ASTHandle]bool)
+	var result []ast.ASTHandle
+	var visit func(ast.ASTHandle)
+	visit = func(declaration ast.ASTHandle) {
+		if visited[declaration] || !candidate[declaration] || forbidden[declaration] {
+			return
+		}
+		visited[declaration] = true
+		for _, dependency := range order {
+			if edges[declaration][dependency] {
+				visit(dependency)
+			}
+		}
+		result = append(result, declaration)
+	}
+	for _, declaration := range order {
+		visit(declaration)
+	}
+	return result
+}
+
+func (p *RuleInlinerPlugin) forbidMultipleMultipliers(source *base.RuleSet, order []ast.ASTHandle, candidate, forbidden map[ast.ASTHandle]bool, edges map[ast.ASTHandle]map[ast.ASTHandle]bool, headCount, tailCount map[ast.ASTHandle]int, definitions map[ast.ASTHandle][]*base.Rule) error {
+	allowed := func(declaration ast.ASTHandle) bool {
+		return candidate[declaration] && !forbidden[declaration]
+	}
+	for _, head := range inlinerTopologicalOrder(order, candidate, forbidden, edges) {
+		multiHead := headCount[head] > 1
+		multiOccurrence := tailCount[head] > 1
+		nextHead := false
+		for _, rule := range definitions[head] {
+			positive, err := rule.PositiveTailSize()
+			if err != nil {
+				return err
+			}
+			for tailIndex := 0; tailIndex < positive; tailIndex++ {
+				tail, err := rule.TailDeclaration(tailIndex)
+				if err != nil {
+					return err
+				}
+				if !allowed(tail) || headCount[tail] <= 1 {
+					continue
+				}
+				if multiHead {
+					forbidden[head] = true
+					nextHead = true
+					break
+				}
+				if multiOccurrence {
+					forbidden[tail] = true
+					continue
+				}
+				multiHead = true
+				headCount[head] *= headCount[tail]
+			}
+			if nextHead {
+				break
+			}
+		}
+	}
+
+	count, err := source.Len()
+	if err != nil {
+		return err
+	}
+	for index := 0; index < count; index++ {
+		rule, getErr := source.Rule(index)
+		if getErr != nil {
+			return getErr
+		}
+		head, getErr := rule.HeadDeclaration()
+		positive, positiveErr := rule.PositiveTailSize()
+		if getErr != nil || positiveErr != nil {
+			return errors.Join(getErr, positiveErr, rule.Close())
+		}
+		if allowed(head) {
+			if getErr = rule.Close(); getErr != nil {
+				return getErr
+			}
+			continue
+		}
+		hasMultiplier := false
+		for tailIndex := 0; tailIndex < positive; tailIndex++ {
+			tail, tailErr := rule.TailDeclaration(tailIndex)
+			if tailErr != nil {
+				getErr = tailErr
+				break
+			}
+			if !allowed(tail) || headCount[tail] <= 1 {
+				continue
+			}
+			if hasMultiplier {
+				forbidden[tail] = true
+			} else {
+				hasMultiplier = true
+			}
+		}
+		if getErr = errors.Join(getErr, rule.Close()); getErr != nil {
+			return getErr
+		}
+	}
+	return nil
+}
+
 func (p *RuleInlinerPlugin) plan(source *base.RuleSet) (map[ast.ASTHandle]bool, map[ast.ASTHandle][]*base.Rule, error) {
 	count, err := source.Len()
 	if err != nil {
@@ -341,6 +445,9 @@ func (p *RuleInlinerPlugin) plan(source *base.RuleSet) (map[ast.ASTHandle]bool, 
 		candidate[declaration] = !p.protected[declaration] && !negative[declaration] && (heads <= 1 || tailCount[declaration] <= 1 && heads <= 4)
 	}
 	forbidden := breakInliningCycles(declarationOrder, candidate, edges)
+	if err = p.forbidMultipleMultipliers(source, declarationOrder, candidate, forbidden, edges, headCount, tailCount, definitions); err != nil {
+		return nil, nil, errors.Join(err, closeRuleBuckets(definitions))
+	}
 	allowed := make(map[ast.ASTHandle]bool)
 	for declaration := range candidate {
 		allowed[declaration] = candidate[declaration] && !forbidden[declaration]
