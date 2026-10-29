@@ -365,6 +365,14 @@ func NewUFBVStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mod
 	return newStrategicSolver(m, strategy, "UFBV", p, proofs, models, cores, config)
 }
 
+func NewBVStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
+	strategy, err := ufbvtactic.NewUFBVTactic(m, p, config)
+	if err != nil {
+		return nil, err
+	}
+	return newStrategicSolver(m, strategy, "BV", p, proofs, models, cores, config)
+}
+
 func NewUFLRAStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, models, cores bool, config smtcore.SMTSolverConfig) (solver.Solver, error) {
 	strategy, err := smtlogics.NewUFLRATactic(m, p, config)
 	if err != nil {

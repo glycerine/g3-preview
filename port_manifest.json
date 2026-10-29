@@ -180090,7 +180090,9 @@
         "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
         "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2",
         "TestSMTLibRunnerScripts/ufbv_solver.smt2",
-        "TestSMTLibRunnerCPPReference/ufbv_solver.smt2"
+        "TestSMTLibRunnerCPPReference/ufbv_solver.smt2",
+        "TestSMTLibRunnerScripts/bv_quantified_strategy.smt2",
+        "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -180103,7 +180105,9 @@
             "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
             "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2",
             "TestSMTLibRunnerScripts/ufbv_solver.smt2",
-            "TestSMTLibRunnerCPPReference/ufbv_solver.smt2"
+            "TestSMTLibRunnerCPPReference/ufbv_solver.smt2",
+            "TestSMTLibRunnerScripts/bv_quantified_strategy.smt2",
+            "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2"
           ]
         }
       ],
@@ -180127,7 +180131,9 @@
         "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
         "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2",
         "TestSMTLibRunnerScripts/ufbv_solver.smt2",
-        "TestSMTLibRunnerCPPReference/ufbv_solver.smt2"
+        "TestSMTLibRunnerCPPReference/ufbv_solver.smt2",
+        "TestSMTLibRunnerScripts/bv_quantified_strategy.smt2",
+        "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2"
       ],
       "conditionals": [
         {
@@ -180143,14 +180149,16 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "UFBV tactic factory and explicit ufbv command registration",
+          "name": "UFBV/BV tactic factory aliases and strategic solver registration",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/ufbv_tactic.go",
           "tests": [
             "TestSMTLibRunnerScripts/ufbv_tactic.smt2",
             "TestSMTLibRunnerCPPReference/ufbv_tactic.smt2",
             "TestSMTLibRunnerScripts/ufbv_solver.smt2",
-            "TestSMTLibRunnerCPPReference/ufbv_solver.smt2"
+            "TestSMTLibRunnerCPPReference/ufbv_solver.smt2",
+            "TestSMTLibRunnerScripts/bv_quantified_strategy.smt2",
+            "TestSMTLibRunnerCPPReference/bv_quantified_strategy.smt2"
           ]
         }
       ],
