@@ -286,11 +286,14 @@ func (f *Frames) PropagateToNextLevel(level uint32) (bool, error) {
 }
 
 func (f *Frames) Close() (result error) {
-	if f == nil || f.manager == nil {
+	if f == nil {
 		return ErrManagerOwner
 	}
 	if f.closed {
 		return nil
+	}
+	if f.manager == nil {
+		return ErrManagerOwner
 	}
 	for i := len(f.lemmas) - 1; i >= 0; i-- {
 		result = errors.Join(result, f.lemmas[i].Close())

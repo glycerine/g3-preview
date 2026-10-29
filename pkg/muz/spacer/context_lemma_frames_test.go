@@ -11,6 +11,7 @@ import (
 	_ "github.com/glycerine/g3/pkg/engine"
 	"github.com/glycerine/g3/pkg/muz/spacer"
 	"github.com/glycerine/g3/pkg/smtcore"
+	"github.com/glycerine/g3/pkg/util/statistics"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -168,6 +169,38 @@ func TestSpacerLemmaInstantiatesBindingsInSourceOrder(t *testing.T) {
 	}
 	spacerMust(t, manager.DelRef(&instances[0]))
 	spacerMust(t, lemma.Close())
+	spacerMust(t, owner.Close())
+	spacerMust(t, command.Close())
+}
+
+func TestSpacerPredicateTransformerConnectsFramesAndSolver(t *testing.T) {
+	command, manager, owner := lemmaOwnerFixture(t)
+	p := spacerBool(t, manager, "predicate-transformer-p")
+	initial, err := manager.MkFalse()
+	spacerMust(t, err)
+	transformer, err := spacer.NewPredicateTransformer(owner, "predicate-transformer", initial, p, spacer.PropSolverConfig{})
+	spacerMust(t, err)
+	added, err := transformer.AddLemma(p, 0)
+	spacerMust(t, err)
+	if !added {
+		t.Fatal("predicate-transformer lemma not added")
+	}
+	all, err := transformer.PropagateToNextLevel(0)
+	spacerMust(t, err)
+	if !all {
+		t.Fatal("transition-implied lemma did not propagate")
+	}
+	formula, err := transformer.Formulas(spacer.InfinityLevel, false)
+	spacerMust(t, err)
+	if formula != p {
+		t.Fatal("infinity formula", formula, p)
+	}
+	collected := statistics.New()
+	spacerMust(t, transformer.CollectStatistics(collected))
+	if collected.Size() == 0 {
+		t.Fatal("predicate-transformer statistics are empty")
+	}
+	spacerMust(t, transformer.Close())
 	spacerMust(t, owner.Close())
 	spacerMust(t, command.Close())
 }

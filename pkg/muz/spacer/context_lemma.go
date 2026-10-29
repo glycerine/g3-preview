@@ -201,11 +201,14 @@ func (l *Lemma) Instances() (_ []ast.ASTRef, resultErr error) {
 }
 
 func (l *Lemma) Close() (result error) {
-	if l == nil || l.manager == nil {
+	if l == nil {
 		return ErrManagerOwner
 	}
 	if l.closed {
 		return nil
+	}
+	if l.manager == nil {
+		return ErrManagerOwner
 	}
 	result = errors.Join(releaseNormalizeRefs(l.manager, l.bindings), releaseNormalizeRefs(l.manager, l.cube), l.manager.DelRef(&l.body))
 	if result == nil {
