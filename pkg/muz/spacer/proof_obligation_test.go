@@ -108,6 +108,39 @@ func TestSpacerProofObligationBindingsDirtyStateAndQueue(t *testing.T) {
 	spacerMust(t, command.Close())
 }
 
+func TestSpacerProofObligationQueueUsesPredicateTieBreaker(t *testing.T) {
+	command, manager, owner := lemmaOwnerFixture(t)
+	truth, err := manager.MkTrue()
+	spacerMust(t, err)
+	childApplication := spacerBool(t, manager, "queue-child-predicate")
+	childDeclaration, err := manager.GetDecl(childApplication)
+	spacerMust(t, err)
+	rootApplication := spacerBool(t, manager, "queue-root-predicate")
+	rootDeclaration, err := manager.GetDecl(rootApplication)
+	spacerMust(t, err)
+	childTransformer, err := spacer.NewRulePredicateTransformer(owner, childDeclaration, spacer.PropSolverConfig{})
+	spacerMust(t, err)
+	rootTransformer, err := spacer.NewRulePredicateTransformer(owner, rootDeclaration, spacer.PropSolverConfig{})
+	spacerMust(t, err)
+	root, err := rootTransformer.NewProofObligation(nil, 1, 1, truth, nil)
+	spacerMust(t, err)
+	child, err := childTransformer.NewProofObligation(root, 1, 1, truth, nil)
+	spacerMust(t, err)
+	var queue spacer.ProofObligationQueue
+	spacerMust(t, queue.SetRoot(root))
+	spacerMust(t, queue.Push(child))
+	top, err := queue.Top()
+	spacerMust(t, err)
+	if top != child {
+		t.Fatal("predicate declaration tie-breaker did not prioritize child")
+	}
+	spacerMust(t, root.Close())
+	spacerMust(t, childTransformer.Close())
+	spacerMust(t, rootTransformer.Close())
+	spacerMust(t, owner.Close())
+	spacerMust(t, command.Close())
+}
+
 func TestSpacerProofObligationStoreReusesNormalizedPostAndParent(t *testing.T) {
 	command, manager, owner := lemmaOwnerFixture(t)
 	truth, err := manager.MkTrue()

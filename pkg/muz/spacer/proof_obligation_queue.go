@@ -85,6 +85,21 @@ func proofObligationLess(left, right *ProofObligation) (bool, error) {
 	if leftID != rightID {
 		return leftID < rightID, nil
 	}
+	leftHead, leftHeadErr := left.transformer.Head()
+	rightHead, rightHeadErr := right.transformer.Head()
+	if leftHeadErr == nil && rightHeadErr == nil {
+		leftHeadID, err := left.transformer.manager.GetASTID(leftHead)
+		if err != nil {
+			return false, err
+		}
+		rightHeadID, err := right.transformer.manager.GetASTID(rightHead)
+		if err != nil {
+			return false, err
+		}
+		if leftHeadID != rightHeadID {
+			return leftHeadID < rightHeadID, nil
+		}
+	}
 	return left.sequence < right.sequence, nil
 }
 

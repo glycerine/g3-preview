@@ -393,8 +393,12 @@ func (p *ProofObligation) Release() (result error) {
 	if p.transformer == nil || p.transformer.manager == nil {
 		return ErrManagerOwner
 	}
-	if len(p.children) != 0 {
-		return ErrManagerOwner
+	children := append([]*ProofObligation(nil), p.children...)
+	for i := len(children) - 1; i >= 0; i-- {
+		result = errors.Join(result, children[i].Release())
+	}
+	if result != nil {
+		return result
 	}
 	manager := p.transformer.manager
 	if p.derivation != nil {

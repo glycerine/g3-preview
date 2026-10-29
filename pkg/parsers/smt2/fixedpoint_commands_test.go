@@ -457,6 +457,39 @@ func TestSMT2FixedpointSpacerIntegerQueriesMatchCPP(t *testing.T) {
 	}
 }
 
+func TestSMT2FixedpointSpacerRebuildsAfterBoundedRecursiveSearch(t *testing.T) {
+	context, err := cmd_context.NewStandaloneContext()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := context.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+	context.PrintSuccess = false
+	script := `(set-option :fixedpoint.engine spacer)
+(set-option :fixedpoint.spacer.max_level 3)
+(declare-rel P (Int))
+(declare-rel Goal ())
+(declare-rel U ())
+(declare-var x Int)
+(rule (P 0))
+(rule (=> (and (P x) (< x 2)) (P (+ x 1))))
+(rule (=> (P 2) Goal))
+(rule (=> U U))
+(query Goal :print-answer false)
+(query U :print-answer false)
+`
+	var output bytes.Buffer
+	if err = smt2.ParseCommands(context, strings.NewReader(script), &output); err != nil {
+		t.Fatal(err)
+	}
+	if text := output.String(); !strings.HasSuffix(text, "unsat\n") || !strings.HasPrefix(text, "unknown\n") && !strings.HasPrefix(text, "sat\n") {
+		t.Fatal("bounded Spacer query lifecycle", text)
+	}
+}
+
 func TestSMT2FixedpointPDRBackgroundAssertionsMatchCPP(t *testing.T) {
 	context, err := cmd_context.NewStandaloneContext()
 	if err != nil {
