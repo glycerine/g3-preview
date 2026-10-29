@@ -88689,6 +88689,7 @@
         "pkg/muz/spacer/predicate_reachable.go",
         "pkg/muz/spacer/predicate_reach_projection.go",
         "pkg/muz/spacer/search.go",
+        "pkg/cmd/g3/test_vectors/fp_spacer_skip_propagate.smt2",
         "pkg/cmd/g3/test_vectors/fp_spacer_arith_inv.smt2",
         "pkg/cmd/g3/test_vectors/fp_spacer_linear_inv.smt2",
         "pkg/cmd/g3/test_vectors/fp_spacer_mutual_inv.smt2"
@@ -88699,6 +88700,7 @@
         "TestSpacerRulePredicateTransformerBuildsSourceStateSignature",
         "TestSMTContextFixedpointSpacerInductiveExports",
         "TestSMTLibRunnerScripts/fixedpoint_spacer_recursive_trace.smt2",
+        "TestSMTLibRunnerScripts/fp_spacer_skip_propagate.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_spacer_recursive_trace.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_arith_inv.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_linear_inv.smt2",

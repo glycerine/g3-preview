@@ -18,19 +18,20 @@ import (
 var ErrContextOwner = errors.New("muz/spacer: invalid or closed context")
 
 type Context struct {
-	manager      *ast.ASTManager
-	owner        *Manager
-	config       PropSolverConfig
-	transformers map[ast.ASTHandle]*PredicateTransformer
-	order        []ast.ASTHandle
-	query        *PredicateTransformer
-	queryDecl    ast.ASTHandle
-	queue        ProofObligationQueue
-	lastResult   lbool.LBool
-	inductive    uint32
-	initialized  bool
-	solved       bool
-	closed       bool
+	manager       *ast.ASTManager
+	owner         *Manager
+	config        PropSolverConfig
+	transformers  map[ast.ASTHandle]*PredicateTransformer
+	order         []ast.ASTHandle
+	query         *PredicateTransformer
+	queryDecl     ast.ASTHandle
+	queue         ProofObligationQueue
+	lastResult    lbool.LBool
+	inductive     uint32
+	skipPropagate bool
+	initialized   bool
+	solved        bool
+	closed        bool
 }
 
 func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumContexts uint32, config smtcore.SMTSolverConfig) (*Context, error) {
@@ -45,9 +46,18 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, errors.Join(err, owner.Close())
 	}
+	fixedpoint, err := config.Globals.SourceGetModuleName("fixedpoint")
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
+	skipName := "spacer.skip_propagate"
+	skipPropagate, err := config.Params.GetBoolName(&fixedpoint, &skipName, false)
+	if err != nil {
+		return nil, errors.Join(err, owner.Close())
+	}
 	return &Context{
 		manager: manager, owner: owner, transformers: make(map[ast.ASTHandle]*PredicateTransformer), lastResult: lbool.Undef,
-		config: propConfig,
+		config: propConfig, skipPropagate: skipPropagate,
 	}, nil
 }
 
@@ -374,7 +384,7 @@ func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr e
 			c.lastResult = lbool.True
 			return c.lastResult, nil
 		}
-		if level > 0 {
+		if level > 0 && !c.skipPropagate {
 			inductive, err := c.propagate(level)
 			if err != nil {
 				return lbool.Undef, err

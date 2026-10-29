@@ -1,0 +1,6 @@
+(set-option :fixedpoint.engine spacer)
+(set-option :fixedpoint.spacer.skip_propagate true)
+(set-option :fixedpoint.spacer.max_level 3)
+(declare-rel Loop ())
+(rule (=> Loop Loop))
+(query Loop :print-answer false)
