@@ -94524,9 +94524,9 @@
       "path": "src/nlsat/tactic/goal2nlsat.cpp",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/nlsat/tactic/goal2nlsat.go"],
+      "tests": ["TestGoalCompilerRealQuadraticSat", "TestGoalCompilerIntegerLinearUnsat", "TestGoalCompilerRationalDenominatorClearing", "TestGoalCompilerBooleanAbstractionModel", "TestGoalCompilerUnsatCoreDependencies"],
       "assertions": [
         {
           "line": 102,
@@ -94555,17 +94555,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "retained nonfactoring goal compiler, model reconstruction, and core mapping",
+          "status": "partial",
+          "go_target": "pkg/nlsat/tactic/goal2nlsat.go",
+          "tests": ["TestGoalCompilerRealQuadraticSat", "TestGoalCompilerIntegerLinearUnsat", "TestGoalCompilerRationalDenominatorClearing", "TestGoalCompilerBooleanAbstractionModel", "TestGoalCompilerUnsatCoreDependencies"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The live QF_NIA route requests factor=false and is complete for the retained compiler fragment. Source polynomial factor_atom and nlsat2goal diagnostic conversion remain pending."]
     },
     {
       "path": "src/nlsat/tactic/goal2nlsat.h",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/nlsat/tactic/goal2nlsat.go"],
+      "tests": ["TestGoalCompilerRealQuadraticSat", "TestGoalCompilerUnsatCoreDependencies"],
       "conditionals": [
         {
           "line": 24,
@@ -94586,9 +94593,9 @@
       "path": "src/nlsat/tactic/nlsat_tactic.cpp",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/nlsat/tactic/nlsat_tactic.go"],
+      "tests": ["TestNLSATTacticPublishesSatModel", "TestNLSATTacticPublishesUnsatCore", "TestNLSATTacticRejectsProofGoal", "TestSMTLibRunnerScripts/nlsat_direct.smt2"],
       "assertions": [
         {
           "line": 136,
@@ -94605,17 +94612,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "retained tactic application, SAT model publication, and UNSAT core publication",
+          "status": "partial",
+          "go_target": "pkg/nlsat/tactic/nlsat_tactic.go",
+          "tests": ["TestNLSATTacticPublishesSatModel", "TestNLSATTacticPublishesUnsatCore", "TestNLSATTacticRejectsProofGoal", "TestSMTLibRunnerScripts/nlsat_direct.smt2"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Statistics forwarding and the source display-variable diagnostic hook remain pending; solving, model, and core behavior are integrated."]
     },
     {
       "path": "src/nlsat/tactic/nlsat_tactic.h",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/nlsat/tactic/nlsat_tactic.go"],
+      "tests": ["TestNLSATTacticPublishesSatModel", "TestNLSATTacticPublishesUnsatCore"],
       "conditionals": [
         {
           "line": 19,
@@ -94636,22 +94650,29 @@
       "path": "src/nlsat/tactic/qfnra_nlsat_tactic.cpp",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/tactic/smtlogics/qfnra_tactic.go"],
+      "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "retained polynomial-CNF route into NLSAT",
+          "status": "partial",
+          "go_target": "pkg/tactic/smtlogics/qfnra_tactic.go",
+          "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The complete purify-arith, factor, term-ITE elimination, and Tseitin-CNF preprocessing chain remains pending; unsupported cases fall through to bounded or SMT routes."]
     },
     {
       "path": "src/nlsat/tactic/qfnra_nlsat_tactic.h",
       "component": "nlsat",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/tactic/smtlogics/qfnra_tactic.go"],
+      "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"],
       "conditionals": [
         {
           "line": 19,
@@ -176871,22 +176892,29 @@
       "path": "src/tactic/smtlogics/qfnra_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/tactic/smtlogics/qfnra_tactic.go"],
+      "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "retained QF_NRA route ordering",
+          "status": "partial",
+          "go_target": "pkg/tactic/smtlogics/qfnra_tactic.go",
+          "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["NLSAT, bounded NLA2BV, and timed SMT routes retain source order. Full qfnra_nlsat preprocessing remains pending."]
     },
     {
       "path": "src/tactic/smtlogics/qfnra_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/tactic/smtlogics/qfnra_tactic.go"],
+      "tests": ["TestSMTLibRunnerScripts/qfnra_nlsat.smt2"],
       "conditionals": [
         {
           "line": 19,
