@@ -1,0 +1,195 @@
+package spacer_test
+
+// Source: src/muz/spacer/spacer_prop_solver.cpp poor-man's MaxSAT,
+// level-guard activation, delta levels, cores, models, and background scopes.
+
+import (
+	"bytes"
+	"errors"
+	"math"
+	"strings"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/cmd_context"
+	_ "github.com/glycerine/g3/pkg/engine"
+	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/muz/spacer"
+	"github.com/glycerine/g3/pkg/smtcore"
+	"github.com/glycerine/g3/pkg/solver"
+	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/lbool"
+)
+
+type spacerPropFixture struct {
+	command  *cmd_context.Context
+	manager  *ast.ASTManager
+	backends [2]*smtcore.SMTSolver
+	solver   *spacer.PropSolver
+	coop     *cooperate.Cooperation
+}
+
+func newSpacerPropFixture(t *testing.T, keepProxy bool) *spacerPropFixture {
+	return newSpacerPropFixtureWithProofs(t, keepProxy, false)
+}
+
+func newSpacerPropFixtureWithProofs(t *testing.T, keepProxy, proofs bool) *spacerPropFixture {
+	t.Helper()
+	command, err := cmd_context.NewStandaloneContext()
+	spacerMust(t, err)
+	manager, err := command.Manager()
+	spacerMust(t, err)
+	if proofs {
+		spacerMust(t, manager.ToggleProofMode(ast.ASTProofEnabled))
+	}
+	globals, err := command.GlobalParameters()
+	spacerMust(t, err)
+	fixture := &spacerPropFixture{command: command, manager: manager}
+	fixture.coop, err = cooperate.NewCooperation(manager.Budget())
+	spacerMust(t, err)
+	evaluator := model.ModelEvaluatorConfig{Context: globals.Context, Globals: globals, Memory: manager.NumeralService().RuntimeOwner(), Cooperation: fixture.coop}
+	var generic [2]solver.Solver
+	for i := range fixture.backends {
+		fixture.backends[i], err = smtcore.NewSMTSolver(manager, nil, "QF_UF", smtcore.SMTSolverConfig{Params: globals.Context, Globals: globals, ModelEvaluator: evaluator})
+		spacerMust(t, err)
+		generic[i] = fixture.backends[i]
+	}
+	truth, err := manager.MkTrue()
+	spacerMust(t, err)
+	fixture.solver, err = spacer.NewPropSolver(manager, generic, truth, "spacer-test", spacer.PropSolverConfig{
+		Itp:       spacer.ItpSolverConfig{Params: globals.Context, Globals: globals},
+		KeepProxy: keepProxy,
+	})
+	spacerMust(t, err)
+	return fixture
+}
+
+func TestPropSolverPublishesFarkasCore(t *testing.T) {
+	fixture := newSpacerPropFixtureWithProofs(t, true, true)
+	p := spacerBool(t, fixture.manager, "spacer-farkas-p")
+	q := spacerBool(t, fixture.manager, "spacer-farkas-q")
+	notP, err := fixture.manager.MkNot(p)
+	spacerMust(t, err)
+	notQ, err := fixture.manager.MkNot(q)
+	spacerMust(t, err)
+	disjunction, err := fixture.manager.MkOr(p, q)
+	spacerMust(t, err)
+	spacerMust(t, fixture.solver.Assert(notP))
+	spacerMust(t, fixture.solver.Assert(notQ))
+	result, err := fixture.solver.CheckAssumptions([]ast.ASTHandle{disjunction}, nil, spacer.PropCheckOptions{NeedCore: true})
+	spacerMust(t, err)
+	if result.Status != lbool.False || !result.FarkasCore || len(result.Core) != 1 {
+		t.Fatal("Farkas PropSolver core", result.Status, result.FarkasCore, len(result.Core))
+	}
+	core, err := fixture.manager.RefGet(result.Core[0])
+	spacerMust(t, err)
+	var printed bytes.Buffer
+	spacerMust(t, ast.DisplayLegacySMT(&printed, fixture.manager, core, 0, nil))
+	if strings.Contains(printed.String(), "spacer_proxy!") {
+		t.Fatal("proxy was not eliminated from Farkas core", printed.String())
+	}
+	spacerMust(t, result.Close(fixture.manager))
+	fixture.close(t)
+}
+
+func (f *spacerPropFixture) close(t *testing.T) {
+	t.Helper()
+	spacerMust(t, f.solver.Close())
+	for i := len(f.backends) - 1; i >= 0; i-- {
+		spacerMust(t, f.backends[i].Close())
+	}
+	spacerMust(t, f.coop.Close())
+	spacerMust(t, f.command.Close())
+}
+
+func TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore(t *testing.T) {
+	fixture := newSpacerPropFixture(t, false)
+	p := spacerBool(t, fixture.manager, "spacer-soft-p")
+	q := spacerBool(t, fixture.manager, "spacer-soft-q")
+	notP, err := fixture.manager.MkNot(p)
+	spacerMust(t, err)
+	spacerMust(t, fixture.solver.Assert(notP))
+	result, err := fixture.solver.CheckAssumptions(nil, []ast.ASTHandle{p, q}, spacer.PropCheckOptions{NeedModel: true})
+	spacerMust(t, err)
+	if result.Status != lbool.True || len(result.Soft) != 1 || result.Soft[0] != q || result.Model == nil {
+		t.Fatal("soft reduction result", result.Status, result.Soft, result.Model)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+
+	result, err = fixture.solver.CheckAssumptions([]ast.ASTHandle{p}, nil, spacer.PropCheckOptions{NeedCore: true, SubsetBasedCore: true})
+	spacerMust(t, err)
+	if result.Status != lbool.False || result.FarkasCore || len(result.Core) != 1 {
+		t.Fatal("subset core result", result.Status, result.FarkasCore, len(result.Core))
+	}
+	core, err := fixture.manager.RefGet(result.Core[0])
+	spacerMust(t, err)
+	if core != p {
+		t.Fatal("wrong subset core", core, p)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+	fixture.close(t)
+}
+
+func TestPropSolverNormalAndDeltaLevelActivation(t *testing.T) {
+	fixture := newSpacerPropFixture(t, true)
+	p := spacerBool(t, fixture.manager, "spacer-level-p")
+	q := spacerBool(t, fixture.manager, "spacer-level-q")
+	notP, err := fixture.manager.MkNot(p)
+	spacerMust(t, err)
+	notQ, err := fixture.manager.MkNot(q)
+	spacerMust(t, err)
+	spacerMust(t, fixture.solver.AssertAtLevel(p, 0))
+	spacerMust(t, fixture.solver.AssertAtLevel(q, 1))
+	if levels, err := fixture.solver.LevelCount(); err != nil || levels != 2 {
+		t.Fatal("level count", levels, err)
+	}
+
+	level0 := uint32(0)
+	result, err := fixture.solver.CheckAssumptions([]ast.ASTHandle{notP}, nil, spacer.PropCheckOptions{Level: &level0, NeedCore: true, SubsetBasedCore: true})
+	spacerMust(t, err)
+	if result.Status != lbool.False || !result.AssumesLevel || result.UsesLevel != 0 {
+		t.Fatal("normal level zero result", result.Status, result.AssumesLevel, result.UsesLevel)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+
+	level1 := uint32(1)
+	result, err = fixture.solver.CheckAssumptions([]ast.ASTHandle{notP}, nil, spacer.PropCheckOptions{Level: &level1, NeedModel: true})
+	spacerMust(t, err)
+	if result.Status != lbool.True || result.Model == nil || result.AssumesLevel || result.UsesLevel != math.MaxUint32 {
+		t.Fatal("inactive earlier level", result.Status, result.Model, result.AssumesLevel, result.UsesLevel)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+
+	result, err = fixture.solver.CheckAssumptions([]ast.ASTHandle{notQ}, nil, spacer.PropCheckOptions{Level: &level1, DeltaLevel: true, NeedCore: true, SubsetBasedCore: true})
+	spacerMust(t, err)
+	if result.Status != lbool.False || !result.AssumesLevel || result.UsesLevel != 1 {
+		t.Fatal("delta level one result", result.Status, result.AssumesLevel, result.UsesLevel)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+
+	background := spacerBool(t, fixture.manager, "spacer-background")
+	notBackground, err := fixture.manager.MkNot(background)
+	spacerMust(t, err)
+	result, err = fixture.solver.CheckAssumptions([]ast.ASTHandle{notBackground}, nil, spacer.PropCheckOptions{Background: []ast.ASTHandle{background}})
+	spacerMust(t, err)
+	if result.Status != lbool.False {
+		t.Fatal("scoped background result", result.Status)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+	result, err = fixture.solver.CheckAssumptions([]ast.ASTHandle{notBackground}, nil, spacer.PropCheckOptions{})
+	spacerMust(t, err)
+	if result.Status != lbool.True {
+		t.Fatal("scoped background survived check", result.Status)
+	}
+	spacerMust(t, result.Close(fixture.manager))
+
+	spacerMust(t, fixture.solver.Close())
+	if _, err := fixture.solver.LevelCount(); !errors.Is(err, spacer.ErrPropSolverOwner) {
+		t.Fatal("closed PropSolver accepted operation", err)
+	}
+	for i := len(fixture.backends) - 1; i >= 0; i-- {
+		spacerMust(t, fixture.backends[i].Close())
+	}
+	spacerMust(t, fixture.coop.Close())
+	spacerMust(t, fixture.command.Close())
+}

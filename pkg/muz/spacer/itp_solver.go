@@ -403,6 +403,13 @@ func (s *ItpSolver) AcquireModel() (*model.ModelCore, error) {
 	return s.backend.AcquireModel()
 }
 
+func (s *ItpSolver) SetProduceModels(enabled bool) error {
+	if err := s.open(); err != nil {
+		return err
+	}
+	return s.backend.SetProduceModels(enabled)
+}
+
 func (s *ItpSolver) eliminateProxies(values []ast.ASTRef) (_ []ast.ASTRef, resultErr error) {
 	defer func() {
 		for i := range values {
@@ -411,7 +418,11 @@ func (s *ItpSolver) eliminateProxies(values []ast.ASTRef) (_ []ast.ASTRef, resul
 			}
 		}
 	}()
-	substitution, err := s.manager.NewExprSubstitutionPolicy(false, false)
+	proofs, err := s.manager.ProofsEnabled()
+	if err != nil {
+		return nil, err
+	}
+	substitution, err := s.manager.NewExprSubstitutionPolicy(false, proofs)
 	if err != nil {
 		return nil, err
 	}
@@ -420,12 +431,19 @@ func (s *ItpSolver) eliminateProxies(values []ast.ASTRef) (_ []ast.ASTRef, resul
 	if err != nil {
 		return nil, err
 	}
+	var proof ast.ASTHandle
+	if proofs {
+		proof, err = s.manager.MkProofAsserted(truth)
+		if err != nil {
+			return nil, err
+		}
+	}
 	for _, reference := range s.proxies {
 		proxy, err := s.manager.RefGet(reference)
 		if err != nil {
 			return nil, err
 		}
-		if err = s.manager.ExprSubstitutionInsert(substitution, proxy, truth, ast.ASTHandle{}, ast.ASTDependency{}); err != nil {
+		if err = s.manager.ExprSubstitutionInsert(substitution, proxy, truth, proof, ast.ASTDependency{}); err != nil {
 			return nil, err
 		}
 	}

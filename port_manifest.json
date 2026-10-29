@@ -89842,9 +89842,16 @@
       "path": "src/muz/spacer/spacer_prop_solver.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/spacer/prop_solver.go",
+        "pkg/muz/spacer/itp_solver.go"
+      ],
+      "tests": [
+        "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
+        "TestPropSolverNormalAndDeltaLevelActivation",
+        "TestPropSolverPublishesFarkasCore"
+      ],
       "assertions": [
         {
           "line": 113,
@@ -89871,19 +89878,62 @@
           "text": "SASSERT(soft_sz >= soft.size());"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "construction, add_level/ensure_level/level_cnt, assert_level_atoms and both assert_expr forms",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/prop_solver.go",
+          "tests": ["TestPropSolverNormalAndDeltaLevelActivation"]
+        },
+        {
+          "name": "maxsmt hard proxying and iterative soft-core removal",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/prop_solver.go",
+          "tests": ["TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore"]
+        },
+        {
+          "name": "internal_check_assumptions model publication, uses_level recovery and subset/Farkas core selection",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/prop_solver.go",
+          "tests": [
+            "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
+            "TestPropSolverNormalAndDeltaLevelActivation",
+            "TestPropSolverPublishesFarkasCore"
+          ]
+        },
+        {
+          "name": "check_assumptions hard conjunction flattening, scoped background modes and source solver-id routing",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/prop_solver.go",
+          "tests": ["TestPropSolverNormalAndDeltaLevelActivation"]
+        },
+        {
+          "name": "collect_statistics and reset_statistics",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/prop_solver.go",
+          "tests": []
+        }
+      ],
+      "ownership": [
+        "PropSolver owns its two ItpSolver wrappers and level-atom references while borrowing both solver backends. MaxSAT pins every hard and soft input across repeated checks. PropCheckResult owns core references and an optional model until Close."
+      ],
+      "deviations": [
+        "Pointer-based one-shot core/model setters and RAII level toggles become one CheckAssumptions options value and an owning result. The source's intentional solver_id == 0 ? 0 : 0 routing is preserved. Go errors replace source assertions for invalid lifetime and level nesting."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_prop_solver.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/spacer/prop_solver.go"],
+      "tests": [
+        "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
+        "TestPropSolverNormalAndDeltaLevelActivation",
+        "TestPropSolverPublishesFarkasCore"
+      ],
       "conditionals": [
         {
           "line": 20,
@@ -89900,11 +89950,32 @@
           "text": "SASSERT(!m_lev);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "level creation/count, global and guarded assertion, assumption checking, core/model controls, level reporting and statistics",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/prop_solver.go",
+          "tests": [
+            "TestPropSolverReducesSoftAssumptionsAndPublishesSubsetCore",
+            "TestPropSolverNormalAndDeltaLevelActivation",
+            "TestPropSolverPublishesFarkasCore"
+          ]
+        },
+        {
+          "name": "scoped_level, scoped_delta_level and scoped_subset_core state changes",
+          "status": "ported",
+          "go_target": "pkg/muz/spacer/prop_solver.go",
+          "tests": ["TestPropSolverNormalAndDeltaLevelActivation"]
+        }
+      ],
+      "ownership": [
+        "The Go surface makes each check's temporary mode explicit and returns a result whose core/model lifetime is closed by the caller."
+      ],
+      "deviations": [
+        "Scoped native mode objects are represented by immutable per-call options, preventing nested or leaked mode state. Header guards are represented by normal Go package compilation."
+      ]
     },
     {
       "path": "src/muz/spacer/spacer_qe_project.cpp",
