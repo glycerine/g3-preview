@@ -45,6 +45,7 @@ type Context struct {
 	proofActive       bool
 	useModel          bool
 	useInductive      bool
+	useArithInductive bool
 	useConvexClosure  bool
 	useConvexInterior bool
 	useUTVPI          bool
@@ -139,6 +140,19 @@ func (c *Context) SetUseInductiveGeneralizer(enabled bool) error {
 		return ast.ErrASTDomain
 	}
 	c.useInductive = enabled
+	return nil
+}
+
+// SetUseArithmeticInductiveGeneralizer selects the source experimental
+// arithmetic core extrapolator. It must be set before Initialize.
+func (c *Context) SetUseArithmeticInductiveGeneralizer(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.useArithInductive = enabled
 	return nil
 }
 

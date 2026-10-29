@@ -196,6 +196,20 @@ func (c *Context) generalizeBlockingCores(node *ModelNode, literals []ast.ASTHan
 		}
 		cores = next
 	}
+	if c.useArithInductive {
+		next := make([]generalizedCore, 0, len(cores))
+		for _, core := range cores {
+			generalized, x := generalizeArithmeticInductiveCore(node.transformer, node.level, core)
+			if x != nil {
+				return nil, errors.Join(x, closeGeneralizedCores(c.manager, next), closeGeneralizedCores(c.manager, cores))
+			}
+			next = append(next, generalized)
+		}
+		if err = closeGeneralizedCores(c.manager, cores); err != nil {
+			return nil, errors.Join(err, closeGeneralizedCores(c.manager, next))
+		}
+		cores = next
+	}
 	return cores, nil
 }
 

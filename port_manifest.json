@@ -83040,6 +83040,7 @@
         "pkg/muz/pdr/context_bounded.go",
         "pkg/muz/pdr/context_solve.go",
         "pkg/muz/pdr/generalizers.go",
+        "pkg/muz/pdr/generalizer_arithmetic.go",
         "pkg/muz/pdr/pdr_closure.go",
         "pkg/muz/pdr/fragment.go",
         "pkg/smtcore/smt_solver_arithmetic_state.go",
@@ -83061,6 +83062,11 @@
         "TestContextSolveFindsInductiveUnreachablePredicate",
         "TestContextSolveProjectsCoupledPredecessors",
         "TestConvexClosureAndInteriorOwnExpectedEndpointRegions",
+        "TestArithmeticInductiveCandidateRewritesAliasesAndIntegerGrid",
+        "TestArithmeticInductiveCandidateNormalizesNegationAndOverwritesMagnitude",
+        "TestArithmeticInductiveCandidateRealAliasOmitsIntegerGrid",
+        "TestArithmeticInductiveCoreOwnsFallbackAndAdoptedSubset",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_inductive.smt2",
         "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup",
         "TestPropSolverRejectsFarkasLemmasOutsideSelectedFragment",
         "TestPDRContextSelectsArithmeticFragmentBeforeSolverSetup",
@@ -84110,6 +84116,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/muz/pdr/generalizers.go",
+        "pkg/muz/pdr/generalizer_arithmetic.go",
         "pkg/muz/pdr/pdr_closure.go",
         "pkg/muz/pdr/predicate_rules.go",
         "pkg/muz/pdr/context_solve.go",
@@ -84127,7 +84134,12 @@
         "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_closure.smt2",
         "TestSMTLibRunnerScripts/fixedpoint_pdr_convex_interior.smt2",
         "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2",
-        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2",
+        "TestArithmeticInductiveCandidateRewritesAliasesAndIntegerGrid",
+        "TestArithmeticInductiveCandidateNormalizesNegationAndOverwritesMagnitude",
+        "TestArithmeticInductiveCandidateRealAliasOmitsIntegerGrid",
+        "TestArithmeticInductiveCoreOwnsFallbackAndAdoptedSubset",
+        "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_inductive.smt2"
       ],
       "assertions": [
         {
@@ -84176,7 +84188,14 @@
           ]
         },
         {
-          "name": "core_multi_generalizer, arithmetic inductive generalizer and induction/reachability generalizer",
+          "name": "core_arith_inductive_generalizer bound pairing, alias extrapolation, integer lattice candidate and all-or-nothing inductiveness check",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/generalizer_arithmetic.go",
+          "go_targets": ["pkg/muz/pdr/generalizers.go", "pkg/muz/pdr/context.go", "pkg/muz/fp/pdr_engine.go"],
+          "tests": ["TestArithmeticInductiveCandidateRewritesAliasesAndIntegerGrid", "TestArithmeticInductiveCandidateNormalizesNegationAndOverwritesMagnitude", "TestArithmeticInductiveCandidateRealAliasOmitsIntegerGrid", "TestArithmeticInductiveCoreOwnsFallbackAndAdoptedSubset", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_inductive.smt2"]
+        },
+        {
+          "name": "core_multi_generalizer and induction/reachability generalizer",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -84189,10 +84208,12 @@
       ],
       "ownership": [
         "The Boolean generalizer pins every input and intermediate subset core across successive solver checks and returns explicit owning references covering the final core until blocking-lemma installation completes.",
-        "The convex multi-core pipeline pins its original core and every generated Farkas core before the next reachability check clears solver-owned results; all final cores remain owned through blocking-lemma insertion."
+        "The convex multi-core pipeline pins its original core and every generated Farkas core before the next reachability check clears solver-owned results; all final cores remain owned through blocking-lemma insertion.",
+        "The arithmetic generalizer roots normalized terms and every synthesized alias/lattice expression until its single inductiveness check completes, then immediately pins either the solver-borrowed reduced core or an independent fallback copy."
       ],
       "deviations": [
-        "The default Boolean and optional live convex closure/interior generalizers are integrated in source order. Other optional experimental and source-buggy multi-core generalizers remain explicit obligations."
+        "The default Boolean and optional live convex closure/interior and arithmetic inductive generalizers are integrated in source order. The remaining optional induction and source-buggy multi-core generalizers remain explicit obligations.",
+        "The source hash-table gives no semantic iteration order for equal-magnitude matches; Go preserves deterministic first-magnitude encounter order without porting source hashing."
       ]
     },
     {
@@ -84200,8 +84221,8 @@
       "component": "muz",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/muz/pdr/generalizers.go", "pkg/muz/pdr/pdr_closure.go"],
-      "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestConvexClosureAndInteriorOwnExpectedEndpointRegions", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2"],
+      "go_targets": ["pkg/muz/pdr/generalizers.go", "pkg/muz/pdr/generalizer_arithmetic.go", "pkg/muz/pdr/pdr_closure.go"],
+      "tests": ["TestPredicateTransformerCheckInductiveReturnsSubsetCore", "TestConvexClosureAndInteriorOwnExpectedEndpointRegions", "TestArithmeticInductiveCandidateRewritesAliasesAndIntegerGrid", "TestArithmeticInductiveCoreOwnsFallbackAndAdoptedSubset", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_closure.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_convex_interior.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_pdr_arithmetic_inductive.smt2"],
       "conditionals": [
         {
           "line": 20,
@@ -84228,7 +84249,13 @@
           "tests": ["TestConvexClosureAndInteriorOwnExpectedEndpointRegions"]
         },
         {
-          "name": "remaining live optional core_multi, arithmetic-inductive and induction generalizer declarations",
+          "name": "core_arith_inductive_generalizer retained concrete declaration",
+          "status": "ported",
+          "go_target": "pkg/muz/pdr/generalizer_arithmetic.go",
+          "tests": ["TestArithmeticInductiveCandidateRewritesAliasesAndIntegerGrid", "TestArithmeticInductiveCoreOwnsFallbackAndAdoptedSubset"]
+        },
+        {
+          "name": "remaining live optional core_multi and induction generalizer declarations",
           "status": "unported",
           "go_target": null,
           "tests": []
