@@ -92,6 +92,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	transformArraysName := "xform.transform_arrays"
+	transformArrays, err := e.params.GetBoolName(&fixedpoint, &transformArraysName, false)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -102,6 +107,15 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	}
 	if err = transformer.Register(newInliner(35000)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
+	}
+	if transformArrays {
+		arrayRewrite, makeErr := transforms.NewArrayEqRewritePlugin(e.manager, e.rules, e.params, e.globals, 34998)
+		if makeErr != nil {
+			return nil, errors.Join(makeErr, transformer.Close())
+		}
+		if err = transformer.Register(arrayRewrite); err != nil {
+			return nil, errors.Join(err, arrayRewrite.Close(), transformer.Close())
+		}
 	}
 	if err = transformer.Register(transforms.NewConePlugin(34990)); err != nil {
 		return nil, errors.Join(err, transformer.Close())
