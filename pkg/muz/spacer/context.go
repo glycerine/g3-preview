@@ -493,10 +493,8 @@ func (c *Context) propagate(minimum, maximum uint32) (bool, error) {
 		return false, nil
 	}
 	if c.simplifyPre {
-		for _, declaration := range c.order {
-			if err := c.transformers[declaration].frames.Simplify(c.owner); err != nil {
-				return false, err
-			}
+		if err := c.simplifyFormulas(); err != nil {
+			return false, err
 		}
 	}
 	for level := minimum; level <= maximum; level++ {
@@ -518,13 +516,20 @@ func (c *Context) propagate(minimum, maximum uint32) (bool, error) {
 		}
 	}
 	if c.simplifyPost {
-		for _, declaration := range c.order {
-			if err := c.transformers[declaration].frames.Simplify(c.owner); err != nil {
-				return false, err
-			}
+		if err := c.simplifyFormulas(); err != nil {
+			return false, err
 		}
 	}
 	return false, nil
+}
+
+func (c *Context) simplifyFormulas() error {
+	for _, declaration := range c.order {
+		if err := c.transformers[declaration].frames.Simplify(c.owner); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (c *Context) lemmaAdditions() (uint64, error) {
@@ -577,6 +582,9 @@ func (c *Context) Solve(fromLevel, maxLevels uint32) (_ lbool.LBool, resultErr e
 			}
 			if inductive {
 				c.inductive = level
+				if err = c.simplifyFormulas(); err != nil {
+					return lbool.Undef, err
+				}
 				c.lastResult = lbool.False
 				return c.lastResult, c.validate()
 			}

@@ -89093,7 +89093,7 @@
       "methods_audited": false,
       "ownership_audited": true,
       "methods": [
-        {"name": "retained context/predicate-transformer lifecycle, frame unit-subsumption simplification, solving, result validation, answers, inductive models, levels and covers", "status": "partial", "go_target": "pkg/muz/spacer/context.go", "tests": ["TestSpacerContextSolvesFactAndRecursiveNoBasePrograms", "TestContextConsumesResultValidationPolicy", "TestContextConsumesFrameSimplificationPolicies", "TestSpacerFramesSimplifySameLevelLemmasByUnitPropagation", "TestSpacerRulePredicateTransformerBuildsSourceStateSignature", "TestSMTContextFixedpointSpacerInductiveExports"]},
+        {"name": "retained context/predicate-transformer lifecycle, configured propagation and final-inductive frame unit-subsumption simplification, solving, result validation, answers, inductive models, levels and covers", "status": "partial", "go_target": "pkg/muz/spacer/context.go", "tests": ["TestSpacerContextSolvesFactAndRecursiveNoBasePrograms", "TestContextConsumesResultValidationPolicy", "TestContextConsumesFrameSimplificationPolicies", "TestSpacerFramesSimplifySameLevelLemmasByUnitPropagation", "TestSpacerRulePredicateTransformerBuildsSourceStateSignature", "TestSMTContextFixedpointSpacerInductiveExports"]},
         {"name": "remaining optional generalizers, transformed-rule inheritance, proof/trace diagnostics and reachable-summary export", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["Context owns predicate transformers and the proof-obligation queue; each transformer owns solver views, frames, reach facts, rules and signature roots. Cover exports transfer one ASTRef to the caller."],
