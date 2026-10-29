@@ -16,6 +16,7 @@ import (
 	"github.com/glycerine/g3/pkg/solver"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/tactic/arith"
+	"github.com/glycerine/g3/pkg/tactic/core"
 	"github.com/glycerine/g3/pkg/tactic/smtlogics"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -67,8 +68,28 @@ func NewALLStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mode
 		probeOwners = append(probeOwners, value)
 		return value, nil
 	}
-	strong, err := smtlogics.NewQFAUFLIATactic(m, p, config)
-	strong, err = keepTactic(strong, err)
+	qfAUFLIA, err := smtlogics.NewQFAUFLIATactic(m, p, config)
+	qfAUFLIA, err = keepTactic(qfAUFLIA, err)
+	if err != nil {
+		return nil, err
+	}
+	qfBV, err := smtlogics.NewQFBVTactic(m, p, config)
+	qfBV, err = keepTactic(qfBV, err)
+	if err != nil {
+		return nil, err
+	}
+	qfAUFBV, err := smtlogics.NewQFAUFBVTactic(m, p, config)
+	qfAUFBV, err = keepTactic(qfAUFBV, err)
+	if err != nil {
+		return nil, err
+	}
+	qfLIA, err := smtlogics.NewQFLIATactic(m, p, config)
+	qfLIA, err = keepTactic(qfLIA, err)
+	if err != nil {
+		return nil, err
+	}
+	qfLRA, err := smtlogics.NewQFLRATactic(m, p, config)
+	qfLRA, err = keepTactic(qfLRA, err)
 	if err != nil {
 		return nil, err
 	}
@@ -91,15 +112,27 @@ func NewALLStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mode
 	if err != nil {
 		return nil, err
 	}
-	qfLIA, err := keepProbe(arith.NewArithmeticFragmentProbe(m.Budget(), config.Params, config.Globals, arith.FragmentQFLIA))
+	qfLIAProbe, err := keepProbe(arith.NewArithmeticFragmentProbe(m.Budget(), config.Params, config.Globals, arith.FragmentQFLIA))
 	if err != nil {
 		return nil, err
 	}
-	qfLRA, err := keepProbe(arith.NewArithmeticFragmentProbe(m.Budget(), config.Params, config.Globals, arith.FragmentQFLRA))
+	qfAUFLIAProbe, err := keepProbe(arith.NewArithmeticFragmentProbe(m.Budget(), config.Params, config.Globals, arith.FragmentQFAUFLIA))
 	if err != nil {
 		return nil, err
 	}
-	qfSingleSort, err := keepProbe(tactic.NewBinaryProbe(m.Budget(), tactic.ProbeOr, qfLIA, qfLRA))
+	qfLRAProbe, err := keepProbe(arith.NewArithmeticFragmentProbe(m.Budget(), config.Params, config.Globals, arith.FragmentQFLRA))
+	if err != nil {
+		return nil, err
+	}
+	qfAUFBVProbe, err := keepProbe(tactic.NewProbe(m.Budget(), tactic.ProbeIsQFArrayUFBitVector, 0))
+	if err != nil {
+		return nil, err
+	}
+	qfBVProbe, err := keepProbe(tactic.NewProbe(m.Budget(), tactic.ProbeIsQFBitVector, 0))
+	if err != nil {
+		return nil, err
+	}
+	qfSingleSort, err := keepProbe(tactic.NewBinaryProbe(m.Budget(), tactic.ProbeOr, qfLIAProbe, qfLRAProbe))
 	if err != nil {
 		return nil, err
 	}
@@ -123,12 +156,44 @@ func NewALLStrategicSolver(m *ast.ASTManager, p *uparams.ParamsRef, proofs, mode
 	if err != nil {
 		return nil, err
 	}
-	liraRoute, err := tactic.NewCondTactic(qfLIRA, lira, ordinary)
-	liraRoute, err = keepTactic(liraRoute, err)
+	route, err := tactic.NewCondTactic(qfLIRA, lira, ordinary)
+	route, err = keepTactic(route, err)
 	if err != nil {
 		return nil, err
 	}
-	strategy, err := tactic.NewCondTactic(asArray, strong, liraRoute)
+	for _, branch := range []struct {
+		probe  tactic.ProbeEvaluator
+		tactic tactic.Tactic
+	}{
+		{qfLRAProbe, qfLRA},
+		{qfAUFLIAProbe, qfAUFLIA},
+		{qfLIAProbe, qfLIA},
+		{qfAUFBVProbe, qfAUFBV},
+		{qfBVProbe, qfBV},
+	} {
+		if err != nil {
+			return nil, err
+		}
+		route, err = tactic.NewCondTactic(branch.probe, branch.tactic, route)
+		route, err = keepTactic(route, err)
+		if err != nil {
+			return nil, err
+		}
+	}
+	route, err = tactic.NewCondTactic(asArray, qfAUFLIA, route)
+	route, err = keepTactic(route, err)
+	if err != nil {
+		return nil, err
+	}
+	simplify, err := core.NewSimplifyTactic(m, config.Params, config.Globals, p)
+	if err != nil {
+		return nil, err
+	}
+	simplifier, err := keepTactic(simplify, nil)
+	if err != nil {
+		return nil, err
+	}
+	strategy, err := tactic.NewAndThenTactic(simplifier, route)
 	if err != nil {
 		return nil, err
 	}
