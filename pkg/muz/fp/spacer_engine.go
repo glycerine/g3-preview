@@ -85,6 +85,11 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, errors.Join(err, transformer.Close())
 	}
+	sliceName := "xform.slice"
+	sliceRules, err := e.params.GetBoolName(&fixedpoint, &sliceName, true)
+	if err != nil {
+		return nil, errors.Join(err, transformer.Close())
+	}
 	newInliner := func(priority uint32) base.RuleTransformPlugin {
 		return transforms.NewRuleInlinerPluginWithServices(e.manager, e.rules, []ast.ASTHandle{query}, inlineEager, inlineLinear, e.params, e.globals, priority)
 	}
@@ -155,6 +160,18 @@ func (e *PropositionalEngine) preprocessHornRules(query ast.ASTHandle) (_ *base.
 	if err != nil {
 		return nil, fmt.Errorf("muz/fp: Spacer rule preprocessing: %w", err)
 	}
+	if sliceRules {
+		slicer := base.NewRuleTransformer()
+		plugin := transforms.NewRuleSlicePlugin(e.manager, e.rules, 1)
+		if err = slicer.Register(plugin); err != nil {
+			return nil, errors.Join(err, plugin.Close(), slicer.Close())
+		}
+		_, err = slicer.Apply(prepared)
+		err = errors.Join(err, slicer.Close())
+		if err != nil {
+			return nil, fmt.Errorf("muz/fp: Spacer rule slicing: %w", err)
+		}
+	}
 	if unfoldRounds > 0 && coalesceRules {
 		coalescer := base.NewRuleTransformer()
 		plugin := transforms.NewRuleCoalescePlugin(e.manager, e.rules, 50)
@@ -222,6 +239,10 @@ func (e *PropositionalEngine) querySpacerFromLevel(declaration ast.ASTHandle, fr
 		return lbool.Undef, err
 	}
 	defer func() { resultErr = errors.Join(resultErr, prepared.Close()) }()
+	queryDeclaration, err := prepared.DerivedPredicate(declaration)
+	if err != nil {
+		return lbool.Undef, err
+	}
 	// The retained Context currently owns one completed proof-obligation
 	// search. Rebuild it for a subsequent query until source reset_query is
 	// ported; the rule set and AST expressions remain borrowed by the engine.
@@ -260,7 +281,7 @@ func (e *PropositionalEngine) querySpacerFromLevel(declaration ast.ASTHandle, fr
 	if err = context.InitializePredicates(prepared, e.predicateOrder); err != nil {
 		return lbool.Undef, errors.Join(fmt.Errorf("muz/fp: initialize preprocessed Spacer rules: %w", err), context.Close())
 	}
-	if err = context.SetQuery(declaration); err != nil {
+	if err = context.SetQuery(queryDeclaration); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
 	e.spacer = context

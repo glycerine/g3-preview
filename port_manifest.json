@@ -89168,10 +89168,11 @@
       "methods": [
         {"name": "direct-predicate and from-level query selection, Spacer context construction and solve routing", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports", "TestSMT2FixedpointSpacerIntegerQueriesMatchCPP"]},
         {"name": "answer, ground answer, trace rules/names, inductive model, level count, cover/invariant, reachable summary, statistics and reset forwarding", "status": "ported", "go_target": "pkg/muz/fp/propositional_engine.go", "tests": ["TestSpacerContextSolvesFactAndRecursiveNoBasePrograms", "TestSpacerEngineRunsReachableAndInductiveHornQueries", "TestSMTContextFixedpointSpacerInductiveExports"]},
-        {"name": "remaining transformed-rule subsumption reuse, slice/unfold/coalesce remapping, proof and diagnostic certificate display", "status": "unported", "go_target": null, "tests": []}
+        {"name": "parameter-controlled semantic slice, coalesce, and iterative unfold preprocessing with direct query predicate remapping", "status": "ported", "go_target": "pkg/muz/fp/spacer_engine.go", "tests": ["TestSMTLibRunnerCPPReference/fixedpoint_spacer_slice_columns.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_spacer_coalesce_unfold.smt2", "TestSMTLibRunnerCPPReference/fixedpoint_spacer_unfold_rules.smt2"]},
+        {"name": "remaining transformed-rule subsumption reuse, slice proof/model/answer expansion, and proof or diagnostic certificate display", "status": "unported", "go_target": null, "tests": []}
       ],
       "ownership": ["PropositionalEngine owns the active Spacer Context and rebuilds it after tracked rule or parameter changes; returned answers and inductive models transfer ownership to the caller."],
-      "deviations": ["Go selects direct predicate declarations through the typed engine API. The retained pipeline does not yet apply native slice/unfold/coalesce transforms or their model converters."]
+      "deviations": ["Go selects direct predicate declarations through the typed engine API and remaps sliced query predicates through RuleSet metadata. Slice/unfold/coalesce proof conversion and slice model/answer expansion remain unported."]
     },
     {
       "path": "src/muz/spacer/spacer_dl_interface.h",
@@ -92967,9 +92968,17 @@
       "path": "src/muz/transforms/dl_mk_slice.cpp",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/muz/transforms/rule_slice.go",
+        "pkg/muz/fp/spacer_engine.go"
+      ],
+      "tests": [
+        "TestRuleSliceRemovesUnconstrainedPredicateColumns",
+        "TestRuleSliceRetainsConstantConstrainedColumn",
+        "TestSMTLibRunnerScripts/fixedpoint_spacer_slice_columns.smt2",
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_slice_columns.smt2"
+      ],
       "assertions": [
         {
           "line": 186,
@@ -93006,17 +93015,49 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "sliceability saturation across predicate positions, constants, repeated body variables, interpreted equalities, and parameter variables",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_slice.go",
+          "tests": [
+            "TestRuleSliceRemovesUnconstrainedPredicateColumns",
+            "TestRuleSliceRetainsConstantConstrainedColumn"
+          ]
+        },
+        {
+          "name": "fresh sliced predicate declaration, original-to-derived mapping, output preservation, and rewritten rule construction",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_slice.go",
+          "tests": [
+            "TestRuleSliceRemovesUnconstrainedPredicateColumns",
+            "TestSMTLibRunnerCPPReference/fixedpoint_spacer_slice_columns.smt2"
+          ]
+        },
+        {
+          "name": "slice proof conversion and model interpretation expansion back to original predicate columns",
+          "status": "unported"
+        }
+      ],
+      "ownership": [
+        "The replacement RuleSet owns sliced rules and original/derived declaration mappings; temporary source rules and rewritten rules are closed after transfer."
+      ],
+      "deviations": [
+        "Semantic slicing and direct query remapping are retained; proof conversion and model/answer expansion to removed columns remain unported."
+      ]
     },
     {
       "path": "src/muz/transforms/dl_mk_slice.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/muz/transforms/rule_slice.go"
+      ],
+      "tests": [
+        "TestRuleSliceRemovesUnconstrainedPredicateColumns",
+        "TestRuleSliceRetainsConstantConstrainedColumn"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -93029,8 +93070,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "RuleSlicePlugin construction, transformation contract, derived-predicate lookup, priority, cancellation metadata, and owned lifecycle",
+          "status": "ported",
+          "go_target": "pkg/muz/transforms/rule_slice.go"
+        }
+      ],
+      "ownership": [
+        "RuleTransformer owns and closes the concrete RuleSlicePlugin after its RuleSet mapping has been transferred."
+      ],
       "deviations": []
     },
     {
