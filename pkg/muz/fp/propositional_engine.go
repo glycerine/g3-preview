@@ -317,6 +317,30 @@ func (e *PropositionalEngine) hasUninterpretedRuleSymbol(root ast.ASTHandle) (bo
 		if err != nil {
 			return false, err
 		}
+		datatypeFamily, datatypeErr := e.manager.DatatypeFamilyID()
+		if datatypeErr == nil && family == datatypeFamily && arguments != 0 {
+			declarationKind, x := e.manager.GetDeclKind(declaration)
+			if x != nil {
+				return false, x
+			}
+			if declarationKind == ast.ASTDatatypeAccessor {
+				argument, x := e.manager.GetArg(expression, 0)
+				if x != nil {
+					return false, x
+				}
+				sort, x := e.manager.GetSort(argument)
+				if x != nil {
+					return false, x
+				}
+				constructors, x := e.manager.DatatypeConstructors(sort)
+				if x != nil {
+					return false, x
+				}
+				if len(constructors) > 1 {
+					return true, nil
+				}
+			}
+		}
 		for index := uint32(0); index < arguments; index++ {
 			argument, x := e.manager.GetArg(expression, index)
 			if x != nil {

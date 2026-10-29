@@ -81867,7 +81867,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go", "pkg/parsers/smt2/fixedpoint_commands_test.go"],
-      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates"],
+      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates", "TestPDRAndSpacerRejectPartialDatatypeAccessors"],
       "assertions": [
         {
           "line": 193,
@@ -81890,7 +81890,13 @@
           "tests": ["TestPDRAndSpacerRejectNegativePredicates"]
         },
         {
-          "name": "remaining rule-property collection, existential-tail, quantifier, infinite-sort and datatype checks",
+          "name": "PDR/Spacer check_uninterpreted_free rejection of accessors from datatypes with multiple constructors (rule_properties.cpp:190-196)",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/propositional_engine.go",
+          "tests": ["TestPDRAndSpacerRejectPartialDatatypeAccessors"]
+        },
+        {
+          "name": "remaining rule-property collection, existential-tail, quantifier and infinite-sort checks",
           "status": "unported",
           "go_target": null,
           "tests": []
@@ -81905,7 +81911,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/muz/fp/propositional_engine.go"],
-      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates"],
+      "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates", "TestPDRAndSpacerRejectPartialDatatypeAccessors"],
       "conditionals": [
         {
           "line": 21,
@@ -81920,10 +81926,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "retained PDR/Spacer uninterpreted-free and negative-predicate rule-check surface",
+          "name": "retained PDR/Spacer uninterpreted-free, partial-datatype-accessor and negative-predicate rule-check surface",
           "status": "ported",
           "go_target": "pkg/muz/fp/propositional_engine.go",
-          "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates"]
+          "tests": ["TestSMT2FixedpointPDRRejectsUninterpretedRuleSymbolsLikeCPP", "TestPDRAndSpacerRejectNegativePredicates", "TestPDRAndSpacerRejectPartialDatatypeAccessors"]
         },
         {
           "name": "remaining rule_properties collection and validation surface",

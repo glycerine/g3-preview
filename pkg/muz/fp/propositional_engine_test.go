@@ -17,6 +17,7 @@ import (
 	"github.com/glycerine/g3/pkg/muz/fp"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func fpMust(t *testing.T, err error) {
@@ -624,6 +625,67 @@ func TestPDRAndSpacerRejectNegativePredicates(t *testing.T) {
 			fpMust(t, engine.AddRule(formula, "negative"))
 			if _, err = engine.QueryPredicate(declarations["Q"]); !errors.Is(err, fp.ErrPropositionalHorn) {
 				t.Fatal("unsupported PDR rule was accepted", err)
+			}
+		})
+	}
+}
+
+func TestPDRAndSpacerRejectPartialDatatypeAccessors(t *testing.T) {
+	for _, backend := range []string{"pdr", "spacer"} {
+		t.Run(backend, func(t *testing.T) {
+			context, err := cmd_context.NewStandaloneContext()
+			fpMust(t, err)
+			t.Cleanup(func() { fpMust(t, context.Close()) })
+			manager, err := context.Manager()
+			fpMust(t, err)
+			globals, err := context.GlobalParameters()
+			fpMust(t, err)
+			engine, err := fp.NewPropositionalEngineWithServices(manager, globals.Context, globals)
+			fpMust(t, err)
+			t.Cleanup(func() { fpMust(t, engine.Close()) })
+			fpMust(t, engine.SelectEngine(backend))
+			boolean, err := manager.MkBoolSort()
+			fpMust(t, err)
+			name := func(suffix string) usymbol.Symbol {
+				t.Helper()
+				symbol, x := manager.Symbols.Intern("fp-" + backend + "-partial-datatype-" + suffix)
+				fpMust(t, x)
+				return symbol
+			}
+			sorts, err := manager.MkDatatypes([]ast.DatatypeDefinition{{
+				Name: name("D"),
+				Constructors: []ast.DatatypeConstructorDefinition{
+					{Name: name("A"), Recognizer: name("is-A"), Accessors: []ast.DatatypeAccessorDefinition{{Name: name("value"), Range: boolean}}},
+					{Name: name("B"), Recognizer: name("is-B")},
+				},
+			}})
+			fpMust(t, err)
+			constructors, err := manager.DatatypeConstructors(sorts[0])
+			fpMust(t, err)
+			accessors, err := manager.DatatypeConstructorAccessors(constructors[0])
+			fpMust(t, err)
+			x, err := manager.MkConst(name("x"), sorts[0])
+			fpMust(t, err)
+			fpMust(t, engine.RegisterVariable(x))
+			q, err := manager.MkFuncDecl(name("Q"), nil, boolean, ast.ASTFuncDeclInfo{})
+			fpMust(t, err)
+			qApp, err := manager.MkApp(q, nil)
+			fpMust(t, err)
+			fpMust(t, engine.RegisterPredicate(q))
+			value, err := manager.MkApp(accessors[0], []ast.ASTHandle{x})
+			fpMust(t, err)
+			truth, err := manager.MkTrue()
+			fpMust(t, err)
+			body, err := manager.MkEq(value, truth)
+			fpMust(t, err)
+			formula, err := manager.MkImplies(body, qApp)
+			fpMust(t, err)
+			formulaRef, err := manager.NewRef(formula)
+			fpMust(t, err)
+			t.Cleanup(func() { fpMust(t, manager.DelRef(&formulaRef)) })
+			fpMust(t, engine.AddRule(formula, "partial-datatype-accessor"))
+			if _, err = engine.QueryPredicate(q); !errors.Is(err, fp.ErrPropositionalHorn) {
+				t.Fatal("partial datatype accessor was accepted", err)
 			}
 		})
 	}
