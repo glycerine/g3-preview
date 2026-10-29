@@ -93740,9 +93740,13 @@
       "path": "src/muz/transforms/dl_transforms.cpp",
       "component": "muz",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/muz/fp/spacer_engine.go",
+        "pkg/muz/transforms/bit_blast.go",
+        "pkg/muz/transforms/scale.go",
+        "pkg/muz/transforms/karr_invariants.go",
+        "pkg/muz/transforms/magic_symbolic.go",
         "pkg/muz/transforms/rule_inliner.go",
         "pkg/muz/transforms/interp_tail_simplifier.go",
         "pkg/muz/transforms/coi_plugin.go",
@@ -93768,10 +93772,14 @@
         "TestSMTLibRunnerCPPReference/fp_spacer_array_eq_rewrite.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_array_instantiation.smt2",
         "TestSMTLibRunnerCPPReference/fp_spacer_quantifier_instantiation.smt2",
-        "TestSMTLibRunnerCPPReference/fp_spacer_quantifier_abstraction.smt2"
+        "TestSMTLibRunnerCPPReference/fp_spacer_quantifier_abstraction.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_bit_blast.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_scale.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_karr.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_magic.smt2"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "live Spacer query specialization: clone finalized rules and run the retained acyclic inliner without mutating rules needed by later queries",
@@ -93799,24 +93807,44 @@
           "go_target": "pkg/muz/fp/spacer_engine.go"
         },
         {
-          "name": "remaining ordered default transform stages for bit blasting, scaling, Karr invariants, and magic sets",
-          "status": "unported"
+          "name": "ordered option-gated bit blasting, scaling, Karr invariant, and symbolic magic stages at source priorities 35000, 36030, 36010, and 36020",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/spacer_engine.go",
+          "go_targets": [
+            "pkg/muz/transforms/bit_blast.go",
+            "pkg/muz/transforms/scale.go",
+            "pkg/muz/transforms/karr_invariants.go",
+            "pkg/muz/transforms/magic_symbolic.go"
+          ],
+          "tests": [
+            "TestSMTLibRunnerCPPReference/fp_spacer_bit_blast.smt2",
+            "TestSMTLibRunnerCPPReference/fp_spacer_scale.smt2",
+            "TestSMTLibRunnerCPPReference/fp_spacer_karr.smt2",
+            "TestSMTLibRunnerCPPReference/fp_spacer_magic.smt2"
+          ]
         }
       ],
       "ownership": [
-        "Each Spacer query owns a finalized transformed RuleSet clone until Context initialization has retained its rules; the engine's original set remains available for subsequent queries."
+        "Each Spacer query owns a finalized transformed RuleSet clone until Context initialization has retained its rules; the engine's original set remains available for subsequent queries.",
+        "RuleTransformer owns every registered transform through application and closure; model-reconstruction state is copied into the Spacer engine before those plugins close."
       ],
       "deviations": [
-        "Every source-scheduled cone, interpreted-tail, subsumption, inliner, array-instantiation/equality/blasting, quantified-instantiation, and array-quantification round reached by the retained Spacer consumer is integrated. Bit blasting, scaling, Karr invariants, and magic sets remain pending."
+        "The source apply_default_transformation entry point is retained as the Spacer engine's per-query preparation path. Transform implementations remain split into concrete Go plugins rather than a universal factory layer."
       ]
     },
     {
       "path": "src/muz/transforms/dl_transforms.h",
       "component": "muz",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "ported",
+      "go_targets": ["pkg/muz/fp/spacer_engine.go"],
+      "tests": [
+        "TestSMTLibRunnerCPPReference/fixedpoint_spacer_acyclic_inlining.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_bit_blast.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_scale.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_karr.smt2",
+        "TestSMTLibRunnerCPPReference/fp_spacer_magic.smt2"
+      ],
       "conditionals": [
         {
           "line": 21,
@@ -93827,11 +93855,21 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "apply_default_transformation retained Spacer entry point",
+          "status": "ported",
+          "go_target": "pkg/muz/fp/spacer_engine.go"
+        }
+      ],
+      "ownership": [
+        "The Spacer engine owns the prepared RuleSet and transferred model-reconstruction state across the query boundary."
+      ],
+      "deviations": [
+        "The package-private Go preparation method replaces the C++ free function while preserving the retained consumer boundary."
+      ]
     },
     {
       "path": "src/nlsat/CMakeLists.txt",
