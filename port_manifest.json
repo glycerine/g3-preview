@@ -4838,6 +4838,7 @@
       ],
       "tests": [
         "TestSMTContextArrayHelpersNativeAndNested",
+        "TestSMTContextArrayMapDefaultAndSetHelpers",
         "TestSMTContextArrayHelpersRejectMalformedRequests",
         "TestSMTContextArrayHelpersClosedGuards"
       ],
@@ -4853,11 +4854,21 @@
             "TestSMTContextArrayHelpersRejectMalformedRequests",
             "TestSMTContextArrayHelpersClosedGuards"
           ]
+        },
+        {
+          "name": "array map/default and array-backed set construction, algebra, membership, addition and deletion operations (api_array.cpp:158-285)",
+          "status": "ported",
+          "go_target": "pkg/api/api_arrays.go",
+          "tests": [
+            "TestSMTContextArrayMapDefaultAndSetHelpers",
+            "TestSMTContextArrayHelpersRejectMalformedRequests",
+            "TestSMTContextArrayHelpersClosedGuards"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The Go public API accepts complete array sorts for constant arrays, which supports native multi-index arrays directly; NestedArraySort, NestedConstantArray, NestedArraySelect and NestedArrayStore are additive typed conveniences for right-nested arrays. Typed AST handles and Go slices replace C pointer arrays and error codes. Remaining map, default and set API operations keep this source unit partial."
+        "The Go public API accepts complete array sorts for constant arrays, which supports native multi-index arrays directly; NestedArraySort, NestedConstantArray, NestedArraySelect and NestedArrayStore are additive typed conveniences for right-nested arrays. Typed AST handles and Go slices replace C pointer arrays and error codes. Set constants accept the element sort and construct their Boolean array sort internally. Array extensionality witnesses, as-array and duplicated public sort-accessor wrappers remain open; the AST manager already exposes the retained sort accessors directly."
       ]
     },
     {

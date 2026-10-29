@@ -55,6 +55,38 @@ func (c *SMTContext) ConstantArray(arraySort, value ast.ASTHandle) (ast.ASTHandl
 	return manager.MkConstArray(arraySort, value)
 }
 
+// ArrayMap applies a function pointwise to one or more arrays with matching
+// index sorts.
+func (c *SMTContext) ArrayMap(function ast.ASTHandle, arrays ...ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if len(arrays) == 0 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkArrayMap(function, ast.SliceArguments(arrays))
+}
+
+// ArrayDefault returns the default value associated with an array.
+func (c *SMTContext) ArrayDefault(array ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	family, err := manager.ArrayFamilyID()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkFamilyApp(family, ast.ASTArrayOpDefault, nil, []ast.ASTHandle{array})
+}
+
 // NestedConstantArray constructs a right-nested constant array whose leaf is
 // value. Index sorts are ordered outermost to innermost.
 func (c *SMTContext) NestedConstantArray(indexSorts []ast.ASTHandle, value ast.ASTHandle) (ast.ASTHandle, error) {
@@ -168,4 +200,123 @@ func (c *SMTContext) NestedArrayStore(array ast.ASTHandle, indices []ast.ASTHand
 		return ast.ASTHandle{}, err
 	}
 	return c.ArrayStore(array, indices[:1], updated)
+}
+
+// SetSort constructs the array-backed set sort for an element sort.
+func (c *SMTContext) SetSort(elementSort ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	boolean, err := manager.MkBoolSort()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkArraySort(ast.SliceArguments([]ast.ASTHandle{elementSort}), boolean)
+}
+
+// EmptySet constructs an empty set over an element sort.
+func (c *SMTContext) EmptySet(elementSort ast.ASTHandle) (ast.ASTHandle, error) {
+	setSort, err := c.SetSort(elementSort)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkEmptySet(setSort)
+}
+
+// FullSet constructs the set containing every value of an element sort.
+func (c *SMTContext) FullSet(elementSort ast.ASTHandle) (ast.ASTHandle, error) {
+	setSort, err := c.SetSort(elementSort)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkFullSet(setSort)
+}
+
+func (c *SMTContext) setApplication(kind int32, sets []ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	family, err := manager.ArrayFamilyID()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return manager.MkFamilyApp(family, kind, nil, sets)
+}
+
+// SetUnion constructs the union of one or more sets.
+func (c *SMTContext) SetUnion(sets ...ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.setApplication(ast.ASTArrayOpSetUnion, sets)
+}
+
+// SetIntersection constructs the intersection of one or more sets.
+func (c *SMTContext) SetIntersection(sets ...ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.setApplication(ast.ASTArrayOpSetIntersect, sets)
+}
+
+// SetDifference constructs the relative complement of right in left.
+func (c *SMTContext) SetDifference(left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.setApplication(ast.ASTArrayOpSetDifference, []ast.ASTHandle{left, right})
+}
+
+// SetComplement constructs the complement of a set.
+func (c *SMTContext) SetComplement(set ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.setApplication(ast.ASTArrayOpSetComplement, []ast.ASTHandle{set})
+}
+
+// SetSubset reports whether left is a subset of right.
+func (c *SMTContext) SetSubset(left, right ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.setApplication(ast.ASTArrayOpSetSubset, []ast.ASTHandle{left, right})
+}
+
+// SetMember reports whether an element belongs to a set.
+func (c *SMTContext) SetMember(element, set ast.ASTHandle) (ast.ASTHandle, error) {
+	return c.ArraySelect(set, element)
+}
+
+// SetAdd returns a set that additionally contains element.
+func (c *SMTContext) SetAdd(set, element ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	value, err := manager.MkTrue()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return c.ArrayStore(set, []ast.ASTHandle{element}, value)
+}
+
+// SetDelete returns a set without element.
+func (c *SMTContext) SetDelete(set, element ast.ASTHandle) (ast.ASTHandle, error) {
+	if err := c.open(); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	manager, err := c.command.Manager()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	value, err := manager.MkFalse()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return c.ArrayStore(set, []ast.ASTHandle{element}, value)
 }
