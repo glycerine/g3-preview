@@ -518,7 +518,7 @@ func (c *Context) mkSolver(m *ast.ASTManager) error {
 		c.solver, err = portfolio.NewQFLRAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
 	case "QF_NRA":
 		c.solver, err = portfolio.NewQFNRAStrategicSolver(m, &c.params, proofs, models, cores, c.config)
-	case "QF_FPBV", "QF_BVFP":
+	case "QF_FP", "QF_FPBV", "QF_BVFP":
 		c.solver, err = portfolio.NewQFFPStrategicSolverWithOutput(m, &c.params, proofs, models, cores, c.logic, c.config, contextRegularOutput{c})
 	case "QF_NIA":
 		c.solver, err = portfolio.NewQFNIAStrategicSolverWithOutput(m, &c.params, proofs, models, cores, c.config, contextRegularOutput{c})

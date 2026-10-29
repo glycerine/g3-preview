@@ -8,23 +8,11 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-func moveFirstTacticResultWithMetadata(g *Goal, out, source *TacticResult) error {
+func moveFirstTacticResultWithMetadata(g *Goal, out, source *TacticResult, modes goalModes) error {
 	if len(source.Goals) == 0 {
 		return ast.ErrASTDomain
 	}
-	models, err := g.ModelsEnabled()
-	if err != nil {
-		return err
-	}
-	proofs, err := g.ProofsEnabled()
-	if err != nil {
-		return err
-	}
-	cores, err := g.UnsatCoresEnabled()
-	if err != nil {
-		return err
-	}
-	if err = out.prepare(source.manager); err != nil {
+	if err := out.prepare(source.manager); err != nil {
 		return err
 	}
 	out.Goals = append(out.Goals, source.Goals[0])
@@ -33,18 +21,18 @@ func moveFirstTacticResultWithMetadata(g *Goal, out, source *TacticResult) error
 	source.goalOwned[0] = false
 	source.Goals = source.Goals[1:]
 	source.goalOwned = source.goalOwned[1:]
-	if models && source.ModelConverter != nil {
-		if err = out.SetModelConverter(source.ModelConverter); err != nil {
+	if modes.models && source.ModelConverter != nil {
+		if err := out.SetModelConverter(source.ModelConverter); err != nil {
 			return err
 		}
 	}
-	if proofs && source.ProofConverter != nil {
-		if err = out.SetProofConverter(source.ProofConverter); err != nil {
+	if modes.proofs && source.ProofConverter != nil {
+		if err := out.SetProofConverter(source.ProofConverter); err != nil {
 			return err
 		}
 	}
-	if cores && !source.Core.IsNull() {
-		if err = out.SetCore(source.Core); err != nil {
+	if modes.cores && !source.Core.IsNull() {
+		if err := out.SetCore(source.Core); err != nil {
 			return err
 		}
 	}
@@ -57,6 +45,10 @@ func (t *unaryTactic) repeatAt(depth uint64, g *Goal, out *TacticResult) (result
 			return err
 		}
 		return out.AddGoal(g)
+	}
+	modes, err := readGoalModes(g)
+	if err != nil {
+		return err
 	}
 	snapshot, err := NewGoalConfigCopy(g)
 	if err != nil {
@@ -80,7 +72,7 @@ func (t *unaryTactic) repeatAt(depth uint64, g *Goal, out *TacticResult) (result
 		return err
 	}
 	if equal {
-		return moveFirstTacticResultWithMetadata(g, out, first)
+		return moveFirstTacticResultWithMetadata(g, out, first, modes)
 	}
 	if len(first.Goals) == 0 {
 		return ast.ErrASTDomain
@@ -88,17 +80,13 @@ func (t *unaryTactic) repeatAt(depth uint64, g *Goal, out *TacticResult) (result
 	if len(first.Goals) != 1 {
 		return composeMultipleTacticResults(g, out, first, func(next *Goal, target *TacticResult) error {
 			return t.repeatAt(depth+1, next, target)
-		})
-	}
-	models, err := g.ModelsEnabled()
-	if err != nil {
-		return err
+		}, modes)
 	}
 	if first.Goals[0].IsDecided() {
 		if err = out.moveGoalsFrom(first); err != nil {
 			return err
 		}
-		if models && first.ModelConverter != nil {
+		if modes.models && first.ModelConverter != nil {
 			return out.SetModelConverter(first.ModelConverter)
 		}
 		return nil
@@ -112,7 +100,7 @@ func (t *unaryTactic) repeatAt(depth uint64, g *Goal, out *TacticResult) (result
 	if err = out.moveGoalsFrom(second); err != nil {
 		return err
 	}
-	if models {
+	if modes.models {
 		combined, err := ConcatModels(g.manager.Budget(), second.ModelConverter, first.ModelConverter)
 		if err != nil {
 			return err
@@ -121,11 +109,7 @@ func (t *unaryTactic) repeatAt(depth uint64, g *Goal, out *TacticResult) (result
 			return err
 		}
 	}
-	proofs, err := g.ProofsEnabled()
-	if err != nil {
-		return err
-	}
-	if proofs {
+	if modes.proofs {
 		combined, err := ConcatProofConverters(g.manager.Budget(), second.ProofConverter, first.ProofConverter)
 		if err != nil {
 			return err
@@ -134,11 +118,7 @@ func (t *unaryTactic) repeatAt(depth uint64, g *Goal, out *TacticResult) (result
 			return err
 		}
 	}
-	cores, err := g.UnsatCoresEnabled()
-	if err != nil {
-		return err
-	}
-	if cores {
+	if modes.cores {
 		combined, err := g.manager.DependencyJoin(first.Core, second.Core)
 		if err != nil {
 			return err

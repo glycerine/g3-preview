@@ -12,7 +12,6 @@ import (
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
 	"github.com/glycerine/g3/pkg/smtcore"
 	"github.com/glycerine/g3/pkg/tactic"
-	"github.com/glycerine/g3/pkg/tactic/arith"
 	"github.com/glycerine/g3/pkg/tactic/bv"
 	"github.com/glycerine/g3/pkg/tactic/core"
 	fpatactic "github.com/glycerine/g3/pkg/tactic/fpa"
@@ -88,7 +87,7 @@ func NewQFFPTacticWithOutput(m *ast.ASTManager, p *uparams.ParamsRef, config smt
 	smt := b.keep(smtcore.NewSMTTactic(m, p, config))
 	sat := b.clean(b.keep(sattactic.NewSATTactic(c, p, config.ModelEvaluator, output)))
 	propositionalBackend := b.keep(tactic.NewCondTactic(proofs, smt, sat))
-	nonlinearReal := b.probe(arith.NewArithmeticFragmentProbe(m.Budget(), c, g, arith.FragmentQFNRA))
+	nonlinearReal := b.probe(newIsFPQFNRAProbe(m.Budget()))
 	nonlinearBackend := b.keep(NewQFNRATactic(m, p, config))
 	fallbackSMT := b.keep(smtcore.NewSMTTactic(m, p, config))
 	nonpropositionalBackend := b.keep(tactic.NewCondTactic(nonlinearReal, nonlinearBackend, fallbackSMT))

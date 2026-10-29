@@ -18,6 +18,32 @@ type converterSkipTactic struct {
 	converter ModelConverter
 }
 
+type replacingGoalTactic struct{ *primitiveTactic }
+
+func (t *replacingGoalTactic) Apply(g *Goal, out *TacticResult) error {
+	replacement, err := NewGoalConfigCopy(g)
+	if err != nil {
+		return err
+	}
+	published := false
+	defer func() {
+		if !published {
+			_ = replacement.Close()
+		}
+	}()
+	if err = g.CopyTo(replacement); err != nil {
+		return err
+	}
+	if err = out.Prepare(g.manager); err != nil {
+		return err
+	}
+	if err = out.TakeGoal(replacement); err != nil {
+		return err
+	}
+	published = true
+	return g.Close()
+}
+
 func (t *converterSkipTactic) Apply(g *Goal, out *TacticResult) error {
 	if err := t.primitiveTactic.Apply(g, out); err != nil {
 		return err
@@ -55,6 +81,31 @@ func TestAndThenSingleGoalAndDecidedShortcut(t *testing.T) {
 	astTestMust(t, sequence.Apply(decided, out))
 	if first.applications != 2 || second.applications != 1 || len(out.Goals) != 1 || out.Goals[0] != decided {
 		t.Fatal("decided shortcut", first.applications, second.applications, len(out.Goals))
+	}
+	astTestMust(t, out.Close())
+}
+
+func TestAndThenSnapshotsModesBeforeOwnedGoalReplacement(t *testing.T) {
+	m := astTestManager(t)
+	g, err := NewGoal(m, false, true, true)
+	astTestMust(t, err)
+	astTestMust(t, g.Assert(goalTestAtom(t, m, "and-then-replaced")))
+	first := &replacingGoalTactic{primitiveTactic: newPrimitiveTactic(primitiveSkip, "", 0)}
+	second := &countingSkipTactic{primitiveTactic: newPrimitiveTactic(primitiveSkip, "", 0)}
+	sequence, err := NewAndThenTactic(first, second)
+	astTestMust(t, err)
+	tacticOwnForTest(t, sequence)
+	out := &TacticResult{}
+	astTestMust(t, sequence.Apply(g, out))
+	if second.applications != 1 || len(out.Goals) != 1 || out.Goals[0] == g {
+		t.Fatal("replacement was not composed", second.applications, out.Goals)
+	}
+	models, err := out.Goals[0].ModelsEnabled()
+	astTestMust(t, err)
+	cores, err := out.Goals[0].UnsatCoresEnabled()
+	astTestMust(t, err)
+	if !models || !cores {
+		t.Fatal("replacement modes", models, cores)
 	}
 	astTestMust(t, out.Close())
 }

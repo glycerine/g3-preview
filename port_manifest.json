@@ -171770,32 +171770,47 @@
       "path": "src/tactic/fpa/qffp_tactic.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/smtlogics/qffp_tactic.go",
+        "pkg/tactic/smtlogics/qffp_probe.go",
+        "pkg/tactic/smtlogics/qffp_probe_test.go",
         "pkg/tactic/portfolio/smt_strategic_solver.go",
         "pkg/cmd_context/context.go",
+        "pkg/cmd_context/tactic_commands.go",
         "pkg/cmd/g3/main_test.go",
-        "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2"
+        "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qffp_solver_models_scopes.smt2",
+        "pkg/cmd/g3/test_vectors/qfnra_boolean.smt2"
       ],
       "tests": [
+        "TestQFFPSourceStructuralProbeOrdering",
         "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
-        "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2"
+        "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2",
+        "TestSMTLibRunnerScripts/qffp_solver_models_scopes.smt2",
+        "TestSMTLibRunnerCPPReference/qffp_solver_models_scopes.smt2",
+        "TestSMTLibRunnerScripts/qfnra_boolean.smt2",
+        "TestSMTLibRunnerCPPReference/qfnra_boolean.smt2"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "retained QF_FPBV/QF_BVFP simplify, FPA-to-BV, Ackermannization, bit-blast, SAT-or-SMT strategy and combined-solver command dispatch",
+          "name": "complete QF_FP/QF_FPBV/QF_BVFP simplify, FPA-to-BV, Ackermannization, bit-blast, exact source FP/QF_NRA structural probe, SAT/QF_NRA/SMT strategy and combined-solver/explicit-tactic command dispatch",
           "status": "ported",
           "go_targets": [
             "pkg/tactic/smtlogics/qffp_tactic.go",
+            "pkg/tactic/smtlogics/qffp_probe.go",
             "pkg/tactic/portfolio/smt_strategic_solver.go",
-            "pkg/cmd_context/context.go"
+            "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go"
           ],
           "tests": [
+            "TestQFFPSourceStructuralProbeOrdering",
             "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
-            "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2"
+            "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2",
+            "TestSMTLibRunnerScripts/qffp_solver_models_scopes.smt2",
+            "TestSMTLibRunnerCPPReference/qffp_solver_models_scopes.smt2"
           ]
         }
       ],
@@ -171803,20 +171818,24 @@
         "The returned parameterized tactical independently owns the composed children before construction owners are released; FPA-to-BV goal/model conversion ownership is recorded with its source unit."
       ],
       "deviations": [
-        "The source is_fp_qfnra structural probe is not yet retained. The current post-bit-blast fallback uses the concrete QF_NRA arithmetic-fragment probe; default QF_FP therefore remains on direct SMT, while QF_FPBV and QF_BVFP use the retained strategic route."
+        "The source probe's ordering is preserved literally: its first family guard rejects basic-family applications before the later basic-family branch can be reached. Native Go traversal and typed family/sort accessors replace the source exception-based visitor."
       ]
     },
     {
       "path": "src/tactic/fpa/qffp_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
-        "pkg/tactic/smtlogics/qffp_tactic.go"
+        "pkg/tactic/smtlogics/qffp_tactic.go",
+        "pkg/tactic/smtlogics/qffp_probe.go"
       ],
       "tests": [
+        "TestQFFPSourceStructuralProbeOrdering",
         "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
-        "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2"
+        "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2",
+        "TestSMTLibRunnerScripts/qffp_solver_models_scopes.smt2",
+        "TestSMTLibRunnerCPPReference/qffp_solver_models_scopes.smt2"
       ],
       "conditionals": [
         {
@@ -171828,12 +171847,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "QF_FP tactic factory surface used by the retained QF_FPBV/QF_BVFP command route",
-          "status": "partial",
+          "name": "QF_FP tactic and structural-probe factory surface used by QF_FP/QF_FPBV/QF_BVFP command routes",
+          "status": "ported",
           "go_target": "pkg/tactic/smtlogics/qffp_tactic.go",
           "tests": [
             "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2"
@@ -171841,9 +171860,7 @@
         }
       ],
       "ownership": [],
-      "deviations": [
-        "The source structural QF_FP/QF_NRA probe factory remains open with the default QF_FP route."
-      ]
+      "deviations": []
     },
     {
       "path": "src/tactic/fpa/qffplra_tactic.cpp",
@@ -173754,18 +173771,22 @@
           ]
         },
         {
-          "name": "Retained QF_FPBV and QF_BVFP branches select the floating-point reduction strategy and combine tactic2solver with incremental SMT under source fallback and result-provider policy",
+          "name": "Retained QF_FP, QF_FPBV and QF_BVFP branches select the floating-point reduction strategy and combine tactic2solver with incremental SMT under source fallback and result-provider policy",
           "status": "ported",
           "go_targets": [
             "pkg/tactic/smtlogics/qffp_tactic.go",
             "pkg/tactic/portfolio/smt_strategic_solver.go",
             "pkg/cmd_context/context.go",
+            "pkg/cmd_context/tactic_commands.go",
             "pkg/cmd/g3/main_test.go",
-            "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2"
+            "pkg/cmd/g3/test_vectors/fpa_canonical_model_scopes.smt2",
+            "pkg/cmd/g3/test_vectors/qffp_solver_models_scopes.smt2"
           ],
           "tests": [
             "TestSMTLibRunnerScripts/fpa_canonical_model_scopes.smt2",
-            "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2"
+            "TestSMTLibRunnerCPPReference/fpa_canonical_model_scopes.smt2",
+            "TestSMTLibRunnerScripts/qffp_solver_models_scopes.smt2",
+            "TestSMTLibRunnerCPPReference/qffp_solver_models_scopes.smt2"
           ]
         },
         {
@@ -173947,7 +173968,7 @@
         "Construction uses local counted tactic/solver references. The returned combined solver owns both child solvers; the tactic solver owns the concrete strategy. Context closes the combined owner before manager/services teardown. Evaluator/parameter services are borrowed through the same concrete configuration used by the incremental backend."
       ],
       "deviations": [
-        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL, QF_LIA, QF_FPBV and QF_BVFP branches use shared combined-solver construction. The general ALL dispatcher now has a narrow OP_AS_ARRAY branch; its complete default classifier and other remaining branches are unported. Output-taking QF_IDL/QF_LIA/QF_FP constructors borrow io.Writer; convenience factories default to os.Stdout. Default QF_FP awaits the exact retained structural FP/NRA probe."
+        "Retained QF_AUFLIA, QF_LRA, QF_UF, QF_IDL, QF_LIA, QF_FP, QF_FPBV and QF_BVFP branches use shared combined-solver construction. The general ALL dispatcher now has a narrow OP_AS_ARRAY branch; its complete default classifier and other remaining branches are unported. Output-taking QF_IDL/QF_LIA/QF_FP constructors borrow io.Writer; convenience factories default to os.Stdout."
       ]
     },
     {
@@ -178527,6 +178548,7 @@
         "TestConditionalTacticsChooseWhenAndFailIf",
         "TestConditionalTacticsGoalProductionGuards",
         "TestAndThenSingleGoalAndDecidedShortcut",
+        "TestAndThenSnapshotsModesBeforeOwnedGoalReplacement",
         "TestAndThenNarySourceOrder",
         "TestAndThenComposesSingleGoalModelConverters",
         "TestAndThenFansOutAcrossMultipleSubgoals",
@@ -178753,11 +178775,12 @@
           ]
         },
         {
-          "name": "and_then construction, lifecycle, single and multiple subgoal execution, converter partitioning, decided-SAT selection and all-UNSAT proof/core collapse (tactical.cpp:26-271)",
+          "name": "and_then construction, lifecycle, pre-application goal-mode snapshots, single and multiple subgoal execution, converter partitioning, decided-SAT selection and all-UNSAT proof/core collapse (tactical.cpp:26-271)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_and_then.go",
           "tests": [
             "TestAndThenSingleGoalAndDecidedShortcut",
+            "TestAndThenSnapshotsModesBeforeOwnedGoalReplacement",
             "TestAndThenNarySourceOrder",
             "TestAndThenComposesSingleGoalModelConverters",
             "TestAndThenFansOutAcrossMultipleSubgoals",
@@ -178890,6 +178913,7 @@
       "tests": [
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
         "TestAndThenSingleGoalAndDecidedShortcut",
+        "TestAndThenSnapshotsModesBeforeOwnedGoalReplacement",
         "TestAndThenNarySourceOrder",
         "TestAndThenComposesSingleGoalModelConverters",
         "TestAndThenFansOutAcrossMultipleSubgoals",
@@ -178940,6 +178964,7 @@
           "go_target": "pkg/tactic/tactic_and_then.go",
           "tests": [
             "TestAndThenSingleGoalAndDecidedShortcut",
+            "TestAndThenSnapshotsModesBeforeOwnedGoalReplacement",
             "TestAndThenNarySourceOrder",
             "TestAndThenComposesSingleGoalModelConverters",
             "TestAndThenFansOutAcrossMultipleSubgoals",

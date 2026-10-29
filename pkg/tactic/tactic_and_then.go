@@ -90,32 +90,48 @@ func (t *andThenTactic) Apply(g *Goal, out *TacticResult) (result error) {
 	if g == nil || out == nil {
 		return ast.ErrASTHandle
 	}
+	modes, err := readGoalModes(g)
+	if err != nil {
+		return err
+	}
 	first := &TacticResult{}
 	defer func() { result = errors.Join(result, first.Close()) }()
 	if err := t.first.Apply(g, first); err != nil {
 		return err
 	}
-	return composeTacticResults(g, out, first, t.second.Apply)
+	return composeTacticResults(g, out, first, t.second.Apply, modes)
 }
 
 type tacticApplyFunc func(*Goal, *TacticResult) error
 
-func composeTacticResults(g *Goal, out, first *TacticResult, applySecond tacticApplyFunc) (result error) {
+type goalModes struct{ models, proofs, cores bool }
+
+func readGoalModes(g *Goal) (goalModes, error) {
+	models, err := g.ModelsEnabled()
+	if err != nil {
+		return goalModes{}, err
+	}
+	proofs, err := g.ProofsEnabled()
+	if err != nil {
+		return goalModes{}, err
+	}
+	cores, err := g.UnsatCoresEnabled()
+	return goalModes{models: models, proofs: proofs, cores: cores}, err
+}
+
+func composeTacticResults(g *Goal, out, first *TacticResult, applySecond tacticApplyFunc, modes goalModes) (result error) {
+	var err error
 	if len(first.Goals) == 0 {
 		return ast.ErrASTDomain
 	}
 	if len(first.Goals) != 1 {
-		return composeMultipleTacticResults(g, out, first, applySecond)
-	}
-	models, err := g.ModelsEnabled()
-	if err != nil {
-		return err
+		return composeMultipleTacticResults(g, out, first, applySecond, modes)
 	}
 	if first.Goals[0].IsDecided() {
 		if err = out.moveGoalsFrom(first); err != nil {
 			return err
 		}
-		if models && first.ModelConverter != nil {
+		if modes.models && first.ModelConverter != nil {
 			return out.SetModelConverter(first.ModelConverter)
 		}
 		return nil
@@ -129,7 +145,7 @@ func composeTacticResults(g *Goal, out, first *TacticResult, applySecond tacticA
 	if err = out.moveGoalsFrom(second); err != nil {
 		return err
 	}
-	if models {
+	if modes.models {
 		combined, err := ConcatModels(g.manager.Budget(), first.ModelConverter, second.ModelConverter)
 		if err != nil {
 			return err
@@ -138,11 +154,7 @@ func composeTacticResults(g *Goal, out, first *TacticResult, applySecond tacticA
 			return err
 		}
 	}
-	proofs, err := g.ProofsEnabled()
-	if err != nil {
-		return err
-	}
-	if proofs {
+	if modes.proofs {
 		combined, err := ConcatProofConverters(g.manager.Budget(), first.ProofConverter, second.ProofConverter)
 		if err != nil {
 			return err
@@ -151,11 +163,7 @@ func composeTacticResults(g *Goal, out, first *TacticResult, applySecond tacticA
 			return err
 		}
 	}
-	cores, err := g.UnsatCoresEnabled()
-	if err != nil {
-		return err
-	}
-	if cores {
+	if modes.cores {
 		combined, err := g.manager.DependencyJoin(first.Core, second.Core)
 		if err != nil {
 			return err
@@ -167,19 +175,8 @@ func composeTacticResults(g *Goal, out, first *TacticResult, applySecond tacticA
 	return nil
 }
 
-func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond tacticApplyFunc) (result error) {
-	models, err := g.ModelsEnabled()
-	if err != nil {
-		return err
-	}
-	proofs, err := g.ProofsEnabled()
-	if err != nil {
-		return err
-	}
-	cores, err := g.UnsatCoresEnabled()
-	if err != nil {
-		return err
-	}
+func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond tacticApplyFunc, modes goalModes) (result error) {
+	var err error
 	if err = out.prepare(g.manager); err != nil {
 		return err
 	}
@@ -207,7 +204,7 @@ func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond
 			if err = out.appendMovedGoalsFrom(branch); err != nil {
 				return err
 			}
-			if models {
+			if modes.models {
 				if err = publishComposedSATModel(g, out, first.ModelConverter, branch.ModelConverter, uint32(subgoalIndex)); err != nil {
 					return err
 				}
@@ -215,10 +212,10 @@ func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond
 			return nil
 		}
 		if branch.DecidedUnsat() {
-			if models {
+			if modes.models {
 				modelConverters = append(modelConverters, nil)
 			}
-			if proofs {
+			if modes.proofs {
 				proof, err := branch.Goals[0].Proof(0)
 				if err != nil {
 					return err
@@ -229,10 +226,10 @@ func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond
 				}
 				proofConverters = append(proofConverters, converter)
 			}
-			if models || proofs {
+			if modes.models || modes.proofs {
 				sizes = append(sizes, 0)
 			}
-			if cores {
+			if modes.cores {
 				dependency, err := branch.Goals[0].Dependency(0)
 				if err != nil {
 					return err
@@ -244,16 +241,16 @@ func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond
 			}
 			continue
 		}
-		if models {
+		if modes.models {
 			modelConverters = append(modelConverters, branch.ModelConverter)
 		}
-		if proofs {
+		if modes.proofs {
 			proofConverters = append(proofConverters, branch.ProofConverter)
 		}
-		if models || proofs {
+		if modes.models || modes.proofs {
 			sizes = append(sizes, uint32(len(branch.Goals)))
 		}
-		if cores {
+		if modes.cores {
 			core, err = g.manager.DependencyJoin(core, branch.Core)
 			if err != nil {
 				return err
@@ -268,7 +265,7 @@ func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond
 			return err
 		}
 		var proof ast.ASTHandle
-		if proofs {
+		if modes.proofs {
 			defer func() {
 				for _, converter := range proofConverters {
 					if converter != nil {
@@ -298,7 +295,7 @@ func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond
 		}
 		return out.AddGoal(g)
 	}
-	if models {
+	if modes.models {
 		combined, err := concatTacticModelSubgoals(g.manager.Budget(), first.ModelConverter, modelConverters, sizes)
 		if err != nil {
 			return err
@@ -307,7 +304,7 @@ func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond
 			return err
 		}
 	}
-	if proofs {
+	if modes.proofs {
 		combined, err := ConcatStarProofConverters(g.manager.Budget(), first.ProofConverter, proofConverters, sizes)
 		if err != nil {
 			return err
@@ -316,7 +313,7 @@ func composeMultipleTacticResults(g *Goal, out, first *TacticResult, applySecond
 			return err
 		}
 	}
-	if cores {
+	if modes.cores {
 		if err = out.SetCore(core); err != nil {
 			return err
 		}
