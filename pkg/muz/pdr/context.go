@@ -41,6 +41,7 @@ type Context struct {
 	maxDepth     uint32
 	useFarkas    bool
 	farkasActive bool
+	useInductive bool
 	initialized  bool
 	closed       bool
 }
@@ -53,7 +54,7 @@ func NewContext(manager *ast.ASTManager, params *uparams.ParamsRef, maximumConte
 	if err != nil {
 		return nil, err
 	}
-	result := &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(false), lastResult: lbool.Undef}
+	result := &Context{manager: manager, owner: owner, cacheMode: cacheMode, search: NewModelSearch(false), lastResult: lbool.Undef, useInductive: true}
 	fail := func(cause error) (*Context, error) {
 		cleanup := result.Close()
 		if cleanup != nil {
@@ -116,6 +117,19 @@ func (c *Context) SetUseFarkas(enabled bool) error {
 		return ast.ErrASTDomain
 	}
 	c.useFarkas = enabled
+	return nil
+}
+
+// SetUseInductiveGeneralizer selects the source Boolean inductive core
+// minimizer. It must be set before Initialize.
+func (c *Context) SetUseInductiveGeneralizer(enabled bool) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if c.initialized {
+		return ast.ErrASTDomain
+	}
+	c.useInductive = enabled
 	return nil
 }
 

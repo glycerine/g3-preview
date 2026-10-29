@@ -717,6 +717,39 @@ func (p *PredicateTransformer) IsInvariant(level uint32, property ast.ASTHandle,
 	return result.Status == lbool.False, result.AssumesLevel, result.Core, err
 }
 
+// CheckInductive tests whether the conjunction of literals is inductive at a
+// frame. On success it returns the subset core selected by the SMT solver.
+// Returned handles remain valid until the next check on this transformer.
+func (p *PredicateTransformer) CheckInductive(level uint32, literals []ast.ASTHandle) (bool, bool, []ast.ASTHandle, error) {
+	if err := p.open(); err != nil {
+		return false, false, nil, err
+	}
+	if level == InfinityLevel {
+		return false, false, nil, ast.ErrASTDomain
+	}
+	states, err := p.manager.MkAndArray(literals)
+	if err != nil {
+		return false, false, nil, err
+	}
+	states, err = p.manager.MkNotSimplified(states)
+	if err != nil {
+		return false, false, nil, err
+	}
+	assumptions, err := p.makeAssumptions(p.head, states)
+	if err != nil {
+		return false, false, nil, err
+	}
+	formula, err := p.manager.MkAndArray(assumptions)
+	if err != nil {
+		return false, false, nil, err
+	}
+	if err = p.solver.SetSubsetBasedCore(true); err != nil {
+		return false, false, nil, err
+	}
+	result, err := p.solver.CheckAtLevelAndFormula(level, literals, formula, true, false)
+	return result.Status == lbool.False, result.AssumesLevel, result.Core, err
+}
+
 func (p *PredicateTransformer) Rules() ([]*base.Rule, error) {
 	if err := p.open(); err != nil {
 		return nil, err

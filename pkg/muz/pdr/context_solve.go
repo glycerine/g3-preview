@@ -61,12 +61,22 @@ func (c *Context) expandNode(node *ModelNode) (resultStatus lbool.LBool, resultE
 		return lbool.True, nil
 	}
 	if check.Status == lbool.False {
-		lemma, x := c.owner.NotAnd(check.Core)
+		core := check.Core
+		usesLevel := check.AssumesLevel
+		var coreReferences []ast.ASTRef
+		if c.useInductive {
+			core, coreReferences, usesLevel, err = generalizeBoolInductiveCore(node.transformer, node.level, core, usesLevel, 0)
+			if err != nil {
+				return lbool.Undef, fmt.Errorf("muz/pdr: Boolean inductive core generalization: %w", err)
+			}
+			defer func() { resultErr = errors.Join(resultErr, closeASTRefs(c.manager, coreReferences)) }()
+		}
+		lemma, x := c.owner.NotAnd(core)
 		if x != nil {
 			return lbool.Undef, fmt.Errorf("muz/pdr: core negation: %w", x)
 		}
 		level := InfinityLevel
-		if check.AssumesLevel {
+		if usesLevel {
 			level = node.level
 		}
 		if _, x = node.transformer.AddProperty(lemma, level); x != nil {

@@ -726,6 +726,7 @@ func (p *PropSolver) check(atoms []ast.ASTHandle, formula ast.ASTHandle, level *
 	if err := p.open(); err != nil {
 		return result, err
 	}
+	defer func() { p.subsetCore = false }()
 	if err := p.clearCoreReferences(); err != nil {
 		return result, err
 	}
@@ -840,6 +841,16 @@ func (p *PropSolver) CheckAtLevel(level uint32, atoms []ast.ASTHandle, wantCore,
 		return PropCheckResult{}, err
 	}
 	return p.check(atoms, truth, &level, wantCore, wantModel, false)
+}
+
+// CheckAtLevelAndFormula checks assumptions against a temporary formula while
+// selecting one PDR frame. The temporary formula is rolled back after the
+// check and is not included in the returned assumption core.
+func (p *PropSolver) CheckAtLevelAndFormula(level uint32, atoms []ast.ASTHandle, formula ast.ASTHandle, wantCore, wantModel bool) (PropCheckResult, error) {
+	if err := p.open(); err != nil {
+		return PropCheckResult{}, err
+	}
+	return p.check(atoms, formula, &level, wantCore, wantModel, false)
 }
 
 func (p *PropSolver) CheckAssumptionsAndFormula(atoms []ast.ASTHandle, formula ast.ASTHandle, wantCore, wantModel bool) (PropCheckResult, error) {

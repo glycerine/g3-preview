@@ -61,6 +61,14 @@ func (e *PropositionalEngine) queryPDR(declaration ast.ASTHandle) (lbool.LBool, 
 	if err = context.SetUseFarkas(useFarkas); err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())
 	}
+	inductiveName := "pdr.use_inductive_generalizer"
+	useInductive, err := e.globals.Context.GetBoolName(&fixedpoint, &inductiveName, true)
+	if err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
+	if err = context.SetUseInductiveGeneralizer(useInductive); err != nil {
+		return lbool.Undef, errors.Join(err, context.Close())
+	}
 	background, err := e.manager.RefGet(e.background)
 	if err != nil {
 		return lbool.Undef, errors.Join(err, context.Close())

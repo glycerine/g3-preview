@@ -157,3 +157,27 @@ func TestPredicateTransformerPropagatesGlobalLemmaToInfinity(t *testing.T) {
 	pdrMust(t, owner.Close())
 	pdrMust(t, command.Close())
 }
+
+func TestPredicateTransformerCheckInductiveReturnsSubsetCore(t *testing.T) {
+	command, manager, owner := pdrManagerFixture(t, 1)
+	boolean, err := manager.MkBoolSort()
+	pdrMust(t, err)
+	head := pdrFunction(t, manager, "inductive_core", nil, boolean)
+	transformer, err := pdr.NewPredicateTransformer(owner, head, pdr.ReachableHashCache)
+	pdrMust(t, err)
+	p := pdrBool(t, manager, "inductive_p")
+	q := pdrBool(t, manager, "inductive_q")
+	notP, err := manager.MkNot(p)
+	pdrMust(t, err)
+	truth, err := manager.MkTrue()
+	pdrMust(t, err)
+	pdrMust(t, transformer.InitializeSystem(notP, truth))
+	inductive, assumesLevel, core, err := transformer.CheckInductive(0, []ast.ASTHandle{p, q})
+	pdrMust(t, err)
+	if !inductive || !assumesLevel || len(core) != 1 || core[0] != p {
+		t.Fatal("inductive subset core", inductive, assumesLevel, core)
+	}
+	pdrMust(t, transformer.Close())
+	pdrMust(t, owner.Close())
+	pdrMust(t, command.Close())
+}

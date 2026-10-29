@@ -198,6 +198,11 @@ func TestPropSolverExtractsFarkasTheoryCore(t *testing.T) {
 	if result.Status != lbool.False || result.FarkasCore || len(result.Core) != 2 {
 		t.Fatal("forced subset-core mode", result.Status, result.FarkasCore, result.Core)
 	}
+	result, err = solver.CheckAssumptions([]ast.ASTHandle{xNonnegative, yNonnegative}, true, false)
+	pdrMust(t, err)
+	if result.Status != lbool.False || !result.FarkasCore {
+		t.Fatal("subset-core override was not one-shot", result.Status, result.FarkasCore)
+	}
 
 	pdrMust(t, solver.Close())
 	pdrMust(t, contexts.Close())
